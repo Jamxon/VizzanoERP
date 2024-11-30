@@ -23,7 +23,7 @@ class Models extends Model
         return $this->hasOne(TechnicNorma::class);
     }
 
-    public function orderModels()
+    public function orderModel()
     {
         return $this->hasMany(OrderModel::class);
     }

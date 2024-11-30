@@ -11,8 +11,11 @@ class Order extends Model
 
     protected $fillable = ['name', 'quantity', 'status'];
 
-    public function models()
+    // Order modeli
+    public function orderModels()
     {
-        return $this->hasMany(OrderModel::class);
+        return $this->belongsToMany(Models::class, 'order_models', 'order_id', 'model_id')
+            ->withPivot('quantity'); // Pivot jadvaldagi qo'shimcha ustunlarni olish
     }
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GetOrdersResource;
 use App\Models\Order;
 use App\Models\OrderModel;
 use Illuminate\Http\Request;
@@ -11,16 +12,11 @@ class OrderController extends Controller
     public function index()
     {
         $orders = Order::all();
-        return response()->json([
-            'orders' => $orders,
-        ]);
+        $resource = GetOrdersResource::collection($orders);
+        return response()->json($resource);
     }
     public function store(Request $request)
     {
-          $request->validate([
-                'name' => 'required',
-                'quantity' => 'required',
-            ]);
         $order = Order::create([
             'name' => $request->name,
             'quantity' => $request->quantity,
@@ -42,8 +38,6 @@ class OrderController extends Controller
                 'quantity' => $request->model['quantity'],
             ]);
         }
-
-
             if ($order) {
                 return response()->json([
                     'message' => 'Order created successfully',
