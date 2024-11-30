@@ -11,7 +11,7 @@ class Models extends Model
 
     protected $table = "models";
 
-    protected $fillable = ['name', 'color', 'normalization'];
+    protected $fillable = ['name', 'color'];
 
     public function groups()
     {
@@ -21,5 +21,10 @@ class Models extends Model
     public function technicnormas()
     {
         return $this->hasOne(TechnicNorma::class);
+    }
+
+    public function orderModels()
+    {
+        return $this->hasMany(OrderModel::class);
     }
 }

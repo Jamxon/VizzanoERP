@@ -14,4 +14,14 @@ class OrderModel extends Model
         'model_id',
         'quantity',
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function model()
+    {
+        return $this->belongsTo(Models::class);
+    }
 }
