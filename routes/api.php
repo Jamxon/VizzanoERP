@@ -5,7 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DayController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\LidController;
 use App\Http\Controllers\ModelController;
+use App\Http\Controllers\ModelKartaController;
+use App\Http\Controllers\NormalizationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -30,21 +33,39 @@ Route::middleware('role:supervisor')->group(function () {
     Route::post('orders', [OrderController::class, 'store']);
     Route::patch('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'delete']);
-    Route::patch('changeorderstatus', [OrderController::class, 'changeStatus']);
+    Route::patch('changeorderstatus', [OrderController::class, 'changeOrderStatus']);
     Route::get('models', [ModelController::class, 'index']);
     Route::post('models', [ModelController::class, 'store']);
     Route::patch('models/{model}', [ModelController::class, 'update']);
     Route::delete('models/{model}', [ModelController::class, 'destroy']);
+    Route::get('normalizations', [NormalizationController::class, 'index']);
+    Route::post('normalizations', [NormalizationController::class, 'store']);
+    Route::patch('normalizations/{normalization}', [NormalizationController::class, 'update']);
+    Route::delete('normalizations/{normalization}', [NormalizationController::class, 'destroy']);
+    Route::get('modelkarta', [ModelKartaController::class, 'index']);
+    Route::post('modelkarta', [ModelKartaController::class, 'store']);
+    Route::patch('modelkarta/{model}', [ModelKartaController::class, 'update']);
+    Route::delete('modelkarta/{model}', [ModelKartaController::class, 'destroy']);
 
     Route::get('daily', [DayController::class, 'getDaily']);
     Route::post('daily', [DayController::class, 'store']);
 });
 
+Route::get('lids', [LidController::class, 'index']);
+Route::post('lids', [LidController::class, 'store']);
+Route::patch('lids/{lid}', [LidController::class, 'update']);
+Route::post('lids/search', [LidController::class, 'search']);
+
 Route::get('/validate', function () {
     $user = auth()->user();
+    if ($user->employee->status == "kicked"){
+        return response()->json([
+            'message' => 'You are kicked from the company'
+        ], 401);
+    }
     return response()->json([
         'message' => $user
-    ]);
+    ], 200);
 });
 
 

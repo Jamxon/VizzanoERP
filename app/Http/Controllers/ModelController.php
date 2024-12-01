@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -9,10 +10,8 @@ class ModelController extends Controller
 {
     public function index()
     {
-        $models = Model::all();
-        return response()->json([
-            'models' => $models,
-        ]);
+        $models = Models::all();
+        return response()->json($models);
     }
     public function store(Request $request)
     {
@@ -20,7 +19,7 @@ class ModelController extends Controller
             'name' => 'required',
             'color' => 'required',
         ]);
-        $model = Model::create([
+        $model = Models::create([
             'name' => $request->name,
             'color' => $request->color,
         ]);
@@ -51,7 +50,7 @@ class ModelController extends Controller
             'model' => $model,
         ]);
     }
-    public function destroy(Model $model)
+    public function destroy(Models $model)
     {
         $model->delete();
         return response()->json([
