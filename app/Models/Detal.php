@@ -10,4 +10,9 @@ class Detal extends Model
     use HasFactory;
 
     protected $fillable = ['model_id', 'name'];
+
+    public function model()
+    {
+        return $this->belongsTo(Models::class, 'model_id');
+    }
 }

@@ -15,6 +15,6 @@ class TechnicNorma extends Model
 
     public function model()
     {
-        return $this->belongsTo(Models::class);
+        return $this->belongsTo(Models::class, 'model_id');
     }
 }

@@ -145,6 +145,7 @@ class LidController extends Controller
             'name' => 'required',
             'phone' => 'required',
             'address' => 'required',
+            'status' => 'required',
         ]);
         $lid->name = $request->name;
         $lid->phone = $request->phone;
@@ -188,9 +189,10 @@ class LidController extends Controller
         $request->validate([
             'query' => 'required',
         ]);
-        $lids = Lid::where('name', 'like', '%' . $request->query . '%')
-            ->orWhere('phone', 'like', '%' . $request->query . '%')
-            ->orWhere('address', 'like', '%' . $request->query . '%')
+        $query = $request->input('query');
+        $lids = Lid::where('name', 'like', '%' . $query . '%')
+            ->orWhere('phone', 'like', '%' . $query . '%')
+            ->orWhere('address', 'like', '%' . $query . '%')
             ->get();
         return response()->json($lids);
     }

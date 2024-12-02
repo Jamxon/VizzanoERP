@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DayController;
+use App\Http\Controllers\DetalController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LidController;
@@ -51,6 +52,14 @@ Route::middleware('role:supervisor')->group(function () {
     Route::post('daily', [DayController::class, 'store']);
 });
 
+Route::middleware('role:technologist')->group(function () {
+    Route::get('detals', [DetalController::class, 'index']);
+    Route::post('detals', [DetalController::class, 'store']);
+    Route::patch('detals/{detal}', [DetalController::class, 'update']);
+    Route::delete('detals/{detal}', [DetalController::class, 'delete']);
+    Route::get('detals/{id}', [DetalController::class, 'sortByModel']);
+});
+
 Route::get('lids', [LidController::class, 'index']);
 Route::post('lids', [LidController::class, 'store']);
 Route::patch('lids/{lid}', [LidController::class, 'update']);
@@ -58,11 +67,25 @@ Route::post('lids/search', [LidController::class, 'search']);
 
 Route::get('/validate', function () {
     $user = auth()->user();
-    if ($user->employee->status == "kicked"){
+
+    if (!$user) {
+        return response()->json([
+            'message' => 'Unauthorized: Token is invalid or missing'
+        ], 401);
+    }
+
+    if (!$user->employee) {
+        return response()->json([
+            'message' => 'Unauthorized: Employee data is missing'
+        ], 401);
+    }
+
+    if ($user->employee->status == "kicked") {
         return response()->json([
             'message' => 'You are kicked from the company'
         ], 401);
     }
+
     return response()->json([
         'message' => $user
     ], 200);
