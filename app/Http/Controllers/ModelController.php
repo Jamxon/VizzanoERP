@@ -36,15 +36,9 @@ class ModelController extends Controller
             ]);
         }
     }
-    public function update(Request $request, Model $model)
+    public function update(Request $request, Models $model)
     {
-        $request->validate([
-            'name' => 'required',
-            'color' => 'required',
-        ]);
-        $model->name = $request->name;
-        $model->color = $request->color;
-        $model->save();
+        $model->update($request->all());
         return response()->json([
             'message' => 'Model updated successfully',
             'model' => $model,

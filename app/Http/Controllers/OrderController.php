@@ -11,7 +11,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::all();
+        $orders = Order::orderBy('created_at', 'asc')->get(); // O'sish tartibida
         $resource = GetOrdersResource::collection($orders);
         return response()->json($resource);
     }
@@ -53,16 +53,7 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order)
     {
-        $request->validate([
-            'name' => 'required',
-            'quantity' => 'required',
-            'status' => 'required',
-        ]);
-
-        $order->name = $request->name;
-        $order->quantity = $request->quantity;
-        $order->status = $request->status;
-        $order->save();
+        $order->update($request->all());
 
         return response()->json([
             'message' => 'Order updated successfully',
