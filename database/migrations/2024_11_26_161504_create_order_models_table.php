@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->integer('model_id');
             $table->integer('order_id');
-            $table->integer('quantity');
             $table->timestamps();
         });
     }

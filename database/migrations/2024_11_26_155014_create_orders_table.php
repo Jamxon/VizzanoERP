@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->integer('quantity');
             $table->string('status');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
             $table->timestamps();
         });
     }

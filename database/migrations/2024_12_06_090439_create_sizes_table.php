@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('normal_technic_proccesses', function (Blueprint $table) {
+        Schema::create('sizes', function (Blueprint $table) {
             $table->id();
-            $table->integer('model_id');
-            $table->integer('detal_id');
-            $table->integer('Sekund');
-            $table->integer('razryad_id');
-            $table->integer('Summa');
+            $table->string('name');
+            $table->integer('submodel_id');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('normal_technic_proccesses');
+        Schema::dropIfExists('sizes');
     }
 };

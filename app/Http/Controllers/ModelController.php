@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Models;
+use App\Models\SubModel;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
@@ -17,12 +18,17 @@ class ModelController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'color' => 'required',
         ]);
         $model = Models::create([
             'name' => $request->name,
-            'color' => $request->color,
         ]);
+
+        foreach ($request->submodels as $submodel) {
+            SubModel::create([
+                'name' => $submodel,
+                'model_id' => $model->id,
+            ]);
+        }
 
         if ($model) {
             return response()->json([

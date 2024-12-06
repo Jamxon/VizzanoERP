@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('normalizations', function (Blueprint $table) {
+        Schema::create('order_sub_models', function (Blueprint $table) {
             $table->id();
-            $table->integer('model_id');
-            $table->string('Material name');
-            $table->integer('Quantity');
-            $table->integer('unit_id');
+            $table->integer('order_model_id');
+            $table->integer('submodel_id');
+            $table->integer('size_id');
+            $table->integer('quantity');
+            $table->integer('recipe_id');
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('normalizations');
+        Schema::dropIfExists('order_sub_models');
     }
 };

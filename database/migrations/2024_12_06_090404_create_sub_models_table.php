@@ -9,24 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('model_kartas', function (Blueprint $table) {
+        Schema::create('sub_models', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->integer('model_id');
-            $table->string('material_name');
-            $table->string('image')->nullable();
-            $table->text('comment')->nullable();
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('model_kartas');
+        Schema::dropIfExists('sub_models');
     }
 };

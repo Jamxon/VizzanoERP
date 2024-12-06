@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('daily_groups', function (Blueprint $table) {
+        Schema::create('recipes', function (Blueprint $table) {
             $table->id();
-            $table->integer('work_count');
-            $table->integer('total_work_time');
-            $table->integer('expected_model');
-            $table->integer('group_id');
-            $table->integer('real_model');
-            $table->integer('diff_model');
+            $table->integer('size_id');
+            $table->integer('item_id');
+            $table->integer('color_id');
+            $table->integer('quantity');
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('days');
+        Schema::dropIfExists('recipes');
     }
 };

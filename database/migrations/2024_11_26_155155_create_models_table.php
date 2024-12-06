@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('models', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('color')->nullable();
+            $table->integer('category_id');
             $table->timestamps();
         });
     }

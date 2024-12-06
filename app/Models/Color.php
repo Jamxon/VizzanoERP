@@ -5,20 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Models extends Model
+class Color extends Model
 {
     use HasFactory;
 
-    protected $table = "models";
-
     protected $fillable = ['name'];
-
-    protected $with = ['submodels'];
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    public function submodels()
+    public function recipes()
     {
-        return $this->hasMany(SubModel::class, 'model_id');
+        return $this->hasMany(Recipe::class);
     }
 }
