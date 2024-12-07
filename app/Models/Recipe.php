@@ -19,11 +19,16 @@ class Recipe extends Model
     protected $hidden = [
       'created_at',
       'updated_at',
+        'size_id',
+        'item_id',
+        'color_id',
     ];
+
+    protected $with = ['item', 'color'];
 
     public function size()
     {
-        return $this->belongsTo(Size::class);
+        return $this->belongsTo(Size::class, 'size_id');
     }
 
     public function item()

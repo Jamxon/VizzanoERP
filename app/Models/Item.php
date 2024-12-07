@@ -20,7 +20,12 @@ class Item extends Model
     protected $hidden = [
         'created_at',
         'updated_at',
+        'unit_id',
+        'color_id',
+
     ];
+
+    protected $with = ['unit', 'color'];
 
     public function unit()
     {

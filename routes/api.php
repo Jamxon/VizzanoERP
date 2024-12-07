@@ -6,11 +6,13 @@ use App\Http\Controllers\DayController;
 use App\Http\Controllers\DetalController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\LidController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\ModelKartaController;
 use App\Http\Controllers\NormalizationController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,17 +41,12 @@ Route::middleware('role:supervisor')->group(function () {
     Route::post('models', [ModelController::class, 'store']);
     Route::patch('models/{model}', [ModelController::class, 'update']);
     Route::delete('models/{model}', [ModelController::class, 'destroy']);
-    Route::get('normalizations', [NormalizationController::class, 'index']);
-    Route::post('normalizations', [NormalizationController::class, 'store']);
-    Route::patch('normalizations/{normalization}', [NormalizationController::class, 'update']);
-    Route::delete('normalizations/{normalization}', [NormalizationController::class, 'destroy']);
-    Route::get('modelkarta', [ModelKartaController::class, 'index']);
-    Route::post('modelkarta', [ModelKartaController::class, 'store']);
-    Route::patch('modelkarta/{model}', [ModelKartaController::class, 'update']);
-    Route::delete('modelkarta/{model}', [ModelKartaController::class, 'destroy']);
-
-    Route::get('daily', [DayController::class, 'getDaily']);
-    Route::post('daily', [DayController::class, 'store']);
+    Route::post('items', [ItemController::class, 'store']);
+    Route::patch('items/{item}', [ItemController::class, 'update']);
+    Route::get('items', [ItemController::class, 'index']);
+    Route::post('recipes', [RecipeController::class, 'store']);
+    Route::patch('recipes/{recipe}', [RecipeController::class, 'update']);
+    Route::get('submodels', [\App\Http\Controllers\SubModelController::class, 'index']);
 });
 
 Route::middleware('role:technologist')->group(function () {

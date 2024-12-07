@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Models;
+use App\Models\Size;
 use App\Models\SubModel;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 
 class ModelController extends Controller
@@ -24,10 +24,16 @@ class ModelController extends Controller
         ]);
 
         foreach ($request->submodels as $submodel) {
-            SubModel::create([
-                'name' => $submodel,
+            $submodelCreate =  SubModel::create([
+                'name' => $submodel['name'],
                 'model_id' => $model->id,
             ]);
+            foreach ($submodel['sizes'] as $size) {
+                Size::create([
+                    'name' => $size,
+                    'submodel_id' => $submodelCreate->id,
+                ]);
+            }
         }
 
         if ($model) {

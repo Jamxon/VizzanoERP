@@ -13,15 +13,17 @@ class Size extends Model
 
     protected $fillable = ['name', 'submodel_id'];
 
-    protected $hidden = ['created_at', 'updated_at'];
+    protected $with = ['recipes'];
+
+    protected $hidden = ['created_at', 'updated_at', 'submodel_id'];
 
     public function submodel()
     {
-        return $this->belongsTo(Submodel::class);
+        return $this->belongsTo(Submodel::class, 'submodel_id');
     }
 
     public function recipes()
     {
-        return $this->hasMany(Recipe::class);
+        return $this->hasMany(Recipe::class, 'size_id');
     }
 }
