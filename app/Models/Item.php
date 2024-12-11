@@ -15,6 +15,8 @@ class Item extends Model
         'unit_id',
         'color_id',
         'image',
+        'type_id',
+        'code'
     ];
 
     protected $hidden = [
@@ -22,10 +24,10 @@ class Item extends Model
         'updated_at',
         'unit_id',
         'color_id',
-
+        'type_id'
     ];
 
-    protected $with = ['unit', 'color'];
+    protected $with = ['unit', 'color', 'type'];
 
     public function unit()
     {
@@ -40,5 +42,10 @@ class Item extends Model
     public function recipes()
     {
         return $this->hasMany(Recipe::class);
+    }
+
+    public function type()
+    {
+        return $this->belongsTo(ItemType::class, 'type_id');
     }
 }

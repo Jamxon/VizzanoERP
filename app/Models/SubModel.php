@@ -13,7 +13,7 @@ class SubModel extends Model
 
     protected $fillable = ['name','model_id'];
 
-    protected $with = ['sizes'];
+    protected $with = ['sizes', 'modelColors'];
 
     protected $hidden = ['created_at', 'updated_at', 'model_id'];
 
@@ -25,5 +25,10 @@ class SubModel extends Model
     public function sizes()
     {
         return $this->hasMany(Size::class, 'submodel_id');
+    }
+
+    public function modelColors()
+    {
+        return $this->hasMany(ModelColor::class, 'submodel_id');
     }
 }

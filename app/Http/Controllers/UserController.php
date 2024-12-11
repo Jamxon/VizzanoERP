@@ -9,8 +9,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
+use App\Exports\EmployersExport;
+use Maatwebsite\Excel\Facades\Excel;
 class UserController extends Controller
 {
+
+    public function export()
+    {
+        return Excel::download(new EmployersExport, 'employers.xlsx');
+    }
+
     public function getUserRole()
     {
         // Foydalanuvchining autentifikatsiyasi amalga oshirilganini tekshirish

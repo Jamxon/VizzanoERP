@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetOrdersResource;
 use App\Models\Order;
 use App\Models\OrderModel;
+use App\Models\OrderSubModel;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -25,11 +26,21 @@ class OrderController extends Controller
 
         if (count($request->models) > 1) {
             foreach ($request->models as $model) {
-                OrderModel::create([
+                $orderModel =  OrderModel::create([
                     'order_id' => $order->id,
                     'model_id' => $model['id'],
                     'quantity' => $model['quantity'],
                 ]);
+
+                foreach ($model['submodels'] as $submodel) {
+                    OrderSubModel::create([
+                        'order_model_id' => $orderModel->id,
+                        'submodel_id' => $submodel['id'],
+                        'quantity' => $submodel['quantity'],
+                        'size_id' => $submodel['size_id'],
+                        'recipe_id' => $submodel['recipe_id'],
+                    ]);
+                }
             }
         } else {
             OrderModel::create([
@@ -86,3 +97,5 @@ class OrderController extends Controller
         ]);
     }
 }
+
+

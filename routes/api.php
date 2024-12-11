@@ -2,17 +2,21 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ColorController;
 use App\Http\Controllers\DayController;
 use App\Http\Controllers\DetalController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\LidController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\ModelKartaController;
 use App\Http\Controllers\NormalizationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\SubModelController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -39,14 +43,38 @@ Route::middleware('role:supervisor')->group(function () {
     Route::patch('changeorderstatus', [OrderController::class, 'changeOrderStatus']);
     Route::get('models', [ModelController::class, 'index']);
     Route::post('models', [ModelController::class, 'store']);
+    Route::get('models/{model}', [ModelController::class, 'show']);
     Route::patch('models/{model}', [ModelController::class, 'update']);
     Route::delete('models/{model}', [ModelController::class, 'destroy']);
     Route::post('items', [ItemController::class, 'store']);
     Route::patch('items/{item}', [ItemController::class, 'update']);
     Route::get('items', [ItemController::class, 'index']);
+    Route::get('itemtypes', [ItemTypeController::class, 'index']);
+    Route::post('itemtypes/{itemType}', [ItemTypeController::class, 'store']);
+    Route::patch('itemtypes/{itemType}', [ItemTypeController::class, 'update']);
+    Route::delete('itemtypes/{itemType}', [ItemTypeController::class, 'destroy']);
+    Route::get('recipes', [RecipeController::class, 'show']);
     Route::post('recipes', [RecipeController::class, 'store']);
     Route::patch('recipes/{recipe}', [RecipeController::class, 'update']);
-    Route::get('submodels', [\App\Http\Controllers\SubModelController::class, 'index']);
+    Route::delete('recipes/{recipe}', [RecipeController::class, 'destroy']);
+    Route::get('submodels', [SubModelController::class, 'index']);
+    Route::get('units', [UnitController::class, 'index']);
+    Route::post('units', [UnitController::class, 'store']);
+    Route::patch('units/{unit}', [UnitController::class, 'update']);
+    Route::delete('units/{unit}', [UnitController::class, 'destroy']);
+    Route::get('colors', [ColorController::class, 'index']);
+    Route::post('colors', [ColorController::class, 'store']);
+    Route::patch('colors/{color}', [ColorController::class, 'update']);
+    Route::delete('colors/{color}', [ColorController::class, 'destroy']);
+    Route::get('/export-items/supervisor', [ItemController::class, 'export']);
+});
+
+Route::middleware('role:hr')->group(function (){
+   Route::get('export-employees', [UserController::class, 'export']);
+});
+
+Route::middleware('role:omborchi')->group(function () {
+    Route::get('/export-items', [ItemController::class, 'export']);
 });
 
 Route::middleware('role:technologist')->group(function () {

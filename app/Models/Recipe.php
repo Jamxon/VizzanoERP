@@ -10,34 +10,34 @@ class Recipe extends Model
     use HasFactory;
 
     protected $fillable = [
-      'size_id',
       'item_id',
-      'color_id',
+      'model_color_id',
       'quantity',
+        'size_id',
     ];
 
     protected $hidden = [
       'created_at',
       'updated_at',
-        'size_id',
         'item_id',
-        'color_id',
+        'size_id',
+        'model_color_id',
     ];
 
-    protected $with = ['item', 'color'];
-
-    public function size()
-    {
-        return $this->belongsTo(Size::class, 'size_id');
-    }
+    protected $with = ['item', 'modelColor', 'size'];
 
     public function item()
     {
         return $this->belongsTo(Item::class);
     }
 
-    public function color()
+    public function modelColor()
     {
-        return $this->belongsTo(Color::class);
+        return $this->belongsTo(ModelColor::class, 'model_color_id');
+    }
+
+    public function size()
+    {
+        return $this->belongsTo(Size::class);
     }
 }

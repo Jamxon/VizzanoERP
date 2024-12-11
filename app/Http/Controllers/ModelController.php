@@ -14,11 +14,17 @@ class ModelController extends Controller
         $models = Models::all();
         return response()->json($models);
     }
+
+    public function show(Models $model)
+    {
+        return response()->json($model);
+    }
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required',
         ]);
+
         $model = Models::create([
             'name' => $request->name,
         ]);

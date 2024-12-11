@@ -23,7 +23,6 @@ class CheckRole
 
         // Foydalanuvchi rolini tekshiramiz
         $user = Auth::user();
-
         if ($user->role->name !== $role) {
             return response('Not allowed', 403); // Foydalanuvchi berilgan rolni bajarishi kerak
         }
