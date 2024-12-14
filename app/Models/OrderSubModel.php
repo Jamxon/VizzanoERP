@@ -16,7 +16,7 @@ class OrderSubModel extends Model
         'submodel_id',
         'size_id',
         'quantity',
-        'recipe_id',
+        'model_color_id',
     ];
 
     protected $hidden = [
@@ -37,10 +37,5 @@ class OrderSubModel extends Model
     public function size()
     {
         return $this->belongsTo(Size::class);
-    }
-
-    public function recipe()
-    {
-        return $this->belongsTo(Recipe::class);
     }
 }

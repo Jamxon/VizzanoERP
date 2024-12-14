@@ -13,18 +13,22 @@ class Recipe extends Model
       'item_id',
       'model_color_id',
       'quantity',
-        'size_id',
+      'size_id'
     ];
 
     protected $hidden = [
       'created_at',
       'updated_at',
-        'item_id',
-        'size_id',
-        'model_color_id',
+      'item_id',
+      'size_id',
+      'model_color_id',
     ];
 
-    protected $with = ['item', 'modelColor', 'size'];
+    protected $with = [
+        'item',
+        'modelColor',
+        'size'
+    ];
 
     public function item()
     {
@@ -39,5 +43,10 @@ class Recipe extends Model
     public function size()
     {
         return $this->belongsTo(Size::class);
+    }
+
+    public function getTotalPriceAttribute()
+    {
+        return $this->item->price * $this->quantity;
     }
 }

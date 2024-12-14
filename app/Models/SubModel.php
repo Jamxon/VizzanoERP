@@ -31,4 +31,9 @@ class SubModel extends Model
     {
         return $this->hasMany(ModelColor::class, 'submodel_id');
     }
+
+    public function details()
+    {
+        return $this->hasMany(Detail::class, 'submodel_id');
+    }
 }

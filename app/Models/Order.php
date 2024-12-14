@@ -11,11 +11,13 @@ class Order extends Model
 
     protected $fillable = ['name', 'quantity', 'status','start_date','end_date'];
 
-    // Order modeli
+    protected $hidden = ['created_at', 'updated_at'];
+
+    protected $with = ['orderModels'];
+
     public function orderModels()
     {
-        return $this->belongsToMany(Models::class, 'order_models', 'order_id', 'model_id')
-            ->withPivot('quantity'); // Pivot jadvaldagi qo'shimcha ustunlarni olish
+        return $this->hasMany(OrderModel::class, 'order_id');
     }
 
 }

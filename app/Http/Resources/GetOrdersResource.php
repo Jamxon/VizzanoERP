@@ -17,13 +17,11 @@ class GetOrdersResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'quantity' => $this->quantity,
             'status' => $this->status,
             'order_models' => $this->orderModels->map(function ($model) {
                 return [
                     'id' => $model->id,
                     'name' => $model->name,
-                    'quantity' => $model->pivot->quantity, // Pivot jadvaldan 'quantity' ustuni
                 ];
             }),
         ];

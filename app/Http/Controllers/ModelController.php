@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ModelColor;
 use App\Models\Models;
 use App\Models\Size;
 use App\Models\SubModel;
@@ -40,6 +41,12 @@ class ModelController extends Controller
                     'submodel_id' => $submodelCreate->id,
                 ]);
             }
+            foreach ($submodel['colors'] as $color) {
+                ModelColor::create([
+                    'color_id' => $color,
+                    'submodel_id' => $submodelCreate->id,
+                ]);
+            }
         }
 
         if ($model) {
@@ -54,14 +61,54 @@ class ModelController extends Controller
             ]);
         }
     }
-    public function update(Request $request, Models $model)
+    public function update(Request $request, $id)
     {
-        $model->update($request->all());
+        $request->validate([
+            'name' => 'required',
+        ]);
+
+        $model = Models::findOrFail($id);
+        $model->update([
+            'name' => $request->name,
+        ]);
+
+        foreach ($model->submodels as $submodel) {
+            foreach ($submodel->sizes as $size) {
+                $size->delete();
+            }
+            foreach ($submodel->modelColors as $color) {
+                $color->delete();
+            }
+            $submodel->delete();
+        }
+
+        foreach ($request->submodels as $submodel) {
+            $submodelCreate = SubModel::create([
+                'name' => $submodel['name'],
+                'model_id' => $model->id,
+            ]);
+
+            foreach ($submodel['sizes'] as $size) {
+                Size::create([
+                    'name' => $size,
+                    'submodel_id' => $submodelCreate->id,
+                ]);
+            }
+
+            foreach ($submodel['colors'] as $color) {
+                ModelColor::create([
+                    'color_id' => $color,
+                    'submodel_id' => $submodelCreate->id,
+                ]);
+            }
+        }
+
         return response()->json([
             'message' => 'Model updated successfully',
             'model' => $model,
         ]);
     }
+
     public function destroy(Models $model)
     {
         $model->delete();

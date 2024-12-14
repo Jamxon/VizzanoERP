@@ -1,24 +1,19 @@
 <?php
 
-use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
-use App\Http\Controllers\DayController;
-use App\Http\Controllers\DetalController;
-use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\DetailController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\LidController;
 use App\Http\Controllers\ModelController;
-use App\Http\Controllers\ModelKartaController;
-use App\Http\Controllers\NormalizationController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RazryadController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+
 Route::middleware('role:supervisor')->group(function () {
     Route::get('groups', [GroupController::class, 'index']);
     Route::post('groups',[GroupController::class, 'store']);
@@ -54,6 +50,7 @@ Route::middleware('role:supervisor')->group(function () {
     Route::patch('itemtypes/{itemType}', [ItemTypeController::class, 'update']);
     Route::delete('itemtypes/{itemType}', [ItemTypeController::class, 'destroy']);
     Route::get('recipes', [RecipeController::class, 'show']);
+    Route::get('getrecipes', [RecipeController::class, 'getRecipe']);
     Route::post('recipes', [RecipeController::class, 'store']);
     Route::patch('recipes/{recipe}', [RecipeController::class, 'update']);
     Route::delete('recipes/{recipe}', [RecipeController::class, 'destroy']);
@@ -66,6 +63,10 @@ Route::middleware('role:supervisor')->group(function () {
     Route::post('colors', [ColorController::class, 'store']);
     Route::patch('colors/{color}', [ColorController::class, 'update']);
     Route::delete('colors/{color}', [ColorController::class, 'destroy']);
+    Route::get('razryads', [RazryadController::class, 'index']);
+    Route::post('razryads', [RazryadController::class, 'store']);
+    Route::patch('razryads/{razryad}', [RazryadController::class, 'update']);
+    Route::delete('razryads/{razryad}', [RazryadController::class, 'destroy']);
     Route::get('/export-items/supervisor', [ItemController::class, 'export']);
 });
 
@@ -78,11 +79,10 @@ Route::middleware('role:omborchi')->group(function () {
 });
 
 Route::middleware('role:technologist')->group(function () {
-    Route::get('detals', [DetalController::class, 'index']);
-    Route::post('detals', [DetalController::class, 'store']);
-    Route::patch('detals/{detal}', [DetalController::class, 'update']);
-    Route::delete('detals/{detal}', [DetalController::class, 'delete']);
-    Route::get('detals/{id}', [DetalController::class, 'sortByModel']);
+    Route::get('details',[DetailController::class, 'index']);
+    Route::post('details',[DetailController::class, 'store']);
+    Route::patch('details/{detail}',[DetailController::class, 'update']);
+    Route::delete('details/{detail}',[DetailController::class, 'delete']);
 });
 
 Route::get('lids', [LidController::class, 'index']);
@@ -119,10 +119,3 @@ Route::get('/validate', function () {
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
-
-
-Route::middleware(['jwt.auth'])->group(function () {
-    Route::get('/profile', function () {
-        return response()->json(auth()->user());
-    });
-});

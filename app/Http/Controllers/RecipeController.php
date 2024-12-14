@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GetRecipesResource;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
 
@@ -15,6 +16,27 @@ class RecipeController extends Controller
             ->get();
         return response()->json($recipe);
     }
+
+    public function getRecipe(Request $request)
+    {
+        $query = Recipe::with(['item.unit', 'item.color', 'item.type'])
+            ->where('model_color_id', $request->model_color_id)
+            ->where('size_id', $request->size_id);
+
+        $totalSum = $query->get()->sum(function ($recipe) {
+            return $recipe->item->price * $recipe->quantity;
+        });
+
+        $recipes = $query->orderBy('updated_at', 'desc')->get();
+        $resource = GetRecipesResource::collection($recipes);
+
+        return response()->json([
+            'recipes' => $resource,
+            'total_sum' => $totalSum,
+        ]);
+    }
+
+
     public function store(Request $request)
     {
         $request->validate([
