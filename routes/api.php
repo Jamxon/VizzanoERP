@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
+use App\Http\Controllers\DetailCategoryController;
 use App\Http\Controllers\DetailController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
@@ -15,17 +16,6 @@ use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 Route::middleware('role:supervisor')->group(function () {
     Route::get('groups', [GroupController::class, 'index']);
@@ -79,10 +69,17 @@ Route::middleware('role:omborchi')->group(function () {
 });
 
 Route::middleware('role:technologist')->group(function () {
+    Route::get('/export-items', [ItemController::class, 'export']);
+    Route::get('models', [ModelController::class, 'index']);
+    Route::get('models/{model}', [ModelController::class, 'show']);
     Route::get('details',[DetailController::class, 'index']);
     Route::post('details',[DetailController::class, 'store']);
     Route::patch('details/{detail}',[DetailController::class, 'update']);
     Route::delete('details/{detail}',[DetailController::class, 'delete']);
+    Route::get('detailcategories', [DetailCategoryController::class, 'index']);
+    Route::post('detailcategories', [DetailCategoryController::class, 'store']);
+    Route::patch('detailcategories/{detailCategory}', [DetailCategoryController::class, 'update']);
+    Route::delete('detailcategories/{detailCategory}', [DetailCategoryController::class, 'delete']);
 });
 
 Route::get('lids', [LidController::class, 'index']);

@@ -1,16 +1,18 @@
 <?php
+
 namespace App\Exports;
 
 use App\Models\Item;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithDrawings;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-use Illuminate\Support\Facades\File;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use Maatwebsite\Excel\Events\AfterSheet;
 
-class ItemsExport implements FromCollection, WithHeadings, WithDrawings
+class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEvents
 {
     public function collection()
     {
@@ -53,12 +55,11 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings
             if (str_starts_with($item->image, 'images/')) {
                 $imagePath = public_path('storage/' . $item->image);
             } elseif (str_starts_with($item->image, 'rasmlar/')) {
-                $remoteImageUrl = 'http://192.168.0.117:2004/media/' . $item->image;
+                $remoteImageUrl = 'http://192.168.0.119:2004/media/' . $item->image;
                 $tempImagePath = storage_path('app/public/images/' . basename($item->image));
 
                 // URL orqali rasmni yuklab olish
                 if (!File::exists($tempImagePath)) {
-                    // Agar fayl mavjud bo'lmasa, rasmni yuklab olish
                     file_put_contents($tempImagePath, file_get_contents($remoteImageUrl));
                 }
 
@@ -67,13 +68,12 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings
                 continue;
             }
 
-            // Fayl mavjudligini tekshirish
             if (file_exists($imagePath)) {
                 $drawing = new Drawing();
-                $drawing->setPath($imagePath); // To‘g‘ri rasm yo‘li
-                $drawing->setHeight(30); // Rasm balandligi
-                $drawing->setWidth(30); //
-                $drawing->setCoordinates('C' . ($index + 2)); // Exceldagi koordinatalar (C ustuni)
+                $drawing->setPath($imagePath);
+                $drawing->setHeight(80); // Rasm balandligi
+                $drawing->setWidth(80);  // Rasm kengligi
+                $drawing->setCoordinates('C' . ($index + 2)); // Excel koordinatalari (C ustuni)
                 $drawings[] = $drawing;
             }
         }
@@ -81,24 +81,43 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings
         return $drawings;
     }
 
-    public function sheet(Spreadsheet $spreadsheet)
+    public function registerEvents(): array
     {
-        // Access the active sheet
-        $sheet = $spreadsheet->getActiveSheet();
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
 
-        // Set column width
-        $sheet->getColumnDimension('A')->setWidth(100);  // Column A
-        $sheet->getColumnDimension('B')->setWidth(200);  // Column B
-        $sheet->getColumnDimension('C')->setWidth(300);  // Column C
-        $sheet->getColumnDimension('D')->setWidth(150);  // Column D
-        $sheet->getColumnDimension('E')->setWidth(150);  // Column E
-        $sheet->getColumnDimension('F')->setWidth(150);  // Column F
-        $sheet->getColumnDimension('G')->setWidth(150);  // Column G
-        $sheet->getColumnDimension('H')->setWidth(150);  // Column H
+                // Ustun kengliklarini sozlash
+                $sheet->getColumnDimension('A')->setWidth(10);  // Column A
+                $sheet->getColumnDimension('B')->setWidth(25);  // Column B
+                $sheet->getColumnDimension('C')->setWidth(20);  // Column C
+                $sheet->getColumnDimension('D')->setWidth(20);  // Column D
+                $sheet->getColumnDimension('E')->setWidth(15);  // Column E
+                $sheet->getColumnDimension('F')->setWidth(15);  // Column F
+                $sheet->getColumnDimension('G')->setWidth(15);  // Column G
+                $sheet->getColumnDimension('H')->setWidth(15);  // Column H
 
-        // Set row height
-        for ($row = 2; $row <= count($this->collection()) + 1; $row++) {
-            $sheet->getRowDimension($row)->setRowHeight(40);  // Set height of each row
-        }
+                // Har bir qatorning balandligini sozlash
+                $rowCount = Item::count() + 1; // Barcha qatorlar soni (header + ma'lumotlar)
+                for ($row = 2; $row <= $rowCount; $row++) {
+                    $sheet->getRowDimension($row)->setRowHeight(60); // Qator balandligi
+                }
+
+                // Matnni o‘rtaga joylashtirish
+                $sheet->getStyle('A1:H' . $rowCount)->getAlignment()->applyFromArray([
+                    'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                    'wrapText' => true,
+                ]);
+
+                // Headerlar uchun qo'shimcha dizayn
+                $sheet->getStyle('A1:H1')->applyFromArray([
+                    'font' => [
+                        'bold' => true,
+                        'size' => 12,
+                    ],
+                ]);
+            },
+        ];
     }
 }
