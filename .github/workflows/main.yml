@@ -1,26 +1,16 @@
-name: Deploy to FTP Server
-
-on:
-  push:
-    branches:
-      - main  # yoki sizning asosiy branch nomingiz
-
+on: push
+name: 🚀 Deploy website on push
 jobs:
-  deploy:
+  web-deploy:
+    name: 🎉 Deploy
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
 
-      - name: Install FTP Client
-        run: sudo apt-get install -y ftp
-
-      - name: Deploy Laravel project to FTP server
-        run: |
-          ftp -inv ${{ secrets.FTP_SERVER }} <<EOF
-          user ${{ secrets.FTP_USERNAME }} ${{ secrets.FTP_PASSWORD }}
-          cd /home/jamkhan/VizzanoERP
-          mput -r *
-          bye
-          EOF
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
