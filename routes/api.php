@@ -77,6 +77,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::get('applications/{model_id}',[TechnologController::class, 'getByModelId']);
     Route::post('applications', [TechnologController::class, 'storeApplication']);
     Route::patch('applications/{application}', [TechnologController::class, 'updateApplication']);
+    Route::delete('applications/{application}', [TechnologController::class, 'destroy']);
 });
 
 Route::get('lids', [LidController::class, 'index']);

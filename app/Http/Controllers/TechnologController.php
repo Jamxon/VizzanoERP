@@ -99,4 +99,10 @@ class TechnologController extends Controller
         $application->update($request->all());
         return response()->json($application, 200);
     }
+
+    public function destroy(Application $application)
+    {
+        $application->delete();
+        return response()->json(null, 204);
+    }
 }
