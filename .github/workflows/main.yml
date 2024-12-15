@@ -18,10 +18,9 @@ jobs:
 
       - name: Deploy Laravel project to FTP server
         run: |
-          # FTP ulanishi va fayl yuborish
           ftp -inv ${{ secrets.FTP_SERVER }} <<EOF
           user ${{ secrets.FTP_USERNAME }} ${{ secrets.FTP_PASSWORD }}
-          cd /home/jamkhan/VizzanoERP  # Laravel loyihasi joylashgan serverdagi katalog
-          mput -r *  # Butun loyihani yuboradi
+          cd /home/jamkhan/VizzanoERP
+          mput -r *
           bye
           EOF
