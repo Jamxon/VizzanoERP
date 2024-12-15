@@ -10,28 +10,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Fayllarni ro'yxatini olish
+      # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # List files in the project directory
       - name: List files in the project directory
         run: ls -la ./VizzanoERP
 
-      # Arxivlash jarayoni
+      # Create a tar archive of the files
       - name: Create tar archive
         run: |
           tar -cvf /tmp/project_archive.tar ./VizzanoERP/*
 
-      # FTP serverga ulanish va fayllarni uzatish
+      # Upload to FTP server using appleboy/ftp-action
       - name: Upload to FTP server
-        uses: sebastianpopp/ftp-deploy-action@v1.0.0
+        uses: appleboy/ftp-action@v1.2.0
         with:
-          host: ${{ secrets.FTP_HOST }}        # FTP server manzili
-          username: ${{ secrets.FTP_USERNAME }}  # FTP foydalanuvchi nomi
-          password: ${{ secrets.FTP_PASSWORD }}  # FTP parol
-          port: 22                              # Port (odatda 22)
-          source: /tmp/project_archive.tar      # Arxivlangan fayl manzili
-          target: "/home/ftpuser/destination_folder"  # FTP serverdagi target manzil
+          host: ${{ secrets.FTP_SERVER }}        # FTP server host
+          username: ${{ secrets.FTP_USERNAME }}  # FTP username
+          password: ${{ secrets.FTP_PASSWORD }}  # FTP password
+          port: 22                              # FTP port (usually 22 for SFTP)
+          source: /tmp/project_archive.tar      # Path to the tar archive
+          target: "/home/ftpuser/destination_folder"  # FTP target directory
           timeout: 30s
           command_timeout: 10m
           use_insecure_cipher: false
@@ -39,6 +40,3 @@ jobs:
           debug: true
           strip_components: 0
           overwrite: false
-          proxy_port: 22
-          proxy_timeout: 30s
-          proxy_use_insecure_cipher: false
