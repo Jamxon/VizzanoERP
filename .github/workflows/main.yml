@@ -25,7 +25,7 @@ jobs:
           if [ -d "./VizzanoERP" ]; then
             tar -cvf /tmp/project_archive.tar ./VizzanoERP/*
           else
-            echo "Directory ./VizzanoERP not found."
+            echo "Directory ../VizzanoERP not found."
             exit 1
           fi
 
