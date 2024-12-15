@@ -11,7 +11,7 @@ jobs:
       - name: 📂 Sync files via SFTP
         uses: SamKirkland/FTP-Deploy-Action@4.0.0
         with:
-          host: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
-          key: ${{ secrets.FTP_PASSWORD }} # If you're using a private key for authentication
           port: 22
+          server: ${{ secrets.FTP_SERVER }}
+          password: ${{ secrets.FTP_PASSWORD }}
