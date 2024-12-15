@@ -17,3 +17,7 @@ jobs:
             exclude: .git/**
             passive: true
             debug: true
+            port: 21
+            localDir: ./VizzanoERP/*
+            remoteDir: /public_html/vizzanoerp/
+            
