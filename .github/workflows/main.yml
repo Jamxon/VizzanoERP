@@ -1,60 +1,16 @@
-name: Deploy to FTP Server
-
-on:
-  push:
-    branches:
-      - main
-
+on: push
+name: 🚀 Deploy website on push
 jobs:
-  deploy:
+  web-deploy:
+    name: 🎉 Deploy
     runs-on: ubuntu-latest
-
     steps:
-      # Repozitoriyani olish
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v3
 
-      # Barcha fayllarni ko'rsatish
-      - name: List all files
-        run: |
-          echo "Listing all files in the current directory"
-          ls -la
-
-      # VizzanoERP papkasini tekshirish
-      - name: Check if VizzanoERP exists
-        run: |
-          if [ -d "./VizzanoERP" ]; then
-            echo "VizzanoERP directory exists!"
-          else
-            echo "VizzanoERP directory does not exist!"
-            exit 1
-          fi
-
-      # Tar arxivini yaratish
-      - name: Create tar archive
-        run: |
-          if [ -d "./VizzanoERP" ]; then
-            echo "Creating archive from VizzanoERP..."
-            tar -cvf /tmp/VizzanoERP.tar ./VizzanoERP/*
-          else
-            echo "VizzanoERP directory not found."
-            exit 1
-          fi
-
-      # FTPga yuklash
-      - name: Upload to FTP server
-        uses: appleboy/ftp-action@v1.2.0
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
-          host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          source: /tmp/VizzanoERP.tar
-          target: "/home/ftpuser/destination_folder"
-          timeout: 30s
-          command_timeout: 10m
-          use_insecure_cipher: false
-          rm: false
-          debug: true
-          strip_components: 0
-          overwrite: false
+          server: {{ FTP_SERVER }}
+          username: {{ FTP_USERNAME }}
+          password: {{ FTP_PASSWORD }}
