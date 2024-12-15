@@ -36,4 +36,9 @@ class SubModel extends Model
     {
         return $this->hasMany(Detail::class, 'submodel_id');
     }
+
+    public function liningPreparations()
+    {
+        return $this->hasMany(LiningPreparation::class, 'submodel_id');
+    }
 }

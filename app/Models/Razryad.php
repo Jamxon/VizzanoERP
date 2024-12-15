@@ -11,4 +11,11 @@ class Razryad extends Model
 
 
     protected $fillable = ['name', 'salary'];
+
+    protected $hidden = ['created_at', 'updated_at'];
+
+    public function liningApplications()
+    {
+        return $this->hasMany(LiningApplication::class, 'razryad_id');
+    }
 }

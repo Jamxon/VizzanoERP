@@ -13,6 +13,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RazryadController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SubModelController;
+use App\Http\Controllers\TechnologController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -57,7 +58,7 @@ Route::middleware('role:supervisor')->group(function () {
     Route::post('razryads', [RazryadController::class, 'store']);
     Route::patch('razryads/{razryad}', [RazryadController::class, 'update']);
     Route::delete('razryads/{razryad}', [RazryadController::class, 'destroy']);
-    Route::get('/export-items/supervisor', [ItemController::class, 'export']);
+    Route::get('export-items/supervisor', [ItemController::class, 'export']);
 });
 
 Route::middleware('role:hr')->group(function (){
@@ -65,21 +66,17 @@ Route::middleware('role:hr')->group(function (){
 });
 
 Route::middleware('role:omborchi')->group(function () {
-    Route::get('/export-items', [ItemController::class, 'export']);
+    Route::get('export-items/omborchi', [ItemController::class, 'export']);
 });
 
 Route::middleware('role:technologist')->group(function () {
-    Route::get('/export-items', [ItemController::class, 'export']);
+    Route::get('export-items/technologist', [ItemController::class, 'export']);
     Route::get('models', [ModelController::class, 'index']);
     Route::get('models/{model}', [ModelController::class, 'show']);
-    Route::get('details',[DetailController::class, 'index']);
-    Route::post('details',[DetailController::class, 'store']);
-    Route::patch('details/{detail}',[DetailController::class, 'update']);
-    Route::delete('details/{detail}',[DetailController::class, 'delete']);
-    Route::get('detailcategories', [DetailCategoryController::class, 'index']);
-    Route::post('detailcategories', [DetailCategoryController::class, 'store']);
-    Route::patch('detailcategories/{detailCategory}', [DetailCategoryController::class, 'update']);
-    Route::delete('detailcategories/{detailCategory}', [DetailCategoryController::class, 'delete']);
+    Route::get('applications', [TechnologController::class, 'getApplication']);
+    Route::get('applications/{model_id}',[TechnologController::class, 'getByModelId']);
+    Route::post('applications', [TechnologController::class, 'storeApplication']);
+    Route::patch('applications/{application}', [TechnologController::class, 'updateApplication']);
 });
 
 Route::get('lids', [LidController::class, 'index']);

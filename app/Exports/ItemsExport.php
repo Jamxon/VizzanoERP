@@ -55,7 +55,7 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEve
             if (str_starts_with($item->image, 'images/')) {
                 $imagePath = public_path('storage/' . $item->image);
             } elseif (str_starts_with($item->image, 'rasmlar/')) {
-                $remoteImageUrl = 'http://192.168.0.119:2004/media/' . $item->image;
+                $remoteImageUrl = 'http://192.168.0.102:2004/media/' . $item->image;
                 $tempImagePath = storage_path('app/public/images/' . basename($item->image));
 
                 // URL orqali rasmni yuklab olish

@@ -20,21 +20,17 @@ class ItemController extends Controller
 
     public function export()
     {
-        // Oldindan mavjud faylni o'chirish
         $filePath = storage_path('app/public/materiallar.xlsx');
         if (file_exists($filePath)) {
             unlink($filePath);  // Faylni o'chirish
         }
 
-        // Faylni queue orqali eksport qilish
         Excel::queue(new ItemsExport, 'public/materiallar.xlsx')->chain([
             new NotifyUserOfCompletedExport(auth()->user())
         ]);
 
-        // Fayl URLini olish
         $fileUrl = url('storage/materiallar.xlsx');  // public diskda materiallar.xlsx fayl URLini olish
 
-        // Javob yuborish
         return response()->json([
             'message' => 'Eksport jarayoni navbatga yuborildi.',
             'fileUrl' => $fileUrl,  // Fayl URLini yuborish
