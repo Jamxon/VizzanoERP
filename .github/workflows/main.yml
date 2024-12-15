@@ -1,20 +1,44 @@
-on: push
-name: 🚀 Deploy website via SFTP
+name: Deploy to FTP Server
+
+on:
+  push:
+    branches:
+      - main
 
 jobs:
-  sftp-deploy:
-    name: 🎉 SFTP Deploy
+  deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: 🚚 Get latest code
-        uses: actions/checkout@v3
 
-      - name: 📂 Upload files via SFTP
-        uses: appleboy/scp-action@v0.1.0
+    steps:
+      # Fayllarni ro'yxatini olish
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: List files in the project directory
+        run: ls -la ./VizzanoERP
+
+      # Arxivlash jarayoni
+      - name: Create tar archive
+        run: |
+          tar -cvf /tmp/project_archive.tar ./VizzanoERP/*
+
+      # FTP serverga ulanish va fayllarni uzatish
+      - name: Upload to FTP server
+        uses: sebastianpopp/ftp-deploy-action@v1.0.0
         with:
-          host: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 22
-          source: "/Users/uzmacbook/Desktop/VizzanoERP/*"
-          target: "home/ftpuser"
+          host: ${{ secrets.FTP_HOST }}        # FTP server manzili
+          username: ${{ secrets.FTP_USERNAME }}  # FTP foydalanuvchi nomi
+          password: ${{ secrets.FTP_PASSWORD }}  # FTP parol
+          port: 22                              # Port (odatda 22)
+          source: /tmp/project_archive.tar      # Arxivlangan fayl manzili
+          target: "/home/ftpuser/destination_folder"  # FTP serverdagi target manzil
+          timeout: 30s
+          command_timeout: 10m
+          use_insecure_cipher: false
+          rm: false
+          debug: true
+          strip_components: 0
+          overwrite: false
+          proxy_port: 22
+          proxy_timeout: 30s
+          proxy_use_insecure_cipher: false
