@@ -31,6 +31,4 @@ return [
 
     'supports_credentials' => false,
 
-    'proxies' => '*',
-
 ];
