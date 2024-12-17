@@ -1,0 +1,36 @@
+services:
+  web:
+    image: php:8.2-apache
+    container_name: laravel_apache
+    volumes:
+      - /Users/uzmacbook/Desktop/VizzanoERP:/var/www/html
+    ports:
+      - "8000:80"
+    networks:
+      - laravel_network
+    depends_on:
+      - db
+    restart: always
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+
+  db:
+    image: postgres:15
+    container_name: laravel_postgres
+    environment:
+      POSTGRES_USER: vizzano
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: vizzano
+    ports:
+      - "5432:5432"
+    volumes:
+      - laravel_db_data:/var/lib/postgresql/data
+    networks:
+      - laravel_network
+    restart: always
+
+volumes:
+  laravel_db_data:
+
+networks:
+  laravel_network:
+
