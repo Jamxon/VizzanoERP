@@ -1,31 +1,30 @@
 on: push
-name: 🚀 Deploy Laravel Project via SFTP
+name: 🚀 Deploy website on push
 jobs:
   web-deploy:
+    name: 🎉 Deploy
     runs-on: ubuntu-latest
     steps:
-      # 1. Kodni yuklab olish
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
-
-      # 2. Laravel dependenciesni o‘rnatish (agar kerak bo‘lsa)
-      - name: 📦 Install Laravel dependencies
+      - name: 📦 Install Composer dependencies
         run: |
           composer install --no-dev --no-scripts --no-progress --prefer-dist
-          php artisan config:cache
+      - name: 🧹 Clear Laravel caches
+        run: |
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
 
-      # 3. Fayllarni yuklash (Appleboy SFTP Action)
-      - name: 📂 Upload files to server via SFTP
-        uses: appleboy/scp-action@master
+      - name: 📂 Sync files
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          host: ${{ secrets.SFTP_SERVER }}
-          username: ${{ secrets.SFTP_USERNAME }}
-          password: ${{ secrets.SFTP_PASSWORD }}
-          port: 22 # Odatda 22 bo‘ladi
-          source: "./" # Yuklanadigan Laravel loyihasi manzili
-          target: "/jamkhan/" # Serverdagi papka
-          strip_components: 1 # Ildiz papkani olib tashlash uchun
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /jamkhan/
 
-      # 4. Tugatish xabari
-      - name: ✅ Deployment Finished
-        run: echo "Deployment completed successfully!"
+
+
+      - name: ✅ Deployment Completed
+        run: echo "Laravel project successfully deployed to the server!"
