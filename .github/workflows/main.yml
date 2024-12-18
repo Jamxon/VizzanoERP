@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
           exclude: |
-            vendor/*
+            /vendor/*
             node_modules/*
             .env
             storage/logs/*
