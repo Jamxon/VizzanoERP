@@ -8,22 +8,24 @@ jobs:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
 
-      # 2. Composer install ni ishga tushirish
-      - name: 📦 Install Composer dependencies
+      # 2. Laravel dependenciesni o‘rnatish (agar kerak bo‘lsa)
+      - name: 📦 Install Laravel dependencies
         run: |
           composer install --no-dev --no-scripts --no-progress --prefer-dist
+          php artisan config:cache
 
-      # 3. Laravelni serverga SFTP orqali yuklash
-      - name: 📂 Upload files via SFTP
-        uses: appleboy/scp-action@v0.2.3
+      # 3. Fayllarni yuklash (Appleboy SFTP Action)
+      - name: 📂 Upload files to server via SFTP
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SFTP_SERVER }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
-          port: 22 # SFTP porti (odatda 22 bo‘ladi)
-          source: "./" # Yuklanadigan fayllar
-          target: "/jamkhan/" # Serverda yuklanadigan papka
+          port: 22 # Odatda 22 bo‘ladi
+          source: "./" # Yuklanadigan Laravel loyihasi manzili
+          target: "/jamkhan/" # Serverdagi papka
+          strip_components: 1 # Ildiz papkani olib tashlash uchun
 
-      # 4. Tugallanganligini tasdiqlash
-      - name: ✅ Deployment Completed
-        run: echo "Laravel project successfully deployed via SFTP!"
+      # 4. Tugatish xabari
+      - name: ✅ Deployment Finished
+        run: echo "Deployment completed successfully!"
