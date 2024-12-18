@@ -24,6 +24,8 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /home/jamkhan/
           passive: true
+          exclude: |
+            vendor/
 
 
 
