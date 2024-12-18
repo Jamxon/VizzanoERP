@@ -7,6 +7,14 @@ jobs:
     steps:
       - name: 🚚 Get latest code
         uses: actions/checkout@v4
+      - name: 📦 Install Composer dependencies
+        run: |
+          composer install --no-dev --no-scripts --no-progress --prefer-dist
+      - name: 🧹 Clear Laravel caches
+        run: |
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
 
       - name: 📂 Sync files
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -14,3 +22,9 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /jamkhan/
+
+
+
+      - name: ✅ Deployment Completed
+        run: echo "Laravel project successfully deployed to the server!"

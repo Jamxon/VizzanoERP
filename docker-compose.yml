@@ -5,13 +5,13 @@ services:
     volumes:
       - /Users/uzmacbook/Desktop/VizzanoERP:/var/www/html
     ports:
-      - "8000:80"
+      - "2005:2005"
     networks:
       - laravel_network
     depends_on:
       - db
     restart: always
-    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+    command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=2005"]
 
   db:
     image: postgres:15
