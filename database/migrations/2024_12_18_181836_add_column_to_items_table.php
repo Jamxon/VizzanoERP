@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('colors', function (Blueprint $table) {
-            $table->string('hex')->nullable();
+        Schema::table('items', function (Blueprint $table) {
+            $table->string('qr_code')->uuid()->nullable();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('colors', function (Blueprint $table) {
+        Schema::table('items', function (Blueprint $table) {
             //
         });
     }
