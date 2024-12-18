@@ -22,10 +22,12 @@ class ColorController extends Controller
     {
         $request->validate([
             'name' => 'required',
+            'hex' => 'required',
         ]);
 
         $color = Color::create([
             'name' => $request->name,
+            'hex' => $request->hex,
         ]);
 
         if ($color) {
