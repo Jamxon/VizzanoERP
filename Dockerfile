@@ -30,6 +30,15 @@ WORKDIR /var/www
 # Loyihani konteynerga yuklash
 COPY . .
 
+# Laravelni ishga tushirish uchun Apache konfiguratsiyasi
+COPY ./src /var/www/html
+COPY ./apache/000-default.conf /etc/apache2/sites-available/000-default.conf
+
+# Apache'ni va Laravelni ishga tushirish
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+RUN a2enmod rewrite
+
 # Laravel uchun permission berish
 RUN chown -R www-data:www-data /var/www
 
