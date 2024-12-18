@@ -28,7 +28,7 @@ Route::middleware('role:supervisor')->group(function () {
     Route::patch('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'delete']);
     Route::patch('changeorderstatus', [OrderController::class, 'changeOrderStatus']);
-    Route::get('models/supervisor', [ModelController::class, 'index']);
+    Route::get('models', [ModelController::class, 'index']);
     Route::post('models', [ModelController::class, 'store']);
     Route::get('models/{model}', [ModelController::class, 'show']);
     Route::patch('models/{model}', [ModelController::class, 'update']);
@@ -71,8 +71,8 @@ Route::middleware('role:omborchi')->group(function () {
 
 Route::middleware('role:technologist')->group(function () {
     Route::get('export-items/technologist', [ItemController::class, 'export']);
-    Route::get('models', [ModelController::class, 'index']);
-    Route::get('models/{model}', [ModelController::class, 'show']);
+    Route::get('models/technologist', [ModelController::class, 'index']);
+    Route::get('models/technologist/{model}', [ModelController::class, 'show']);
     Route::get('applications', [TechnologController::class, 'getApplication']);
     Route::get('applications/{model_id}',[TechnologController::class, 'getByModelId']);
     Route::post('applications', [TechnologController::class, 'storeApplication']);
