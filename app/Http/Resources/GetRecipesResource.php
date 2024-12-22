@@ -16,15 +16,8 @@ class GetRecipesResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->item->name,
-            'price' => $this->item->price,
-            'total_price' => $this->getTotalPriceAttribute(),
+            'item' => $this->item,
             'quantity' => $this->quantity,
-            'code' => $this->item->code,
-            'image' => $this->item->image,
-            'unit' => $this->item->unit->name,
-            'item_color' => $this->item->color->name,
-            'type' => $this->item->type->name,
         ];
     }
 }

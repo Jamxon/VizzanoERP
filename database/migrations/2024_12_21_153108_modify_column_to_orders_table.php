@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('lining_applications', function (Blueprint $table) {
-            $table->integer('razryad_id');
-            $table->string('machine');
-            $table->integer('second');
-            $table->integer('summa');
+        Schema::table('orders', function (Blueprint $table) {
+           $table->double('rasxod')->change();
         });
     }
 
@@ -24,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('lining_applications', function (Blueprint $table) {
+        Schema::table('orders', function (Blueprint $table) {
             //
         });
     }

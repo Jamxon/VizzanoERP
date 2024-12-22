@@ -25,6 +25,7 @@ Route::middleware('role:supervisor')->group(function () {
     Route::delete('groups/{group}',[GroupController::class, 'delete']);
     Route::get('orders', [OrderController::class, 'index']);
     Route::post('orders', [OrderController::class, 'store']);
+    Route::get('order/{order}', [OrderController::class, 'show']);
     Route::patch('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'delete']);
     Route::patch('changeorderstatus', [OrderController::class, 'changeOrderStatus']);
