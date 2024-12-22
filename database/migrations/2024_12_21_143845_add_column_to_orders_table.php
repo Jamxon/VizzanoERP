@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('lining_preparations', function (Blueprint $table) {
-            $table->integer('submodel_id')->nullable();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->integer('rasxod')->nullable();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('lining_preparation', function (Blueprint $table) {
+        Schema::table('orders', function (Blueprint $table) {
             //
         });
     }

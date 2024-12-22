@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('applications', function (Blueprint $table) {
-            $table->dropColumn('submodel_id');
+        Schema::table('order_models', function (Blueprint $table) {
+            $table->double('rasxod')->change();
         });
     }
 
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('application', function (Blueprint $table) {
+        Schema::table('order_models', function (Blueprint $table) {
             //
         });
     }

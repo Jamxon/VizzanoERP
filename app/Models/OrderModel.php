@@ -12,7 +12,12 @@ class OrderModel extends Model
     protected $fillable = [
         'order_id',
         'model_id',
+        'rasxod',
     ];
+
+    protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id'];
+
+    protected $with = ['model'];
 
     public function order()
     {

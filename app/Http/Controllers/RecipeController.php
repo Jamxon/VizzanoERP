@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GetRecipesResource;
+use App\Models\ModelColor;
 use App\Models\Recipe;
+use App\Models\Size;
+use App\Models\SubModel;
 use Illuminate\Http\Request;
 
 class RecipeController extends Controller
@@ -23,18 +26,48 @@ class RecipeController extends Controller
             ->where('model_color_id', $request->model_color_id)
             ->where('size_id', $request->size_id);
 
+        if (!$query->exists()) {
+            return response()->json([
+                'error' => 'Recipe not found'
+            ], 404);
+        }
+
         $totalSum = $query->get()->sum(function ($recipe) {
             return $recipe->item->price * $recipe->quantity;
         });
 
         $recipes = $query->orderBy('updated_at', 'desc')->get();
+
+        // Relationlarni bo'shatish
+        $recipes->each(function ($recipe) {
+            $recipe->setRelations([]);
+        });
+
+        $modelColor = ModelColor::find($request->model_color_id);
+        $modelColor->setRelations(['color']);
+        $modelColor->load('color');
+
+        $submodel = $modelColor->submodel;
+        $submodel->setRelations([]);
+
+        $model = $submodel->model;
+        $model->setRelations([]);
+
+        $size = Size::find($request->size_id);
+        $size->setRelations([]);
+
         $resource = GetRecipesResource::collection($recipes);
 
         return response()->json([
             'recipes' => $resource,
             'total_sum' => $totalSum,
+            'submodel' => $submodel->name,
+            'model'  => $model,
+            'model_color'  => $modelColor,
+            'size'  => $size,
         ]);
     }
+
 
 
     public function store(Request $request)
