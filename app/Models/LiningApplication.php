@@ -17,7 +17,8 @@ class LiningApplication extends Model
         'razryad_id',
         'machine',
         'second',
-        'summa'
+        'summa',
+        'user_id'
     ];
 
     protected $hidden = ['created_at', 'updated_at'];
@@ -34,5 +35,8 @@ class LiningApplication extends Model
         return $this->belongsTo(Razryad::class,'razryad_id');
     }
 
-
+    public function user()
+    {
+        return $this->belongsTo(User::class,'user_id');
+    }
 }

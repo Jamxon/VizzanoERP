@@ -18,13 +18,13 @@ class CheckRole
     {
         // Foydalanuvchi tizimga kirganini tekshiramiz
         if (!Auth::check()) {
-            return response('Unauthorized: '.Auth::user().$role, 401); // Foydalanuvchi tizimga kirgan bo'lishi kerak
+            return response('Unauthorized', 401); // Foydalanuvchi tizimga kirgan bo'lishi kerak
         }
 
         // Foydalanuvchi rolini tekshiramiz
         $user = Auth::user();
         if ($user->role->name !== $role) {
-            return response('Not allowed'.$role.$user->role->name, 403); // Foydalanuvchi berilgan rolni bajarishi kerak
+            return response('Not allowed'." bu rol $role uchun, san esa ".$user->role->name." bo'lib kirmoqchi bo'lyapsan", 403); // Foydalanuvchi berilgan rolni bajarishi kerak
         }
 
         return $next($request);
