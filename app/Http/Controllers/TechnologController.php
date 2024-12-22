@@ -14,7 +14,6 @@ class TechnologController extends Controller
             ->with('liningPreparations.liningApplications') // relationlarni yuklash
             ->firstOrFail(); // agar topilmasa, 404 xato qaytariladi
 
-        // Submodelning barcha lining preparations'ini yig'amiz
         $preparations = $submodel->liningPreparations->map(function ($preparation) {
             $liningApplications = $preparation->liningApplications->map(function ($liningApplication) {
                 return [
