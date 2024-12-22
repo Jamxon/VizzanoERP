@@ -52,4 +52,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasOne(Group::class, 'responsible_user_id');
     }
+
+    public function liningApplications()
+    {
+        return $this->hasMany(LiningApplication::class, 'user_id');
+    }
 }

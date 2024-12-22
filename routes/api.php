@@ -2,8 +2,6 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
-use App\Http\Controllers\DetailCategoryController;
-use App\Http\Controllers\DetailController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
@@ -25,7 +23,7 @@ Route::middleware('role:supervisor')->group(function () {
     Route::delete('groups/{group}',[GroupController::class, 'delete']);
     Route::get('orders', [OrderController::class, 'index']);
     Route::post('orders', [OrderController::class, 'store']);
-    Route::get('order/{order}', [OrderController::class, 'show']);
+    Route::get('orders/{order}', [OrderController::class, 'show']);
     Route::patch('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'delete']);
     Route::patch('changeorderstatus', [OrderController::class, 'changeOrderStatus']);

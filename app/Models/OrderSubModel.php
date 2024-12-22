@@ -22,7 +22,13 @@ class OrderSubModel extends Model
     protected $hidden = [
         'created_at',
         'updated_at',
+        'model_color_id',
+        'size_id',
+        'order_model_id',
+        'submodel_id',
     ];
+
+    protected $with = ['size', 'modelColor','submodel'];
 
     public function orderModel()
     {
@@ -37,5 +43,10 @@ class OrderSubModel extends Model
     public function size()
     {
         return $this->belongsTo(Size::class);
+    }
+
+    public function modelColor()
+    {
+        return $this->belongsTo(ModelColor::class, 'model_color_id');
     }
 }

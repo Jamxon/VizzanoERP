@@ -11,19 +11,18 @@ class TechnologController extends Controller
     public function getByModelId($model_id)
     {
         $submodel = SubModel::where('model_id', $model_id)
-            ->with('liningPreparations.liningApplications') // relationlarni yuklash
-            ->firstOrFail(); // agar topilmasa, 404 xato qaytariladi
+            ->with('liningPreparations.liningApplications')
+            ->firstOrFail();
 
         $preparations = $submodel->liningPreparations->map(function ($preparation) {
             $liningApplications = $preparation->liningApplications->map(function ($liningApplication) {
                 return [
                     'name' => $liningApplication->name,
-                    'time' => $liningApplication->second, // vaqtni olamiz
-                    'sum' => $liningApplication->summa,  // summani olamiz
+                    'time' => $liningApplication->second,
+                    'sum' => $liningApplication->summa
                 ];
             });
 
-            // Har bir lining_preparation uchun total_time va total_sum
             $preparationTotalTime = $liningApplications->sum('time');
             $preparationTotalSum = $liningApplications->sum('sum');
 
@@ -39,13 +38,11 @@ class TechnologController extends Controller
             ];
         });
 
-        // Submodelning barcha applications'ini yig'amiz
         $applications = $submodel->liningPreparations
             ->groupBy('application.id')
             ->map(function ($group) {
                 $applicationName = $group->first()->application->name;
 
-                // Application uchun total_time va total_sum
                 $applicationTotalTime = $group->reduce(function ($carry, $preparation) {
                     return $carry + $preparation->liningApplications->sum('second');
                 }, 0);
@@ -62,11 +59,9 @@ class TechnologController extends Controller
                 ];
             });
 
-        // Submodel uchun umumiy total_time va total_sum
         $totalTime = $preparations->sum('total_time');
         $totalSum = $preparations->sum('total_sum');
 
-        // Natijani tuzamiz
         $response = [
             'submodel' => [
                 'id' => $submodel->id,
