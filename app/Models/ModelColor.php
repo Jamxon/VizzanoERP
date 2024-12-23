@@ -31,7 +31,7 @@ class ModelColor extends Model
     }
     public function submodel()
     {
-        return $this->belongsTo(Submodel::class, 'submodel_id');
+        return $this->belongsTo(\App\Models\Submodel::class, 'submodel_id');
     }
 
     public function recipes()
