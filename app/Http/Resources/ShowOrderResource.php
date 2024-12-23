@@ -25,14 +25,29 @@ class ShowOrderResource extends JsonResource
 
             $orderModelSubmodels = OrderSubModel::where('order_model_id', $orderModel->id)->get();
             $orderModelSubmodelsArray = [];
+            $orderModelTotalRasxod = 0;
+
             foreach ($orderModelSubmodels as $orderModelSubmodel) {
                 $orderModelRecipes = OrderRecipes::where('model_color_id', $orderModelSubmodel->model_color_id)
                     ->where('size_id', $orderModelSubmodel->size_id)
                     ->where('order_id', $this->id)
+                    ->with('item')
                     ->get();
+
+                $submodelRecipesRasxod = $orderModelRecipes->sum(function ($recipe) {
+                    return $recipe->item->price * $recipe->quantity;
+                });
+
+                $submodelTotalRasxod = $submodelRecipesRasxod * $orderModelSubmodel->quantity;
+
                 $orderModelSubmodel['recipes'] = $orderModelRecipes;
+                $orderModelSubmodel['total_rasxod'] = $submodelTotalRasxod;
                 $orderModelSubmodelsArray[] = $orderModelSubmodel;
+
+                $orderModelTotalRasxod += $submodelTotalRasxod;
             }
+
+            $orderModel['total_rasxod'] = $orderModelTotalRasxod;
             $orderModel['submodels'] = $orderModelSubmodelsArray;
         }
 
