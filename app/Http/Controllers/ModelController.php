@@ -29,6 +29,7 @@ class ModelController extends Controller
 
         $model = Models::create([
             'name' => $request->name,
+            'rasxod' => $request->rasxod ?? 0
         ]);
 
         foreach ($request->submodels as $submodel) {
