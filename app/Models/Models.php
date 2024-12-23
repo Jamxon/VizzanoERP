@@ -11,7 +11,7 @@ class Models extends Model
 
     protected $table = "models";
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'rasxod'];
 
     protected $with = ['submodels'];
 
