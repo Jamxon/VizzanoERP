@@ -44,7 +44,7 @@ class RecipeController extends Controller
         });
 
         $modelColor = ModelColor::find($request->model_color_id);
-        $modelColor->setRelations(['color']);
+        $modelColor->setRelations([]);
         $modelColor->load('color');
 
         $submodel = $modelColor->submodel;
