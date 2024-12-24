@@ -32,6 +32,7 @@ Route::middleware('role:supervisor')->group(function () {
     Route::get('models/{model}', [ModelController::class, 'show']);
     Route::patch('models/{model}', [ModelController::class, 'update']);
     Route::delete('models/{model}', [ModelController::class, 'destroy']);
+    Route::delete('model/image/{modelImage}', [ModelController::class, 'destroyImage']);
     Route::post('items', [ItemController::class, 'store']);
     Route::patch('items/{item}', [ItemController::class, 'update']);
     Route::get('items', [ItemController::class, 'index']);

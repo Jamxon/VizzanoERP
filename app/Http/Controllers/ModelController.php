@@ -102,6 +102,22 @@ class ModelController extends Controller
             $submodel->delete();
         }
 
+        if ($request->has('images')) {
+            foreach ($request->images as $image) {
+                // Fayl nomini yaratish
+                $fileName = time() . '_' . $image->getClientOriginalName();
+
+                // Faylni saqlash
+                $image->storeAs('public/images', $fileName);
+
+                // Bazaga yozish (images/ prefiks bilan)
+                ModelImages::create([
+                    'model_id' => $model->id,
+                    'image' => 'images/' . $fileName,
+                ]);
+            }
+        }
+
         foreach ($request->submodels as $submodel) {
             $submodelCreate = SubModel::create([
                 'name' => $submodel['name'],
@@ -134,6 +150,14 @@ class ModelController extends Controller
         $model->delete();
         return response()->json([
             'message' => 'Model deleted successfully',
+        ]);
+    }
+
+    public function destroyImage(ModelImages $image)
+    {
+        $image->delete();
+        return response()->json([
+            'message' => 'Image deleted successfully',
         ]);
     }
 }
