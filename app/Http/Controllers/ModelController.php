@@ -92,14 +92,16 @@ class ModelController extends Controller
             'name' => $request->name,
         ]);
 
-        foreach ($model->submodels as $submodel) {
-            foreach ($submodel->sizes as $size) {
-                $size->delete();
+        if ($request->has('submodels')){
+            foreach ($model->submodels as $submodel) {
+                foreach ($submodel->sizes as $size) {
+                    $size->delete();
+                }
+                foreach ($submodel->modelColors as $color) {
+                    $color->delete();
+                }
+                $submodel->delete();
             }
-            foreach ($submodel->modelColors as $color) {
-                $color->delete();
-            }
-            $submodel->delete();
         }
 
         if ($request->has('images')) {
@@ -118,24 +120,26 @@ class ModelController extends Controller
             }
         }
 
-        foreach ($request->submodels as $submodel) {
-            $submodelCreate = SubModel::create([
-                'name' => $submodel['name'],
-                'model_id' => $model->id,
-            ]);
-
-            foreach ($submodel['sizes'] as $size) {
-                Size::create([
-                    'name' => $size,
-                    'submodel_id' => $submodelCreate->id,
+        if ($request->has('submodels')){
+            foreach ($request->submodels as $submodel) {
+                $submodelCreate = SubModel::create([
+                    'name' => $submodel['name'],
+                    'model_id' => $model->id,
                 ]);
-            }
 
-            foreach ($submodel['colors'] as $color) {
-                ModelColor::create([
-                    'color_id' => $color,
-                    'submodel_id' => $submodelCreate->id,
-                ]);
+                foreach ($submodel['sizes'] as $size) {
+                    Size::create([
+                        'name' => $size,
+                        'submodel_id' => $submodelCreate->id,
+                    ]);
+                }
+
+                foreach ($submodel['colors'] as $color) {
+                    ModelColor::create([
+                        'color_id' => $color,
+                        'submodel_id' => $submodelCreate->id,
+                    ]);
+                }
             }
         }
 
