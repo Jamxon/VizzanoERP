@@ -13,7 +13,7 @@ class Models extends Model
 
     protected $fillable = ['name', 'rasxod'];
 
-    protected $with = ['submodels'];
+    protected $with = ['submodels','images'];
 
     protected $hidden = ['created_at', 'updated_at'];
 
