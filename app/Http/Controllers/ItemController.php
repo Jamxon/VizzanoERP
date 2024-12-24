@@ -22,18 +22,18 @@ class ItemController extends Controller
     {
         $filePath = storage_path('app/public/materiallar.xlsx');
         if (file_exists($filePath)) {
-            unlink($filePath);  // Faylni o'chirish
+            unlink($filePath);
         }
 
         Excel::queue(new ItemsExport, 'public/materiallar.xlsx')->chain([
             new NotifyUserOfCompletedExport(auth()->user())
         ]);
 
-        $fileUrl = url('storage/materiallar.xlsx');  // public diskda materiallar.xlsx fayl URLini olish
+        $fileUrl = url('storage/materiallar.xlsx');
 
         return response()->json([
             'message' => 'Eksport jarayoni navbatga yuborildi.',
-            'fileUrl' => $fileUrl,  // Fayl URLini yuborish
+            'fileUrl' => $fileUrl,
         ]);
     }
 
@@ -44,7 +44,7 @@ class ItemController extends Controller
             'price' => 'required',
             'unit_id' => 'required|exists:units,id',
             'color_id' => 'required|exists:colors,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Tasvir validatsiyasi
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'type_id' => 'required|exists:item_types,id',
         ]);
         $request->validate([
@@ -53,33 +53,25 @@ class ItemController extends Controller
             'code.unique' => 'Code must be unique',
         ]);
 
-        $imagePath = null;
-
-        // Faylni saqlash
+//        $imagePath = null;
 
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
-            // Rasmni olish
+
             $image = $request->file('image');
 
-            // Unikal nom yaratish
             $imageName = time() . '_' . $image->getClientOriginalName();
 
-            // Faylni saqlash (public disk)
             $imagePath = $image->storeAs('public/images', $imageName);
 
-            // URL olish (agar kerak bo'lsa)
-            $imageUrl = Storage::url($imagePath);
+//            $imageUrl = Storage::url($imagePath);
 
             $imagePath = str_replace('public/', '', $imagePath);
         } else {
-            // Fayl topilmagan yoki noto'g'ri fayl
-            // Xato qaytarish
             return response()->json(['error' => 'Image file is missing or invalid'], 400);
         }
 
-//        $imageOriginalName = preg_split('/', $imageUrl)[2] ?? null;
+        //$imageOriginalName = preg_split('/', $imageUrl)[2] ?? null;
 
-        // Yangi yozuv yaratish
         $item = Item::create([
             'name' => $request->name,
             'price' => $request->price  ?? 0,
