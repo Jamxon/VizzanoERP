@@ -21,4 +21,9 @@ class Models extends Model
     {
         return $this->hasMany(SubModel::class, 'model_id');
     }
+
+    public function images()
+    {
+        return $this->hasMany(ModelImages::class, 'model_id');
+    }
 }

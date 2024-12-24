@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ModelColor;
+use App\Models\ModelImages;
 use App\Models\Models;
 use App\Models\Size;
 use App\Models\SubModel;
@@ -33,11 +34,27 @@ class ModelController extends Controller
             'rasxod' => $request->rasxod ?? 0
         ]);
 
+        if ($request->has('images')) {
+            foreach ($request->images as $image) {
+
+                $fileName = time() . '_' . $image->getClientOriginalName();
+
+                $image->storeAs('public/images', $fileName);
+
+                ModelImages::create([
+                    'model_id' => $model->id,
+                    'image' => $fileName,
+                ]);
+            }
+        }
+
+
         foreach ($request->submodels as $submodel) {
             $submodelCreate =  SubModel::create([
                 'name' => $submodel['name'],
                 'model_id' => $model->id,
             ]);
+
             foreach ($submodel['sizes'] as $size) {
                 Size::create([
                     'name' => $size,
