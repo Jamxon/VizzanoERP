@@ -62,7 +62,7 @@ class ItemController extends Controller
             $image = $request->file('image');
 
             // Unikal nom yaratish
-            $imageName = uniqid() . '.' . $image->getClientOriginalExtension();
+            $imageName = time() . '_' . $image->getClientOriginalName();
 
             // Faylni saqlash (public disk)
             $imagePath = $image->storeAs('public/images', $imageName);
