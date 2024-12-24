@@ -83,7 +83,7 @@ class ModelController extends Controller
     }
     public function update(Request $request, $id)
     {
-        dd($id);
+        dd($request->all());
         $request->validate([
             'name' => 'required',
         ]);
