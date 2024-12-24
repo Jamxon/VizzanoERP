@@ -35,17 +35,20 @@ class ModelController extends Controller
 
         if ($request->has('images')) {
             foreach ($request->images as $image) {
-
+                // Fayl nomini yaratish
                 $fileName = time() . '_' . $image->getClientOriginalName();
 
-                $image->storeAs('public/images', 'images'.$fileName);
+                // Faylni saqlash
+                $image->storeAs('public/images', $fileName);
 
+                // Bazaga yozish (images/ prefiks bilan)
                 ModelImages::create([
                     'model_id' => $model->id,
-                    'image' => $fileName,
+                    'image' => 'images/' . $fileName,
                 ]);
             }
         }
+
 
 
         foreach ($request->submodels as $submodel) {
