@@ -38,7 +38,7 @@ class ModelController extends Controller
 
                 $fileName = time() . '_' . $image->getClientOriginalName();
 
-                $image->storeAs('public/images', $fileName);
+                $image->storeAs('public/images', 'images'.$fileName);
 
                 ModelImages::create([
                     'model_id' => $model->id,
