@@ -49,8 +49,6 @@ class ModelController extends Controller
             }
         }
 
-
-
         foreach ($request->submodels as $submodel) {
             $submodelCreate =  SubModel::create([
                 'name' => $submodel['name'],

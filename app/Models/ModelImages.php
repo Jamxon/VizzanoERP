@@ -14,6 +14,8 @@ class ModelImages extends Model
 
     protected $fillable = ['model_id', 'image'];
 
+    protected $hidden = ['created_at', 'updated_at', 'model_id'];
+
     public function model()
     {
         return $this->belongsTo(Models::class);
