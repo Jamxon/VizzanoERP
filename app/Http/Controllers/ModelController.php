@@ -24,9 +24,15 @@ class ModelController extends Controller
     }
     public function store(Request $request)
     {
-        dd($request->all());
-        // Asosiy ma'lumotlarni olish
-        $data = $request->input('data');
+        // `data` maydonini JSON sifatida dekodlash
+        $data = json_decode($request->input('data'), true);
+
+        if (!$data) {
+            return response()->json([
+                'message' => 'Invalid data format',
+                'error' => 'Data field is not a valid JSON string',
+            ], 400);
+        }
 
         // Model yaratish
         $model = Models::create([
@@ -35,8 +41,8 @@ class ModelController extends Controller
         ]);
 
         // Suratlarni saqlash (agar mavjud bo'lsa)
-        if ($request->hasFile('images') && !empty($request->images)) {
-            foreach ($request->images as $image) {
+        if ($request->hasFile('images') && !empty($request->file('images'))) {
+            foreach ($request->file('images') as $image) {
                 // Faylni nomini o'zgartirib saqlash
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('public/images', $fileName);
@@ -94,6 +100,7 @@ class ModelController extends Controller
             ], 500);
         }
     }
+
 
 
 
