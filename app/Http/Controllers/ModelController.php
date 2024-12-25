@@ -53,6 +53,7 @@ class ModelController extends Controller
         }
         // Submodel va uning rang va o'lchamlarini saqlash (agar mavjud bo'lsa)
         if ($request->has('submodels') && !empty($request->submodels)) {
+            dd($request->submodels);
             foreach ($request->submodels as $submodel) {
                 // Submodelni yaratish
                 $submodelCreate = SubModel::create([
