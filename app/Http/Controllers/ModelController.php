@@ -101,38 +101,39 @@ class ModelController extends Controller
         }
     }
 
-
-
-
-
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required',
-        ]);
+        // `data` maydonini JSON sifatida dekodlash
+        $data = json_decode($request->input('data'), true);
 
-        $model = Models::findOrFail($id);
-        $model->update([
-            'name' => $request->name,
-        ]);
-
-        if ($request->has('submodels')){
-            foreach ($model->submodels as $submodel) {
-                foreach ($submodel->sizes as $size) {
-                    $size->delete();
-                }
-                foreach ($submodel->modelColors as $color) {
-                    $color->delete();
-                }
-                $submodel->delete();
-            }
+        if (!$data) {
+            return response()->json([
+                'message' => 'Invalid data format',
+                'error' => 'Data field is not a valid JSON string',
+            ], 400);
         }
 
-        if ($request->has('images')) {
-            foreach ($request->images as $image) {
+        // Modelni topish
+        $model = Models::findOrFail($id);
 
+        // Modelni yangilash
+        $model->update([
+            'name' => $data['name'] ?? $model->name,
+            'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
+        ]);
+
+        // Eski suratlarni o'chirish va yangi suratlarni saqlash
+        if ($request->hasFile('images') && !empty($request->file('images'))) {
+            // Eski suratlarni o'chirish
+            foreach ($model->images as $oldImage) {
+                // Faylni tizimdan o'chirish (ixtiyoriy)
+                Storage::delete('public/' . $oldImage->image);
+                $oldImage->delete();
+            }
+
+            // Yangi suratlarni saqlash
+            foreach ($request->file('images') as $image) {
                 $fileName = time() . '_' . $image->getClientOriginalName();
-
                 $image->storeAs('public/images', $fileName);
 
                 ModelImages::create([
@@ -142,25 +143,44 @@ class ModelController extends Controller
             }
         }
 
-        if ($request->has('submodels')){
-            foreach ($request->submodels as $submodel) {
+        // Eski submodellarga oid ma'lumotlarni o'chirish
+        foreach ($model->submodels as $submodel) {
+            foreach ($submodel->sizes as $size) {
+                $size->delete();
+            }
+            foreach ($submodel->modelColors as $color) {
+                $color->delete();
+            }
+            $submodel->delete();
+        }
+
+        // Yangi submodellarga oid ma'lumotlarni saqlash
+        if (!empty($data['submodels'])) {
+            foreach ($data['submodels'] as $submodel) {
+                // Submodelni yaratish
                 $submodelCreate = SubModel::create([
-                    'name' => $submodel['name'],
+                    'name' => $submodel['name'] ?? null,
                     'model_id' => $model->id,
                 ]);
 
-                foreach ($submodel['sizes'] as $size) {
-                    Size::create([
-                        'name' => $size,
-                        'submodel_id' => $submodelCreate->id,
-                    ]);
+                // O'lchamlarni saqlash
+                if (isset($submodel['sizes']) && !empty($submodel['sizes'])) {
+                    foreach ($submodel['sizes'] as $size) {
+                        Size::create([
+                            'name' => $size,
+                            'submodel_id' => $submodelCreate->id,
+                        ]);
+                    }
                 }
 
-                foreach ($submodel['colors'] as $color) {
-                    ModelColor::create([
-                        'color_id' => $color,
-                        'submodel_id' => $submodelCreate->id,
-                    ]);
+                // Ranglarni saqlash
+                if (isset($submodel['colors']) && !empty($submodel['colors'])) {
+                    foreach ($submodel['colors'] as $color) {
+                        ModelColor::create([
+                            'color_id' => $color,
+                            'submodel_id' => $submodelCreate->id,
+                        ]);
+                    }
                 }
             }
         }
@@ -170,6 +190,7 @@ class ModelController extends Controller
             'model' => $model,
         ]);
     }
+
 
     public function destroy(Models $model)
     {
