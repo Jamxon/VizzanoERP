@@ -24,63 +24,81 @@ class ModelController extends Controller
     }
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
+        // Validation
+        $validated = $request->validate([
+            'name' => 'required|string|max:255', // 'name' talab qilinadi
+            'rasxod' => 'nullable|numeric', // 'rasxod' son bo'lishi kerak, lekin ixtiyoriy
+            'images' => 'nullable|array', // 'images' array bo'lishi mumkin
+            'submodels' => 'nullable|array', // 'submodels' array bo'lishi mumkin
         ]);
 
+        // Model yaratish
         $model = Models::create([
-            'name' => $request->name,
-            'rasxod' => $request->rasxod ?? 0
+            'name' => $validated['name'],
+            'rasxod' => $validated['rasxod'] ?? 0 // 'rasxod' bo'lmasa, 0 qiymatini olish
         ]);
 
+        // Suratlarni saqlash (agar mavjud bo'lsa)
         if ($request->has('images')) {
-            foreach ($request->images as $image) {
-
+            foreach ($validated['images'] as $image) {
+                // Har bir rasmni nomini o'zgartirib saqlash
                 $fileName = time() . '_' . $image->getClientOriginalName();
-
                 $image->storeAs('public/images', $fileName);
 
+                // Rasm ma'lumotlarini saqlash
                 ModelImages::create([
                     'model_id' => $model->id,
-                    'image' => 'images/' . $fileName,
+                    'image' => 'images/' . $fileName, // Fayl manzili
                 ]);
             }
         }
 
-        if ($request->has('submodels') || !empty($request->submodels)) {
-            foreach ($request->submodels as $submodel) {
-                $submodelCreate =  SubModel::create([
+        // Submodel va uning rang va o'lchamlarini saqlash (agar mavjud bo'lsa)
+        if ($request->has('submodels') && !empty($validated['submodels'])) {
+            foreach ($validated['submodels'] as $submodel) {
+                // Submodelni yaratish
+                $submodelCreate = SubModel::create([
                     'name' => $submodel['name'],
                     'model_id' => $model->id,
                 ]);
 
-                foreach ($submodel['sizes'] as $size) {
-                    Size::create([
-                        'name' => $size,
-                        'submodel_id' => $submodelCreate->id,
-                    ]);
+                // O'lchamlarni saqlash
+                if (isset($submodel['sizes']) && !empty($submodel['sizes'])) {
+                    foreach ($submodel['sizes'] as $size) {
+                        Size::create([
+                            'name' => $size,
+                            'submodel_id' => $submodelCreate->id,
+                        ]);
+                    }
                 }
-                foreach ($submodel['colors'] as $color) {
-                    ModelColor::create([
-                        'color_id' => $color,
-                        'submodel_id' => $submodelCreate->id,
-                    ]);
+
+                // Ranglarni saqlash
+                if (isset($submodel['colors']) && !empty($submodel['colors'])) {
+                    foreach ($submodel['colors'] as $color) {
+                        ModelColor::create([
+                            'color_id' => $color,
+                            'submodel_id' => $submodelCreate->id,
+                        ]);
+                    }
                 }
             }
         }
 
+        // Model muvaffaqiyatli yaratilganini qaytarish
         if ($model) {
             return response()->json([
                 'message' => 'Model created successfully',
                 'model' => $model,
-            ]);
+            ], 201); // Status kodi 201, yangi resurs yaratildi
         } else {
+            // Xato holat
             return response()->json([
-                'message' => 'Model not created',
-                'error' => $model->errors(),
-            ]);
+                'message' => 'Model creation failed',
+                'error' => 'There was an error creating the model.',
+            ], 500); // Status kodi 500, server xatosi
         }
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
