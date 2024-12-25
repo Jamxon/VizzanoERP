@@ -50,6 +50,9 @@ class ModelController extends Controller
                 ]);
             }
         }
+
+        dd($request->submodels);
+        
         // Submodel va uning rang va o'lchamlarini saqlash (agar mavjud bo'lsa)
         if ($request->has('submodels') && !empty($request->submodels)) {
             foreach ($request->submodels as $submodel) {
