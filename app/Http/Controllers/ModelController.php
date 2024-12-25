@@ -24,25 +24,24 @@ class ModelController extends Controller
     }
     public function store(Request $request)
     {
-        dd($request->all());
-        // Validation
+        // Validatsiya
         $validated = $request->validate([
-            'name' => 'required|string|max:255', // 'name' talab qilinadi
-            'rasxod' => 'nullable|numeric', // 'rasxod' son bo'lishi kerak, lekin ixtiyoriy
-            'images' => 'nullable|array', // 'images' array bo'lishi mumkin
-            'submodels' => 'nullable|array', // 'submodels' array bo'lishi mumkin
+            'name' => 'required|string|max:255',
+            'rasxod' => 'nullable|numeric',
+            'images' => 'nullable|array',
+            'submodels' => 'nullable|array',
         ]);
 
         // Model yaratish
         $model = Models::create([
             'name' => $validated['name'],
-            'rasxod' => $validated['rasxod'] ?? 0 // 'rasxod' bo'lmasa, 0 qiymatini olish
+            'rasxod' => $validated['rasxod'] ?? 0
         ]);
 
         // Suratlarni saqlash (agar mavjud bo'lsa)
-        if ($request->has('images')) {
+        if ($request->has('images') && !empty($validated['images'])) {
             foreach ($validated['images'] as $image) {
-                // Har bir rasmni nomini o'zgartirib saqlash
+                // Faylni nomini o'zgartirib saqlash
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('public/images', $fileName);
 
@@ -99,6 +98,7 @@ class ModelController extends Controller
             ], 500); // Status kodi 500, server xatosi
         }
     }
+
 
     public function update(Request $request, $id)
     {
