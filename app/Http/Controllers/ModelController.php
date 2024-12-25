@@ -121,12 +121,6 @@ class ModelController extends Controller
 
         // Eski suratlarni o'chirish va yangi suratlarni saqlash
         if ($request->hasFile('images') && !empty($request->file('images'))) {
-            // Eski suratlarni o'chirish
-            foreach ($model->images as $oldImage) {
-                // Faylni tizimdan o'chirish (ixtiyoriy)
-                Storage::delete('public/' . $oldImage->image);
-                $oldImage->delete();
-            }
 
             // Yangi suratlarni saqlash
             foreach ($request->file('images') as $image) {
