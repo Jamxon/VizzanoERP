@@ -102,7 +102,7 @@ class ModelController extends Controller
         }
     }
 
-    public function update(Request $request, Models $models)
+    public function update(Request $request, Models $model)
     {
         // `data` maydonini JSON sifatida dekodlash
         $data = json_decode($request->input('data'), true);
@@ -113,17 +113,17 @@ class ModelController extends Controller
                 'error' => 'Data field is not a valid JSON string',
             ], 400);
         }
-         return $models;
+         return $model;
         // Modelni yangilash
-        $models->update([
-            'name' => $data['name'] ?? $models->name,
-            'rasxod' => (double) ($data['rasxod'] ?? $models->rasxod),
+        $model->update([
+            'name' => $data['name'] ?? $model->name,
+            'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
         ]);
 
         // Eski suratlarni o'chirish va yangi suratlarni saqlash
         if ($request->hasFile('images') && !empty($request->file('images'))) {
             // Eski suratlarni o'chirish
-            foreach ($models->images as $oldImage) {
+            foreach ($model->images as $oldImage) {
                 // Faylni tizimdan o'chirish (ixtiyoriy)
                 Storage::delete('public/' . $oldImage->image);
                 $oldImage->delete();
@@ -142,7 +142,7 @@ class ModelController extends Controller
         }
 
         // Eski submodellarga oid ma'lumotlarni o'chirish
-        foreach ($models->submodels as $submodel) {
+        foreach ($model->submodels as $submodel) {
             foreach ($submodel->sizes as $size) {
                 $size->delete();
             }
@@ -185,7 +185,7 @@ class ModelController extends Controller
 
         return response()->json([
             'message' => 'Model updated successfully',
-            'model' => $models,
+            'model' => $model,
         ]);
     }
 
