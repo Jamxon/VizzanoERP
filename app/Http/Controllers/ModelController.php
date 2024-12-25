@@ -35,13 +35,11 @@ class ModelController extends Controller
 
         if ($request->has('images')) {
             foreach ($request->images as $image) {
-                // Fayl nomini yaratish
+
                 $fileName = time() . '_' . $image->getClientOriginalName();
 
-                // Faylni saqlash
                 $image->storeAs('public/images', $fileName);
 
-                // Bazaga yozish (images/ prefiks bilan)
                 ModelImages::create([
                     'model_id' => $model->id,
                     'image' => 'images/' . $fileName,
@@ -49,23 +47,25 @@ class ModelController extends Controller
             }
         }
 
-        foreach ($request->submodels as $submodel) {
-            $submodelCreate =  SubModel::create([
-                'name' => $submodel['name'],
-                'model_id' => $model->id,
-            ]);
+        if ($request->has('submodels') || !empty($request->submodels)) {
+            foreach ($request->submodels as $submodel) {
+                $submodelCreate =  SubModel::create([
+                    'name' => $submodel['name'],
+                    'model_id' => $model->id,
+                ]);
 
-            foreach ($submodel['sizes'] as $size) {
-                Size::create([
-                    'name' => $size,
-                    'submodel_id' => $submodelCreate->id,
-                ]);
-            }
-            foreach ($submodel['colors'] as $color) {
-                ModelColor::create([
-                    'color_id' => $color,
-                    'submodel_id' => $submodelCreate->id,
-                ]);
+                foreach ($submodel['sizes'] as $size) {
+                    Size::create([
+                        'name' => $size,
+                        'submodel_id' => $submodelCreate->id,
+                    ]);
+                }
+                foreach ($submodel['colors'] as $color) {
+                    ModelColor::create([
+                        'color_id' => $color,
+                        'submodel_id' => $submodelCreate->id,
+                    ]);
+                }
             }
         }
 
@@ -106,13 +106,11 @@ class ModelController extends Controller
 
         if ($request->has('images')) {
             foreach ($request->images as $image) {
-                // Fayl nomini yaratish
+
                 $fileName = time() . '_' . $image->getClientOriginalName();
 
-                // Faylni saqlash
                 $image->storeAs('public/images', $fileName);
 
-                // Bazaga yozish (images/ prefiks bilan)
                 ModelImages::create([
                     'model_id' => $model->id,
                     'image' => 'images/' . $fileName,
