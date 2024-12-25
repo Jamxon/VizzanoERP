@@ -47,7 +47,7 @@ class ItemController extends Controller
         }
 
         // Validatsiya
-        $validator = Validator::make($data, [
+        $validated = $request->merge($data)->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
             'unit_id' => 'required|exists:units,id',
@@ -57,10 +57,6 @@ class ItemController extends Controller
         ], [
             'code.unique' => 'Code must be unique',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
 
         // Rasmni yuklash
         $imagePath = null;
@@ -73,12 +69,12 @@ class ItemController extends Controller
 
         // Ma'lumotni bazaga yozish
         $item = Item::create([
-            'name' => $data['name'],
-            'price' => $data['price'],
-            'unit_id' => $data['unit_id'],
-            'color_id' => $data['color_id'],
-            'type_id' => $data['type_id'],
-            'code' => $data['code'] ?? uniqid(),
+            'name' => $validated['name'],
+            'price' => $validated['price'],
+            'unit_id' => $validated['unit_id'],
+            'color_id' => $validated['color_id'],
+            'type_id' => $validated['type_id'],
+            'code' => $validated['code'] ?? uniqid(),
             'image' => $imagePath,
         ]);
 
@@ -87,6 +83,7 @@ class ItemController extends Controller
             'item' => $item,
         ], $item ? 201 : 500);
     }
+
 
 
     public function update(Request $request, Item $item)
@@ -99,7 +96,7 @@ class ItemController extends Controller
         }
 
         // Validatsiya
-        $validator = Validator::make($data, [
+        $validated = $request->merge($data)->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
             'unit_id' => 'required|exists:units,id',
@@ -109,10 +106,6 @@ class ItemController extends Controller
         ], [
             'code.unique' => 'Code must be unique',
         ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
 
         // Rasmni yangilash
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
@@ -131,12 +124,12 @@ class ItemController extends Controller
 
         // Ma'lumotni yangilash
         $item->update([
-            'name' => $data['name'],
-            'price' => $data['price'],
-            'unit_id' => $data['unit_id'],
-            'color_id' => $data['color_id'],
-            'type_id' => $data['type_id'],
-            'code' => $data['code'] ?? $item->code,
+            'name' => $validated['name'],
+            'price' => $validated['price'],
+            'unit_id' => $validated['unit_id'],
+            'color_id' => $validated['color_id'],
+            'type_id' => $validated['type_id'],
+            'code' => $validated['code'] ?? $item->code,
         ]);
 
         return response()->json([
