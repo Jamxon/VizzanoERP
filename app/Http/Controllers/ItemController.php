@@ -32,7 +32,7 @@ class ItemController extends Controller
         $fileUrl = url('storage/materiallar.xlsx');
 
         return response()->json([
-            'message' => 'Eksport jarayoni navbatga yuborildi.',
+            'message' => 'Eksport jarayoni navbatga bodybuilder.',
             'fileUrl' => $fileUrl,
         ]);
     }
@@ -115,7 +115,6 @@ class ItemController extends Controller
             $imagePath = $image->storeAs('public/images', $imageName);
             $imagePath = str_replace('public/', '', $imagePath);
 
-            // Eski rasmini o'chirish
             if ($item->image && Storage::exists('public/' . $item->image)) {
                 Storage::delete('public/' . $item->image);
             }
@@ -137,5 +136,4 @@ class ItemController extends Controller
             'item' => $item,
         ]);
     }
-
 }

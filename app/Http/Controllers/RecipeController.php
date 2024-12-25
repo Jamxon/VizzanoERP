@@ -110,6 +110,7 @@ class RecipeController extends Controller
 
     public function destroy(Recipe $recipe)
     {
+        dd($recipe);
         $recipe->delete();
         return response()->json([
             'message' => 'Recipe deleted successfully',
