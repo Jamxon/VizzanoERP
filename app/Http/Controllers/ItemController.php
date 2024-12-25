@@ -39,82 +39,89 @@ class ItemController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required',
+        // JSON ma'lumotlarni dekodlash
+        $data = json_decode($request->input('data'), true);
+
+        if (!$data) {
+            return response()->json(['error' => 'Invalid JSON data'], 400);
+        }
+
+        // Validatsiya
+        $validator = Validator::make($data, [
+            'name' => 'required|string',
+            'price' => 'required|numeric',
             'unit_id' => 'required|exists:units,id',
             'color_id' => 'required|exists:colors,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'type_id' => 'required|exists:item_types,id',
-        ]);
-        $request->validate([
-            'code' => 'unique:items,code',
+            'code' => 'nullable|unique:items,code',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
 
-//        $imagePath = null;
-
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
-
-            $image = $request->file('image');
-
-            $imageName = time() . '_' . $image->getClientOriginalName();
-
-            $imagePath = $image->storeAs('public/images', $imageName);
-
-//            $imageUrl = Storage::url($imagePath);
-
-            $imagePath = str_replace('public/', '', $imagePath);
-        } else {
-            return response()->json(['error' => 'Image file is missing or invalid'], 400);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        //$imageOriginalName = preg_split('/', $imageUrl)[2] ?? null;
+        // Rasmni yuklash
+        $imagePath = null;
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $imagePath = $image->storeAs('public/images', $imageName);
+            $imagePath = str_replace('public/', '', $imagePath);
+        }
 
+        // Ma'lumotni bazaga yozish
         $item = Item::create([
-            'name' => $request->name,
-            'price' => $request->price  ?? 0,
-            'unit_id' => $request->unit_id,
-            'color_id' => $request->color_id,
+            'name' => $data['name'],
+            'price' => $data['price'],
+            'unit_id' => $data['unit_id'],
+            'color_id' => $data['color_id'],
+            'type_id' => $data['type_id'],
+            'code' => $data['code'] ?? uniqid(),
             'image' => $imagePath,
-            'code' => $request->code ?? uniqid(),
-            'type_id' => $request->type_id,
         ]);
 
-        if ($item) {
-            return response()->json([
-                'message' => 'Item created successfully',
-                'item' => $item,
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Item not created',
-                'error' => $item->errors(),
-            ]);
-        }
+        return response()->json([
+            'message' => $item ? 'Item created successfully' : 'Item not created',
+            'item' => $item,
+        ], $item ? 201 : 500);
     }
+
 
     public function update(Request $request, Item $item)
     {
-        $request->validate([
-            'name' => 'required',
-            'price' => 'required',
+        // JSON ma'lumotlarni dekodlash
+        $data = json_decode($request->input('data'), true);
+
+        if (!$data) {
+            return response()->json(['error' => 'Invalid JSON data'], 400);
+        }
+
+        // Validatsiya
+        $validator = Validator::make($data, [
+            'name' => 'required|string',
+            'price' => 'required|numeric',
             'unit_id' => 'required|exists:units,id',
             'color_id' => 'required|exists:colors,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'type_id' => 'required|exists:item_types,id',
-            'code' => 'unique:items,code,' . $item->id,
+            'code' => 'nullable|unique:items,code,' . $item->id,
         ], [
             'code.unique' => 'Code must be unique',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Rasmni yangilash
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
             $imagePath = $image->storeAs('public/images', $imageName);
             $imagePath = str_replace('public/', '', $imagePath);
 
+            // Eski rasmni o'chirish
             if ($item->image && Storage::exists('public/' . $item->image)) {
                 Storage::delete('public/' . $item->image);
             }
@@ -122,13 +129,14 @@ class ItemController extends Controller
             $item->image = $imagePath;
         }
 
+        // Ma'lumotni yangilash
         $item->update([
-            'name' => $request->name,
-            'price' => $request->price ?? $item->price,
-            'unit_id' => $request->unit_id,
-            'color_id' => $request->color_id,
-            'code' => $request->code ?? $item->code,
-            'type_id' => $request->type_id,
+            'name' => $data['name'],
+            'price' => $data['price'],
+            'unit_id' => $data['unit_id'],
+            'color_id' => $data['color_id'],
+            'type_id' => $data['type_id'],
+            'code' => $data['code'] ?? $item->code,
         ]);
 
         return response()->json([
@@ -136,4 +144,5 @@ class ItemController extends Controller
             'item' => $item,
         ]);
     }
+
 }
