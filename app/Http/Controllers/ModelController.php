@@ -135,7 +135,7 @@ class ModelController extends Controller
                 $image->storeAs('public/images', $fileName);
 
                 ModelImages::create([
-                    'model_id' => $model->id,
+                    'model_id' => $models->id,
                     'image' => 'images/' . $fileName,
                 ]);
             }
@@ -158,7 +158,7 @@ class ModelController extends Controller
                 // Submodelni yaratish
                 $submodelCreate = SubModel::create([
                     'name' => $submodel['name'] ?? null,
-                    'model_id' => $model->id,
+                    'model_id' => $models->id,
                 ]);
 
                 // O'lchamlarni saqlash
