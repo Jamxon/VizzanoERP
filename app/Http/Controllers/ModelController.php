@@ -27,15 +27,13 @@ class ModelController extends Controller
         // Validatsiya
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'rasxod' => 'nullable|numeric',
             'images' => 'nullable|array',
             'submodels' => 'nullable|array',
         ]);
-        return "validate";
         // Model yaratish
         $model = Models::create([
             'name' => $validated['name'],
-            'rasxod' => $validated['rasxod'] ?? 0
+            'rasxod' => (double) $validated['rasxod'] ?? 0
         ]);
 
         // Suratlarni saqlash (agar mavjud bo'lsa)
