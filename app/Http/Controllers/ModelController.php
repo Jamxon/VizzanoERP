@@ -105,7 +105,7 @@ class ModelController extends Controller
     public function update(Request $request, Models $models)
     {
         // `data` maydonini JSON sifatida dekodlash
-        return  $data = json_decode($request->input('data'), true);
+        $data = json_decode($request->input('data'), true);
 
         if (!$data) {
             return response()->json([
@@ -113,7 +113,7 @@ class ModelController extends Controller
                 'error' => 'Data field is not a valid JSON string',
             ], 400);
         }
-
+         return $models;
         // Modelni yangilash
         $models->update([
             'name' => $data['name'] ?? $models->name,
