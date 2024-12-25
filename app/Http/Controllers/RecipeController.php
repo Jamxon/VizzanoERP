@@ -79,6 +79,15 @@ class RecipeController extends Controller
             'size_id' => 'required',
         ]);
 
+        if (Recipe::where('item_id', $request->item_id)
+            ->where('model_color_id', $request->model_color_id)
+            ->where('size_id', $request->size_id)
+            ->exists()) {
+            return response()->json([
+                'message' => 'Recipe already exists',
+            ],999);
+        }
+
         $recipe = Recipe::create([
             'item_id' => $request->item_id,
             'quantity' => $request->quantity,
