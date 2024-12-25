@@ -25,7 +25,7 @@ class ModelController extends Controller
     public function store(Request $request)
     {
         // Asosiy ma'lumotlarni olish
-        return $data = $request->json('data');
+        return $data = $request->json('data', []);
 
         // Model yaratish
         $model = Models::create([
