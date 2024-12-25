@@ -39,7 +39,6 @@ class ModelController extends Controller
 
         // Suratlarni saqlash (agar mavjud bo'lsa)
         if ($request->has('images') && !empty($request->images)) {
-            dd($request->images);
             foreach ($request->images as $image) {
                 // Faylni nomini o'zgartirib saqlash
                 $fileName = time() . '_' . $image->getClientOriginalName();
