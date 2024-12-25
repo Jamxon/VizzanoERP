@@ -37,6 +37,7 @@ class ModelController extends Controller
             'rasxod' => (double) $request->rasxod ?? 0,
         ]);
 
+        dd($request->submodels);
         // Suratlarni saqlash (agar mavjud bo'lsa)
         if ($request->has('images') && !empty($request->images)) {
             foreach ($request->images as $image) {
@@ -53,7 +54,6 @@ class ModelController extends Controller
         }
         // Submodel va uning rang va o'lchamlarini saqlash (agar mavjud bo'lsa)
         if ($request->has('submodels') && !empty($request->submodels)) {
-            dd($request->submodels);
             foreach ($request->submodels as $submodel) {
                 // Submodelni yaratish
                 $submodelCreate = SubModel::create([
