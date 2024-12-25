@@ -31,7 +31,7 @@ class ModelController extends Controller
             'images' => 'nullable|array',
             'submodels' => 'nullable|array',
         ]);
-
+        return "validate";
         // Model yaratish
         $model = Models::create([
             'name' => $validated['name'],
