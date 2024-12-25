@@ -105,7 +105,7 @@ class ModelController extends Controller
     public function update(Request $request, Models $models)
     {
         // `data` maydonini JSON sifatida dekodlash
-        $data = json_decode($request->input('data'), true);
+        return  $data = json_decode($request->input('data'), true);
 
         if (!$data) {
             return response()->json([
