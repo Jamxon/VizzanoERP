@@ -24,14 +24,6 @@ class ModelController extends Controller
     }
     public function store(Request $request)
     {
-        // Validatsiya
-        dd($request->all());
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'images' => 'nullable|array',
-            'submodels' => 'nullable|array',
-        ]);
-        dd($request->all());
         // Model yaratish
         $model = Models::create([
             'name' => $request->name,
