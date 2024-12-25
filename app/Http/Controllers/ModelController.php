@@ -30,7 +30,7 @@ class ModelController extends Controller
             'images' => 'nullable|array',
             'submodels' => 'nullable|array',
         ]);
-
+        dd($request->all());
         // Model yaratish
         $model = Models::create([
             'name' => $request->name,
