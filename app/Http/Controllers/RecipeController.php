@@ -85,7 +85,7 @@ class RecipeController extends Controller
             ->exists()) {
             return response()->json([
                 'message' => 'Recipe already exists',
-            ],999);
+            ], 400);
         }
 
         $recipe = Recipe::create([
