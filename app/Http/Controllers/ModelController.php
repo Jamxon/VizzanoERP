@@ -24,8 +24,9 @@ class ModelController extends Controller
     }
     public function store(Request $request)
     {
+        dd($request->all());
         // Asosiy ma'lumotlarni olish
-        return $data = $request->input('data');
+        $data = $request->input('data');
 
         // Model yaratish
         $model = Models::create([
