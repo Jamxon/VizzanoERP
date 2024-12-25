@@ -25,20 +25,23 @@ class ModelController extends Controller
     public function store(Request $request)
     {
         // Validatsiya
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
             'images' => 'nullable|array',
             'submodels' => 'nullable|array',
         ]);
+
+        dd("Validated");
+
         // Model yaratish
         $model = Models::create([
-            'name' => $validated['name'],
-            'rasxod' => (double) $validated['rasxod'] ?? 0
+            'name' => $request->name,
+            'rasxod' => (double) $request->rasxod ?? 0,
         ]);
 
         // Suratlarni saqlash (agar mavjud bo'lsa)
-        if ($request->has('images') && !empty($validated['images'])) {
-            foreach ($validated['images'] as $image) {
+        if ($request->has('images') && !empty($request->images)) {
+            foreach ($request->images as $image) {
                 // Faylni nomini o'zgartirib saqlash
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('public/images', $fileName);
@@ -46,14 +49,14 @@ class ModelController extends Controller
                 // Rasm ma'lumotlarini saqlash
                 ModelImages::create([
                     'model_id' => $model->id,
-                    'image' => 'images/' . $fileName, // Fayl manzili
+                    'image' => 'images/' . $fileName,
                 ]);
             }
         }
 
         // Submodel va uning rang va o'lchamlarini saqlash (agar mavjud bo'lsa)
-        if ($request->has('submodels') && !empty($validated['submodels'])) {
-            foreach ($validated['submodels'] as $submodel) {
+        if ($request->has('submodels') && !empty($request->submodels)) {
+            foreach ($request->submodels as $submodel) {
                 // Submodelni yaratish
                 $submodelCreate = SubModel::create([
                     'name' => $submodel['name'],
@@ -87,15 +90,16 @@ class ModelController extends Controller
             return response()->json([
                 'message' => 'Model created successfully',
                 'model' => $model,
-            ], 201); // Status kodi 201, yangi resurs yaratildi
+            ], 201);
         } else {
             // Xato holat
             return response()->json([
                 'message' => 'Model creation failed',
                 'error' => 'There was an error creating the model.',
-            ], 500); // Status kodi 500, server xatosi
+            ], 500);
         }
     }
+
 
 
     public function update(Request $request, $id)
