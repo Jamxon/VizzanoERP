@@ -113,7 +113,6 @@ class ModelController extends Controller
                 'error' => 'Data field is not a valid JSON string',
             ], 400);
         }
-         return $model;
         // Modelni yangilash
         $model->update([
             'name' => $data['name'] ?? $model->name,
@@ -135,7 +134,7 @@ class ModelController extends Controller
                 $image->storeAs('public/images', $fileName);
 
                 ModelImages::create([
-                    'model_id' => $models->id,
+                    'model_id' => $model->id,
                     'image' => 'images/' . $fileName,
                 ]);
             }
@@ -158,7 +157,7 @@ class ModelController extends Controller
                 // Submodelni yaratish
                 $submodelCreate = SubModel::create([
                     'name' => $submodel['name'] ?? null,
-                    'model_id' => $models->id,
+                    'model_id' => $model->id,
                 ]);
 
                 // O'lchamlarni saqlash
