@@ -97,10 +97,45 @@ class ItemController extends Controller
 
     public function update(Request $request, Item $item)
     {
-        $item->update($request->all());
+        $request->validate([
+            'name' => 'required',
+            'price' => 'required',
+            'unit_id' => 'required|exists:units,id',
+            'color_id' => 'required|exists:colors,id',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'type_id' => 'required|exists:item_types,id',
+            'code' => 'unique:items,code,' . $item->id,
+        ], [
+            'code.unique' => 'Code must be unique',
+        ]);
+
+        if ($request->hasFile('image') && $request->file('image')->isValid()) {
+            $image = $request->file('image');
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $imagePath = $image->storeAs('public/images', $imageName);
+            $imagePath = str_replace('public/', '', $imagePath);
+
+            // Eski rasmini o'chirish
+            if ($item->image && Storage::exists('public/' . $item->image)) {
+                Storage::delete('public/' . $item->image);
+            }
+
+            $item->image = $imagePath;
+        }
+
+        $item->update([
+            'name' => $request->name,
+            'price' => $request->price ?? $item->price,
+            'unit_id' => $request->unit_id,
+            'color_id' => $request->color_id,
+            'code' => $request->code ?? $item->code,
+            'type_id' => $request->type_id,
+        ]);
+
         return response()->json([
             'message' => 'Item updated successfully',
             'item' => $item,
         ]);
     }
+
 }
