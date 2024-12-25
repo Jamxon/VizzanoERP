@@ -36,8 +36,6 @@ class ModelController extends Controller
             'name' => $request->name,
             'rasxod' => (double) $request->rasxod ?? 0,
         ]);
-
-        dd($request->submodels);
         // Suratlarni saqlash (agar mavjud bo'lsa)
         if ($request->has('images') && !empty($request->images)) {
             foreach ($request->images as $image) {
