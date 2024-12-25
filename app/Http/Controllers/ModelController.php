@@ -24,14 +24,17 @@ class ModelController extends Controller
     }
     public function store(Request $request)
     {
+        // Asosiy ma'lumotlarni olish
+        $data = $request->json('data', []);
+
         // Model yaratish
         $model = Models::create([
-            'name' => $request->name,
-            'rasxod' => (double) $request->rasxod ?? 0,
+            'name' => $data['name'] ?? null,
+            'rasxod' => (double) ($data['rasxod'] ?? 0),
         ]);
-        dd($request->all());
+
         // Suratlarni saqlash (agar mavjud bo'lsa)
-        if ($request->has('images') && !empty($request->images)) {
+        if ($request->hasFile('images') && !empty($request->images)) {
             foreach ($request->images as $image) {
                 // Faylni nomini o'zgartirib saqlash
                 $fileName = time() . '_' . $image->getClientOriginalName();
@@ -45,14 +48,12 @@ class ModelController extends Controller
             }
         }
 
-        dd($request->submodels);
-
         // Submodel va uning rang va o'lchamlarini saqlash (agar mavjud bo'lsa)
-        if ($request->has('submodels') && !empty($request->submodels)) {
-            foreach ($request->submodels as $submodel) {
+        if (!empty($data['submodels'])) {
+            foreach ($data['submodels'] as $submodel) {
                 // Submodelni yaratish
                 $submodelCreate = SubModel::create([
-                    'name' => $submodel['name'],
+                    'name' => $submodel['name'] ?? null,
                     'model_id' => $model->id,
                 ]);
 
@@ -92,6 +93,7 @@ class ModelController extends Controller
             ], 500);
         }
     }
+
 
 
 
