@@ -104,7 +104,7 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $models)
     {
-        dd($request->all());
+        dd($request->all(), $models);
         // `data` maydonini JSON sifatida dekodlash
         $data = json_decode($request->input('data'), true);
 
