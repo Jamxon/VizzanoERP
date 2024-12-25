@@ -24,6 +24,7 @@ class ModelController extends Controller
     }
     public function store(Request $request)
     {
+        dd($request->all());
         // Validation
         $validated = $request->validate([
             'name' => 'required|string|max:255', // 'name' talab qilinadi
