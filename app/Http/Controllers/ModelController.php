@@ -102,7 +102,7 @@ class ModelController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Models $models)
     {
         dd($request->all());
         // `data` maydonini JSON sifatida dekodlash
@@ -115,19 +115,16 @@ class ModelController extends Controller
             ], 400);
         }
 
-        // Modelni topish
-        $model = Models::findOrFail($id);
-
         // Modelni yangilash
-        $model->update([
-            'name' => $data['name'] ?? $model->name,
-            'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
+        $models->update([
+            'name' => $data['name'] ?? $models->name,
+            'rasxod' => (double) ($data['rasxod'] ?? $models->rasxod),
         ]);
 
         // Eski suratlarni o'chirish va yangi suratlarni saqlash
         if ($request->hasFile('images') && !empty($request->file('images'))) {
             // Eski suratlarni o'chirish
-            foreach ($model->images as $oldImage) {
+            foreach ($models->images as $oldImage) {
                 // Faylni tizimdan o'chirish (ixtiyoriy)
                 Storage::delete('public/' . $oldImage->image);
                 $oldImage->delete();
@@ -146,7 +143,7 @@ class ModelController extends Controller
         }
 
         // Eski submodellarga oid ma'lumotlarni o'chirish
-        foreach ($model->submodels as $submodel) {
+        foreach ($models->submodels as $submodel) {
             foreach ($submodel->sizes as $size) {
                 $size->delete();
             }
@@ -189,7 +186,7 @@ class ModelController extends Controller
 
         return response()->json([
             'message' => 'Model updated successfully',
-            'model' => $model,
+            'model' => $models,
         ]);
     }
 
