@@ -191,7 +191,7 @@ class ModelController extends Controller
         ]);
     }
 
-    public function destroyImage(ModelImages $image)
+    public function destroyImage(ModelImages $modelImage)
     {
         $image->delete();
         return response()->json([
