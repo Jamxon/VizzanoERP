@@ -193,7 +193,7 @@ class ModelController extends Controller
 
     public function destroyImage(ModelImages $modelImage)
     {
-        $image->delete();
+        $modelImage->delete();
         return response()->json([
             'message' => 'Image deleted successfully',
         ]);
