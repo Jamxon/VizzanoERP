@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
+use App\Models\SpecificationCategory;
 use App\Models\SubModel;
 use Illuminate\Http\Request;
 
@@ -76,5 +77,90 @@ class TechnologController extends Controller
         return response()->json($response);
     }
 
-    
+    //[
+    //    {
+    //        "id": 1,
+    //        "name": "TIKAN 1",
+    //        "specifications": [
+    //            {
+    //                "id": 1,
+    //                "name": "Specification 1",
+    //                "code": "S1",
+    //                "quantity": 100,
+    //                "comment": "This is a comment"
+    //            },
+    //            {
+    //                "id": 2,
+    //                "name": "Specification 2",
+    //                "code": "S2",
+    //                "quantity": 150,
+    //                "comment": "This is a comment"
+    //            }
+    //        ]
+    //    },
+    //    {
+    //        "id": 1,
+    //        "name": "TIKAN 2",
+    //        "specifications": [
+    //            {
+    //                "id": 3,
+    //                "name": "Specification 3",
+    //                "code": "S3",
+    //                "quantity": 100,
+    //                "comment": "This is a comment"
+    //            },
+    //            {
+    //                "id": 4,
+    //                "name": "Specification 4",
+    //                "code": "S4",
+    //                "quantity": 150,
+    //                "comment": "This is a comment"
+    //            }
+    //        ]
+    //    }
+    //]
+
+    public function storeSpecification(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'submodel_id' => 'required|integer|submodels:id',
+            'specifications' => 'required|array',
+            'specifications.*.name' => 'required|string',
+            'specifications.*.code' => 'required|string',
+            'specifications.*.quantity' => 'required|integer',
+            'specifications.*.comment' => 'nullable|string',
+        ]);
+
+        $data = $request->all();
+
+        foreach ($data as $datum) {
+            $specificationCategory = SpecificationCategory::create([
+                'name' => $datum['name'],
+                'submodel_id' => $datum['submodel_id'],
+            ]);
+
+            foreach ($datum['specifications'] as $specification) {
+                $specificationCategory->specifications()->create($specification);
+            }
+        }
+
+        if ($specificationCategory && $specificationCategory->specifications) {
+            return response()->json([
+                'message' => 'Specifications and SpecificationCategory created successfully'
+            ], 201);
+        }elseif (!$specificationCategory) {
+            return response()->json([
+                'message' => 'SpecificationCategory error'
+            ], 404);
+        }elseif (!$specificationCategory->specifications) {
+            return response()->json([
+                'message' => 'Specifications error'
+            ], 404);
+        }else {
+            return response()->json([
+                'message' => 'Something went wrong'
+            ], 500);
+        }
+    }
 }
