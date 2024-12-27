@@ -72,7 +72,7 @@ Route::middleware('role:omborchi')->group(function () {
 Route::middleware('role:technologist')->group(function () {
     Route::get('export-items/technologist', [ItemController::class, 'export']);
 //    Route::get('models/technologist', [ModelController::class, 'index']);
-    Route::get('models/technologist', function (){
+    Route::get('models', function (){
         return response()->json(\auth()->user());
     });
     Route::get('models/technologist/{model}', [ModelController::class, 'show']);
