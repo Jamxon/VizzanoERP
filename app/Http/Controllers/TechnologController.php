@@ -123,11 +123,9 @@ class TechnologController extends Controller
     public function storeSpecification(Request $request)
     {
         $request->validate([
-            '*.id' => 'required|integer|distinct',
             '*.name' => 'required|string',
             '*.submodel_id' => 'required|integer',
             '*.specifications' => 'required|array',
-            '*.specifications.*.id' => 'required|integer|distinct',
             '*.specifications.*.name' => 'required|string',
             '*.specifications.*.code' => 'required|string',
             '*.specifications.*.quantity' => 'required|integer|min:0',
