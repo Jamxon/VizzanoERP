@@ -27,7 +27,7 @@ class SpecificationCategory extends Model
         return $this->belongsTo(SubModel::class, 'submodel_id');
     }
 
-    public function parts()
+    public function specifications()
     {
         return $this->hasMany(PartSpecification::class, 'specification_category_id');
     }

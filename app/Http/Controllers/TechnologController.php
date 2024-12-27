@@ -11,7 +11,7 @@ class TechnologController extends Controller
 {
     public function getSpecificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
     {
-        $specifications = SpecificationCategory::where('submodel_id', $submodelId)->with('parts')->get();
+        $specifications = SpecificationCategory::where('submodel_id', $submodelId)->with('specifications')->get();
 
         if ($specifications) {
             return response()->json($specifications, 200);
