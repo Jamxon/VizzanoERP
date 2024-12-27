@@ -73,6 +73,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::get('export-items/technologist', [ItemController::class, 'export']);
     Route::get('models/technologist', [ModelController::class, 'index']);
     Route::get('models/technologist/{model}', [ModelController::class, 'show']);
+    Route::post('specification/store', [TechnologController::class, 'storeSpecification']);
 });
 
 Route::get('lids', [LidController::class, 'index']);
