@@ -75,6 +75,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::get('models/technologist/{model}', [ModelController::class, 'show']);
     Route::post('specification/store', [TechnologController::class, 'storeSpecification']);
     Route::get('specification/{submodelId}', [TechnologController::class, 'getSpecificationBySubmodelId']);
+    Route::patch('specification/update/{id}', [TechnologController::class, 'updateSpecification']);
 });
 
 Route::get('lids', [LidController::class, 'index']);
