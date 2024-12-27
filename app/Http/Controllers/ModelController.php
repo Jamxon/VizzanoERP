@@ -16,7 +16,7 @@ class ModelController extends Controller
     public function index()
     {
         $models = Models::all();
-        return response()->json($models);
+        return response()->json(\auth()->user());
     }
 
     public function show(Models $model)
