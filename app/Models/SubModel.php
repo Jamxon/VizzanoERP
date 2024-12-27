@@ -32,13 +32,13 @@ class SubModel extends Model
         return $this->hasMany(ModelColor::class, 'submodel_id');
     }
 
-    public function details()
+    public function specificationCategories()
     {
-        return $this->hasMany(Detail::class, 'submodel_id');
+        return $this->hasMany(SpecificationCategory::class, 'submodel_id');
     }
 
-    public function liningPreparations()
+    public function tarifications()
     {
-        return $this->hasMany(LiningPreparation::class, 'submodel_id');
+        return $this->hasMany(Tarification::class, 'submodel_id');
     }
 }

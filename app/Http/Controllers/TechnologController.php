@@ -76,27 +76,5 @@ class TechnologController extends Controller
         return response()->json($response);
     }
 
-    public function getApplication()
-    {
-        $applications = Application::all();
-        return response()->json($applications);
-    }
-
-    public function storeApplication(Request $request)
-    {
-        $application = Application::create($request->all());
-        return response()->json($application, 201);
-    }
-
-    public function updateApplication(Request $request, Application $application)
-    {
-        $application->update($request->all());
-        return response()->json($application, 200);
-    }
-
-    public function destroy(Application $application)
-    {
-        $application->delete();
-        return response()->json(null, 204);
-    }
+    
 }
