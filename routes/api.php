@@ -71,7 +71,7 @@ Route::middleware('role:omborchi')->group(function () {
 
 Route::middleware('role:technologist')->group(function () {
     Route::get('export-items/technologist', [ItemController::class, 'export']);
-    Route::get('getmodels', [ModelController::class, 'index']);
+    Route::get('models', [ModelController::class, 'index']);
     Route::get('models/technologist/{model}', [ModelController::class, 'show']);
     Route::post('specification/store', [TechnologController::class, 'storeSpecification']);
     Route::get('specification/{submodelId}', [TechnologController::class, 'getSpecificationBySubmodelId']);
