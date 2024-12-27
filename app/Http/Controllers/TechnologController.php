@@ -14,9 +14,7 @@ class TechnologController extends Controller
         $specifications = SpecificationCategory::where('submodel_id', $submodelId)->with('parts')->get();
 
         if ($specifications) {
-            return response()->json([
-                'specifications' => $specifications
-            ], 200);
+            return response()->json($specifications, 200);
         }else {
             return response()->json([
                 'message' => 'Specifications not found'
