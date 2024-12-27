@@ -9,8 +9,21 @@ use Illuminate\Http\Request;
 
 class TechnologController extends Controller
 {
-    
-    public function storeSpecification(Request $request)
+    public function getSpecificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
+    {
+        $specifications = SpecificationCategory::where('submodel_id', $submodelId)->with('parts')->get();
+
+        if ($specifications) {
+            return response()->json([
+                'specifications' => $specifications
+            ], 200);
+        }else {
+            return response()->json([
+                'message' => 'Specifications not found'
+            ], 404);
+        }
+    }
+    public function storeSpecification(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             '*.name' => 'required|string',
