@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
+use App\Models\PartSpecification;
 use App\Models\SpecificationCategory;
 use App\Models\SubModel;
 use Illuminate\Http\Request;
@@ -141,11 +142,17 @@ class TechnologController extends Controller
             ]);
 
             foreach ($datum['specifications'] as $specification) {
-                $specificationCategory->specifications()->create($specification);
+                $specifications = PartSpecification::create([
+                    'specification_category_id' => $specificationCategory->id,
+                    'name' => $specification['name'],
+                    'code' => $specification['code'],
+                    'quantity' => $specification['quantity'],
+                    'comment' => $specification['comment'],
+                ]);
             }
         }
 
-        if ($specificationCategory && $specificationCategory->specifications) {
+        if ($specificationCategory && $specifications) {
             return response()->json([
                 'message' => 'Specifications and SpecificationCategory created successfully'
             ], 201);
@@ -153,7 +160,7 @@ class TechnologController extends Controller
             return response()->json([
                 'message' => 'SpecificationCategory error'
             ], 404);
-        }elseif (!$specificationCategory->specifications) {
+        }elseif (!$specifications) {
             return response()->json([
                 'message' => 'Specifications error'
             ], 404);
