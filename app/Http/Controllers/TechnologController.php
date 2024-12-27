@@ -70,4 +70,53 @@ class TechnologController extends Controller
             ], 500);
         }
     }
+
+    public function updateSpecification(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'submodel_id' => 'required|integer',
+            'specifications' => 'required|array',
+            'specifications.*.name' => 'required|string',
+            'specifications.*.code' => 'required|string',
+            'specifications.*.quantity' => 'required|integer|min:0',
+            'specifications.*.comment' => 'nullable|string',
+        ]);
+
+        $data = $request->all();
+
+        $specificationCategory = SpecificationCategory::find($id);
+
+        if ($specificationCategory) {
+            $specificationCategory->update([
+                'name' => $data['name'],
+                'submodel_id' => $data['submodel_id'],
+            ]);
+
+            foreach ($data['specifications'] as $specification) {
+                $specifications = PartSpecification::find($specification['id']);
+
+                if ($specifications) {
+                    $specifications->update([
+                        'name' => $specification['name'],
+                        'code' => $specification['code'],
+                        'quantity' => $specification['quantity'],
+                        'comment' => $specification['comment'],
+                    ]);
+                }else {
+                    return response()->json([
+                        'message' => 'Specification not found'
+                    ], 404);
+                }
+            }
+
+            return response()->json([
+                'message' => 'Specifications and SpecificationCategory updated successfully'
+            ], 200);
+        }else {
+            return response()->json([
+                'message' => 'SpecificationCategory not found'
+            ], 404);
+        }
+    }
 }
