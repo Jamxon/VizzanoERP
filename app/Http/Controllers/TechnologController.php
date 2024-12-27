@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\PartSpecification;
 use App\Models\SpecificationCategory;
-use App\Models\SubModel;
 use Illuminate\Http\Request;
 
 class TechnologController extends Controller
@@ -116,6 +115,52 @@ class TechnologController extends Controller
         }else {
             return response()->json([
                 'message' => 'SpecificationCategory not found'
+            ], 404);
+        }
+    }
+
+    public function destroySpecificationCategory($id): \Illuminate\Http\JsonResponse
+    {
+        $specificationCategory = SpecificationCategory::find($id);
+
+        if ($specificationCategory) {
+            $specifications = PartSpecification::where('specification_category_id', $id)->get();
+
+            if ($specifications) {
+                foreach ($specifications as $specification) {
+                    $specification->delete();
+                }
+
+                $specificationCategory->delete();
+
+                return response()->json([
+                    'message' => 'Specifications and SpecificationCategory deleted successfully'
+                ], 200);
+            }else {
+                return response()->json([
+                    'message' => 'Specifications not found'
+                ], 404);
+            }
+        }else {
+            return response()->json([
+                'message' => 'SpecificationCategory not found'
+            ], 404);
+        }
+    }
+
+    public function destroySpecification($id): \Illuminate\Http\JsonResponse
+    {
+        $specification = PartSpecification::find($id);
+
+        if ($specification) {
+            $specification->delete();
+
+            return response()->json([
+                'message' => 'Specification deleted successfully'
+            ], 200);
+        }else {
+            return response()->json([
+                'message' => 'Specification not found'
             ], 404);
         }
     }
