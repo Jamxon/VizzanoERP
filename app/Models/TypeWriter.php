@@ -23,6 +23,6 @@ class TypeWriter extends Model
 
     public function tarifications()
     {
-        return $this->hasMany(Tarification::class);
+        return $this->hasMany(Tarification::class, 'typewriter_id');
     }
 }
