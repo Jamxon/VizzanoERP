@@ -186,8 +186,8 @@ class TechnologController extends Controller
             'data.*.tarifications.*.name' => 'required|string|max:255',
             'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
-            'data.*.tarifications.*.second' => 'required|double',
-            'data.*.tarifications.*.summa' => 'required|double',
+            'data.*.tarifications.*.second' => 'required|integer',
+            'data.*.tarifications.*.summa' => 'required|integer',
         ])->validate();
 
         foreach ($validatedData['data'] as $datum) {
