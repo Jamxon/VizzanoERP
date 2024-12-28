@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\PartSpecification;
 use App\Models\SpecificationCategory;
+use App\Models\Tarification;
+use App\Models\TarificationCategory;
 use Illuminate\Http\Request;
 
 class TechnologController extends Controller
@@ -163,6 +165,65 @@ class TechnologController extends Controller
             return response()->json([
                 'message' => 'Specification not found'
             ], 404);
+        }
+    }
+
+    public function storeTarification(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (is_null($data)) {
+            return response()->json([
+                'message' => 'Invalid JSON format',
+            ], 400);
+        }
+
+        $validatedData = validator($data, [
+            'data.*.name' => 'required|array',
+            'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
+            'data.*.tarifications' => 'required|array',
+            'data.*.tarifications.*.user_id' => 'required|integer|exists:users,id',
+            'data.*.tarifications.*.name' => 'required|string|max:255',
+            'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
+            'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
+            'data.*.tarifications.*.second' => 'required|double',
+            'data.*.tarifications.*.summa' => 'required|double',
+        ])->validate();
+
+        foreach ($validatedData['data'] as $datum) {
+            $tarificationCategory = TarificationCategory::create([
+                'name' => $datum['name'],
+                'submodel_id' => $datum['submodel_id'],
+            ]);
+
+            foreach ($datum['tarifications'] as $tarification) {
+                $tarifications = Tarification::create([
+                    'tarification_category_id' => $tarificationCategory->id,
+                    'user_id' => $tarification['user_id'],
+                    'name' => $tarification['name'],
+                    'razryad_id' => $tarification['razryad_id'],
+                    'typewriter_id' => $tarification['typewriter_id'],
+                    'second' => $tarification['second'],
+                    'summa' => $tarification['summa'],
+                ]);
+            }
+        }
+        if (isset($tarificationCategory) && isset($tarifications)) {
+            return response()->json([
+                'message' => 'Tarifications and TarificationCategory created successfully',
+            ], 201);
+        } elseif (!isset($tarificationCategory)) {
+            return response()->json([
+                'message' => 'TarificationCategory error',
+            ], 404);
+        } elseif (!isset($tarifications)) {
+            return response()->json([
+                'message' => 'Tarifications error',
+            ], 404);
+        } else {
+            return response()->json([
+                'message' => 'Something went wrong',
+            ], 500);
         }
     }
 }
