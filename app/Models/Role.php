@@ -15,13 +15,11 @@ class Role extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    // Foydalanuvchilarni olish
     public function users()
     {
         return $this->hasMany(User::class);
     }
 
-    // Ruxsatlarni olish (agar kerak bo'lsa)
     public function permissions()
     {
         return $this->belongsToMany(Permission::class);
