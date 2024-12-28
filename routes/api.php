@@ -78,6 +78,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::patch('specification/update/{id}', [TechnologController::class, 'updateSpecification']);
     Route::delete('specification/category/{id}', [TechnologController::class, 'destroySpecificationCategory']);
     Route::delete('specification/{id}', [TechnologController::class, 'destroySpecification']);
+    Route::post('tarification/store', [TechnologController::class, 'storeTarification']);
 });
 
 Route::get('lids', [LidController::class, 'index']);
