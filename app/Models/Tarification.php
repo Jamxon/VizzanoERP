@@ -34,21 +34,21 @@ class Tarification extends Model
 
     public function tarificationCategory()
     {
-        return $this->belongsTo(TarificationCategory::class);
+        return $this->belongsTo(TarificationCategory::class,'tarification_category_id');
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id');
     }
 
     public function razryad()
     {
-        return $this->belongsTo(Razryad::class);
+        return $this->belongsTo(Razryad::class,'razryad_id');
     }
 
     public function typewriter()
     {
-        return $this->belongsTo(Typewriter::class,'typewriter_id');
+        return $this->belongsTo(TypeWriter::class,'typewriter_id');
     }
 }
