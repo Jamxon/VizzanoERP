@@ -82,11 +82,6 @@ class TechnologController extends Controller
         $request->validate([
             'name' => 'required|string',
             'submodel_id' => 'required|integer',
-            'specifications' => 'required|array',
-            'specifications.*.name' => 'required|string',
-            'specifications.*.code' => 'required|string',
-            'specifications.*.quantity' => 'required|integer|min:0',
-            'specifications.*.comment' => 'nullable|string',
         ]);
 
         $data = $request->all();
@@ -99,30 +94,32 @@ class TechnologController extends Controller
                 'submodel_id' => $data['submodel_id'],
             ]);
 
-            foreach ($data['specifications'] as $specification) {
-                if (isset($specification['id'])) {
-                    $spec = PartSpecification::find($specification['id']);
+            if ($data['specifications']){
+                foreach ($data['specifications'] as $specification) {
+                    if (isset($specification['id'])) {
+                        $spec = PartSpecification::find($specification['id']);
 
-                    if ($spec) {
-                        $spec->update([
+                        if ($spec) {
+                            $spec->update([
+                                'name' => $specification['name'],
+                                'code' => $specification['code'],
+                                'quantity' => $specification['quantity'],
+                                'comment' => $specification['comment'],
+                            ]);
+                        } else {
+                            return response()->json([
+                                'message' => 'Specification not found'
+                            ], 404);
+                        }
+                    } else {
+                        $specifications = PartSpecification::create([
+                            'specification_category_id' => $id,
                             'name' => $specification['name'],
                             'code' => $specification['code'],
                             'quantity' => $specification['quantity'],
                             'comment' => $specification['comment'],
                         ]);
-                    } else {
-                        return response()->json([
-                            'message' => 'Specification not found'
-                        ], 404);
                     }
-                } else {
-                    $specifications = PartSpecification::create([
-                        'specification_category_id' => $id,
-                        'name' => $specification['name'],
-                        'code' => $specification['code'],
-                        'quantity' => $specification['quantity'],
-                        'comment' => $specification['comment'],
-                    ]);
                 }
             }
 
