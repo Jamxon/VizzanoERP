@@ -30,7 +30,7 @@ class Tarification extends Model
         'typewriter_id',
     ];
 
-    protected $with = ['tarificationCategory', 'user', 'razryad', 'typewriter'];
+    protected $with = ['user', 'razryad', 'typewriter'];
 
     public function tarificationCategory()
     {
