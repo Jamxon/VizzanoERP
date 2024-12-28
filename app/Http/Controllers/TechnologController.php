@@ -94,41 +94,28 @@ class TechnologController extends Controller
                 'submodel_id' => $data['submodel_id'],
             ]);
 
-            if ($data['specifications']){
-                foreach ($data['specifications'] as $specification) {
-                    if (isset($specification['id'])) {
-                        $spec = PartSpecification::find($specification['id']);
+            PartSpecification::where('specification_category_id', $specificationCategory->id)->delete();
 
-                        if ($spec) {
-                            $spec->update([
-                                'name' => $specification['name'],
-                                'code' => $specification['code'],
-                                'quantity' => $specification['quantity'],
-                                'comment' => $specification['comment'],
-                            ]);
-                        } else {
-                            return response()->json([
-                                'message' => 'Specification not found'
-                            ], 404);
-                        }
-                    } else {
-                        $specifications = PartSpecification::create([
-                            'specification_category_id' => $id,
+            if (!empty($data['specifications'])) {
+                foreach ($data['specifications'] as $specification) {
+                    if (!empty($specification['name']) && !empty($specification['code']) && !empty($specification['quantity'])) {
+                        PartSpecification::create([
+                            'specification_category_id' => $specificationCategory->id,
                             'name' => $specification['name'],
                             'code' => $specification['code'],
                             'quantity' => $specification['quantity'],
-                            'comment' => $specification['comment'],
+                            'comment' => $specification['comment'] ?? null,
                         ]);
                     }
                 }
             }
 
             return response()->json([
-                'message' => 'Specifications and SpecificationCategory updated successfully'
+                'message' => 'Specifications updated successfully',
             ], 200);
-        }else {
+        } else {
             return response()->json([
-                'message' => 'SpecificationCategory not found'
+                'message' => 'SpecificationCategory not found',
             ], 404);
         }
     }
