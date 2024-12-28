@@ -49,6 +49,6 @@ class Tarification extends Model
 
     public function typewriter()
     {
-        return $this->belongsTo(Typewriter::class);
+        return $this->belongsTo(Typewriter::class,'typewriter_id');
     }
 }
