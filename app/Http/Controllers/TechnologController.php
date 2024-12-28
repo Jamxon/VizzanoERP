@@ -100,19 +100,29 @@ class TechnologController extends Controller
             ]);
 
             foreach ($data['specifications'] as $specification) {
-                $specifications = PartSpecification::find($specification['id']);
+                if (isset($specification['id'])) {
+                    $spec = PartSpecification::find($specification['id']);
 
-                if ($specifications) {
-                    $specifications->update([
+                    if ($spec) {
+                        $spec->update([
+                            'name' => $specification['name'],
+                            'code' => $specification['code'],
+                            'quantity' => $specification['quantity'],
+                            'comment' => $specification['comment'],
+                        ]);
+                    } else {
+                        return response()->json([
+                            'message' => 'Specification not found'
+                        ], 404);
+                    }
+                } else {
+                    $specifications = PartSpecification::create([
+                        'specification_category_id' => $id,
                         'name' => $specification['name'],
                         'code' => $specification['code'],
                         'quantity' => $specification['quantity'],
                         'comment' => $specification['comment'],
                     ]);
-                }else {
-                    return response()->json([
-                        'message' => 'Specification not found'
-                    ], 404);
                 }
             }
 
