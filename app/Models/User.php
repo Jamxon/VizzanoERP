@@ -31,7 +31,7 @@ class User extends Authenticatable implements JWTSubject
 
     public $with = ['role'];
 
-    public $hidden = ['role_id', 'password'];
+    public $hidden = ['role_id', 'password','created_at', 'updated_at'];
     // Role modeliga aloqani o'rnatamiz
     public function role()
     {

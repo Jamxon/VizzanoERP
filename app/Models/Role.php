@@ -13,6 +13,8 @@ class Role extends Model
 
     protected $fillable = ['name', 'description'];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     // Foydalanuvchilarni olish
     public function users()
     {
