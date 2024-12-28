@@ -178,18 +178,32 @@ class TechnologController extends Controller
             ], 400);
         }
 
-        $validatedData = validator($data, [
-            'data.*.name' => 'required|array',
+        // Validatsiya
+        $validator = validator($data, [
+            'data' => 'required|array',
+            'data.*.name' => 'required|string|max:255',
             'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
             'data.*.tarifications' => 'required|array',
             'data.*.tarifications.*.user_id' => 'required|integer|exists:users,id',
             'data.*.tarifications.*.name' => 'required|string|max:255',
             'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
-            'data.*.tarifications.*.second' => 'required|integer',
-            'data.*.tarifications.*.summa' => 'required|integer',
-        ])->validate();
+            'data.*.tarifications.*.second' => 'required|numeric|min:0',
+            'data.*.tarifications.*.summa' => 'required|numeric|min:0',
+        ]);
 
+        // Validatsiya xatolarini tekshirish
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation errors',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        // Validatsiya qilingan ma'lumotlar
+        $validatedData = $validator->validated();
+
+        // Ma'lumotlarni saqlash
         foreach ($validatedData['data'] as $datum) {
             $tarificationCategory = TarificationCategory::create([
                 'name' => $datum['name'],
@@ -197,7 +211,7 @@ class TechnologController extends Controller
             ]);
 
             foreach ($datum['tarifications'] as $tarification) {
-                $tarifications = Tarification::create([
+                Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
                     'user_id' => $tarification['user_id'],
                     'name' => $tarification['name'],
@@ -208,22 +222,10 @@ class TechnologController extends Controller
                 ]);
             }
         }
-        if (isset($tarificationCategory) && isset($tarifications)) {
-            return response()->json([
-                'message' => 'Tarifications and TarificationCategory created successfully',
-            ], 201);
-        } elseif (!isset($tarificationCategory)) {
-            return response()->json([
-                'message' => 'TarificationCategory error',
-            ], 404);
-        } elseif (!isset($tarifications)) {
-            return response()->json([
-                'message' => 'Tarifications error',
-            ], 404);
-        } else {
-            return response()->json([
-                'message' => 'Something went wrong',
-            ], 500);
-        }
+
+        return response()->json([
+            'message' => 'Tarifications and TarificationCategory created successfully',
+        ], 201);
     }
+
 }
