@@ -77,7 +77,6 @@ class TechnologController extends Controller
         }
     }
 
-
     public function updateSpecification(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         $request->validate([
