@@ -228,4 +228,16 @@ class TechnologController extends Controller
         ], 201);
     }
 
+    public function getTarificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
+    {
+        $tarifications = TarificationCategory::where('submodel_id', $submodelId)->with('tarifications')->get();
+
+        if ($tarifications) {
+            return response()->json($tarifications, 200);
+        }else {
+            return response()->json([
+                'message' => 'Tarifications not found'
+            ], 404);
+        }
+    }
 }
