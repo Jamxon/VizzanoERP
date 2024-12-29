@@ -191,7 +191,6 @@ class TechnologController extends Controller
             'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
             'data.*.tarifications.*.second' => 'required|numeric|min:0',
-            'data.*.tarifications.*.summa' => 'required|numeric|min:0',
         ]);
 
         // Validatsiya xatolarini tekshirish
@@ -220,7 +219,7 @@ class TechnologController extends Controller
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
                     'second' => $tarification['second'],
-                    'summa' => $tarification['summa'],
+                    'summa' => $tarification['second'] * $tarification['razryad']['price'],
                 ]);
             }
         }
