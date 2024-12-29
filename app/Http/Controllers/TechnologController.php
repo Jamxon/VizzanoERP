@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Department;
+use App\Models\Employee;
 use App\Models\PartSpecification;
 use App\Models\SpecificationCategory;
 use App\Models\Tarification;
@@ -239,5 +241,10 @@ class TechnologController extends Controller
                 'message' => 'Tarifications not found'
             ], 404);
         }
+    }
+
+    public function getEmployerByDepartment($departmentIndex)
+    {
+        return Department::all();
     }
 }
