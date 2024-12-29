@@ -245,6 +245,7 @@ class TechnologController extends Controller
 
     public function getEmployerByDepartment()
     {
-        return Department::with('groups')->get();
+        $user = auth()->user();
+        return Department::where('branch_id', $user->employee->branch_id)->with('groups.employees')->get();
     }
 }
