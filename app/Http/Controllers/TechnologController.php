@@ -243,7 +243,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function getEmployerByDepartment($departmentIndex)
+    public function getEmployerByDepartment()
     {
         return Department::all();
     }
