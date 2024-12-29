@@ -245,6 +245,6 @@ class TechnologController extends Controller
 
     public function getEmployerByDepartment()
     {
-        return Department::with('groups.users')->get();
+        return Department::with('groups')->get();
     }
 }
