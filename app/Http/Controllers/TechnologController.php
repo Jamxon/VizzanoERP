@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
-use App\Models\Employee;
 use App\Models\PartSpecification;
 use App\Models\SpecificationCategory;
 use App\Models\Tarification;
 use App\Models\TarificationCategory;
+use App\Models\TypeWriter;
 use Illuminate\Http\Request;
 
 class TechnologController extends Controller
@@ -170,7 +170,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function storeTarification(Request $request)
+    public function storeTarification(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -248,8 +248,8 @@ class TechnologController extends Controller
         $user = auth()->user();
 
         return Department::where('branch_id', $user->employee->branch_id)
-            ->whereIn('id', [1, 2]) // Bir vaqtning o'zida 1 yoki 2 bo'lgan ID larni olish
-            ->with('groups.employees') // groups orqali employees ni yuklash
+            ->whereIn('id', [1, 2])
+            ->with('groups.employees')
             ->get()
             ->flatMap(function ($department) {
                 return $department->groups->flatMap(function ($group) {
@@ -258,4 +258,16 @@ class TechnologController extends Controller
             });
     }
 
+    public function getTypeWriter()
+    {
+        $typeWriters = TypeWriter::all();
+
+        if ($typeWriters) {
+            return response()->json($typeWriters, 200);
+        }else {
+            return response()->json([
+                'message' => 'TypeWriters not found'
+            ], 404);
+        }
+    }
 }
