@@ -183,7 +183,6 @@ class TechnologController extends Controller
 
         // Validatsiya
         $validator = validator($data, [
-            'data' => 'required|array',
             'data.*.name' => 'required|string|max:255',
             'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
             'data.*.tarifications' => 'required|array',
