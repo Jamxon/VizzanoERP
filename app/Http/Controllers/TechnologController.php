@@ -206,12 +206,26 @@ class TechnologController extends Controller
 
         // Ma'lumotlarni saqlash
         foreach ($validatedData['data'] as $datum) {
+            // Create Tarification Category
             $tarificationCategory = TarificationCategory::create([
                 'name' => $datum['name'],
                 'submodel_id' => $datum['submodel_id'],
             ]);
 
             foreach ($datum['tarifications'] as $tarification) {
+                // Fetch the Razryad model once
+                $razryad = Razryad::find($tarification['razryad_id']);
+
+                if (!$razryad) {
+                    return response()->json([
+                        'message' => 'Razryad not found',
+                    ], 404);
+                }
+
+                // Calculate summa using the found Razryad salary
+                $summa = $tarification['second'] * $razryad->salary;
+
+                // Create Tarification entry
                 Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
                     'user_id' => $tarification['user_id'],
@@ -219,7 +233,7 @@ class TechnologController extends Controller
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
                     'second' => $tarification['second'],
-                    'summa' => $tarification['second'] * Razryad::find($tarification['razryad_id'])->salary,
+                    'summa' => $summa,
                 ]);
             }
         }
@@ -228,6 +242,7 @@ class TechnologController extends Controller
             'message' => 'Tarifications and TarificationCategory created successfully',
         ], 201);
     }
+
 
     public function getTarificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
     {
