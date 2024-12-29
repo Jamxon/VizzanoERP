@@ -80,6 +80,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::delete('specification/{id}', [TechnologController::class, 'destroySpecification']);
     Route::post('tarification/store', [TechnologController::class, 'storeTarification']);
     Route::get('tarification/{submodelId}', [TechnologController::class, 'getTarificationBySubmodelId']);
+    Route::get('departments', [TechnologController::class, 'getEmployerByDepartment']);
 });
 
 Route::get('lids', [LidController::class, 'index']);
