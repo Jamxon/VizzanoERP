@@ -16,7 +16,7 @@ class Group extends Model
         'total_work_time',
         'model_id'];
 
-    protected $with = ['users','employees'];
+//    protected $with = ['users','employees'];
 
     public function users()
     {
