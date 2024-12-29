@@ -81,6 +81,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::post('tarification/store', [TechnologController::class, 'storeTarification']);
     Route::get('tarification/users', [TechnologController::class, 'getEmployerByDepartment']);
     Route::get('tarification/{submodelId}', [TechnologController::class, 'getTarificationBySubmodelId']);
+    Route::get('typewriter', [TechnologController::class, 'getTypeWriter']);
 });
 
 Route::get('lids', [LidController::class, 'index']);
