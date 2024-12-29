@@ -220,7 +220,7 @@ class TechnologController extends Controller
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
                     'second' => $tarification['second'],
-                    'summa' => $tarification['second'] * Razryad::find($tarification['razryad_id'])->price,
+                    'summa' => $tarification['second'] * Razryad::find($tarification['razryad_id'])->salary,
                 ]);
             }
         }
