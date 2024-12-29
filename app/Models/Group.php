@@ -16,6 +16,8 @@ class Group extends Model
         'total_work_time',
         'model_id'];
 
+    protected $with = ['users','employees'];
+
     public function users()
     {
         return $this->belongsTo(User::class, 'responsible_user_id');
@@ -32,6 +34,6 @@ class Group extends Model
 
     public function employees()
     {
-        return $this->hasMany(Employee::class);
+        return $this->hasMany(Employee::class,'group_id');
     }
 }
