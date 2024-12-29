@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\PartSpecification;
+use App\Models\Razryad;
 use App\Models\SpecificationCategory;
 use App\Models\Tarification;
 use App\Models\TarificationCategory;
@@ -219,7 +220,7 @@ class TechnologController extends Controller
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
                     'second' => $tarification['second'],
-                    'summa' => $tarification['second'] * $tarification['razryad']['price'],
+                    'summa' => $tarification['second'] * Razryad::find($tarification['razryad_id'])->price,
                 ]);
             }
         }
