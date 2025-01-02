@@ -186,7 +186,6 @@ class TechnologController extends Controller
             'data.*.name' => 'required|string|max:255',
             'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
             'data.*.tarifications' => 'required|array',
-//            'data.*.tarifications.*.user_id' => 'required|integer|exists:employers,id',
             'data.*.tarifications.*.name' => 'required|string|max:255',
             'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
@@ -228,7 +227,6 @@ class TechnologController extends Controller
                 // Create Tarification entry
                 Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
-//    'user_id' => $tarification['user_id'],
                     'name' => $tarification['name'],
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
@@ -236,7 +234,6 @@ class TechnologController extends Controller
                     'summa' => $summa,
                     'code' => $this->generateSequentialCode(), // Tartiblangan kod generatsiyasi
                 ]);
-
             }
         }
 
@@ -245,6 +242,9 @@ class TechnologController extends Controller
         ], 201);
     }
 
+    /**
+     * Kodni generatsiya qiluvchi funksiya
+     */
     private function generateSequentialCode(): string
     {
         // Oxirgi tarification yozuvini olamiz
@@ -267,13 +267,40 @@ class TechnologController extends Controller
         // Raqamni oshiramiz
         $number++;
 
-        // Agar raqam 100 dan oshsa, yangi harfga o‘tamiz
+        // Agar raqam 99 dan oshsa, yangi harfga o‘tamiz
         if ($number > 99) {
-            $letter = ++$letter;
             $number = 1; // Qayta 1-dan boshlaymiz
+            $letter = $this->incrementLetter($letter); // Harfni oshiramiz
         }
 
         return $letter . $number;
+    }
+
+    /**
+     * Harfni oshiruvchi funksiya
+     */
+    private function incrementLetter(string $letter): string
+    {
+        $length = strlen($letter);
+        $incremented = false;
+
+        for ($i = $length - 1; $i >= 0; $i--) {
+            if ($letter[$i] !== 'Z') {
+                // Harfni oshiramiz
+                $letter[$i] = chr(ord($letter[$i]) + 1);
+                $incremented = true;
+                break;
+            }
+            // Z ni A ga o'zgartiramiz
+            $letter[$i] = 'A';
+        }
+
+        // Agar barcha harflar Z bo'lsa, yangi harf qo'shamiz
+        if (!$incremented) {
+            $letter = 'A' . $letter;
+        }
+
+        return $letter;
     }
 
 
