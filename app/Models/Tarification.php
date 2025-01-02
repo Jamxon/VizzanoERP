@@ -30,16 +30,16 @@ class Tarification extends Model
         'typewriter_id',
     ];
 
-    protected $with = ['user', 'razryad', 'typewriter'];
+    protected $with = ['employee', 'razryad', 'typewriter'];
 
     public function tarificationCategory()
     {
         return $this->belongsTo(TarificationCategory::class,'tarification_category_id');
     }
 
-    public function user()
+    public function employee()
     {
-        return $this->belongsTo(User::class,'user_id');
+        return $this->belongsTo(Employee::class,'user_id');
     }
 
     public function razryad()
