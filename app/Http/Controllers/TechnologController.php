@@ -228,13 +228,15 @@ class TechnologController extends Controller
                 // Create Tarification entry
                 Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
-//                    'user_id' => $tarification['user_id'],
+//    'user_id' => $tarification['user_id'],
                     'name' => $tarification['name'],
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
                     'second' => $tarification['second'],
                     'summa' => $summa,
+                    'code' => $this->generateSequentialCode(), // Tartiblangan kod generatsiyasi
                 ]);
+
             }
         }
 
@@ -242,6 +244,38 @@ class TechnologController extends Controller
             'message' => 'Tarifications and TarificationCategory created successfully',
         ], 201);
     }
+
+    private function generateSequentialCode(): string
+    {
+        // Oxirgi tarification yozuvini olamiz
+        $lastTarification = Tarification::latest('id')->first();
+
+        if (!$lastTarification) {
+            // Agar hech narsa bo‘lmasa, boshlang‘ich qiymat qaytadi
+            return 'A1';
+        }
+
+        // Oxirgi yozuvning kodini olamiz
+        $lastCode = $lastTarification->code;
+
+        // Harf va raqamlarni ajratamiz
+        preg_match('/([A-Z]+)(\d+)/', $lastCode, $matches);
+
+        $letter = $matches[1] ?? 'A'; // Harf
+        $number = (int)($matches[2] ?? 0); // Raqam
+
+        // Raqamni oshiramiz
+        $number++;
+
+        // Agar raqam 100 dan oshsa, yangi harfga o‘tamiz
+        if ($number > 99) {
+            $letter = ++$letter;
+            $number = 1; // Qayta 1-dan boshlaymiz
+        }
+
+        return $letter . $number;
+    }
+
 
 
     public function getTarificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
