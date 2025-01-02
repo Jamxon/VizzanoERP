@@ -186,7 +186,7 @@ class TechnologController extends Controller
             'data.*.name' => 'required|string|max:255',
             'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
             'data.*.tarifications' => 'required|array',
-            'data.*.tarifications.*.user_id' => 'required|integer|exists:users,id',
+            'data.*.tarifications.*.user_id' => 'required|integer|exists:employers,id',
             'data.*.tarifications.*.name' => 'required|string|max:255',
             'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
@@ -281,6 +281,52 @@ class TechnologController extends Controller
         }else {
             return response()->json([
                 'message' => 'TypeWriters not found'
+            ], 404);
+        }
+    }
+
+    public function destroyTarificationCategory($id)
+    {
+        $tarificationCategory = TarificationCategory::find($id);
+
+        if ($tarificationCategory) {
+            $tarifications = Tarification::where('tarification_category_id', $id)->get();
+
+            if ($tarifications) {
+                foreach ($tarifications as $tarification) {
+                    $tarification->delete();
+                }
+
+                $tarificationCategory->delete();
+
+                return response()->json([
+                    'message' => 'Tarifications and TarificationCategory deleted successfully'
+                ], 200);
+            }else {
+                return response()->json([
+                    'message' => 'Tarifications not found'
+                ], 404);
+            }
+        }else {
+            return response()->json([
+                'message' => 'TarificationCategory not found'
+            ], 404);
+        }
+    }
+
+    public function deleteTarification($id)
+    {
+        $tarification = Tarification::find($id);
+
+        if ($tarification) {
+            $tarification->delete();
+
+            return response()->json([
+                'message' => 'Tarification deleted successfully'
+            ], 200);
+        }else {
+            return response()->json([
+                'message' => 'Tarification not found'
             ], 404);
         }
     }
