@@ -242,6 +242,61 @@ class TechnologController extends Controller
         ], 201);
     }
 
+    public function updateTarification(Request $request, $id)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'submodel_id' => 'required|integer|exists:sub_models,id',
+        ]);
+
+        $data = $request->all();
+
+        $tarificationCategory = TarificationCategory::find($id);
+
+        if ($tarificationCategory) {
+            $tarificationCategory->update([
+                'name' => $data['name'],
+                'submodel_id' => $data['submodel_id'],
+            ]);
+
+            Tarification::where('tarification_category_id', $tarificationCategory->id)->delete();
+
+            if (!empty($data['tarifications'])) {
+                foreach ($data['tarifications'] as $tarification) {
+                    if (!empty($tarification['name']) && !empty($tarification['razryad_id']) && !empty($tarification['typewriter_id']) && !empty($tarification['second'])) {
+                        $razryad = Razryad::find($tarification['razryad_id']);
+
+                        if (!$razryad) {
+                            return response()->json([
+                                'message' => 'Razryad not found',
+                            ], 404);
+                        }
+
+                        $summa = $tarification['second'] * $razryad->salary;
+
+                        Tarification::create([
+                            'tarification_category_id' => $tarificationCategory->id,
+                            'name' => $tarification['name'],
+                            'razryad_id' => $tarification['razryad_id'],
+                            'typewriter_id' => $tarification['typewriter_id'],
+                            'second' => $tarification['second'],
+                            'summa' => $summa,
+                            'code' => $this->generateSequentialCode(),
+                        ]);
+                    }
+                }
+            }
+
+            return response()->json([
+                'message' => 'Tarifications updated successfully',
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'TarificationCategory not found',
+            ], 404);
+        }
+    }
+
     /**
      * Kodni generatsiya qiluvchi funksiya
      */
