@@ -186,7 +186,7 @@ class TechnologController extends Controller
             'data.*.name' => 'required|string|max:255',
             'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
             'data.*.tarifications' => 'required|array',
-            'data.*.tarifications.*.user_id' => 'required|integer|exists:employers,id',
+//            'data.*.tarifications.*.user_id' => 'required|integer|exists:employers,id',
             'data.*.tarifications.*.name' => 'required|string|max:255',
             'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
@@ -228,7 +228,7 @@ class TechnologController extends Controller
                 // Create Tarification entry
                 Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
-                    'user_id' => $tarification['user_id'],
+//                    'user_id' => $tarification['user_id'],
                     'name' => $tarification['name'],
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
