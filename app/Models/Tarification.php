@@ -19,6 +19,7 @@ class Tarification extends Model
         'typewriter_id',
         'second',
         'summa',
+        'code',
     ];
 
     protected $hidden = [
