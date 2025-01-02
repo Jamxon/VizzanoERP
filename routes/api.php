@@ -79,6 +79,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::delete('specification/category/{id}', [TechnologController::class, 'destroySpecificationCategory']);
     Route::delete('specification/{id}', [TechnologController::class, 'destroySpecification']);
     Route::post('tarification/store', [TechnologController::class, 'storeTarification']);
+    Route::patch('tarification/update/{id}', [TechnologController::class, 'updateTarification']);
     Route::get('tarification/users', [TechnologController::class, 'getEmployerByDepartment']);
     Route::get('tarification/{submodelId}', [TechnologController::class, 'getTarificationBySubmodelId']);
     Route::get('typewriter', [TechnologController::class, 'getTypeWriter']);
