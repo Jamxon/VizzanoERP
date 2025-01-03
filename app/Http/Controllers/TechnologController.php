@@ -242,7 +242,7 @@ class TechnologController extends Controller
         ], 201);
     }
 
-    public function updateTarification(Request $request, $id)
+    public function updateTarification(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -388,7 +388,7 @@ class TechnologController extends Controller
             });
     }
 
-    public function getTypeWriter()
+    public function getTypeWriter(): \Illuminate\Http\JsonResponse
     {
         $typeWriters = TypeWriter::all();
 
