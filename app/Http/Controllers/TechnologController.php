@@ -452,7 +452,9 @@ class TechnologController extends Controller
     {
         $user = auth()->user();
 
-        $orders = Order::where('branch_id', $user->employee->branch_id)->get();
+        $orders = Order::where('branch_id', $user->employee->branch_id)
+            ->where('status', '!=', 'inactive')
+            ->get();
 
         return response()->json($orders, 200);
     }
