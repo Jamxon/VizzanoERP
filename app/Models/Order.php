@@ -9,9 +9,17 @@ class Order extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'quantity', 'status','start_date','end_date','rasxod'];
+    protected $fillable = [
+        'name',
+        'quantity',
+        'status',
+        'start_date',
+        'end_date',
+        'rasxod',
+        'branch_id'
+    ];
 
-    protected $hidden = ['created_at', 'updated_at'];
+    protected $hidden = ['created_at', 'updated_at', 'branch_id'];
 
     protected $with = ['orderModels'];
 
@@ -20,4 +28,8 @@ class Order extends Model
         return $this->hasMany(OrderModel::class, 'order_id');
     }
 
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }
