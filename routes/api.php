@@ -81,12 +81,12 @@ Route::middleware('role:technologist')->group(function () {
     Route::post('tarification/store', [TechnologController::class, 'storeTarification']);
     Route::patch('tarification/update/{id}', [TechnologController::class, 'updateTarification']);
     Route::get('tarification/users', [TechnologController::class, 'getEmployerByDepartment']);
+    Route::get('tarification/orders', [TechnologController::class, 'getOrders']);
     Route::get('tarification/{submodelId}', [TechnologController::class, 'getTarificationBySubmodelId']);
     Route::get('typewriter', [TechnologController::class, 'getTypeWriter']);
     Route::get('razryads', [RazryadController::class, 'index']);
     Route::delete('tarification/category/{id}', [TechnologController::class, 'destroyTarificationCategory']);
     Route::delete('tarification/{id}', [TechnologController::class, 'deleteTarification']);
-    Route::get('tarification/order', [TechnologController::class, 'getOrders']);
 });
 
 Route::get('lids', [LidController::class, 'index']);
