@@ -457,4 +457,17 @@ class TechnologController extends Controller
 
         return response()->json($orders, 200);
     }
+
+    public function showTarification($id)
+    {
+        $tarification = Tarification::find($id);
+
+        if ($tarification) {
+            return response()->json($tarification, 200);
+        }else {
+            return response()->json([
+                'message' => 'Tarification not found'
+            ], 404);
+        }
+    }
 }
