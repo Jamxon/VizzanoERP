@@ -82,6 +82,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::patch('tarification/update/{id}', [TechnologController::class, 'updateTarification']);
     Route::get('tarification/users', [TechnologController::class, 'getEmployerByDepartment']);
     Route::get('tarification/orders', [TechnologController::class, 'getOrders']);
+    Route::get('tarification/orders/{order}', [OrderController::class, 'show']);
     Route::get('tarification/{submodelId}', [TechnologController::class, 'getTarificationBySubmodelId']);
     Route::get('typewriter', [TechnologController::class, 'getTypeWriter']);
     Route::get('razryads', [RazryadController::class, 'index']);
