@@ -22,4 +22,11 @@ class Branch extends Model
     {
         return $this->hasMany(Department::class);
     }
+
+    // Buyurtmalarga aloqani o'rnatamiz
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

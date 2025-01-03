@@ -40,6 +40,8 @@ class OrderController extends Controller
             'models.*.quantity' => 'required|integer',
         ]);
 
+        $user = auth()->user();
+
         $order = Order::create([
             'name' => $request->name,
             'quantity' => $request->quantity,
@@ -47,6 +49,7 @@ class OrderController extends Controller
             'start_date' => $request->start_date ?? null,
             'end_date' => $request->end_date ?? null,
             'rasxod'  => $request->rasxod ?? 0,
+            'branch_id' => $user->employee->branch_id,
         ]);
 
         foreach ($request->models as $model) {
