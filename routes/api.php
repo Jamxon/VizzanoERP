@@ -86,6 +86,7 @@ Route::middleware('role:technologist')->group(function () {
     Route::get('razryads', [RazryadController::class, 'index']);
     Route::delete('tarification/category/{id}', [TechnologController::class, 'destroyTarificationCategory']);
     Route::delete('tarification/{id}', [TechnologController::class, 'deleteTarification']);
+    Route::get('tarification/order', [TechnologController::class, 'getOrders']);
 });
 
 Route::get('lids', [LidController::class, 'index']);

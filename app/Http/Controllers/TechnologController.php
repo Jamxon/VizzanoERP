@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Order;
 use App\Models\PartSpecification;
 use App\Models\Razryad;
 use App\Models\SpecificationCategory;
@@ -445,5 +446,14 @@ class TechnologController extends Controller
                 'message' => 'Tarification not found'
             ], 404);
         }
+    }
+
+    public function getOrders()
+    {
+        $user = auth()->user();
+
+        $orders = Order::where('branch_id', $user->employee->branch_id)->get();
+
+        return response()->json($orders, 200);
     }
 }
