@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Models\User;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -56,7 +57,7 @@ class AuthController extends Controller
 
 
         $user = User::where('username', $request->username)->first();
-        return $user->employee->status != 'kicked';
+        return response()->json($user->employee->status != 'kicked');
 
         if (!$user && !$this->checkDjangoPassword($request->password, $user->password) && ($user->employee->status != 'kicked')) {
             return response()->json(['error' => 'Unauthorized'], 401);
