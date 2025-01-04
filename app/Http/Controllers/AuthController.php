@@ -58,7 +58,7 @@ class AuthController extends Controller
 
         $user = User::where('username', $request->username)->first();
 
-        if (!$user && !$this->checkDjangoPassword($request->password, $user->password) && ($user->employee->status == 'kicked')) {
+        if (!$user || !$this->checkDjangoPassword($request->password, $user->password) || ($user->employee->status == 'kicked')) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
