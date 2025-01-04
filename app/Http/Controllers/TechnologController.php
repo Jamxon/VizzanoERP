@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Order;
+use App\Models\OrderGroup;
 use App\Models\PartSpecification;
 use App\Models\Razryad;
 use App\Models\SpecificationCategory;
@@ -378,12 +379,26 @@ class TechnologController extends Controller
 
     public function getEmployerByDepartment(Request $request)
     {
-        $user = auth()->user();
-
         $order_id = $request->query('order_id');
-        $group_id = $request->query('group_id');
         $submodel_id = $request->query('submodel_id');
+
+        $groupIds = OrderGroup::where('order_id', $order_id)
+            ->where('submodel_id', $submodel_id)
+            ->pluck('group_id');
+
+        $employees = Employee::whereIn('group_id', $groupIds)
+            ->where('status', 'active')
+            ->get();
+
+        if ($employees->isNotEmpty()) {
+            return response()->json($employees, 200);
+        } else {
+            return response()->json([
+                'message' => 'Employers not found'
+            ], 404);
+        }
     }
+
 
     public function getTypeWriter(): \Illuminate\Http\JsonResponse
     {
