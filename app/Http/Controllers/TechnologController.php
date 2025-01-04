@@ -376,19 +376,13 @@ class TechnologController extends Controller
         }
     }
 
-    public function getEmployerByDepartment()
+    public function getEmployerByDepartment(Request $request)
     {
         $user = auth()->user();
 
-        return Department::where('branch_id', $user->employee->branch_id)
-            ->whereIn('id', [1, 2])
-            ->with('groups.employees')
-            ->get()
-            ->flatMap(function ($department) {
-                return $department->groups->flatMap(function ($group) {
-                    return $group->employees;
-                });
-            });
+        $order_id = $request->query('order_id');
+        $group_id = $request->query('group_id');
+        $submodel_id = $request->query('submodel_id');
     }
 
     public function getTypeWriter(): \Illuminate\Http\JsonResponse
