@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Order;
 use App\Models\PartSpecification;
 use App\Models\Razryad;
@@ -26,6 +27,7 @@ class TechnologController extends Controller
             ], 404);
         }
     }
+
     public function storeSpecification(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -470,4 +472,45 @@ class TechnologController extends Controller
             ], 404);
         }
     }
+
+    public function fasteningToEmployee(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (is_null($data)) {
+            return response()->json([
+                'message' => 'Invalid JSON format',
+            ], 400);
+        }
+
+        $validator = validator($data, [
+            'data' => 'required|array',
+            'data.*.user_id' => 'required|integer|exists:employees,id',
+            'data.*.tarifications' => 'required|array',
+            'data.*.tarifications.*' => 'required|integer|exists:tarifications,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation errors',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validatedData = $validator->validated();
+
+        foreach ($validatedData['data'] as $datum) {
+            $userId = $datum['user_id'];
+            $tarifications = $datum['tarifications'];
+
+            foreach ($tarifications as $tarificationId) {
+                Tarification::where('id', $tarificationId)->update(['user_id' => $userId]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Tarifications fastened to employees successfully',
+        ], 200);
+    }
+
 }
