@@ -384,7 +384,7 @@ class TechnologController extends Controller
             ->pluck('group_id');
 
         $employees = Employee::whereIn('group_id', $groupIds)
-            ->where('status', 'active')
+            ->where('status', 'working')
             ->get();
 
         return $employees->isNotEmpty()
