@@ -379,25 +379,19 @@ class TechnologController extends Controller
 
     public function getEmployerByDepartment(Request $request)
     {
-        $order_id = $request->query('order_id');
-        $submodel_id = $request->query('submodel_id');
-
-        $groupIds = OrderGroup::where('order_id', $order_id)
-            ->where('submodel_id', $submodel_id)
+        $groupIds = OrderGroup::where('order_id', $request->query('order_id'))
+            ->where('submodel_id', $request->query('submodel_id'))
             ->pluck('group_id');
 
         $employees = Employee::whereIn('group_id', $groupIds)
             ->where('status', 'active')
             ->get();
 
-        if ($employees->isNotEmpty()) {
-            return response()->json($employees, 200);
-        } else {
-            return response()->json([
-                'message' => 'Employers not found'
-            ], 404);
-        }
+        return $employees->isNotEmpty()
+            ? response()->json($employees, 200)
+            : response()->json(['message' => 'Employers not found'], 404);
     }
+
 
 
     public function getTypeWriter(): \Illuminate\Http\JsonResponse
