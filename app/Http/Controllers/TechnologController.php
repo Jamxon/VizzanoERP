@@ -383,16 +383,16 @@ class TechnologController extends Controller
             ->where('submodel_id', $request->query('submodel_id'))
             ->pluck('group_id');
 
-        $employees = Employee::whereIn('group_id', $groupIds)
-            ->where('status', 'active')
-            ->get();
+//        $employees = Employee::whereIn('group_id', $groupIds)
+//            ->where('status', 'active')
+//            ->get();
+
+        $employees = Employee::all();
 
         return $employees->isNotEmpty()
             ? response()->json($employees, 200)
             : response()->json(['message' => 'Employers not found'], 404);
     }
-
-
 
     public function getTypeWriter(): \Illuminate\Http\JsonResponse
     {
