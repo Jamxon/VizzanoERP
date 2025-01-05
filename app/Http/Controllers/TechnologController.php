@@ -383,11 +383,9 @@ class TechnologController extends Controller
             ->where('submodel_id', $request->query('submodel_id'))
             ->pluck('group_id');
 
-//        $employees = Employee::whereIn('group_id', $groupIds)
-//            ->where('status', 'active')
-//            ->get();
-
-        $employees = Employee::all();
+        $employees = Employee::whereIn('group_id', $groupIds)
+            ->where('status', 'active')
+            ->get();
 
         return $employees->isNotEmpty()
             ? response()->json($employees, 200)
