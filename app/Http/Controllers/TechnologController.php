@@ -385,7 +385,7 @@ class TechnologController extends Controller
         $groupIds = OrderGroup::where('order_id', $order_id)
             ->where('submodel_id', $submodel_id)
             ->pluck('group_id');
-        return $groupIds;
+
         $employees = Employee::whereIn('group_id', $groupIds)
             ->where('status', 'active')
             ->get();
