@@ -367,7 +367,7 @@ class TechnologController extends Controller
 
 
 
-    public function getTarificationByOrderModelId($orderModelId): \Illuminate\Http\JsonResponse
+    public function getTarificationByOrderModelId($orderModelId)
     {
        return  $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)->first();
         $tarifications = TarificationCategory::where('submodel_id', $orderSubModel->submodel_id)->with('tarifications')->get();
