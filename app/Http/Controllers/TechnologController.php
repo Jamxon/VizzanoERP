@@ -372,6 +372,7 @@ class TechnologController extends Controller
         $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)->first();
         $tarifications = TarificationCategory::where('submodel_id', $orderSubModel->submodel_id)->with('tarifications')->get();
         $submodels = SubModel::where('id', $orderSubModel->submodel_id)->with('tarifications')->get();
+        $submodels->load('tarifications');
         return response()->json($submodels, 200);
     }
 
