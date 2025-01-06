@@ -36,6 +36,6 @@ class Employee extends Model
 
     public function tarifications()
     {
-        return $this->hasMany(Tarification::class);
+        return $this->hasMany(Tarification::class, 'user_id');
     }
 }
