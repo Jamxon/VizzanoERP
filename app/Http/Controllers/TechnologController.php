@@ -483,8 +483,7 @@ class TechnologController extends Controller
         $validator = validator($data, [
             'data' => 'required|array',
             'data.*.user_id' => 'required|integer|exists:employees,id',
-            'data.*.tarifications' => 'required|array',
-            'data.*.tarifications.*' => 'required|integer|exists:tarifications,id',
+            'data.*.tarifications' => 'nullable|array',
         ]);
 
         if ($validator->fails()) {
@@ -499,6 +498,9 @@ class TechnologController extends Controller
 
         Tarification::whereIn('user_id', $userIds)->update(['user_id' => null]);
 
+        if (empty($validatedData['data']['tarifications'])) {
+            return response()->json(['message' => 'Tarifications unfastened from employees successfully'], 200);
+        }
         foreach ($validatedData['data'] as $datum) {
             $userId = $datum['user_id'];
             $tarifications = $datum['tarifications'];
