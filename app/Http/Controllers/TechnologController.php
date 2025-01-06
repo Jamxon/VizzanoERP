@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderGroup;
-use App\Models\OrderModel;
 use App\Models\OrderSubModel;
 use App\Models\PartSpecification;
 use App\Models\Razryad;
@@ -479,9 +477,7 @@ class TechnologController extends Controller
         $data = json_decode($request->getContent(), true);
 
         if (is_null($data)) {
-            return response()->json([
-                'message' => 'Invalid JSON format',
-            ], 400);
+            return response()->json(['message' => 'Invalid JSON format'], 400);
         }
 
         $validator = validator($data, [
@@ -499,20 +495,20 @@ class TechnologController extends Controller
         }
 
         $validatedData = $validator->validated();
+        $userIds = collect($validatedData['data'])->pluck('user_id')->unique();
+
+        Tarification::whereIn('user_id', $userIds)->update(['user_id' => null]);
 
         foreach ($validatedData['data'] as $datum) {
             $userId = $datum['user_id'];
             $tarifications = $datum['tarifications'];
 
-            foreach ($tarifications as $tarificationId) {
-                Tarification::where('id', $tarificationId)->update(['user_id' => $userId]);
-            }
+            Tarification::whereIn('id', $tarifications)->update(['user_id' => $userId]);
         }
 
-        return response()->json([
-            'message' => 'Tarifications fastened to employees successfully',
-        ], 200);
+        return response()->json(['message' => 'Tarifications fastened to employees successfully'], 200);
     }
+
 
     public function fasteningOrderToGroup(Request $request)
     {
