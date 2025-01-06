@@ -98,31 +98,8 @@ Route::patch('lids/{lid}', [LidController::class, 'update']);
 Route::post('lids/search', [LidController::class, 'search']);
 
 Route::get('/validate', function () {
-    $user = auth()->user();
-
-    if (!$user) {
-        return response()->json([
-            'message' => 'Unauthorized: Token is invalid or missing'
-        ], 401);
-    }
-
-    if (!$user->employee) {
-        return response()->json([
-            'message' => 'Unauthorized: Employee data is missing'
-        ], 401);
-    }
-
-    if ($user->employee->status == "kicked") {
-        return response()->json([
-            'message' => 'You are kicked from the company'
-        ], 401);
-    }
-
-    return response()->json([
-        'message' => $user
-    ], 200);
-});
-
+    return response()->json(['message' => auth()->user()], 200);
+})->middleware('validate.status');
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
