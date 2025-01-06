@@ -370,14 +370,9 @@ class TechnologController extends Controller
     public function getTarificationByOrderModelId($orderModelId)
     {
         $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)->first();
-        $tarifications = TarificationCategory::where('submodel_id', $orderSubModel->submodel_id)->with('tarifications')->get();
-        $submodels = SubModel::where('id', $orderSubModel->submodel_id)->with('tarifications')->get();
-        //without relations and hidden fields
-        $submodels = $submodels->map(function ($submodel) {
-            $submodel->makeHidden(['created_at', 'updated_at', 'model_id']);
-            $submodel->tarifications->makeHidden(['created_at', 'updated_at', 'submodel_id']);
-            return $submodel;
-        });
+        $submodels = SubModel::where('id', $orderSubModel->submodel_id)->with('tarifications')
+            ->get()
+            ->makeHidden(['sizes', 'modelColors', 'specificationCategories']);
         return response()->json($submodels, 200);
     }
 
