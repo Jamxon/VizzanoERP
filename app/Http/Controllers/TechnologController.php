@@ -6,6 +6,8 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderModel;
+use App\Models\OrderSubModel;
 use App\Models\PartSpecification;
 use App\Models\Razryad;
 use App\Models\SpecificationCategory;
@@ -364,17 +366,11 @@ class TechnologController extends Controller
 
 
 
-    public function getTarificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
+    public function getTarificationByOrderModelId($orderModelId): \Illuminate\Http\JsonResponse
     {
-        $tarifications = TarificationCategory::where('submodel_id', $submodelId)->with('tarifications')->get();
-
-        if ($tarifications) {
-            return response()->json($tarifications, 200);
-        }else {
-            return response()->json([
-                'message' => 'Tarifications not found'
-            ], 404);
-        }
+        $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)->first();
+        $tarifications = TarificationCategory::where('submodel_id', $orderSubModel->submodel_id)->with('tarifications')->get();
+        return response()->json($tarifications, 200);
     }
 
     public function getEmployerByDepartment(Request $request)
