@@ -370,7 +370,7 @@ class TechnologController extends Controller
     public function getTarificationByOrderModelId($orderModelId)
     {
         $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)->first();
-        $submodels = SubModel::where('id', $orderSubModel->submodel_id)->with('tarificationcategory')
+        $submodels = SubModel::where('id', $orderSubModel->submodel_id)->with('tarification_category')
             ->get()
             ->makeHidden(['sizes', 'modelColors', 'specificationCategories']);
         return response()->json($submodels, 200);
@@ -510,6 +510,49 @@ class TechnologController extends Controller
 
         return response()->json([
             'message' => 'Tarifications fastened to employees successfully',
+        ], 200);
+    }
+
+    public function fasteningOrderToGroup(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (is_null($data)) {
+            return response()->json([
+                'message' => 'Invalid JSON format',
+            ], 400);
+        }
+
+        $validator = validator($data, [
+            'data' => 'required|array',
+            'data.*.group_id' => 'required|integer|exists:groups,id',
+            'data.*.order_id' => 'required|integer|exists:orders,id',
+            'data.*.submodel_id' => 'required|integer|exists:submodels,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation errors',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validatedData = $validator->validated();
+
+        foreach ($validatedData['data'] as $datum) {
+            $groupId = $datum['group_id'];
+            $orderId = $datum['order_id'];
+            $submodelId = $datum['submodel_id'];
+
+            OrderGroup::create([
+                'group_id' => $groupId,
+                'order_id' => $orderId,
+                'submodel_id' => $submodelId,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Order fastened to group successfully',
         ], 200);
     }
 
