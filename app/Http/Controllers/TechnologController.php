@@ -497,10 +497,7 @@ class TechnologController extends Controller
         $userIds = collect($validatedData['data'])->pluck('user_id')->unique();
 
         Tarification::whereIn('user_id', $userIds)->update(['user_id' => null]);
-
-        if (empty($validatedData['data']['tarifications'])) {
-            return response()->json(['message' => 'Tarifications unfastened from employees successfully'], 200);
-        }
+        
         foreach ($validatedData['data'] as $datum) {
             $userId = $datum['user_id'];
             $tarifications = $datum['tarifications'];
