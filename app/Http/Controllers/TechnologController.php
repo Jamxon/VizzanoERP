@@ -363,7 +363,13 @@ class TechnologController extends Controller
         return $letter;
     }
 
-
+    public function getTarificationBySubmodelId($submodelId)
+    {
+        $tarificationCategories = TarificationCategory::where('submodel_id', $submodelId)->with('tarifications')
+            ->get()
+            ->makeHidden(['created_at', 'updated_at', 'submodel_id']);
+        return response()->json($tarificationCategories, 200);
+    }
 
     public function getTarificationByOrderModelId($orderModelId)
     {
@@ -497,7 +503,7 @@ class TechnologController extends Controller
         $userIds = collect($validatedData['data'])->pluck('user_id')->unique();
 
         Tarification::whereIn('user_id', $userIds)->update(['user_id' => null]);
-        
+
         foreach ($validatedData['data'] as $datum) {
             $userId = $datum['user_id'];
             $tarifications = $datum['tarifications'];
