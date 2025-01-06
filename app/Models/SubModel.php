@@ -37,7 +37,7 @@ class SubModel extends Model
         return $this->hasMany(SpecificationCategory::class, 'submodel_id');
     }
 
-    public function tarifications()
+    public function tarificationcategory()
     {
         return $this->hasMany(TarificationCategory::class, 'submodel_id');
     }
