@@ -17,27 +17,27 @@ class SubModel extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'model_id'];
 
-    public function model()
+    public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Models::class, 'model_id');
     }
 
-    public function sizes()
+    public function sizes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Size::class, 'submodel_id');
     }
 
-    public function modelColors()
+    public function modelColors(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ModelColor::class, 'submodel_id');
     }
 
-    public function specificationCategories()
+    public function specificationCategories(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SpecificationCategory::class, 'submodel_id');
     }
 
-    public function tarification_category()
+    public function tarification_categories(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(TarificationCategory::class, 'submodel_id');
     }
