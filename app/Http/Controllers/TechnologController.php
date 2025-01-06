@@ -11,6 +11,7 @@ use App\Models\OrderSubModel;
 use App\Models\PartSpecification;
 use App\Models\Razryad;
 use App\Models\SpecificationCategory;
+use App\Models\SubModel;
 use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use App\Models\TypeWriter;
@@ -370,7 +371,8 @@ class TechnologController extends Controller
     {
         $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)->first();
         $tarifications = TarificationCategory::where('submodel_id', $orderSubModel->submodel_id)->with('tarifications')->get();
-        return response()->json($tarifications, 200);
+        $submodels = SubModel::find($orderSubModel->submodel_id);
+        return response()->json($submodels, 200);
     }
 
     public function getEmployerByDepartment(Request $request)
