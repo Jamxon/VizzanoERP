@@ -1,0 +1,1789 @@
+openapi: 3.0.3
+info:
+  title: Laravel
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: '176.124.208.61:2005'
+paths:
+  /api/documentation:
+    get:
+      summary: 'Display Swagger API page.'
+      operationId: displaySwaggerAPIPage
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <title>L5 Swagger UI</title>\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"176.124.208.61:2005/docs/asset/swagger-ui.css?v=0755b7093afdd36d03212b65315f0209\">\n    <link rel=\"icon\" type=\"image/png\" href=\"176.124.208.61:2005/docs/asset/favicon-32x32.png?v=40d4f2c38d1cd854ad463f16373cbcb6\" sizes=\"32x32\"/>\n    <link rel=\"icon\" type=\"image/png\" href=\"176.124.208.61:2005/docs/asset/favicon-16x16.png?v=f0ae831196d55d8f4115b6c5e8ec5384\" sizes=\"16x16\"/>\n    <style>\n    html\n    {\n        box-sizing: border-box;\n        overflow: -moz-scrollbars-vertical;\n        overflow-y: scroll;\n    }\n    *,\n    *:before,\n    *:after\n    {\n        box-sizing: inherit;\n    }\n\n    body {\n      margin:0;\n      background: #fafafa;\n    }\n    </style>\n    </head>\n\n<body >\n<div id=\"swagger-ui\"></div>\n\n<script src=\"176.124.208.61:2005/docs/asset/swagger-ui-bundle.js?v=6c23777357d2beae9650f9aa035d93fb\"></script>\n<script src=\"176.124.208.61:2005/docs/asset/swagger-ui-standalone-preset.js?v=6b2892eb9458da5c3224817b3984d14c\"></script>\n<script>\n    window.onload = function() {\n        // Build a system\n        const ui = SwaggerUIBundle({\n            dom_id: '#swagger-ui',\n            url: \"176.124.208.61:2005/docs/api-docs.json\",\n            operationsSorter: null,\n            configUrl: null,\n            validatorUrl: null,\n            oauth2RedirectUrl: \"176.124.208.61:2005/api/oauth2-callback\",\n\n            requestInterceptor: function(request) {\n                request.headers['X-CSRF-TOKEN'] = '';\n                return request;\n            },\n\n            presets: [\n                SwaggerUIBundle.presets.apis,\n                SwaggerUIStandalonePreset\n            ],\n\n            plugins: [\n                SwaggerUIBundle.plugins.DownloadUrl\n            ],\n\n            layout: \"StandaloneLayout\",\n            docExpansion : \"none\",\n            deepLinking: true,\n            filter: true,\n            persistAuthorization: \"false\",\n\n        })\n\n        window.ui = ui\n\n            }\n</script>\n</body>\n</html>\n"
+      tags:
+        - Endpoints
+      security: []
+  /api/oauth2-callback:
+    get:
+      summary: 'Display Oauth2 callback pages.'
+      operationId: displayOauth2CallbackPages
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "<!doctype html>\n<html lang=\"en-US\">\n<head>\n    <title>Swagger UI: OAuth2 Redirect</title>\n</head>\n<body>\n<script>\n    'use strict';\n    function run () {\n        var oauth2 = window.opener.swaggerUIRedirectOauth2;\n        var sentState = oauth2.state;\n        var redirectUrl = oauth2.redirectUrl;\n        var isValid, qp, arr;\n\n        if (/code|token|error/.test(window.location.hash)) {\n            qp = window.location.hash.substring(1).replace('?', '&');\n        } else {\n            qp = location.search.substring(1);\n        }\n\n        arr = qp.split(\"&\");\n        arr.forEach(function (v,i,_arr) { _arr[i] = '\"' + v.replace('=', '\":\"') + '\"';});\n        qp = qp ? JSON.parse('{' + arr.join() + '}',\n                function (key, value) {\n                    return key === \"\" ? value : decodeURIComponent(value);\n                }\n        ) : {};\n\n        isValid = qp.state === sentState;\n\n        if ((\n          oauth2.auth.schema.get(\"flow\") === \"accessCode\" ||\n          oauth2.auth.schema.get(\"flow\") === \"authorizationCode\" ||\n          oauth2.auth.schema.get(\"flow\") === \"authorization_code\"\n        ) && !oauth2.auth.code) {\n            if (!isValid) {\n                oauth2.errCb({\n                    authId: oauth2.auth.name,\n                    source: \"auth\",\n                    level: \"warning\",\n                    message: \"Authorization may be unsafe, passed state was changed in server. The passed state wasn't returned from auth server.\"\n                });\n            }\n\n            if (qp.code) {\n                delete oauth2.state;\n                oauth2.auth.code = qp.code;\n                oauth2.callback({auth: oauth2.auth, redirectUrl: redirectUrl});\n            } else {\n                let oauthErrorMsg;\n                if (qp.error) {\n                    oauthErrorMsg = \"[\"+qp.error+\"]: \" +\n                        (qp.error_description ? qp.error_description+ \". \" : \"no accessCode received from the server. \") +\n                        (qp.error_uri ? \"More info: \"+qp.error_uri : \"\");\n                }\n\n                oauth2.errCb({\n                    authId: oauth2.auth.name,\n                    source: \"auth\",\n                    level: \"error\",\n                    message: oauthErrorMsg || \"[Authorization failed]: no accessCode received from the server.\"\n                });\n            }\n        } else {\n            oauth2.callback({auth: oauth2.auth, token: qp, isValid: isValid, redirectUrl: redirectUrl});\n        }\n        window.close();\n    }\n\n    if (document.readyState !== 'loading') {\n        run();\n    } else {\n        document.addEventListener('DOMContentLoaded', function () {\n            run();\n        });\n    }\n</script>\n</body>\n</html>\n"
+      tags:
+        - Endpoints
+      security: []
+  /api/groups:
+    get:
+      summary: ''
+      operationId: getApiGroups
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiGroups
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/groups/{group_id}':
+    patch:
+      summary: ''
+      operationId: patchApiGroupsGroup_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiGroupsGroup_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: group_id
+        description: 'The ID of the group.'
+        example: 6
+        required: true
+        schema:
+          type: integer
+  /api/orders:
+    get:
+      summary: ''
+      operationId: getApiOrders
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiOrders
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: quam
+                  nullable: false
+                quantity:
+                  type: integer
+                  description: ''
+                  example: 1
+                  nullable: false
+                models:
+                  type: array
+                  description: ''
+                  example:
+                    - []
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: 'The <code>id</code> of an existing record in the models table.'
+                        example: 2
+                        nullable: false
+                      submodel:
+                        type: object
+                        description: ''
+                        example: []
+                        nullable: false
+                        properties:
+                          id:
+                            type: integer
+                            description: 'The <code>id</code> of an existing record in the sub_models table.'
+                            example: 5
+                            nullable: true
+                      size:
+                        type: object
+                        description: ''
+                        example: []
+                        nullable: false
+                        properties:
+                          id:
+                            type: integer
+                            description: 'The <code>id</code> of an existing record in the sizes table.'
+                            example: 20
+                            nullable: true
+                      model_color:
+                        type: object
+                        description: ''
+                        example: []
+                        nullable: false
+                        properties:
+                          id:
+                            type: integer
+                            description: 'The <code>id</code> of an existing record in the model_colors table.'
+                            example: 19
+                            nullable: true
+                      quantity:
+                        type: integer
+                        description: ''
+                        example: 1
+                        nullable: false
+                    required:
+                      - id
+                      - quantity
+              required:
+                - name
+                - quantity
+                - models
+      security: []
+  '/api/orders/{order_id}':
+    get:
+      summary: ''
+      operationId: getApiOrdersOrder_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    patch:
+      summary: ''
+      operationId: patchApiOrdersOrder_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiOrdersOrder_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: order_id
+        description: 'The ID of the order.'
+        example: 37
+        required: true
+        schema:
+          type: integer
+  /api/changeorderstatus:
+    patch:
+      summary: ''
+      operationId: patchApiChangeorderstatus
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  description: ''
+                  example: consectetur
+                  nullable: false
+                order_id:
+                  type: string
+                  description: ''
+                  example: eaque
+                  nullable: false
+              required:
+                - status
+                - order_id
+      security: []
+  /api/models:
+    get:
+      summary: ''
+      operationId: getApiModels
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiModels
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/models/{model_id}':
+    get:
+      summary: ''
+      operationId: getApiModelsModel_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    patch:
+      summary: ''
+      operationId: patchApiModelsModel_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiModelsModel_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: model_id
+        description: 'The ID of the model.'
+        example: 8
+        required: true
+        schema:
+          type: integer
+  '/api/models/image/{modelImage_id}':
+    delete:
+      summary: ''
+      operationId: deleteApiModelsImageModelImage_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: modelImage_id
+        description: 'The ID of the modelImage.'
+        example: 12
+        required: true
+        schema:
+          type: integer
+  /api/items:
+    post:
+      summary: ''
+      operationId: postApiItems
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    get:
+      summary: ''
+      operationId: getApiItems
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  '/api/items/{item_id}':
+    patch:
+      summary: ''
+      operationId: patchApiItemsItem_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: item_id
+        description: 'The ID of the item.'
+        example: 26
+        required: true
+        schema:
+          type: integer
+  /api/itemtypes:
+    get:
+      summary: ''
+      operationId: getApiItemtypes
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  '/api/itemtypes/{itemType}':
+    post:
+      summary: ''
+      operationId: postApiItemtypesItemType
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: cumque
+                  nullable: false
+              required:
+                - name
+      security: []
+    parameters:
+      -
+        in: path
+        name: itemType
+        description: ''
+        example: 2
+        required: true
+        schema:
+          type: integer
+  '/api/itemtypes/{itemType_id}':
+    patch:
+      summary: ''
+      operationId: patchApiItemtypesItemType_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiItemtypesItemType_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: itemType_id
+        description: 'The ID of the itemType.'
+        example: 2
+        required: true
+        schema:
+          type: integer
+  /api/recipes:
+    get:
+      summary: ''
+      operationId: getApiRecipes
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiRecipes
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                item_id:
+                  type: string
+                  description: ''
+                  example: et
+                  nullable: false
+                quantity:
+                  type: string
+                  description: ''
+                  example: quia
+                  nullable: false
+                model_color_id:
+                  type: string
+                  description: ''
+                  example: iste
+                  nullable: false
+                size_id:
+                  type: string
+                  description: ''
+                  example: labore
+                  nullable: false
+              required:
+                - item_id
+                - quantity
+                - model_color_id
+                - size_id
+      security: []
+  /api/getrecipes:
+    get:
+      summary: ''
+      operationId: getApiGetrecipes
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  '/api/recipes/{recipe_id}':
+    patch:
+      summary: ''
+      operationId: patchApiRecipesRecipe_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiRecipesRecipe_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: recipe_id
+        description: 'The ID of the recipe.'
+        example: 20
+        required: true
+        schema:
+          type: integer
+  /api/submodels:
+    get:
+      summary: ''
+      operationId: getApiSubmodels
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  /api/units:
+    get:
+      summary: ''
+      operationId: getApiUnits
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiUnits
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: ea
+                  nullable: false
+              required:
+                - name
+      security: []
+  '/api/units/{unit_id}':
+    patch:
+      summary: ''
+      operationId: patchApiUnitsUnit_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiUnitsUnit_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: unit_id
+        description: 'The ID of the unit.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/colors:
+    get:
+      summary: ''
+      operationId: getApiColors
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiColors
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: itaque
+                  nullable: false
+                hex:
+                  type: string
+                  description: ''
+                  example: placeat
+                  nullable: false
+              required:
+                - name
+                - hex
+      security: []
+  '/api/colors/{color_id}':
+    patch:
+      summary: ''
+      operationId: patchApiColorsColor_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiColorsColor_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: color_id
+        description: 'The ID of the color.'
+        example: 28
+        required: true
+        schema:
+          type: integer
+  /api/razryads:
+    get:
+      summary: ''
+      operationId: getApiRazryads
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiRazryads
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: nulla
+                  nullable: false
+                salary:
+                  type: string
+                  description: ''
+                  example: rerum
+                  nullable: false
+              required:
+                - name
+                - salary
+      security: []
+  '/api/razryads/{razryad_id}':
+    patch:
+      summary: ''
+      operationId: patchApiRazryadsRazryad_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    delete:
+      summary: ''
+      operationId: deleteApiRazryadsRazryad_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: razryad_id
+        description: 'The ID of the razryad.'
+        example: 1
+        required: true
+        schema:
+          type: integer
+  /api/export-items/supervisor:
+    get:
+      summary: ''
+      operationId: getApiExportItemsSupervisor
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  /api/export-employees:
+    get:
+      summary: ''
+      operationId: getApiExportEmployees
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  /api/export-items/omborchi:
+    get:
+      summary: ''
+      operationId: getApiExportItemsOmborchi
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  /api/export-items/technologist:
+    get:
+      summary: ''
+      operationId: getApiExportItemsTechnologist
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  '/api/models/technologist/{model_id}':
+    get:
+      summary: ''
+      operationId: getApiModelsTechnologistModel_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: model_id
+        description: 'The ID of the model.'
+        example: 8
+        required: true
+        schema:
+          type: integer
+  /api/specification/store:
+    post:
+      summary: ''
+      operationId: postApiSpecificationStore
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/specification/{submodelId}':
+    get:
+      summary: ''
+      operationId: getApiSpecificationSubmodelId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: submodelId
+        description: ''
+        example: explicabo
+        required: true
+        schema:
+          type: string
+  '/api/specification/update/{id}':
+    patch:
+      summary: ''
+      operationId: patchApiSpecificationUpdateId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: id
+                  nullable: false
+                submodel_id:
+                  type: integer
+                  description: ''
+                  example: 4
+                  nullable: false
+              required:
+                - name
+                - submodel_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the update.'
+        example: eum
+        required: true
+        schema:
+          type: string
+  '/api/specification/category/{id}':
+    delete:
+      summary: ''
+      operationId: deleteApiSpecificationCategoryId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the category.'
+        example: pariatur
+        required: true
+        schema:
+          type: string
+  '/api/specification/{id}':
+    delete:
+      summary: ''
+      operationId: deleteApiSpecificationId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the specification.'
+        example: ratione
+        required: true
+        schema:
+          type: string
+  /api/tarification/store:
+    post:
+      summary: ''
+      operationId: postApiTarificationStore
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  '/api/tarification/update/{id}':
+    patch:
+      summary: ''
+      operationId: patchApiTarificationUpdateId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: rsmxzvcxhupfwpgjyvzgcy
+                  nullable: false
+                submodel_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the sub_models table.'
+                  example: 13
+                  nullable: false
+              required:
+                - name
+                - submodel_id
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the update.'
+        example: praesentium
+        required: true
+        schema:
+          type: string
+  /api/tarification/users:
+    get:
+      summary: ''
+      operationId: getApiTarificationUsers
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  /api/tarification/orders:
+    get:
+      summary: ''
+      operationId: getApiTarificationOrders
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  '/api/tarification/orders/{order_id}':
+    get:
+      summary: ''
+      operationId: getApiTarificationOrdersOrder_id
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: order_id
+        description: 'The ID of the order.'
+        example: 37
+        required: true
+        schema:
+          type: integer
+  '/api/tarification/show/{id}':
+    get:
+      summary: ''
+      operationId: getApiTarificationShowId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the show.'
+        example: omnis
+        required: true
+        schema:
+          type: string
+  '/api/tarification/{modelId}':
+    get:
+      summary: ''
+      operationId: getApiTarificationModelId
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: modelId
+        description: ''
+        example: maiores
+        required: true
+        schema:
+          type: string
+  /api/typewriter:
+    get:
+      summary: ''
+      operationId: getApiTypewriter
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Unauthorized
+      tags:
+        - Endpoints
+      security: []
+  '/api/tarification/category/{id}':
+    delete:
+      summary: ''
+      operationId: deleteApiTarificationCategoryId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the category.'
+        example: dicta
+        required: true
+        schema:
+          type: string
+  '/api/tarification/{id}':
+    delete:
+      summary: ''
+      operationId: deleteApiTarificationId
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+    parameters:
+      -
+        in: path
+        name: id
+        description: 'The ID of the tarification.'
+        example: occaecati
+        required: true
+        schema:
+          type: string
+  /api/tarification/fastening:
+    post:
+      summary: ''
+      operationId: postApiTarificationFastening
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      security: []
+  /api/lids:
+    get:
+      summary: ''
+      operationId: getApiLids
+      description: ''
+      parameters: []
+      responses:
+        200:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                example:
+                  -
+                    id: 2
+                    name: 'Test Lid'
+                    phone: '+988123112321'
+                    address: Andijon
+                    status: inactive
+                    comment: 'Test uchun'
+                    created_at: '2024-12-16T06:28:45.000000Z'
+                    updated_at: '2024-12-16T06:29:31.000000Z'
+                  -
+                    id: 1
+                    name: Jamshid
+                    phone: '+998500079955'
+                    address: Namangan
+                    status: deleted
+                    comment: Izohsiz
+                    created_at: '2024-12-07T01:57:06.000000Z'
+                    updated_at: '2024-12-18T15:16:01.000000Z'
+                  -
+                    id: 8
+                    name: Messi
+                    phone: '+9843243'
+                    address: rewrewwe
+                    status: deleted
+                    comment: rewrew
+                    created_at: '2024-12-18T10:33:10.000000Z'
+                    updated_at: '2024-12-18T15:38:37.000000Z'
+                  -
+                    id: 9
+                    name: Tursunxon
+                    phone: '1322321'
+                    address: '31312123'
+                    status: deleted
+                    comment: '321132213'
+                    created_at: '2024-12-18T10:40:06.000000Z'
+                    updated_at: '2024-12-18T15:40:27.000000Z'
+                  -
+                    id: 10
+                    name: dewewq
+                    phone: ewqqeqw
+                    address: ewqewq
+                    status: deleted
+                    comment: ewqqew
+                    created_at: '2024-12-18T10:43:07.000000Z'
+                    updated_at: '2024-12-18T15:47:42.000000Z'
+                  -
+                    id: 11
+                    name: Akbarali
+                    phone: '+998772577766'
+                    address: 'Namangan shaxar'
+                    status: deleted
+                    comment: Boshlig’
+                    created_at: '2024-12-18T14:21:35.000000Z'
+                    updated_at: '2024-12-19T00:24:17.000000Z'
+                  -
+                    id: 12
+                    name: Guli
+                    phone: '+998999201010'
+                    address: Uychi
+                    status: deleted
+                    comment: 'Dangasa man'
+                    created_at: '2024-12-20T00:11:35.000000Z'
+                    updated_at: '2024-12-20T10:18:27.000000Z'
+                  -
+                    id: 26
+                    name: Guljaxon
+                    phone: '+998996039963'
+                    address: Baliqchi
+                    status: active
+                    comment: "Yanvarda bog'lanish kerak"
+                    created_at: '2024-12-25T03:40:12.000000Z'
+                    updated_at: '2024-12-25T03:40:12.000000Z'
+                  -
+                    id: 27
+                    name: Saida
+                    phone: '+998940145786'
+                    address: Nanay
+                    status: active
+                    comment: "Yanvarda bog'lanish kerak"
+                    created_at: '2024-12-25T03:41:33.000000Z'
+                    updated_at: '2024-12-25T03:41:33.000000Z'
+                  -
+                    id: 13
+                    name: Zebo
+                    phone: '+9989022222220'
+                    address: Turaqurgon
+                    status: deleted
+                    comment: Dangasa
+                    created_at: '2024-12-20T21:46:56.000000Z'
+                    updated_at: '2024-12-25T03:55:30.000000Z'
+                  -
+                    id: 28
+                    name: Muhayyo
+                    phone: '+998941741027'
+                    address: 'Chortoq tumani'
+                    status: active
+                    comment: 'İshga kelgan, yanvardan keladi nimchaga'
+                    created_at: '2024-12-25T04:18:15.000000Z'
+                    updated_at: '2024-12-25T04:18:15.000000Z'
+                  -
+                    id: 29
+                    name: 'Turdibayeva Nigora'
+                    phone: '+998942723254'
+                    address: 'Chortoq tumani'
+                    status: active
+                    comment: 'İshga kelgan, yakshanbadan nimchaga'
+                    created_at: '2024-12-25T04:18:54.000000Z'
+                    updated_at: '2024-12-25T04:18:54.000000Z'
+                  -
+                    id: 30
+                    name: 'Xolmirzayeva Xabiba'
+                    phone: '+998913502561'
+                    address: 'Chortoq tuman'
+                    status: active
+                    comment: 'İshga kelgan, yanvardan nimchada ishlaydi'
+                    created_at: '2024-12-25T04:20:42.000000Z'
+                    updated_at: '2024-12-25T04:20:42.000000Z'
+                  -
+                    id: 14
+                    name: Qodirxon
+                    phone: '+998213121'
+                    address: dsadsaads
+                    status: inactive
+                    comment: dsasddas
+                    created_at: '2024-12-23T05:21:37.000000Z'
+                    updated_at: '2024-12-25T06:20:10.000000Z'
+                  -
+                    id: 15
+                    name: 'Diyorbek Abdurakhmanov'
+                    phone: '+99821231132'
+                    address: Namangan
+                    status: inactive
+                    comment: Diyorbek
+                    created_at: '2024-12-23T05:24:04.000000Z'
+                    updated_at: '2024-12-25T06:20:15.000000Z'
+                  -
+                    id: 16
+                    name: 'Diyorbek Abdurakhmanov'
+                    phone: '+9981221'
+                    address: Namangan
+                    status: inactive
+                    comment: wasews
+                    created_at: '2024-12-23T05:36:51.000000Z'
+                    updated_at: '2024-12-25T06:20:20.000000Z'
+                  -
+                    id: 17
+                    name: dsads
+                    phone: sfadsadsa
+                    address: dsadsa
+                    status: inactive
+                    comment: dsadsa
+                    created_at: '2024-12-23T05:37:45.000000Z'
+                    updated_at: '2024-12-25T06:20:24.000000Z'
+                  -
+                    id: 18
+                    name: 'Diyorbek Abdurakhmanov213'
+                    phone: '+998321321213'
+                    address: Namangan
+                    status: inactive
+                    comment: sdasddsa
+                    created_at: '2024-12-23T05:48:05.000000Z'
+                    updated_at: '2024-12-25T06:20:28.000000Z'
+                  -
+                    id: 19
+                    name: 'Diyorbek Abdurakhmanov'
+                    phone: '+998213132'
+                    address: Fergana
+                    status: inactive
+                    comment: dsda
+                    created_at: '2024-12-23T05:48:25.000000Z'
+                    updated_at: '2024-12-25T06:20:34.000000Z'
+                  -
+                    id: 20
+                    name: 'Diyorbek Abdurakhmanov'
+                    phone: +998dsadsa
+                    address: Namangan
+                    status: inactive
+                    comment: dsadassad
+                    created_at: '2024-12-23T05:48:39.000000Z'
+                    updated_at: '2024-12-25T06:20:38.000000Z'
+                  -
+                    id: 21
+                    name: dsaadsdas
+                    phone: +998dsadasdas
+                    address: dsaadsdas
+                    status: inactive
+                    comment: dsaadsdsa
+                    created_at: '2024-12-23T05:49:05.000000Z'
+                    updated_at: '2024-12-25T06:20:42.000000Z'
+                  -
+                    id: 22
+                    name: Qodirxon
+                    phone: '+99844224'
+                    address: Namangan
+                    status: inactive
+                    comment: Dangasa
+                    created_at: '2024-12-23T05:49:30.000000Z'
+                    updated_at: '2024-12-25T06:20:46.000000Z'
+                  -
+                    id: 23
+                    name: 'Diyorbek Abdurakhmanov'
+                    phone: '+998321321321'
+                    address: Namangan
+                    status: inactive
+                    comment: '321312213'
+                    created_at: '2024-12-23T05:50:54.000000Z'
+                    updated_at: '2024-12-25T06:20:51.000000Z'
+                  -
+                    id: 24
+                    name: Abduqodir
+                    phone: '321321321'
+                    address: '321123'
+                    status: inactive
+                    comment: '231123'
+                    created_at: '2024-12-23T05:51:39.000000Z'
+                    updated_at: '2024-12-25T06:20:56.000000Z'
+                  -
+                    id: 25
+                    name: 'Test uchun'
+                    phone: '+99855455754557'
+                    address: Yer
+                    status: inactive
+                    comment: Ggg
+                    created_at: '2024-12-24T04:37:08.000000Z'
+                    updated_at: '2024-12-25T06:21:00.000000Z'
+                  -
+                    id: 31
+                    name: Xafiza
+                    phone: '+998940107143'
+                    address: "Ulug' Nor"
+                    status: active
+                    comment: '6 kishi. Yanvarda gaplashish kerak'
+                    created_at: '2024-12-26T22:42:06.000000Z'
+                    updated_at: '2024-12-26T22:42:06.000000Z'
+                  -
+                    id: 32
+                    name: Feruza
+                    phone: '+998940097390'
+                    address: Namangan
+                    status: active
+                    comment: 'Tekstilga qiziqaman'
+                    created_at: '2024-12-27T03:14:18.000000Z'
+                    updated_at: '2024-12-27T03:14:18.000000Z'
+                  -
+                    id: 33
+                    name: Diyor
+                    phone: '+998948555552'
+                    address: 'Chortoq sanatorya'
+                    status: deleted
+                    comment: "IT \nFarg'onada o'qiydi"
+                    created_at: '2024-12-27T21:38:33.000000Z'
+                    updated_at: '2024-12-28T02:41:44.000000Z'
+                  -
+                    id: 34
+                    name: Test
+                    phone: '+998 91 777 77 00'
+                    address: dsasd
+                    status: deleted
+                    comment: '1212'
+                    created_at: '2025-01-01T06:25:46.000000Z'
+                    updated_at: '2025-01-01T11:26:34.000000Z'
+                  -
+                    id: 35
+                    name: Test
+                    phone: '+998 33 665 55 12'
+                    address: '1212'
+                    status: deleted
+                    comment: dsasad
+                    created_at: '2025-01-01T08:01:54.000000Z'
+                    updated_at: '2025-01-01T13:13:05.000000Z'
+                  -
+                    id: 36
+                    name: sdadsadsa
+                    phone: '+998 11 111 11 11'
+                    address: '2222'
+                    status: deleted
+                    comment: 2e1dws
+                    created_at: '2025-01-01T08:20:22.000000Z'
+                    updated_at: '2025-01-01T13:20:40.000000Z'
+                  -
+                    id: 37
+                    name: '212222222'
+                    phone: '+998 12 212 12 1'
+                    address: '212121'
+                    status: deleted
+                    comment: '12212'
+                    created_at: '2025-01-01T08:24:27.000000Z'
+                    updated_at: '2025-01-01T13:24:42.000000Z'
+                  -
+                    id: 38
+                    name: fasbkasdkjn
+                    phone: '+998 22 22'
+                    address: '2121'
+                    status: deleted
+                    comment: '121221'
+                    created_at: '2025-01-01T08:26:19.000000Z'
+                    updated_at: '2025-01-01T13:26:35.000000Z'
+                  -
+                    id: 39
+                    name: '1212211'
+                    phone: '+998 22 222'
+                    address: dsadsa
+                    status: active
+                    comment: dasd
+                    created_at: '2025-01-01T13:32:37.000000Z'
+                    updated_at: '2025-01-01T13:32:37.000000Z'
+                  -
+                    id: 40
+                    name: qani
+                    phone: '+998 21'
+                    address: dasdsads
+                    status: active
+                    comment: dsasa
+                    created_at: '2025-01-01T13:33:26.000000Z'
+                    updated_at: '2025-01-01T13:33:26.000000Z'
+      tags:
+        - Endpoints
+      security: []
+    post:
+      summary: ''
+      operationId: postApiLids
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: minus
+                  nullable: false
+                phone:
+                  type: string
+                  description: ''
+                  example: inventore
+                  nullable: false
+                address:
+                  type: string
+                  description: ''
+                  example: commodi
+                  nullable: false
+              required:
+                - name
+                - phone
+                - address
+      security: []
+  '/api/lids/{lid_id}':
+    patch:
+      summary: ''
+      operationId: patchApiLidsLid_id
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: ''
+                  example: voluptatem
+                  nullable: false
+                phone:
+                  type: string
+                  description: ''
+                  example: recusandae
+                  nullable: false
+                address:
+                  type: string
+                  description: ''
+                  example: et
+                  nullable: false
+                status:
+                  type: string
+                  description: ''
+                  example: voluptate
+                  nullable: false
+              required:
+                - name
+                - phone
+                - address
+                - status
+      security: []
+    parameters:
+      -
+        in: path
+        name: lid_id
+        description: 'The ID of the lid.'
+        example: 2
+        required: true
+        schema:
+          type: integer
+  /api/lids/search:
+    post:
+      summary: ''
+      operationId: postApiLidsSearch
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: ''
+                  example: suscipit
+                  nullable: false
+              required:
+                - query
+      security: []
+  /api/validate:
+    get:
+      summary: ''
+      operationId: getApiValidate
+      description: ''
+      parameters: []
+      responses:
+        401:
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                example:
+                  message: 'Unauthorized: Token is invalid or missing'
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized: Token is invalid or missing'
+      tags:
+        - Endpoints
+      security: []
+  /api/register:
+    post:
+      summary: ''
+      operationId: postApiRegister
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: 'Must not be greater than 255 characters.'
+                  example: xrwim
+                  nullable: false
+                password:
+                  type: string
+                  description: 'Must be at least 6 characters.'
+                  example: '&h4u1-7%0Q(ct'
+                  nullable: false
+                role_id:
+                  type: integer
+                  description: 'The <code>id</code> of an existing record in the roles table.'
+                  example: 6
+                  nullable: false
+              required:
+                - username
+                - password
+                - role_id
+      security: []
+  /api/login:
+    post:
+      summary: ''
+      operationId: postApiLogin
+      description: ''
+      parameters: []
+      responses: {  }
+      tags:
+        - Endpoints
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: ''
+                  example: ut
+                  nullable: false
+                password:
+                  type: string
+                  description: 'Must be at least 6 characters.'
+                  example: .vCq2za
+                  nullable: false
+              required:
+                - username
+                - password
+      security: []
+tags:
+  -
+    name: Endpoints
+    description: ''
