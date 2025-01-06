@@ -384,6 +384,7 @@ class TechnologController extends Controller
 
         $employees = Employee::whereIn('group_id', $groupIds)
             ->where('status', 'working')
+            ->with('tarifications')
             ->get();
 
         return $employees->isNotEmpty()

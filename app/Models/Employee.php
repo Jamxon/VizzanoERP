@@ -34,7 +34,7 @@ class Employee extends Model
         return $this->belongsTo(Role::class);
     }
 
-    public function tarification()
+    public function tarifications()
     {
         return $this->hasMany(Tarification::class);
     }
