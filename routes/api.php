@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
+use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
@@ -59,6 +60,10 @@ Route::middleware('role:supervisor')->group(function () {
     Route::patch('razryads/{razryad}', [RazryadController::class, 'update']);
     Route::delete('razryads/{razryad}', [RazryadController::class, 'destroy']);
     Route::get('export-items/supervisor', [ItemController::class, 'export']);
+    Route::get('departments', [DepartmentController::class, 'index']);
+    Route::post('departments', [DepartmentController::class, 'store']);
+    Route::patch('departments/{department}', [DepartmentController::class, 'update']);
+    Route::delete('departments/{department}', [DepartmentController::class, 'destroy']);
 });
 
 Route::middleware('role:hr')->group(function (){

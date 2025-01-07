@@ -514,7 +514,6 @@ class TechnologController extends Controller
         return response()->json(['message' => 'Tarifications fastened to employees successfully'], 200);
     }
 
-
     public function fasteningOrderToGroup(Request $request)
     {
         $data = json_decode($request->getContent(), true);
@@ -557,5 +556,4 @@ class TechnologController extends Controller
             'message' => 'Order fastened to group successfully',
         ], 200);
     }
-
 }
