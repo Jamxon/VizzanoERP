@@ -21,4 +21,9 @@ class Department extends Model
     {
         return $this->hasMany(Group::class);
     }
+
+    public function responsibleUser()
+    {
+        return $this->belongsTo(User::class, 'responsible_user_id');
+    }
 }
