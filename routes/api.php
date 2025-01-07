@@ -110,7 +110,6 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::post('tarification/fastening', [TechnologController::class, 'fasteningToEmployee']);
 });
 
-Route::prefix('public')->group(function () {
     Route::get('lids', [LidController::class, 'index']);
     Route::post('lids', [LidController::class, 'store']);
     Route::patch('lids/{lid}', [LidController::class, 'update']);
@@ -122,4 +121,4 @@ Route::prefix('public')->group(function () {
 
     Route::post('register', [AuthController::class, 'register']);
     Route::post('login', [AuthController::class, 'login']);
-});
+
