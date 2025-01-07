@@ -28,7 +28,7 @@ Route::middleware('role:supervisor')->group(function () {
     Route::patch('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'delete']);
     Route::patch('changeorderstatus', [OrderController::class, 'changeOrderStatus']);
-    Route::get('models', [ModelController::class, 'index']);
+    Route::get('models/supervisor', [ModelController::class, 'index']);
     Route::post('models', [ModelController::class, 'store']);
     Route::get('models/{model}', [ModelController::class, 'show']);
     Route::patch('models/{model}', [ModelController::class, 'update']);
