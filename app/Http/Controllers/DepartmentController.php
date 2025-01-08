@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\Group;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class DepartmentController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
 
@@ -19,7 +20,7 @@ class DepartmentController extends Controller
         return response()->json($departments);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'name' => 'required|string',
@@ -28,10 +29,17 @@ class DepartmentController extends Controller
             'groups' => 'required|array',
         ]);
 
+        $user = User::find($data['responsible_user_id']);
+
         $department = Department::create([
             'name' => $data['name'],
             'responsible_user_id' => $data['responsible_user_id'],
             'branch_id' => $data['branch_id'],
+        ]);
+
+        $user->employee->update([
+            'group_id' => null,
+            'department_id' => $department->id,
         ]);
 
         foreach ($data['groups'] as $group) {
@@ -40,12 +48,18 @@ class DepartmentController extends Controller
                 'responsible_user_id' => $group['responsible_user_id'],
                 'department_id' => $department->id,
             ]);
+
+            $user = User::find($group['responsible_user_id']);
+            $user->employee->update([
+                'group_id' => null,
+                'department_id' => $department->id,
+            ]);
         }
 
         return response()->json($department);
     }
 
-    public function update(Request $request, Department $department)
+    public function update(Request $request, Department $department): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'name' => 'required|string',
@@ -73,7 +87,7 @@ class DepartmentController extends Controller
         return response()->json($department);
     }
 
-    public function destroy(Department $department)
+    public function destroy(Department $department): \Illuminate\Http\JsonResponse
     {
         $department->delete();
 
