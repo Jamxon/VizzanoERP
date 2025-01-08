@@ -23,6 +23,7 @@ class UserController extends Controller
         $users = User::where('role_id', '=', 8)
             ->whereHas('employee', function ($query) {
                 $query->where('status', 'working');
+                $query->where('branch_id', '=', Auth::user()->employee->branch_id);
             })
             ->get();
 
@@ -40,6 +41,7 @@ class UserController extends Controller
         $users = User::where('role_id', '=', 9)
             ->whereHas('employee', function ($query) {
                 $query->where('status', 'working');
+                $query->where('branch_id', '=', Auth::user()->employee->branch_id);
             })
             ->get();
 
