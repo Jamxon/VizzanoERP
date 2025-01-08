@@ -38,8 +38,10 @@ class WarehouseController extends Controller
         ], 201);
     }
 
-    public function getWarehouse()
+    public function getWarehouse(): \Illuminate\Http\JsonResponse
     {
+        dd(auth()->user()->employee);
+
         $employee = auth()->user()->employee;
 
         if (!$employee) {
