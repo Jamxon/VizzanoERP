@@ -38,11 +38,18 @@ class WarehouseController extends Controller
         ], 201);
     }
 
-    public function getWarehouse(): \Illuminate\Http\JsonResponse
+    public function getWarehouse()
     {
-        $branch = auth()->user()->employee->branch_id;
-        $warehouses = Warehouse::where('branch_id', $branch)->get();
-        return response()->json($warehouses, 200);
+        $employee = auth()->user()->employee;
+
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found'], 404);
+        }
+
+        $warehouses = Warehouse::where('branch_id', $employee->branch_id)->get();
+
+        return response()->json(['warehouses' => $warehouses], 200);
     }
+
 
 }
