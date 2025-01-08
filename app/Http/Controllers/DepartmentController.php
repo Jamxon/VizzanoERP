@@ -28,7 +28,6 @@ class DepartmentController extends Controller
             'groups' => 'nullable|array',
         ]);
 
-        dd($data);
         $user = User::find($data['responsible_user_id']);
 
         $department = Department::create([
