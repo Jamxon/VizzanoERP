@@ -32,4 +32,9 @@ class Warehouse extends Model
     {
         return $this->hasMany(Stok::class, 'warehouse_id');
     }
+
+    public function users()
+    {
+        return $this->hasMany(WarehouseRelatedUser::class, 'warehouse_id');
+    }
 }
