@@ -22,10 +22,10 @@ class DepartmentController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-
         $data = $request->validate([
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
+            'groups' => 'nullable|array',
         ]);
 
         dd($data);
