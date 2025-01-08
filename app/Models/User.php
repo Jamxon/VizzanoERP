@@ -43,11 +43,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(Group::class, 'responsible_user_id');
     }
 
-    //warehouse
-
     public function warehouses()
     {
-        return $this->belongsToMany(Warehouse::class, 'warehouse_related_users');
+        return $this->belongsTo(WarehouseRelatedUser::class, 'warehouse_id');
     }
 
 }
