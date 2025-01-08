@@ -46,7 +46,9 @@ class WarehouseController extends Controller
             return response()->json(['message' => 'Employee not found'], 404);
         }
 
-        $warehouses = Warehouse::where('branch_id', $employee->branch_id)->get();
+        $warehouses = Warehouse::where('branch_id', $employee->branch_id)
+            ->with('stoks')
+            ->get();
 
         return response()->json($warehouses, 200);
     }
