@@ -363,7 +363,7 @@ class TechnologController extends Controller
         return $letter;
     }
 
-    public function getTarificationBySubmodelId($submodelId)
+    public function getTarificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
     {
         $tarificationCategories = TarificationCategory::where('submodel_id', $submodelId)->with('tarifications')
             ->get()
@@ -371,7 +371,7 @@ class TechnologController extends Controller
         return response()->json($tarificationCategories, 200);
     }
 
-    public function getTarificationByOrderModelId($orderModelId)
+    public function getTarificationByOrderModelId($orderModelId): \Illuminate\Http\JsonResponse
     {
         $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)->first();
         $submodels = SubModel::where('id', $orderSubModel->submodel_id)->with('tarification_categories')
@@ -380,7 +380,7 @@ class TechnologController extends Controller
         return response()->json($submodels, 200);
     }
 
-    public function getEmployerByDepartment(Request $request)
+    public function getEmployerByDepartment(Request $request): \Illuminate\Http\JsonResponse
     {
         $groupIds = OrderGroup::where('order_id', $request->query('order_id'))
             ->where('submodel_id', $request->query('submodel_id'))
@@ -409,7 +409,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function destroyTarificationCategory($id)
+    public function destroyTarificationCategory($id): \Illuminate\Http\JsonResponse
     {
         $tarificationCategory = TarificationCategory::find($id);
 
@@ -438,7 +438,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function deleteTarification($id)
+    public function deleteTarification($id): \Illuminate\Http\JsonResponse
     {
         $tarification = Tarification::find($id);
 
@@ -455,7 +455,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function getOrders()
+    public function getOrders(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
 
@@ -465,7 +465,7 @@ class TechnologController extends Controller
         return response()->json($orders, 200);
     }
 
-    public function showTarification($id)
+    public function showTarification($id): \Illuminate\Http\JsonResponse
     {
         $tarification = Tarification::find($id);
 
@@ -478,7 +478,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function fasteningToEmployee(Request $request)
+    public function fasteningToEmployee(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -514,46 +514,4 @@ class TechnologController extends Controller
         return response()->json(['message' => 'Tarifications fastened to employees successfully'], 200);
     }
 
-    public function fasteningOrderToGroup(Request $request)
-    {
-        $data = json_decode($request->getContent(), true);
-
-        if (is_null($data)) {
-            return response()->json([
-                'message' => 'Invalid JSON format',
-            ], 400);
-        }
-
-        $validator = validator($data, [
-            'data' => 'required|array',
-            'data.*.group_id' => 'required|integer|exists:groups,id',
-            'data.*.order_id' => 'required|integer|exists:orders,id',
-            'data.*.submodel_id' => 'required|integer|exists:submodels,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation errors',
-                'errors' => $validator->errors(),
-            ], 422);
-        }
-
-        $validatedData = $validator->validated();
-
-        foreach ($validatedData['data'] as $datum) {
-            $groupId = $datum['group_id'];
-            $orderId = $datum['order_id'];
-            $submodelId = $datum['submodel_id'];
-
-            OrderGroup::create([
-                'group_id' => $groupId,
-                'order_id' => $orderId,
-                'submodel_id' => $submodelId,
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Order fastened to group successfully',
-        ], 200);
-    }
 }

@@ -109,14 +109,14 @@ class UserController extends Controller
 
     public function getUsers()
     {
-        $users = User::where('status', 'active')->get();
+        $users = User::where('role_id', '=', 8)
+            ->whereHas('employee', function ($query) {
+                $query->where('status', 'working');
+            })
+            ->get();
 
-        $resource = GetUserResource::collection($users);
-
-        if ($resource) {
-            return response()->json([
-                'users' => $resource,
-            ]);
+        if ($users) {
+            return response()->json($users);
         } else {
             return response()->json([
                 'message' => 'Users not found',
