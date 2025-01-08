@@ -41,9 +41,8 @@ class WarehouseController extends Controller
     public function getWarehouse(): \Illuminate\Http\JsonResponse
     {
 
-        $warehouses = Warehouse::all();
 
-        return response()->json($warehouses, 200);
+        return response()->json("Warehouse", 200);
     }
 
 }

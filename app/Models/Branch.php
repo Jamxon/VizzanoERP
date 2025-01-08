@@ -34,6 +34,6 @@ class Branch extends Model
 
     public function warehouses()
     {
-        return $this->hasMany(Warehouse::class);
+        return $this->hasMany(Warehouse::class, 'branch_id');
     }
 }
