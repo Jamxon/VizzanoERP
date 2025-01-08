@@ -22,11 +22,13 @@ class DepartmentController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
+
         $data = $request->validate([
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
         ]);
 
+        dd($data);
         $user = User::find($data['responsible_user_id']);
 
         $department = Department::create([
@@ -40,19 +42,21 @@ class DepartmentController extends Controller
             'department_id' => $department->id,
         ]);
 
-        foreach ($data['groups'] as $group) {
-            Group::create([
-                'name' => $group['name'],
-                'responsible_user_id' => $group['responsible_user_id'],
-                'department_id' => $department->id,
-            ]);
+       if ($department){
+           foreach ($data['groups'] as $group) {
+               Group::create([
+                   'name' => $group['name'],
+                   'responsible_user_id' => $group['responsible_user_id'],
+                   'department_id' => $department->id,
+               ]);
 
-            $user = User::find($group['responsible_user_id']);
-            $user->employee->update([
-                'group_id' => null,
-                'department_id' => $department->id,
-            ]);
-        }
+               $user = User::find($group['responsible_user_id']);
+               $user->employee->update([
+                   'group_id' => null,
+                   'department_id' => $department->id,
+               ]);
+           }
+       }
 
         return response()->json($department);
     }
