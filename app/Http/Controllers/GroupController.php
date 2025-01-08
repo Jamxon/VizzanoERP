@@ -11,9 +11,8 @@ class GroupController extends Controller
 {
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $groups = Group::all();
-        $resource = GetGroupsResource::collection($groups);
-        return response()->json($resource);
+        $groups = Group::with('users')->get();
+        return response()->json($groups);
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse

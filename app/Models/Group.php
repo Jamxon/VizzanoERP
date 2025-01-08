@@ -16,6 +16,13 @@ class Group extends Model
         'total_work_time',
         'model_id'];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'total_work_time',
+        'model_id',
+        'responsible_user_id',
+    ];
     public function users()
     {
         return $this->belongsTo(User::class, 'responsible_user_id');
