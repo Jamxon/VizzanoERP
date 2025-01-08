@@ -60,30 +60,59 @@ class DepartmentController extends Controller
         return response()->json($department);
     }
 
-    public function update(Request $request, Department $department): \Illuminate\Http\JsonResponse
+    public function update(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
-            'branch_id' => 'required|integer|exists:branches,id',
-            'groups' => 'required|array',
+            'groups' => 'nullable|array',
         ]);
 
+        $department = Department::findOrFail($id); // Mavjud departmentni topish
         $department->update([
             'name' => $data['name'],
             'responsible_user_id' => $data['responsible_user_id'],
-            'branch_id' => $data['branch_id'],
         ]);
 
-        $department->groups()->delete();
+        $user = User::find($data['responsible_user_id']);
+        $user->employee->update([
+            'group_id' => null,
+            'department_id' => $department->id,
+        ]);
 
+        // Avvalgi guruhlarni o‘chirib tashlash yoki yangilash uchun
+        $existingGroupIds = [];
         foreach ($data['groups'] as $group) {
-            Group::create([
-                'name' => $group['name'],
-                'responsible_user_id' => $group['responsible_user_id'],
-                'department_id' => $department->id,
-            ]);
+            if (isset($group['id'])) {
+                $existingGroup = Group::find($group['id']);
+                if ($existingGroup) {
+                    $existingGroup->update([
+                        'name' => $group['name'],
+                        'responsible_user_id' => $group['responsible_user_id'],
+                    ]);
+                    $existingGroupIds[] = $existingGroup->id;
+                }
+            } else {
+                $newGroup = Group::create([
+                    'name' => $group['name'],
+                    'responsible_user_id' => $group['responsible_user_id'],
+                    'department_id' => $department->id,
+                ]);
+
+                $newUser = User::find($group['responsible_user_id']);
+                $newUser->employee->update([
+                    'group_id' => $newGroup->id,
+                    'department_id' => $department->id,
+                ]);
+
+                $existingGroupIds[] = $newGroup->id;
+            }
         }
+
+        // Mavjud bo'lmagan guruhlarni o'chirish
+        Group::where('department_id', $department->id)
+            ->whereNotIn('id', $existingGroupIds)
+            ->delete();
 
         return response()->json($department);
     }
