@@ -22,6 +22,7 @@ class Group extends Model
         'total_work_time',
         'model_id',
         'responsible_user_id',
+        'department_id'
     ];
     public function users()
     {
