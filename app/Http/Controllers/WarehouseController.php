@@ -40,8 +40,15 @@ class WarehouseController extends Controller
 
     public function getWarehouse()
     {
-        $warehouses = Warehouse::where('branch_id', auth()->user()->employee->branch_id)->get();
+        $employee = auth()->user()->employee;
 
-        return response()->json($warehouses, 200);
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found'], 404);
+        }
+
+        $warehouses = Warehouse::where('branch_id', $employee->branch_id)->get();
+
+        return response()->json(['warehouses' => $warehouses], 200);
     }
+
 }
