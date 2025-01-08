@@ -9,7 +9,7 @@ class WarehouseRelatedUser extends Model
 {
     use HasFactory;
 
-    protected $table = 'warehouse_related_users';
+    protected $table = 'warehouses_related_users';
 
     protected $fillable = [
         'user_id',
