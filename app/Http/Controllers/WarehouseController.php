@@ -42,7 +42,7 @@ class WarehouseController extends Controller
     {
 
 
-        return response()->json("Warehouse", 200);
+        return response()->json(Warehouse::all(), 200);
     }
 
 }
