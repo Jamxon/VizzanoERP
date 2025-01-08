@@ -9,7 +9,7 @@ class Stok extends Model
 {
     use HasFactory;
 
-    protected $table = 'stok';
+    protected $table = 'stock';
 
     protected $fillable = [
         'warehouse_id',
