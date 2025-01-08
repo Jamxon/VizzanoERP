@@ -107,7 +107,7 @@ class UserController extends Controller
         }
     }
 
-    public function getUsers()
+    public function getUsersMaster()
     {
         $users = User::where('role_id', '=', 8)
             ->whereHas('employee', function ($query) {
