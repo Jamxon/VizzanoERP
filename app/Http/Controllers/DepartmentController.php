@@ -25,7 +25,6 @@ class DepartmentController extends Controller
         $data = $request->validate([
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
-            'groups' => 'required|array',
         ]);
 
         $user = User::find($data['responsible_user_id']);
