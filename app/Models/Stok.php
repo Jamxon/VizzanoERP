@@ -19,6 +19,13 @@ class Stok extends Model
         'min_quantity'
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'warehouse_id',
+        'product_id'
+    ];
+
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class,'warehouse_id');
