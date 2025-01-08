@@ -15,6 +15,7 @@ use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\TechnologController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
@@ -74,6 +75,9 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::delete('razryads/{razryad}', [RazryadController::class, 'destroy']);
 
     Route::get('export-items', [ItemController::class, 'export']);
+
+    Route::get('warehouses', [WarehouseController::class, 'getWarehouse']);
+    Route::post('warehouses', [WarehouseController::class, 'warehouseStore']);
 
     Route::get('departments', [DepartmentController::class, 'index']);
     Route::post('departments', [DepartmentController::class, 'store']);
