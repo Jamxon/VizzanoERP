@@ -41,11 +41,9 @@ class WarehouseController extends Controller
     public function getWarehouse(): \Illuminate\Http\JsonResponse
     {
 
-        $employee = auth()->user()->employee;
-
         $warehouses = Warehouse::all();
 
-        return response()->json(['warehouses' => $warehouses], 200);
+        return response()->json($warehouses, 200);
     }
 
 }
