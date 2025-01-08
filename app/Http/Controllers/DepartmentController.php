@@ -25,7 +25,6 @@ class DepartmentController extends Controller
         $data = $request->validate([
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
-            'branch_id' => 'required|integer|exists:branches,id',
             'groups' => 'required|array',
         ]);
 
@@ -34,7 +33,7 @@ class DepartmentController extends Controller
         $department = Department::create([
             'name' => $data['name'],
             'responsible_user_id' => $data['responsible_user_id'],
-            'branch_id' => $data['branch_id'],
+            'branch_id' => auth()->user()->employee->branch_id,
         ]);
 
         $user->employee->update([
