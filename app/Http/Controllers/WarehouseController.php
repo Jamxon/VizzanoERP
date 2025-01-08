@@ -40,7 +40,8 @@ class WarehouseController extends Controller
 
     public function getWarehouse(): \Illuminate\Http\JsonResponse
     {
-        $warehouses = Warehouse::where('branch_id', auth()->user()->employee->branch_id)->get();
+        $branch = auth()->user()->employee->branch_id;
+        $warehouses = Warehouse::where('branch_id', $branch)->get();
         return response()->json($warehouses, 200);
     }
 
