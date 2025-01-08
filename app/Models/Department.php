@@ -9,7 +9,7 @@ class Department extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'responsible_user', 'branch_id'];
+    protected $fillable = ['name', 'responsible_user_id', 'branch_id'];
 
     protected $hidden = ['created_at', 'updated_at','branch_id','responsible_user_id'];
     // Filialga aloqani o'rnatamiz
