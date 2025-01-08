@@ -48,8 +48,10 @@ class WarehouseController extends Controller
 
         $warehouses = Warehouse::where('branch_id', $employee->branch_id)->get();
 
-        return response()->json(['warehouses' => $warehouses], 200);
+        // Ehtimoliy muammolarni bartaraf etish uchun toArray() qo'shildi.
+        return response()->json(['warehouses' => $warehouses->toArray()], 200);
     }
+
 
 
 }
