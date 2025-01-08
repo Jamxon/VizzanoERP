@@ -42,8 +42,6 @@ class WarehouseController extends Controller
     {
         $warehouses = Warehouse::where('branch_id', auth()->user()->employee->branch_id)->get();
 
-        return response()->json([
-            'warehouses' => $warehouses,
-        ], 200);
+        return response()->json($warehouses, 200);
     }
 }
