@@ -24,6 +24,8 @@ class Group extends Model
         'responsible_user_id',
         'department_id'
     ];
+
+    protected $with = ['users'];
     public function users()
     {
         return $this->belongsTo(User::class, 'responsible_user_id');
