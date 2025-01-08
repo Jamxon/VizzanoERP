@@ -101,7 +101,7 @@ class DepartmentController extends Controller
 
                 $newUser = User::find($group['responsible_user_id']);
                 $newUser->employee->update([
-                    'group_id' => $newGroup->id,
+                    'group_id' =>  null,
                     'department_id' => $department->id,
                 ]);
 
