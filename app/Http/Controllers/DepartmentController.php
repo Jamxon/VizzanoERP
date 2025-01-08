@@ -68,7 +68,7 @@ class DepartmentController extends Controller
             'groups' => 'nullable|array',
         ]);
 
-        $department = Department::findOrFail($id); // Mavjud departmentni topish
+        $department = Department::findOrFail($id);
         $department->update([
             'name' => $data['name'],
             'responsible_user_id' => $data['responsible_user_id'],
@@ -80,7 +80,6 @@ class DepartmentController extends Controller
             'department_id' => $department->id,
         ]);
 
-        // Avvalgi guruhlarni o‘chirib tashlash yoki yangilash uchun
         $existingGroupIds = [];
         foreach ($data['groups'] as $group) {
             if (isset($group['id'])) {
@@ -109,7 +108,6 @@ class DepartmentController extends Controller
             }
         }
 
-        // Mavjud bo'lmagan guruhlarni o'chirish
         Group::where('department_id', $department->id)
             ->whereNotIn('id', $existingGroupIds)
             ->delete();
