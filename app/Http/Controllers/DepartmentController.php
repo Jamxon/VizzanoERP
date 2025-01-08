@@ -13,7 +13,7 @@ class DepartmentController extends Controller
         $user = auth()->user();
 
         $departments = Department::where('branch_id', $user->employee->branch_id)
-            ->with('responsibleUser','groups')
+            ->with('responsibleUser','groups.users')
             ->get();
 
         return response()->json($departments);
