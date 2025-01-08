@@ -27,4 +27,9 @@ class Warehouse extends Model
     {
         return $this->belongsTo(Branch::class, 'branch_id');
     }
+
+    public function stoks()
+    {
+        return $this->hasMany(Stok::class, 'warehouse_id');
+    }
 }
