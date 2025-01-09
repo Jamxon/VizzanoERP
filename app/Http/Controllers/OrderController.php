@@ -145,6 +145,6 @@ class OrderController extends Controller
             ->orderBy('start_date', 'asc')
             ->get();
         Log::info('Now: ' . now());
-        return $orders;
+        return response()->json($orders);
     }
 }
