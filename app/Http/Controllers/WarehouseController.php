@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class WarehouseController extends Controller
 {
-    public function warehouseStore(Request $request)
+    public function warehouseStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -38,7 +38,7 @@ class WarehouseController extends Controller
         ], 201);
     }
 
-    public function getWarehouse()
+    public function getWarehouse(): \Illuminate\Http\JsonResponse
     {
         $employee = auth()->user()->employee;
 
