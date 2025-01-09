@@ -132,9 +132,8 @@ class OrderController extends Controller
 
     public function getOrderWithPlan()
     {
-        return date_format(now()->addDays(3), 'Y-m-d');
         $orders = Order::where('status', 'active')
-            ->where('start_date', '>=', now()->addDays(3))
+            ->where('start_date', '>=', date_format(now()->addDays(3), 'Y-m-d'))
             ->orderBy('start_date', 'desc')
             ->get();
 
