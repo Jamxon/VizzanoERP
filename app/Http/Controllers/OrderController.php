@@ -132,7 +132,7 @@ class OrderController extends Controller
     public function getOrderWithPlan()
     {
         $now = now()->toDateString();
-        return $now;
+        dd(now()->toDateString());  // `now()` qiymatini ko'rish
         $orders = Order::where('status', 'active')
 //            ->whereRaw('DATE(start_date) = ?', [now()->toDateString()])
             ->whereDate('start_date','>=', "2024-01-09")
