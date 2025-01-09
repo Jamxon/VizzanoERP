@@ -133,13 +133,14 @@ class OrderController extends Controller
     {
 
         $orders = Order::where('status', 'active')
-            ->where(function ($query) {
-                $query->whereDate('start_date', '<=', now()->toDateString())
-                    ->orWhere(function ($query) {
-                        $query->whereDate('start_date', '>=', now()->toDateString())
-                            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString());
-                    });
-            })
+            ->whereDate('start_date', '<=', now()->toDateString())
+//            ->where(function ($query) {
+//                $query->whereDate('start_date', '<=', now()->toDateString())
+//                    ->orWhere(function ($query) {
+//                        $query->whereDate('start_date', '>=', now()->toDateString())
+//                            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString());
+//                    });
+//            })
             ->orderBy('start_date', 'asc')
             ->get();
         Log::info('Now: ' . now());
