@@ -143,7 +143,6 @@ class OrderController extends Controller
             ->orderBy('start_date', 'asc')
             ->get();
         Log::info('Now: ' . now());
-        Log::info('Orders query: ' . $orders->toSql());
         return $orders;
     }
 }
