@@ -13,7 +13,7 @@ class WarehouseController extends Controller
     {
         $data = json_decode($request->getContent(), true);
 
-        $data = $data->validate([
+        $data->validate([
             'name' => 'required|string',
             'location' => 'required|string',
             'users' => 'required|array',
