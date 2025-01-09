@@ -132,28 +132,12 @@ class OrderController extends Controller
 
     public function getOrderWithPlan()
     {
-        $now = now()->toDateString();
-        $threeDaysLater = now()->addDays(3)->toDateString();  // 3 kun keyingi sana
-        Log::info('Now: ' . $now);
-        Log::info('Three Days Later: ' . $threeDaysLater);
-
-        // Barcha orderlarni va ularning start_date qiymatlarini loglash
         $orders = Order::where('status', 'active')
+            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString())
             ->orderBy('start_date', 'asc')
             ->get();
 
-        foreach ($orders as $order) {
-            Log::info('Order start_date: ' . $order->start_date);
-        }
-
-        // So'rovga mos keladigan orderlarni chiqarish
-        $ordersFiltered = $orders->filter(function ($order) use ($now, $threeDaysLater) {
-            // Faqat bugundan 3 kun keyingi oraliqda start_date bo'lgan orderlarni olish
-            return \Carbon\Carbon::parse($order->start_date)->toDateString() <= $threeDaysLater;
-        });
-
-        return response()->json($ordersFiltered);
+        Log::info('Now: ' . now()->toDateString());
+        return response()->json($orders);
     }
-
-
 }
