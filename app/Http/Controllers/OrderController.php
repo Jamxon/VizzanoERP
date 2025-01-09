@@ -149,7 +149,7 @@ class OrderController extends Controller
         // So'rovga mos keladigan orderlarni chiqarish
         $ordersFiltered = $orders->filter(function ($order) use ($now, $threeDaysLater) {
             // Faqat bugundan 3 kun keyingi oraliqda start_date bo'lgan orderlarni olish
-            return \Carbon\Carbon::parse($order->start_date)->toDateString() <= $threeDaysLater;
+            return \Carbon\Carbon::parse($order->start_date)->toDateString() >= $threeDaysLater;
         });
 
         return response()->json($ordersFiltered);
