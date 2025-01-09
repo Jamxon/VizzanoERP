@@ -133,7 +133,7 @@ class OrderController extends Controller
     {
         $orders = Order::where('status', 'active')
 //            ->whereDate('start_date','>=',now()->toDateString())
-            ->where('start_date', '2024-01-09')
+            ->whereDate('start_date', '2024-01-09')
 //            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString())
             ->orderBy('start_date', 'asc')
             ->get();
