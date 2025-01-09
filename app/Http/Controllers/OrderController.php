@@ -129,17 +129,27 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
+
     public function getOrderWithPlan()
     {
         $now = now()->toDateString();
+        Log::info('Now: ' . $now);
+
+        // Barcha orderlarni va ularning start_date qiymatlarini loglash
         $orders = Order::where('status', 'active')
-//            ->whereRaw('DATE(start_date) >= ?', [$now])
-            ->whereDate('start_date', '>=', $now . ' 00:00:00')
-//            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString())
             ->orderBy('start_date', 'asc')
             ->get();
 
-        Log::info('Now: ' . now()->toDateString());
-        return response()->json($orders);
+        foreach ($orders as $order) {
+            Log::info('Order start_date: ' . $order->start_date);
+        }
+
+        // So'rovga mos keladigan orderlarni chiqarish
+        $ordersFiltered = $orders->filter(function ($order) use ($now) {
+            return \Carbon\Carbon::parse($order->start_date)->toDateString() >= $now;
+        });
+
+        return response()->json($ordersFiltered);
     }
+
 }
