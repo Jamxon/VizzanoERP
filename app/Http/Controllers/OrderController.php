@@ -146,7 +146,7 @@ class OrderController extends Controller
 
         // So'rovga mos keladigan orderlarni chiqarish
         $ordersFiltered = $orders->filter(function ($order) use ($now) {
-            return \Carbon\Carbon::parse($order->start_date)->toDateString() >= $now;
+            return \Carbon\Carbon::parse($order->start_date)->toDateString() <= $now;
         });
 
         return response()->json($ordersFiltered);
