@@ -21,6 +21,7 @@ class GetRecipesResource extends JsonResource
                 'quantity' => $this->item->stok->quantity,
                 'min_quantity' => $this->item->stok->min_quantity,
             ] : null,
+            'item' => $this->item,
             'quantity' => $this->quantity,
         ];
     }
