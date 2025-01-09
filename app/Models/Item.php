@@ -48,4 +48,9 @@ class Item extends Model
     {
         return $this->belongsTo(ItemType::class, 'type_id');
     }
+
+    public function stok()
+    {
+        return $this->hasOne(Stok::class, 'product_id');
+    }
 }

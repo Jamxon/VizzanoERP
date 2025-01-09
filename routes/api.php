@@ -80,6 +80,7 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
 
     Route::get('warehouses', [WarehouseController::class, 'getWarehouse']);
     Route::post('warehouses', [WarehouseController::class, 'warehouseStore']);
+    Route::patch('warehouses/{warehouse}', [WarehouseController::class, 'warehouseUpdate']);
 
     Route::get('departments', [DepartmentController::class, 'index']);
     Route::post('departments', [DepartmentController::class, 'store']);
