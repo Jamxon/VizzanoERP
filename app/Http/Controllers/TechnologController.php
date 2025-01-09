@@ -218,6 +218,13 @@ class TechnologController extends Controller
             // Submodel tarification logini bir vaqtning o'zida yaratish
             $submodelId = $datum['submodel_id'];
 
+            // TarificationCategory yaratish
+
+            $tarificationCategory = TarificationCategory::create([
+                'name' => $datum['name'],
+                'submodel_id' => $submodelId,
+            ]);
+
             foreach ($datum['tarifications'] as $tarification) {
                 // Razryad modelini bir martada olish
                 $razryad = Razryad::find($tarification['razryad_id']);
@@ -233,7 +240,7 @@ class TechnologController extends Controller
 
                 // Tarificationni yaratish
                 Tarification::create([
-                    'tarification_category_id' => $datum['id'],  // category_id ga to'g'ri moslashtirilgan
+                    'tarification_category_id' => $tarificationCategory->id,
                     'name' => $tarification['name'],
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
