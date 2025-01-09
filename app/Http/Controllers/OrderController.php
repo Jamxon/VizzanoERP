@@ -11,6 +11,7 @@ use App\Models\OrderSubModel;
 use App\Models\Recipe;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
@@ -128,24 +129,23 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
-
-
     public function getOrderWithPlan()
     {
-        return now()->toDateString();
+
         $orders = Order::where('status', 'active')
             ->where(function ($query) {
-                // Bugundan oldingi va hozirgi kunni o'z ichiga olgan buyurtmalar
-                $query->where('start_date', '<=', now())
+                // Bugungi sana va hozirgi sanani faqat sana qismiga solishtirish
+                $query->whereDate('start_date', '<=', now()->toDateString())
                     ->orWhere(function ($query) {
                         // 3 kun ichida boshlanadigan buyurtmalar
-                        $query->where('start_date', '>=', now())
-                            ->where('start_date', '<=', now()->addDays(3));
+                        $query->whereDate('start_date', '>=', now()->toDateString())
+                            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString());
                     });
             })
             ->orderBy('start_date', 'asc')
             ->get();
-
+        Log::info('Now: ' . now()); // Hozirgi sanani ko‘rish
+        Log::info('Orders query: ' . $orders->toSql()); // SQL so‘rovini tekshirish
         return $orders;
     }
 }
