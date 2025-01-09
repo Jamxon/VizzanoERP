@@ -133,7 +133,7 @@ class OrderController extends Controller
     public function getOrderWithPlan()
     {
         $now = now()->toDateString();
-       return  $threeDaysLater = now()->addDays(3)->toDateString();  // 3 kun keyingi sana
+        $threeDaysLater = now()->addDays(3)->toDateString();  // 3 kun keyingi sana
         Log::info('Now: ' . $now);
         Log::info('Three Days Later: ' . $threeDaysLater);
 
