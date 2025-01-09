@@ -131,7 +131,7 @@ class OrderController extends Controller
     }
     public function getOrderWithPlan()
     {
-
+        $user = auth()->user();
         $orders = Order::whereDate('start_date', now()->toDateString())
 //            ->where('status', 'active')
 //            ->where(function ($query) {
@@ -141,6 +141,7 @@ class OrderController extends Controller
 //                            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString());
 //                    });
 //            })
+            ->where('branch_id', $user->employee->branch_id)
             ->orderBy('start_date', 'asc')
             ->get();
         Log::info('Now: ' . now());
