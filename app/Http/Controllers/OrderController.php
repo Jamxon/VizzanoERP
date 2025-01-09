@@ -133,7 +133,8 @@ class OrderController extends Controller
     {
         $orders = Order::where('status', 'active')
             ->where(function ($query) {
-                $query->orWhereBetween('start_date', [now()->toDateString(), now()->addDays(3)->toDateString()]);
+                $query->where('start_date', '>=', now()->toDateString())
+                    ->orWhereBetween('start_date', [now()->toDateString(), now()->addDays(3)->toDateString()]);
             })
             ->orderBy('start_date', 'asc')
             ->get();
