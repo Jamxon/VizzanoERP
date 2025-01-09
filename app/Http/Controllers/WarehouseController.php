@@ -11,9 +11,8 @@ class WarehouseController extends Controller
 {
     public function warehouseStore(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = json_decode($request->getContent(), true);
 
-        $data->validate([
+        $data = $request->validate([
             'name' => 'required|string',
             'location' => 'required|string',
             'users' => 'required|array',
