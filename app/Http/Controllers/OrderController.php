@@ -134,18 +134,16 @@ class OrderController extends Controller
 
         $orders = Order::where('status', 'active')
             ->where(function ($query) {
-                // Bugungi sana va hozirgi sanani faqat sana qismiga solishtirish
                 $query->whereDate('start_date', '<=', now()->toDateString())
                     ->orWhere(function ($query) {
-                        // 3 kun ichida boshlanadigan buyurtmalar
                         $query->whereDate('start_date', '>=', now()->toDateString())
                             ->whereDate('start_date', '<=', now()->addDays(3)->toDateString());
                     });
             })
             ->orderBy('start_date', 'asc')
             ->get();
-        Log::info('Now: ' . now()); // Hozirgi sanani ko‘rish
-        Log::info('Orders query: ' . $orders->toSql()); // SQL so‘rovini tekshirish
+        Log::info('Now: ' . now());
+        Log::info('Orders query: ' . $orders->toSql());
         return $orders;
     }
 }
