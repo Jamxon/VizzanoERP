@@ -10,6 +10,7 @@ use App\Models\PartSpecification;
 use App\Models\Razryad;
 use App\Models\SpecificationCategory;
 use App\Models\SubModel;
+use App\Models\SubmodelSpend;
 use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use App\Models\TypeWriter;
@@ -210,14 +211,15 @@ class TechnologController extends Controller
 
         // Ma'lumotlarni saqlash
         foreach ($validatedData['data'] as $datum) {
-            // Create Tarification Category
-            $tarificationCategory = TarificationCategory::create([
-                'name' => $datum['name'],
-                'submodel_id' => $datum['submodel_id'],
-            ]);
+            // Jami vaqt va summa hisoblash
+            $totalSecond = 0;
+            $totalSumma = 0;
+
+            // Submodel tarification logini bir vaqtning o'zida yaratish
+            $submodelId = $datum['submodel_id'];
 
             foreach ($datum['tarifications'] as $tarification) {
-                // Fetch the Razryad model once
+                // Razryad modelini bir martada olish
                 $razryad = Razryad::find($tarification['razryad_id']);
 
                 if (!$razryad) {
@@ -226,12 +228,12 @@ class TechnologController extends Controller
                     ], 404);
                 }
 
-                // Calculate summa using the found Razryad salary
+                // Summa hisoblash
                 $summa = $tarification['second'] * $razryad->salary;
 
-                // Create Tarification entry
+                // Tarificationni yaratish
                 Tarification::create([
-                    'tarification_category_id' => $tarificationCategory->id,
+                    'tarification_category_id' => $datum['id'],  // category_id ga to'g'ri moslashtirilgan
                     'name' => $tarification['name'],
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
@@ -239,7 +241,18 @@ class TechnologController extends Controller
                     'summa' => $summa,
                     'code' => $this->generateSequentialCode(), // Tartiblangan kod generatsiyasi
                 ]);
+
+                // Tarificationni umumiy qiymatga qo'shish
+                $totalSecond += $tarification['second'];
+                $totalSumma += $summa;
             }
+
+            // Submodel spend logini yaratish
+            SubmodelSpend::create([
+                'submodel_id' => $submodelId,
+                'seconds' => $totalSecond,
+                'summa' => $totalSumma,
+            ]);
         }
 
         return response()->json([
@@ -256,50 +269,71 @@ class TechnologController extends Controller
 
         $data = $request->all();
 
+        // TarificationCategory ni topish
         $tarificationCategory = TarificationCategory::find($id);
 
-        if ($tarificationCategory) {
-            $tarificationCategory->update([
-                'name' => $data['name'],
-                'submodel_id' => $data['submodel_id'],
-            ]);
-
-            Tarification::where('tarification_category_id', $tarificationCategory->id)->delete();
-
-            if (!empty($data['tarifications'])) {
-                foreach ($data['tarifications'] as $tarification) {
-                    if (!empty($tarification['name']) && !empty($tarification['razryad_id']) && !empty($tarification['typewriter_id']) && !empty($tarification['second'])) {
-                        $razryad = Razryad::find($tarification['razryad_id']);
-
-                        if (!$razryad) {
-                            return response()->json([
-                                'message' => 'Razryad not found',
-                            ], 404);
-                        }
-
-                        $summa = $tarification['second'] * $razryad->salary;
-
-                        Tarification::create([
-                            'tarification_category_id' => $tarificationCategory->id,
-                            'name' => $tarification['name'],
-                            'razryad_id' => $tarification['razryad_id'],
-                            'typewriter_id' => $tarification['typewriter_id'],
-                            'second' => $tarification['second'],
-                            'summa' => $summa,
-                            'code' => $this->generateSequentialCode(),
-                        ]);
-                    }
-                }
-            }
-
-            return response()->json([
-                'message' => 'Tarifications updated successfully',
-            ], 200);
-        } else {
+        if (!$tarificationCategory) {
             return response()->json([
                 'message' => 'TarificationCategory not found',
             ], 404);
         }
+
+        // TarificationCategory yangilash
+        $tarificationCategory->update([
+            'name' => $data['name'],
+            'submodel_id' => $data['submodel_id'],
+        ]);
+
+        // Tarificationlarni o'chirish va qayta yozish
+        $totalSecond = 0;
+        $totalSumma = 0;
+
+        // Eski tarificationlarni o'chirish
+        Tarification::where('tarification_category_id', $tarificationCategory->id)->delete();
+
+        // Tarificationlar mavjud bo'lsa, ularni qayta ishlash
+        if (!empty($data['tarifications'])) {
+            foreach ($data['tarifications'] as $tarification) {
+                // Har bir tarification uchun validatsiya va summa hisoblash
+                if (!empty($tarification['name']) && !empty($tarification['razryad_id']) && !empty($tarification['typewriter_id']) && !empty($tarification['second'])) {
+                    $razryad = Razryad::find($tarification['razryad_id']);
+
+                    if (!$razryad) {
+                        return response()->json([
+                            'message' => 'Razryad not found',
+                        ], 404);
+                    }
+
+                    // Summa hisoblash
+                    $summa = $tarification['second'] * $razryad->salary;
+
+                    // Tarificationni yangilash yoki yaratish
+                    Tarification::create([
+                        'tarification_category_id' => $tarificationCategory->id,
+                        'name' => $tarification['name'],
+                        'razryad_id' => $tarification['razryad_id'],
+                        'typewriter_id' => $tarification['typewriter_id'],
+                        'second' => $tarification['second'],
+                        'summa' => $summa,
+                        'code' => $this->generateSequentialCode(),
+                    ]);
+
+                    // Jami vaqt va summa hisoblash
+                    $totalSecond += $tarification['second'];
+                    $totalSumma += $summa;
+                }
+            }
+        }
+
+        // SubmodelSpend ni yangilash yoki yaratish
+        SubmodelSpend::updateOrCreate(
+            ['submodel_id' => $tarificationCategory->submodel_id],
+            ['seconds' => $totalSecond, 'summa' => $totalSumma]
+        );
+
+        return response()->json([
+            'message' => 'Tarifications updated successfully',
+        ], 200);
     }
 
     /**
