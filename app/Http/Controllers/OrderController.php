@@ -129,20 +129,21 @@ class OrderController extends Controller
         ]);
     }
 
+
     public function getOrderWithPlan()
     {
         $orders = Order::where('status', 'active')
             ->where(function ($query) {
-                // Hozirgi kunda yoki undan oldin boshlanishi kerak
+                // Bugundan oldingi buyurtmalar (hozirgi kunga qadar)
                 $query->where('start_date', '<=', now())
-                    // 3 kun ichida boshlanishi kerak
-                    ->orWhere('start_date', '>=', now()->toDateString())
-                    ->where('start_date', '<=', now()->addDays(3)->toDateString());
+                    // Yoki 3 kun ichidagi buyurtmalar (hozirgi kundan 3 kun keyingacha)
+                    ->orWhereBetween('start_date', [now()->toDateString(), now()->addDays(3)->toDateString()]);
             })
             ->orderBy('start_date', 'asc')
             ->get();
 
         return $orders;
     }
+
 
 }
