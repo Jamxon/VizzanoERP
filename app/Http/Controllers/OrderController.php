@@ -135,7 +135,7 @@ class OrderController extends Controller
         $orders = Order::where('status', 'active')
             ->where('start_date', '<=', now())
 //            ->where('start_date', '<=', date_format(now()->addDays(3), 'Y-m-d'))
-            ->orderBy('start_date', 'desc')
+            ->orderBy('start_date', 'asc')
             ->get();
 
         return $orders;
