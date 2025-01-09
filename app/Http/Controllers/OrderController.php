@@ -132,6 +132,7 @@ class OrderController extends Controller
 
     public function getOrderWithPlan()
     {
+        return now();
         $orders = Order::where('status', 'active')
             ->where(function ($query) {
                 // Bugundan oldingi va hozirgi kunni o'z ichiga olgan buyurtmalar
