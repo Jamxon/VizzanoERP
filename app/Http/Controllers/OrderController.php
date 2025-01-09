@@ -132,11 +132,10 @@ class OrderController extends Controller
 
     public function getOrderWithPlan()
     {
+        return now()->addDays(3)->toDateString();
         $orders = Order::where('status', 'active')
             ->where(function ($query) {
-                // Bugundan oldingi buyurtmalar (hozirgi kunga qadar)
                 $query->where('start_date', '<=', now())
-                    // Yoki 3 kun ichidagi buyurtmalar (hozirgi kundan 3 kun keyingacha)
                     ->orWhereBetween('start_date', [now()->toDateString(), now()->addDays(3)->toDateString()]);
             })
             ->orderBy('start_date', 'asc')
