@@ -133,9 +133,9 @@ class OrderController extends Controller
     {
         $orders = Order::where('status', 'active')
             ->where(function ($query) {
-                // Bu yerda start_date cheklovlarini o'rnatish
-                $query->where('start_date', '<=', now())
-                    ->orWhereBetween('start_date', [now(), now()->addDays(3)]);
+                // start_date faqat sanasiga qarab solishtirish
+                $query->whereDate('start_date', '<=', now())
+                    ->orWhereBetween('start_date', [now()->toDateString(), now()->addDays(3)->toDateString()]);
             })
             ->orderBy('start_date', 'asc')
             ->get();
