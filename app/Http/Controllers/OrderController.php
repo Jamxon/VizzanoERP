@@ -131,20 +131,14 @@ class OrderController extends Controller
     }
     public function getOrderWithPlan()
     {
-        $user = auth()->user();
-        $orders = Order::whereDate('start_date', now()->toDateString())
-//            ->where('status', 'active')
-//            ->where(function ($query) {
-//                $query->whereDate('start_date', '<=', now()->toDateString())
-//                    ->orWhere(function ($query) {
-//                        $query->whereDate('start_date', '>=', now()->toDateString())
-//                            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString());
-//                    });
-//            })
-            ->where('branch_id', $user->employee->branch_id)
+        $orders = Order::where('status', 'active')
+            ->whereDate('start_date', '>=', now()->toDateString()) // faqat sanani solishtiradi
+            ->whereDate('start_date', '<=', now()->addDays(3)->toDateString())
             ->orderBy('start_date', 'asc')
             ->get();
-        Log::info('Now: ' . now());
+
+        Log::info('Now: ' . now()->toDateString());
         return response()->json($orders);
     }
+
 }
