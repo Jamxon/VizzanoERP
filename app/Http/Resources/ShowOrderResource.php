@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Group;
 use App\Models\OrderGroup;
 use App\Models\OrderRecipes;
 use App\Models\OrderSubModel;
@@ -41,14 +42,15 @@ class ShowOrderResource extends JsonResource
 
                 $orderGroup = OrderGroup::where('submodel_id', $orderModelSubmodel->submodel_id)
                     ->where('order_id', $this->id)
-                    ->with('group')
                     ->first();
+
+                $group = Group::find($orderGroup->group_id);
 
                 $submodelTotalRasxod = $submodelRecipesRasxod * $orderModelSubmodel->quantity;
 
                 $orderModelSubmodel['recipes'] = $orderModelRecipes;
                 $orderModelSubmodel['total_rasxod'] = $submodelTotalRasxod;
-                $orderModelSubmodel['group'] = $orderGroup;
+                $orderModelSubmodel['group'] = $group;
                 $orderModelSubmodelsArray[] = $orderModelSubmodel;
 
                 $orderModelTotalRasxod += $submodelTotalRasxod;
