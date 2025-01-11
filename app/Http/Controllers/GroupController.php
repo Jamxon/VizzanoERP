@@ -11,7 +11,10 @@ class GroupController extends Controller
 {
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $groups = Group::all();
+        $user = auth()->user();
+      return  $department = $user->employee->department->branch->departments;
+        $groups = Group::where('department_id', $user->department_id)
+            ->get();
         return response()->json($groups);
     }
 
