@@ -13,7 +13,7 @@ class SubModel extends Model
 
     protected $fillable = ['name','model_id'];
 
-    protected $with = ['sizes', 'modelColors','orderGroup'];
+    protected $with = ['sizes', 'modelColors'];
 
     protected $hidden = ['created_at', 'updated_at', 'model_id'];
 
