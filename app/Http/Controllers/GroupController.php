@@ -18,7 +18,17 @@ class GroupController extends Controller
     public function Test()
     {
         $user = auth()->user();
-        return  $department = $user->employee->group->department->branch->departments;
+
+        $branch = $user->employee->group->department->branch;
+        $departments = $branch->departments;
+
+        $groups = Group::whereIn('department_id', $departments->pluck('id'))->get();
+
+        return response()->json([
+            'departments' => $departments,
+            'groups' => $groups,
+        ], 200);
+
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
