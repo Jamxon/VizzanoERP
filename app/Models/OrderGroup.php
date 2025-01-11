@@ -32,9 +32,9 @@ class OrderGroup extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function submodel()
+    public function orderSubmodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(SubModel::class, 'submodel_id');
+        return $this->belongsTo(OrderSubModel::class, 'submodel_id');
     }
 
     public function group()
