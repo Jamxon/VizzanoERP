@@ -17,6 +17,16 @@ class OrderGroup extends Model
         'group_id',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'order_id',
+        'submodel_id',
+        'group_id',
+    ];
+
+    protected $with = ['group'];
+
     public function order()
     {
         return $this->belongsTo(Order::class);

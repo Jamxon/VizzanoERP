@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetGroupsResource;
 use App\Models\Group;
 use App\Models\OrderGroup;
+use http\Exception\InvalidArgumentException;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
@@ -91,6 +92,13 @@ class GroupController extends Controller
             $groupId = $datum['group_id'];
             $orderId = $datum['order_id'];
             $submodelId = $datum['submodel_id'];
+
+            if (OrderGroup::where('order_id', $orderId)->where('submodel_id', $submodelId)->exists()) {
+                $group = OrderGroup::where('order_id', $orderId)->where('submodel_id', $submodelId)->first();
+                $group->update([
+                    'group_id' => $groupId,
+                ]);
+            }
 
             OrderGroup::create([
                 'group_id' => $groupId,
