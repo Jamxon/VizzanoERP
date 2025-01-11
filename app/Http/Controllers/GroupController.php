@@ -11,11 +11,14 @@ class GroupController extends Controller
 {
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $user = auth()->user();
-      return  $department = $user->employee->department->branch->departments;
-        $groups = Group::where('department_id', $user->department_id)
-            ->get();
+        $groups = Group::all();
         return response()->json($groups);
+    }
+
+    public function Test()
+    {
+        $user = auth()->user();
+        return  $department = $user->employee->department->branch->departments;
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
