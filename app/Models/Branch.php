@@ -30,9 +30,16 @@ class Branch extends Model
         return $this->hasMany(Order::class);
     }
 
+
     // Omborlar bilan aloqani o'rnatamiz
 
     public function warehouses()
     {
+        return $this->hasMany(Warehouse::class, 'branch_id');
+    }
+
+    public function groups()
+    {
+        return $this->hasMany(Group::class);
     }
 }
