@@ -46,9 +46,4 @@ class SubModel extends Model
     {
         return $this->hasMany(SubmodelSpend::class, 'submodel_id');
     }
-
-    public function orderGroup(): \Illuminate\Database\Eloquent\Relations\HasOne
-    {
-        return $this->hasOne(OrderGroup::class, 'submodel_id');
-    }
 }

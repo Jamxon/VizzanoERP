@@ -28,7 +28,7 @@ class OrderSubModel extends Model
         'submodel_id',
     ];
 
-    protected $with = ['size', 'modelColor','submodel'];
+    protected $with = ['size', 'modelColor','submodel','orderGroup'];
 
     public function orderModel()
     {
@@ -48,5 +48,10 @@ class OrderSubModel extends Model
     public function modelColor()
     {
         return $this->belongsTo(ModelColor::class, 'model_color_id');
+    }
+
+    public function orderGroup()
+    {
+        return $this->hasOne(OrderGroup::class, 'submodel_id');
     }
 }
