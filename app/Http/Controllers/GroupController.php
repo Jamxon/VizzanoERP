@@ -11,29 +11,19 @@ class GroupController extends Controller
 {
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $groups = Group::all();
-        return response()->json($groups);
-    }
-
-    public function Test()
-    {
         $user = auth()->user();
 
-// Foydalanuvchining branchini olish
         $branch = $user->employee->branch;
 
         if (!$branch) {
             return response()->json(['message' => 'Branch not found for this user'], 404);
         }
 
-// Branchga tegishli departmentlarni olish
         $departments = $branch->departments;
 
-// Barcha departmentlarning gruppalarini olish
         $groups = Group::whereIn('department_id', $departments->pluck('id'))->get();
 
         return response()->json($groups, 200);
-
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
