@@ -75,7 +75,7 @@ class GroupController extends Controller
             'data' => 'required|array',
             'data.*.group_id' => 'required|integer|exists:groups,id',
             'data.*.order_id' => 'required|integer|exists:orders,id',
-            'data.*.submodel_id' => 'required|integer|exists:submodels,id',
+            'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
         ]);
 
         if ($validator->fails()) {
