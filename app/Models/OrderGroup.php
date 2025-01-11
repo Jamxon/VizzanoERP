@@ -25,8 +25,6 @@ class OrderGroup extends Model
         'group_id',
     ];
 
-    protected $with = ['group'];
-
     public function order()
     {
         return $this->belongsTo(Order::class);
