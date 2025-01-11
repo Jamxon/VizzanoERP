@@ -25,7 +25,6 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::patch('groups/{group}', [GroupController::class, 'update']);
     Route::delete('groups/{group}', [GroupController::class, 'delete']);
     Route::get('fasteningOrderToGroup', [GroupController::class, 'fasteningOrderToGroup']);
-    Route::get('test', [GroupController::class, 'Test']);
 
     Route::get('users/master', [UserController::class, 'getUsersMaster']);
     Route::get('users/submaster', [UserController::class, 'getUsersSubMaster']);
