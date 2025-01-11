@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
+use App\Http\Controllers\ConstructorController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
@@ -35,7 +36,6 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::patch('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'delete']);
     Route::patch('changeorderstatus', [OrderController::class, 'changeOrderStatus']);
-    Route::get('ordersplanning', [OrderController::class, 'getOrderWithPlan']);
 
     Route::get('models', [ModelController::class, 'index']);
     Route::post('models', [ModelController::class, 'store']);
@@ -121,6 +121,10 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::post('tarification/fastening', [TechnologController::class, 'fasteningToEmployee']);
 });
 
+
+Route::prefix('constructor')->middleware('role:constructor')->group(function () {
+    Route::get('getOrders', [ConstructorController::class, 'getOrderWithPlan']);
+});
     Route::get('lids', [LidController::class, 'index']);
     Route::post('lids', [LidController::class, 'store']);
     Route::patch('lids/{lid}', [LidController::class, 'update']);
