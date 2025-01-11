@@ -52,6 +52,6 @@ class OrderSubModel extends Model
 
     public function orderGroup()
     {
-        return $this->hasMany(OrderGroup::class, 'submodel_id');
+        return $this->hasOne(OrderGroup::class, 'submodel_id');
     }
 }
