@@ -19,9 +19,17 @@ class GroupController extends Controller
     {
         $user = auth()->user();
 
-        $branch = $user->employee->group->department->branch;
+// Foydalanuvchining branchini olish
+        $branch = $user->employee->branch;
+
+        if (!$branch) {
+            return response()->json(['message' => 'Branch not found for this user'], 404);
+        }
+
+// Branchga tegishli departmentlarni olish
         $departments = $branch->departments;
 
+// Barcha departmentlarning gruppalarini olish
         $groups = Group::whereIn('department_id', $departments->pluck('id'))->get();
 
         return response()->json([

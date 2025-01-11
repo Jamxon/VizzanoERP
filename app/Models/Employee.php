@@ -13,6 +13,7 @@ class Employee extends Model
     protected $fillable = [
         'name', 'phone', 'group_id', 'user_id', 'payment_type',
         'salary', 'hiring_date', 'status', 'address', 'passport_number'
+        ,'branch_id'
     ];
     public function group()
     {
@@ -37,5 +38,10 @@ class Employee extends Model
     public function tarifications()
     {
         return $this->hasMany(Tarification::class, 'user_id');
+    }
+
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }
