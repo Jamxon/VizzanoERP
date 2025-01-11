@@ -418,7 +418,7 @@ class TechnologController extends Controller
         $submodels = SubModel::where('id', $orderSubModel->submodel_id)->with('tarification_categories')
             ->get()
             ->makeHidden(['sizes', 'modelColors', 'specificationCategories']);
-        return response()->json($submodels, 200);
+        return response()->json($submodels, 200 );
     }
 
     public function getEmployerByDepartment(Request $request): \Illuminate\Http\JsonResponse
