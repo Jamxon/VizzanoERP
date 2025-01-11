@@ -14,7 +14,8 @@ class Group extends Model
         'department_id',
         'responsible_user_id',
         'total_work_time',
-        'model_id'];
+        'model_id'
+    ];
 
     protected $hidden = [
         'created_at',
