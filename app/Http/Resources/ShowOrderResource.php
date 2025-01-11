@@ -41,6 +41,7 @@ class ShowOrderResource extends JsonResource
 
                 $orderGroup = OrderGroup::where('submodel_id', $orderModelSubmodel->submodel_id)
                     ->where('order_id', $this->id)
+                    ->with('group')
                     ->first();
 
                 $submodelTotalRasxod = $submodelRecipesRasxod * $orderModelSubmodel->quantity;
