@@ -13,7 +13,7 @@ class SubModel extends Model
 
     protected $fillable = ['name','model_id'];
 
-    protected $with = ['sizes', 'modelColors'];
+    protected $with = ['sizes', 'modelColors','orderGroup'];
 
     protected $hidden = ['created_at', 'updated_at', 'model_id'];
 
@@ -45,5 +45,10 @@ class SubModel extends Model
     public function submodelSpend(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SubmodelSpend::class, 'submodel_id');
+    }
+
+    public function orderGroup(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderGroup::class, 'submodel_id');
     }
 }
