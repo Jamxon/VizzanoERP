@@ -28,7 +28,7 @@ class OrderSubModel extends Model
         'submodel_id',
     ];
 
-    protected $with = ['size', 'modelColor','submodel','orderGroup'];
+    protected $with = ['size', 'modelColor','submodel'];
 
     public function orderModel()
     {
