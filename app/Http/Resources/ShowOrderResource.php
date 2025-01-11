@@ -47,7 +47,7 @@ class ShowOrderResource extends JsonResource
 
                 $orderModelSubmodel['recipes'] = $orderModelRecipes;
                 $orderModelSubmodel['total_rasxod'] = $submodelTotalRasxod;
-                $orderModelSubmodel['group'] = $orderGroup;
+                $orderModelSubmodel['group'] = $orderGroup->group;
                 $orderModelSubmodelsArray[] = $orderModelSubmodel;
 
                 $orderModelTotalRasxod += $submodelTotalRasxod;
