@@ -24,7 +24,7 @@ class OrderGroup extends Model
 
     public function submodel()
     {
-        return $this->belongsTo(SubModel::class);
+        return $this->belongsTo(SubModel::class, 'submodel_id');
     }
 
     public function group()
