@@ -32,10 +32,7 @@ class GroupController extends Controller
 // Barcha departmentlarning gruppalarini olish
         $groups = Group::whereIn('department_id', $departments->pluck('id'))->get();
 
-        return response()->json([
-            'departments' => $departments,
-            'groups' => $groups,
-        ], 200);
+        return response()->json($groups, 200);
 
     }
 
