@@ -18,7 +18,7 @@ class GroupController extends Controller
     public function Test()
     {
         $user = auth()->user();
-        return  $department = $user->employee->department->branch->departments;
+        return  $department = $user->employee->group->department->branch->departments;
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
