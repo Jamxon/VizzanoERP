@@ -123,7 +123,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
 
 
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
-    Route::get('getOrders', [ConstructorController::class, 'getOrderWithPlan']);
+    Route::get('orders', [ConstructorController::class, 'getOrderWithPlan']);
 });
     Route::get('lids', [LidController::class, 'index']);
     Route::post('lids', [LidController::class, 'store']);
