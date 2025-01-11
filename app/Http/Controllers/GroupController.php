@@ -98,6 +98,9 @@ class GroupController extends Controller
                 $group->update([
                     'group_id' => $groupId,
                 ]);
+                return response()->json([
+                    'message' => 'Order fastened to group successfully',
+                ], 200);
             }
 
             OrderGroup::create([
