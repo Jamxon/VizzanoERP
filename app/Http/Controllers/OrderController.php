@@ -15,20 +15,20 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::orderBy('updated_at', 'asc')->get();
         return response()->json($orders);
     }
 
-    public function show(Order $order)
+    public function show(Order $order): \Illuminate\Http\JsonResponse
     {
         $resource = new ShowOrderResource($order);
 
         return response()->json($resource);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'name' => 'required|string',
@@ -95,7 +95,7 @@ class OrderController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, Order $order)
+    public function update(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
         $order->update($request->all());
 
@@ -105,7 +105,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function delete(Order $order)
+    public function delete(Order $order): \Illuminate\Http\JsonResponse
     {
         $order->delete();
         return response()->json([
@@ -113,7 +113,7 @@ class OrderController extends Controller
         ]);
     }
 
-    public function changeOrderStatus(Request $request)
+    public function changeOrderStatus(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'status' => 'required',
