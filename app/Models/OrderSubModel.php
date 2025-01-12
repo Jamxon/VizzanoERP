@@ -32,7 +32,7 @@ class OrderSubModel extends Model
 
     public function orderModel()
     {
-        return $this->belongsTo(OrderModel::class);
+        return $this->belongsTo(OrderModel::class, 'order_model_id');
     }
 
     public function submodel()

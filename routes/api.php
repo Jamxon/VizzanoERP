@@ -125,6 +125,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
     Route::get('orders', [ConstructorController::class, 'getOrders']);
 });
+
     Route::get('lids', [LidController::class, 'index']);
     Route::post('lids', [LidController::class, 'store']);
     Route::patch('lids/{lid}', [LidController::class, 'update']);

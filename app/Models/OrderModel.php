@@ -17,7 +17,7 @@ class OrderModel extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id'];
 
-    protected $with = ['model'];
+    protected $with = ['model', 'submodels'];
 
     public function order()
     {
@@ -27,5 +27,10 @@ class OrderModel extends Model
     public function model()
     {
         return $this->belongsTo(Models::class);
+    }
+
+    public function submodels(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderSubModel::class, 'order_model_id');
     }
 }
