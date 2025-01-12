@@ -18,7 +18,7 @@ class ConstructorController extends Controller
         $orders->each(function ($order) {
             $order->orderModels->each(function ($orderModel) {
                 $orderModel->model->makeHidden(['submodels']); // 'model' dan 'submodels'ni yashiradi
-                $orderModel->submodels->submodel->each(function ($submodel) {
+                $orderModel->submodels->each(function ($submodel) {
                     $submodel->makeHidden(['modelColor', 'size']); // Har bir 'submodel' ichidagi 'modelColor' va 'size' yashiriladi
                 });
             });
