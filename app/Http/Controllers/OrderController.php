@@ -113,14 +113,12 @@ class OrderController extends Controller
         ]);
     }
 
-    public function changeOrderStatus(Request $request): \Illuminate\Http\JsonResponse
+    public function changeOrderStatus(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'status' => 'required',
-            'order_id' => 'required',
         ]);
 
-        $order = Order::find($request->order_id);
         $order->status = $request->status;
         $order->save();
 
