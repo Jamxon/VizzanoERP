@@ -17,7 +17,7 @@ class OrderController extends Controller
 {
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::orderBy('updated_at', 'asc')->get();
+        $orders = Order::orderBy('created_at', 'asc')->get();
         return response()->json($orders);
     }
 
