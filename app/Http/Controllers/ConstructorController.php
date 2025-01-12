@@ -17,7 +17,7 @@ class ConstructorController extends Controller
 
         $orders->each(function ($order) {
             $order->orderModels->each(function ($orderModel) {
-                unset($orderModel->model->with['submodels']);
+                unset($orderModel->model->relations['submodels']);
             });
         });
 
