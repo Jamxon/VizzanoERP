@@ -17,11 +17,10 @@ class ConstructorController extends Controller
 
         $orders->each(function ($order) {
             $order->orderModels->each(function ($orderModel) {
-                unset($orderModel->model->relations['submodels']);
+                $orderModel->model->makeHidden(['submodels']); // 'submodels'ni yashiradi
             });
         });
 
         return response()->json($orders);
-
     }
 }
