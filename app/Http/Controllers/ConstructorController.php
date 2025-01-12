@@ -13,9 +13,15 @@ class ConstructorController extends Controller
             ->whereDate('start_date', '<=', now()->addDays(3)->toDateString())
             ->orderBy('start_date', 'asc')
             ->with('orderModels.model', 'orderModels.submodels', 'orderModels.submodels.size', 'orderModels.submodels.modelColor')
-            ->setHidden(['orderModels.model.submodels'])
             ->get();
 
+        $orders->each(function ($order) {
+            $order->orderModels->each(function ($orderModel) {
+                unset($orderModel->model->relations['submodels']);
+            });
+        });
+
         return response()->json($orders);
+
     }
 }
