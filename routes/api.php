@@ -3,10 +3,12 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ConstructorController;
+use App\Http\Controllers\CuttingMasterConroller;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
+use App\Http\Controllers\MasterstrokeController;
 use App\Http\Controllers\LidController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\OrderController;
@@ -124,6 +126,10 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
 
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
     Route::get('orders', [ConstructorController::class, 'getOrders']);
+});
+
+Route::prefix('master')->middleware('role:master')->group(function () {
+    Route::get('orders/cutting',[CuttingMasterConroller::class, 'getOrders']);
 });
 
     Route::get('lids', [LidController::class, 'index']);
