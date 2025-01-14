@@ -33,4 +33,9 @@ class OrderModel extends Model
     {
         return $this->hasMany(OrderSubModel::class, 'order_model_id');
     }
+
+    public function orderPrintingTimes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderPrintingTimes::class, 'order_model_id');
+    }
 }
