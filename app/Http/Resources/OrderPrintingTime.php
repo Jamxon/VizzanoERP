@@ -21,7 +21,29 @@ class OrderPrintingTime extends JsonResource
             "status" => $this->status,
             "start_date" => $this->start_date,
             "end_date" => $this->end_date,
-            "order_printing_times" => $this->orderModels->orderPrintingTimes
+            "order_printing_times" => $this->orderModels->map(function ($orderModel) {
+                return [
+                    "id" => $orderModel->id,
+                    "model" => $orderModel->model,
+                    "submodels" => $orderModel->submodels->map(function ($submodel) {
+                        return [
+                            "id" => $submodel->id,
+                            "submodel" => $submodel->submodel,
+                            "size" => $submodel->size,
+                            "modelColor" => $submodel->modelColor
+                        ];
+                    }),
+                    "order_printing_times" => $orderModel->orderPrintingTimes->map(function ($orderPrintingTime) {
+                        return [
+                            "id" => $orderPrintingTime->id,
+                            "planned_time" => $orderPrintingTime->planned_time,
+                            "status" => $orderPrintingTime->status,
+                            "comment" => $orderPrintingTime->comment,
+                            "user_id" => $orderPrintingTime->user_id
+                        ];
+                    })
+                ];
+            })
         ];
     }
 }
