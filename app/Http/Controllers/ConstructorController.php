@@ -11,9 +11,13 @@ use Illuminate\Support\Facades\Log;
 
 class ConstructorController extends Controller
 {
-    public function getOrders(): \Illuminate\Http\JsonResponse
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
+
+        $plannedTime = $request->input('planned_time') ?? now()->toDateString();
+
         $orders = OrderPrintingTimes::where('status', 'printing')
+            ->whereDate('planned_time', $plannedTime)
             ->orderBy('planned_time', 'asc')
             ->with('orderModel.model', 'orderModel.submodels', 'orderModel.submodels.size', 'orderModel.submodels.modelColor')
             ->get();
