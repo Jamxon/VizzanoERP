@@ -27,7 +27,7 @@ class OrderPrintingTime extends JsonResource
 //                    "planned_time" => $orderModel->orderPrintingTimes->planned_time,
 //                    "actual_time" => $orderModel->orderPrintingTimes->actual_time,
 //                    "status" => $orderModel->orderPrintingTimes->status,
-//                    "comment" => $orderModel->orderPrintingTimes->comment,
+                    "comment" => $orderModel->orderPrintingTimes->comment,
 //                    "user" => $orderModel->orderPrintingTimes->user,
                     "model" => $orderModel->model->makeHidden(['submodels']),
                     "submodels" => $orderModel->submodels->map(function ($submodel) {
