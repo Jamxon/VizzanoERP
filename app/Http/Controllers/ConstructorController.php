@@ -20,7 +20,9 @@ class ConstructorController extends Controller
             ->get();
 
         foreach ($orderPrintingTimes as $order) {
-            $orders = Order::find($order->orderModel->order_id);
+            $orders = Order::where('id',$order->orderModel->order_id)
+                ->with('orderPrintingTimes')
+                ->get();
             $constructorOrders[] = $orders;
         }
 
