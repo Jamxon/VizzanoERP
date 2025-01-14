@@ -13,20 +13,26 @@ class ConstructorController extends Controller
     {
 
         $plannedTime = $request->input('planned_time') ?? now()->toDateString();
-        $constructorOrders = [];
-        $orderPrintingTimes = OrderPrintingTimes::whereDate('planned_time', $plannedTime)
-            ->orderBy('planned_time', 'asc')
-            ->with('orderModel.model', 'orderModel.submodels', 'orderModel.submodels.size', 'orderModel.submodels.modelColor')
+//        $constructorOrders = [];
+//        $orderPrintingTimes = OrderPrintingTimes::whereDate('planned_time', $plannedTime)
+//            ->orderBy('planned_time', 'asc')
+//            ->with('orderModel.model', 'orderModel.submodels', 'orderModel.submodels.size', 'orderModel.submodels.modelColor')
+//            ->get();
+//
+//        foreach ($orderPrintingTimes as $order) {
+//            $orders = Order::where('id',$order->orderModel->order_id)
+//                ->with('orderModels.orderPrintingTimes')
+//                ->get();
+//            $constructorOrders[] = $orders;
+//        }
+
+        $orders = Order::where('status', 'printing')
+            ->whereHas('orderModels.orderPrintingTimes', function ($query) use ($plannedTime) {
+                $query->whereDate('planned_time', $plannedTime);
+            })
             ->get();
 
-        foreach ($orderPrintingTimes as $order) {
-            $orders = Order::where('id',$order->orderModel->order_id)
-                ->with('orderModels.orderPrintingTimes')
-                ->get();
-            $constructorOrders[] = $orders;
-        }
-
-        return response()->json($constructorOrders);
+        return response()->json($orders);
     }
 
     public function sendToCuttingMaster(Request $request): \Illuminate\Http\JsonResponse
