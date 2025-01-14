@@ -24,12 +24,7 @@ class OrderPrintingTime extends JsonResource
             "order_printing_times" => $this->orderModels->map(function ($orderModel) {
                 return [
                     "id" => $orderModel->id,
-                    "model" => $orderModel->model->map(function ($model) {
-                        return [
-                            "id" => $model->id,
-                            "model" => $model->name
-                        ];
-                    }),
+                    "model" => $orderModel->model,
                     "submodels" => $orderModel->submodels->map(function ($submodel) {
                         return [
                             "id" => $submodel->id,
