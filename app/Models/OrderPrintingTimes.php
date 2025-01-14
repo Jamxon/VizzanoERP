@@ -32,4 +32,9 @@ class OrderPrintingTimes extends Model
     {
         return $this->belongsTo(OrderModel::class);
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

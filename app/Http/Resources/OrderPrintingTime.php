@@ -23,7 +23,12 @@ class OrderPrintingTime extends JsonResource
             "end_date" => $this->end_date,
             "order_printing_times" => $this->orderModels->map(function ($orderModel) {
                 return [
-                    "id" => $orderModel->id,
+                    "id" => $orderModel->orderPrintingTimes->id,
+                    "planned_time" => $orderModel->orderPrintingTimes->planned_time,
+                    "actual_time" => $orderModel->orderPrintingTimes->actual_time,
+                    "status" => $orderModel->orderPrintingTimes->status,
+                    "comment" => $orderModel->orderPrintingTimes->comment,
+                    "user" => $orderModel->orderPrintingTimes->user,
                     "model" => $orderModel->model->makeHidden(['submodels']),
                     "submodels" => $orderModel->submodels->map(function ($submodel) {
                         return [
@@ -32,7 +37,7 @@ class OrderPrintingTime extends JsonResource
                             "size" => $submodel->size,
                             "modelColor" => $submodel->modelColor
                         ];
-                    })
+                    }),
                 ];
             })
         ];

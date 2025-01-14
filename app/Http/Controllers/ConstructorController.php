@@ -20,26 +20,6 @@ class ConstructorController extends Controller
             ->with('orderModels.orderPrintingTimes')
             ->get();
 
-        $orders->each(function ($order) {
-            // orderModels ustida ishlash
-            $order->orderModels->each(function ($orderModel) {
-                $orderModel->makeHidden(['model', 'submodels', 'rasxod']);
-
-                // orderPrintingTimes bilan ishlash
-                $orderModel->orderPrintingTimes->each(function ($orderPrintingTime) {
-                    $orderModel = $orderPrintingTime->orderModel;
-
-                    // Bu yerda orderModelning submodelsini yashirish
-                    if ($orderModel) {
-                        $orderModel->model->makeHidden(['submodels']);
-                        $orderModel->submodels->each(function ($submodel) {
-                            $submodel->submodel->makeHidden(['sizes', 'modelColors']);
-                        });
-                    }
-                });
-            });
-        });
-
         $resource = OrderPrintingTime::collection($orders);
 
         return response()->json($resource);
