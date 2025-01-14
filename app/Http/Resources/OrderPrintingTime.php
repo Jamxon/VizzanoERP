@@ -21,7 +21,7 @@ class OrderPrintingTime extends JsonResource
             "status" => $this->status,
             "start_date" => $this->start_date,
             "end_date" => $this->end_date,
-            "order_printing_times" => OrderPrintingTime::collection($this->orderPrintingTimes),
+            "order_printing_times" => $this->orderModel->orderPrintingTimes
         ];
     }
 }
