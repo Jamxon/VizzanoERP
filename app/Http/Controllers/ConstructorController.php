@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderPrintingTime;
 use App\Models\Order;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
@@ -39,7 +40,9 @@ class ConstructorController extends Controller
             });
         });
 
-        return response()->json($orders);
+        $resource = OrderPrintingTime::collection($orders);
+
+        return response()->json($resource);
     }
 
     public function sendToCuttingMaster(Request $request): \Illuminate\Http\JsonResponse
