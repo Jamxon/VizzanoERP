@@ -28,7 +28,7 @@ class OrderPrintingTime extends JsonResource
                     "submodels" => $orderModel->submodels->map(function ($submodel) {
                         return [
                             "id" => $submodel->id,
-                            "submodel" => $submodel->submodel, //shuni relationlardan tozalash kerak
+                            "submodel" => $submodel->submodel->makeHidden(['sizes', 'modelColors']),
                             "size" => $submodel->size,
                             "modelColor" => $submodel->modelColor
                         ];
