@@ -29,6 +29,7 @@ class ConstructorController extends Controller
         $orders = Order::whereHas('orderModels.orderPrintingTimes', function ($query) use ($plannedTime) {
                 $query->whereDate('planned_time', $plannedTime);
             })
+            ->with('orderModels.orderPrintingTimes')
             ->get();
 
         return response()->json($orders);
