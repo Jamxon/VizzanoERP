@@ -45,13 +45,12 @@ class ConstructorController extends Controller
                     if ($orderModel) {
                         $orderModel->model->makeHidden(['submodels']);
                         $orderModel->submodels->each(function ($submodel) {
-                            $submodel->makeHidden(['sizes', 'modelColors']);
+                            $submodel->makeHidden(['submodel']);
                         });
                     }
                 });
             });
         });
-
 
         return response()->json($orders);
     }
