@@ -15,7 +15,7 @@ class ConstructorController extends Controller
     {
         $orders = OrderPrintingTimes::where('status', 'printing')
             ->orderBy('planned_time', 'asc')
-//            ->with('orderModel')
+            ->with('orderModel')
             ->get();
 
 //        $orders->orderModel->each(function ($orderModel) {
