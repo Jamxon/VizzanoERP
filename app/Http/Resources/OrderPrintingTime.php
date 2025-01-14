@@ -31,14 +31,17 @@ class OrderPrintingTime extends JsonResource
                         "comment" => $orderPrintingTime->comment,
                         "user" => $orderPrintingTime->user,
                         "model" => $orderModel->model->makeHidden(['submodels']),
-                        "submodels" => $orderModel->submodels->map(function ($submodel) {
+                        "submodels" => $orderModel->submodels
+                            ->groupBy('submodel_id')
+                            ->map(function ($groupedSubmodels) {
+                                $firstSubmodel = $groupedSubmodels->first();
                                 return [
-                                    "id" => $submodel->id,
-                                    "submodel" => $submodel->submodel->makeHidden(['sizes', 'modelColors']),
-                                    "size" => $submodel->size,
-                                    "modelColor" => $submodel->modelColor,
+                                    "id" => $firstSubmodel->id,
+                                    "submodel" => $firstSubmodel->submodel->makeHidden(['sizes', 'modelColors']),
+                                    "sizes" => $groupedSubmodels->pluck('size'),
+                                    "modelColor" => $firstSubmodel->modelColor,
                                 ];
-                            }),
+                            })->values(),
                     ];
                 });
             }),
