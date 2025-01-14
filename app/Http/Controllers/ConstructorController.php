@@ -33,7 +33,7 @@ class ConstructorController extends Controller
             ->get();
 
         $orders->each(function ($order) {
-            $order->orderModels->makeHidden(['model', 'submodels']); 
+            $order->orderModels->makeHidden(['model', 'submodels','rasxod']);
             $order->orderModels->each(function ($orderModel) {
                 $orderModel->model->makeHidden(['submodels']); // 'model' dan 'submodels'ni yashiradi
                 $orderModel->submodels->each(function ($submodel) {
