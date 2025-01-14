@@ -32,6 +32,15 @@ class ConstructorController extends Controller
             ->with('orderModels.orderPrintingTimes')
             ->get();
 
+        $orders->each(function ($order) {
+            $order->orderModels->each(function ($orderModel) {
+                $orderModel->model->makeHidden(['submodels']); // 'model' dan 'submodels'ni yashiradi
+                $orderModel->submodels->each(function ($submodel) {
+                    $submodel->submodel->makeHidden(['sizes', 'modelColors']); // 'submodel' dan 'sizes' va 'modelColors'ni yashiradi
+                });
+            });
+        });
+
         return response()->json($orders);
     }
 
