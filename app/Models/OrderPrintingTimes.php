@@ -26,6 +26,8 @@ class OrderPrintingTimes extends Model
         'updated_at',
     ];
 
+    protected $with = ['orderModel'];
+
     public function orderModel()
     {
         return $this->belongsTo(OrderModel::class);
