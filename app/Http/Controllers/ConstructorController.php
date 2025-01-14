@@ -19,13 +19,15 @@ class ConstructorController extends Controller
             ->get();
 
         $orders->each(function ($order) {
-            $order->orderModel->each(function ($orderModel) {
+            $orderModel = $order->orderModel;  // orderModel bitta model bo'lgani uchun loop shart emas
+            if ($orderModel) {
                 $orderModel->model->makeHidden(['submodels']);
                 $orderModel->submodels->each(function ($submodel) {
-                    $submodel->submodel->makeHidden(['sizes', 'modelColors']);
+                    $submodel->makeHidden(['sizes', 'modelColors']);  // to'g'ridan-to'g'ri submodelda yashirish
                 });
-            });
+            }
         });
+
 
         return response()->json($orders);
 
