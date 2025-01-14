@@ -14,8 +14,7 @@ class ConstructorController extends Controller
 
         $plannedTime = $request->input('planned_time') ?? now()->toDateString();
 
-        $orders = OrderPrintingTimes::where('status', 'printing')
-            ->whereDate('planned_time', $plannedTime)
+        $orders = OrderPrintingTimes::whereDate('planned_time', $plannedTime)
             ->orderBy('planned_time', 'asc')
             ->with('orderModel.model', 'orderModel.submodels', 'orderModel.submodels.size', 'orderModel.submodels.modelColor')
             ->get();
