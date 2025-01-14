@@ -24,7 +24,7 @@ class ConstructorController extends Controller
                     $submodel->submodel->makeHidden(['sizes', 'modelColors']); // 'submodel' dan 'sizes' va 'modelColors'ni yashiradi
                 });
             });
-        }
+        });
 
         return response()->json($orders);
 
