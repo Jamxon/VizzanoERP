@@ -12,6 +12,7 @@ class OrderPrintingTimes extends Model
     protected $table = 'order_printing_times';
 
     protected $fillable = [
+        'id',
         'order_model_id',
         'planned_time',
         'actual_time',
