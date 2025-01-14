@@ -28,18 +28,9 @@ class OrderPrintingTime extends JsonResource
                     "submodels" => $orderModel->submodels->map(function ($submodel) {
                         return [
                             "id" => $submodel->id,
-                            "submodel" => $submodel->submodel,
+                            "submodel" => $submodel->submodel, //shuni relationlardan tozalash kerak
                             "size" => $submodel->size,
                             "modelColor" => $submodel->modelColor
-                        ];
-                    }),
-                    "order_printing_times" => $orderModel->orderPrintingTimes->map(function ($orderPrintingTime) {
-                        return [
-                            "id" => $orderPrintingTime->id,
-                            "planned_time" => $orderPrintingTime->planned_time,
-                            "status" => $orderPrintingTime->status,
-                            "comment" => $orderPrintingTime->comment,
-                            "user_id" => $orderPrintingTime->user_id
                         ];
                     })
                 ];
