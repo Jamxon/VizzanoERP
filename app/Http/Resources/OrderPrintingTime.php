@@ -39,7 +39,7 @@ class OrderPrintingTime extends JsonResource
                                     "id" => $firstSubmodel->id,
                                     "submodel" => $firstSubmodel->submodel->makeHidden(['sizes', 'modelColors']),
                                     "sizes" => $groupedSubmodels->pluck('size'),
-                                    "modelColor" => $firstSubmodel->modelColor,
+                                    "modelColors" => $firstSubmodel->pluck('modelColor')
                                 ];
                             })->values(),
                     ];
