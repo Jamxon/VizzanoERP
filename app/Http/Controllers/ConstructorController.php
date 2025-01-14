@@ -15,15 +15,15 @@ class ConstructorController extends Controller
     {
         $orders = OrderPrintingTimes::where('status', 'printing')
             ->orderBy('planned_time', 'asc')
-            ->with('orderModel')
+//            ->with('orderModel')
             ->get();
 
-        $orders->orderModel->each(function ($orderModel) {
-            $orderModel->model->makeHidden(['submodels']); // 'model' dan 'submodels'ni yashiradi
-            $orderModel->submodels->each(function ($submodel) {
-                $submodel->submodel->makeHidden(['sizes', 'modelColors']); // 'submodel' dan 'sizes' va 'modelColors'ni yashiradi
-            });
-        });
+//        $orders->orderModel->each(function ($orderModel) {
+//            $orderModel->model->makeHidden(['submodels']); // 'model' dan 'submodels'ni yashiradi
+//            $orderModel->submodels->each(function ($submodel) {
+//                $submodel->submodel->makeHidden(['sizes', 'modelColors']); // 'submodel' dan 'sizes' va 'modelColors'ni yashiradi
+//            });
+//        });
 
         return response()->json($orders);
 
