@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ConstructorOrder;
 use App\Models\Order;
+use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
-use http\Env\Response;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ConstructorController extends Controller
 {
@@ -23,7 +21,7 @@ class ConstructorController extends Controller
             ->get();
 
         $orders->each(function ($order) {
-            $orderModel = $order->orderModel;  // orderModel bitta model bo'lgani uchun loop shart emas
+            $orderModel = $order->orderModel;
             if ($orderModel) {
                 $orderModel->model->makeHidden(['submodels']);
                 $orderModel->submodels->each(function ($submodel) {
@@ -31,11 +29,32 @@ class ConstructorController extends Controller
                 });
             }
         });
-
-
         return response()->json($orders);
-
     }
 
+    public function sendToCuttingMaster(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+           'order_printing_times_id' => 'required|integer|exists:order_printing_times,id',
+        ]);
+
+        $orderPrintingTime = OrderPrintingTimes::find($data['order_printing_times_id']);
+
+        $orderModel = OrderModel::find($orderPrintingTime->order_model_id);
+
+        $order = Order::find($orderModel->order_id);
+
+        $order->update([
+            'status' => 'cutting'
+        ]);
+
+        $orderPrintingTime->update([
+            'status' => 'cutting',
+            'actual_time' => now(),
+            'user_id' => auth()->user()->id
+        ]);
+
+        return response()->json($orderPrintingTime);
+    }
 
 }
