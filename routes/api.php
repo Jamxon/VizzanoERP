@@ -126,6 +126,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
 
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
     Route::get('orderPrintingTimes', [ConstructorController::class, 'getOrders']);
+    Route::post('sendToCuttingMaster', [ConstructorController::class, 'sendToCuttingMaster']);
 });
 
 Route::prefix('master')->middleware('role:master')->group(function () {
