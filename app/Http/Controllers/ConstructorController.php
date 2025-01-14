@@ -13,22 +13,18 @@ class ConstructorController extends Controller
     {
 
         $plannedTime = $request->input('planned_time') ?? now()->toDateString();
-
-        $orders = OrderPrintingTimes::whereDate('planned_time', $plannedTime)
+        $constructorOrders = [];
+        $orderPrintingTimes = OrderPrintingTimes::whereDate('planned_time', $plannedTime)
             ->orderBy('planned_time', 'asc')
             ->with('orderModel.model', 'orderModel.submodels', 'orderModel.submodels.size', 'orderModel.submodels.modelColor')
             ->get();
 
-        $orders->each(function ($order) {
-            $orderModel = $order->orderModel;
-            if ($orderModel) {
-                $orderModel->model->makeHidden(['submodels']);
-                $orderModel->submodels->each(function ($submodel) {
-                    $submodel->submodel->makeHidden(['sizes', 'modelColors']);
-                });
-            }
-        });
-        return response()->json($orders);
+        foreach ($orderPrintingTimes as $order) {
+            $orders = Order::find($order->orderModel->order_id);
+            $constructorOrders[] = $orders;
+        }
+
+        return response()->json($constructorOrders);
     }
 
     public function sendToCuttingMaster(Request $request): \Illuminate\Http\JsonResponse
