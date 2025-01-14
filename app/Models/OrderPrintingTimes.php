@@ -25,4 +25,9 @@ class OrderPrintingTimes extends Model
         'user_id',
         'updated_at',
     ];
+
+    public function orderModel()
+    {
+        return $this->belongsTo(OrderModel::class);
+    }
 }

@@ -29,7 +29,7 @@ class CuttingMasterConroller extends Controller
         return response()->json($orders);
     }
 
-    public function sendToConstructor(Request $request)
+    public function sendToConstructor(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'order_model_id' => 'required|integer|exists:order_models,id',
