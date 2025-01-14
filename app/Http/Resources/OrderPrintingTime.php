@@ -21,25 +21,31 @@ class OrderPrintingTime extends JsonResource
             "status" => $this->status,
             "start_date" => $this->start_date,
             "end_date" => $this->end_date,
-            "order_printing_times" => $this->orderModels->map(function ($orderModel) {
-                return [
-                    "id" => $orderModel->orderPrintingTimes->id,
-                    "planned_time" => $orderModel->orderPrintingTimes->planned_time,
-                    "actual_time" => $orderModel->orderPrintingTimes->actual_time,
-                    "status" => $orderModel->orderPrintingTimes->status,
-                    "comment" => $orderModel->orderPrintingTimes->comment,
-                    "user" => $orderModel->orderPrintingTimes->user,
-                    "model" => $orderModel->model->makeHidden(['submodels']),
-                    "submodels" => $orderModel->submodels->map(function ($submodel) {
-                        return [
-                            "id" => $submodel->id,
-                            "submodel" => $submodel->submodel->makeHidden(['sizes', 'modelColors']),
-                            "size" => $submodel->size,
-                            "modelColor" => $submodel->modelColor
-                        ];
-                    }),
-                ];
-            })
+            "order_printing_times" => $this->orderModels->flatMap(function ($orderModel) {
+                return $orderModel->orderPrintingTimes->map(function ($orderPrintingTime) use ($orderModel) {
+                    return [
+                        "id" => $orderPrintingTime->id,
+                        "planned_time" => $orderPrintingTime->planned_time,
+                        "actual_time" => $orderPrintingTime->actual_time,
+                        "status" => $orderPrintingTime->status,
+                        "comment" => $orderPrintingTime->comment,
+                        "user" => $orderPrintingTime->user,
+                        "order_model" => [
+                            "id" => $orderModel->id,
+                            "model" => $orderModel->model->makeHidden(['submodels']),
+                            "submodels" => $orderModel->submodels->map(function ($submodel) {
+                                return [
+                                    "id" => $submodel->id,
+                                    "submodel" => $submodel->submodel->makeHidden(['sizes', 'modelColors']),
+                                    "size" => $submodel->size,
+                                    "modelColor" => $submodel->modelColor,
+                                ];
+                            }),
+                        ],
+                    ];
+                });
+            }),
         ];
     }
+
 }
