@@ -45,13 +45,9 @@ class ConstructorController extends Controller
         return response()->json($resource);
     }
 
-    public function sendToCuttingMaster(Request $request): \Illuminate\Http\JsonResponse
+    public function sendToCuttingMaster($id): \Illuminate\Http\JsonResponse
     {
-        $data = $request->validate([
-           'order_printing_times_id' => 'required|integer|exists:order_printing_times,id',
-        ]);
-
-        $orderPrintingTime = OrderPrintingTimes::find($data['order_printing_times_id']);
+        $orderPrintingTime = OrderPrintingTimes::find($id);
 
         $orderModel = OrderModel::find($orderPrintingTime->order_model_id);
 
