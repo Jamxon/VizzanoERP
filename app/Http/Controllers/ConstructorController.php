@@ -26,8 +26,7 @@ class ConstructorController extends Controller
 //            $constructorOrders[] = $orders;
 //        }
 
-        $orders = Order::where('status', 'printing')
-            ->whereHas('orderModels.orderPrintingTimes', function ($query) use ($plannedTime) {
+        $orders = Order::whereHas('orderModels.orderPrintingTimes', function ($query) use ($plannedTime) {
                 $query->whereDate('planned_time', $plannedTime);
             })
             ->get();
