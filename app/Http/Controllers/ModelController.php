@@ -22,7 +22,7 @@ class ModelController extends Controller
 
     public function getMaterials()
     {
-        $materials = Item::where('type', 'mato')->get();
+        $materials = Item::where('type_id', 2)->get();
         return response()->json($materials);
     }
 
