@@ -12,7 +12,7 @@ class ModelColor extends Model
     protected $table = 'model_colors';
 
     protected $fillable = [
-        'color_id',
+        'material_id',
         'submodel_id',
     ];
 
@@ -20,14 +20,12 @@ class ModelColor extends Model
         'created_at',
         'updated_at',
         'submodel_id',
-        'color_id'
+        'material_id'
     ];
 
-    protected $with = ['color'];
-
-    public function color()
+    public function material()
     {
-        return $this->belongsTo(Color::class, 'color_id', 'id');
+        return $this->belongsTo(Item::class, 'material_id');
     }
 
     public function submodel()

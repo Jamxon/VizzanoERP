@@ -48,6 +48,4 @@ class OrderPrintingTime extends JsonResource
             }),
         ];
     }
-
-
 }
