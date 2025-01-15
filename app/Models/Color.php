@@ -21,7 +21,7 @@ class Color extends Model
 
     public function modelColors()
     {
-        return $this->hasMany(ModelColor::class, 'color_id');
+        return $this->hasMany(Materials::class, 'color_id');
     }
 
     public function items()

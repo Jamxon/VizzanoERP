@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
-use App\Models\ModelColor;
+use App\Models\Materials;
 use App\Models\ModelImages;
 use App\Models\Models;
 use App\Models\Size;
@@ -138,22 +138,21 @@ class ModelController extends Controller
             }
         }
 
+        if (!empty($submodel['materials'])) {
+            foreach ($submodel['materials'] as $material) {
+                Materials::create([
+                    'material_id' => $material,
+                    'model_id' => $model->id,
+                ]);
+            }
+        }
+
         if (!empty($data['submodels'])) {
             foreach ($data['submodels'] as $submodel) {
-
-                $submodelCreate = SubModel::create([
+                    SubModel::create([
                     'name' => $submodel['name'] ?? null,
                     'model_id' => $model->id,
                 ]);
-
-                if (!empty($submodel['materials'])) {
-                    foreach ($submodel['materials'] as $material) {
-                        ModelColor::create([
-                            'material_id' => $material,
-                            'submodel_id' => $submodelCreate->id,
-                        ]);
-                    }
-                }
             }
         }
 
