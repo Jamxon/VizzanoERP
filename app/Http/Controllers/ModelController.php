@@ -22,7 +22,7 @@ class ModelController extends Controller
 
     public function getMaterials(): \Illuminate\Http\JsonResponse
     {
-        $materials = Item::whareHas('type', function ($query) {
+        $materials = Item::whereHas('type', function ($query) {
             $query->where('name', 'Mato');
         })->get();
         return response()->json($materials);
