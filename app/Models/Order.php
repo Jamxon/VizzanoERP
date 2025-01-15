@@ -18,12 +18,13 @@ class Order extends Model
         'start_date',
         'end_date',
         'rasxod',
-        'branch_id'
+        'branch_id',
+        'final_product_name',
+        'comment',
+        'contragent_id',
     ];
 
-    protected $hidden = ['created_at', 'updated_at', 'branch_id'];
-
-    protected $with = ['orderModels'];
+    protected $hidden = ['created_at', 'updated_at', 'branch_id', 'contragent_id'];
 
     public function orderModels()
     {
