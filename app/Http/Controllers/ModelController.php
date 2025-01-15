@@ -41,8 +41,6 @@ class ModelController extends Controller
             ], 400);
         }
 
-        dd($data);
-
         $model = Models::create([
             'name' => $data['name'] ?? null,
             'rasxod' => (double)($data['rasxod'] ?? 0),
