@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ShowOrderResource;
 use App\Models\Contragent;
+use App\Models\Materials;
 use App\Models\Models;
 use App\Models\Order;
 use App\Models\OrderInstruction;
@@ -38,11 +39,11 @@ class OrderController extends Controller
             'rasxod' => 'nullable|numeric',
             'final_product_name' => 'nullable|string',
             'comment' => 'nullable|string',
+            'material_id' => 'required|integer|exists:items,id',
             'models' => 'required|array',
             'models.*.id' => 'required|integer',
             'models.*.submodel.id' => 'required|integer',
             'models.*.size.id' => 'required|integer',
-            'models.*.materials_id.id' => 'required|integer',
             'models.*.quantity' => 'required|integer',
             'contragent_id' => 'nullable|integer',
             'contragent_name' => 'nullable|string',
@@ -76,7 +77,7 @@ class OrderController extends Controller
         ]);
 
         foreach ($request->instructions as $instruction) {
-            OrderInstruction::create([
+            $orderInstruction = OrderInstruction::create([
                 'order_id' => $order->id,
                 'title' => $instruction['title'],
                 'description' => $instruction['description'],
@@ -95,11 +96,22 @@ class OrderController extends Controller
 
             $orderModel = OrderModel::where('order_id', $order->id)->where('model_id', $model['id'])->first();
 
+            $material = Materials::where('material_id', $request->material_id)
+                ->where('model_id', $orderModel->model_id)
+                ->first();
+
+            if (!$material) {
+                $material = Materials::create([
+                    'material_id' => $request->material_id,
+                    'model_id' => $orderModel->model_id,
+                ]);
+            }
+
             OrderSubModel::create([
                 'order_model_id' => $orderModel->id,
                 'submodel_id' => $model['submodel']['id'],
                 'size_id' => $model['size']['id'],
-                'materials_id' => $model['materials_id']['id'],
+                'materials_id' => $material->id,
                 'quantity' => $model['quantity'],
             ]);
 
