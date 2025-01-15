@@ -32,23 +32,22 @@ class ModelController extends Controller
     }
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = json_decode($request->input('data'), true);
+        $data = $request->input('data'); // Massivni to'g'ridan-to'g'ri olish
 
-        if (!$data) {
+        if (!is_array($data) || empty($data)) {
             return response()->json([
                 'message' => 'Invalid data format',
-                'error' => 'Data field is not a valid JSON string',
+                'error' => 'Data field is not a valid array',
             ], 400);
         }
 
         $model = Models::create([
             'name' => $data['name'] ?? null,
-            'rasxod' => (double) ($data['rasxod'] ?? 0),
+            'rasxod' => (double)($data['rasxod'] ?? 0),
         ]);
 
         if ($request->hasFile('images') && !empty($request->file('images'))) {
             foreach ($request->file('images') as $image) {
-
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('public/images', $fileName);
 
@@ -59,8 +58,8 @@ class ModelController extends Controller
             }
         }
 
-        if (!empty($submodel['sizes'])) {
-            foreach ($submodel['sizes'] as $size) {
+        if (!empty($data['sizes'])) {
+            foreach ($data['sizes'] as $size) {
                 Size::create([
                     'name' => $size,
                     'model_id' => $model->id,
@@ -89,6 +88,7 @@ class ModelController extends Controller
             ], 500);
         }
     }
+
 
     public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
