@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Contragent extends Model
 {
-    protected $table = "contragents";
+    protected $table = "contragent";
 
     protected $fillable = [
         'name',
