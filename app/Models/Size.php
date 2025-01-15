@@ -11,18 +11,18 @@ class Size extends Model
 
     protected $table = "sizes";
 
-    protected $fillable = ['name', 'submodel_id'];
+    protected $fillable = ['name', 'model_id'];
 
 
-    protected $hidden = ['created_at', 'updated_at', 'submodel_id'];
+    protected $hidden = ['created_at', 'updated_at', 'model_id'];
 
 
-    public function submodel()
+    public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Submodel::class, 'submodel_id');
+        return $this->belongsTo(Models::class, 'model_id');
     }
 
-    public function recipes()
+    public function recipes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Recipe::class, 'size_id');
     }
