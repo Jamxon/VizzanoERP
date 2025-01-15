@@ -39,9 +39,9 @@ class OrderController extends Controller
             'rasxod' => 'nullable|numeric',
             'final_product_name' => 'nullable|string',
             'comment' => 'nullable|string',
-            'material_id' => 'required|integer|exists:items,id',
             'models' => 'required|array',
             'models.*.id' => 'required|integer',
+            'models.*.material_id' => 'required|integer|exists:items,id',
             'models.*.submodel.id' => 'required|integer',
             'models.*.size.id' => 'required|integer',
             'models.*.quantity' => 'required|integer',
@@ -97,13 +97,13 @@ class OrderController extends Controller
 
             $orderModel = OrderModel::where('order_id', $order->id)->where('model_id', $model['id'])->first();
 
-            $material = Materials::where('material_id', $request->material_id)
+            $material = Materials::where('material_id', $model['material_id'])
                 ->where('model_id', $orderModel->model_id)
                 ->first();
 
             if (!$material) {
                 $material = Materials::create([
-                    'material_id' => $request->material_id,
+                    'material_id' => $model['material_id'],
                     'model_id' => $orderModel->model_id,
                 ]);
             }
