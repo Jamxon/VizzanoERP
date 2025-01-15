@@ -13,8 +13,6 @@ class SubModel extends Model
 
     protected $fillable = ['name','model_id'];
 
-    protected $with = ['modelColors'];
-
     protected $hidden = ['created_at', 'updated_at', 'model_id'];
 
     public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
