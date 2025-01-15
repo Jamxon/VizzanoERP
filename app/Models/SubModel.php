@@ -13,18 +13,13 @@ class SubModel extends Model
 
     protected $fillable = ['name','model_id'];
 
-    protected $with = ['sizes', 'modelColors'];
+    protected $with = ['modelColors'];
 
     protected $hidden = ['created_at', 'updated_at', 'model_id'];
 
     public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Models::class, 'model_id');
-    }
-
-    public function sizes(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Size::class, 'submodel_id');
     }
 
     public function modelColors(): \Illuminate\Database\Eloquent\Relations\HasMany

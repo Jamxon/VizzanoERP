@@ -59,31 +59,21 @@ class ModelController extends Controller
             }
         }
 
+        if (!empty($submodel['sizes'])) {
+            foreach ($submodel['sizes'] as $size) {
+                Size::create([
+                    'name' => $size,
+                    'model_id' => $model->id,
+                ]);
+            }
+        }
+
         if (!empty($data['submodels'])) {
             foreach ($data['submodels'] as $submodel) {
-
-                $submodelCreate = SubModel::create([
+                SubModel::create([
                     'name' => $submodel['name'] ?? null,
                     'model_id' => $model->id,
                 ]);
-
-                if (!empty($submodel['sizes'])) {
-                    foreach ($submodel['sizes'] as $size) {
-                        Size::create([
-                            'name' => $size,
-                            'submodel_id' => $submodelCreate->id,
-                        ]);
-                    }
-                }
-
-                if (!empty($submodel['materials'])) {
-                    foreach ($submodel['materials'] as $material) {
-                        ModelColor::create([
-                            'material_id' => $material,
-                            'submodel_id' => $submodelCreate->id,
-                        ]);
-                    }
-                }
             }
         }
 
@@ -128,14 +118,24 @@ class ModelController extends Controller
             }
         }
 
+        foreach ($model->sizes as $size) {
+            $size->delete();
+        }
+
         foreach ($model->submodels as $submodel) {
-            foreach ($submodel->sizes as $size) {
-                $size->delete();
-            }
             foreach ($submodel->modelColors as $color) {
                 $color->delete();
             }
             $submodel->delete();
+        }
+
+        if (!empty($submodel['sizes'])) {
+            foreach ($submodel['sizes'] as $size) {
+                Size::create([
+                    'name' => $size,
+                    'model_id' => $model->id,
+                ]);
+            }
         }
 
         if (!empty($data['submodels'])) {
@@ -146,19 +146,10 @@ class ModelController extends Controller
                     'model_id' => $model->id,
                 ]);
 
-                if (!empty($submodel['sizes'])) {
-                    foreach ($submodel['sizes'] as $size) {
-                        Size::create([
-                            'name' => $size,
-                            'submodel_id' => $submodelCreate->id,
-                        ]);
-                    }
-                }
-
                 if (!empty($submodel['materials'])) {
                     foreach ($submodel['materials'] as $material) {
                         ModelColor::create([
-                            'color_id' => $material,
+                            'material_id' => $material,
                             'submodel_id' => $submodelCreate->id,
                         ]);
                     }
