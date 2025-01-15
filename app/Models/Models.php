@@ -13,8 +13,6 @@ class Models extends Model
 
     protected $fillable = ['name', 'rasxod'];
 
-    protected $with = ['submodels','images'];
-
     protected $hidden = ['created_at', 'updated_at'];
 
     public function sizes(): \Illuminate\Database\Eloquent\Relations\HasMany
