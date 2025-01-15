@@ -41,6 +41,12 @@ class OrderController extends Controller
             'models.*.quantity' => 'required|integer',
         ]);
 
+        if ($request->contragent_id) {
+            $request->validate([
+                'contragent_id' => 'required|integer|exists:contragents,id',
+            ]);
+        }
+
         $user = auth()->user();
 
         $order = Order::create([
