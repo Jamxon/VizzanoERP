@@ -37,7 +37,7 @@ class Recipe extends Model
 
     public function modelColor()
     {
-        return $this->belongsTo(ModelColor::class, 'model_color_id');
+        return $this->belongsTo(Materials::class, 'model_color_id');
     }
 
     public function size()

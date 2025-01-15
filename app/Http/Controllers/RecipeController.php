@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GetRecipesResource;
-use App\Models\ModelColor;
+use App\Models\Materials;
 use App\Models\Recipe;
 use App\Models\Size;
 use App\Models\SubModel;
@@ -43,7 +43,7 @@ class RecipeController extends Controller
             $recipe->setRelations([]);
         });
 
-        $modelColor = ModelColor::find($request->model_color_id);
+        $modelColor = Materials::find($request->model_color_id);
         $modelColor->setRelations([]);
         $modelColor->load('color');
 

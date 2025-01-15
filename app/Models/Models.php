@@ -15,6 +15,11 @@ class Models extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
+    public function materials(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Materials::class, 'model_id');
+    }
+
     public function sizes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Size::class, 'model_id');
