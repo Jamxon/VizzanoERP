@@ -20,9 +20,11 @@ class ModelController extends Controller
         return response()->json($models);
     }
 
-    public function getMaterials()
+    public function getMaterials(): \Illuminate\Http\JsonResponse
     {
-        $materials = Item::where('type_id', 2)->get();
+        $materials = Item::whareHas('type', function ($query) {
+            $query->where('name', 'Mato');
+        })->get();
         return response()->json($materials);
     }
 
