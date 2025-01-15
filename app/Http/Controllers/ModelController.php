@@ -14,7 +14,7 @@ class ModelController extends Controller
 {
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $models = Models::all();
+        $models = Models::with(['sizes', 'submodels', 'images'])->get();
         return response()->json($models);
     }
 
