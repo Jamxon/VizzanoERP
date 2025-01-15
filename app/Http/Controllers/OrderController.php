@@ -53,13 +53,14 @@ class OrderController extends Controller
             'instructions.*.description' => 'required|string',
         ]);
 
+        if ($request->contragent_id){
             $contragent = Contragent::find($request->contragent_id);
-            if (!$contragent) {
-                $contragent = Contragent::create([
-                    'name' => $request->contragent_name,
-                    'description' => $request->contragent_description ?? null,
-                ]);
-            }
+        } else {
+            $contragent = Contragent::create([
+                'name' => $request->contragent_name ?? null,
+                'description' => $request->contragent_description ?? null,
+            ]);
+        }
 
         $user = auth()->user();
 
