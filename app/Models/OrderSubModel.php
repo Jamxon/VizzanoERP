@@ -16,41 +16,39 @@ class OrderSubModel extends Model
         'submodel_id',
         'size_id',
         'quantity',
-        'model_color_id',
+        'materials_id',
     ];
 
     protected $hidden = [
         'created_at',
         'updated_at',
-        'model_color_id',
+        'materials_id',
         'size_id',
         'order_model_id',
         'submodel_id',
     ];
 
-    protected $with = ['size', 'modelColor','submodel'];
-
-    public function orderModel()
+    public function orderModel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(OrderModel::class, 'order_model_id');
     }
 
-    public function submodel()
+    public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(SubModel::class);
     }
 
-    public function size()
+    public function size(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Size::class);
     }
 
-    public function modelColor()
+    public function materials(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Materials::class, 'model_color_id');
+        return $this->belongsTo(Materials::class, 'materials_id');
     }
 
-    public function orderGroup()
+    public function orderGroup(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(OrderGroup::class, 'submodel_id');
     }
