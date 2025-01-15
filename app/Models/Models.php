@@ -17,12 +17,17 @@ class Models extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    public function submodels()
+    public function sizes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Size::class, 'model_id');
+    }
+
+    public function submodels(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SubModel::class, 'model_id');
     }
 
-    public function images()
+    public function images(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(ModelImages::class, 'model_id');
     }
