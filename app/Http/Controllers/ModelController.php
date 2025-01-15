@@ -9,8 +9,6 @@ use App\Models\Models;
 use App\Models\Size;
 use App\Models\SubModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ModelController extends Controller
 {
