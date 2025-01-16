@@ -70,7 +70,7 @@ class ModelController extends Controller
         if (!empty($data['submodels'])) {
             foreach ($data['submodels'] as $submodel) {
                 SubModel::create([
-                    'name' => $submodel['name'] ?? null,
+                    'name' => $submodel ?? null,
                     'model_id' => $model->id,
                 ]);
             }
