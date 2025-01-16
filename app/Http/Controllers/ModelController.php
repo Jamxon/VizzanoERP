@@ -95,6 +95,7 @@ class ModelController extends Controller
     {
         $data = json_decode($request->data, true);
 
+        dd($data);
         if (!$data) {
             return response()->json([
                 'message' => 'Invalid data format',
