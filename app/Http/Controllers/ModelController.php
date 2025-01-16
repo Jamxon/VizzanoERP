@@ -32,7 +32,7 @@ class ModelController extends Controller
     }
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = $request->input('data');
+        $data = json_decode($request->data, true);
         dd($data);
         if (!is_array($data) || empty($data)) {
             return response()->json([
