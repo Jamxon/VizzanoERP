@@ -28,12 +28,13 @@ class ModelController extends Controller
 
     public function show(Models $model): \Illuminate\Http\JsonResponse
     {
+        $model->load(['sizes', 'submodels', 'images']);
         return response()->json($model);
     }
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->data, true);
-        
+
         if (!is_array($data) || empty($data)) {
             return response()->json([
                 'message' => 'Invalid data format',
