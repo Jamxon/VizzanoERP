@@ -93,7 +93,7 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
-        $data = json_decode($request->input('data'), true);
+        $data = json_decode($request->data, true);
 
         if (!$data) {
             return response()->json([
@@ -119,19 +119,12 @@ class ModelController extends Controller
             }
         }
 
-        foreach ($model->sizes as $size) {
+        foreach ($model['sizes'] as $size) {
             $size->delete();
         }
 
-        foreach ($model->submodels as $submodel) {
-            foreach ($submodel->modelColors as $color) {
-                $color->delete();
-            }
-            $submodel->delete();
-        }
-
-        if (!empty($submodel['sizes'])) {
-            foreach ($submodel['sizes'] as $size) {
+        if (!empty($data['sizes'])) {
+            foreach ($data['sizes'] as $size) {
                 Size::create([
                     'name' => $size,
                     'model_id' => $model->id,
@@ -139,19 +132,17 @@ class ModelController extends Controller
             }
         }
 
-        if (!empty($submodel['materials'])) {
-            foreach ($submodel['materials'] as $material) {
-                Materials::create([
-                    'material_id' => $material,
-                    'model_id' => $model->id,
-                ]);
+        foreach ($model['submodels'] as $submodel) {
+            foreach ($submodel->modelColors as $color) {
+                $color->delete();
             }
+            $submodel->delete();
         }
 
         if (!empty($data['submodels'])) {
             foreach ($data['submodels'] as $submodel) {
-                    SubModel::create([
-                    'name' => $submodel['name'] ?? null,
+                SubModel::create([
+                    'name' => $submodel ?? null,
                     'model_id' => $model->id,
                 ]);
             }
