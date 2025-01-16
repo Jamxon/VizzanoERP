@@ -29,6 +29,12 @@ class OrderController extends Controller
         return response()->json($resource);
     }
 
+    public function getContragents(): \Illuminate\Http\JsonResponse
+    {
+        $contragents = Contragent::all();
+        return response()->json($contragents);
+    }
+
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([

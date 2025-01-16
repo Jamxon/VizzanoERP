@@ -32,6 +32,8 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::get('users/submaster', [UserController::class, 'getUsersSubMaster']);
     Route::get('users/warehouse', [WarehouseController::class, 'getWarehouseUsers']);
 
+    Route::get('contragents', [OrderController::class, 'getContragents']);
+
     Route::get('orders', [OrderController::class, 'index']);
     Route::post('orders', [OrderController::class, 'store']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
