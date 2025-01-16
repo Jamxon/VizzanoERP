@@ -95,7 +95,6 @@ class ModelController extends Controller
     {
         $data = json_decode($request->data, true);
 
-        dd($data);
         if (!$data) {
             return response()->json([
                 'message' => 'Invalid data format',
@@ -120,8 +119,10 @@ class ModelController extends Controller
             }
         }
 
-        foreach ($model['sizes'] as $size) {
-            $size->delete();
+        if (!empty($data['sizes'])) {
+            foreach ($model->sizes as $size) {
+                $size->delete();
+            }
         }
 
         if (!empty($data['sizes'])) {
@@ -133,11 +134,10 @@ class ModelController extends Controller
             }
         }
 
-        foreach ($model['submodels'] as $submodel) {
-            foreach ($submodel->modelColors as $color) {
-                $color->delete();
+        if (!empty($data['submodels'])) {
+            foreach ($model->submodels as $submodel) {
+                $submodel->delete();
             }
-            $submodel->delete();
         }
 
         if (!empty($data['submodels'])) {
