@@ -14,7 +14,9 @@ class ItemController extends Controller
 {
     public function index()
     {
-        $items = Item::orderBy('updated_at', 'desc')->get();
+        $items = Item::orderBy('updated_at', 'desc')
+            ->with('unit', 'color', 'type')
+            ->get();
         return response()->json($items);
     }
 

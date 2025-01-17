@@ -91,6 +91,17 @@ class OrderController extends Controller
             ]);
         }
 
+        if (!empty($request->recipes)){
+            foreach ($request->recipes as $recipe) {
+                $orderRecipe = OrderRecipes::create([
+                    'order_id' => $order->id,
+                    'item_id' => $recipe['item_id'],
+                    'quantity' => $recipe['quantity'],
+                    'submodel_id' => $recipe['submodel_id'],
+                ]);
+            }
+        }
+
         foreach ($request->models as $model) {
             if (!OrderModel::where('order_id', $order->id)->where('model_id', $model['id'])->exists()) {
                 $modelRasxod = Models::find($model['id']);
@@ -121,22 +132,6 @@ class OrderController extends Controller
                 'materials_id' => $material->id,
                 'quantity' => $model['quantity'],
             ]);
-
-//           $recipes = Recipe::where('model_color_id', $model['model_color']['id'])
-//                        ->where('size_id', $model['size']['id'])
-//                        ->get();
-//
-//           if ($recipes) {
-//               foreach ($recipes as $recipe) {
-//                   OrderRecipes::create([
-//                       'order_id' => $order->id,
-//                       'item_id' => $recipe->item_id,
-//                       'model_color_id' => $recipe->model_color_id,
-//                       'quantity' => $recipe->quantity,
-//                       'size_id' => $recipe->size_id,
-//                   ]);
-//               }
-//           }
         }
 
         return response()->json([

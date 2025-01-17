@@ -12,33 +12,24 @@ class OrderRecipes extends Model
     protected $fillable = [
         'order_id',
         'item_id',
-        'model_color_id',
         'quantity',
-        'size_id',
+        'submodel_id'
     ];
 
     protected $hidden = [
         'created_at',
         'updated_at',
         'item_id',
-        'size_id',
-        'model_color_id',
+        'submodel_id'
     ];
-
-    protected $with = ['item'];
 
     public function item()
     {
         return $this->belongsTo(Item::class);
     }
 
-    public function modelColor()
+    public function submodel()
     {
-        return $this->belongsTo(Materials::class, 'model_color_id');
-    }
-
-    public function size()
-    {
-        return $this->belongsTo(Size::class);
+        return $this->belongsTo(SubModel::class);
     }
 }

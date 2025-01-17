@@ -27,8 +27,6 @@ class Item extends Model
         'type_id'
     ];
 
-    protected $with = ['unit', 'color', 'type'];
-
     public function unit()
     {
         return $this->belongsTo(Unit::class);
