@@ -19,44 +19,6 @@ class ShowOrderResource extends JsonResource
 
     public function toArray(Request $request): array
     {
-        $orderModelsArray = [];
-
-        foreach ($this->orderModels as $orderModel) {
-            $orderModelsArray[] = $orderModel;
-
-            $orderModelSubmodels = OrderSubModel::where('order_model_id', $orderModel->id)->get();
-            $orderModelSubmodelsArray = [];
-            $orderModelTotalRasxod = 0;
-
-            foreach ($orderModelSubmodels as $orderModelSubmodel) {
-                $orderModelRecipes = OrderRecipes::where('model_color_id', $orderModelSubmodel->model_color_id)
-                    ->where('size_id', $orderModelSubmodel->size_id)
-                    ->where('order_id', $this->id)
-                    ->with('item')
-                    ->get();
-
-                $submodelRecipesRasxod = $orderModelRecipes->sum(function ($recipe) {
-                    return $recipe->item->price * $recipe->quantity;
-                });
-
-                $orderGroup = OrderGroup::where('submodel_id', $orderModelSubmodel->submodel_id)
-                    ->where('order_id', $this->id)
-                    ->with('group')
-                    ->first();
-
-                $submodelTotalRasxod = $submodelRecipesRasxod * $orderModelSubmodel->quantity;
-
-                $orderModelSubmodel['recipes'] = $orderModelRecipes;
-                $orderModelSubmodel['total_rasxod'] = $submodelTotalRasxod;
-                $orderModelSubmodel['group'] = $orderGroup;
-                $orderModelSubmodelsArray[] = $orderModelSubmodel;
-
-                $orderModelTotalRasxod += $submodelTotalRasxod;
-            }
-
-            $orderModel['total_rasxod'] = $orderModelTotalRasxod;
-            $orderModel['submodels'] = $orderModelSubmodelsArray;
-        }
 
         return [
             'id' => $this->id,
@@ -66,7 +28,26 @@ class ShowOrderResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'rasxod' => $this->rasxod,
-            'order_models' => $orderModelsArray,
+            'order_models' => $this->orderModels->map(function ($orderModel) {
+                return [
+                    'id' => $orderModel->id,
+                    'model' => $orderModel->model,
+                    'material' => $orderModel->material,
+                    'sizes' => $orderModel->sizes->map(function ($size) {
+                        return [
+                            'id' => $size->id,
+                            'size' => $size->size,
+                            'quantity' => $size->pivot->quantity,
+                        ];
+                    }),
+                    'submodels' => $orderModel->submodels->map(function ($submodel) {
+                        return [
+                            'id' => $submodel->id,
+                            'submodel' => $submodel->submodel,
+                        ];
+                    }),
+                ];
+            }),
         ];
     }
 }
