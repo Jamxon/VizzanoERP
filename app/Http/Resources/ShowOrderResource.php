@@ -37,7 +37,7 @@ class ShowOrderResource extends JsonResource
                         return [
                             'id' => $size->id,
                             'size' => $size->size,
-                            'quantity' => $size->pivot->quantity,
+                            'quantity' => $size->quantity,
                         ];
                     }),
                     'submodels' => $orderModel->submodels->map(function ($submodel) {
