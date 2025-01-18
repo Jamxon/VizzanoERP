@@ -39,4 +39,9 @@ class OrderSubModel extends Model
     {
         return $this->hasOne(OrderGroup::class, 'submodel_id');
     }
+
+    public function orderRecipes()
+    {
+        return $this->hasMany(OrderRecipes::class, 'submodel_id');
+    }
 }
