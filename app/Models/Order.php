@@ -30,6 +30,11 @@ class Order extends Model
         return $this->hasMany(OrderModel::class, 'order_id');
     }
 
+    public function instructions()
+    {
+        return $this->hasMany(OrderInstruction::class, 'order_id');
+    }
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);
