@@ -23,7 +23,7 @@ class OrderSubModel extends Model
         'submodel_id',
     ];
 
-    protected $with = ['submodel'];
+    protected $with = ['submodel','orderRecipes'];
 
     public function orderModel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
