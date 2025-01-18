@@ -119,12 +119,30 @@ class OrderController extends Controller
             'comment' => $request->comment ?? null,
         ]);
 
+        $modelRasxod = Models::find($request->model['id'])->rasxod;
+
+        $orderModel = OrderModel::create([
+            'order_id' => $order->id,
+            'model_id' => $request->model['id'],
+            'rasxod' => $modelRasxod ?? 0,
+            'material_id' => $request->model['material_id'],
+        ]);
+
         if(!empty($request->instructions)){
             foreach ($request->instructions as $instruction) {
                 $orderInstruction = OrderInstruction::create([
                     'order_id' => $order->id,
                     'title' => $instruction['title'],
                     'description' => $instruction['description'],
+                ]);
+            }
+        }
+
+        if (!empty($request->model['submodels'])){
+            foreach ($request->model['submodels'] as $submodel) {
+                $orderSubModel = OrderSubModel::create([
+                    'order_model_id' => $orderModel->id,
+                    'submodel_id' => $submodel,
                 ]);
             }
         }
@@ -140,28 +158,14 @@ class OrderController extends Controller
             }
         }
 
-        $modelRasxod = Models::find($request->model['id'])->rasxod;
-
-        $orderModel = OrderModel::create([
-            'order_id' => $order->id,
-            'model_id' => $request->model['id'],
-            'rasxod' => $modelRasxod ?? 0,
-            'material_id' => $request->model['material_id'],
-        ]);
-
-        foreach ($request->model['submodels'] as $submodel) {
-            $orderSubModel = OrderSubModel::create([
-                'order_model_id' => $orderModel->id,
-                'submodel_id' => $submodel,
-            ]);
-        }
-
-        foreach ($request->model['sizes'] as $size) {
-            $orderSize = OrderSize::create([
-                'order_model_id' => $orderModel->id,
-                'size_id' => $size['id'],
-                'quantity' => $size['quantity'],
-            ]);
+        if (!empty($request->model['sizes'])){
+            foreach ($request->model['sizes'] as $size) {
+                $orderSize = OrderSize::create([
+                    'order_model_id' => $orderModel->id,
+                    'size_id' => $size['id'],
+                    'quantity' => $size['quantity'],
+                ]);
+            }
         }
 
         return response()->json([
