@@ -24,8 +24,6 @@ class OrderRecipes extends Model
         'order_id'
     ];
 
-    protected $with = ['item'];
-
     public function item()
     {
         return $this->belongsTo(Item::class);
