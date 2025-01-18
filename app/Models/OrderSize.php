@@ -18,4 +18,14 @@ class OrderSize extends Model
     ];
 
     protected $hidden = ['created_at', 'updated_at', 'order_model_id', 'size_id'];
+
+    public function orderModel()
+    {
+        return $this->belongsTo(OrderModel::class, 'order_model_id');
+    }
+
+    public function size()
+    {
+        return $this->belongsTo(Size::class, 'size_id');
+    }
 }
