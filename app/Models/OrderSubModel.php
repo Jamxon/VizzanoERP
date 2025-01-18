@@ -23,6 +23,8 @@ class OrderSubModel extends Model
         'submodel_id',
     ];
 
+    protected $with = ['submodel'];
+
     public function orderModel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(OrderModel::class, 'order_model_id');
