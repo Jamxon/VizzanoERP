@@ -27,6 +27,11 @@ class Item extends Model
         'type_id'
     ];
 
+    public function order()
+    {
+        return $this->hasMany(OrderModel::class, 'material_id');
+    }
+
     public function unit()
     {
         return $this->belongsTo(Unit::class);
