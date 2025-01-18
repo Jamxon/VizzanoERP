@@ -26,4 +26,9 @@ class Size extends Model
     {
         return $this->hasMany(Recipe::class, 'size_id');
     }
+
+    public function orderSizes(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderSize::class, 'size_id');
+    }
 }
