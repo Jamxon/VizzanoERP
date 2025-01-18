@@ -13,9 +13,10 @@ class OrderModel extends Model
         'order_id',
         'model_id',
         'rasxod',
+        'material_id'
     ];
 
-    protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id'];
+    protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id','material_id'];
 
     protected $with = ['model', 'submodels'];
 

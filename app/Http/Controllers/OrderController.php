@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\OrderInstruction;
 use App\Models\OrderModel;
 use App\Models\OrderRecipes;
+use App\Models\OrderSize;
 use App\Models\OrderSubModel;
 use App\Models\Recipe;
 use Illuminate\Http\Request;
@@ -37,6 +38,41 @@ class OrderController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
+
+        //{
+        //    "name": "OrderName",
+        //    "quantity": 100,
+        //    "start_date": "2021-01-01",
+        //    "end_date": "2021-01-02",
+        //    "rasxod": 0.1,
+        //    "final_product_name": "POLNOTA 1",
+        //    "comment": "Order Comment",
+        //    "contragent_id": 1,
+        //    "contragent_name": "Contragent Name",
+        //    "instructions": [
+        //        {
+        //            "title": "Instruction Name",
+        //            "description": "Instruction Description"
+        //        }
+        //    ],
+        //    "model": {
+        //        "id": 1,
+        //        "material_id": 1,
+        //        "submodel": [
+        //            1,
+        //            2,
+        //            3,
+        //            4
+        //        ],
+        //        "sizes": [
+        //            {
+        //                "id": 1,
+        //                "quantity": 10
+        //            }
+        //        ]
+        //    }
+        //}
+
         $request->validate([
             'name' => 'required|string',
             'quantity' => 'required|integer',
@@ -45,18 +81,20 @@ class OrderController extends Controller
             'rasxod' => 'nullable|numeric',
             'final_product_name' => 'nullable|string',
             'comment' => 'nullable|string',
-            'models' => 'required|array',
-            'models.*.id' => 'required|integer',
-            'models.*.material_id' => 'required|integer|exists:items,id',
-            'models.*.submodel.id' => 'required|integer',
-            'models.*.size.id' => 'required|integer',
-            'models.*.quantity' => 'required|integer',
-            'contragent_id' => 'nullable|integer',
-            'contragent_name' => 'nullable|string',
-            'contragent_description' => 'nullable|string',
+            'model' => 'required|array',
+            'model.id' => 'required|integer',
+            'model.material_id' => 'required|integer|exists:items,id',
+            'model.submodels' => 'required|array',
+            'model.sizes' => 'required|array',
+            'model.*.sizes.*.id' => 'required|integer',
+            'model.*.sizes.*.quantity' => 'required|integer',
             'instructions' => 'nullable|array',
             'instructions.*.title' => 'required|string',
             'instructions.*.description' => 'required|string',
+            'recipes' => 'nullable|array',
+            'recipes.*.item_id' => 'required|integer',
+            'recipes.*.quantity' => 'required|integer',
+            'recipes.*.submodel_id' => 'required|integer',
         ]);
 
         if ($request->contragent_id){
@@ -102,35 +140,27 @@ class OrderController extends Controller
             }
         }
 
-        foreach ($request->models as $model) {
-            if (!OrderModel::where('order_id', $order->id)->where('model_id', $model['id'])->exists()) {
-                $modelRasxod = Models::find($model['id']);
-                OrderModel::create([
-                    'order_id' => $order->id,
-                    'model_id' => $model['id'],
-                    'rasxod' => $modelRasxod->rasxod ?? 0,
-                ]);
-            }
+        $modelRasxod = Models::find($request->model['id'])->rasxod;
 
-            $orderModel = OrderModel::where('order_id', $order->id)->where('model_id', $model['id'])->first();
+        $orderModel = OrderModel::create([
+            'order_id' => $order->id,
+            'model_id' => $request->model['id'],
+            'rasxod' => $modelRasxod ?? 0,
+            'material_id' => $request->model['material_id'],
+        ]);
 
-            $material = Materials::where('material_id', $model['material_id'])
-                ->where('model_id', $orderModel->model_id)
-                ->first();
-
-            if (!$material) {
-                $material = Materials::create([
-                    'material_id' => $model['material_id'],
-                    'model_id' => $orderModel->model_id,
-                ]);
-            }
-
-            OrderSubModel::create([
+        foreach ($request->model['submodels'] as $submodel) {
+            $orderSubModel = OrderSubModel::create([
                 'order_model_id' => $orderModel->id,
-                'submodel_id' => $model['submodel']['id'],
-                'size_id' => $model['size']['id'],
-                'materials_id' => $material->id,
-                'quantity' => $model['quantity'],
+                'submodel_id' => $submodel,
+            ]);
+        }
+
+        foreach ($request->model['sizes'] as $size) {
+            $orderSize = OrderSize::create([
+                'order_model_id' => $orderModel->id,
+                'size_id' => $size['id'],
+                'quantity' => $size['quantity'],
             ]);
         }
 
