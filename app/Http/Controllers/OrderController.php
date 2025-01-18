@@ -79,7 +79,6 @@ class OrderController extends Controller
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date',
             'rasxod' => 'nullable|numeric',
-            'final_product_name' => 'nullable|string',
             'comment' => 'nullable|string',
             'model' => 'required|array',
             'model.id' => 'required|integer',
@@ -117,7 +116,6 @@ class OrderController extends Controller
             'rasxod'  => $request->rasxod ?? 0,
             'branch_id' => $user->employee->branch_id,
             'contragent_id' => $contragent->id ?? null,
-            'final_product_name' => $request->final_product_name ?? null,
             'comment' => $request->comment ?? null,
         ]);
 

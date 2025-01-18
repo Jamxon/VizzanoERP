@@ -19,7 +19,6 @@ class Order extends Model
         'end_date',
         'rasxod',
         'branch_id',
-        'final_product_name',
         'comment',
         'contragent_id',
     ];
