@@ -19,6 +19,7 @@ class OrderSize extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'order_model_id', 'size_id'];
 
+    protected $with = ['size'];
     public function orderModel()
     {
         return $this->belongsTo(OrderModel::class, 'order_model_id');
