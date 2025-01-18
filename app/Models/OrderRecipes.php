@@ -20,7 +20,8 @@ class OrderRecipes extends Model
         'created_at',
         'updated_at',
         'item_id',
-        'submodel_id'
+        'submodel_id',
+        'order_id'
     ];
 
     public function item()
