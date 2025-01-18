@@ -39,4 +39,14 @@ class Order extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function contragent()
+    {
+        return $this->belongsTo(Contragent::class);
+    }
+
+    public function orderRecipes()
+    {
+        return $this->hasMany(OrderRecipes::class, 'order_id');
+    }
 }
