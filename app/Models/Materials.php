@@ -23,6 +23,11 @@ class Materials extends Model
         'material_id'
     ];
 
+    public function order()
+    {
+        return $this->hasMany(OrderModel::class, 'material_id', 'id');
+    }
+
     public function material(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Item::class, 'material_id');
