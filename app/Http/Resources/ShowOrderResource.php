@@ -41,21 +41,22 @@ class ShowOrderResource extends JsonResource
                         ];
                     }),
                     'submodels' => $orderModel->submodels->map(function ($submodel) {
+                        $recipes = OrderRecipes::where('submodel_id', $submodel->id)
+                            ->where('order_id', $this->id)
+                            ->get();
                         return [
                             'id' => $submodel->id,
                             'submodel' => $submodel->submodel,
-                            $recipe = OrderRecipes::where('submodel_id', $submodel->id)
-                                ->where('order_id', $this->id)
-                                ->get(),
-                            'recipes' => $recipe->map(function ($recipe) {
+                            'recipes' => $recipes->map(function ($recipe) {
                                 return [
                                     'id' => $recipe->id,
-                                    'item' => $recipe->item,
+                                    'item' => $recipe->item,  // item bilan bog'lanish mavjudligini tekshiring
                                     'quantity' => $recipe->quantity,
                                 ];
                             }),
                         ];
                     }),
+
                 ];
             }),
         ];
