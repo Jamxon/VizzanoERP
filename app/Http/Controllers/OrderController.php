@@ -27,6 +27,7 @@ class OrderController extends Controller
 
     public function show(Order $order): \Illuminate\Http\JsonResponse
     {
+        $order->load('orderModels', 'orderModels.model', 'orderModels.materials', 'orderModels.sizes', 'orderModels.submodels', 'instructions', 'orderRecipes', 'contragent');
         return response()->json($order);
     }
 
