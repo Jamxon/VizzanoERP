@@ -28,7 +28,7 @@ class ShowOrderResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'rasxod' => $this->rasxod,
-            'order_models' => $this->orderModels->map(function ($orderModel) {
+            'order_model' => $this->orderModel->map(function ($orderModel) {
                 return [
                     'id' => $orderModel->id,
                     'model' => $orderModel->model,
@@ -45,7 +45,7 @@ class ShowOrderResource extends JsonResource
                             ->where('order_id', $this->id)
                             ->get();
 
-                        
+
                         return [
                             'id' => $submodel->id,
                             'submodel' => $submodel->submodel,
