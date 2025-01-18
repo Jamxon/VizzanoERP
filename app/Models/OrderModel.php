@@ -28,7 +28,7 @@ class OrderModel extends Model
         return $this->hasMany(OrderSize::class, 'order_model_id');
     }
 
-    public function materials()
+    public function material()
     {
         return $this->belongsTo(Materials::class, 'material_id');
     }
