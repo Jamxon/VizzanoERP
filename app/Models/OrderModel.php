@@ -23,6 +23,11 @@ class OrderModel extends Model
         return $this->belongsTo(Order::class, 'order_id');
     }
 
+    public function materials()
+    {
+        return $this->belongsTo(Materials::class, 'material_id');
+    }
+
     public function model()
     {
         return $this->belongsTo(Models::class);
