@@ -20,7 +20,7 @@ class OrderController extends Controller
     public function index(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::orderBy('created_at', 'asc')
-            ->with('orderModels', 'orderModels.model', 'orderModels.material', 'orderModels.sizes.size', 'orderModels.submodels.submodel', 'instructions', 'orderRecipes.item', 'contragent')
+            ->with('orderModels', 'orderModels.model', 'orderModels.material', 'orderModels.sizes.size', 'orderModels.submodels.submodel', 'instructions', 'contragent')
             ->get();
         return response()->json($orders);
     }
