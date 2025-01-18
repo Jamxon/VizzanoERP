@@ -29,7 +29,7 @@ class Item extends Model
 
     public function order()
     {
-        return $this->hasMany(OrderModel::class, 'material_id');
+        return $this->hasMany(OrderModel::class, 'material_id', 'id');
     }
 
     public function unit()
