@@ -25,9 +25,9 @@ class Order extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'branch_id', 'contragent_id'];
 
-    public function orderModels()
+    public function orderModel()
     {
-        return $this->hasMany(OrderModel::class, 'order_id');
+        return $this->hasOne(OrderModel::class, 'order_id');
     }
 
     public function instructions()
