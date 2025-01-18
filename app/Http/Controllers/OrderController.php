@@ -121,12 +121,14 @@ class OrderController extends Controller
             'comment' => $request->comment ?? null,
         ]);
 
-        foreach ($request->instructions as $instruction) {
-            $orderInstruction = OrderInstruction::create([
-                'order_id' => $order->id,
-                'title' => $instruction['title'],
-                'description' => $instruction['description'],
-            ]);
+        if(!empty($request->instructions)){
+            foreach ($request->instructions as $instruction) {
+                $orderInstruction = OrderInstruction::create([
+                    'order_id' => $order->id,
+                    'title' => $instruction['title'],
+                    'description' => $instruction['description'],
+                ]);
+            }
         }
 
         if (!empty($request->recipes)){
