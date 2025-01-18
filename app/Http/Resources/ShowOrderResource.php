@@ -28,39 +28,36 @@ class ShowOrderResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'rasxod' => $this->rasxod,
-            'order_model' => $this->orderModel->map(function ($orderModel) {
-                return [
-                    'id' => $orderModel->id,
-                    'model' => $orderModel->model,
-                    'material' => $orderModel->material,
-                    'sizes' => $orderModel->sizes->map(function ($size) {
-                        return [
-                            'id' => $size->id,
-                            'size' => $size->size,
-                            'quantity' => $size->quantity,
-                        ];
-                    }),
-                    'submodels' => $orderModel->submodels->map(function ($submodel) {
-                        $recipes = OrderRecipes::where('submodel_id', $submodel->submodel->id)
-                            ->where('order_id', $this->id)
-                            ->get();
+            'order_model' => $this->orderModel ? [
+                'id' => $this->orderModel->id,
+                'model' => $this->orderModel->model,
+                'material' => $this->orderModel->material,
+                'sizes' => $this->orderModel->sizes->map(function ($size) {
+                    return [
+                        'id' => $size->id,
+                        'size' => $size->size,
+                        'quantity' => $size->quantity,
+                    ];
+                }),
+                'submodels' => $this->orderModel->submodels->map(function ($submodel) {
+                    $recipes = OrderRecipes::where('submodel_id', $submodel->submodel->id)
+                        ->where('order_id', $this->id)
+                        ->get();
 
+                    return [
+                        'id' => $submodel->id,
+                        'submodel' => $submodel->submodel,
+                        'recipes' => $recipes->map(function ($recipe) {
+                            return [
+                                'id' => $recipe->id,
+                                'item' => $recipe->item,
+                                'quantity' => $recipe->quantity,
+                            ];
+                        }),
+                    ];
+                }),
+            ] : null,
 
-                        return [
-                            'id' => $submodel->id,
-                            'submodel' => $submodel->submodel,
-                            'recipes' => $recipes->map(function ($recipe) {
-                                return [
-                                    'id' => $recipe->id,
-                                    'item' => $recipe->item,  // item bilan bog'lanish mavjudligini tekshiring
-                                    'quantity' => $recipe->quantity,
-                                ];
-                            }),
-                        ];
-                    }),
-
-                ];
-            }),
         ];
     }
 }
