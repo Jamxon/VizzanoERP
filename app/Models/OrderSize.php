@@ -16,4 +16,6 @@ class OrderSize extends Model
         'size_id',
         'quantity',
     ];
+
+    protected $hidden = ['created_at', 'updated_at', 'order_model_id', 'size_id'];
 }
