@@ -39,41 +39,6 @@ class OrderController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-
-        //{
-        //    "name": "OrderName",
-        //    "quantity": 100,
-        //    "start_date": "2021-01-01",
-        //    "end_date": "2021-01-02",
-        //    "rasxod": 0.1,
-        //    "final_product_name": "POLNOTA 1",
-        //    "comment": "Order Comment",
-        //    "contragent_id": 1,
-        //    "contragent_name": "Contragent Name",
-        //    "instructions": [
-        //        {
-        //            "title": "Instruction Name",
-        //            "description": "Instruction Description"
-        //        }
-        //    ],
-        //    "model": {
-        //        "id": 1,
-        //        "material_id": 1,
-        //        "submodel": [
-        //            1,
-        //            2,
-        //            3,
-        //            4
-        //        ],
-        //        "sizes": [
-        //            {
-        //                "id": 1,
-        //                "quantity": 10
-        //            }
-        //        ]
-        //    }
-        //}
-
         $request->validate([
             'name' => 'required|string',
             'quantity' => 'required|integer',
