@@ -50,7 +50,17 @@ class ShowOrderResource extends JsonResource
                         'recipes' => $recipes->map(function ($recipe) {
                             return [
                                 'id' => $recipe->id,
-                                'item' => $recipe->item,
+                                'item' => $recipe->item ? [
+                                    'id' => $recipe->item->id,
+                                    'name' => $recipe->item->name,
+                                    'unit' => $recipe->item->unit ? [
+                                        'id' => $recipe->item->unit->id,
+                                        'name' => $recipe->item->unit->name,
+                                    ] : null,
+                                    'quantity' => $recipe->item->quantity,
+                                    'price' => $recipe->item->price,
+                                    'code' => $recipe->item->code,
+                                ] : null,
                                 'quantity' => $recipe->quantity,
                             ];
                         }),
