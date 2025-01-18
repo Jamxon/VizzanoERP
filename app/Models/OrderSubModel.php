@@ -14,16 +14,11 @@ class OrderSubModel extends Model
     protected $fillable = [
         'order_model_id',
         'submodel_id',
-        'size_id',
-        'quantity',
-        'materials_id',
     ];
 
     protected $hidden = [
         'created_at',
         'updated_at',
-        'materials_id',
-        'size_id',
         'order_model_id',
         'submodel_id',
     ];
@@ -36,16 +31,6 @@ class OrderSubModel extends Model
     public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(SubModel::class);
-    }
-
-    public function size(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Size::class);
-    }
-
-    public function materials(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Materials::class, 'materials_id');
     }
 
     public function orderGroup(): \Illuminate\Database\Eloquent\Relations\HasOne
