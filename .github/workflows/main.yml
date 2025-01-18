@@ -1,40 +1,22 @@
-on: push
-name: 🚀 Deploy website on push
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
-  web-deploy:
-    name: 🎉 Deploy
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 🚚 Get latest code
-        uses: actions/checkout@v4
-      - name: 📦 Install Composer dependencies
-        run: |
-          composer install --no-dev --no-scripts --no-progress --prefer-dist
-      - name: 🧹 Clear Laravel caches
-        run: |
-          php artisan config:clear
-          php artisan route:clear
-          php artisan view:clear
+      - uses: actions/checkout@v3
 
-      - name: 📂 Sync files
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./
-          exclude: |
-            /vendor/*
-            node_modules/*
-            .env
-            storage/logs/*
-            storage/framework/*
-            *.log
-          verbose: true
-
-      - name: 📦 Install Composer dependencies on server
-        run: ssh ${{ secrets.FTP_USERNAME }}@${{ secrets.FTP_SERVER }} 'cd /path/to/project && composer install --no-dev --no-scripts --prefer-dist'
-
-
-      - name: ✅ Deployment Completed
-        run: echo "Laravel project successfully deployed to the server!"
+          host: '176.124.208.61'
+          username: 'root'
+          password: 'hS+mN_w4+@SaWm'
+          script: |
+            cd /home/jamkhan/VizzanoERP/
+            git pull
