@@ -19,15 +19,15 @@ class OrderController extends Controller
 {
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::orderBy('created_at', 'asc')->get();
+        $orders = Order::orderBy('created_at', 'asc')
+            ->with('orderModel', 'orderModel.model', 'orderModel.material', 'orderModel.sizes', 'orderModel.submodels', 'orderInstructions', 'orderRecipes', 'contragent')
+            ->get();
         return response()->json($orders);
     }
 
     public function show(Order $order): \Illuminate\Http\JsonResponse
     {
-        $resource = new ShowOrderResource($order);
-
-        return response()->json($resource);
+        return response()->json($order);
     }
 
     public function getContragents(): \Illuminate\Http\JsonResponse
