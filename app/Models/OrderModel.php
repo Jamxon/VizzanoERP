@@ -18,8 +18,6 @@ class OrderModel extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id','material_id'];
 
-    protected $with = ['model', 'submodels'];
-
     public function order()
     {
         return $this->belongsTo(Order::class, 'order_id');
