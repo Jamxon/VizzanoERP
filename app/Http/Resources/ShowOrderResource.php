@@ -28,6 +28,7 @@ class ShowOrderResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'rasxod' => $this->rasxod,
+            'comment' => $this->comment,
             'order_model' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
                 'model' => $this->orderModel->model,
@@ -67,6 +68,13 @@ class ShowOrderResource extends JsonResource
                     ];
                 }),
             ] : null,
+            'instructions' => $this->instructions->map(function ($instruction) {
+                return [
+                    'id' => $instruction->id,
+                    'title' => $instruction->title,
+                    'description' => $instruction->description,
+                ];
+            }),
 
         ];
     }
