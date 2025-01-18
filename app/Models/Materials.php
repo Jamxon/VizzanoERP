@@ -23,11 +23,6 @@ class Materials extends Model
         'material_id'
     ];
 
-    public function order()
-    {
-        return $this->hasOne(OrderModel::class, 'material_id', 'id');
-    }
-
     public function material(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Item::class, 'material_id');
@@ -36,10 +31,5 @@ class Materials extends Model
     public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Models::class, 'model_id');
-    }
-
-    public function recipes(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Recipe::class, 'model_color_id');
     }
 }
