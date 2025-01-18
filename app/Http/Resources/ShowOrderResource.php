@@ -41,7 +41,7 @@ class ShowOrderResource extends JsonResource
                         ];
                     }),
                     'submodels' => $orderModel->submodels->map(function ($submodel) {
-                        $recipes = OrderRecipes::where('submodel_id', $submodel->id)
+                        $recipes = OrderRecipes::where('submodel_id', $submodel->submodel->id)
                             ->where('order_id', $this->id)
                             ->get();
                         return [
