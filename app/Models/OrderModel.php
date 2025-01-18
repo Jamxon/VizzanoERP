@@ -30,7 +30,7 @@ class OrderModel extends Model
 
     public function material()
     {
-        return $this->belongsTo(Materials::class, 'model_id');
+        return $this->belongsTo(Item::class, 'material_id');
     }
 
     public function model()
