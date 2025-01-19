@@ -25,6 +25,15 @@ class ConstructorController extends Controller
         return response()->json($resource);
     }
 
+    public function showOrder($id)
+    {
+        $order = Order::find($id);
+
+        $resource = OrderPrintingTime::collection($order);
+
+        return response()->json($order);
+    }
+
     public function sendToCuttingMaster($id): \Illuminate\Http\JsonResponse
     {
         $orderPrintingTime = OrderPrintingTimes::find($id);
