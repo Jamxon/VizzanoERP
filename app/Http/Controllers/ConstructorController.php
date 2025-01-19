@@ -17,7 +17,7 @@ class ConstructorController extends Controller
         $orders = Order::whereHas('orderModel.orderPrintingTimes', function ($query) use ($plannedTime) {
                 $query->whereDate('planned_time', $plannedTime);
             })
-            ->with('orderModels')
+            ->with('orderModel')
             ->get();
 
         $resource = OrderPrintingTime::collection($orders);
