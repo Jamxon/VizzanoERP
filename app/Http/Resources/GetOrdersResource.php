@@ -18,7 +18,7 @@ class GetOrdersResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'status' => $this->status,
-            'order_models' => $this->orderModels->map(function ($model) {
+            'order_models' => $this->orderModel->map(function ($model) {
                 return [
                     'id' => $model->id,
                     'name' => $model->name,
