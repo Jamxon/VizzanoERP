@@ -37,11 +37,16 @@ class OrderPrintingTime extends JsonResource
                             return [
                                 "id" => $firstSubmodel->id,
                                 "submodel" => $firstSubmodel->submodel->makeHidden(['sizes', 'modelColors']),
-                                "sizes" => $groupedSubmodels->pluck('size')->unique()->values(),
-                                "modelColors" => $groupedSubmodels->pluck('modelColor')->unique()->values(),
                                 "total_quantity" => $groupedSubmodels->sum('quantity'),
                             ];
                         })->values(),
+                    'sizes' => $this->orderModel->sizes->map(function ($size) {
+                        return [
+                            'id' => $size->id,
+                            'size' => $size->size,
+                            'quantity' => $size->quantity,
+                        ];
+                    }),
                 ];
             }) : [],
         ];
