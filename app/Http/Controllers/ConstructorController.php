@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderPrintingTime;
+use App\Http\Resources\ShowOrderPrintingTime;
 use App\Models\Order;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
@@ -29,7 +30,7 @@ class ConstructorController extends Controller
     {
         $order = Order::find($id);
 
-        $resource = OrderPrintingTime::collection($order);
+        $resource = ShowOrderPrintingTime::collection($order);
 
         return response()->json($order);
     }
