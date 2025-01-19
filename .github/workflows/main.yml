@@ -20,3 +20,4 @@ jobs:
           script: |
             cd /home/jamkhan/VizzanoERP/
             git pull
+            php artisan optimize
