@@ -21,14 +21,24 @@ class ShowOrderPrintingTime extends JsonResource
             "status" => $this->status,
             "start_date" => $this->start_date,
             "end_date" => $this->end_date,
-            "order_printing_times" => $this->orderModel ? $this->orderModel->orderPrintingTimes ? [
-                "id" => $this->orderModel->orderPrintingTimes->id,
-                "planned_time" => $this->orderModel->orderPrintingTimes->planned_time,
-                "actual_time" => $this->orderModel->orderPrintingTimes->actual_time,
-                "status" => $this->orderModel->orderPrintingTimes->status,
-                "comment" => $this->orderModel->orderPrintingTimes->comment,
-                "user" => $this->orderModel->orderPrintingTimes->user,
+            "comment" => $this->comment,
+            "instructions" => $this->instructions->map(function ($instruction) {
+                return [
+                    "id" => $instruction->id,
+                    "title" => $instruction->title,
+                    "description" => $instruction->description,
+                ];
+            }),
+            "order_model" => $this->orderModel ? [
+                "id" => $this->orderModel->id,
                 "model" => $this->orderModel->model->makeHidden(['submodels']),
+                "sizes" => $this->orderModel->sizes->map(function ($size) {
+                    return [
+                        "id" => $size->id,
+                        "size" => $size->size,
+                        "quantity" => $size->quantity,
+                    ];
+                }),
                 "submodels" => $this->orderModel->submodels
                     ->groupBy('submodel_id')
                     ->map(function ($groupedSubmodels) {
@@ -39,14 +49,18 @@ class ShowOrderPrintingTime extends JsonResource
                             "total_quantity" => $groupedSubmodels->sum('quantity'),
                         ];
                     })->values(),
-                'sizes' => $this->orderModel->sizes->map(function ($size) {
+                "order_printing_times" => $this->orderModel->orderPrintingTimes->map(function ($orderPrintingTime) {
                     return [
-                        'id' => $size->id,
-                        'size' => $size->size,
-                        'quantity' => $size->quantity,
+                        "id" => $orderPrintingTime->id,
+                        "planned_time" => $orderPrintingTime->planned_time,
+                        "actual_time" => $orderPrintingTime->actual_time,
+                        "status" => $orderPrintingTime->status,
+                        "comment" => $orderPrintingTime->comment,
+                        "user" => $orderPrintingTime->user,
                     ];
                 }),
-            ] : [] : [],
+            ] : [],
         ];
     }
+
 }
