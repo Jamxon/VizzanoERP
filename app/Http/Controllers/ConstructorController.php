@@ -30,10 +30,15 @@ class ConstructorController extends Controller
     {
         $order = Order::find($id);
 
-        $resource = ShowOrderPrintingTime::collection($order);
+        if (!$order) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        $resource = new ShowOrderPrintingTime($order);  // Individual obyekt uchun
 
         return response()->json($resource);
     }
+
 
     public function sendToCuttingMaster($id): \Illuminate\Http\JsonResponse
     {
