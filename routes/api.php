@@ -134,8 +134,8 @@ Route::prefix('constructor')->middleware('role:constructor')->group(function () 
     Route::post('orderPrintingTimes/{id}', [ConstructorController::class, 'sendToCuttingMaster']);
 });
 
-Route::prefix('master')->middleware('role:master')->group(function () {
-    Route::get('orders/cutting',[CuttingMasterController::class, 'getOrders']);
+Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function () {
+    Route::get('orders',[CuttingMasterController::class, 'getOrders']);
     Route::post('sendToConstructor', [CuttingMasterController::class, 'sendToConstructor']);
 });
 
