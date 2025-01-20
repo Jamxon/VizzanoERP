@@ -7,7 +7,7 @@ use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
 use Illuminate\Http\Request;
 
-class CuttingMasterConroller extends Controller
+class CuttingMasterController extends Controller
 {
     public function getOrders(): \Illuminate\Http\JsonResponse
     {
