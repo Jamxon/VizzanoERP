@@ -32,7 +32,7 @@ class ConstructorController extends Controller
 
         $resource = ShowOrderPrintingTime::collection($order);
 
-        return response()->json($order);
+        return response()->json($resource);
     }
 
     public function sendToCuttingMaster($id): \Illuminate\Http\JsonResponse
