@@ -3,7 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ConstructorController;
-use App\Http\Controllers\CuttingMasterConroller;
+use App\Http\Controllers\CuttingMasterController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
@@ -135,8 +135,8 @@ Route::prefix('constructor')->middleware('role:constructor')->group(function () 
 });
 
 Route::prefix('master')->middleware('role:master')->group(function () {
-    Route::get('orders/cutting',[CuttingMasterConroller::class, 'getOrders']);
-    Route::post('sendToConstructor', [CuttingMasterConroller::class, 'sendToConstructor']);
+    Route::get('orders/cutting',[CuttingMasterController::class, 'getOrders']);
+    Route::post('sendToConstructor', [CuttingMasterController::class, 'sendToConstructor']);
 });
 
     Route::get('lids', [LidController::class, 'index']);
