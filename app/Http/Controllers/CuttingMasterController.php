@@ -14,7 +14,7 @@ class CuttingMasterController extends Controller
         $orders = Order::where('status', 'active')
             ->whereDate('start_date', '<=', now()->addDays(15)->toDateString())
             ->orderBy('start_date', 'asc')
-            ->with('orderModel.model', 'orderModel.submodels', 'orderModel.submodels.size', 'orderModels.submodels.modelColor')
+            ->with('orderModel.model', 'orderModel.submodels', 'orderModel.submodels.submodel')
             ->get();
 
         $orders->each(function ($order) {
