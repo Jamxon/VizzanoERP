@@ -60,5 +60,5 @@ class ConstructorController extends Controller
 
         return response()->json($orderPrintingTime);
     }
-
+    
 }
