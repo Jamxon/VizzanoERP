@@ -43,7 +43,7 @@ class OrderModel extends Model
         return $this->hasMany(OrderSubModel::class, 'order_model_id');
     }
 
-    public function outcomeItemModelDistribution(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function outcomeItemModelDistributions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OutcomeItemModelDistrubition::class, 'model_id');
     }
