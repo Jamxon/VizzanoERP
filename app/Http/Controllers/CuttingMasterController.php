@@ -57,12 +57,12 @@ class CuttingMasterController extends Controller
         return response()->json($orderPrintingTime);
     }
 
-    public function getCompletedItems(Request $request)
+    public function getCompletedItems(Request $request): \Illuminate\Http\JsonResponse
     {
         $orderId = $request->input('order_id');
 
-        $orderModelIds = OrderModel::where('order_id', $orderId)->pluck('id')->first();
-        
+        $orderModelIds = OrderModel::where('order_id', $orderId)->pluck('id')->toArray();
+
         $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
             ->whereHas('outcomeItem.outcome', function ($query) {
                 $query->where('outcome_type', 'production')
@@ -80,7 +80,6 @@ class CuttingMasterController extends Controller
 
         return response()->json($outcomeItemModelDistribution);
     }
-
 
     public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
     {
