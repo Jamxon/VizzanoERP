@@ -79,7 +79,7 @@ class CuttingMasterController extends Controller
             )
             ->get();
 
-        $orderModelId = $orders->pluck('orderModel')->pluck('id');
+        $orderModelId = (int) $orders->pluck('orderModel')->pluck('id');
 
         $outcomeItemModelDistribution = OutcomeItemModelDistrubition::where('model_id', $orderModelId)
             ->with('outcomeItem.outcome.items.product')
