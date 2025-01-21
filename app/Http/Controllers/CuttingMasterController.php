@@ -59,29 +59,21 @@ class CuttingMasterController extends Controller
 
     public function getCompletedItems(): \Illuminate\Http\JsonResponse
     {
-        $items = ProductionOutcome::where('received_by_id', auth()->user()->id)
-            ->whereHas('outcome', function ($query) {
-                $query->where('outcome_type', 'production');
-            })
-            ->with('outcome.items.product')
-            ->get();
-
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
             ->whereDate('start_date', '<=', now()->addDays(15)->toDateString())
-            ->orderBy('start_date', 'asc')
-            ->with(
-                'instructions',
-                'orderModel.model',
-                'orderModel.submodels',
-                'orderModel.submodels.submodel',
-                'orderModel.sizes.size',
-                'orderPrintingTime'
-            )
             ->get();
 
         $orderModelIds = $orders->pluck('orderModel')->flatten()->pluck('id')->toArray();
 
         $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
+            ->whareHas('outcomeItem', function ($query) {
+                $query->whereHas('outcome', function ($query) {
+                    $query->where('outcome_type', 'production');
+                    $query->whareHas('productionOutcome', function ($query) {
+                        $query->where('received_by_id', auth()->user()->id);
+                    });
+                });
+            })
             ->with('outcomeItem.outcome.items.product')
             ->get();
 
