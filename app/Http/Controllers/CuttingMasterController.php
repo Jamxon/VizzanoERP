@@ -59,9 +59,9 @@ class CuttingMasterController extends Controller
 
     public function getCompletedItems(Request $request)
     {
-        return $orderId = $request->input('order_id');
+        $orderId = $request->input('order_id');
 
-        $orderModelIds = Order::where('id', $orderId)
+        return $orderModelIds = Order::where('id', $orderId)
             ->with('orderModel:id,order_id,model_id')
             ->get()
             ->pluck('orderModel.*.model_id')
