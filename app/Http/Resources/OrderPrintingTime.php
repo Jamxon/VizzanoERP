@@ -29,7 +29,7 @@ class OrderPrintingTime extends JsonResource
                 ];
             }),
             "comment" => $this->comment,
-            "order_printing_times" => $this->orderModel ? $this->orderModel->orderPrintingTimes->map(function ($orderPrintingTime) {
+            "order_printing_times" => $this->orderModel ? $this->orderPrintingTimes->map(function ($orderPrintingTime) {
                 return [
                     "id" => $orderPrintingTime->id,
                     "planned_time" => $orderPrintingTime->planned_time,
