@@ -74,7 +74,12 @@ class CuttingMasterController extends Controller
                     });
                 });
             })
-            ->with('outcomeItem.outcome.items.product')
+            ->with(
+                'outcomeItem.outcome.items.product',
+                'orderModel',
+                'orderModel.model',
+                'orderModel.order'
+            )
             ->get();
 
 
