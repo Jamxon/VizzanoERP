@@ -81,6 +81,23 @@ class CuttingMasterController extends Controller
         return response()->json($outcomeItemModelDistribution);
     }
 
+    public function showOrder(Order $order): \Illuminate\Http\JsonResponse
+    {
+        $order->load([
+            'instructions',
+            'orderModel.model',
+            'orderModel.outcomeItemModelDistrubitions',
+            'orderModel.submodels',
+            'orderModel.submodels.submodel',
+            'orderModel.sizes.size',
+            'orderPrintingTime'
+        ]);
+
+        return response()->json($order);
+    }
+
+
+
     public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
     {
         $outcome = Outcome::find($id);
