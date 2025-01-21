@@ -25,32 +25,32 @@ class Order extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'branch_id', 'contragent_id'];
 
-    public function orderModel()
+    public function orderModel(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(OrderModel::class, 'order_id');
     }
 
-    public function instructions()
+    public function instructions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderInstruction::class, 'order_id');
     }
 
-    public function branch()
+    public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
 
-    public function contragent()
+    public function contragent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Contragent::class);
     }
 
-    public function orderRecipes()
+    public function orderRecipes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderRecipes::class, 'order_id');
     }
 
-    public function orderPrintingTimes()
+    public function orderPrintingTimes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderPrintingTimes::class, 'order_id');
     }
