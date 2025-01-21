@@ -137,6 +137,7 @@ Route::prefix('constructor')->middleware('role:constructor')->group(function () 
 Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function () {
     Route::get('orders',[CuttingMasterController::class, 'getOrders']);
     Route::post('sendToConstructor', [CuttingMasterController::class, 'sendToConstructor']);
+    Route::get('completedItems', [CuttingMasterController::class, 'getCompletedItems']);
 });
 
     Route::get('lids', [LidController::class, 'index']);
