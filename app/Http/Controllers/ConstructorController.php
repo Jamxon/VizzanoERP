@@ -15,7 +15,7 @@ class ConstructorController extends Controller
     {
 
         $plannedTime = $request->input('planned_time') ?? now()->toDateString();
-        $orders = Order::whereHas('orderModel.orderPrintingTimes', function ($query) use ($plannedTime) {
+        $orders = Order::whereHas('orderPrintingTimes', function ($query) use ($plannedTime) {
                 $query->whereDate('planned_time', $plannedTime);
             })
             ->where('branch_id', auth()->user()->employee->branch_id)
