@@ -26,20 +26,19 @@ class CuttingMasterController extends Controller
     public function sendToConstructor(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
-            'order_model_id' => 'required|integer|exists:order_models,id',
-            'planned_time' => 'required|date',
+            'order_id' => 'required|integer|exists:orders,id',
+            'planned_time' => 'required|dateTime',
             'comment' => 'nullable|string'
         ]);
-        $orderModel = OrderModel::find($data['order_model_id']);
 
-        $order = Order::find($orderModel->order_id);
+        $order = Order::find($data['order_id']);
 
         $order->update([
             'status' => 'printing'
         ]);
 
         $orderPrintingTime = OrderPrintingTimes::create([
-            'order_model_id' => $data['order_model_id'],
+            'order_id' => $data['order_id'],
             'planned_time' => $data['planned_time'],
             'status' => 'printing',
             'comment' => $data['comment'],
