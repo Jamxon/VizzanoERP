@@ -52,8 +52,7 @@ class CuttingMasterController extends Controller
     {
         $items = ProductionOutcome::where('received_by_id', auth()->user()->id)
             ->whereHas('outcome', function ($query) {
-                $query->where('status', 'draft')
-                    ->where('outcome_type', 'production');
+                $query->where('outcome_type', 'production');
             })
             ->with('outcome.items.product')
             ->get();
