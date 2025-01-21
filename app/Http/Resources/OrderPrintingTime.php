@@ -29,33 +29,31 @@ class OrderPrintingTime extends JsonResource
                 ];
             }),
             "comment" => $this->comment,
-            "order_printing_times" => $this->orderModel ? $this->orderPrintingTimes->map(function ($orderPrintingTime) {
-                return [
-                    "id" => $orderPrintingTime->id,
-                    "planned_time" => $orderPrintingTime->planned_time,
-                    "actual_time" => $orderPrintingTime->actual_time,
-                    "status" => $orderPrintingTime->status,
-                    "comment" => $orderPrintingTime->comment,
-                    "user" => $orderPrintingTime->user,
-                    "model" => $this->orderModel->model->makeHidden(['submodels']),
-                    "submodels" => $this->orderModel->submodels
-                        ->groupBy('submodel_id')
-                        ->map(function ($groupedSubmodels) {
-                            $firstSubmodel = $groupedSubmodels->first();
-                            return [
-                                "id" => $firstSubmodel->id,
-                                "submodel" => $firstSubmodel->submodel->makeHidden(['sizes', 'modelColors']),
-                            ];
-                        })->values(),
-                    'sizes' => $this->orderModel->sizes->map(function ($size) {
+            "order_printing_time" => $this->orderPrintingTime ?  [
+                "id" => $this->orderPrintingTime->id,
+                "planned_time" => $this->orderPrintingTime->planned_time,
+                "actual_time" => $this->orderPrintingTime->actual_time,
+                "status" => $this->orderPrintingTime->status,
+                "comment" => $this->orderPrintingTime->comment,
+                "user" => $this->orderPrintingTime->user,
+                "model" => $this->orderModel->model->makeHidden(['submodels']),
+                "submodels" => $this->orderModel->submodels
+                    ->groupBy('submodel_id')
+                    ->map(function ($groupedSubmodels) {
+                        $firstSubmodel = $groupedSubmodels->first();
                         return [
-                            'id' => $size->id,
-                            'size' => $size->size,
-                            'quantity' => $size->quantity,
+                            "id" => $firstSubmodel->id,
+                            "submodel" => $firstSubmodel->submodel->makeHidden(['sizes', 'modelColors']),
                         ];
-                    }),
-                ];
-            }) : [],
+                    })->values(),
+                'sizes' => $this->orderModel->sizes->map(function ($size) {
+                    return [
+                        'id' => $size->id,
+                        'size' => $size->size,
+                        'quantity' => $size->quantity,
+                    ];
+                }),
+            ] : null,
         ];
     }
 
