@@ -49,4 +49,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderRecipes::class, 'order_id');
     }
+
+    public function orderPrintingTimes()
+    {
+        return $this->hasMany(OrderPrintingTimes::class, 'order_id');
+    }
 }

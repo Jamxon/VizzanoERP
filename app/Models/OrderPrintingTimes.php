@@ -13,7 +13,7 @@ class OrderPrintingTimes extends Model
 
     protected $fillable = [
         'id',
-        'order_model_id',
+        'order_id',
         'planned_time',
         'actual_time',
         'status',
@@ -22,20 +22,18 @@ class OrderPrintingTimes extends Model
     ];
 
     protected $hidden = [
-        'order_model_id',
+        'order_id',
         'user_id',
         'updated_at',
     ];
 
-    protected $with = ['orderModel'];
-
-    public function orderModel()
-    {
-        return $this->belongsTo(OrderModel::class);
-    }
-
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
     }
 }

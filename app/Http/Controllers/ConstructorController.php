@@ -45,9 +45,7 @@ class ConstructorController extends Controller
     {
         $orderPrintingTime = OrderPrintingTimes::find($id);
 
-        $orderModel = OrderModel::find($orderPrintingTime->order_model_id);
-
-        $order = Order::find($orderModel->order_id);
+        $order = Order::find($orderPrintingTime->order_id);
 
         $order->update([
             'status' => 'cutting'
