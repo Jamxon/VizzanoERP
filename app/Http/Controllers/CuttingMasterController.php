@@ -62,11 +62,7 @@ class CuttingMasterController extends Controller
         $orderId = $request->input('order_id');
 
         $orderModelIds = OrderModel::where('order_id', $orderId)->pluck('id')->first();
-
-        return response()->json($orderModelIds);
-
-
-
+        
         $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
             ->whereHas('outcomeItem.outcome', function ($query) {
                 $query->where('outcome_type', 'production')
