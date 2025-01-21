@@ -79,11 +79,12 @@ class CuttingMasterController extends Controller
             )
             ->get();
 
-        $orderModelId = (int) $orders->pluck('orderModel')->pluck('id');
+        $orderModelIds = $orders->pluck('orderModel')->flatten()->pluck('id')->toArray();
 
-        $outcomeItemModelDistribution = OutcomeItemModelDistrubition::where('model_id', $orderModelId)
+        $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
             ->with('outcomeItem.outcome.items.product')
             ->get();
+
 
         return response()->json($outcomeItemModelDistribution);
     }
