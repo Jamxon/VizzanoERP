@@ -79,11 +79,13 @@ class CuttingMasterController extends Controller
             )
             ->get();
 
-        $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereHas('orderModel', function ($query) {
-            $query->where('order_id', auth()->user()->employee->branch_id);
-        })->get();
+        $orderModelId = $orders->pluck('orderModel')->pluck('id');
 
-        return response()->json($items);
+        $outcomeItemModelDistribution = OutcomeItemModelDistrubition::where('model_id', $orderModelId)
+            ->with('outcomeItem.outcome.items.product')
+            ->get();
+
+        return response()->json($outcomeItemModelDistribution);
     }
 
     public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
