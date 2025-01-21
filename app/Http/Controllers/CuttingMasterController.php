@@ -18,7 +18,14 @@ class CuttingMasterController extends Controller
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->whereDate('start_date', '<=', now()->addDays(15)->toDateString())
             ->orderBy('start_date', 'asc')
-            ->with('instructions','orderModel.model', 'orderModel.submodels', 'orderModel.submodels.submodel','orderModel.sizes.size')
+            ->with(
+                'instructions',
+                'orderModel.model',
+                'orderModel.submodels',
+                'orderModel.submodels.submodel',
+                'orderModel.sizes.size',
+                'orderPrintingTimes'
+            )
             ->get();
 
         return response()->json($orders);
