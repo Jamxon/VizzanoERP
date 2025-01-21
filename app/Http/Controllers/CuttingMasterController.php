@@ -64,11 +64,14 @@ class CuttingMasterController extends Controller
         $orderModelIds = Order::where('id', $orderId)
             ->with('orderModel:id,order_id,model_id')
             ->get()
-            ->pluck('orderModel.*.model_id')
-            ->flatten()
+            ->flatMap(function ($order) {
+                return $order->orderModel->pluck('id');
+            })
             ->toArray();
 
-        return $orderModelIds;
+        return response()->json($orderModelIds);
+
+
 
         $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
             ->whereHas('outcomeItem.outcome', function ($query) {
