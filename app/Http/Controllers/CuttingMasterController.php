@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
 use App\Models\Outcome;
+use App\Models\OutcomeItemModelDistrubition;
 use App\Models\ProductionOutcome;
 use Illuminate\Http\Request;
 
@@ -65,10 +66,27 @@ class CuttingMasterController extends Controller
             ->with('outcome.items.product')
             ->get();
 
+        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
+            ->whereDate('start_date', '<=', now()->addDays(15)->toDateString())
+            ->orderBy('start_date', 'asc')
+            ->with(
+                'instructions',
+                'orderModel.model',
+                'orderModel.submodels',
+                'orderModel.submodels.submodel',
+                'orderModel.sizes.size',
+                'orderPrintingTime'
+            )
+            ->get();
+
+        $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereHas('orderModel', function ($query) {
+            $query->where('order_id', auth()->user()->employee->branch_id);
+        })->get();
+
         return response()->json($items);
     }
 
-    public function acceptCompletedItem($id)
+    public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
     {
         $outcome = Outcome::find($id);
 
@@ -79,7 +97,7 @@ class CuttingMasterController extends Controller
         return response()->json($outcome);
     }
 
-    public function cancelCompletedItem($id)
+    public function cancelCompletedItem($id): \Illuminate\Http\JsonResponse
     {
         $outcome = Outcome::find($id);
 
