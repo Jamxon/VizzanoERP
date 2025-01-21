@@ -57,34 +57,35 @@ class CuttingMasterController extends Controller
         return response()->json($orderPrintingTime);
     }
 
-    public function getCompletedItems(): \Illuminate\Http\JsonResponse
+    public function getCompletedItems(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
-            ->whereDate('start_date', '<=', now()->addDays(15)->toDateString())
-            ->get();
+        $orderId = $request->input('order_id');
 
-        $orderModelIds = $orders->pluck('orderModel')->flatten()->pluck('id')->toArray();
+        $orderModelIds = Order::where('id', $orderId)
+            ->with('orderModel:id,order_id,model_id')
+            ->get()
+            ->pluck('orderModel.*.model_id')
+            ->flatten()
+            ->toArray();
 
         $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
-            ->whereHas('outcomeItem', function ($query) {
-                $query->whereHas('outcome', function ($query) {
-                    $query->where('outcome_type', 'production');
-                    $query->whereHas('productionOutcome', function ($query) {
-                        $query->where('received_by_id', auth()->user()->id);
+            ->whereHas('outcomeItem.outcome', function ($query) {
+                $query->where('outcome_type', 'production')
+                    ->whereHas('productionOutcome', function ($query) {
+                        $query->where('received_by_id', auth()->id());
                     });
-                });
             })
-            ->with(
-                'outcomeItem.outcome.items.product',
-                'orderModel',
-                'orderModel.model',
-                'orderModel.order'
-            )
+            ->with([
+                'outcomeItem.outcome.items.product:id,name',
+                'orderModel:id,model_id,order_id',
+                'orderModel.model:id,name',
+                'orderModel.order:id,start_date'
+            ])
             ->get();
-
 
         return response()->json($outcomeItemModelDistribution);
     }
+
 
     public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
     {
