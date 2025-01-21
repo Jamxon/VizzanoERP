@@ -86,7 +86,7 @@ class CuttingMasterController extends Controller
         $order->load([
             'instructions',
             'orderModel.model',
-            'orderModel.outcomeItemModelDistrubitions',
+            'orderModel.outcomeItemModelDistribution',
             'orderModel.submodels',
             'orderModel.submodels.submodel',
             'orderModel.sizes.size',
