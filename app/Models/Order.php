@@ -50,7 +50,7 @@ class Order extends Model
         return $this->hasMany(OrderRecipes::class, 'order_id');
     }
 
-    public function orderPrintingTimes(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function orderPrintingTime(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(OrderPrintingTimes::class, 'order_id');
     }
