@@ -63,8 +63,8 @@ class CuttingMasterController extends Controller
 
         $orderModelIds = Order::find($orderId)
             ->orderModel
-            ->pluck('model_id')
-            ->toArray();
+            ->pluck('id')
+            ->first();
 
 
         return response()->json($orderModelIds);
