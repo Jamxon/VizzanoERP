@@ -37,4 +37,9 @@ class Outcome extends Model
     {
         return $this->hasMany(OutcomeItem::class);
     }
+
+    public function productionOutcome()
+    {
+        return $this->hasOne(ProductionOutcome::class);
+    }
 }
