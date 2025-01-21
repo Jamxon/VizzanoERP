@@ -57,7 +57,7 @@ class CuttingMasterController extends Controller
         return response()->json($orderPrintingTime);
     }
 
-    public function getCompletedItems(Request $request): \Illuminate\Http\JsonResponse
+    public function getCompletedItems(Request $request)
     {
         $orderId = $request->input('order_id');
 
