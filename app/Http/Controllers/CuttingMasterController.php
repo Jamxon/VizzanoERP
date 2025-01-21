@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
+use App\Models\Outcome;
 use App\Models\ProductionOutcome;
 use Illuminate\Http\Request;
 
@@ -48,7 +49,7 @@ class CuttingMasterController extends Controller
         return response()->json($orderPrintingTime);
     }
 
-    public function getCompletedItems()
+    public function getCompletedItems(): \Illuminate\Http\JsonResponse
     {
         $items = ProductionOutcome::where('received_by_id', auth()->user()->id)
             ->whereHas('outcome', function ($query) {
@@ -58,5 +59,27 @@ class CuttingMasterController extends Controller
             ->get();
 
         return response()->json($items);
+    }
+
+    public function acceptCompletedItem($id)
+    {
+        $outcome = Outcome::find($id);
+
+        $outcome->update([
+            'status' => 'completed'
+        ]);
+
+        return response()->json($outcome);
+    }
+
+    public function cancelCompletedItem($id)
+    {
+        $outcome = Outcome::find($id);
+
+        $outcome->update([
+            'status' => 'cancelled'
+        ]);
+
+        return response()->json($outcome);
     }
 }
