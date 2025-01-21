@@ -11,9 +11,10 @@ use Illuminate\Http\Request;
 
 class CuttingMasterController extends Controller
 {
-    public function getOrders(): \Illuminate\Http\JsonResponse
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('status', 'active')
+        $status = $request->input('status');
+        $orders = Order::where('status', $status)
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->whereDate('start_date', '<=', now()->addDays(15)->toDateString())
             ->orderBy('start_date', 'asc')
