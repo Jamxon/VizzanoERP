@@ -18,6 +18,7 @@ class ConstructorController extends Controller
         $orders = Order::whereHas('orderModel.orderPrintingTimes', function ($query) use ($plannedTime) {
                 $query->whereDate('planned_time', $plannedTime);
             })
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->with('orderModel')
             ->get();
 
