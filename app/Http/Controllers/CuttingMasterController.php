@@ -66,10 +66,10 @@ class CuttingMasterController extends Controller
         $orderModelIds = $orders->pluck('orderModel')->flatten()->pluck('id')->toArray();
 
         $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
-            ->whareHas('outcomeItem', function ($query) {
+            ->whereHas('outcomeItem', function ($query) {
                 $query->whereHas('outcome', function ($query) {
                     $query->where('outcome_type', 'production');
-                    $query->whareHas('productionOutcome', function ($query) {
+                    $query->whereHas('productionOutcome', function ($query) {
                         $query->where('received_by_id', auth()->user()->id);
                     });
                 });
