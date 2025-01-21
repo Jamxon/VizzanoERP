@@ -27,7 +27,7 @@ class CuttingMasterController extends Controller
     {
         $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
-            'planned_time' => 'required|dateTime',
+            'planned_time' => 'required|date',
             'comment' => 'nullable|string'
         ]);
 
