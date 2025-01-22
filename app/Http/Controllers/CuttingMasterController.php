@@ -102,6 +102,14 @@ class CuttingMasterController extends Controller
             ])
             ->get();
 
+        $orderRecipes = $order->orderRecipes->map(function ($recipe) {
+            return [
+                'id' => $recipe->id,
+                'quantity' => $recipe->quantity,
+                'item' => $recipe->item,
+            ];
+        });
+
         $outcomes = [];
         foreach ($outcomeItemModelDistribution as $item) {
             $outcome = $item->outcomeItem->outcome;
@@ -116,9 +124,8 @@ class CuttingMasterController extends Controller
                 ];
             }
 
-            // Mahsulotlar unikal bo‘lishi uchun `id` bo‘yicha filtrlaymiz
             foreach ($outcome->items as $outcomeItem) {
-                $itemId = $outcomeItem->id; // item id asosida unikal qilish
+                $itemId = $outcomeItem->id;
                 if (!isset($outcomes[$outcomeId]['items'][$itemId])) {
                     $outcomes[$outcomeId]['items'][$itemId] = [
                         'id' => $outcomeItem->id,
@@ -135,9 +142,8 @@ class CuttingMasterController extends Controller
             }
         }
 
-// Yig‘ilgan outcomesni ro‘yxatga aylantirish
         $outcomes = array_map(function ($outcome) {
-            $outcome['items'] = array_values($outcome['items']); // Itemsni indekslash
+            $outcome['items'] = array_values($outcome['items']);
             return $outcome;
         }, array_values($outcomes));
 
