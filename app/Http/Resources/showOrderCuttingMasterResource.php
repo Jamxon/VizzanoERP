@@ -29,7 +29,7 @@ class showOrderCuttingMasterResource extends JsonResource
             'contragent' => $this->contragent,
             'orderRecipes' => $this->orderRecipes,
             'orderPrintingTime' => $this->orderPrintingTime,
-            'outcomes' => $this->outcomes ?? [], // Default empty array if not set
+            'outcomes' => $this->outcomes,
         ];
     }
 
