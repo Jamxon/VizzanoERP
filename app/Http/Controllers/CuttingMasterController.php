@@ -140,6 +140,7 @@ class CuttingMasterController extends Controller
                             'name' => $outcomeItem->product->color->name ?? null,
                             'hex' => $outcomeItem->product->color->hex ?? null,
                         ],
+                        'unit' => $outcomeItem->unit ?? null,
                     ];
                 }
             }
