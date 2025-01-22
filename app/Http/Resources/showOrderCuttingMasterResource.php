@@ -26,12 +26,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
             'orderModel' => $this->whenLoaded('orderModel', function () {
                 return $this->orderModel->load('model', 'submodels', 'submodels.submodel', 'sizes.size');
             }),
-            'instructions' => $this->instructions,
-            'orderRecipes' => $this->orderRecipes,
+            'instructions' => $this->whenLoaded('instructions', function () {
+                return $this->instructions;
+            }),
+            'orderRecipes' => $this->whenLoaded('orderRecipes', function () {
+                return $this->orderRecipes;
+            }),
             'orderPrintingTime' => $this->whenLoaded('orderPrintingTime', function () {
                 return $this->orderPrintingTime->load('user');
             }),
-            'outcomes' => $this->outcomes,
+            'outcomes' => $this->whenLoaded('outcomes', function () {
+                return $this->outcomes->load('outcomeItems');
+            }),
         ];
     }
 
