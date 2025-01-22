@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\showOrderCuttingMasterResource;
 use App\Models\Order;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
@@ -79,20 +80,14 @@ class CuttingMasterController extends Controller
             ])
             ->get();
 
+
+
         return response()->json($outcomeItemModelDistribution);
     }
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
-        $order->load([
-            'instructions',
-            'orderModel.model',
-            'orderModel.outcomeItemModelDistributions.outcomeItem.outcome',
-            'orderModel.submodels',
-            'orderModel.submodels.submodel',
-            'orderModel.sizes.size',
-            'orderPrintingTime'
-        ]);
+        $resource = showOrderCuttingMasterResource::collection($order);
 
         return response()->json($order);
     }
