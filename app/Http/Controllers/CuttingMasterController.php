@@ -102,7 +102,9 @@ class CuttingMasterController extends Controller
         $outcome = $outcomeItemModelDistribution->map(function ($item) {
             return $item->outcomeItem->outcome->items;
         });
-        $outcome->load('product');
+        $outcome->with([
+            'product:id,name'
+        ]);
 //        $resource = new showOrderCuttingMasterResource($order);
 
         return response()->json($outcome);
