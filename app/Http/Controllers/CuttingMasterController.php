@@ -100,7 +100,9 @@ class CuttingMasterController extends Controller
             ->get();
 
         $outcome = $outcomeItemModelDistribution->map(function ($item) {
-            return $item->outcomeItem->outcome;
+            return $item->outcomeItem->outcome->items->map(function ($item) {
+                return $item->product;
+            });
         });
 //        $resource = new showOrderCuttingMasterResource($order);
 
