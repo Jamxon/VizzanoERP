@@ -120,6 +120,7 @@ class CuttingMasterController extends Controller
             // Har bir mahsulotni outcome ichiga qo‘shish
             foreach ($outcome->items as $outcomeItem) {
                 $outcomes[$outcomeId]['items'][] = [
+                    'id' => $outcomeItem->product->id ?? null,
                     'name' => $outcomeItem->product->name ?? null,
                     'code' => $outcomeItem->product->code ?? null,
                     'quantity' => $outcomeItem->quantity ?? 0,
