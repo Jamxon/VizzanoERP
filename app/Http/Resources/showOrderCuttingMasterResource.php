@@ -25,7 +25,7 @@ class showOrderCuttingMasterResource extends JsonResource
             'orderModel' => $this->orderModel->load('model', 'submodels', 'submodels.submodel', 'sizes.size'),
             'instructions' => $this->instructions,
             'orderRecipes' => $this->orderRecipes,
-            'orderPrintingTime' => $this->orderPrintingTime,
+            'orderPrintingTime' => $this->orderPrintingTime->load('user'),
             'outcomes' => $this->outcomes,
         ];
     }
