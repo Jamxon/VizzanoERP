@@ -19,13 +19,18 @@ class OutcomeItem extends Model
         'notes',
     ];
 
-    public function outcome()
+    public function outcome(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Outcome::class);
     }
 
-    public function product()
+    public function product(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function distributions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OutcomeItemModelDistrubition::class);
     }
 }
