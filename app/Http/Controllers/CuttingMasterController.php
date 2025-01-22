@@ -109,7 +109,7 @@ class CuttingMasterController extends Controller
             return [
                 'id' => $recipe->id,
                 'quantity' => $recipe->quantity,
-                'item' => $recipe->item->load('color'),
+                'item' => $recipe->item->load('color','unit'),
             ];
         });
 
@@ -139,8 +139,7 @@ class CuttingMasterController extends Controller
                             'id' => $outcomeItem->product->color->id ?? null,
                             'name' => $outcomeItem->product->color->name ?? null,
                             'hex' => $outcomeItem->product->color->hex ?? null,
-                        ],
-                        'unit' => $outcomeItem->product->unit ?? null
+                        ]
                     ];
                 }
             }
