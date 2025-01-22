@@ -74,7 +74,8 @@ class CuttingMasterController extends Controller
                 'outcomeItem.outcome.items.product:id,name',
                 'orderModel:id,model_id,order_id',
                 'orderModel.model:id,name',
-                'orderModel.order:id,start_date'
+                'orderModel.order:id,start_date',
+                'orderModel.order'
             ])
             ->get();
 
