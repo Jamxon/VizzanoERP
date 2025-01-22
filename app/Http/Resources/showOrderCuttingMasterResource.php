@@ -35,9 +35,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
             'orderPrintingTime' => $this->whenLoaded('orderPrintingTime', function () {
                 return $this->orderPrintingTime->load('user');
             }),
-            'outcomes' => $this->whenLoaded('outcomes', function () {
-                return $this->outcomes->load('outcomeItems');
-            }),
+            'outcomes' => $this->outcomes,
         ];
     }
 
