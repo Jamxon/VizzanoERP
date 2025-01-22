@@ -98,34 +98,48 @@ class CuttingMasterController extends Controller
                     });
             })
             ->with([
-                'outcomeItem.outcome.items.product',
+                'outcomeItem.outcome.items.product.color',
             ])
             ->get();
 
-        $outcome = $outcomeItemModelDistribution->map(function ($item) {
-            return [
-                'id' => $item->outcomeItem->outcome->id ?? null,
-                'outcome_type' => $item->outcomeItem->outcome->outcome_type ?? null,
-                'number' => $item->outcomeItem->outcome->number ?? null,
-                'items' => $item->outcomeItem->outcome->items->map(function ($item) {
-                    return [
-                        'name' => $item->product->name ?? null,
-                        'code' =>$item->product->code,
-                        'quantity' => $item->quantity ?? 0,
-                        'color' => $item->product->color ?? null,
-                    ];
-                }),
-            ];
-        });
+        // Outcome ID asosida birlashtirilgan outcomes
+        $outcomes = [];
+        foreach ($outcomeItemModelDistribution as $item) {
+            $outcome = $item->outcomeItem->outcome;
+            $outcomeId = $outcome->id;
 
-        // Pass the outcome data to the resource
+            if (!isset($outcomes[$outcomeId])) {
+                $outcomes[$outcomeId] = [
+                    'id' => $outcome->id,
+                    'outcome_type' => $outcome->outcome_type,
+                    'number' => $outcome->number,
+                    'items' => [],
+                ];
+            }
+
+            // Har bir mahsulotni outcome ichiga qo‘shish
+            foreach ($outcome->items as $outcomeItem) {
+                $outcomes[$outcomeId]['items'][] = [
+                    'name' => $outcomeItem->product->name ?? null,
+                    'code' => $outcomeItem->product->code ?? null,
+                    'quantity' => $outcomeItem->quantity ?? 0,
+                    'color' => [
+                        'id' => $outcomeItem->product->color->id ?? null,
+                        'name' => $outcomeItem->product->color->name ?? null,
+                        'hex' => $outcomeItem->product->color->hex ?? null,
+                    ],
+                ];
+            }
+        }
+
+        // Yig‘ilgan outcomesni ro‘yxatga o‘tkazish
+        $outcomes = array_values($outcomes);
+
         $resource = new showOrderCuttingMasterResource($order);
-        $resource->outcomes = $outcome;  // Add this dynamic property to the resource
+        $resource->outcomes = $outcomes;
 
         return response()->json($resource);
     }
-
-
 
 
     public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
