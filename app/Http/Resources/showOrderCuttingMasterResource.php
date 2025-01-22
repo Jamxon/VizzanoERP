@@ -23,10 +23,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'comment' => $this->comment,
-            'orderModel' => $this->orderModel->load('model', 'submodels', 'submodels.submodel', 'sizes.size'),
+            'orderModel' => $this->whenLoaded('orderModel', function () {
+                return $this->orderModel->load('model', 'submodels', 'submodels.submodel', 'sizes.size');
+            }),
             'instructions' => $this->instructions,
             'orderRecipes' => $this->orderRecipes,
-            'orderPrintingTime' => $this->orderPrintingTime->load('user') ?? null,
+            'orderPrintingTime' => $this->orderPrintingTime->load('user'),
             'outcomes' => $this->outcomes,
         ];
     }
