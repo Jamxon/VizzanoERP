@@ -23,7 +23,7 @@ class showOrderCuttingMasterResource extends JsonResource
             'end_date' => $this->end_date,
             'rasxod' => $this->rasxod,
             'comment' => $this->comment,
-            'orderModel' => $this->orderModel,
+            'orderModel' => $this->orderModel->load('model', 'submodels', 'submodels.submodel', 'sizes.size'),
             'instructions' => $this->instructions,
             'branch' => $this->branch,
             'contragent' => $this->contragent,
