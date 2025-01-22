@@ -22,27 +22,27 @@ class ProductionOutcome extends Model
         'acceptance_notes',
     ];
 
-    public function outcome()
+    public function outcome(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Outcome::class);
     }
 
-    public function department()
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
-    public function group()
+    public function group(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Group::class);
     }
 
-    public function order()
+    public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function receivedBy()
+    public function receivedBy(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'received_by_id');
     }
