@@ -102,13 +102,18 @@ class CuttingMasterController extends Controller
             ])
             ->get();
 
+        // Prepare the outcome data
         $outcome = $outcomeItemModelDistribution->map(function ($item) {
             return $item->outcomeItem->outcome->items;
         });
-//        $resource = new showOrderCuttingMasterResource($order);
 
-        return response()->json($outcome);
+        // Pass the outcome data to the resource
+        $resource = new showOrderCuttingMasterResource($order);
+        $resource->outcomes = $outcome;  // Add this dynamic property to the resource
+
+        return response()->json($resource);
     }
+
 
 
 
