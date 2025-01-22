@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed $orderRecipes
+ * @method static find(mixed $order_id)
+ * @method static where(string $string, mixed $status)
+ */
 class Order extends Model
 {
     use HasFactory;

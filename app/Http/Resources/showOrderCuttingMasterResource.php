@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources;
 
+use AllowDynamicProperties;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class showOrderCuttingMasterResource extends JsonResource
+#[AllowDynamicProperties] class showOrderCuttingMasterResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -25,7 +26,7 @@ class showOrderCuttingMasterResource extends JsonResource
             'orderModel' => $this->orderModel->load('model', 'submodels', 'submodels.submodel', 'sizes.size'),
             'instructions' => $this->instructions,
             'orderRecipes' => $this->orderRecipes,
-            'orderPrintingTime' => $this->orderPrintingTime->load('user'),
+            'orderPrintingTime' => $this->orderPrintingTime->load('user') ?? null,
             'outcomes' => $this->outcomes,
         ];
     }
