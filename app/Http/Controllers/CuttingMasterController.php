@@ -87,7 +87,7 @@ class CuttingMasterController extends Controller
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
-        $resource = showOrderCuttingMasterResource::collection($order);
+        $resource = new showOrderCuttingMasterResource($order);
 
         return response()->json($resource);
     }
