@@ -102,7 +102,6 @@ class CuttingMasterController extends Controller
             ])
             ->get();
 
-        // Outcome ID asosida birlashtirilgan outcomes
         $outcomes = [];
         foreach ($outcomeItemModelDistribution as $item) {
             $outcome = $item->outcomeItem->outcome;
@@ -117,24 +116,30 @@ class CuttingMasterController extends Controller
                 ];
             }
 
-            // Har bir mahsulotni outcome ichiga qo‘shish
+            // Mahsulotlar unikal bo‘lishi uchun `id` bo‘yicha filtrlaymiz
             foreach ($outcome->items as $outcomeItem) {
-                $outcomes[$outcomeId]['items'][] = [
-                    'id' => $outcomeItem->product->id ?? null,
-                    'name' => $outcomeItem->product->name ?? null,
-                    'code' => $outcomeItem->product->code ?? null,
-                    'quantity' => $outcomeItem->quantity ?? 0,
-                    'color' => [
-                        'id' => $outcomeItem->product->color->id ?? null,
-                        'name' => $outcomeItem->product->color->name ?? null,
-                        'hex' => $outcomeItem->product->color->hex ?? null,
-                    ],
-                ];
+                $itemId = $outcomeItem->id; // item id asosida unikal qilish
+                if (!isset($outcomes[$outcomeId]['items'][$itemId])) {
+                    $outcomes[$outcomeId]['items'][$itemId] = [
+                        'id' => $outcomeItem->id,
+                        'name' => $outcomeItem->product->name ?? null,
+                        'code' => $outcomeItem->product->code ?? null,
+                        'quantity' => $outcomeItem->quantity ?? 0,
+                        'color' => [
+                            'id' => $outcomeItem->product->color->id ?? null,
+                            'name' => $outcomeItem->product->color->name ?? null,
+                            'hex' => $outcomeItem->product->color->hex ?? null,
+                        ],
+                    ];
+                }
             }
         }
 
-        // Yig‘ilgan outcomesni ro‘yxatga o‘tkazish
-        $outcomes = array_values($outcomes);
+// Yig‘ilgan outcomesni ro‘yxatga aylantirish
+        $outcomes = array_map(function ($outcome) {
+            $outcome['items'] = array_values($outcome['items']); // Itemsni indekslash
+            return $outcome;
+        }, array_values($outcomes));
 
         $resource = new showOrderCuttingMasterResource($order);
         $resource->outcomes = $outcomes;
