@@ -112,6 +112,7 @@ class CuttingMasterController extends Controller
                         'name' => $item->product->name ?? null,
                         'code' =>$item->product->code,
                         'quantity' => $item->quantity ?? 0,
+                        'color' => $item->product->color ?? null,
                     ];
                 }),
             ];
