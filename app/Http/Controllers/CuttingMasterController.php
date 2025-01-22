@@ -89,7 +89,7 @@ class CuttingMasterController extends Controller
     {
         $resource = showOrderCuttingMasterResource::collection($order);
 
-        return response()->json($order);
+        return response()->json($resource);
     }
 
 
