@@ -99,6 +99,9 @@ class CuttingMasterController extends Controller
             })
             ->with([
                 'outcomeItem.outcome.items.product.color',
+                'orderModel.model',
+                'orderModel.submodels.submodel',
+                'orderModel.sizes.size',
             ])
             ->get();
 
@@ -109,8 +112,6 @@ class CuttingMasterController extends Controller
                 'item' => $recipe->item->load('color'),
             ];
         });
-
-        $order->orderModel->load('model', 'submodels.submodel', 'sizes.size');
 
         $outcomes = [];
         foreach ($outcomeItemModelDistribution as $item) {
