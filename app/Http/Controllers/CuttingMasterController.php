@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
 use App\Models\Outcome;
+use App\Models\OutcomeItem;
 use App\Models\OutcomeItemModelDistrubition;
 use App\Models\ProductionOutcome;
 use Illuminate\Http\Request;
@@ -87,9 +88,23 @@ class CuttingMasterController extends Controller
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
-        $resource = new showOrderCuttingMasterResource($order);
+        $orderModelIds = OrderModel::where('order_id', $order->id)->pluck('id')->toArray();
 
-        return response()->json($resource);
+        $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
+            ->whereHas('outcomeItem.outcome', function ($query) {
+                $query->where('outcome_type', 'production')
+                    ->whereHas('productionOutcome', function ($query) {
+                        $query->where('received_by_id', auth()->id());
+                    });
+            })
+            ->get();
+
+        $outcome = $outcomeItemModelDistribution->map(function ($item) {
+            return $item->outcomeItem->outcome;
+        });
+//        $resource = new showOrderCuttingMasterResource($order);
+
+        return response()->json($outcome);
     }
 
 
