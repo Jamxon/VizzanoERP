@@ -106,6 +106,7 @@ class CuttingMasterController extends Controller
             return [
                 'outcome_id' => $item->outcomeItem->outcome->id ?? null,
                 'outcome_type' => $item->outcomeItem->outcome->outcome_type ?? null,
+                'number' => $item->outcomeItem->outcome->number ?? null,
                 'item_id' => $item->outcomeItem->id ?? null,
 //                'product_name' => $item->outcomeItem->outcome->items->item->name ?? null,
 //                'quantity' => $item->outcomeItem->outcome->items->quantity ?? 0,
