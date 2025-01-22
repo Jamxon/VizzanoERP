@@ -106,19 +106,7 @@ class CuttingMasterController extends Controller
             return [
                 'id' => $recipe->id,
                 'quantity' => $recipe->quantity,
-                'item' => $recipe->item->map(function ($item) {
-                    return [
-                        'id' => $item->id,
-                        'name' => $item->name,
-                        'code' => $item->code,
-                        'price' => $item->price,
-                        'color' => [
-                            'id' => $item->color->id,
-                            'name' => $item->color->name,
-                            'hex' => $item->color->hex,
-                        ],
-                    ];
-                }),
+                'item' => $recipe->item->load('color'),
             ];
         });
 
