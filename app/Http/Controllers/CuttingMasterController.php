@@ -104,7 +104,7 @@ class CuttingMasterController extends Controller
 
         $outcome = $outcomeItemModelDistribution->map(function ($item) {
             return [
-                'outcome_id' => $item->outcomeItem->outcome->id ?? null,
+                'id' => $item->outcomeItem->outcome->id ?? null,
                 'outcome_type' => $item->outcomeItem->outcome->outcome_type ?? null,
                 'number' => $item->outcomeItem->outcome->number ?? null,
                 'items' => $item->outcomeItem->outcome->items->map(function ($item) {
