@@ -29,9 +29,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
             'instructions' => $this->whenLoaded('instructions', function () {
                 return $this->instructions;
             }),
-            'orderRecipes' => $this->whenLoaded('orderRecipes', function () {
-                return $this->orderRecipes;
-            }),
+            'orderRecipes' => $this->orderRecipes,
             'orderPrintingTime' => $this->whenLoaded('orderPrintingTime', function () {
                 return $this->orderPrintingTime->load('user');
             }),
