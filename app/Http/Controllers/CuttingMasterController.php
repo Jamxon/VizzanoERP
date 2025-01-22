@@ -109,14 +109,11 @@ class CuttingMasterController extends Controller
                 'number' => $item->outcomeItem->outcome->number ?? null,
                 'items' => $item->outcomeItem->outcome->items->map(function ($item) {
                     return [
-                        'product_name' => $item->product->name ?? null,
+                        'name' => $item->product->name ?? null,
+                        'code' =>$item->product->code,
                         'quantity' => $item->quantity ?? 0,
                     ];
                 }),
-//                'product_name' => $item->outcomeItem->outcome->items->item->name ?? null,
-//                'quantity' => $item->outcomeItem->outcome->items->quantity ?? 0,
-//                'received_by' => $item->outcomeItem->outcome->productionOutcome->receivedBy->name ?? 'Unknown',
-//                'date' => $item->outcomeItem->outcome->created_at ?? null,
             ];
         });
 
