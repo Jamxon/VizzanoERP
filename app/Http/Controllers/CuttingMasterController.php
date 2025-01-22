@@ -97,14 +97,14 @@ class CuttingMasterController extends Controller
                         $query->where('received_by_id', auth()->id());
                     });
             })
+            ->with([
+                'outcomeItem.outcome.items.product',
+            ])
             ->get();
 
         $outcome = $outcomeItemModelDistribution->map(function ($item) {
             return $item->outcomeItem->outcome->items;
         });
-        $outcome->with([
-            'product:id,name'
-        ]);
 //        $resource = new showOrderCuttingMasterResource($order);
 
         return response()->json($outcome);
