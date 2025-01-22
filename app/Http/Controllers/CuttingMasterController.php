@@ -110,6 +110,8 @@ class CuttingMasterController extends Controller
             ];
         });
 
+        $order->orderModel->load('model', 'submodels.submodel', 'sizes.size');
+
         $outcomes = [];
         foreach ($outcomeItemModelDistribution as $item) {
             $outcome = $item->outcomeItem->outcome;
