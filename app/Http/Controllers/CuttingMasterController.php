@@ -140,6 +140,7 @@ class CuttingMasterController extends Controller
                         'name' => $outcomeItem->product->name ?? null,
                         'code' => $outcomeItem->product->code ?? null,
                         'quantity' => $outcomeItem->quantity ?? 0,
+                        'unit' => $outcomeItem->product->unit ?? null,
                         'color' => [
                             'id' => $outcomeItem->product->color->id ?? null,
                             'name' => $outcomeItem->product->color->name ?? null,
