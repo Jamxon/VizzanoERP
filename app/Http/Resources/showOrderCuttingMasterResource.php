@@ -26,7 +26,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
             'orderModel' => $this->orderModel->load('model', 'submodels', 'submodels.submodel', 'sizes.size'),
             'instructions' => $this->instructions,
             'orderRecipes' => $this->orderRecipes,
-            'orderPrintingTime' => $this->orderPrintingTime->load('user') ?? null,
+            'orderPrintingTime' => $this->orderPrintingTime,
             'outcomes' => $this->outcomes,
         ];
     }
