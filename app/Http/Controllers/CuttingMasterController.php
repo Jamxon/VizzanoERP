@@ -127,6 +127,7 @@ class CuttingMasterController extends Controller
                     'id' => $outcome->id,
                     'outcome_type' => $outcome->outcome_type,
                     'number' => $outcome->number,
+                    'status' => $outcome->status,
                     'items' => [],
                 ];
             }
@@ -166,7 +167,7 @@ class CuttingMasterController extends Controller
         $outcome = Outcome::find($id);
 
         $outcome->update([
-            'status' => 'completed'
+            'status' => 'accepted'
         ]);
 
         return response()->json($outcome);
