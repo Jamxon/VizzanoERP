@@ -7,9 +7,7 @@ use App\Models\Order;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
 use App\Models\Outcome;
-use App\Models\OutcomeItem;
 use App\Models\OutcomeItemModelDistrubition;
-use App\Models\ProductionOutcome;
 use Illuminate\Http\Request;
 
 class CuttingMasterController extends Controller
