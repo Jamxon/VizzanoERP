@@ -177,7 +177,7 @@ class CuttingMasterController extends Controller
             return response()->json(['error' => 'User token not found'], 401);
         }
 
-        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$request->input('id')}/";
+        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$request->input('id')}/status/";
 
         $response = Http::withToken($token)->patch($url, [
             'status' => 'accepted'
@@ -214,7 +214,7 @@ class CuttingMasterController extends Controller
             return response()->json(['error' => 'User token not found'], 401);
         }
 
-        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$id}/";
+        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$id}/status/";
 
         $response = Http::withToken($token)->patch($url, [
             'status' => 'cancelled'
