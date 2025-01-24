@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GetSpecificationResource;
 use App\Http\Resources\showOrderCuttingMasterResource;
 use App\Models\Order;
 use App\Models\OrderModel;
@@ -235,9 +236,12 @@ class CuttingMasterController extends Controller
     {
         $order = Order::find($id);
 
+
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
         }
+
+        $resource = new GetSpecificationResource($order);
 
         $orderModel = $order->orderModel;
 
@@ -251,6 +255,6 @@ class CuttingMasterController extends Controller
             ->with('specifications')
             ->get();
 
-        return response()->json($specifications);
+        return response()->json($resource);
     }
 }
