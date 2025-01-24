@@ -181,7 +181,7 @@ class CuttingMasterController extends Controller
             'status' => 'accepted'
         ]);
 
-        if ($response->status() === 200) {
+        if ($response->successful()) {
             return response()->json([
                 'message' => 'Outcome status updated successfully',
                 'outcome' => $outcome
