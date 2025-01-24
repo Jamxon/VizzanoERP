@@ -164,7 +164,7 @@ class CuttingMasterController extends Controller
 
     public function acceptCompletedItem(Request $request): \Illuminate\Http\JsonResponse
     {
-        $outcome = Outcome::find($request->input('id'));
+        $outcome = Outcome::find($request->id);
 
         if (!$outcome) {
             return response()->json(['error' => 'Outcome not found'], 404);
@@ -181,11 +181,7 @@ class CuttingMasterController extends Controller
             'status' => 'accepted'
         ]);
 
-        if ($response->successful()) {
-            $outcome->update([
-                'status' => 'accepted'
-            ]);
-
+        if ($response->status() === 200) {
             return response()->json([
                 'message' => 'Outcome status updated successfully',
                 'outcome' => $outcome
@@ -220,9 +216,6 @@ class CuttingMasterController extends Controller
         ]);
 
         if ($response->successful()) {
-            $outcome->update([
-                'status' => 'cancelled'
-            ]);
 
             return response()->json([
                 'message' => 'Outcome status updated to cancelled successfully',
