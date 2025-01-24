@@ -170,8 +170,6 @@ class CuttingMasterController extends Controller
             return response()->json(['error' => 'Outcome not found'], 404);
         }
 
-//        $token = Auth::user()->tokens->first();
-
         $token = $request->bearerToken();
         if (!$token) {
             return response()->json(['error' => 'User token not found'], 401);
@@ -200,21 +198,22 @@ class CuttingMasterController extends Controller
         ], $response->status());
     }
 
-    public function cancelCompletedItem($id): \Illuminate\Http\JsonResponse
+    public function cancelCompletedItem(Request $request): \Illuminate\Http\JsonResponse
     {
-        $outcome = Outcome::find($id);
+        $outcome = Outcome::find($request->id);
 
         if (!$outcome) {
             return response()->json(['error' => 'Outcome not found'], 404);
         }
 
-        $token = Auth::user()->token;
+
+        $token = $request->bearerToken();
 
         if (!$token) {
             return response()->json(['error' => 'User token not found'], 401);
         }
 
-        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$id}/status/";
+        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$request->input('id')}/status/";
 
         $response = Http::withToken($token)->patch($url, [
             'status' => 'cancelled'
