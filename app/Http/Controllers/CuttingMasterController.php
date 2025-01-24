@@ -229,39 +229,4 @@ class CuttingMasterController extends Controller
             ], 400);
         }
     }
-
-    public function cancelCompletedItem(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $outcome = Outcome::find($request->id);
-
-        if (!$outcome) {
-            return response()->json(['error' => 'Outcome not found'], 404);
-        }
-
-
-        $token = $request->bearerToken();
-
-        if (!$token) {
-            return response()->json(['error' => 'User token not found'], 401);
-        }
-
-        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$request->input('id')}/status/";
-
-        $response = Http::withToken($token)->patch($url, [
-            'status' => 'cancelled'
-        ]);
-
-        if ($response->successful()) {
-
-            return response()->json([
-                'message' => 'Outcome status updated to cancelled successfully',
-                'outcome' => $outcome
-            ]);
-        }
-
-        return response()->json([
-            'error' => 'Failed to update outcome status on external API',
-            'details' => $response->body()
-        ], $response->status());
-    }
 }
