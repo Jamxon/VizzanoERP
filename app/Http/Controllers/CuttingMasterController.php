@@ -8,6 +8,7 @@ use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
 use App\Models\Outcome;
 use App\Models\OutcomeItemModelDistrubition;
+use App\Models\SpecificationCategory;
 use App\Models\Stok;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -228,5 +229,23 @@ class CuttingMasterController extends Controller
                 'error' => $e->getMessage()
             ], 400);
         }
+    }
+
+    public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
+    {
+        $order = Order::find($id);
+        $orderModels = $order->orderModel;
+        $submodels = [];
+        foreach ($orderModels as $orderModel) {
+            $submodels[] = $orderModel->submodels;
+        }
+        $submodels = array_merge(...$submodels);
+        $submodelIds = array_map(function ($submodel) {
+            return $submodel->submodel_id;
+        }, $submodels);
+        $specifications = SpecificationCategory::whereIn('submodel_id', $submodelIds)
+            ->with('specifications')
+            ->get();
+        return response()->json($specifications);
     }
 }
