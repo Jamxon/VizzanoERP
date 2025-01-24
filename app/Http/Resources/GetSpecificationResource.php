@@ -9,6 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $orderModel
  * @property mixed $name
  * @property mixed $id
+ * @property mixed $quantity
  */
 class GetSpecificationResource extends JsonResource
 {
@@ -22,14 +23,15 @@ class GetSpecificationResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'quantity' => $this->quantity,
             'orderModel' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
                 'model' => $this->orderModel->model,
                 'submodels' => $this->orderModel->submodels ? $this->orderModel->submodels->map(function ($submodel) {
                     return [
                         'id' => $submodel->submodel->id,
-                        'name' => $submodel->name,
-                        'specificationCategories' => $submodel->specificationCategories ? $submodel->specificationCategories->map(function ($specificationCategory) {
+                        'name' => $submodel->submodel->name,
+                        'specificationCategories' => $submodel->submodel->specificationCategories ? $submodel->submodel->specificationCategories->map(function ($specificationCategory) {
                             return [
                                 'id' => $specificationCategory->id,
                                 'name' => $specificationCategory->name,
