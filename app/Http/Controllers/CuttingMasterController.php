@@ -8,7 +8,9 @@ use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
 use App\Models\Outcome;
 use App\Models\OutcomeItemModelDistrubition;
+use App\Models\Stok;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
 
@@ -162,38 +164,69 @@ class CuttingMasterController extends Controller
         return response()->json($resource);
     }
 
-    public function acceptCompletedItem(Request $request): \Illuminate\Http\JsonResponse
+    public function acceptCompletedItem(Request $request, $id): \Illuminate\Http\JsonResponse
     {
-        $outcome = Outcome::find($request->id);
+        DB::beginTransaction();
+        try {
+            $outcome = Outcome::findOrFail($id);
 
-        if (!$outcome) {
-            return response()->json(['error' => 'Outcome not found'], 404);
-        }
+            $newStatus = $request->status;
 
-        $token = $request->bearerToken();
-        if (!$token) {
-            return response()->json(['error' => 'User token not found'], 401);
-        }
+            if ($newStatus == "cancelled") {
+                foreach ($outcome->items as $item) {
+                    $stock = Stok::where('warehouse_id', $outcome->warehouse_id)
+                        ->where('product_id', $item->product_id)
+                        ->firstOrFail();
+                    $stock->quantity += $item->quantity;
+                    $stock->save();
+                }
+            }
 
-        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$request->input('id')}/status/";
+            if (in_array($newStatus, ["sent", "completed", "accepted"])) {
+                foreach ($outcome->items as $item) {
+                    $stock = Stok::where('warehouse_id', $outcome->warehouse_id)
+                        ->where('product_id', $item->product_id)
+                        ->first();
 
-        $response = Http::withToken($token)
-            ->timeout(3)
-            ->patch($url, [
-            'status' => 'accepted'
-        ]);
+                    if (!$stock) {
+                        return response()->json([
+                            'error' => "'{$item->product->name}' mahsuloti omborda mavjud emas"
+                        ], 400);
+                    }
 
-        if ($response->successful()) {
+                    if ($stock->quantity < $item->quantity) {
+                        return response()->json([
+                            'error' => "'{$item->product->name}' mahsuloti omborda yetarli emas. Mavjud: {$stock->quantity}, Kerak: {$item->quantity}"
+                        ], 400);
+                    }
+                }
+            }
+
+            $outcome->status = $newStatus;
+            $outcome->save();
+
+            if (in_array($newStatus, ["sent", "completed", "accepted"])) {
+                foreach ($outcome->items as $item) {
+                    $stock = Stok::where('warehouse_id', $outcome->warehouse_id)
+                        ->where('product_id', $item->product_id)
+                        ->firstOrFail();
+                    $stock->quantity -= $item->quantity;
+                    $stock->save();
+                }
+            }
+
+            DB::commit();
             return response()->json([
-                'message' => 'Outcome status updated successfully',
-                'outcome' => $outcome
-            ]);
-        }
+                'success' => true,
+                'data' => $outcome->load('outcomeItems')
+            ], 200);
 
-        return response()->json([
-            'error' => 'Failed to update outcome status on external API',
-            'details' => $response->body()
-        ], $response->status());
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function cancelCompletedItem(Request $request): \Illuminate\Http\JsonResponse
