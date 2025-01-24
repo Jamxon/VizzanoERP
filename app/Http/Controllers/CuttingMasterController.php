@@ -9,6 +9,8 @@ use App\Models\OrderPrintingTimes;
 use App\Models\Outcome;
 use App\Models\OutcomeItemModelDistrubition;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Auth;
 
 class CuttingMasterController extends Controller
 {
@@ -160,26 +162,78 @@ class CuttingMasterController extends Controller
         return response()->json($resource);
     }
 
-
     public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
     {
+        // Outcome modeldan ma'lumotni olib kelamiz
         $outcome = Outcome::find($id);
 
-        $outcome->update([
+        if (!$outcome) {
+            return response()->json(['error' => 'Outcome not found'], 404);
+        }
+
+        $token = Auth::user()->token;
+
+        if (!$token) {
+            return response()->json(['error' => 'User token not found'], 401);
+        }
+
+        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$id}/";
+
+        $response = Http::withToken($token)->patch($url, [
             'status' => 'accepted'
         ]);
 
-        return response()->json($outcome);
+        if ($response->successful()) {
+            $outcome->update([
+                'status' => 'accepted'
+            ]);
+
+            return response()->json([
+                'message' => 'Outcome status updated successfully',
+                'outcome' => $outcome
+            ]);
+        }
+
+        return response()->json([
+            'error' => 'Failed to update outcome status on external API',
+            'details' => $response->body()
+        ], $response->status());
     }
 
     public function cancelCompletedItem($id): \Illuminate\Http\JsonResponse
     {
         $outcome = Outcome::find($id);
 
-        $outcome->update([
+        if (!$outcome) {
+            return response()->json(['error' => 'Outcome not found'], 404);
+        }
+
+        $token = Auth::user()->token;
+
+        if (!$token) {
+            return response()->json(['error' => 'User token not found'], 401);
+        }
+
+        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$id}/";
+
+        $response = Http::withToken($token)->patch($url, [
             'status' => 'cancelled'
         ]);
 
-        return response()->json($outcome);
+        if ($response->successful()) {
+            $outcome->update([
+                'status' => 'cancelled'
+            ]);
+
+            return response()->json([
+                'message' => 'Outcome status updated to cancelled successfully',
+                'outcome' => $outcome
+            ]);
+        }
+
+        return response()->json([
+            'error' => 'Failed to update outcome status on external API',
+            'details' => $response->body()
+        ], $response->status());
     }
 }
