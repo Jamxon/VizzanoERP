@@ -162,21 +162,22 @@ class CuttingMasterController extends Controller
         return response()->json($resource);
     }
 
-    public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
+    public function acceptCompletedItem(Request $request): \Illuminate\Http\JsonResponse
     {
-        $outcome = Outcome::find($id);
+        $outcome = Outcome::find($request->input('id'));
 
         if (!$outcome) {
             return response()->json(['error' => 'Outcome not found'], 404);
         }
 
-        $token = Auth::user()->tokens->first();
+//        $token = Auth::user()->tokens->first();
 
+        $token = $request->bearerToken();
         if (!$token) {
             return response()->json(['error' => 'User token not found'], 401);
         }
 
-        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$id}/";
+        $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$request->input('id')}/";
 
         $response = Http::withToken($token)->patch($url, [
             'status' => 'accepted'
