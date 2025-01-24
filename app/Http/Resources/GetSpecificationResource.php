@@ -25,15 +25,15 @@ class GetSpecificationResource extends JsonResource
             'orderModel' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
                 'model' => $this->orderModel->model,
-                'submodels' => $this->orderModel->submodels->map(function ($submodel) {
+                'submodels' => $this->orderModel->submodels ? $this->orderModel->submodels->map(function ($submodel) {
                     return [
                         'id' => $submodel->id,
                         'name' => $submodel->name,
-                        'specificationCategories' => $submodel->specificationCategories->map(function ($specificationCategory) {
+                        'specificationCategories' => $submodel->specificationCategories ? $submodel->specificationCategories->map(function ($specificationCategory) {
                             return [
                                 'id' => $specificationCategory->id,
                                 'name' => $specificationCategory->name,
-                                'specifications' => $specificationCategory->specifications->map(function ($specification) {
+                                'specifications' => $specificationCategory->specifications ? $specificationCategory->specifications->map(function ($specification) {
                                     return [
                                         'id' => $specification->id,
                                         'name' => $specification->name,
@@ -41,12 +41,12 @@ class GetSpecificationResource extends JsonResource
                                         'quantity' => $specification->quantity,
                                         'comment' => $specification->comment,
                                     ];
-                                }),
+                                }) : [], // Bo'sh array qaytariladi, agar `specifications` null bo'lsa
                             ];
-                        }),
+                        }) : [], // Bo'sh array qaytariladi, agar `specificationCategories` null bo'lsa
                     ];
-                }),
-            ] : null,
+                }) : [], // Bo'sh array qaytariladi, agar `submodels` null bo'lsa
+            ] : null, // Agar `orderModel` null bo'lsa, null qaytariladi
         ];
     }
 }
