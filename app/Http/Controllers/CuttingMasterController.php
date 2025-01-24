@@ -170,7 +170,7 @@ class CuttingMasterController extends Controller
             return response()->json(['error' => 'Outcome not found'], 404);
         }
 
-        $token = \auth()->user()->token;
+        $token = Auth::user()->tokens->first();
 
         if (!$token) {
             return response()->json(['error' => 'User token not found'], 401);
