@@ -234,15 +234,17 @@ class CuttingMasterController extends Controller
     public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::find($id);
+
         $orderModels = $order->orderModel;
+
         $submodels = [];
 
         $submodels[] = $orderModels->submodels;
 
-        $submodels = array_merge(...$submodels);
         $submodelIds = array_map(function ($submodel) {
             return $submodel->submodel_id;
         }, $submodels);
+
         $specifications = SpecificationCategory::whereIn('submodel_id', $submodelIds)
             ->with('specifications')
             ->get();
