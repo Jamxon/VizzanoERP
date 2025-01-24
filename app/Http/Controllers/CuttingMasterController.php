@@ -164,14 +164,13 @@ class CuttingMasterController extends Controller
 
     public function acceptCompletedItem($id): \Illuminate\Http\JsonResponse
     {
-        // Outcome modeldan ma'lumotni olib kelamiz
         $outcome = Outcome::find($id);
 
         if (!$outcome) {
             return response()->json(['error' => 'Outcome not found'], 404);
         }
 
-        $token = Auth::user()->token;
+        $token = \auth()->user()->token;
 
         if (!$token) {
             return response()->json(['error' => 'User token not found'], 401);
