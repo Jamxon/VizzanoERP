@@ -236,9 +236,9 @@ class CuttingMasterController extends Controller
         $order = Order::find($id);
         $orderModels = $order->orderModel;
         $submodels = [];
-        foreach ($orderModels as $orderModel) {
-            $submodels[] = $orderModel->submodels;
-        }
+
+        $submodels[] = $orderModels->submodels;
+
         $submodels = array_merge(...$submodels);
         $submodelIds = array_map(function ($submodel) {
             return $submodel->submodel_id;
