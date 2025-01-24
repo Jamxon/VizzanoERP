@@ -27,7 +27,7 @@ class GetSpecificationResource extends JsonResource
                 'model' => $this->orderModel->model,
                 'submodels' => $this->orderModel->submodels ? $this->orderModel->submodels->map(function ($submodel) {
                     return [
-                        'id' => $submodel->id,
+                        'id' => $submodel->submodel->id,
                         'name' => $submodel->name,
                         'specificationCategories' => $submodel->specificationCategories ? $submodel->specificationCategories->map(function ($specificationCategory) {
                             return [
