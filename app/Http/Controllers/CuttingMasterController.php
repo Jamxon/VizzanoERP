@@ -219,7 +219,7 @@ class CuttingMasterController extends Controller
             DB::commit();
             return response()->json([
                 'success' => true,
-                'data' => $outcome->load('outcomeItems')
+                'data' => $outcome->load('items')
             ], 200);
 
         } catch (\Exception $e) {
