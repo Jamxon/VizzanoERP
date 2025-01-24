@@ -164,8 +164,9 @@ class CuttingMasterController extends Controller
         return response()->json($resource);
     }
 
-    public function acceptCompletedItem(Request $request, $id): \Illuminate\Http\JsonResponse
+    public function acceptCompletedItem(Request $request): \Illuminate\Http\JsonResponse
     {
+        $id = $request->id;
         DB::beginTransaction();
         try {
             $outcome = Outcome::findOrFail($id);
