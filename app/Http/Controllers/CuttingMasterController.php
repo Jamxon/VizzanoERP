@@ -177,7 +177,9 @@ class CuttingMasterController extends Controller
 
         $url = "https://omborapi.vizzano-apparel.uz:2021/api/outcomes/{$request->input('id')}/status/";
 
-        $response = Http::withToken($token)->patch($url, [
+        $response = Http::withToken($token)
+            ->timeout(3)
+            ->patch($url, [
             'status' => 'accepted'
         ]);
 
