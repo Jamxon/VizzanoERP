@@ -239,7 +239,7 @@ class CuttingMasterController extends Controller
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-        $orderModel = $order->orderModel;
+return        $orderModel = $order->orderModel;
 
         if (!$orderModel) {
             return response()->json(['error' => 'Order model not found'], 404);
