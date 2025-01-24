@@ -29,6 +29,8 @@ class Stok extends Model
         'product_id'
     ];
 
+    public $timestamps = false;
+
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class,'warehouse_id');
