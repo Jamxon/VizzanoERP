@@ -17,7 +17,7 @@ class GetSpecificationResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'orderModel' => $this->orderModel->each(function ($orderModel) {
+            'orderModel' => $this->orderModel->map(function ($orderModel) {
                 return [
                     'id' => $orderModel->id,
                     'model' => $orderModel->model,
