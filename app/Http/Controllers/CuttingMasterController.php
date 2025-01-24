@@ -239,13 +239,13 @@ class CuttingMasterController extends Controller
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-return        $orderModel = $order->orderModel;
+        $orderModel = $order->orderModel;
 
         if (!$orderModel) {
             return response()->json(['error' => 'Order model not found'], 404);
         }
 
-        $submodelIds = $orderModel->submodels->pluck('submodel_id')->toArray();
+        return $submodelIds = $orderModel->submodels->pluck('submodel_id')->toArray();
 
         $specifications = SpecificationCategory::whereIn('submodel_id', $submodelIds)
             ->with('specifications')
