@@ -191,13 +191,13 @@ class CuttingMasterController extends Controller
 
                     if (!$stock) {
                         return response()->json([
-                            'error' => "'{$item->product->name}' mahsuloti omborda mavjud emas"
+                            'error' => "{$item->product->name} mahsuloti omborda mavjud emas"
                         ], 400);
                     }
 
                     if ($stock->quantity < $item->quantity) {
                         return response()->json([
-                            'error' => "'{$item->product->name}' mahsuloti omborda yetarli emas. Mavjud: {$stock->quantity}, Kerak: {$item->quantity}"
+                            'error' => "{$item->product->name} mahsuloti omborda yetarli emas. Mavjud: {$stock->quantity}, Kerak: {$item->quantity}"
                         ], 400);
                     }
                 }
