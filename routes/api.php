@@ -139,8 +139,7 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::post('sendToConstructor', [CuttingMasterController::class, 'sendToConstructor']);
     Route::get('orders/{order}', [CuttingMasterController::class, 'showOrder']);
     Route::get('completedItems', [CuttingMasterController::class, 'getCompletedItems']);
-    Route::post('acceptCompletedItem', [CuttingMasterController::class, 'acceptCompletedItem']);
-    Route::post('cancelCompletedItem', [CuttingMasterController::class, 'cancelCompletedItem']);
+    Route::post('completedItem', [CuttingMasterController::class, 'acceptCompletedItem']);
 });
 
     Route::get('lids', [LidController::class, 'index']);
