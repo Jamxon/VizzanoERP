@@ -21,32 +21,32 @@ class GetSpecificationResource extends JsonResource
                 return [
                     'id' => $orderModel->id,
                     'model' => $orderModel->model,
-                    'submodels' => $orderModel->submodels->each(function ($submodel) {
-                        return [
-                            'id' => $submodel->id,
-                            'submodel' => $submodel->submodel->each(function ($submodel) {
-                                return [
-                                    'id' => $submodel->id,
-                                    'name' => $submodel->name,
-                                    'specificationCategories' => $submodel->specificationCategories->each(function ($specificationCategory) {
-                                        return [
-                                            'id' => $specificationCategory->id,
-                                            'name' => $specificationCategory->name,
-                                            'specifications' => $specificationCategory->specifications->each(function ($specification) {
-                                                return [
-                                                    'id' => $specification->id,
-                                                    'name' => $specification->name,
-                                                    'code' => $specification->code,
-                                                    'quantity' => $specification->quantity,
-                                                    'comment' => $specification->comment,
-                                                ];
-                                            }),
-                                        ];
-                                    }),
-                                ];
-                            }),
-                        ];
-                    })
+//                    'submodels' => $orderModel->submodels->each(function ($submodel) {
+//                        return [
+//                            'id' => $submodel->id,
+//                            'submodel' => $submodel->submodel->each(function ($submodel) {
+//                                return [
+//                                    'id' => $submodel->id,
+//                                    'name' => $submodel->name,
+//                                    'specificationCategories' => $submodel->specificationCategories->each(function ($specificationCategory) {
+//                                        return [
+//                                            'id' => $specificationCategory->id,
+//                                            'name' => $specificationCategory->name,
+//                                            'specifications' => $specificationCategory->specifications->each(function ($specification) {
+//                                                return [
+//                                                    'id' => $specification->id,
+//                                                    'name' => $specification->name,
+//                                                    'code' => $specification->code,
+//                                                    'quantity' => $specification->quantity,
+//                                                    'comment' => $specification->comment,
+//                                                ];
+//                                            }),
+//                                        ];
+//                                    }),
+//                                ];
+//                            }),
+//                        ];
+//                    })
                 ];
             }),
         ];
