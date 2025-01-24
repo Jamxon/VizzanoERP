@@ -231,7 +231,7 @@ class CuttingMasterController extends Controller
         }
     }
 
-    public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
+    public function getSpecificationByOrderId($id)
     {
         $order = Order::find($id);
 
