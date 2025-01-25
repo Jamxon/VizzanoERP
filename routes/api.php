@@ -141,6 +141,7 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::get('completedItems', [CuttingMasterController::class, 'getCompletedItems']);
     Route::post('completedItem', [CuttingMasterController::class, 'acceptCompletedItem']);
     Route::get('specifications/{id}', [CuttingMasterController::class, 'getSpecificationByOrderId']);
+    Route::post('markAsCut', [CuttingMasterController::class, 'markAsCut']);
 });
 
     Route::get('lids', [LidController::class, 'index']);

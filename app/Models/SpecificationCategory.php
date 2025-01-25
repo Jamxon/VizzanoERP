@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static whereIn(string $string, array $submodelIds)
+ * @method static find($categoryId)
  */
 class SpecificationCategory extends Model
 {
