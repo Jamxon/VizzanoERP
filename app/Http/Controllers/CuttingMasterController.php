@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GetOrderCutResource;
 use App\Http\Resources\GetSpecificationResource;
 use App\Http\Resources\showOrderCuttingMasterResource;
 use App\Models\Order;
@@ -265,11 +266,14 @@ class CuttingMasterController extends Controller
         ]);
     }
 
-    public function getCuts(Request $request): \Illuminate\Http\JsonResponse
+    public function getCuts($id): \Illuminate\Http\JsonResponse
     {
-        $cuts = OrderCut::with('order', 'category', 'user')
+        $cuts = OrderCut::where('order_id', $id)
             ->get();
 
-        return response()->json($cuts);
+        $resource = GetOrderCutResource::collection($cuts);
+
+
+        return response()->json($resource);
     }
 }
