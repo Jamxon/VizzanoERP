@@ -292,9 +292,9 @@ class CuttingMasterController extends Controller
                             'name' => $cut->category->name,
                         ],
                     ];
-                }),
+                })->values()->all(),
             ];
-        });
+        })->values()->all();
 
         return response()->json($resource);
     }
