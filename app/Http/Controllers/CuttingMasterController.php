@@ -270,7 +270,7 @@ class CuttingMasterController extends Controller
     {
         $cuts = OrderCut::where('order_id', $id)
             ->groupBy(function ($cut) {
-                return $cut->specificationCategory->subModel->id;
+                return $cut->category->submodel->id;
             })
             ->get();
 
