@@ -288,8 +288,8 @@ class CuttingMasterController extends Controller
                         'cut_at' => $cut->cut_at,
                         'quantity' => $cut->quantity,
                         'category' => [
-                            'id' => $cut->specificationCategory->id,
-                            'name' => $cut->specificationCategory->name,
+                            'id' => $cut->category->id,
+                            'name' => $cut->category->name,
                         ],
                     ];
                 }),
