@@ -267,8 +267,7 @@ class CuttingMasterController extends Controller
 
     public function getCuts(Request $request): \Illuminate\Http\JsonResponse
     {
-        $cuts = OrderCut::where('user_id', auth()->id())
-            ->with('order', 'specificationCategory')
+        $cuts = OrderCut::with('order', 'category', 'user')
             ->get();
 
         return response()->json($cuts);
