@@ -5,16 +5,15 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetSpecificationResource;
 use App\Http\Resources\showOrderCuttingMasterResource;
 use App\Models\Order;
+use App\Models\OrderCut;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
 use App\Models\Outcome;
 use App\Models\OutcomeItemModelDistrubition;
-use App\Models\SpecificationCategory;
 use App\Models\Stok;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class CuttingMasterController extends Controller
 {
@@ -232,7 +231,7 @@ class CuttingMasterController extends Controller
         }
     }
 
-    public function getSpecificationByOrderId($id)
+    public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::find($id);
 
@@ -245,4 +244,24 @@ class CuttingMasterController extends Controller
         return response()->json($resource);
     }
 
+    public function markAsCut(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $orderId = $request->order_id;
+        $categoryId = $request->category_id;
+        $quantity = $request->quantity;
+        $user = auth()->user();
+
+        $cut = OrderCut::create([
+            'order_id' => $orderId,
+            'specification_category_id' => $categoryId,
+            'user_id' => $user->id,
+            'cut_at' => Carbon::now(),
+            'quantity' => $quantity,
+        ]);
+
+        return response()->json([
+            'message' => 'Order cut marked successfully!',
+            'cut' => $cut,
+        ]);
+    }
 }
