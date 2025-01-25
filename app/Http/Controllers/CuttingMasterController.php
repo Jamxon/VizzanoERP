@@ -269,12 +269,20 @@ class CuttingMasterController extends Controller
     public function getCuts($id): \Illuminate\Http\JsonResponse
     {
         $cuts = OrderCut::where('order_id', $id)
-            ->groupBy(function ($cut) {
-                return $cut->category->submodel->id;
-            })
             ->get();
 
-        $resource = GetOrderCutResource::collection($cuts);
+        $groupedCuts = $cuts->groupBy(function ($cut) {
+            return $cut->specificationCategory->subModel->id ?? null;
+        });
+
+        $resource = $groupedCuts->map(function ($group) {
+            return [
+                'submodel' => $group->first()->category->submodel,
+                'cuts' => $group,
+            ];
+        });
+
+//        $resource = GetOrderCutResource::collection($cuts);
 
 
         return response()->json($resource);
