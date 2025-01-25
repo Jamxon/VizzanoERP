@@ -11,7 +11,7 @@ class SubModel extends Model
 
     protected $table = "sub_models";
 
-    protected $fillable = ['name','model_id'];
+    protected $fillable = ['id','name','model_id'];
 
     protected $hidden = ['created_at', 'updated_at', 'model_id'];
 

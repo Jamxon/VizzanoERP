@@ -14,6 +14,7 @@ class OrderCut extends Model
     use HasFactory;
 
     protected $fillable = [
+        'id',
         'order_id',
         'specification_category_id',
         'user_id',
