@@ -264,4 +264,13 @@ class CuttingMasterController extends Controller
             'cut' => $cut,
         ]);
     }
+
+    public function getCuts(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $cuts = OrderCut::where('user_id', auth()->id())
+            ->with('order', 'specificationCategory')
+            ->get();
+
+        return response()->json($cuts);
+    }
 }
