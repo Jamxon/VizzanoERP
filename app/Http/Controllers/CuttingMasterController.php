@@ -275,15 +275,26 @@ class CuttingMasterController extends Controller
             return $cut->category->submodel->id ?? null;
         });
 
-        $resource = $groupedCuts->map(function ($group) {
+        $resource = $groupedCuts->map(function ($group, $submodelId) {
+            $submodel = $group->first()->category->submodel;
             return [
-                'submodel' => $group->first()->category->submodel,
-                'cuts' => $group,
+                'submodel' => [
+                    'id' => $submodel->id ?? null,
+                    'name' => $submodel->name ?? null,
+                ],
+                'cuts' => $group->map(function ($cut) {
+                    return [
+                        'id' => $cut->id,
+                        'cut_at' => $cut->cut_at,
+                        'quantity' => $cut->quantity,
+                        'category' => [
+                            'id' => $cut->specificationCategory->id,
+                            'name' => $cut->specificationCategory->name,
+                        ],
+                    ];
+                }),
             ];
         });
-
-//        $resource = GetOrderCutResource::collection($cuts);
-
 
         return response()->json($resource);
     }
