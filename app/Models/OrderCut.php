@@ -21,6 +21,14 @@ class OrderCut extends Model
         'quantity',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'order_id',
+        'specification_category_id',
+        'user_id',
+    ];
+
     public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Order::class);
