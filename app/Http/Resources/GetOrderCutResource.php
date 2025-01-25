@@ -21,7 +21,7 @@ class GetOrderCutResource extends JsonResource
     {
         return [
             'submodel' => $this->category->submodel,
-            'category' => $this->category,
+            'category' => $this->category->makeHidden('submodel'),
             'quantity' => $this->quantity,
             'cut_at' => $this->cut_at,
         ];
