@@ -16,6 +16,7 @@ class SpecificationCategory extends Model
     protected $table = 'specification_categories';
 
     protected $fillable = [
+        'id',
         'name',
         'submodel_id',
     ];
