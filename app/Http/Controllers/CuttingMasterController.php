@@ -260,7 +260,7 @@ class CuttingMasterController extends Controller
             'quantity' => $quantity,
         ]);
 
-        return response()->json($cut->id);
+        return response()->json(["message" => "Cut marked successfully"]);
     }
 
     public function getCuts($id): \Illuminate\Http\JsonResponse
