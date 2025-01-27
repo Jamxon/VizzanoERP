@@ -252,7 +252,7 @@ class CuttingMasterController extends Controller
         $quantity = $request->quantity;
         $user = auth()->user();
 
-        $cut = OrderCut::create([
+        OrderCut::create([
             'order_id' => $orderId,
             'specification_category_id' => $categoryId,
             'user_id' => $user->id,
