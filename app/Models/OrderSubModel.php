@@ -41,8 +41,13 @@ class OrderSubModel extends Model
         return $this->hasOne(OrderGroup::class, 'submodel_id');
     }
 
-    public function orderRecipes()
+    public function orderRecipes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderRecipes::class, 'submodel_id');
+    }
+
+    public function tarificationCategories(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TarificationCategory::class, 'submodel_id');
     }
 }

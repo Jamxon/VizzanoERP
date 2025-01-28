@@ -28,11 +28,6 @@ class SubModel extends Model
         return $this->hasMany(SpecificationCategory::class, 'submodel_id');
     }
 
-    public function tarification_categories(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(TarificationCategory::class, 'submodel_id');
-    }
-
     public function submodelSpend(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SubmodelSpend::class, 'submodel_id');
