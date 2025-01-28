@@ -25,11 +25,9 @@ class TarificationCategory extends Model
         'submodel_id',
     ];
 
-    protected $with = ['tarifications'];
-
     public function submodel()
     {
-        return $this->belongsTo(SubModel::class);
+        return $this->belongsTo(OrderSubModel::class, 'submodel_id');
     }
 
     public function tarifications()
