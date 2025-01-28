@@ -433,7 +433,6 @@ class TechnologController extends Controller
             ->get();
 
         return response()->json($employees, 200);
-//            : response()->json(['message' => 'Employers not found'], 200);
     }
 
     public function getTypeWriter(): \Illuminate\Http\JsonResponse
