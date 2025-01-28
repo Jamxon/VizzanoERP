@@ -501,6 +501,7 @@ class TechnologController extends Controller
         $user = auth()->user();
 
         $orders = Order::where('branch_id', $user->employee->branch_id)
+            ->with('orderModel')
             ->get();
 
         return response()->json($orders, 200);
