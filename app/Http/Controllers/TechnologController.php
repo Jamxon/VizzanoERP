@@ -187,18 +187,17 @@ class TechnologController extends Controller
             ], 400);
         }
 
-        // Validatsiya
         $validator = validator($data, [
             'data.*.name' => 'required|string|max:255',
-            'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
+            'data.*.submodel_id' => 'required|integer|exists:order_sub_models,id',
             'data.*.tarifications' => 'required|array',
+            'data.*.tarifications.*.user_id' => 'nullable|integer|exists:employees,id',
             'data.*.tarifications.*.name' => 'required|string|max:255',
             'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
             'data.*.tarifications.*.second' => 'required|numeric|min:0',
         ]);
 
-        // Validatsiya xatolarini tekshirish
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation errors',
@@ -206,19 +205,13 @@ class TechnologController extends Controller
             ], 422);
         }
 
-        // Validatsiya qilingan ma'lumotlar
         $validatedData = $validator->validated();
 
-        // Ma'lumotlarni saqlash
         foreach ($validatedData['data'] as $datum) {
-            // Jami vaqt va summa hisoblash
             $totalSecond = 0;
             $totalSumma = 0;
 
-            // Submodel tarification logini bir vaqtning o'zida yaratish
             $submodelId = $datum['submodel_id'];
-
-            // TarificationCategory yaratish
 
             $tarificationCategory = TarificationCategory::create([
                 'name' => $datum['name'],
@@ -226,7 +219,6 @@ class TechnologController extends Controller
             ]);
 
             foreach ($datum['tarifications'] as $tarification) {
-                // Razryad modelini bir martada olish
                 $razryad = Razryad::find($tarification['razryad_id']);
 
                 if (!$razryad) {
@@ -235,26 +227,23 @@ class TechnologController extends Controller
                     ], 404);
                 }
 
-                // Summa hisoblash
                 $summa = $tarification['second'] * $razryad->salary;
 
-                // Tarificationni yaratish
                 Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
                     'name' => $tarification['name'],
+                    'user_id' => $tarification['user_id'],
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
                     'second' => $tarification['second'],
                     'summa' => $summa,
-                    'code' => $this->generateSequentialCode(), // Tartiblangan kod generatsiyasi
+                    'code' => $this->generateSequentialCode(),
                 ]);
 
-                // Tarificationni umumiy qiymatga qo'shish
                 $totalSecond += $tarification['second'];
                 $totalSumma += $summa;
             }
 
-            // Submodel spend logini yaratish
             SubmodelSpend::create([
                 'submodel_id' => $submodelId,
                 'seconds' => $totalSecond,
@@ -276,7 +265,6 @@ class TechnologController extends Controller
 
         $data = $request->all();
 
-        // TarificationCategory ni topish
         $tarificationCategory = TarificationCategory::find($id);
 
         if (!$tarificationCategory) {
@@ -285,23 +273,18 @@ class TechnologController extends Controller
             ], 404);
         }
 
-        // TarificationCategory yangilash
         $tarificationCategory->update([
             'name' => $data['name'],
             'submodel_id' => $data['submodel_id'],
         ]);
 
-        // Tarificationlarni o'chirish va qayta yozish
         $totalSecond = 0;
         $totalSumma = 0;
 
-        // Eski tarificationlarni o'chirish
         Tarification::where('tarification_category_id', $tarificationCategory->id)->delete();
 
-        // Tarificationlar mavjud bo'lsa, ularni qayta ishlash
         if (!empty($data['tarifications'])) {
             foreach ($data['tarifications'] as $tarification) {
-                // Har bir tarification uchun validatsiya va summa hisoblash
                 if (!empty($tarification['name']) && !empty($tarification['razryad_id']) && !empty($tarification['typewriter_id']) && !empty($tarification['second'])) {
                     $razryad = Razryad::find($tarification['razryad_id']);
 
@@ -311,13 +294,12 @@ class TechnologController extends Controller
                         ], 404);
                     }
 
-                    // Summa hisoblash
                     $summa = $tarification['second'] * $razryad->salary;
 
-                    // Tarificationni yangilash yoki yaratish
                     Tarification::create([
                         'tarification_category_id' => $tarificationCategory->id,
                         'name' => $tarification['name'],
+                        'user_id' => $tarification['user_id'],
                         'razryad_id' => $tarification['razryad_id'],
                         'typewriter_id' => $tarification['typewriter_id'],
                         'second' => $tarification['second'],
@@ -325,14 +307,12 @@ class TechnologController extends Controller
                         'code' => $this->generateSequentialCode(),
                     ]);
 
-                    // Jami vaqt va summa hisoblash
                     $totalSecond += $tarification['second'];
                     $totalSumma += $summa;
                 }
             }
         }
 
-        // SubmodelSpend ni yangilash yoki yaratish
         SubmodelSpend::updateOrCreate(
             ['submodel_id' => $tarificationCategory->submodel_id],
             ['seconds' => $totalSecond, 'summa' => $totalSumma]
@@ -343,9 +323,6 @@ class TechnologController extends Controller
         ], 200);
     }
 
-    /**
-     * Kodni generatsiya qiluvchi funksiya
-     */
     private function generateSequentialCode(): string
     {
         // Oxirgi tarification yozuvini olamiz
