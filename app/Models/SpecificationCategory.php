@@ -31,7 +31,7 @@ class SpecificationCategory extends Model
 
     public function submodel()
     {
-        return $this->belongsTo(SubModel::class, 'submodel_id');
+        return $this->belongsTo(OrderSubModel::class, 'submodel_id');
     }
 
     public function specifications()
