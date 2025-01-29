@@ -114,7 +114,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
 
     Route::post('tarification', [TechnologController::class, 'storeTarification']);
     Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
-    Route::get('tarification/users', [TechnologController::class, 'getEmployerByDepartment']);
+    Route::get('users', [TechnologController::class, 'getEmployerByDepartment']);
     Route::get('tarification/orders', [TechnologController::class, 'getOrders']);
     Route::get('tarification/orders/{order}', [OrderController::class, 'show']);
     Route::get('tarification/show/{id}', [TechnologController::class, 'showTarification']);
