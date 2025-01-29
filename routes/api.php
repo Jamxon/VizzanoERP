@@ -118,7 +118,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::get('tarification/orders', [TechnologController::class, 'getOrders']);
     Route::get('tarification/orders/{order}', [OrderController::class, 'show']);
     Route::get('tarification/show/{id}', [TechnologController::class, 'showTarification']);
-    Route::get('tarification/{modelId}', [TechnologController::class, 'getTarificationByOrderModelId']);
+    Route::get('tarification/{orderModelId}', [TechnologController::class, 'getTarificationByOrderModelId']);
     Route::get('tarification/category/{submodelId}', [TechnologController::class, 'getTarificationBySubmodelId']);
     Route::get('typewriter', [TechnologController::class, 'getTypeWriter']);
     Route::get('razryads', [RazryadController::class, 'index']);

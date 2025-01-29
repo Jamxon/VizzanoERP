@@ -5,6 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static create(array $array)
+ * @method static latest(string $string)
+ * @method static where(string $string, $id)
+ * @method static find($id)
+ * @method static whereIn(string $string, \Illuminate\Support\Collection $userIds)
+ */
 class Tarification extends Model
 {
     use HasFactory;

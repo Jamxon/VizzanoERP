@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static where(string $string, $submodelId)
+ * @method static create(array $array)
+ * @method static find($id)
  */
 class TarificationCategory extends Model
 {

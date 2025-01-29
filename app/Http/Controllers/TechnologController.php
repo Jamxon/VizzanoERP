@@ -9,12 +9,12 @@ use App\Models\OrderSubModel;
 use App\Models\PartSpecification;
 use App\Models\Razryad;
 use App\Models\SpecificationCategory;
-use App\Models\SubModel;
 use App\Models\SubmodelSpend;
 use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use App\Models\TypeWriter;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class TechnologController extends Controller
 {
@@ -177,6 +177,9 @@ class TechnologController extends Controller
         }
     }
 
+    /**
+     * @throws ValidationException
+     */
     public function storeTarification(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -325,38 +328,29 @@ class TechnologController extends Controller
 
     private function generateSequentialCode(): string
     {
-        // Oxirgi tarification yozuvini olamiz
         $lastTarification = Tarification::latest('id')->first();
 
         if (!$lastTarification) {
-            // Agar hech narsa bo‘lmasa, boshlang‘ich qiymat qaytadi
             return 'A1';
         }
 
-        // Oxirgi yozuvning kodini olamiz
         $lastCode = $lastTarification->code;
 
-        // Harf va raqamlarni ajratamiz
         preg_match('/([A-Z]+)(\d+)/', $lastCode, $matches);
 
-        $letter = $matches[1] ?? 'A'; // Harf
-        $number = (int)($matches[2] ?? 0); // Raqam
+        $letter = $matches[1] ?? 'A';
+        $number = (int)($matches[2] ?? 0);
 
-        // Raqamni oshiramiz
         $number++;
 
-        // Agar raqam 99 dan oshsa, yangi harfga o‘tamiz
         if ($number > 99) {
-            $number = 1; // Qayta 1-dan boshlaymiz
-            $letter = $this->incrementLetter($letter); // Harfni oshiramiz
+            $number = 1;
+            $letter = $this->incrementLetter($letter);
         }
 
         return $letter . $number;
     }
 
-    /**
-     * Harfni oshiruvchi funksiya
-     */
     private function incrementLetter(string $letter): string
     {
         $length = strlen($letter);
@@ -364,16 +358,13 @@ class TechnologController extends Controller
 
         for ($i = $length - 1; $i >= 0; $i--) {
             if ($letter[$i] !== 'Z') {
-                // Harfni oshiramiz
                 $letter[$i] = chr(ord($letter[$i]) + 1);
                 $incremented = true;
                 break;
             }
-            // Z ni A ga o'zgartiramiz
             $letter[$i] = 'A';
         }
 
-        // Agar barcha harflar Z bo'lsa, yangi harf qo'shamiz
         if (!$incremented) {
             $letter = 'A' . $letter;
         }
@@ -494,6 +485,9 @@ class TechnologController extends Controller
         }
     }
 
+    /**
+     * @throws ValidationException
+     */
     public function fasteningToEmployee(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);

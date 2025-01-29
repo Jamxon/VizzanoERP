@@ -28,7 +28,7 @@ class OrderGroup extends Model
         'group_id',
     ];
 
-    public function order()
+    public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
@@ -38,7 +38,7 @@ class OrderGroup extends Model
         return $this->belongsTo(OrderSubModel::class, 'submodel_id');
     }
 
-    public function group()
+    public function group(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Group::class);
     }
