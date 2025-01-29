@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static whereIn(string $string, array $submodelIds)
  * @method static find($categoryId)
+ * @method static create(array $array)
+ * @method static where(string $string, $submodelId)
  */
 class SpecificationCategory extends Model
 {
