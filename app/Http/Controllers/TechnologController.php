@@ -374,7 +374,8 @@ class TechnologController extends Controller
 
     public function getTarificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
     {
-        $tarificationCategories = TarificationCategory::where('submodel_id', $submodelId)->with('tarifications')
+        $tarificationCategories = TarificationCategory::where('submodel_id', $submodelId)
+            ->with('tarifications')
             ->get()
             ->makeHidden(['created_at', 'updated_at', 'submodel_id']);
         return response()->json($tarificationCategories, 200);

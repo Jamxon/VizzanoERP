@@ -50,4 +50,9 @@ class OrderSubModel extends Model
     {
         return $this->hasMany(TarificationCategory::class, 'submodel_id');
     }
+
+    public function specificationCategories(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SpecificationCategory::class, 'submodel_id');
+    }
 }
