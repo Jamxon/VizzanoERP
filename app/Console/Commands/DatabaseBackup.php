@@ -35,8 +35,8 @@ class DatabaseBackup extends Command
 
         $this->info("Database backup yaratildi: $fileName");
 
-        $botToken = env('TELEGRAM_BOT_TOKEN');
-        $chatId = env('TELEGRAM_CHAT_ID');
+        $botToken = "7905618693:AAFsNBRPGOA5TFVWr8gORlyH_rtXzCYhLS8";
+        $chatId = "-1002476073696";
 
         $response = Http::attach('document', fopen($filePath, 'r'), $fileName)
             ->post("https://api.telegram.org/bot{$botToken}/sendDocument", [
