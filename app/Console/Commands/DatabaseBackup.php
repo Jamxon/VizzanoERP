@@ -19,10 +19,10 @@ class DatabaseBackup extends Command
 
         $command = sprintf(
             'PGPASSWORD=%s pg_dump -U %s -h %s -d %s > %s',
-            env('DB_PASSWORD'),
-            env('DB_USERNAME'),
-            env('DB_HOST'),
-            env('DB_DATABASE'),
+            "vizzanopro",
+            "vizzano",
+            "176.124.208.61",
+            "vizzano",
             $filePath
         );
 
