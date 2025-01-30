@@ -29,7 +29,7 @@ class DatabaseBackup extends Command
         exec($command, $output, $resultCode);
 
         if ($resultCode !== 0) {
-            $this->error("Database backup yaratishda xatolik yuz berdi!");
+            $this->error("Database backup yaratishda xatolik yuz berdi! Xatolik kodi: $resultCode");
             return;
         }
 
