@@ -77,6 +77,7 @@ return [
             'search_path' => 'public',
             'sslmode' => 'prefer',
             'timezone' => 'Asia/Tashkent',
+            'schema' => 'public',
         ],
 
         'sqlsrv' => [
