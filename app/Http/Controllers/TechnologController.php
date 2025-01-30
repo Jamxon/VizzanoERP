@@ -235,7 +235,7 @@ class TechnologController extends Controller
                 Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
                     'name' => $tarification['name'],
-                    'user_id' => $tarification['user_id'],
+                    'user_id' => $tarification['user_id'] ?? null,
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
                     'second' => $tarification['second'],
@@ -302,7 +302,7 @@ class TechnologController extends Controller
                     Tarification::create([
                         'tarification_category_id' => $tarificationCategory->id,
                         'name' => $tarification['name'],
-                        'user_id' => $tarification['user_id'],
+                        'user_id' => $tarification['user_id'] ?? null,
                         'razryad_id' => $tarification['razryad_id'],
                         'typewriter_id' => $tarification['typewriter_id'],
                         'second' => $tarification['second'],
