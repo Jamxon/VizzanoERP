@@ -30,13 +30,6 @@ class ShowOrderResource extends JsonResource
                 'id' => $this->orderModel->id,
                 'model' => $this->orderModel->model,
                 'material' => $this->orderModel->material,
-                'sizes' => $this->orderModel->sizes->map(function ($size) {
-                    return [
-                        'id' => $size->id,
-                        'size' => $size->size,
-                        'quantity' => $size->quantity,
-                    ];
-                }),
                 'submodels' => $this->orderModel->submodels->map(function ($submodel) {
                     $recipes = OrderRecipes::where('submodel_id', $submodel->submodel->id)
                         ->where('order_id', $this->id)
@@ -45,6 +38,7 @@ class ShowOrderResource extends JsonResource
                     return [
                         'id' => $submodel->id,
                         'submodel' => $submodel->submodel,
+                        "spends" => $submodel->submodelSpend,
                         'recipes' => $recipes->map(function ($recipe) {
                             return [
                                 'id' => $recipe->id,

@@ -23,11 +23,6 @@ class SubModel extends Model
         return $this->belongsTo(Models::class, 'model_id');
     }
 
-    public function submodelSpend(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(SubmodelSpend::class, 'submodel_id');
-    }
-
     public function orderRecipes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderRecipes::class, 'submodel_id');

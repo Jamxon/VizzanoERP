@@ -26,6 +26,11 @@ class OrderSubModel extends Model
         'submodel_id',
     ];
 
+    public function submodelSpend(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SubmodelSpend::class, 'submodel_id');
+    }
+
     public function orderModel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(OrderModel::class, 'order_model_id');
