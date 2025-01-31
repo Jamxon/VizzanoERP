@@ -263,7 +263,7 @@ class TechnologController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'submodel_id' => 'required|integer|exists:sub_models,id',
+            'submodel_id' => 'required|integer|exists:order_sub_models,id',
         ]);
 
         $data = $request->all();
