@@ -101,13 +101,15 @@ class ModelController extends Controller
                 'error' => 'Data field is not a valid JSON string',
             ], 400);
         }
+
+        // Update model data
         $model->update([
             'name' => $data['name'] ?? $model->name,
             'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
         ]);
 
+        // Handle images
         if ($request->hasFile('images') && !empty($request->file('images'))) {
-
             foreach ($request->file('images') as $image) {
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('public/images', $fileName);
@@ -119,33 +121,41 @@ class ModelController extends Controller
             }
         }
 
+        // Update sizes by id
         if (!empty($data['sizes'])) {
-            foreach ($model->sizes as $size) {
-                $size->delete();
+            foreach ($data['sizes'] as $sizeId) {
+                $size = Size::find($sizeId);
+                if ($size && $size->model_id == $model->id) {
+                    $size->update([
+                        'model_id' => $model->id,
+                        'name' => $size->name, // Here you can add any changes if needed
+                    ]);
+                } else {
+                    // If not found, create a new one
+                    Size::create([
+                        'name' => 'default_name', // You can use a default or dynamic value
+                        'model_id' => $model->id,
+                    ]);
+                }
             }
         }
 
-        if (!empty($data['sizes'])) {
-            foreach ($data['sizes'] as $size) {
-                Size::create([
-                    'name' => $size,
-                    'model_id' => $model->id,
-                ]);
-            }
-        }
-
+        // Update submodels by id
         if (!empty($data['submodels'])) {
-            foreach ($model->submodels as $submodel) {
-                $submodel->delete();
-            }
-        }
-
-        if (!empty($data['submodels'])) {
-            foreach ($data['submodels'] as $submodel) {
-                SubModel::create([
-                    'name' => $submodel ?? null,
-                    'model_id' => $model->id,
-                ]);
+            foreach ($data['submodels'] as $submodelId) {
+                $submodel = SubModel::find($submodelId);
+                if ($submodel && $submodel->model_id == $model->id) {
+                    $submodel->update([
+                        'model_id' => $model->id,
+                        'name' => $submodel->name, // Here you can add any changes if needed
+                    ]);
+                } else {
+                    // If not found, create a new one
+                    SubModel::create([
+                        'name' => 'default_name', // You can use a default or dynamic value
+                        'model_id' => $model->id,
+                    ]);
+                }
             }
         }
 
@@ -154,6 +164,7 @@ class ModelController extends Controller
             'model' => $model,
         ]);
     }
+
 
 
     public function destroy(Models $model): \Illuminate\Http\JsonResponse
