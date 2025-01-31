@@ -27,8 +27,8 @@ class SubmodelSpend extends Model
         'submodel_id'
     ];
 
-    public function submodel()
+    public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Submodel::class);
+        return $this->belongsTo(OrderSubmodel::class);
     }
 }
