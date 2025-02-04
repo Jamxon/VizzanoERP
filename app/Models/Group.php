@@ -5,6 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static whereIn(string $string, $pluck)
+ * @method static create(array $all)
+ * @method static find(mixed $id)
+ */
 class Group extends Model
 {
     use HasFactory;

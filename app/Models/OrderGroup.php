@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static where(string $string, array|string|null $query)
+ * @method static create(array $array)
  */
 class OrderGroup extends Model
 {
