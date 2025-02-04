@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\GetGroupsResource;
 use App\Models\Group;
 use App\Models\OrderGroup;
-use http\Exception\InvalidArgumentException;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class GroupController extends Controller
 {
@@ -37,10 +36,8 @@ class GroupController extends Controller
     {
         $groups = Group::find($group->id);
 
-        // Ma'lumotlarni yangilash
         $groups->update($request->all());
 
-        // Javobni qaytarish
         return response()->json([
             'message' => 'Group updated successfully',
             'group' => $group,
@@ -76,7 +73,7 @@ class GroupController extends Controller
             'data' => 'required|array',
             'data.*.group_id' => 'required|integer|exists:groups,id',
             'data.*.order_id' => 'required|integer|exists:orders,id',
-            'data.*.submodel_id' => 'required|integer|exists:sub_models,id',
+            'data.*.submodel_id' => 'required|integer|exists:order_sub_models,id',
         ]);
 
         if ($validator->fails()) {
@@ -86,7 +83,14 @@ class GroupController extends Controller
             ], 422);
         }
 
-        $validatedData = $validator->validated();
+        try {
+            $validatedData = $validator->validated();
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation errors',
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
         foreach ($validatedData['data'] as $datum) {
             $groupId = $datum['group_id'];
@@ -114,5 +118,4 @@ class GroupController extends Controller
             'message' => 'Order fastened to group successfully',
         ], 200);
     }
-
 }
