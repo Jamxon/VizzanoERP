@@ -98,7 +98,7 @@ class WarehouseController extends Controller
         }
 
         $warehouses = Warehouse::where('branch_id', $employee->branch_id)
-            ->with('stoks','stoks.item','users')
+            ->with('stoks','stoks.item','users','stoks.item.unit','stoks.item.color','stoks.item.type')
             ->get();
 
         return response()->json($warehouses, 200);
