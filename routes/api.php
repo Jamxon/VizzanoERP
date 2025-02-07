@@ -8,7 +8,6 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
-use App\Http\Controllers\MasterstrokeController;
 use App\Http\Controllers\LidController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\OrderController;
@@ -19,6 +18,7 @@ use App\Http\Controllers\TechnologController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
