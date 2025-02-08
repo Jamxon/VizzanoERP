@@ -82,16 +82,14 @@ class TailorMasterController extends Controller
                 $group->update([
                     'group_id' => $groupId,
                 ]);
-                return response()->json([
-                    'message' => 'Order fastened to group successfully',
-                ], 200);
+            }else{
+                OrderGroup::create([
+                    'group_id' => $groupId,
+                    'order_id' => $orderId,
+                    'submodel_id' => $submodelId,
+                ]);
             }
 
-            OrderGroup::create([
-                'group_id' => $groupId,
-                'order_id' => $orderId,
-                'submodel_id' => $submodelId,
-            ]);
         }
 
         return response()->json([
