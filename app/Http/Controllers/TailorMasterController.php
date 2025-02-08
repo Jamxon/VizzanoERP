@@ -29,18 +29,21 @@ class TailorMasterController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // JSON javobni formatlash va group ichida yana group kelishini oldini olish
         $orders = $orders->map(function ($order) {
             if ($order->orderModel) {
                 $order->orderModel->submodels = collect($order->orderModel->submodels)->map(function ($submodel) {
-                    if (isset($submodel['group']) && is_array($submodel['group']) && isset($submodel['group']['group'])) {
-                        $submodel['group'] = $submodel['group']['group']; // Nested groupni tekislaymiz
+                    if (isset($submodel['group']) && is_array($submodel['group'])) {
+                        // Agar group ichida yana group bo'lsa, uni tekislash
+                        if (isset($submodel['group']['group']) && is_array($submodel['group']['group'])) {
+                            $submodel['group'] = $submodel['group']['group']; // Ichki group ni tekislaymiz
+                        }
                     }
                     return $submodel;
                 });
             }
             return $order;
         });
+
 
         return response()->json($orders);
     }
