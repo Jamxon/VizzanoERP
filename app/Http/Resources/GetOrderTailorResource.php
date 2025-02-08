@@ -23,36 +23,27 @@ class GetOrderTailorResource extends JsonResource
             'end_date' => $this->end_date,
             'rasxod' => $this->rasxod,
             'comment' => $this->comment,
-            'orderModel' => $this->orderModel->map(function ($model) {
-                return [
-                    'id' => $model->id,
-                    'model' => $model->model,
-                    'material' => $model->material,
-                    'rasxod' => $model->rasxod,
-                    'sizes' => $model->sizes->map(function ($size) {
-                        return [
-                            'size' => $size->size,
-                            'quantity' => $size->quantity,
-                        ];
-                    }),
-                    'submodels' => $model->submodels->map(function ($submodel) {
-                        return [
-                            'submodelx' => $submodel->submodel,
-                            'group' => [
-                                'id' => $submodel->group->group->id,
-                                'name' => $submodel->group->group->name,
-                            ]
-                        ];
-                    }),
-                ];
-            }),
-            'instructions' => $this->instructions->map(function ($instruction) {
-                return [
-                    'id' => $instruction->id,
-                    'title' => $instruction->title,
-                    'description' => $instruction->description,
-                ];
-            }),
+            'orderModel' => $this->orderModel ? [
+                'id' => $this->orderModel->id,
+                'model' => $this->orderModel->model,
+                'material' => $this->orderModel->material,
+                'rasxod' => $this->orderModel->rasxod,
+                'sizes' => $this->orderModel->sizes->map(function ($size) {
+                    return [
+                        'size' => $size->size,
+                        'quantity' => $size->quantity,
+                    ];
+                }),
+                'submodels' => $this->orderModel->submodels->map(function ($submodel) {
+                    return [
+                        'submodelx' => $submodel->submodel,
+                        'group' => $submodel->group && isset($submodel->group->group) ? [
+                            'id' => $submodel->group->group->id,
+                            'name' => $submodel->group->group->name,
+                        ] : null,
+                    ];
+                }),
+            ] : null,
         ];
     }
 }
