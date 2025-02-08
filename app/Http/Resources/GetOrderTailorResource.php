@@ -38,7 +38,7 @@ class GetOrderTailorResource extends JsonResource
                     'submodels' => $model->submodels->map(function ($submodel) {
                         return [
                             'submodel' => $submodel->submodel,
-                            'group' => $submodel->group->group ?? null
+                            'group' => $submodel->group ?? null
                         ];
                     }),
                 ];
