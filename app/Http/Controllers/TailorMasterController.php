@@ -34,7 +34,7 @@ class TailorMasterController extends Controller
 
 
 
-        return response()->json($orders);
+        return response()->json($resource);
     }
 
 
