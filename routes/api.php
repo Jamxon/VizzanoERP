@@ -21,6 +21,17 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
+    Route::get('orders', [TailorMasterController::class, 'getOrders']);
+    Route::post('sendToConstructor', [TailorMasterController::class, 'sendToConstructor']);
+    Route::get('orders/{order}', [TailorMasterController::class, 'showOrder']);
+    Route::get('completedItems', [TailorMasterController::class, 'getCompletedItems']);
+    Route::post('completedItem', [TailorMasterController::class, 'acceptCompletedItem']);
+    Route::get('specifications/{id}', [TailorMasterController::class, 'getSpecificationByOrderId']);
+    Route::post('markAsTailored', [TailorMasterController::class, 'markAsTailored']);
+    Route::get('cuts/{id}', [TailorMasterController::class, 'getCuts']);
+});
+
 Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::get('groups', [GroupController::class, 'index']);
     Route::post('groups', [GroupController::class, 'store']);
