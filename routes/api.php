@@ -31,6 +31,7 @@ Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function (
     Route::get('specifications/{id}', [TailorMasterController::class, 'getSpecificationByOrderId']);
     Route::post('markAsTailored', [TailorMasterController::class, 'markAsTailored']);
     Route::get('cuts/{id}', [TailorMasterController::class, 'getCuts']);
+    Route::post('fasteningOrderToGroup',[TailorMasterController::class, 'fasteningOrderToGroup']);
 });
 
 Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
