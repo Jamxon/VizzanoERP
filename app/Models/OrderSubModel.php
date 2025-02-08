@@ -41,7 +41,7 @@ class OrderSubModel extends Model
         return $this->belongsTo(SubModel::class);
     }
 
-    public function orderGroup(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function group(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(OrderGroup::class, 'submodel_id');
     }

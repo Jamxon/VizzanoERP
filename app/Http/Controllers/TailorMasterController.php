@@ -23,6 +23,7 @@ class TailorMasterController extends Controller
                 'orderModel.material',
                 'orderModel.sizes.size',
                 'orderModel.submodels.submodel',
+                'orderModel.submodels.group',
                 'instructions'
             )
             ->orderBy('created_at', 'desc')
