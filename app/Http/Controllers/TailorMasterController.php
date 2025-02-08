@@ -29,19 +29,16 @@ class TailorMasterController extends Controller
             ->get();
 
         $orders = $orders->map(function ($order) {
-            if ($order->orderModel) {
                 $order->orderModel->submodels = collect($order->orderModel->submodels)->map(function ($submodel) {
                     if (isset($submodel['group'])) {
                         // Agar group ichida yana group bo'lsa, uni to'g'ri tekislaymiz
                         $submodel['group'] = $submodel['group']['group'] ?? $submodel['group'];
-//                      
+//
                     } else {
                         $submodel['group'] = null; // Agar group null bo'lsa, uni null qilib qo'yamiz
                     }
                     return $submodel;
                 });
-            }
-            return $order;
         });
 
 
