@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
     Route::get('orders', [TailorMasterController::class, 'getOrders']);
+    Route::get('groups', [GroupController::class, 'index']);
     Route::post('sendToConstructor', [TailorMasterController::class, 'sendToConstructor']);
     Route::get('orders/{order}', [TailorMasterController::class, 'showOrder']);
     Route::get('completedItems', [TailorMasterController::class, 'getCompletedItems']);
@@ -33,11 +34,9 @@ Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function (
 });
 
 Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
-    Route::get('groups', [GroupController::class, 'index']);
     Route::post('groups', [GroupController::class, 'store']);
     Route::patch('groups/{group}', [GroupController::class, 'update']);
     Route::delete('groups/{group}', [GroupController::class, 'delete']);
-    Route::post('fasteningOrderToGroup', [GroupController::class, 'fasteningOrderToGroup']);
 
     Route::get('users/master', [UserController::class, 'getUsersMaster']);
     Route::get('users/submaster', [UserController::class, 'getUsersSubMaster']);
