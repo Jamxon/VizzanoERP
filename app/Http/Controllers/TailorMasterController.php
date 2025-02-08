@@ -33,18 +33,28 @@ class TailorMasterController extends Controller
             if ($order->orderModel) {
                 $order->orderModel->submodels = collect($order->orderModel->submodels)->map(function ($submodel) {
                     if (isset($submodel['group']) && is_array($submodel['group'])) {
+                        // Agar group ichida yana group bo'lsa, uni to'g'ri tekislaymiz
                         if (isset($submodel['group']['group']) && is_array($submodel['group']['group'])) {
                             $submodel['group'] = [
-                                'id' => $submodel['group']['group']['id'],
-                                'name' => $submodel['group']['group']['name'],
+                                'id' => $submodel['group']['group']['id'] ?? null,
+                                'name' => $submodel['group']['group']['name'] ?? null,
+                            ];
+                        } else {
+                            // Agar group o'zi to'g'ridan-to'g'ri kelgan bo'lsa, shunchaki tekshiramiz
+                            $submodel['group'] = [
+                                'id' => $submodel['group']['id'] ?? null,
+                                'name' => $submodel['group']['name'] ?? null,
                             ];
                         }
+                    } else {
+                        $submodel['group'] = null; // Agar group null bo'lsa, uni null qilib qo'yamiz
                     }
                     return $submodel;
                 });
             }
             return $order;
         });
+
 
 
         return response()->json($orders);
