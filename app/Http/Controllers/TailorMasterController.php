@@ -39,6 +39,7 @@ class TailorMasterController extends Controller
                     }
                     return $submodel;
                 });
+                return $order;
         });
 
 
