@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GetOrderTailorResource;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderGroup;
@@ -28,20 +29,7 @@ class TailorMasterController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        $orders = $orders->map(function ($order) {
-                $order->orderModel->submodels = collect($order->orderModel->submodels)->map(function ($submodel) {
-                    if (isset($submodel['group'])) {
-                        // Agar group ichida yana group bo'lsa, uni to'g'ri tekislaymiz
-                        $submodel['group'] = $submodel['group']['group'] ?? $submodel['group'];
-//
-                    } else {
-                        $submodel['group'] = null; // Agar group null bo'lsa, uni null qilib qo'yamiz
-                    }
-                    $submodel['group'] = "nnajdej";
-                    return $submodel;
-                });
-                return $order;
-        });
+        $resource = GetOrderTailorResource::collection($orders);
 
 
 
