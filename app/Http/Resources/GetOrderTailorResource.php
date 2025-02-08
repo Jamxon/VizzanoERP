@@ -45,6 +45,7 @@ class GetOrderTailorResource extends JsonResource
                     ];
                 }),
             ] : null,
+            'instructions' => $this->instructions,
         ];
     }
 }
