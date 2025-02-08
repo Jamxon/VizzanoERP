@@ -33,7 +33,7 @@ class TailorMasterController extends Controller
                 $order->orderModel->submodels = collect($order->orderModel->submodels)->map(function ($submodel) {
                     if (isset($submodel['group'])) {
                         // Agar group ichida yana group bo'lsa, uni to'g'ri tekislaymiz
-                        if (isset($submodel['group']['group']) && is_array($submodel['group']['group'])) {
+                        if (isset($submodel['group']['group'])) {
                             $submodel['group'] = [
                                 'id' => $submodel['group']['group']['id'] ?? null,
                                 'name' => $submodel['group']['group']['name'] ?? null,
