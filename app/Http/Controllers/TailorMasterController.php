@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class TailorMasterController extends Controller
 {
-    public function getOrders()
+    public function getOrders(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('branch_id' , auth()->user()->branch_id)
             ->where('status', 'printing')
@@ -23,5 +23,7 @@ class TailorMasterController extends Controller
             )
             ->orderBy('created_at', 'desc')
             ->get();
+
+        return response()->json($orders);
     }
 }
