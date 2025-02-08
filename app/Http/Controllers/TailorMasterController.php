@@ -12,29 +12,44 @@ class TailorMasterController extends Controller
 {
     public function getOrders(): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('branch_id' , auth()->user()->branch_id)
+        $orders = Order::where('branch_id', auth()->user()->branch_id)
             ->orWhere('status', 'printing')
             ->orWhere('status', 'cutting')
             ->orWhere('status', 'pending')
             ->orWhere('status', 'tailoring')
-            ->with(
+            ->with([
                 'orderModel',
                 'orderModel.model',
                 'orderModel.material',
                 'orderModel.sizes.size',
                 'orderModel.submodels.submodel',
-                'orderModel.submodels.group.group',
+                'orderModel.submodels.group', // faqat asosiy groupni olish
                 'instructions'
-            )
+            ])
             ->orderBy('created_at', 'desc')
             ->get();
+
+        // JSON javobni formatlash va group ichida yana group kelishini oldini olish
+        $orders = $orders->map(function ($order) {
+            if ($order->orderModel) {
+                $order->orderModel->submodels = collect($order->orderModel->submodels)->map(function ($submodel) {
+                    if (isset($submodel['group']) && is_array($submodel['group']) && isset($submodel['group']['group'])) {
+                        $submodel['group'] = $submodel['group']['group']; // Nested groupni tekislaymiz
+                    }
+                    return $submodel;
+                });
+            }
+            return $order;
+        });
 
         return response()->json($orders);
     }
 
+
     public function fasteningOrderToGroup(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+
 
         if (is_null($data)) {
             return response()->json([
