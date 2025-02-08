@@ -10,9 +10,9 @@ class TailorMasterController extends Controller
     public function getOrders(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('branch_id' , auth()->user()->branch_id)
-            ->where('status', 'printing')
-            ->where('status', 'cutting')
-            ->where('status', 'tailoring')
+            ->orWhere('status', 'printing')
+            ->orWhere('status', 'cutting')
+            ->orWhere('status', 'tailoring')
             ->with(
                 'orderModel',
                 'orderModel.model',
