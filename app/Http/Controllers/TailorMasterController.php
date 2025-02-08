@@ -37,6 +37,7 @@ class TailorMasterController extends Controller
                     } else {
                         $submodel['group'] = null; // Agar group null bo'lsa, uni null qilib qo'yamiz
                     }
+                    $submodel['group'] = "nnajdej";
                     return $submodel;
                 });
                 return $order;
