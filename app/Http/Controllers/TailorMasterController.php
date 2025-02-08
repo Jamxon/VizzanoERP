@@ -36,7 +36,7 @@ class TailorMasterController extends Controller
                         if (isset($submodel['group']['group'])) {
                             $submodel['group'] = [
                                 'id' => $submodel['group']['group']['id'] ?? null,
-                                'name' => $submodel['group']['group']['name'] ?? null,
+                                'name' => $submodel['submodel']['name'] ?? null,
                             ];
                         } else {
                             // Agar group o'zi to'g'ridan-to'g'ri kelgan bo'lsa, shunchaki tekshiramiz
