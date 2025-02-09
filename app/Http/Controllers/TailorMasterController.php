@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
 
 class TailorMasterController extends Controller
 {
-    public function getOrders(): \Illuminate\Http\JsonResponse
+    public function getOrders()
     {
         return auth()->user()->employee->branch_id;
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
