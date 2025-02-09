@@ -23,6 +23,7 @@ class GetOrderTailorResource extends JsonResource
             'end_date' => $this->end_date,
             'rasxod' => $this->rasxod,
             'comment' => $this->comment,
+            'branch_id' => $this->branch_id,
             'orderModel' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
                 'model' => $this->orderModel->model,
