@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GetOrderTailorResource;
+use App\Models\Department;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderGroup;
@@ -99,4 +100,20 @@ class TailorMasterController extends Controller
             'message' => 'Order fastened to group successfully',
         ], 200);
     }
+
+    public function getGroups(): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+
+        $department = Department::where('responsible_user_id', $user->id)->first();
+
+        if (!$department) {
+            return response()->json(['message' => 'Department not found'], 404);
+        }
+
+        $groups = $department->groups()->get();
+
+        return response()->json($groups);
+    }
+
 }
