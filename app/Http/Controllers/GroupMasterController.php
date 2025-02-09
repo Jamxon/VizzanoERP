@@ -18,7 +18,7 @@ class GroupMasterController extends Controller
         if (!$user->group) {
             return response()->json(['message' => 'Group not found'], 404);
         }
-
+return $user->group->id;
         $query = OrderGroup::where('group_id', $user->group->id)
             ->whereHas('order', function ($q) use ($request) {
                     $status = $request->status;
