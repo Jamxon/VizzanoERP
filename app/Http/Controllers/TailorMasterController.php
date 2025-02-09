@@ -11,13 +11,17 @@ use Illuminate\Validation\ValidationException;
 
 class TailorMasterController extends Controller
 {
-    public function getOrders()
+    public function getOrders(): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('status', 'printing')
-            ->orWhere('status', 'cutting')
-            ->orWhere('status', 'pending')
-            ->orWhere('status', 'tailoring')
-            ->where('branch_id', auth()->user()->employee->branch_id)
+        $branchId = auth()->user()->employee->branch_id ?? null;
+
+        $orders = Order::where('branch_id', $branchId)
+        ->where(function ($query) {
+            $query->where('status', 'printing')
+                ->orWhere('status', 'cutting')
+                ->orWhere('status', 'pending')
+                ->orWhere('status', 'tailoring');
+        })
             ->with([
                 'orderModel',
                 'orderModel.model',
@@ -32,10 +36,9 @@ class TailorMasterController extends Controller
 
         $resource = GetOrderTailorResource::collection($orders);
 
-
-
         return response()->json($resource);
     }
+
 
 
     public function fasteningOrderToGroup(Request $request): \Illuminate\Http\JsonResponse
