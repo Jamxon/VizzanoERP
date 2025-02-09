@@ -28,7 +28,7 @@ class GroupMasterController extends Controller
             'order.instructions'
         ]);
 
-            $status = strtolower(trim($request->input('status')));
+          return  $status = strtolower(trim($request->status));
 
             $query->whereHas('order', function ($q) use ($status) {
                 $q->where('status', $status); // OrderGroup emas, Order modeldan olish!
