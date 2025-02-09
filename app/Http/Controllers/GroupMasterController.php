@@ -15,13 +15,13 @@ class GroupMasterController extends Controller
         }
 
         $orders = $user->group->orders()->with([
-            'orderModel',
-            'orderModel.model',
-            'orderModel.material',
-            'orderModel.sizes.size',
-            'orderModel.submodels.submodel',
-            'orderModel.submodels.group',
-            'instructions'
+            'order.orderModel',
+            'order.orderModel.model',
+            'order.orderModel.material',
+            'order.orderModel.sizes.size',
+            'order.orderModel.submodels.submodel',
+            'order.orderModel.submodels.group',
+            'order.instructions'
         ])->get();
 
         return response()->json($orders);
