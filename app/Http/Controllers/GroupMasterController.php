@@ -18,6 +18,7 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
+        // Queryni boshlaymiz
         $query = $user->group->orders()->with([
             'order.orderModel',
             'order.orderModel.model',
@@ -28,19 +29,17 @@ class GroupMasterController extends Controller
             'order.instructions'
         ]);
 
+        // Agar status bor bo‘lsa, filterlash
         if ($request->has('status') && !empty($request->status)) {
-            $query->whereHas('order', function ($query) use ($request) {
-                $query->where('status', $request->status);
+            $query->whereHas('order', function ($q) use ($request) {
+                $q->where('status', $request->status);
             });
         }
 
         $orders = $query->get();
 
-        $resource = GetOrderGroupMasterResource::collection($orders);
-
-        return response()->json($resource);
+        return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
-
 
     public function getEmployees(): \Illuminate\Http\JsonResponse
     {
