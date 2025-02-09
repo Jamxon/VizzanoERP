@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
 {
-    public function getOrders(): \Illuminate\Http\JsonResponse
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
 
@@ -18,7 +18,7 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-        $orders = $user->group->orders()->with([
+        $query = $user->group->orders()->with([
             'order.orderModel',
             'order.orderModel.model',
             'order.orderModel.material',
@@ -26,12 +26,19 @@ class GroupMasterController extends Controller
             'order.orderModel.submodels.submodel',
             'order.orderModel.submodels.group',
             'order.instructions'
-        ])->get();
+        ]);
+
+        if ($request->has('status') && !empty($request->status)) {
+            $query->where('status', $request->status);
+        }
+
+        $orders = $query->get();
 
         $resource = GetOrderGroupMasterResource::collection($orders);
 
         return response()->json($resource);
     }
+
 
     public function getEmployees(): \Illuminate\Http\JsonResponse
     {
@@ -83,7 +90,7 @@ class GroupMasterController extends Controller
 
         foreach ($data as $item) {
             $tarificationId = $item['tarification_id'];
-            $userIds = $item['user_ids'];
+            $userIds = $item['user_id'];
 
             $tarification = Tarification::find($tarificationId);
 
