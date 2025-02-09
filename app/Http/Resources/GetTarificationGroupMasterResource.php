@@ -15,9 +15,9 @@ class GetTarificationGroupMasterResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => optional($this->orderModel->submodels->first())->tarificationCategories->id ?? null,
-            'name' => optional($this->orderModel->submodels->first())->tarificationCategories->name ?? null,
-            'tarifications' => optional($this->orderModel->submodels->first())->tarificationCategories->tarifications ?? [],
+            'id' => optional($this->order->orderModel->submodels->first())->tarificationCategories->id ?? null,
+            'name' => optional($this->order->orderModel->submodels->first())->tarificationCategories->name ?? null,
+            'tarifications' => optional($this->order->orderModel->submodels->first())->tarificationCategories->tarifications ?? [],
         ];
     }
 
