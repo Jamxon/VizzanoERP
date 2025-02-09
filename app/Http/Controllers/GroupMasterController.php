@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
 {
-    public function getOrders(Request $request)
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
 
@@ -32,7 +32,8 @@ class GroupMasterController extends Controller
                 'order.orderModel.submodels.submodel',
                 'order.orderModel.submodels.group',
                 'order.instructions'
-            ]);
+            ])
+            ->groupBy('order_id');
 
         $orders = $query->get();
 
