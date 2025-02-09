@@ -12,13 +12,12 @@ class GroupMasterController extends Controller
 {
     public function getOrders(Request $request)
     {
-return        $user = auth()->user();
+        $user = auth()->user();
 
         if (!$user->group) {
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-        // Guruhga bog‘langan buyurtmalarni olish
         $query = $user->group->orders()->with([
             'order.orderModel',
             'order.orderModel.model',
@@ -29,14 +28,14 @@ return        $user = auth()->user();
             'order.instructions'
         ]);
 
-        // ❗️ Katta harf yoki maydon nomi noto‘g‘ri bo‘lishi mumkin, tekshirish uchun:
         if ($request->has('status') && !empty($request->status)) {
-            $status = strtolower(trim($request->status)); // Statusni to‘g‘rilash
+            $status = strtolower(trim($request->status));
 
             $query->whereHas('order', function ($q) use ($status) {
-                $q->whereRaw('LOWER(status) = ?', [$status]); // **Katta-kichik harfni tekshirish**
+                $q->where('status', $status); // OrderGroup emas, Order modeldan olish!
             });
         }
+
 
         $orders = $query->get();
 
