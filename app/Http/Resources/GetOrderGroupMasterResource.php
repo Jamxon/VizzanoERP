@@ -46,6 +46,7 @@ class GetOrderGroupMasterResource extends JsonResource
                     ];
                 }),
             ],
+            'instructions' => $this->order->instructions,
         ];
     }
 }
