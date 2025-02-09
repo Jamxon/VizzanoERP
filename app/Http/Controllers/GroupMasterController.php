@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
 {
-    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
+    public function getOrders(Request $request)
     {
         $user = auth()->user();
 
