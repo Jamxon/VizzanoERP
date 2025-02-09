@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GetOrderGroupMasterResource;
+use App\Http\Resources\GetTarificationGroupMasterResource;
 use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
@@ -43,7 +44,7 @@ class GroupMasterController extends Controller
         return response()->json($employees);
     }
 
-    public function getTarifications()
+    public function getTarifications(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
 
@@ -56,6 +57,8 @@ class GroupMasterController extends Controller
             'order.orderModel.submodels.tarificationCategories.tarifications',
         ])->get();
 
-        return response()->json($tarifications);
+        $resource = GetTarificationGroupMasterResource::collection($tarifications);
+
+        return response()->json($resource);
     }
 }
