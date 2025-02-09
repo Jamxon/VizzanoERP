@@ -13,7 +13,7 @@ class TailorMasterController extends Controller
 {
     public function getOrders(): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('branch_id', auth()->user()->branch_id)
+        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
             ->orWhere('status', 'printing')
             ->orWhere('status', 'cutting')
             ->orWhere('status', 'pending')
