@@ -13,12 +13,11 @@ class TailorMasterController extends Controller
 {
     public function getOrders()
     {
-        return auth()->user()->employee->branch_id;
-        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
-            ->orWhere('status', 'printing')
+        $orders = Order::where('status', 'printing')
             ->orWhere('status', 'cutting')
             ->orWhere('status', 'pending')
             ->orWhere('status', 'tailoring')
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->with([
                 'orderModel',
                 'orderModel.model',
