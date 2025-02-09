@@ -27,7 +27,7 @@ class GroupMasterController extends Controller
 
         $resource = GetOrderGroupMasterResource::collection($orders);
 
-        return response()->json($orders);
+        return response()->json($resource);
     }
 
 }
