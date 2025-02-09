@@ -17,6 +17,7 @@ class TarificationCategory extends Model
     protected $table = 'tarification_categories';
 
     protected $fillable = [
+        'id',
         'name',
         'submodel_id',
     ];
