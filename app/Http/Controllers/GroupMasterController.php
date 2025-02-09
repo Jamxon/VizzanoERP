@@ -12,14 +12,14 @@ class GroupMasterController extends Controller
 {
     public function getOrders(Request $request)
     {
-        $user = auth()->user();
+return        $user = auth()->user();
 
         if (!$user->group) {
             return response()->json(['message' => 'Group not found'], 404);
         }
 
         // Guruhga bog‘langan buyurtmalarni olish
-return        $query = $user->group->orders()->with([
+        $query = $user->group->orders()->with([
             'order.orderModel',
             'order.orderModel.model',
             'order.orderModel.material',
