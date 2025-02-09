@@ -43,4 +43,19 @@ class GroupMasterController extends Controller
         return response()->json($employees);
     }
 
+    public function getTarifications()
+    {
+        $user = auth()->user();
+
+        if (!$user->group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        $tarifications = $user->group->orders()->with([
+            'order.orderModel.submodels.tarificationCategories',
+            'order.orderModel.submodels.tarificationCategories.tarifications',
+        ])->get();
+
+        return response()->json($tarifications);
+    }
 }
