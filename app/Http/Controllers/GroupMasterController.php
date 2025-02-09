@@ -19,10 +19,12 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
+        $status = strtolower(trim($request->status));
+
+        // ORDER_ID bo‘yicha GROUP BY qilyapmiz
         $query = OrderGroup::where('group_id', $user->group->id)
-            ->whereHas('order', function ($q) use ($request) {
-                    $status = $request->status;
-                    $q->where('status', $status);
+            ->whereHas('order', function ($q) use ($status) {
+                $q->where('status', $status);
             })
             ->with([
                 'order.orderModel',
@@ -33,12 +35,13 @@ class GroupMasterController extends Controller
                 'order.orderModel.submodels.group',
                 'order.instructions'
             ])
-            ->distinct();
+            ->groupBy('order_id'); // Orderlarni takrorlanishini oldini olamiz
 
         $orders = $query->get();
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
+
 
 
 
