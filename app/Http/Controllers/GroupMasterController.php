@@ -30,4 +30,17 @@ class GroupMasterController extends Controller
         return response()->json($resource);
     }
 
+    public function getEmployees(): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+
+        if (!$user->group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        $employees = $user->group->employees()->get();
+
+        return response()->json($employees);
+    }
+
 }
