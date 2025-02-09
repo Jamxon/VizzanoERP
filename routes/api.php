@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
    Route::get('orders',[\App\Http\Controllers\GroupMasterController::class, 'getOrders']);
     Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);
+    Route::get('tarifications',[\App\Http\Controllers\GroupMasterController::class, 'getTarifications']);
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
