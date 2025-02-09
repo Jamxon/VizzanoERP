@@ -53,12 +53,12 @@ class GroupMasterController extends Controller
         }
 
         $tarifications = $user->group->orders()->with([
-            'order.orderModel.submodels.tarificationCategories',
-            'order.orderModel.submodels.tarificationCategories.tarifications',
+            'orderModel.submodels.tarificationCategories.tarifications',
         ])->get();
 
         $resource = GetTarificationGroupMasterResource::collection($tarifications);
 
         return response()->json($resource);
     }
+
 }
