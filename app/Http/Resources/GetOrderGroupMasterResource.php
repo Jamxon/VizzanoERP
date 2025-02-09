@@ -22,6 +22,7 @@ class GetOrderGroupMasterResource extends JsonResource
             'end_date' => $this->order->end_date,
             'rasxod' => $this->order->rasxod,
             'status' => $this->order->status,
+            'comment' => $this->order->comment,
             'orderModel' => [
                 'id' => $this->order->orderModel->id,
                 'model' => [
