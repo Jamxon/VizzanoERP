@@ -30,11 +30,11 @@ class GroupMasterController extends Controller
         ]);
 
         // Agar status bor bo‘lsa, filterlash
-        if ($request->has('status') && !empty($request->status)) {
-            $query->whereHas('order', function ($q) use ($request) {
-                $q->where('status', $request->status);
-            });
-        }
+//        if ($request->has('status') && !empty($request->status)) {
+//            $query->whereHas('order', function ($q) use ($request) {
+//                $q->where('status', $request->status);
+//            });
+//        }
 
         $orders = $query->get();
 
