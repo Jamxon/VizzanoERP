@@ -33,7 +33,8 @@ class GroupMasterController extends Controller
                 'order.orderModel.submodels.group',
                 'order.instructions'
             ])
-            ->groupBy('order_id');
+            ->distinct()
+            ->get();
 
         $orders = $query->get();
 
