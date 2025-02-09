@@ -10,6 +10,6 @@ class GroupMasterController extends Controller
     {
         $user = auth()->user();
         $group = $user->group;
-        return $group->orders->order;
+        return $group->orders;
     }
 }
