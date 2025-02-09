@@ -28,22 +28,22 @@ class User extends Authenticatable implements JWTSubject
 
     public $hidden = ['role_id', 'password','created_at', 'updated_at'];
 
-    public function role()
+    public function role(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
-    public function employee()
+    public function employee(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Employee::class, 'user_id');
     }
 
-    public function group()
+    public function group(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Group::class, 'responsible_user_id');
     }
 
-    public function warehouses()
+    public function warehouses(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Warehouse::class, 'warehouses_related_users', 'user_id', 'warehouse_id');
     }
