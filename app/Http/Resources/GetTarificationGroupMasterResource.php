@@ -14,11 +14,15 @@ class GetTarificationGroupMasterResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $submodel = optional($this->order->orderModel->submodels->first()); // Birinchi submodelni olamiz
+        $tarificationCategory = optional($submodel->tarificationCategories->first()); // Birinchi tarificationCategoryni olamiz
+
         return [
-            'id' => optional($this->order->orderModel->submodels->first())->tarificationCategories->id ?? null,
-            'name' => optional($this->order->orderModel->submodels->first())->tarificationCategories->name ?? null,
-            'tarifications' => optional($this->order->orderModel->submodels->first())->tarificationCategories->tarifications ?? [],
+            'id' => $tarificationCategory->id ?? null,
+            'name' => $tarificationCategory->name ?? null,
+            'tarifications' => $tarificationCategory->tarifications ?? [],
         ];
     }
+
 
 }
