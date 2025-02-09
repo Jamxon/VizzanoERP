@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
-use Illuminate\Http\Request;
+use App\Models\Order;
 
 class GroupMasterController extends Controller
 {
@@ -59,6 +59,20 @@ class GroupMasterController extends Controller
         $resource = GetTarificationGroupMasterResource::collection($tarifications);
 
         return response()->json($resource);
+    }
+
+    public function startOrder($id): \Illuminate\Http\JsonResponse
+    {
+        $order = Order::find($id);
+
+        $order->update([
+            'status' => 'tailoring'
+        ]);
+
+        return response()->json([
+            'message' => "Order successful started",
+            'order' => $order
+        ]);
     }
 
 }
