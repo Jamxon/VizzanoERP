@@ -24,7 +24,6 @@ class GetOrderGroupMasterResource extends JsonResource
             'status' => $this->order->status,
             'orderModel' => [
                 'id' => $this->order->orderModel->id,
-                'name' => $this->order->orderModel->name,
                 'model' => [
                     'id' => $this->order->orderModel->model->id,
                     'name' => $this->order->orderModel->model->name,
@@ -35,14 +34,15 @@ class GetOrderGroupMasterResource extends JsonResource
                 ],
                 'sizes' => $this->order->orderModel->sizes->map(function ($size) {
                     return [
-                        'id' => $size->size->id,
-                        'name' => $size->size->name,
+                        'id' => $size->id,
+                        'size' => $size->size,
+                        'quantity' => $size->quantity,
                     ];
                 }),
                 'submodels' => $this->order->orderModel->submodels->map(function ($submodel) {
                     return [
-                        'id' => $submodel->submodel->id,
-                        'name' => $submodel->submodel->name,
+                        'id' => $submodel->id,
+                        'submodel' => $submodel->submodel,
                     ];
                 }),
             ],
