@@ -29,7 +29,9 @@ class GroupMasterController extends Controller
         ]);
 
         if ($request->has('status') && !empty($request->status)) {
-            $query->where('status', $request->status);
+            $query->whereHas('order', function ($query) use ($request) {
+                $query->where('status', $request->status);
+            });
         }
 
         $orders = $query->get();
