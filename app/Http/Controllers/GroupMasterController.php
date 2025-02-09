@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Models\Order;
+use App\Models\Tarification;
+use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
 {
@@ -72,6 +74,31 @@ class GroupMasterController extends Controller
         return response()->json([
             'message' => "Order successful started",
             'order' => $order
+        ]);
+    }
+
+    public function assignEmployeesToTarifications(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->input('data');
+
+        foreach ($data as $item) {
+            $tarificationId = $item['tarification_id'];
+            $userIds = $item['user_ids'];
+
+            $tarification = Tarification::find($tarificationId);
+
+            if ($tarification) {
+                $existingIds = $tarification->user_ids ? json_decode($tarification->user_ids, true) : [];
+                $updatedIds = array_unique(array_merge($existingIds, $userIds));
+
+                $tarification->update([
+                    'user_ids' => json_encode($updatedIds)
+                ]);
+            }
+        }
+
+        return response()->json([
+            'message' => 'Employees assigned to tarifications successfully'
         ]);
     }
 
