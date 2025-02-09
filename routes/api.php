@@ -31,7 +31,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
     Route::get('orders', [TailorMasterController::class, 'getOrders']);
-    Route::get('groups', [GroupController::class, 'index']);
+    Route::get('groups', [TailorMasterController::class,'getGroups']);
     Route::post('sendToConstructor', [TailorMasterController::class, 'sendToConstructor']);
     Route::get('orders/{order}', [TailorMasterController::class, 'showOrder']);
     Route::get('completedItems', [TailorMasterController::class, 'getCompletedItems']);
