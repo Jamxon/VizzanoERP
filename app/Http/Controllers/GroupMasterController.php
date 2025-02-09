@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GetOrderGroupMasterResource;
 use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
@@ -23,6 +24,8 @@ class GroupMasterController extends Controller
             'order.orderModel.submodels.group',
             'order.instructions'
         ])->get();
+
+        $resource = GetOrderGroupMasterResource::collection($orders);
 
         return response()->json($orders);
     }
