@@ -21,10 +21,8 @@ class GroupMasterController extends Controller
 
         $query = OrderGroup::where('group_id', $user->group->id)
             ->whereHas('order', function ($q) use ($request) {
-                if ($request->has('status') && !empty($request->status)) {
-                    $status = strtolower(trim($request->status));
+                    $status = $request->status;
                     $q->where('status', $status);
-                }
             })
             ->with([
                 'order.orderModel',
