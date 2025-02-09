@@ -18,28 +18,28 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-        $query = $user->group->orders()->with([
-            'order.orderModel',
-            'order.orderModel.model',
-            'order.orderModel.material',
-            'order.orderModel.sizes.size',
-            'order.orderModel.submodels.submodel',
-            'order.orderModel.submodels.group',
-            'order.instructions'
-        ]);
+        $query = OrderGroup::where('group_id', $user->group->id)
+            ->whereHas('order', function ($q) use ($request) {
+                if ($request->has('status') && !empty($request->status)) {
+                    $status = strtolower(trim($request->status));
+                    $q->where('status', $status);
+                }
+            })
+            ->with([
+                'order.orderModel',
+                'order.orderModel.model',
+                'order.orderModel.material',
+                'order.orderModel.sizes.size',
+                'order.orderModel.submodels.submodel',
+                'order.orderModel.submodels.group',
+                'order.instructions'
+            ]);
 
-            $status = strtolower(trim($request->status));
-
-            $query->whereHas('order', function ($q) use ($status) {
-                $q->where('status', $status); // OrderGroup emas, Order modeldan olish!
-            });
-
-
-
-  return       $orders = $query->get();
+        $orders = $query->get();
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
+
 
 
     public function getEmployees(): \Illuminate\Http\JsonResponse
