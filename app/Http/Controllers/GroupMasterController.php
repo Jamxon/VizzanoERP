@@ -35,7 +35,7 @@ class GroupMasterController extends Controller
                 'order.orderModel.submodels.group',
                 'order.instructions'
             ])
-            ->groupBy('order_id'); // Orderlarni takrorlanishini oldini olamiz
+            ->selectRaw('DISTINCT ON (order_id) *');
 
         $orders = $query->get();
 
