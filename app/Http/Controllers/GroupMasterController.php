@@ -28,13 +28,12 @@ class GroupMasterController extends Controller
             'order.instructions'
         ]);
 
-        if ($request->has('status') && !empty($request->status)) {
-            $status = strtolower(trim($request->status));
+            $status = strtolower(trim($request->input('status')));
 
             $query->whereHas('order', function ($q) use ($status) {
                 $q->where('status', $status); // OrderGroup emas, Order modeldan olish!
             });
-        }
+
 
 
         $orders = $query->get();
