@@ -18,7 +18,7 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-        // Queryni boshlaymiz
+        // Guruhga bog‘langan buyurtmalarni olish
         $query = $user->group->orders()->with([
             'order.orderModel',
             'order.orderModel.model',
@@ -29,17 +29,20 @@ class GroupMasterController extends Controller
             'order.instructions'
         ]);
 
-        // Agar status bor bo‘lsa, filterlash
-//        if ($request->has('status') && !empty($request->status)) {
-//            $query->whereHas('order', function ($q) use ($request) {
-//                $q->where('status', $request->status);
-//            });
-//        }
+        // ❗️ Katta harf yoki maydon nomi noto‘g‘ri bo‘lishi mumkin, tekshirish uchun:
+        if ($request->has('status') && !empty($request->status)) {
+            $status = strtolower(trim($request->status)); // Statusni to‘g‘rilash
+
+            $query->whereHas('order', function ($q) use ($status) {
+                $q->whereRaw('LOWER(status) = ?', [$status]); // **Katta-kichik harfni tekshirish**
+            });
+        }
 
         $orders = $query->get();
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
+
 
     public function getEmployees(): \Illuminate\Http\JsonResponse
     {
