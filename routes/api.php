@@ -21,6 +21,10 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
+   Route::get('orders',[\App\Http\Controllers\GroupMasterController::class, 'getOrders']); 
+});
+
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
     Route::get('orders', [TailorMasterController::class, 'getOrders']);
     Route::get('groups', [GroupController::class, 'index']);

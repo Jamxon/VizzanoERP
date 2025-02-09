@@ -31,17 +31,22 @@ class Group extends Model
         'department_id'
     ];
 
-    public function responsibleUser()
+    public function responsibleUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'responsible_user_id');
     }
-    public function department()
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Department::class);
     }
 
-    public function employees()
+    public function employees(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Employee::class,'group_id');
+    }
+
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderGroup::class,'group_id');
     }
 }
