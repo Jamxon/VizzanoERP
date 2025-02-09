@@ -19,7 +19,7 @@ class GroupMasterController extends Controller
         }
 
         // Guruhga bog‘langan buyurtmalarni olish
-        $query = $user->group->orders()->with([
+return        $query = $user->group->orders()->with([
             'order.orderModel',
             'order.orderModel.model',
             'order.orderModel.material',
