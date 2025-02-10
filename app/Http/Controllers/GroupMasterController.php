@@ -43,17 +43,17 @@ class GroupMasterController extends Controller
 
         $orders = $query->get();
 
-        $orders = $orders->map(function ($orderGroup) {
-            $order = $orderGroup->order;
-
-            if ($order && $order->orderModel) {
-                $order->orderModel->submodels = $order->orderModel->submodels
-                    ->where('id', $orderGroup->submodel_id)
-                    ->values();
-            }
-
-            return $orderGroup;
-        });
+//        $orders = $orders->map(function ($orderGroup) {
+//            $order = $orderGroup->order;
+//
+//            if ($order && $order->orderModel) {
+//                $order->orderModel->submodels = $order->orderModel->submodels
+//                    ->where('id', $orderGroup->submodel_id)
+//                    ->values();
+//            }
+//
+//            return $orderGroup;
+//        });
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
