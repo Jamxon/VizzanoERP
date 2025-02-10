@@ -37,7 +37,7 @@ class GroupMasterController extends Controller
                 'order.orderModel.material',
                 'order.orderModel.sizes.size',
                 'order.instructions',
-                'submodel'
+                'order.orderModel.submodels.submodel',
             ])
             ->selectRaw('DISTINCT ON (order_id) *');
 
