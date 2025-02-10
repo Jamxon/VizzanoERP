@@ -57,7 +57,7 @@ class GetOrderGroupMasterResource extends JsonResource
                                 'quantity' => $sewingOutput->quantity,
                                 'time' => [
                                     'id' => $sewingOutput->time->id,
-                                    'name' => $sewingOutput->time->name,
+                                    'name' => $sewingOutput->time->time,
                                 ],
                             ];
                         }),
