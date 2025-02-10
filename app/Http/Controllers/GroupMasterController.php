@@ -37,28 +37,28 @@ class GroupMasterController extends Controller
                 'order.orderModel.material',
                 'order.orderModel.sizes.size',
                 'order.instructions',
-                'order.orderModel.submodels.submodel',
+
             ])
-            ->selectRaw('DISTINCT ON (order_id) *');
+            ->selectRaw('DISTINCT ON (order_id, submodel_id) *');
 
         $orders = $query->get();
 
-        $orders = $orders->map(function ($orderGroup) {
-            $order = $orderGroup->order;
+        $orders = $orders->groupBy('order_id')->map(function ($orderGroups) {
+            $firstOrderGroup = $orderGroups->first();
+            $order = $firstOrderGroup->order;
 
             if ($order && $order->orderModel) {
+                $linkedSubmodelIds = $orderGroups->pluck('submodel_id')->unique();
                 $order->orderModel->submodels = $order->orderModel->submodels
-                    ->where('id', $orderGroup->submodel_id)
+                    ->whereIn('id', $linkedSubmodelIds)
                     ->values();
             }
 
-            return $orderGroup;
-        });
+            return $firstOrderGroup;
+        })->values();
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
-
-
 
     public function showOrder($id)
     {
