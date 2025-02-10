@@ -28,6 +28,8 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
     Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);
     Route::get('tarifications/{id}',[\App\Http\Controllers\GroupMasterController::class, 'getTarifications']);
     Route::post('tarifications',[\App\Http\Controllers\GroupMasterController::class,'assignEmployeesToTarifications']);
+    Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
+    Route::post('sewingOutputs',[\App\Http\Controllers\GroupMasterController::class, 'SewingOutputsStore']);
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
