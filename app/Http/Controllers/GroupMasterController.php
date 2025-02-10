@@ -149,7 +149,7 @@ class GroupMasterController extends Controller
 
         foreach ($data as $item) {
             $tarificationId = $item['tarification_id'];
-            $userIds = $item['user_id'];
+            $userIds = is_array($item['user_id']) ? $item['user_id'] : [$item['user_id']]; // Agar integer bo‘lsa, arrayga o‘girish
 
             $tarification = Tarification::find($tarificationId);
 
@@ -167,5 +167,6 @@ class GroupMasterController extends Controller
             'message' => 'Employees assigned to tarifications successfully'
         ]);
     }
+
 
 }
