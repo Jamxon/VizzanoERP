@@ -7,6 +7,7 @@ use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Models\Order;
 use App\Models\OrderGroup;
 use App\Models\Tarification;
+use http\Env\Response;
 use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
@@ -41,7 +42,26 @@ class GroupMasterController extends Controller
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
 
+    public function showOrder($id)
+    {
+        $order = Order::where('id', $id)
+            ->with([
+                'orderModel',
+                'orderModel.model',
+                'orderModel.material',
+                'orderModel.sizes.size',
+                'orderModel.submodels.submodel',
+                'orderModel.submodels.group',
+                'instructions'
+            ])
+            ->first();
 
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        return response()->json($order);
+    }
 
 
     public function getEmployees(): \Illuminate\Http\JsonResponse
