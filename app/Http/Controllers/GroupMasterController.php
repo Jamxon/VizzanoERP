@@ -175,15 +175,14 @@ class GroupMasterController extends Controller
 
     public function SewingOutputsStore(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = $request->input('data');
-
-        $data = $data->validate([
-            'order_submodel_id' => 'required|exists:order_submodels,id',
-            'quantity' => 'required|integer',
-            'time_id' => 'required|exists:times,id'
+        $validatedData = $request->validate([
+            'data' => 'required|array',
+            'data.*.order_submodel_id' => 'required|exists:order_submodels,id',
+            'data.*.quantity' => 'required|integer',
+            'data.*.time_id' => 'required|exists:times,id'
         ]);
 
-        foreach ($data as $item) {
+        foreach ($validatedData['data'] as $item) {
             SewingOutputs::create($item);
         }
 
@@ -191,4 +190,5 @@ class GroupMasterController extends Controller
             'message' => 'Sewing outputs created successfully'
         ]);
     }
+
 }
