@@ -18,7 +18,7 @@ class GetTarificationGroupMasterResource extends JsonResource
             'submodels' => $this->orderModel->submodels->map(function ($submodel) {
                 return [
                     'id' => $submodel->id,
-                    'name' => $submodel->name,
+                    'submodel' => $submodel->submodel,
                     'tarification_categories' => $submodel->tarificationCategories->map(function ($category) {
                         return [
                             'id' => $category->id,
