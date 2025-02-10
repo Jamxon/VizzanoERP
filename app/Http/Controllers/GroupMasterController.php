@@ -60,7 +60,7 @@ class GroupMasterController extends Controller
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
 
-    public function showOrder($id)
+    public function showOrder($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::where('id', $id)
             ->with([
@@ -76,6 +76,19 @@ class GroupMasterController extends Controller
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Order bilan bog‘liq OrderGroup larni olish
+        $orderGroups = OrderGroup::where('order_id', $id)->get();
+
+        if ($order->orderModel) {
+            // OrderGroup orqali bog‘langan submodellarning IDlarini olish
+            $linkedSubmodelIds = $orderGroups->pluck('submodel_id')->unique();
+
+            // Faqat OrderGroup orqali bog‘langan submodellari qoldirish
+            $order->orderModel->submodels = $order->orderModel->submodels
+                ->whereIn('id', $linkedSubmodelIds)
+                ->values(); // Indekslarni tiklash
         }
 
         return response()->json(new ShowOrderGroupMaster($order));
