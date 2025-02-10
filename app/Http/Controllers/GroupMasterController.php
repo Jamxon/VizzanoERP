@@ -7,7 +7,9 @@ use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\SewingOutputs;
 use App\Models\Tarification;
+use App\Models\Time;
 use http\Env\Response;
 use Illuminate\Http\Request;
 
@@ -163,5 +165,30 @@ class GroupMasterController extends Controller
         ]);
     }
 
+    public function getTimes(): \Illuminate\Http\JsonResponse
+    {
 
+       $times = Time::all();
+
+       return response()->json($times);
+    }
+
+    public function SewingOutputsStore(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->input('data');
+
+        $data = $data->validate([
+            'order_submodel_id' => 'required|exists:order_submodels,id',
+            'quantity' => 'required|integer',
+            'time_id' => 'required|exists:times,id'
+        ]);
+
+        foreach ($data as $item) {
+            SewingOutputs::create($item);
+        }
+
+        return response()->json([
+            'message' => 'Sewing outputs created successfully'
+        ]);
+    }
 }
