@@ -59,20 +59,24 @@ class GroupMasterController extends Controller
 
     public function getTarifications($id): \Illuminate\Http\JsonResponse
     {
-        $tarifications = Order::where('id', $id)
+        // Orderni topish
+        $order = Order::where('id', $id)
             ->with([
-                'orderModel.submodels.tarificationCategories'
+                'orderModel.submodels.tarificationCategory'
             ])
             ->first();
 
-        if (!$tarifications) {
+        // Agar order topilmasa, 404 qaytarish
+        if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        $resource = GetTarificationGroupMasterResource::make($tarifications);
+        // Resurs orqali chiqarish
+        $resource = new GetTarificationGroupMasterResource($order);
 
         return response()->json($resource);
     }
+
 
 
     public function startOrder($id): \Illuminate\Http\JsonResponse
