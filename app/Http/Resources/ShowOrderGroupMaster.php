@@ -46,6 +46,14 @@ class ShowOrderGroupMaster extends JsonResource
                                 'name' => $category->name,
                                 'tarifications' => $category->tarifications,
                             ]) ?? [],
+                        'sewingOutputs' => $submodel->sewingOutputs?->map(fn($sewingOutput) => [
+                                'id' => $sewingOutput->id,
+                                'quantity' => $sewingOutput->quantity,
+                                'time' => [
+                                    'id' => $sewingOutput->time?->id,
+                                    'name' => $sewingOutput->time?->name,
+                                ],
+                            ]) ?? [],
                     ]) ?? [],
             ] : null,
             'instructions' => $this->instructions,
