@@ -21,11 +21,15 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-        $status = strtolower(trim($request->status));
+        $status = $request->has('status') ? strtolower(trim($request->status)) : null;
 
         $query = OrderGroup::where('group_id', $user->group->id)
             ->whereHas('order', function ($q) use ($status) {
-                $q->where('status', $status);
+                if ($status) {
+                    $q->where('status', $status);
+                } else {
+                    $q->whereIn('status', ['pending', 'cutting']);
+                }
             })
             ->with([
                 'order.orderModel',
@@ -42,6 +46,7 @@ class GroupMasterController extends Controller
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
+
 
     public function showOrder($id)
     {
