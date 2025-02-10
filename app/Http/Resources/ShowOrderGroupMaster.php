@@ -14,52 +14,42 @@ class ShowOrderGroupMaster extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $order = optional($this->order);
-        $orderModel = optional($order->orderModel);
-
         return [
-            'id' => $order->id,
-            'name' => $order->name,
-            'quantity' => $order->quantity,
-            'start_date' => $order->start_date,
-            'end_date' => $order->end_date,
-            'rasxod' => $order->rasxod,
-            'status' => $order->status,
-            'comment' => $order->comment,
-            'orderModel' => [
-                'id' => $orderModel->id,
+            'id' => $this->order?->id,
+            'name' => $this->order?->name,
+            'quantity' => $this->order?->quantity,
+            'start_date' => $this->order?->start_date,
+            'end_date' => $this->order?->end_date,
+            'rasxod' => $this->order?->rasxod,
+            'status' => $this->order?->status,
+            'comment' => $this->order?->comment,
+            'orderModel' => $this->order?->orderModel ? [
+                'id' => $this->order->orderModel->id,
                 'model' => [
-                    'id' => optional($orderModel->model)->id,
-                    'name' => optional($orderModel->model)->name,
+                    'id' => $this->order->orderModel->model?->id,
+                    'name' => $this->order->orderModel->model?->name,
                 ],
                 'material' => [
-                    'id' => optional($orderModel->material)->id,
-                    'name' => optional($orderModel->material)->name,
+                    'id' => $this->order->orderModel->material?->id,
+                    'name' => $this->order->orderModel->material?->name,
                 ],
-                'sizes' => optional($orderModel->sizes)->map(function ($size) {
-                        return [
-                            'id' => $size->id,
-                            'size' => $size->size,
-                            'quantity' => $size->quantity,
-                        ];
-                    }) ?? [],
-                'submodels' => optional($orderModel->submodels)->map(function ($submodel) {
-                        return [
-                            'id' => $submodel->id,
-                            'submodel' => $submodel->submodel,
-                            'tarificationCategories' => optional($submodel->tarificationCategories)->map(function ($category) {
-                                    return [
-                                        'id' => $category->id,
-                                        'name' => $category->name,
-                                        'tarifications' => $category->tarifications,
-                                    ];
-                                }) ?? [],
-                        ];
-                    }) ?? [],
-            ],
-            'instructions' => $order->instructions,
+                'sizes' => $this->order->orderModel->sizes?->map(fn($size) => [
+                        'id' => $size->id,
+                        'size' => $size->size,
+                        'quantity' => $size->quantity,
+                    ]) ?? [],
+                'submodels' => $this->order->orderModel->submodels?->map(fn($submodel) => [
+                        'id' => $submodel->id,
+                        'submodel' => $submodel->submodel,
+                        'tarificationCategories' => $submodel->tarificationCategories?->map(fn($category) => [
+                                'id' => $category->id,
+                                'name' => $category->name,
+                                'tarifications' => $category->tarifications,
+                            ]) ?? [],
+                    ]) ?? [],
+            ] : null,
+            'instructions' => $this->order?->instructions,
         ];
     }
-
 
 }
