@@ -51,7 +51,7 @@ class ShowOrderGroupMaster extends JsonResource
                                 'quantity' => $sewingOutput->quantity,
                                 'time' => [
                                     'id' => $sewingOutput->time?->id,
-                                    'name' => $sewingOutput->time?->time,
+                                    'time' => $sewingOutput->time?->time,
                                 ],
                             ]) ?? [],
                     ]) ?? [],
