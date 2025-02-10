@@ -21,7 +21,6 @@ class GroupMasterController extends Controller
 
         $status = strtolower(trim($request->status));
 
-        // ORDER_ID bo‘yicha GROUP BY qilyapmiz
         $query = OrderGroup::where('group_id', $user->group->id)
             ->whereHas('order', function ($q) use ($status) {
                 $q->where('status', $status);
@@ -58,22 +57,23 @@ class GroupMasterController extends Controller
         return response()->json($employees);
     }
 
-    public function getTarifications(): \Illuminate\Http\JsonResponse
+    public function getTarifications($id): \Illuminate\Http\JsonResponse
     {
-        $user = auth()->user();
+        $tarifications = Order::where('id', $id)
+            ->with([
+                'orderModel.submodels.tarificationCategory'
+            ])
+            ->first();
 
-        if (!$user->group) {
-            return response()->json(['message' => 'Group not found'], 404);
+        if (!$tarifications) {
+            return response()->json(['message' => 'Order not found'], 404);
         }
 
-        $tarifications = $user->group->orders()->with([
-            'order.orderModel.submodels.tarificationCategories.tarifications',
-        ])->get();
-
-        $resource = GetTarificationGroupMasterResource::collection($tarifications);
+        $resource = GetTarificationGroupMasterResource::make($tarifications);
 
         return response()->json($resource);
     }
+
 
     public function startOrder($id): \Illuminate\Http\JsonResponse
     {
