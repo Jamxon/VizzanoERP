@@ -14,9 +14,12 @@ class GetTarificationGroupMasterResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        return [
+            'submodels' => $this->orderModel->submodels->map(function ($submodel) {
                 return [
-                    'submodel' => $this->orderModel->submodels->submodel,
-                    'tarification_categories' => $this->orderModel->submodels->tarificationCategories->map(function ($category) {
+                    'id' => $submodel->id,
+                    'submodel' => $submodel->submodel,
+                    'tarification_categories' => $submodel->tarificationCategories->map(function ($category) {
                         return [
                             'id' => $category->id,
                             'name' => $category->name,
@@ -24,6 +27,9 @@ class GetTarificationGroupMasterResource extends JsonResource
                         ];
                     }),
                 ];
+            }),
+        ];
+
     }
 
 
