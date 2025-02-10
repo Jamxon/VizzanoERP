@@ -177,7 +177,7 @@ class GroupMasterController extends Controller
     {
         $validatedData = $request->validate([
             'data' => 'required|array',
-            'data.*.order_submodel_id' => 'required|exists:order_submodels,id',
+            'data.*.order_submodel_id' => 'required|exists:order_sub_models,id',
             'data.*.quantity' => 'required|integer',
             'data.*.time_id' => 'required|exists:times,id'
         ]);
