@@ -15,6 +15,7 @@ class OrderSubModel extends Model
     protected $table = "order_sub_models";
 
     protected $fillable = [
+        'id',
         'order_model_id',
         'submodel_id',
     ];
