@@ -78,17 +78,16 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        // Order bilan bog‘liq OrderGroup larni olish
-        $orderGroups = OrderGroup::where('order_id', $id)->get();
+        $orderGroups = OrderGroup::where('order_id', $id)
+            ->where('group_id', auth()->user()->group->id)
+            ->get();
 
         if ($order->orderModel) {
-            // OrderGroup orqali bog‘langan submodellarning IDlarini olish
-            $linkedSubmodelIds = $orderGroups->pluck('submodel_id')->unique();
+            $linkedSubmodelIds = $orderGroups->pluck('submodel_id');
 
-            // Faqat OrderGroup orqali bog‘langan submodellari qoldirish
             $order->orderModel->submodels = $order->orderModel->submodels
                 ->whereIn('id', $linkedSubmodelIds)
-                ->values(); // Indekslarni tiklash
+                ->values();
         }
 
         return response()->json(new ShowOrderGroupMaster($order));
