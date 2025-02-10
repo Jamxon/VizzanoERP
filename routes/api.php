@@ -25,7 +25,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
    Route::get('orders',[\App\Http\Controllers\GroupMasterController::class, 'getOrders']);
     Route::get('orders/{id}',[\App\Http\Controllers\GroupMasterController::class,'startOrder']);
     Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);
-    Route::get('tarifications',[\App\Http\Controllers\GroupMasterController::class, 'getTarifications']);
+    Route::get('tarifications/{id}',[\App\Http\Controllers\GroupMasterController::class, 'getTarifications']);
     Route::post('tarifications',[\App\Http\Controllers\GroupMasterController::class,'assignEmployeesToTarifications']);
 });
 
