@@ -62,7 +62,7 @@ class GroupMasterController extends Controller
         // Orderni topish
         $order = Order::where('id', $id)
             ->with([
-                'orderModel.submodels.tarificationCategory'
+                'orderModel.submodels.tarificationCategories'
             ])
             ->first();
 
