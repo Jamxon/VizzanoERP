@@ -17,7 +17,8 @@ class SewingOutputs extends Model
     protected $fillable = [
         'order_submodel_id',
         'quantity',
-        'time_id'
+        'time_id',
+        'comment'
     ];
 
     public function orderSubmodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
