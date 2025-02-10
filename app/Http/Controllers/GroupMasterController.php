@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
+use App\Http\Resources\ShowOrderGroupMaster;
 use App\Models\Order;
 use App\Models\OrderGroup;
 use App\Models\Tarification;
@@ -60,7 +61,7 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        return response()->json($order);
+        return response()->json(new ShowOrderGroupMaster($order));
     }
 
 
