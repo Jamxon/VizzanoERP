@@ -158,7 +158,7 @@ class GroupMasterController extends Controller
                 $updatedIds = array_unique(array_merge($existingIds, $userIds));
 
                 $tarification->update([
-                    'user_ids' => json_encode($updatedIds)
+                    'user_id' => json_encode($updatedIds)
                 ]);
             }
         }
