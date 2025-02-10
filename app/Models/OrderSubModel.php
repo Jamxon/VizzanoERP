@@ -61,4 +61,9 @@ class OrderSubModel extends Model
     {
         return $this->hasMany(SpecificationCategory::class, 'submodel_id');
     }
+
+    public function sewingOutputs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SewingOutputs::class, 'order_submodel_id');
+    }
 }
