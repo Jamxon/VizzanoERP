@@ -44,6 +44,13 @@ class GetOrderGroupMasterResource extends JsonResource
                     return [
                         'id' => $submodel->id,
                         'submodel' => $submodel->submodel,
+                        'tarificationCategories' => $submodel->tarificationCategories->map(function ($category) {
+                            return [
+                                'id' => $category->id,
+                                'name' => $category->name,
+                                'tarifications' => $category->tarifications,
+                            ];
+                        }),
                     ];
                 }),
             ],
