@@ -149,18 +149,13 @@ class GroupMasterController extends Controller
 
         foreach ($data as $item) {
             $tarificationId = $item['tarification_id'];
-            $userIds = is_array($item['user_id']) ? $item['user_id'] : [$item['user_id']]; // Agar integer bo‘lsa, arrayga o‘girish
+            $userId = $item['user_id'];
 
             $tarification = Tarification::find($tarificationId);
 
-            if ($tarification) {
-                $existingIds = $tarification->user_ids ? json_decode($tarification->user_ids, true) : [];
-                $updatedIds = array_unique(array_merge($existingIds, $userIds));
-
-                $tarification->update([
-                    'user_id' => json_encode($updatedIds)
-                ]);
-            }
+            $tarification->update([
+                'user_id' => $userId
+            ]);
         }
 
         return response()->json([
