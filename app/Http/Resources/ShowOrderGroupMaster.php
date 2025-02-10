@@ -14,33 +14,36 @@ class ShowOrderGroupMaster extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $order = optional($this->order);
+        $orderModel = optional($order->orderModel);
+
         return [
-            'id' => $this->order->id ?? null,
-            'name' => $this->order->name ?? null,
-            'quantity' => $this->order->quantity ?? null,
-            'start_date' => $this->order->start_date ?? null,
-            'end_date' => $this->order->end_date ?? null,
-            'rasxod' => $this->order->rasxod ?? null,
-            'status' => $this->order->status ?? null,
-            'comment' => $this->order->comment ?? null,
+            'id' => $order->id,
+            'name' => $order->name,
+            'quantity' => $order->quantity,
+            'start_date' => $order->start_date,
+            'end_date' => $order->end_date,
+            'rasxod' => $order->rasxod,
+            'status' => $order->status,
+            'comment' => $order->comment,
             'orderModel' => [
-                'id' => optional($this->order->orderModel)->id,
+                'id' => $orderModel->id,
                 'model' => [
-                    'id' => optional($this->order->orderModel->model)->id,
-                    'name' => optional($this->order->orderModel->model)->name,
+                    'id' => optional($orderModel->model)->id,
+                    'name' => optional($orderModel->model)->name,
                 ],
                 'material' => [
-                    'id' => optional($this->order->orderModel->material)->id,
-                    'name' => optional($this->order->orderModel->material)->name,
+                    'id' => optional($orderModel->material)->id,
+                    'name' => optional($orderModel->material)->name,
                 ],
-                'sizes' => optional($this->order->orderModel->sizes)->map(function ($size) {
+                'sizes' => optional($orderModel->sizes)->map(function ($size) {
                         return [
                             'id' => $size->id,
                             'size' => $size->size,
                             'quantity' => $size->quantity,
                         ];
                     }) ?? [],
-                'submodels' => optional($this->order->orderModel->submodels)->map(function ($submodel) {
+                'submodels' => optional($orderModel->submodels)->map(function ($submodel) {
                         return [
                             'id' => $submodel->id,
                             'submodel' => $submodel->submodel,
@@ -54,8 +57,9 @@ class ShowOrderGroupMaster extends JsonResource
                         ];
                     }) ?? [],
             ],
-            'instructions' => $this->order->instructions ?? null,
+            'instructions' => $order->instructions,
         ];
     }
+
 
 }
