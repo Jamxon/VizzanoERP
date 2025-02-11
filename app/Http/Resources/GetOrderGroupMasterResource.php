@@ -63,7 +63,6 @@ class GetOrderGroupMasterResource extends JsonResource
                                     ],
                                 ];
                             }),
-
                     ];
                 }),
             ],
