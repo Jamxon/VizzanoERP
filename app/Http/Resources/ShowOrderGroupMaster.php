@@ -48,19 +48,17 @@ class ShowOrderGroupMaster extends JsonResource
                             ]) ?? [],
                         'sewingOutputs' => $submodel->sewingOutputs
                                 ?->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
-                                ->mapWithKeys(fn($sewingOutput) => [
-                                    (string) $sewingOutput->id => [ // ID kalit sifatida string bo'lishi kerak
-                                        'id' => $sewingOutput->id,
-                                        'quantity' => $sewingOutput->quantity,
-                                        'time' => [
-                                            'id' => $sewingOutput->time?->id,
-                                            'start' => $sewingOutput->time?->start,
-                                            'end' => $sewingOutput->time?->end,
-                                        ],
+                                ->map(fn($sewingOutput) => [
+                                    'id' => $sewingOutput->id,
+                                    'quantity' => $sewingOutput->quantity,
+                                    'time' => [
+                                        'id' => $sewingOutput->time?->id,
+                                        'start' => $sewingOutput->time?->start,
+                                        'end' => $sewingOutput->time?->end,
                                     ],
                                 ])
+                                ->values() // <-- Indekslangan massiv shaklida qaytarish
                                 ->toArray() ?? [],
-
 
                     ]) ?? [],
             ] : null,
