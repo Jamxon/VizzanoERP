@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static create(mixed $item)
+ * @method static where(string $string, string $string1, mixed $startDate)
+ * @method static whereDate(string $string, string $string1, mixed $startDate)
  */
 class SewingOutputs extends Model
 {
