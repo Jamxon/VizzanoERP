@@ -26,6 +26,7 @@ class VizzanoReportTvController extends Controller
                 'model' => $sewingOutput->orderSubmodel->orderModel->model,
                 'submodel' => $sewingOutput->orderSubmodel->submodel,
                 'quantity' => $sewingOutput->quantity,
+                'group' => $sewingOutput->orderSubmodel->group->group,
             ];
         });
 
