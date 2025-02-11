@@ -51,16 +51,19 @@ class GetOrderGroupMasterResource extends JsonResource
                                 'tarifications' => $category->tarifications,
                             ];
                         }),
-                        'sewingOutputs' => $submodel->sewingOutputs->map(function ($sewingOutput) {
-                            return [
-                                'id' => $sewingOutput->id,
-                                'quantity' => $sewingOutput->quantity,
-                                'time' => [
-                                    'id' => $sewingOutput->time->id,
-                                    'time' => $sewingOutput->time->time,
-                                ],
-                            ];
-                        }),
+                        'sewingOutputs' => $submodel->sewingOutputs
+                            ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+                            ->map(function ($sewingOutput) {
+                                return [
+                                    'id' => $sewingOutput->id,
+                                    'quantity' => $sewingOutput->quantity,
+                                    'time' => [
+                                        'id' => $sewingOutput->time->id,
+                                        'time' => $sewingOutput->time->time,
+                                    ],
+                                ];
+                            }),
+
                     ];
                 }),
             ],
