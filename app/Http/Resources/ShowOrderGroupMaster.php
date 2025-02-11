@@ -53,8 +53,7 @@ class ShowOrderGroupMaster extends JsonResource
                                     'quantity' => $sewingOutput->quantity,
                                     'time' => [
                                         'id' => $sewingOutput->time?->id,
-                                        'start' => $sewingOutput->time?->start,
-                                        'end' => $sewingOutput->time?->end,
+                                        'time' => $sewingOutput->time->time,
                                     ],
                                 ])
                                 ->values() // <-- Indekslangan massiv shaklida qaytarish
