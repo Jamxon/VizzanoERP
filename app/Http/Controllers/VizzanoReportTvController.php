@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Motivation;
 use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
 
@@ -26,16 +27,24 @@ class VizzanoReportTvController extends Controller
             ->orderBy('total_quantity', 'desc')
             ->get();
 
-        $resource = $sewingOutputs->map(function ($sewingOutput) {
-            return [
-                'id' => $sewingOutput->id,
-                'model' => optional($sewingOutput->orderSubmodel->orderModel)->model,
-                'submodel' => $sewingOutput->orderSubmodel->submodel,
-                'group' => optional($sewingOutput->orderSubmodel->group)->group,
-                'total_quantity' => $sewingOutput->total_quantity,
-                'today_quantity' => $sewingOutput->today_quantity,
-            ];
-        });
+        $motivations = Motivation::all()->map(fn($motivation) => [
+            'title' => $motivation->title,
+        ]);
+
+        // Natijani shakllantirish
+        $resource = [
+            'sewing_outputs' => $sewingOutputs->map(function ($sewingOutput) {
+                return [
+                    'id' => $sewingOutput->id,
+                    'model' => optional($sewingOutput->orderSubmodel->orderModel)->model,
+                    'submodel' => $sewingOutput->orderSubmodel->submodel,
+                    'group' => optional($sewingOutput->orderSubmodel->group)->group,
+                    'total_quantity' => $sewingOutput->total_quantity,
+                    'today_quantity' => $sewingOutput->today_quantity,
+                ];
+            }),
+            'motivations' => $motivations,
+        ];
 
         return response()->json($resource);
     }
