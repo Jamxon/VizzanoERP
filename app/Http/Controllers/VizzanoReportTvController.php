@@ -30,7 +30,7 @@ class VizzanoReportTvController extends Controller
             return [
                 'id' => $sewingOutput->id,
                 'model' => optional($sewingOutput->orderSubmodel->orderModel)->model,
-                'submodel' => optional($sewingOutput->orderSubmodel->submodel)->submodel,
+                'submodel' => optional($sewingOutput->orderSubmodel->submodel),
                 'group' => optional($sewingOutput->orderSubmodel->group)->group,
                 'total_quantity' => $sewingOutput->total_quantity,  // Umumiy ishlab chiqarilgan miqdor
                 'today_quantity' => $sewingOutput->today_quantity,  // Bugungi ishlab chiqarilgan miqdor
