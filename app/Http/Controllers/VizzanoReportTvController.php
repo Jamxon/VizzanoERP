@@ -16,6 +16,7 @@ class VizzanoReportTvController extends Controller
 
         if (!$endDate) {
             $query = SewingOutputs::whereDate('created_at', '=', $startDate);
+            $today = $startDate;
         } else {
             $query = SewingOutputs::whereDate('created_at', '>=', $startDate)
                 ->whereDate('created_at', '<=', $endDate);
