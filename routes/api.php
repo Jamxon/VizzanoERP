@@ -17,6 +17,7 @@ use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\TechnologController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VizzanoReportTvController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
@@ -167,10 +168,7 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::get('cuts/{id}', [CuttingMasterController::class, 'getCuts']);
 });
 
-    Route::get('lids', [LidController::class, 'index']);
-    Route::post('lids', [LidController::class, 'store']);
-    Route::patch('lids/{lid}', [LidController::class, 'update']);
-    Route::post('lids/search', [LidController::class, 'search']);
+Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
 
     Route::get('/validate', function () {
         return response()->json(['message' => auth()->user()], 200);
