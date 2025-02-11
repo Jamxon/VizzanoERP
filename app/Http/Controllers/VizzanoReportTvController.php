@@ -18,19 +18,27 @@ class VizzanoReportTvController extends Controller
             $query->whereDate('created_at', '<=', $endDate);
         }
 
-        $sewingOutputs = $query->orderBy('created_at', 'desc')->get();
+        // Guruh va submodel bo'yicha umumiy va bugungi ishlab chiqarilgan miqdorlarni hisoblash
+        $sewingOutputs = $query
+            ->selectRaw('order_submodel_id, SUM(quantity) as total_quantity, SUM(CASE WHEN DATE(created_at) = ? THEN quantity ELSE 0 END) as today_quantity', [$startDate])
+            ->groupBy('order_submodel_id')
+            ->with(['orderSubmodel.orderModel', 'orderSubmodel.submodel', 'orderSubmodel.group'])
+            ->orderBy('total_quantity', 'desc')
+            ->get();
 
         $resource = $sewingOutputs->map(function ($sewingOutput) {
             return [
                 'id' => $sewingOutput->id,
-                'model' => $sewingOutput->orderSubmodel->orderModel->model,
-                'submodel' => $sewingOutput->orderSubmodel->submodel,
-                'quantity' => $sewingOutput->quantity,
-                'group' => $sewingOutput->orderSubmodel->group->group,
+                'model' => optional($sewingOutput->orderSubmodel->orderModel)->model,
+                'submodel' => optional($sewingOutput->orderSubmodel->submodel)->name,
+                'group' => optional($sewingOutput->orderSubmodel->group)->group,
+                'total_quantity' => $sewingOutput->total_quantity,  // Umumiy ishlab chiqarilgan miqdor
+                'today_quantity' => $sewingOutput->today_quantity,  // Bugungi ishlab chiqarilgan miqdor
             ];
         });
 
         return response()->json($resource);
     }
+
 
 }
