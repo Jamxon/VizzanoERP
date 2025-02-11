@@ -35,7 +35,6 @@ class VizzanoReportTvController extends Controller
         $resource = [
             'sewing_outputs' => $sewingOutputs->map(function ($sewingOutput) {
                 return [
-                    'id' => $sewingOutput->id,
                     'model' => optional($sewingOutput->orderSubmodel->orderModel)->model,
                     'submodel' => $sewingOutput->orderSubmodel->submodel,
                     'group' => optional($sewingOutput->orderSubmodel->group)->group,
