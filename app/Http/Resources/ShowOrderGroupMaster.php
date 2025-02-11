@@ -46,14 +46,16 @@ class ShowOrderGroupMaster extends JsonResource
                                 'name' => $category->name,
                                 'tarifications' => $category->tarifications,
                             ]) ?? [],
-                        'sewingOutputs' => $submodel->sewingOutputs?->map(fn($sewingOutput) => [
-                                'id' => $sewingOutput->id,
-                                'quantity' => $sewingOutput->quantity,
-                                'time' => [
-                                    'id' => $sewingOutput->time?->id,
-                                    'time' => $sewingOutput->time?->time,
-                                ],
-                            ]) ?? [],
+                        'sewingOutputs' => $submodel->sewingOutputs
+                                ?->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+                                ->map(fn($sewingOutput) => [
+                                    'id' => $sewingOutput->id,
+                                    'quantity' => $sewingOutput->quantity,
+                                    'time' => [
+                                        'id' => $sewingOutput->time?->id,
+                                        'time' => $sewingOutput->time?->time,
+                                    ],
+                                ]) ?? [],
                     ]) ?? [],
             ] : null,
             'instructions' => $this->instructions,
