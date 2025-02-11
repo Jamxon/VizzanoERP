@@ -11,11 +11,15 @@ class VizzanoReportTvController extends Controller
     public function getSewingOutputs(Request $request): \Illuminate\Http\JsonResponse
     {
         $startDate = $request->get('start_date') ?? now()->subDays(6)->format('Y-m-d'); // Default: oxirgi 7 kun
-        $endDate = $request->get('end_date') ?? now()->format('Y-m-d'); // Bugungi sana
+        $endDate = $request->get('end_date') ?? null; // Bugungi sana
         $today = now()->format('Y-m-d'); // Bugungi sana
 
         $query = SewingOutputs::whereDate('created_at', '>=', $startDate)
             ->whereDate('created_at', '<=', $endDate);
+
+        if ($endDate) {
+            $query->whereDate('created_at', '<=', $endDate);
+        }
 
         // Guruh va submodel bo'yicha umumiy va bugungi ishlab chiqarilgan miqdorlarni hisoblash
         $sewingOutputs = $query
