@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\OrderSubModel;
 
 /**
  * @method static create(mixed $item)
@@ -25,7 +26,7 @@ class SewingOutputs extends Model
 
     public function orderSubmodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(OrderSubmodel::class,'order_submodel_id');
+        return $this->belongsTo(OrderSubModel::class, 'order_submodel_id');
     }
 
     public function time(): \Illuminate\Database\Eloquent\Relations\BelongsTo
