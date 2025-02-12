@@ -24,12 +24,12 @@ class VizzanoReportTvController extends Controller
             $today = $startDate;
         }
 
-        $groupIds = $query
-            ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
+        $groupIds = SewingOutputs::join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
             ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id')
             ->whereDate('sewing_outputs.created_at', '=', $startDate)
             ->pluck('order_groups.group_id')
             ->unique();
+
 
         $sewingOutputs = $query
             ->selectRaw('order_submodel_id, SUM(quantity) as total_quantity, SUM(CASE WHEN DATE(sewing_outputs.created_at) = ? THEN quantity ELSE 0 END) as today_quantity', [$today])

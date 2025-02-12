@@ -10,6 +10,7 @@ use App\Models\OrderSubModel;
  * @method static create(mixed $item)
  * @method static where(string $string, string $string1, mixed $startDate)
  * @method static whereDate(string $string, string $string1, mixed $startDate)
+ * @method static join(string $string, string $string1, string $string2, string $string3)
  */
 class SewingOutputs extends Model
 {
