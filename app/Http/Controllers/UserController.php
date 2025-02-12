@@ -38,9 +38,9 @@ class UserController extends Controller
 
     public function getUsersSubMaster()
     {
-        $users = User::where('role_id', '=', 9)
-            ->whereHas('employee', function ($query) {
+        $users = User::whereHas('employee', function ($query) {
                 $query->where('status', 'working');
+                $query->where('type', "aup");
                 $query->where('branch_id', '=', Auth::user()->employee->branch_id);
             })
             ->get();
