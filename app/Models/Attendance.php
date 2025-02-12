@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static whereDate(string $string, mixed $today)
+ */
 class Attendance extends Model
 {
     use HasFactory;
