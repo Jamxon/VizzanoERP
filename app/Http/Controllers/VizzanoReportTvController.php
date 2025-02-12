@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class VizzanoReportTvController extends Controller
 {
-    public function getSewingOutputs(Request $request): \Illuminate\Http\JsonResponse
+    public function getSewingOutputs(Request $request)
     {
         $startDate = $request->get('start_date') ?? now()->format('Y-m-d');
         $endDate = $request->get('end_date');
@@ -24,7 +24,7 @@ class VizzanoReportTvController extends Controller
             $today = $startDate;
         }
 
-        $groupIds = $query
+       return  $groupIds = $query
             ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
             ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id') // To‘g‘ri bog‘lash
             ->whereDate('sewing_outputs.created_at', '=', $startDate) // created_at aniq jadvaldan
