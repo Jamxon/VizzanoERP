@@ -24,11 +24,11 @@ class VizzanoReportTvController extends Controller
             $today = $startDate;
         }
 
-        // SewingOutputs orqali chiqqan guruhlarning IDlarini olish
+        // Faqat SewingOutputs da ishlatilgan group_id larni olish
         $groupIds = $query
-            ->join('order_submodels', 'sewing_outputs.order_submodel_id', '=', 'order_submodels.id')
-            ->join('groups', 'order_submodels.group_id', '=', 'groups.id')
-            ->pluck('groups.id')
+            ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
+            ->join('order_groups', 'order_sub_models.submodel_id', '=', 'order_groups.submodel_id') // To‘g‘ri bog‘lanish
+            ->pluck('order_groups.group_id')
             ->unique();
 
         $sewingOutputs = $query
@@ -38,11 +38,11 @@ class VizzanoReportTvController extends Controller
             ->orderBy('total_quantity', 'desc')
             ->get();
 
-        // Faqat SewingOutputs bo'yicha mavjud bo'lgan guruhlar uchun ishchilar sonini olish
+        // Faqat SewingOutputs dagi group_id lar uchun ishchilar sonini olish
         $employeeCounts = Attendance::where('attendance.date', $today)
             ->where('attendance.status', '!=', 'ABSENT')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
-            ->whereIn('employees.group_id', $groupIds) // Faqat chiqayotgan guruhlarni hisoblash
+            ->whereIn('employees.group_id', $groupIds) // Faqat chiqqan group_id larni olish
             ->groupBy('employees.group_id')
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
@@ -59,7 +59,7 @@ class VizzanoReportTvController extends Controller
                     'group' => optional($sewingOutput->orderSubmodel->group)->group,
                     'total_quantity' => $sewingOutput->total_quantity,
                     'today_quantity' => $sewingOutput->today_quantity,
-                    'employee_count' => $employeeCounts[$sewingOutput->orderSubmodel->group_id] ?? 0, // Faqat mavjudlarini olamiz
+                    'employee_count' => $employeeCounts[$sewingOutput->orderSubmodel->group_id] ?? 0,
                 ];
             }),
             'motivations' => $motivations,
@@ -67,6 +67,5 @@ class VizzanoReportTvController extends Controller
 
         return response()->json($resource);
     }
-
 
 }
