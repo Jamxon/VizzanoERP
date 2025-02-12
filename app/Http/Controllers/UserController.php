@@ -20,9 +20,9 @@ class UserController extends Controller
     }
     public function getUsersMaster()
     {
-        $users = User::where('role_id', '=', 8)
-            ->whereHas('employee', function ($query) {
+        $users = User::whereHas('employee', function ($query) {
                 $query->where('status', 'working');
+                $query->where('type', "aup");
                 $query->where('branch_id', '=', Auth::user()->employee->branch_id);
             })
             ->get();
