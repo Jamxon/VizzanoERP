@@ -18,9 +18,9 @@ class VizzanoReportTvController extends Controller
         $query = SewingOutputs::query();
 
         if ($endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
+            $query->whereBetween('sewing_outputs.created_at', [$startDate, $endDate]);
         } else {
-            $query->whereDate('created_at', '=', $startDate);
+            $query->whereDate('sewing_outputs.created_at', '=', $startDate);
             $today = $startDate;
         }
 
@@ -33,7 +33,7 @@ class VizzanoReportTvController extends Controller
 
 
         $sewingOutputs = $query
-            ->selectRaw('order_submodel_id, SUM(quantity) as total_quantity, SUM(CASE WHEN DATE(created_at) = ? THEN quantity ELSE 0 END) as today_quantity', [$today])
+            ->selectRaw('order_submodel_id, SUM(quantity) as total_quantity, SUM(CASE WHEN DATE(sewing_outputs.created_at) = ? THEN quantity ELSE 0 END) as today_quantity', [$today])
             ->groupBy('order_submodel_id')
             ->with(['orderSubmodel.orderModel', 'orderSubmodel.submodel', 'orderSubmodel.group'])
             ->orderBy('total_quantity', 'desc')
