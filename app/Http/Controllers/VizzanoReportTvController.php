@@ -65,8 +65,8 @@ class VizzanoReportTvController extends Controller
             'sewing_outputs' => $sewingOutputs->map(function ($sewingOutput) use ($employeeCounts, $workTimeByGroup) {
                 $group_id = optional($sewingOutput->orderSubmodel->group->group)->id;
                 $employeeCount = $employeeCounts[$group_id] ?? 0;
-              return  $workTime = $workTimeByGroup[$group_id] ?? 0; // Ish vaqti soniyalarda
-                $submodelSpend = optional($sewingOutput->orderSubmodel->submodelSpend)->seconds ?? 0;
+                $workTime = $workTimeByGroup[$group_id] ?? 0; // Ish vaqti soniyalarda
+                return  $submodelSpend = optional($sewingOutput->orderSubmodel->submodelSpend)->seconds ?? 0;
 
                 // Bugungi reja hisoblash
                 $today_plan = ($submodelSpend > 0 && $employeeCount > 0)
