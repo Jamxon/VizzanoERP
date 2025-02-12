@@ -51,9 +51,10 @@ class VizzanoReportTvController extends Controller
             ->join('departments', 'groups.department_id', '=', 'departments.id')
             ->selectRaw('
         groups.id as group_id, 
-        EXTRACT(EPOCH FROM (departments.end_time - departments.start_time) - departments.break_time) as work_seconds
-        ')
+        EXTRACT(EPOCH FROM (departments.end_time - departments.start_time - (departments.break_time * INTERVAL \'1 second\'))) as work_seconds
+    ')
             ->pluck('work_seconds', 'group_id');
+
 
 
         $motivations = Motivation::all()->map(fn($motivation) => [
