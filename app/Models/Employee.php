@@ -16,7 +16,7 @@ class Employee extends Model
     protected $fillable = [
         'name', 'phone', 'group_id', 'user_id', 'payment_type',
         'salary', 'hiring_date', 'status', 'address', 'passport_number'
-        ,'branch_id'
+        ,'branch_id', 'type'
     ];
     public function group(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

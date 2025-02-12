@@ -8,7 +8,6 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
-use App\Http\Controllers\LidController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RazryadController;
