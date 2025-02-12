@@ -24,12 +24,14 @@ class VizzanoReportTvController extends Controller
             $today = $startDate;
         }
 
+
         $groupIds = $query
             ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
             ->join('order_groups', 'order_sub_models.submodel_id', '=', 'order_groups.submodel_id')
-            ->whereDate('sewing_outputs.created_at', '=', $startDate) // Jadval nomini qo‘shdik
+            ->whereDate('sewing_outputs.created_at', '=', $startDate) // Jadval nomi aniq ko‘rsatildi
             ->pluck('order_groups.group_id')
             ->unique();
+
 
 
         $sewingOutputs = $query
