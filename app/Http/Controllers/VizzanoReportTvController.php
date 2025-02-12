@@ -47,7 +47,7 @@ class VizzanoReportTvController extends Controller
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
 
-     return    $workTimeByGroup = \App\Models\Group::whereIn('groups.id', $groupIds)
+        $workTimeByGroup = \App\Models\Group::whereIn('groups.id', $groupIds)
             ->join('departments', 'groups.department_id', '=', 'departments.id')
             ->selectRaw('
         groups.id as group_id, 
@@ -65,7 +65,7 @@ class VizzanoReportTvController extends Controller
             'sewing_outputs' => $sewingOutputs->map(function ($sewingOutput) use ($employeeCounts, $workTimeByGroup) {
                 $group_id = optional($sewingOutput->orderSubmodel->group->group)->id;
                 $employeeCount = $employeeCounts[$group_id] ?? 0;
-                $workTime = $workTimeByGroup[$group_id] ?? 0; // Ish vaqti soniyalarda
+              return  $workTime = $workTimeByGroup[$group_id] ?? 0; // Ish vaqti soniyalarda
                 $submodelSpend = optional($sewingOutput->orderSubmodel->submodelSpend)->seconds ?? 0;
 
                 // Bugungi reja hisoblash
