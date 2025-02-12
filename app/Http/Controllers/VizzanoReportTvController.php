@@ -47,11 +47,14 @@ class VizzanoReportTvController extends Controller
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
 
-        // Ish vaqtini hisoblash
         $workTimeByGroup = \App\Models\Group::whereIn('id', $groupIds)
             ->join('departments', 'groups.department_id', '=', 'departments.id')
-            ->selectRaw('groups.id as group_id, TIME_TO_SEC(TIMEDIFF(departments.end_time, departments.start_time)) - TIME_TO_SEC(departments.break_time) as work_seconds')
+            ->selectRaw('
+        groups.id as group_id, 
+        EXTRACT(EPOCH FROM (departments.end_time - departments.start_time) - departments.break_time) as work_seconds
+        ')
             ->pluck('work_seconds', 'group_id');
+
 
         $motivations = Motivation::all()->map(fn($motivation) => [
             'title' => $motivation->title,
