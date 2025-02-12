@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class VizzanoReportTvController extends Controller
 {
-    public function getSewingOutputs(Request $request): \Illuminate\Http\JsonResponse
+    public function getSewingOutputs(Request $request)
     {
         $startDate = $request->get('start_date') ?? now()->format('Y-m-d');
         $endDate = $request->get('end_date');
