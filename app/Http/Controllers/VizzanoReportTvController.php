@@ -47,7 +47,7 @@ class VizzanoReportTvController extends Controller
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
 
-        $workTimeByGroup = \App\Models\Group::whereIn('groups.id', $groupIds)
+     return    $workTimeByGroup = \App\Models\Group::whereIn('groups.id', $groupIds)
             ->join('departments', 'groups.department_id', '=', 'departments.id')
             ->selectRaw('
         groups.id as group_id, 
