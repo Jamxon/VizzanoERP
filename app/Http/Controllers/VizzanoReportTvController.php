@@ -24,12 +24,13 @@ class VizzanoReportTvController extends Controller
             $today = $startDate;
         }
 
-        // Faqat SewingOutputs da ishlatilgan group_id larni olish
         $groupIds = $query
             ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
-            ->join('order_groups', 'order_sub_models.submodel_id', '=', 'order_groups.submodel_id') // To‘g‘ri bog‘lanish
+            ->join('order_groups', 'order_sub_models.submodel_id', '=', 'order_groups.submodel_id')
+            ->whereDate('sewing_outputs.created_at', '=', $startDate) // Jadval nomini qo‘shdik
             ->pluck('order_groups.group_id')
             ->unique();
+
 
         $sewingOutputs = $query
             ->selectRaw('order_submodel_id, SUM(quantity) as total_quantity, SUM(CASE WHEN DATE(created_at) = ? THEN quantity ELSE 0 END) as today_quantity', [$today])
