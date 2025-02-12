@@ -9,9 +9,18 @@ class Attendance extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['employee_id', 'date', 'check_in', 'check_out'];
+    protected $fillable = [
+        'employee_id',
+        'date',
+        'check_in',
+        'check_out',
+        'status',
+        'work_hours',
+        'overtime_hours',
+        'comment'
+    ];
 
-    public function employee()
+    public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }
