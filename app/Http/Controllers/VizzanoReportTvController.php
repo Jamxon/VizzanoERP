@@ -31,8 +31,8 @@ class VizzanoReportTvController extends Controller
             ->orderBy('total_quantity', 'desc')
             ->get();
 
-        $employeeCounts = Attendance::where('date', $today)
-            ->where('status', '!=', 'ABSENT')
+        $employeeCounts = Attendance::where('attendance.date', $today)
+            ->where('attendance.status', '!=', 'ABSENT')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
             ->groupBy('employees.group_id')
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
