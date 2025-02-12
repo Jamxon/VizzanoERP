@@ -24,13 +24,13 @@ class OrderRecipes extends Model
         'order_id'
     ];
 
-    public function item()
+    public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Item::class);
     }
 
-    public function submodel()
+    public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(SubModel::class);
+        return $this->belongsTo(OrderSubModel::class, 'submodel_id');
     }
 }
