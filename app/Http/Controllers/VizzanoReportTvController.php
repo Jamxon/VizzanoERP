@@ -60,7 +60,7 @@ class VizzanoReportTvController extends Controller
                     'group' => optional($sewingOutput->orderSubmodel->group)->group,
                     'total_quantity' => $sewingOutput->total_quantity,
                     'today_quantity' => $sewingOutput->today_quantity,
-                    'employee_count' => $employeeCounts ?? 0,
+                    'employee_count' => $employeeCounts[$sewingOutput->orderSubmodel->group->group->id] ?? 0,
                 ];
             }),
             'motivations' => $motivations,
