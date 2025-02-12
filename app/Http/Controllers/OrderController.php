@@ -28,7 +28,8 @@ class OrderController extends Controller
                 'orderModel.submodels.submodel',
                 'instructions',
                 'contragent',
-                'orderModel.submodels.orderRecipes'
+                'orderModel.submodels.orderRecipes',
+                'orderModel.submodels.orderRecipes.item'
             )
             ->get();
         return response()->json($orders);
