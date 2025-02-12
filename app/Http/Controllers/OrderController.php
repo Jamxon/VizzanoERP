@@ -83,6 +83,8 @@ class OrderController extends Controller
 
         $user = auth()->user();
 
+        $orderSubModel = null;
+
         $order = Order::create([
             'name' => $request->name,
             'quantity' => $request->quantity,
@@ -129,7 +131,7 @@ class OrderController extends Controller
                     'order_id' => $order->id,
                     'item_id' => $recipe['item_id'],
                     'quantity' => $recipe['quantity'],
-                    'submodel_id' => $recipe['submodel_id'],
+                    'submodel_id' => $orderSubModel->id,
                 ]);
             }
         }
