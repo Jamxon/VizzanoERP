@@ -33,9 +33,9 @@ class VizzanoReportTvController extends Controller
 
         $employeeCounts = Attendance::where('date', $today)
             ->where('status', '!=', 'ABSENT')
-            ->join('employees', 'attendances.employee_id', '=', 'employees.id')
+            ->join('employees', 'attendance.employee_id', '=', 'employees.id')
             ->groupBy('employees.group_id')
-            ->selectRaw('employees.group_id, COUNT(DISTINCT attendances.employee_id) as employee_count')
+            ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
 
         $motivations = Motivation::all()->map(fn($motivation) => [
