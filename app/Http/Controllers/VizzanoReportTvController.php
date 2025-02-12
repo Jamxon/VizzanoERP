@@ -26,46 +26,57 @@ class VizzanoReportTvController extends Controller
 
         $groupIds = $query
             ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
-            ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id') // To‘g‘ri bog‘lash
-            ->whereDate('sewing_outputs.created_at', '=', $startDate) // created_at aniq jadvaldan
+            ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id')
+            ->whereDate('sewing_outputs.created_at', '=', $startDate)
             ->pluck('order_groups.group_id')
             ->unique();
-
 
         $sewingOutputs = $query
             ->selectRaw('order_submodel_id, SUM(quantity) as total_quantity, SUM(CASE WHEN DATE(sewing_outputs.created_at) = ? THEN quantity ELSE 0 END) as today_quantity', [$today])
             ->groupBy('order_submodel_id')
-            ->with(['orderSubmodel.orderModel', 'orderSubmodel.submodel', 'orderSubmodel.group'])
+            ->with(['orderSubmodel.orderModel', 'orderSubmodel.submodel', 'orderSubmodel.group', 'orderSubmodel.submodelSpend'])
             ->orderBy('total_quantity', 'desc')
             ->get();
 
-        // Faqat SewingOutputs dagi group_id lar uchun ishchilar sonini olish
+        // Ishchilar sonini hisoblash
         $employeeCounts = Attendance::whereDate('attendance.date', $today)
             ->where('attendance.status', '!=', 'ABSENT')
-            ->whereIn('attendance.employee_id', function ($query) use ($groupIds) {
-                $query->select('employees.id')
-                    ->from('employees')
-                    ->whereIn('employees.group_id', $groupIds);
-            })
-            ->groupBy('employees.group_id')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
+            ->whereIn('employees.group_id', $groupIds)
+            ->groupBy('employees.group_id')
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
 
+        // Ish vaqtini hisoblash
+        $workTimeByGroup = \App\Models\Group::whereIn('id', $groupIds)
+            ->join('departments', 'groups.department_id', '=', 'departments.id')
+            ->selectRaw('groups.id as group_id, TIME_TO_SEC(TIMEDIFF(departments.end_time, departments.start_time)) - TIME_TO_SEC(departments.break_time) as work_seconds')
+            ->pluck('work_seconds', 'group_id');
 
         $motivations = Motivation::all()->map(fn($motivation) => [
             'title' => $motivation->title,
         ]);
 
         $resource = [
-            'sewing_outputs' => $sewingOutputs->map(function ($sewingOutput) use ($employeeCounts) {
+            'sewing_outputs' => $sewingOutputs->map(function ($sewingOutput) use ($employeeCounts, $workTimeByGroup) {
+                $group_id = optional($sewingOutput->orderSubmodel->group)->id;
+                $employeeCount = $employeeCounts[$group_id] ?? 0;
+                $workTime = $workTimeByGroup[$group_id] ?? 0; // Ish vaqti soniyalarda
+                $submodelSpend = optional($sewingOutput->orderSubmodel->submodelSpend)->seconds ?? 0;
+
+                // Bugungi reja hisoblash
+                $today_plan = ($submodelSpend > 0 && $employeeCount > 0)
+                    ? intval(($workTime * $employeeCount) / $submodelSpend)
+                    : 0;
+
                 return [
                     'model' => optional($sewingOutput->orderSubmodel->orderModel)->model,
                     'submodel' => $sewingOutput->orderSubmodel->submodel,
                     'group' => optional($sewingOutput->orderSubmodel->group)->group,
                     'total_quantity' => $sewingOutput->total_quantity,
                     'today_quantity' => $sewingOutput->today_quantity,
-                    'employee_count' => $employeeCounts[$sewingOutput->orderSubmodel->group->group->id] ?? 0,
+                    'employee_count' => $employeeCount,
+                    'today_plan' => $today_plan,
                 ];
             }),
             'motivations' => $motivations,
