@@ -40,13 +40,18 @@ class VizzanoReportTvController extends Controller
             ->get();
 
         // Faqat SewingOutputs dagi group_id lar uchun ishchilar sonini olish
-        $employeeCounts = Attendance::where('attendance.date', $today)
+        $employeeCounts = Attendance::whereDate('attendance.date', $today)
             ->where('attendance.status', '!=', 'ABSENT')
-            ->join('employees', 'attendance.employee_id', '=', 'employees.id')
-            ->whereIn('employees.group_id', $groupIds) // Faqat chiqqan group_id larni olish
+            ->whereIn('attendance.employee_id', function ($query) use ($groupIds) {
+                $query->select('employees.id')
+                    ->from('employees')
+                    ->whereIn('employees.group_id', $groupIds);
+            })
             ->groupBy('employees.group_id')
+            ->join('employees', 'attendance.employee_id', '=', 'employees.id')
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
+
 
         $motivations = Motivation::all()->map(fn($motivation) => [
             'title' => $motivation->title,
