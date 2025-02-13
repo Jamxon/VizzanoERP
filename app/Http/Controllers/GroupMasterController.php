@@ -194,7 +194,7 @@ class GroupMasterController extends Controller
 
         $orderCut = OrderCut::where('order_id', $orderId)
             ->where('specification_category_id', $categoryId)
-            ->first();
+            ->get();
 
         if (!$orderCut) {
             return response()->json(['message' => 'Order cut not found'], 404);
@@ -219,14 +219,9 @@ class GroupMasterController extends Controller
         return response()->json($orderCuts);
     }
 
-    public function receiveOrderCut(Request $request): \Illuminate\Http\JsonResponse
+    public function receiveOrderCut($id): \Illuminate\Http\JsonResponse
     {
-        $orderId = $request->order_id;
-        $categoryId = $request->category_id;
-
-        $orderCut = OrderCut::where('order_id', $orderId)
-            ->where('specification_category_id', $categoryId)
-            ->first();
+        $orderCut = OrderCut::find($id);
 
         if (!$orderCut) {
             return response()->json(['message' => 'Order cut not found'], 404);
