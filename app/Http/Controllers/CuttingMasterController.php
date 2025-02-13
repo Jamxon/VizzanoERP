@@ -300,4 +300,16 @@ class CuttingMasterController extends Controller
 
         return response()->json($resource);
     }
+
+    public function finishCutting($id): \Illuminate\Http\JsonResponse
+    {
+        $order = Order::find($id);
+        $order->update([
+            'status' => 'pending'
+        ]);
+
+        return response()->json([
+            'message' => 'Order cutting finished'
+        ]);
+    }
 }
