@@ -35,7 +35,7 @@ class OrderCut extends Model
         return $this->belongsTo(Order::class);
     }
 
-    public function specificationCategory(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function category(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(SpecificationCategory::class, 'specification_category_id');
     }
