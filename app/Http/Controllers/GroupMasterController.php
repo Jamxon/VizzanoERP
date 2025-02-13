@@ -194,7 +194,7 @@ class GroupMasterController extends Controller
 
         $orderCut = OrderCut::where('order_id', $orderId)
             ->where('specification_category_id', $categoryId)
-            ->get();
+            ->first();
 
         if (!$orderCut) {
             return response()->json(['message' => 'Order cut not found'], 404);
