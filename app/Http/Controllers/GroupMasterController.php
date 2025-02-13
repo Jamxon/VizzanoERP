@@ -6,6 +6,7 @@ use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
 use App\Models\Order;
+use App\Models\OrderCut;
 use App\Models\OrderGroup;
 use App\Models\SewingOutputs;
 use App\Models\Tarification;
@@ -128,8 +129,6 @@ class GroupMasterController extends Controller
         return response()->json($resource);
     }
 
-
-
     public function startOrder($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::find($id);
@@ -188,5 +187,19 @@ class GroupMasterController extends Controller
         ]);
     }
 
+    public function getOrderCuts(): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
 
+        $orderCuts = OrderCut::where('user_id', $user->id)
+            ->where('cut_at', now()->format('Y-m-d'))
+            ->with(
+                'specificationCategory',
+                'user',
+                'order'
+            )
+            ->get();
+
+        return response()->json($orderCuts);
+    }
 }
