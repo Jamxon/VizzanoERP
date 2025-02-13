@@ -241,6 +241,8 @@ class CuttingMasterController extends Controller
             'orderModel.submodels.specificationCategories.specifications'
         ]);
 
+        return $order;
+
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
         }
