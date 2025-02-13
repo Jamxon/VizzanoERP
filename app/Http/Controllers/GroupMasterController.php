@@ -202,4 +202,27 @@ class GroupMasterController extends Controller
 
         return response()->json($orderCuts);
     }
+
+    public function receiveOrderCut(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $orderId = $request->order_id;
+        $categoryId = $request->category_id;
+
+        $orderCut = OrderCut::where('order_id', $orderId)
+            ->where('specification_category_id', $categoryId)
+            ->first();
+
+        if (!$orderCut) {
+            return response()->json(['message' => 'Order cut not found'], 404);
+        }
+
+        $orderCut->update([
+            'status' => true,
+            'user_id' => auth()->user()->id,
+        ]);
+
+        return response()->json([
+            'message' => 'Order cut received successfully'
+        ]);
+    }
 }
