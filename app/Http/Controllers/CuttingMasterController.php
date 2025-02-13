@@ -281,8 +281,8 @@ class CuttingMasterController extends Controller
             $submodel = $group->first()->category->submodel;
             return [
                 'submodel' => [
-                    'id' => $submodel->id ?? null,
-                    'name' => $submodel->name ?? null,
+                    'id' => $submodel->submodel->id ?? null,
+                    'name' => $submodel->submodel->name ?? null,
                 ],
                 'cuts' => $group->map(function ($cut) {
                     return [
