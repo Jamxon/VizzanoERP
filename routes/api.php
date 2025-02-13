@@ -168,6 +168,7 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::get('specifications/{id}', [CuttingMasterController::class, 'getSpecificationByOrderId']);
     Route::post('markAsCut', [CuttingMasterController::class, 'markAsCut']);
     Route::get('cuts/{id}', [CuttingMasterController::class, 'getCuts']);
+    Route::get('finishCutting/{id}', [CuttingMasterController::class, 'finishCutting']);
 });
 
 Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
