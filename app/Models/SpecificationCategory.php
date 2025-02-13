@@ -29,12 +29,12 @@ class SpecificationCategory extends Model
         'submodel_id',
     ];
 
-    public function submodel()
+    public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(OrderSubModel::class, 'submodel_id');
+        return $this->belongsTo(OrderSubModel::class, 'specification_categories.submodel_id');
     }
 
-    public function specifications()
+    public function specifications(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(PartSpecification::class, 'specification_category_id');
     }
