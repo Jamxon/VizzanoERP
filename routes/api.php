@@ -30,6 +30,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
     Route::post('tarifications',[\App\Http\Controllers\GroupMasterController::class,'assignEmployeesToTarifications']);
     Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
     Route::post('sewingOutputs',[\App\Http\Controllers\GroupMasterController::class, 'SewingOutputsStore']);
+    Route::get('orderCuts',[\App\Http\Controllers\GroupMasterController::class, 'getOrderCuts']);
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
