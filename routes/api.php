@@ -31,6 +31,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
     Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
     Route::post('sewingOutputs',[\App\Http\Controllers\GroupMasterController::class, 'SewingOutputsStore']);
     Route::get('orderCuts',[\App\Http\Controllers\GroupMasterController::class, 'getOrderCuts']);
+    Route::get('orderCuts/show',[\App\Http\Controllers\GroupMasterController::class, 'showOrderCuts']);
     Route::post('orderCuts',[\App\Http\Controllers\GroupMasterController::class, 'receiveOrderCut']);
 });
 
