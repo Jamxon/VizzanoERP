@@ -236,6 +236,11 @@ class CuttingMasterController extends Controller
     {
         $order = Order::find($id);
 
+        $order->load([
+            'orderModel.submodels.specificationCategories',
+            'orderModel.submodels.specificationCategories.specifications'
+        ]);
+
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
         }
