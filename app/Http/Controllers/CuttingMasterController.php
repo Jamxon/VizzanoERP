@@ -232,7 +232,7 @@ class CuttingMasterController extends Controller
         }
     }
 
-    public function getSpecificationByOrderId($id)
+    public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::find($id);
 
@@ -240,8 +240,6 @@ class CuttingMasterController extends Controller
             'orderModel.submodels.specificationCategories',
             'orderModel.submodels.specificationCategories.specifications'
         ]);
-
-        return $order;
 
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
