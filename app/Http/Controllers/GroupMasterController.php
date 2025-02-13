@@ -194,7 +194,7 @@ class GroupMasterController extends Controller
         $orderCuts = OrderCut::where('user_id', $user->id)
             ->where('cut_at', now()->format('Y-m-d'))
             ->with(
-                'specificationCategory',
+                'category',
                 'user',
                 'order'
             )
