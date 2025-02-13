@@ -31,7 +31,7 @@ class GetSpecificationResource extends JsonResource
                     return [
                         'id' => $submodel->submodel->id,
                         'name' => $submodel->submodel->name,
-                        'specificationCategories' => $submodel->submodels->specificationCategories ? $submodel->submodels->specificationCategories->map(function ($specificationCategory) {
+                        'specificationCategories' => $submodel->specificationCategories ? $submodel->specificationCategories->map(function ($specificationCategory) {
                             return [
                                 'id' => $specificationCategory->id,
                                 'name' => $specificationCategory->name,
