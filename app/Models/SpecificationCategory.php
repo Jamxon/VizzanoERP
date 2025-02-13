@@ -31,7 +31,7 @@ class SpecificationCategory extends Model
 
     public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(OrderSubModel::class, 'specification_categories.submodel_id');
+        return $this->belongsTo(OrderSubModel::class, 'submodel_id');
     }
 
     public function specifications(): \Illuminate\Database\Eloquent\Relations\HasMany
