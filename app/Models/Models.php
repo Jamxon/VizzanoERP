@@ -5,6 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property mixed $name
+ * @property mixed $rasxod
+ * @property mixed $id
+ * @property mixed $materials
+ * @property mixed $sizes
+ * @property mixed $submodels
+ * @property mixed $images
+ * @method static create(array $array)
+ * @method static with(string[] $array)
+ * @method static find(mixed $modelId)
+ */
 class Models extends Model
 {
     use HasFactory;

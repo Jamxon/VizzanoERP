@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static whereHas(string $string, \Closure $param)
+ */
 class Item extends Model
 {
     use HasFactory;
