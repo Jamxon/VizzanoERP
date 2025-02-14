@@ -154,8 +154,8 @@ class ModelController extends Controller
         }
 
         if (!empty($data['sizes'])) {
-            foreach ($data['sizes'] as $sizeId) {
-                $size = Size::find($sizeId);
+            foreach ($data['sizes'] as $size) {
+                $size = Size::find($size->id);
                 if ($size && $size->model_id == $model->id) {
                     $size->update([
                         'model_id' => $model->id,
@@ -171,8 +171,8 @@ class ModelController extends Controller
         }
 
         if (!empty($data['submodels'])) {
-            foreach ($data['submodels'] as $submodelId) {
-                $submodel = SubModel::find($submodelId);
+            foreach ($data['submodels'] as $submodel) {
+                $submodel = SubModel::find($submodel->id);
                 if ($submodel && $submodel->model_id == $model->id) {
                     $submodel->update([
                         'model_id' => $model->id,
