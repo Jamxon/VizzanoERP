@@ -17,7 +17,6 @@ class ModelController extends Controller
         $models = Models::with([
             'sizes',
             'submodels',
-            'materials',
             'images'
         ])->get();
 
@@ -165,7 +164,7 @@ class ModelController extends Controller
             'model' => $model,
         ]);
     }
-    
+
     public function destroy(Models $model): \Illuminate\Http\JsonResponse
     {
         $model->delete();
