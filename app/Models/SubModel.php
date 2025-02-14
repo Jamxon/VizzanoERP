@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static where(string $string, $submodel_id)
+ * @method static create(array $array)
+ * @method static find(mixed $submodelId)
  */
 class SubModel extends Model
 {
