@@ -18,7 +18,9 @@ class ModelController extends Controller
             'sizes',
             'submodels',
             'images'
-        ])->get();
+        ])
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
         $resource = $models->map(function ($model) {
             return [
