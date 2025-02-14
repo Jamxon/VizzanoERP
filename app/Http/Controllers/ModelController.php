@@ -20,7 +20,35 @@ class ModelController extends Controller
             'images'
         ])->get();
 
-        return response()->json($models);
+        $resource = [
+            'models' => $models->map(function ($model) {
+                return [
+                    'id' => $model->id,
+                    'name' => $model->name,
+                    'rasxod' => $model->rasxod,
+                    'sizes' => $model->sizes->map(function ($size) {
+                        return [
+                            'id' => $size->id,
+                            'name' => $size->name,
+                        ];
+                    }),
+                    'submodels' => $model->submodels->map(function ($submodel) {
+                        return [
+                            'id' => $submodel->id,
+                            'name' => $submodel->name,
+                        ];
+                    }),
+                    'images' => $model->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image' => "http://176.124.208.61:2005/storage/".$image->image,
+                        ];
+                    }),
+                ];
+            }),
+        ];
+
+        return response()->json($resource);
     }
 
     public function getMaterials(): \Illuminate\Http\JsonResponse
