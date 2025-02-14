@@ -37,6 +37,7 @@ class ModelController extends Controller
         $model->load(['sizes', 'submodels', 'images']);
         return response()->json($model);
     }
+
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->data, true);
@@ -164,9 +165,7 @@ class ModelController extends Controller
             'model' => $model,
         ]);
     }
-
-
-
+    
     public function destroy(Models $model): \Illuminate\Http\JsonResponse
     {
         $model->delete();
