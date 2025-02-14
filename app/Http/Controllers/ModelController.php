@@ -21,7 +21,7 @@ class ModelController extends Controller
         ])->get();
 
         $resource = [
-            'models' => $models->map(function ($model) {
+            $models->map(function ($model) {
                 return [
                     'id' => $model->id,
                     'name' => $model->name,
