@@ -7,13 +7,13 @@ use Illuminate\Http\Request;
 
 class RazryadController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
         $razryads = Razryad::all();
         return response()->json($razryads);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'name' => 'required',
@@ -38,7 +38,7 @@ class RazryadController extends Controller
         }
     }
 
-    public function update(Request $request, Razryad $razryad)
+    public function update(Request $request, Razryad $razryad): \Illuminate\Http\JsonResponse
     {
         $razryad->update($request->all());
 
@@ -55,7 +55,7 @@ class RazryadController extends Controller
         }
     }
 
-    public function destroy(Razryad $razryad)
+    public function destroy(Razryad $razryad): \Illuminate\Http\JsonResponse
     {
         $razryad->delete();
 
