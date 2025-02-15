@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static find($warehouseId)
+ * @method static create(array $array)
+ */
 class Warehouse extends Model
 {
     use HasFactory;
