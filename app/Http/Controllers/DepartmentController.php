@@ -26,6 +26,9 @@ class DepartmentController extends Controller
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
             'groups' => 'nullable|array',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
+            'break_time' => 'nullable|date_format:H:i',
         ]);
 
         $user = User::find($data['responsible_user_id']);
