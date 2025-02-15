@@ -127,7 +127,7 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
-        $data = $request->all();
+        $data = $request->data;
 
         $model->update([
             'name' => $data['name'] ?? $model->name,
