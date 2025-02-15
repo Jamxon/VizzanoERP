@@ -129,8 +129,6 @@ class ModelController extends Controller
     {
         $data = $request->all();
 
-        dd($data);
-
         $model->update([
             'name' => $data['name'] ?? $model->name,
             'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
