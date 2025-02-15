@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static where(string $string, $submodel_id)
  * @method static create(array $array)
  * @method static find(mixed $submodelId)
+ * @method static updateOrCreate(array $array, array $array1)
  */
 class SubModel extends Model
 {
