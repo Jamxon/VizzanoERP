@@ -127,21 +127,14 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
-        $data = json_decode($request->data, true);
-
-        if (!$data) {
-            return response()->json([
-                'message' => 'Invalid data format',
-                'error' => 'Data field is not a valid JSON string',
-            ], 400);
-        }
+        $data = $request->all();
 
         $model->update([
             'name' => $data['name'] ?? $model->name,
             'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
         ]);
 
-        if ($request->hasFile('images') && !empty($request->file('images'))) {
+        if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('public/images', $fileName);
@@ -154,44 +147,29 @@ class ModelController extends Controller
         }
 
         if (!empty($data['sizes'])) {
-            foreach ($data['sizes'] as $size) {
-                $size = Size::find($size->id);
-                if ($size && $size->model_id == $model->id) {
-                    $size->update([
-                        'model_id' => $model->id,
-                        'name' => $size->name,
-                    ]);
-                } else {
-                    Size::create([
-                        'name' => 'default_name',
-                        'model_id' => $model->id,
-                    ]);
-                }
+            foreach ($data['sizes'] as $sizeData) {
+                Size::updateOrCreate(
+                    ['id' => $sizeData['id'], 'model_id' => $model->id],
+                    ['name' => $sizeData['name']]
+                );
             }
         }
 
         if (!empty($data['submodels'])) {
-            foreach ($data['submodels'] as $submodel) {
-                $submodel = SubModel::find($submodel->id);
-                if ($submodel && $submodel->model_id == $model->id) {
-                    $submodel->update([
-                        'model_id' => $model->id,
-                        'name' => $submodel->name,
-                    ]);
-                } else {
-                    SubModel::create([
-                        'name' => 'default_name',
-                        'model_id' => $model->id,
-                    ]);
-                }
+            foreach ($data['submodels'] as $submodelData) {
+                SubModel::updateOrCreate(
+                    ['id' => $submodelData['id'], 'model_id' => $model->id],
+                    ['name' => $submodelData['name']]
+                );
             }
         }
 
         return response()->json([
             'message' => 'Model updated successfully',
-            'model' => $model,
+            'model' => $model->load(['sizes', 'submodels', 'images']),
         ]);
     }
+
 
     public function destroy(Models $model): \Illuminate\Http\JsonResponse
     {
