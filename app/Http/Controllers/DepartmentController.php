@@ -26,7 +26,6 @@ class DepartmentController extends Controller
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
             'groups' => 'nullable|array',
-            //'07:30:00'
             'start_time' => 'nullable|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i',
             'break_time' => 'nullable|integer',
