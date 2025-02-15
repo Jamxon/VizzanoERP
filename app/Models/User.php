@@ -7,6 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
+/**
+ * @method static find(mixed $responsible_user_id)
+ */
 class User extends Authenticatable implements JWTSubject
 {
     use HasFactory, Notifiable;

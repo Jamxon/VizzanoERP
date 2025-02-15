@@ -34,6 +34,9 @@ class DepartmentController extends Controller
             'name' => $data['name'],
             'responsible_user_id' => $data['responsible_user_id'],
             'branch_id' => auth()->user()->employee->branch_id,
+            'start_time' => $data['start_time'],
+            'end_time' => $data['end_time'],
+            'break_time' => $data['break_time'],
         ]);
 
         $user->employee->update([
@@ -65,24 +68,38 @@ class DepartmentController extends Controller
         $data = $request->validate([
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
+            'break_time' => 'nullable|date_format:H:i',
             'groups' => 'nullable|array',
+            'groups.*.id' => 'nullable|integer|exists:groups,id',
+            'groups.*.name' => 'required|string',
+            'groups.*.responsible_user_id' => 'required|integer|exists:users,id',
         ]);
 
         $department = Department::findOrFail($id);
+
         $department->update([
             'name' => $data['name'],
             'responsible_user_id' => $data['responsible_user_id'],
+            'start_time' => $data['start_time'] ?? $department->start_time,
+            'end_time' => $data['end_time'] ?? $department->end_time,
+            'break_time' => $data['break_time'] ?? $department->break_time,
         ]);
 
         $user = User::find($data['responsible_user_id']);
-        $user->employee->update([
-            'group_id' => null,
-            'department_id' => $department->id,
-        ]);
+        if ($user && $user->employee) {
+            $user->employee->update([
+                'group_id' => null,
+                'department_id' => $department->id,
+            ]);
+        }
 
         $existingGroupIds = [];
+        $data['groups'] = $data['groups'] ?? [];
+
         foreach ($data['groups'] as $group) {
-            if (isset($group['id'])) {
+            if (!empty($group['id'])) {
                 $existingGroup = Group::find($group['id']);
                 if ($existingGroup) {
                     $existingGroup->update([
@@ -99,10 +116,12 @@ class DepartmentController extends Controller
                 ]);
 
                 $newUser = User::find($group['responsible_user_id']);
-                $newUser->employee->update([
-                    'group_id' =>  null,
-                    'department_id' => $department->id,
-                ]);
+                if ($newUser && $newUser->employee) {
+                    $newUser->employee->update([
+                        'group_id' => null,
+                        'department_id' => $department->id,
+                    ]);
+                }
 
                 $existingGroupIds[] = $newGroup->id;
             }
@@ -112,7 +131,10 @@ class DepartmentController extends Controller
             ->whereNotIn('id', $existingGroupIds)
             ->delete();
 
-        return response()->json($department);
+        return response()->json([
+            'message' => 'Department updated successfully',
+            'department' => $department->load('groups'),
+        ]);
     }
 
     public function destroy(Department $department): \Illuminate\Http\JsonResponse

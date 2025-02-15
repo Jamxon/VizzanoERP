@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static where(string $string, $id)
+ * @method static findOrFail($id)
+ * @method static create(array $array)
  */
 class Department extends Model
 {
