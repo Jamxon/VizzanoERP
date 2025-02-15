@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static whereIn(string $string, $groupIds)
+ * @method static find($id)
  */
 class Employee extends Model
 {

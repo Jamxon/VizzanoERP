@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -42,7 +43,9 @@ class DepartmentController extends Controller
             'break_time' => $data['break_time'],
         ]);
 
-        $user->employee->update([
+        $employee = Employee::find($user->employee->id);
+
+        $employee->update([
             'group_id' => null,
             'department_id' => $department->id,
         ]);
