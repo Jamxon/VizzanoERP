@@ -127,7 +127,14 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
-        $data = $request->data;
+        $data = is_string($request->data) ? json_decode($request->data, true) : $request->data;
+
+        if (!is_array($data)) {
+            return response()->json([
+                'message' => 'Invalid data format',
+                'error' => 'Data should be a valid JSON object',
+            ], 400);
+        }
 
         $model->update([
             'name' => $data['name'] ?? $model->name,
