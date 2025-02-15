@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static whereIn(string $string, $pluck)
  * @method static create(array $all)
  * @method static find(mixed $id)
+ * @method static where(string $string, $id)
  */
 class Group extends Model
 {
