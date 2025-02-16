@@ -10,6 +10,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OrderImportController;
 use App\Http\Controllers\RazryadController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SubModelController;
@@ -65,6 +66,8 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::patch('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'delete']);
     Route::patch('orders/change/{order}', [OrderController::class, 'changeOrderStatus']);
+
+    Route::post('/import-orders', [OrderImportController::class, 'import'])->name('orders.import');
 
     Route::get('materials', [ModelController::class, 'getMaterials']);
 
