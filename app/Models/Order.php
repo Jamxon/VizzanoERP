@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed $orderRecipes
  * @method static find(mixed $order_id)
  * @method static where(string $string, mixed $status)
+ * @method static create(array $array)
  */
 class Order extends Model
 {
