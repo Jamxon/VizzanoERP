@@ -25,7 +25,9 @@ class OrderImportController extends Controller
 
         $filePath = $file->storeAs('uploads', $file->getClientOriginalName());
 
-        dd(storage_path("app/" . $filePath));
+        if (!Storage::exists($filePath)) {
+            return response()->json(['success' => false, 'message' => 'Fayl saqlanmadi!'], 400);
+        }
 
         $spreadsheet = IOFactory::load(storage_path("app/" . $filePath));
         $worksheet = $spreadsheet->getActiveSheet();
