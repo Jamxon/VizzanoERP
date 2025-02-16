@@ -16,7 +16,7 @@ class OrderImportController extends Controller
             'file' => 'required|file|max:102400|mimes:xlsx,xls',
         ]);
 
-        $file = $request->file('excel');
+        $file = $request->file('file');
 
         $fileName = $file->getClientOriginalName();
         $filePath = $file->storeAs('temp', $fileName);
