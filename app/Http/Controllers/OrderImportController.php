@@ -68,8 +68,8 @@ class OrderImportController extends Controller
             $imagePath = $images["C$rowIndex"] ?? $images["D$rowIndex"] ?? null;
 
             $order = Order::create([
-                'name' => $orderData[0] ?? 'No Name',
-                'quantity' => $orderData[1] ?? 0,
+                'name' => $orderData[4] ?? 'No Name',
+                'quantity' => $orderData[6] ?? 0,
                 'status' => $orderData[2] ?? 'inactive',
                 'start_date' => null,
                 'end_date' => null,
