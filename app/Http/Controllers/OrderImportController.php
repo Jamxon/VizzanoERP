@@ -14,16 +14,13 @@ class OrderImportController extends Controller
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
         if (!$request->hasFile('file')) {
-            return response()->json(['success' => false, 'message' => 'Fayl yuklanmagan!'], 400);
+            return response()->json(['success' => false, 'message' => 'Fayl yuklanmadi!'], 400);
         }
 
         $file = $request->file('file');
 
-        if (!in_array($file->getClientOriginalExtension(), ['xls', 'xlsx'])) {
-            return response()->json(['success' => false, 'message' => 'Faqat .xls yoki .xlsx fayllar yuklanishi mumkin!'], 400);
-        }
-
-        $filePath = $file->storeAs('uploads', $file->getClientOriginalName());
+        $fileName = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
+        $filePath = $file->storeAs('uploads', $fileName);
 
         if (!Storage::exists($filePath)) {
             return response()->json(['success' => false, 'message' => 'Fayl saqlanmadi!'], 400);
