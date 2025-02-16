@@ -25,7 +25,7 @@ class OrderImportController extends Controller
             throw new \Exception("Fayl saqlanmadi!");
         }
 
-        $spreadsheet = IOFactory::load(storage_path("app/temp/$filePath"));
+        $spreadsheet = IOFactory::load(storage_path("app/$filePath"));
         $worksheet = $spreadsheet->getActiveSheet();
 
         $drawings = $worksheet->getDrawingCollection();
