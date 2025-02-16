@@ -107,9 +107,9 @@ class WarehouseController extends Controller
 
         $branchId = $employee->branch_id;
 
-        $warehouses = User::where('type', 'aup')
-            ->whereHas('employee', function ($query) use ($branchId) {
+        $warehouses = User::whereHas('employee', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
+                $query->where('type', 'aup');
             })
             ->get();
 
