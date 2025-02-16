@@ -10,44 +10,47 @@ class OrderImportController extends Controller
 {
     public function import(Request $request)
     {
-        if (!$request->hasFile('file')) {
-            return response()->json(['success' => false, 'message' => 'Fayl yuklanmadi!'], 400);
-        }
-
         $file = $request->file('file');
 
-        // Excel faylni yuklamasdan o'qish
+        if (!$file->isValid()) {
+            return response()->json(['success' => false, 'message' => 'Fayl noto‘g‘ri yuklangan!'], 400);
+        }
+
         $spreadsheet = IOFactory::load($file->getPathname());
         $sheet = $spreadsheet->getActiveSheet();
 
+        $highestRow = $sheet->getHighestRow(); // Oxirgi satrni olamiz
+        $highestColumn = $sheet->getHighestColumn(); // Oxirgi ustunni olamiz
+
+        Log::info("Oxirgi satr: $highestRow, Oxirgi ustun: $highestColumn");
+
+        if ($highestRow < 2) {
+            return response()->json(['success' => false, 'message' => 'Fayl ichida maʼlumot yo‘q!'], 400);
+        }
         $data = [];
-        $row = 1; // Barcha qatorlarni tekshiramiz
+        $row = 1;
 
         while (true) {
             $eColumn = $sheet->getCell("E$row")->getValue();
-            Log::info("Row: $row | E ustun qiymati: " . json_encode($eColumn));
-
-            // E ustuni butunlay bo‘sh yoki null bo‘lsa, tsiklni to‘xtatamiz
             if (is_null($eColumn) || trim((string)$eColumn) === "") {
                 break;
             }
 
             try {
-                // Formulalar va oddiy qiymatlarni o'qish
                 $data[] = [
-                    'a' => $sheet->getCell("A$row")->isFormula() ? $sheet->getCell("A$row")->getCalculatedValue() : $sheet->getCell("A$row")->getValue(),
-                    'b' => $sheet->getCell("B$row")->isFormula() ? $sheet->getCell("B$row")->getCalculatedValue() : $sheet->getCell("B$row")->getValue(),
-                    'c' => $sheet->getCell("C$row")->isFormula() ? $sheet->getCell("C$row")->getCalculatedValue() : $sheet->getCell("C$row")->getValue(),
-                    'd' => $sheet->getCell("D$row")->isFormula() ? $sheet->getCell("D$row")->getCalculatedValue() : $sheet->getCell("D$row")->getValue(),
-                    'e' => $eColumn,
-                    'f' => $sheet->getCell("F$row")->isFormula() ? $sheet->getCell("F$row")->getCalculatedValue() : $sheet->getCell("F$row")->getValue(),
-                    'g' => $sheet->getCell("G$row")->isFormula() ? $sheet->getCell("G$row")->getCalculatedValue() : $sheet->getCell("G$row")->getValue(),
-                    'h' => $sheet->getCell("H$row")->isFormula() ? $sheet->getCell("H$row")->getCalculatedValue() : $sheet->getCell("H$row")->getValue(),
-                    'i' => $sheet->getCell("I$row")->isFormula() ? $sheet->getCell("I$row")->getCalculatedValue() : $sheet->getCell("I$row")->getValue(),
-                    'j' => $sheet->getCell("J$row")->isFormula() ? $sheet->getCell("J$row")->getCalculatedValue() : $sheet->getCell("J$row")->getValue(),
-                    'k' => $sheet->getCell("K$row")->isFormula() ? $sheet->getCell("K$row")->getCalculatedValue() : $sheet->getCell("K$row")->getValue(),
-                    'l' => $sheet->getCell("L$row")->isFormula() ? $sheet->getCell("L$row")->getCalculatedValue() : $sheet->getCell("L$row")->getValue(),
-                    'm' => $sheet->getCell("M$row")->isFormula() ? $sheet->getCell("M$row")->getCalculatedValue() : $sheet->getCell("M$row")->getValue(),
+                    'a' => (string)$sheet->getCell("A$row")->getValue(),
+                    'b' => (string)$sheet->getCell("B$row")->getValue(),
+                    'c' => (string)$sheet->getCell("C$row")->getValue(),
+                    'd' => (string)$sheet->getCell("D$row")->getValue(),
+                    'e' => (string)$eColumn,
+                    'f' => (string)$sheet->getCell("F$row")->getValue(),
+                    'g' => (string)$sheet->getCell("G$row")->getValue(),
+                    'h' => (string)$sheet->getCell("H$row")->getValue(),
+                    'i' => (string)$sheet->getCell("I$row")->getValue(),
+                    'j' => (string)$sheet->getCell("J$row")->getValue(),
+                    'k' => (string)$sheet->getCell("K$row")->getValue(),
+                    'l' => (string)$sheet->getCell("L$row")->getValue(),
+                    'm' => (string)$sheet->getCell("M$row")->getValue(),
                 ];
             } catch (\Exception $ex) {
                 Log::error("Xatolik: " . $ex->getMessage() . " | Row: $row");
@@ -56,9 +59,6 @@ class OrderImportController extends Controller
             $row++;
         }
 
-        Log::info("Final Data: " . json_encode($data));
-
-        // JSON qaytarish
         return response()->json(['success' => true, 'data' => $data]);
     }
 }
