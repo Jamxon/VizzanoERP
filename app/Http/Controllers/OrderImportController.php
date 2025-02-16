@@ -67,9 +67,11 @@ class OrderImportController extends Controller
             $rowIndex = $row->getRowIndex();
             $imagePath = $images["C$rowIndex"] ?? $images["D$rowIndex"] ?? null;
 
+            $quantity = isset($orderData[6]) ? intval($orderData[6]) : 0;
+
             $order = Order::create([
                 'name' => $orderData[4] ?? 'No Name',
-                'quantity' => $orderData[6] ?? 0,
+                'quantity' => $quantity,
                 'status' => $orderData[2] ?? 'inactive',
                 'start_date' => null,
                 'end_date' => null,
