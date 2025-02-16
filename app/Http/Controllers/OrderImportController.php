@@ -18,15 +18,30 @@ class OrderImportController extends Controller
 
         $file = $request->file('file');
 
-        $fileName = $file->getClientOriginalName();
-        $filePath = $file->storeAs('temp', $fileName);
-
-        if (!Storage::exists('temp/' . $fileName)) {
-            throw new \Exception("Fayl saqlanmadi!");
+        if (!$file) {
+            return response()->json(['error' => 'Fayl yuklanmadi!'], 400);
         }
 
-        $spreadsheet = IOFactory::load(storage_path("app/$filePath"));
-        $worksheet = $spreadsheet->getActiveSheet();
+        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+        $filePath = $file->storeAs('temp', $fileName);
+
+        if (!Storage::exists("temp/$fileName")) {
+            return response()->json(['error' => 'Fayl saqlanmadi yoki yo‘q!'], 500);
+        }
+
+        $fullPath = storage_path("app/temp/$fileName");
+
+        if (!file_exists($fullPath)) {
+            return response()->json(['error' => "Fayl mavjud emas: $fullPath"], 500);
+        }
+
+        try {
+            $spreadsheet = IOFactory::load($fullPath);
+            $worksheet = $spreadsheet->getActiveSheet();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Excel faylni ochishda xatolik: ' . $e->getMessage()], 500);
+        }
 
         $drawings = $worksheet->getDrawingCollection();
         $images = [];
@@ -67,13 +82,20 @@ class OrderImportController extends Controller
         ]);
     }
 
+    /**
+     * Rasmni saqlash
+     */
     private function saveImage(Drawing $drawing): string
     {
         $imageName = uniqid() . '.' . $drawing->getExtension();
         $path = storage_path('app/public/orders/' . $imageName);
+
+        if (!file_exists(storage_path('app/public/orders'))) {
+            mkdir(storage_path('app/public/orders'), 0775, true);
+        }
+
         $drawing->getImageResource()->writeImage($path);
 
         return 'storage/orders/' . $imageName;
     }
 }
-
