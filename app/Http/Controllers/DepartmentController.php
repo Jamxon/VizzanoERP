@@ -71,6 +71,11 @@ class DepartmentController extends Controller
 
     public function update(Request $request, $id): \Illuminate\Http\JsonResponse
     {
+        $request->merge([
+            'start_time' => $request->start_time ? date("H:i", strtotime($request->start_time)) : null,
+            'end_time' => $request->end_time ? date("H:i", strtotime($request->end_time)) : null,
+        ]);
+
         $data = $request->validate([
             'name' => 'required|string',
             'responsible_user_id' => 'required|integer|exists:users,id',
@@ -82,6 +87,7 @@ class DepartmentController extends Controller
             'groups.*.name' => 'required|string',
             'groups.*.responsible_user_id' => 'required|integer|exists:users,id',
         ]);
+
 
         $department = Department::findOrFail($id);
 

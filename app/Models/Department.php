@@ -39,4 +39,14 @@ class Department extends Model
     {
         return $this->belongsTo(User::class, 'responsible_user_id');
     }
+
+    public function setStartTimeAttribute($value): void
+    {
+        $this->attributes['start_time'] = $value ? date("H:i", strtotime($value)) : null;
+    }
+
+    public function setEndTimeAttribute($value): void
+    {
+        $this->attributes['end_time'] = $value ? date("H:i", strtotime($value)) : null;
+    }
 }
