@@ -22,13 +22,13 @@ class OrderImportController extends Controller
 
             $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-            $filePath = $file->storeAs('temp', $fileName);
+            $filePath = $file->storeAs('public', $fileName);
 
             if (!$filePath) {
                 return response()->json(['error' => 'Fayl saqlanmadi!'], 500);
             }
 
-            $fullPath = storage_path("app/temp/$fileName");
+            $fullPath = storage_path("app/public/$fileName");
         }else{
             return response()->json(['error' => 'Fayl topilmadi'], 500);
         }
@@ -37,11 +37,11 @@ class OrderImportController extends Controller
             return response()->json(['error' => "Fayl mavjud emas (file_exists tekshiruvi): $fullPath"], 500);
         }
 
-        if (!Storage::exists("temp/$fileName")) {
+        if (!Storage::exists("public/$fileName")) {
             return response()->json(['error' => 'Fayl saqlanmadi yoki yo‘q!'], 500);
         }
 
-        $fullPath = storage_path("app/temp/$fileName");
+        $fullPath = storage_path("app/public/$fileName");
 
         if (!file_exists($fullPath)) {
             return response()->json(['error' => "Fayl mavjud emas: $fullPath"], 500);
