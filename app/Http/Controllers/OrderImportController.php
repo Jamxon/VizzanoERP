@@ -64,14 +64,17 @@ class OrderImportController extends Controller
                 $orderData[] = $cell->getValue();
             }
 
+            // **E ustuni bo'sh bo'lsa, siklni to'xtatish**
+            if (empty($orderData[4])) { // E ustuni indeks bo'yicha 4
+                break;
+            }
+
             $rowIndex = $row->getRowIndex();
             $imagePath = $images["C$rowIndex"] ?? $images["D$rowIndex"] ?? null;
 
-            $quantity = isset($orderData[6]) ? intval($orderData[6]) : 0;
-
             $order = Order::create([
                 'name' => $orderData[4] ?? 'No Name',
-                'quantity' => $quantity,
+                'quantity' => $orderData[6] ?? 0,
                 'status' => $orderData[2] ?? 'inactive',
                 'start_date' => null,
                 'end_date' => null,
@@ -83,6 +86,7 @@ class OrderImportController extends Controller
 
             $orders[] = $order;
         }
+
 
         return response()->json([
             'message' => count($orders) . ' ta order yaratildi',
