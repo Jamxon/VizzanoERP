@@ -20,7 +20,7 @@ class OrderImportController extends Controller
         $file = $request->file('file');
 
         $fileName = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
-        $filePath = $file->storeAs('uploads', $fileName);
+        $filePath = $file->storeAs('public', $fileName);
 
         if (!Storage::exists($filePath)) {
             return response()->json(['success' => false, 'message' => 'Fayl saqlanmadi!'], 400);
