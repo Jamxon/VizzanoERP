@@ -70,7 +70,13 @@ class OrderImportController extends Controller
             $order = Order::create([
                 'name' => $orderData[0] ?? 'No Name',
                 'quantity' => $orderData[1] ?? 0,
-                'image' => $imagePath,
+                'status' => $orderData[2] ?? 'inactive',
+                'start_date' => null,
+                'end_date' => null,
+                'rasxod' => 0,
+                'branch_id' => auth()->user()->employee->branch_id,
+                'contragent_id' => null,
+                'comment' => null,
             ]);
 
             $orders[] = $order;
