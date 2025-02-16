@@ -4,107 +4,76 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-use App\Models\Order;
 use Illuminate\Support\Facades\Storage;
 
 class OrderImportController extends Controller
 {
-    public function import(Request $request): \Illuminate\Http\JsonResponse
+    /**
+     * Excel faylni yuklash va JSON obyektga o'tkazish.
+     */
+    public function import(Request $request)
     {
-        $request->validate([
-            'file' => 'required|file|max:102400|mimes:xlsx,xls',
-        ]);
+        // Fayl yuklanganligini tekshiramiz
+        if (!$request->hasFile('file')) {
+            return response()->json(['success' => false, 'message' => 'Fayl yuklanmagan!'], 400);
+        }
 
         $file = $request->file('file');
 
-        if (!$file) {
-            return response()->json(['error' => 'Fayl topilmadi'], 500);
+        // Faqat Excel fayllariga ruxsat beramiz
+        if (!in_array($file->getClientOriginalExtension(), ['xls', 'xlsx'])) {
+            return response()->json(['success' => false, 'message' => 'Faqat .xls yoki .xlsx fayllar yuklanishi mumkin!'], 400);
         }
 
-        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        // Faylni vaqtinchalik papkaga saqlaymiz
+        $filePath = $file->storeAs('uploads', $file->getClientOriginalName());
 
-        $filePath = $file->storeAs('public', $fileName);
+        // Excel faylini ochamiz
+        $spreadsheet = IOFactory::load(storage_path("app/" . $filePath));
+        $worksheet = $spreadsheet->getActiveSheet();
 
-        if (!$filePath) {
-            return response()->json(['error' => 'Fayl saqlanmadi!'], 500);
-        }
+        $data = []; // JSON obyektni yig'ish uchun massiv
 
-        $fullPath = storage_path("app/public/public/$fileName");
-
-        if (!file_exists($fullPath)) {
-            return response()->json(['error' => "Fayl mavjud emas: $fullPath"], 500);
-        }
-
-        try {
-            $spreadsheet = IOFactory::load($fullPath);
-            $worksheet = $spreadsheet->getActiveSheet();
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Excel faylni ochishda xatolik: ' . $e->getMessage()], 500);
-        }
-
-        $drawings = $worksheet->getDrawingCollection();
-        $images = [];
-
-        foreach ($drawings as $drawing) {
-            if ($drawing instanceof Drawing) {
-                $cell = $drawing->getCoordinates();
-                $imagePath = $this->saveImage($drawing);
-                $images[$cell] = $imagePath;
-            }
-        }
-
-        $orders = [];
+        // 2-qatordan boshlab iteratsiya qilamiz
         foreach ($worksheet->getRowIterator(2) as $row) {
             $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
+            $cellIterator->setIterateOnlyExistingCells(false); // Bo'sh hujayralarni ham o'qish
 
             $orderData = [];
             foreach ($cellIterator as $cell) {
                 $orderData[] = $cell->getValue();
             }
 
-            // **E ustuni bo'sh bo'lsa, siklni to'xtatish**
-            if (empty($orderData[4])) { // E ustuni indeks bo'yicha 4
+            // Agar E ustuni bo'sh bo'lsa, siklni to'xtatamiz
+            if (empty($orderData[4])) {
                 break;
             }
 
-            $rowIndex = $row->getRowIndex();
-            $imagePath = $images["C$rowIndex"] ?? $images["D$rowIndex"] ?? null;
-
-            $order = Order::create([
-                'name' => $orderData[4] ?? 'No Name',
-                'quantity' => $orderData[6] ?? 0,
-                'status' => $orderData[2] ?? 'inactive',
-                'start_date' => null,
-                'end_date' => null,
-                'rasxod' => 0,
-                'branch_id' => auth()->user()->employee->branch_id,
-                'contragent_id' => null,
-                'comment' => null,
-            ]);
-
-            $orders[] = $order;
+            // JSON obyekt sifatida saqlash
+            $data[] = [
+                'A' => $orderData[0] ?? null,
+                'B' => $orderData[1] ?? null,
+                'C' => $orderData[2] ?? null,
+                'D' => $orderData[3] ?? null,
+                'E' => $orderData[4] ?? null,
+                'F' => $orderData[5] ?? null,
+                'G' => $orderData[6] ?? null,
+                'H' => $orderData[7] ?? null,
+                'I' => $orderData[8] ?? null,
+                'J' => $orderData[9] ?? null,
+                'K' => $orderData[10] ?? null,
+                'L' => $orderData[11] ?? null,
+                'M' => $orderData[12] ?? null,
+            ];
         }
 
+        // Faylni o'chiramiz
+        Storage::delete($filePath);
 
+        // JSON formatida qaytaramiz
         return response()->json([
-            'message' => count($orders) . ' ta order yaratildi',
-            'orders' => $orders,
+            'success' => true,
+            'data' => $data,
         ]);
-    }
-
-    /**
-     * Excel ichidan rasmni saqlash
-     */
-    private function saveImage(Drawing $drawing): string
-    {
-        $imageName = uniqid() . '.' . $drawing->getExtension();
-
-        // Rasmni `storage/app/public/orders/` ichiga saqlash
-        Storage::disk('public')->put('orders/' . $imageName, file_get_contents($drawing->getPath()));
-
-        // URL orqali ochish uchun to‘g‘ri yo‘lni qaytarish
-        return 'storage/orders/' . $imageName;
     }
 }
