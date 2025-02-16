@@ -26,6 +26,12 @@ class OrderImportController extends Controller
 
         $filePath = $file->storeAs('temp', $fileName);
 
+        $fullPath = storage_path("app/temp/$fileName");
+
+        if (!file_exists($fullPath)) {
+            return response()->json(['error' => "Fayl mavjud emas (file_exists tekshiruvi): $fullPath"], 500);
+        }
+
         if (!Storage::exists("temp/$fileName")) {
             return response()->json(['error' => 'Fayl saqlanmadi yoki yo‘q!'], 500);
         }
