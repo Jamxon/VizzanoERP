@@ -76,7 +76,7 @@ class DepartmentController extends Controller
             'responsible_user_id' => 'required|integer|exists:users,id',
             'start_time' => 'nullable|date_format:H:i',
             'end_time' => 'nullable|date_format:H:i',
-            'break_time' => 'nullable|date_format:H:i',
+            'break_time' => 'nullable|integer',
             'groups' => 'nullable|array',
             'groups.*.id' => 'nullable|integer|exists:groups,id',
             'groups.*.name' => 'required|string',
