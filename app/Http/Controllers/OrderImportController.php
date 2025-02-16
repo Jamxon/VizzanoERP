@@ -18,15 +18,16 @@ class OrderImportController extends Controller
 
         $file = $request->file('file');
 
-        if (!$file) {
-            return response()->json(['error' => 'Fayl yuklanmadi!'], 400);
+        if ($file){
+
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+            $filePath = $file->storeAs('temp', $fileName);
+
+            $fullPath = storage_path("app/temp/$fileName");
+        }else{
+            return response()->json(['error' => 'Fayl topilmadi'], 500);
         }
-
-        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-        $filePath = $file->storeAs('temp', $fileName);
-
-        $fullPath = storage_path("app/temp/$fileName");
 
         if (!file_exists($fullPath)) {
             return response()->json(['error' => "Fayl mavjud emas (file_exists tekshiruvi): $fullPath"], 500);
