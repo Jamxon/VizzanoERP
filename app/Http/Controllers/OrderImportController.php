@@ -18,27 +18,16 @@ class OrderImportController extends Controller
 
         $file = $request->file('file');
 
-        if ($file){
-
-            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-            $filePath = $file->storeAs('public', $fileName);
-
-            if (!$filePath) {
-                return response()->json(['error' => 'Fayl saqlanmadi!'], 500);
-            }
-
-            $fullPath = storage_path("app/public/$fileName");
-        }else{
+        if (!$file) {
             return response()->json(['error' => 'Fayl topilmadi'], 500);
         }
 
-        if (!file_exists($fullPath)) {
-            return response()->json(['error' => "Fayl mavjud emas (file_exists tekshiruvi): $fullPath"], 500);
-        }
+        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
 
-        if (!Storage::exists("public/$fileName")) {
-            return response()->json(['error' => 'Fayl saqlanmadi yoki yo‘q!'], 500);
+        $filePath = $file->storeAs('public', $fileName);
+
+        if (!$filePath) {
+            return response()->json(['error' => 'Fayl saqlanmadi!'], 500);
         }
 
         $fullPath = storage_path("app/public/$fileName");
@@ -94,19 +83,16 @@ class OrderImportController extends Controller
     }
 
     /**
-     * Rasmni saqlash
+     * Excel ichidan rasmni saqlash
      */
     private function saveImage(Drawing $drawing): string
     {
         $imageName = uniqid() . '.' . $drawing->getExtension();
-        $path = storage_path('app/public/orders/' . $imageName);
 
-        if (!file_exists(storage_path('app/public/orders'))) {
-            mkdir(storage_path('app/public/orders'), 0775, true);
-        }
+        // Rasmni `storage/app/public/orders/` ichiga saqlash
+        Storage::disk('public')->put('orders/' . $imageName, file_get_contents($drawing->getPath()));
 
-        $drawing->getImageResource()->writeImage($path);
-
+        // URL orqali ochish uchun to‘g‘ri yo‘lni qaytarish
         return 'storage/orders/' . $imageName;
     }
 }
