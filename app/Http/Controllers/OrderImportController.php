@@ -1,16 +1,11 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use Illuminate\Support\Facades\Storage;
 
 class OrderImportController extends Controller
 {
-    /**
-     * Excel faylni yuklash va JSON obyektga o'tkazish.
-     */
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
         if (!$request->hasFile('file')) {
@@ -19,55 +14,39 @@ class OrderImportController extends Controller
 
         $file = $request->file('file');
 
-        $fileName = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
-        $filePath = $file->storeAs('public', $fileName);
-
-        dd($filePath);
-        
-        if (!Storage::exists($filePath)) {
-            return response()->json(['success' => false, 'message' => 'Fayl saqlanmadi!'], 400);
-        }
-
-        $spreadsheet = IOFactory::load(storage_path("app/" . $filePath));
-        $worksheet = $spreadsheet->getActiveSheet();
+        // Excel faylni bevosita o‘qish
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $sheet = $spreadsheet->getActiveSheet();
 
         $data = [];
+        $row = 2; // 1-qator sarlavha bo‘lsa, 2-qatordan boshlaymiz
 
-        foreach ($worksheet->getRowIterator(2) as $row) {
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
+        while (true) {
+            $eColumn = trim($sheet->getCell("E$row")->getValue());
 
-            $orderData = [];
-            foreach ($cellIterator as $cell) {
-                $orderData[] = $cell->getValue();
-            }
-
-            if (empty($orderData[4])) {
-                break;
+            if ($eColumn === "") {
+                break; // Agar E ustuni bo‘sh bo‘lsa, tsiklni to‘xtatamiz
             }
 
             $data[] = [
-                'A' => $orderData[0] ?? null,
-                'B' => $orderData[1] ?? null,
-                'C' => $orderData[2] ?? null,
-                'D' => $orderData[3] ?? null,
-                'E' => $orderData[4] ?? null,
-                'F' => $orderData[5] ?? null,
-                'G' => $orderData[6] ?? null,
-                'H' => $orderData[7] ?? null,
-                'I' => $orderData[8] ?? null,
-                'J' => $orderData[9] ?? null,
-                'K' => $orderData[10] ?? null,
-                'L' => $orderData[11] ?? null,
-                'M' => $orderData[12] ?? null,
+                'a' => $sheet->getCell("A$row")->getValue(),
+                'b' => $sheet->getCell("B$row")->getValue(),
+                'c' => $sheet->getCell("C$row")->getValue(),
+                'd' => $sheet->getCell("D$row")->getValue(),
+                'e' => $eColumn,
+                'f' => $sheet->getCell("F$row")->getValue(),
+                'g' => $sheet->getCell("G$row")->getValue(),
+                'h' => $sheet->getCell("H$row")->getValue(),
+                'i' => $sheet->getCell("I$row")->getValue(),
+                'j' => $sheet->getCell("J$row")->getValue(),
+                'k' => $sheet->getCell("K$row")->getValue(),
+                'l' => $sheet->getCell("L$row")->getValue(),
+                'm' => $sheet->getCell("M$row")->getValue(),
             ];
+
+            $row++;
         }
 
-        Storage::delete($filePath);
-
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-        ]);
+        return response()->json(['success' => true, 'data' => $data]);
     }
 }
