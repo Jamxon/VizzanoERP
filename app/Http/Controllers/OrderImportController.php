@@ -25,6 +25,8 @@ class OrderImportController extends Controller
 
         $filePath = $file->storeAs('uploads', $file->getClientOriginalName());
 
+        dd(storage_path("app/" . $filePath));
+
         $spreadsheet = IOFactory::load(storage_path("app/" . $filePath));
         $worksheet = $spreadsheet->getActiveSheet();
 
