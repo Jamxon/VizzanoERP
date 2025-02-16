@@ -16,8 +16,6 @@ return new class extends Migration
             $table->string('name');
             $table->integer('responsible_user_id');
             $table->integer('department_id');
-            $table->integer('total_work_time');
-            $table->integer('model_id');
             $table->timestamps();
         });
     }

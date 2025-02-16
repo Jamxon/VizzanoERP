@@ -11,7 +11,7 @@ class OrderImportController extends Controller
     /**
      * Excel faylni yuklash va JSON obyektga o'tkazish.
      */
-    public function import(Request $request)
+    public function import(Request $request): \Illuminate\Http\JsonResponse
     {
         // Fayl yuklanganligini tekshiramiz
         if (!$request->hasFile('file')) {
