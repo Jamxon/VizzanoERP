@@ -16,10 +16,16 @@ class OrderImportController extends Controller
             'file' => 'required|file|max:102400|mimes:xlsx,xls',
         ]);
 
-        $file = $request->file('file');
-        $path = $file->store('temp');
+        $file = $request->file('excel');
 
-        $spreadsheet = IOFactory::load(storage_path("app/$path"));
+        $fileName = $file->getClientOriginalName();
+        $filePath = $file->storeAs('temp', $fileName);
+
+        if (!Storage::exists('temp/' . $fileName)) {
+            throw new \Exception("Fayl saqlanmadi!");
+        }
+
+        $spreadsheet = IOFactory::load(storage_path("app/temp/$filePath"));
         $worksheet = $spreadsheet->getActiveSheet();
 
         $drawings = $worksheet->getDrawingCollection();
