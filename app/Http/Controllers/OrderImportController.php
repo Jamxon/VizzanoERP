@@ -22,6 +22,8 @@ class OrderImportController extends Controller
         $fileName = time() . '_' . preg_replace('/[^A-Za-z0-9.]/', '_', $file->getClientOriginalName());
         $filePath = $file->storeAs('public', $fileName);
 
+        dd($filePath);
+        
         if (!Storage::exists($filePath)) {
             return response()->json(['success' => false, 'message' => 'Fayl saqlanmadi!'], 400);
         }
