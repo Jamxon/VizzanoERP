@@ -30,7 +30,7 @@ class OrderImportController extends Controller
             return response()->json(['error' => 'Fayl saqlanmadi!'], 500);
         }
 
-        $fullPath = storage_path("app/public/$fileName");
+        $fullPath = storage_path("app/public/public/$fileName");
 
         if (!file_exists($fullPath)) {
             return response()->json(['error' => "Fayl mavjud emas: $fullPath"], 500);
