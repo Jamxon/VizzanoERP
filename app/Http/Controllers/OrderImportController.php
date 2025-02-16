@@ -13,7 +13,7 @@ class OrderImportController extends Controller
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls',
+            'file' => 'required|file|max:102400|mimes:xlsx,xls',
         ]);
 
         $file = $request->file('file');
