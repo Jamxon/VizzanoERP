@@ -28,6 +28,7 @@ class OrderImportController extends Controller
         $currentBlock = [];
         $currentSizes = [];
         $currentSubModel = null;
+        $currentModelSumma = 0; // Model bo'yicha umumiy summa
 
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
@@ -38,7 +39,7 @@ class OrderImportController extends Controller
             $hValue = (float)$sheet->getCell("H$row")->getValue();
             $iValue = (float)$sheet->getCell("I$row")->getValue();
             $jValue = (float)$sheet->getCell("J$row")->getValue();
-            $mValue = trim((float)$sheet->getCell("M$row")->getValue());
+            $mValue = (float)$sheet->getCell("M$row")->getValue(); // To'g'ri formatda olish
 
             // O'lchamlarni yig'ish
             if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
@@ -49,28 +50,21 @@ class OrderImportController extends Controller
             // Yangi model boshlanishini tekshirish
             if ($eValue && $eValue !== $currentGroup) {
                 if (!empty($currentBlock)) {
-                    $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
-                        return $item['price'] > 0 || $item['quantity'] > 0 || $item['total'] > 0;
-                    });
-
                     $data[] = [
                         'model' => $currentGroup,
                         'submodel' => $currentSubModel,
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                        'model_summa' => $mValue,
+                        'model_summa' => $currentModelSumma, // To'g'ri hisoblash
                         'sizes' => array_values(array_unique($currentSizes))
                     ];
                 }
 
+                // Yangi model uchun qiymatlarni nollash
                 $currentGroup = $eValue;
                 $currentSubModel = $dValue;
                 $currentBlock = [];
                 $currentSizes = [];
-
-                if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
-                        preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
-                    $currentSizes[] = $aValue;
-                }
+                $currentModelSumma = 0; // Yangi model uchun hisobni nollash
             }
 
             // Ahamiyatli qatorlarni qo'shish
@@ -84,20 +78,18 @@ class OrderImportController extends Controller
                     'total_minut' => $jValue,
                     'model_summa' => $mValue
                 ];
+
+                $currentModelSumma += $mValue; // Model bo'yicha umumiy summani qo'shish
             }
         }
 
         // Oxirgi blokni qo'shish
         if (!empty($currentBlock)) {
-            $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
-                return $item['price'] > 0 || $item['quantity'] > 0 || $item['total'] > 0;
-            });
-
             $data[] = [
                 'model' => $currentGroup,
                 'submodel' => $currentSubModel,
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
+                'model_summa' => $currentModelSumma, // Oxirgi model uchun ham qo'shish
                 'sizes' => array_values(array_unique($currentSizes))
             ];
         }
