@@ -59,7 +59,7 @@ class OrderImportController extends Controller
             $hValue = (float)$sheet->getCell("H$row")->getValue();
             $iValue = (float)$sheet->getCell("I$row")->getValue();
             $jValue = (float)$sheet->getCell("J$row")->getValue();
-            $mValue = (float)$sheet->getCell("M$row")->getValue();
+            $mValue = (float)$sheet->getCell("M$row")->getCalculatedValue();
 
             // O'lchamlarni yig'ish (E guruhi uchun)
             if ($eValue && $eValue !== $currentGroup) {
