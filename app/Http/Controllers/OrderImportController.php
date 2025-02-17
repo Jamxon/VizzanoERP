@@ -29,30 +29,6 @@ class OrderImportController extends Controller
         $currentSizes = [];
         $currentSubModel = null;
 
-        // Birinchi bo'sh element
-//        $data[] = [
-//            'model' => null,
-//            'submodel' => null,
-//            'items' => [[
-//                'size' => '',
-//                'price' => 0,
-//                'quantity' => 0,
-//                'total' => 0,
-//                'minut' => 0,
-//                'total_minut' => 0,
-//                'model_summa' => 0
-//            ]],
-//            'total' => [
-//                'price' => 0,
-//                'quantity' => 0,
-//                'total' => 0,
-//                'minut' => 0,
-//                'total_minut' => 0,
-//                'model_summa' => 0
-//            ],
-//            'sizes' => []
-//        ];
-
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
@@ -62,7 +38,7 @@ class OrderImportController extends Controller
             $hValue = (float)$sheet->getCell("H$row")->getValue();
             $iValue = (float)$sheet->getCell("I$row")->getValue();
             $jValue = (float)$sheet->getCell("J$row")->getValue();
-            $mValue = (float)$sheet->getCell("M$row")->getValue();
+            $mValue = trim((float)$sheet->getCell("M$row")->getValue());
 
             // O'lchamlarni yig'ish
             if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
@@ -81,14 +57,6 @@ class OrderImportController extends Controller
                         'model' => $currentGroup,
                         'submodel' => $currentSubModel,
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                        'items' => $currentBlock,
-                        'total' => [
-                            'price' => $nonZeroItem['price'] ?? 0,
-                            'total' => array_sum(array_column($currentBlock, 'total')),
-                            'minut' => $nonZeroItem['minut'] ?? 0,
-                            'total_minut' => $nonZeroItem['total_minut'] ?? 0,
-                            'model_summa' => array_sum(array_column($currentBlock, 'model_summa')) // model_summa to'plami
-                        ],
                         'sizes' => array_values(array_unique($currentSizes))
                     ];
                 }
@@ -113,7 +81,7 @@ class OrderImportController extends Controller
                     'total' => $hValue,
                     'minut' => $iValue,
                     'total_minut' => $jValue,
-                    'model_summa' => $mValue // model_summa ni qo'shamiz
+                    'model_summa' => $mValue
                 ];
             }
         }
@@ -128,14 +96,6 @@ class OrderImportController extends Controller
                 'model' => $currentGroup,
                 'submodel' => $currentSubModel,
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                'items' => $currentBlock,
-                'total' => [
-                    'price' => $nonZeroItem['price'] ?? 0,
-                    'total' => array_sum(array_column($currentBlock, 'total')),
-                    'minut' => $nonZeroItem['minut'] ?? 0,
-                    'total_minut' => $nonZeroItem['total_minut'] ?? 0,
-                    'model_summa' => array_sum(array_column($currentBlock, 'model_summa')) // umumiy model_summa hisoblash
-                ],
                 'sizes' => array_values(array_unique($currentSizes))
             ];
         }
