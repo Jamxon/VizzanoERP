@@ -71,15 +71,8 @@ class OrderImportController extends Controller
                     $data[] = [
                         'model' => $currentGroup,
                         'submodel' => $currentSubModel,
-                        'items' => $currentBlock,
-                        'total' => [
-                            'price' => $nonZeroItem['price'] ?? 0,
-                            'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                            'total' => array_sum(array_column($currentBlock, 'total')),
-                            'minut' => $nonZeroItem['minut'] ?? 0,
-                            'total_minut' => $nonZeroItem['total_minut'] ?? 0,
-                            'model_summa' => $nonZeroItem['model_summa'] ?? 0
-                        ],
+                        'price' => $nonZeroItem['price'] ?? 0,
+                        'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                         'sizes' => array_values(array_unique($currentSizes))
                     ];
                 }
@@ -104,9 +97,6 @@ class OrderImportController extends Controller
                     'size' => $aValue,
                     'price' => $fValue,
                     'quantity' => $gValue,
-                    'total' => $hValue,
-                    'minut' => $iValue,
-                    'total_minut' => $jValue,
                     'model_summa' => $mValue
                 ];
             }
