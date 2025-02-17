@@ -29,11 +29,9 @@ class OrderImportController extends Controller
         $modelImages = [];
         $currentGroup = null;
         $currentSubModel = null;
-        $currentBlock = [];
         $currentSizes = [];
-        $rowModelMapping = [];
 
-        // Rasmlarni qator bilan bog‘lash
+        // Rasmlarni olish
         foreach ($sheet->getDrawingCollection() as $drawing) {
             if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
                 $coordinates = $drawing->getCoordinates();
@@ -47,9 +45,6 @@ class OrderImportController extends Controller
                 $rowNumber = $matches[0] ?? null;
 
                 if ($rowNumber) {
-                    if (!isset($modelImages[$rowNumber])) {
-                        $modelImages[$rowNumber] = [];
-                    }
                     $modelImages[$rowNumber][] = url('storage/' . $imagePath);
                 }
             }
@@ -61,12 +56,17 @@ class OrderImportController extends Controller
             $eValue = trim((string)$sheet->getCell("E$row")->getValue());
             $fValue = (float)$sheet->getCell("F$row")->getValue();
             $gValue = (float)$sheet->getCell("G$row")->getValue();
+            $hValue = (float)$sheet->getCell("H$row")->getValue();
+            $iValue = (float)$sheet->getCell("I$row")->getValue();
+            $jValue = (float)$sheet->getCell("J$row")->getValue();
             $mValue = (float)$sheet->getCell("M$row")->getCalculatedValue();
 
-            // Agar yangi model boshlangan bo'lsa, avvalgisini saqlaymiz
+            // O'lchamlarni yig'ish (E guruhi uchun)
             if ($eValue && $eValue !== $currentGroup) {
                 if (!empty($currentBlock)) {
-                    $nonZeroItem = collect($currentBlock)->firstWhere(fn($item) => $item['quantity'] > 0);
+                    $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
+                        return $item['quantity'] > 0;
+                    });
 
                     $data[] = [
                         'model' => $currentGroup,
@@ -75,7 +75,7 @@ class OrderImportController extends Controller
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                         'sizes' => array_values(array_unique($currentSizes)),
                         'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
-                        'images' => $modelImages[$rowModelMapping[$currentGroup] ?? $row] ?? [],
+                        'images' => $modelImages[$row] ?? [],
                     ];
                 }
 
@@ -83,17 +83,17 @@ class OrderImportController extends Controller
                 $currentSubModel = $dValue;
                 $currentBlock = [];
                 $currentSizes = [];
-
-                // Model qatorini mapping qilish
-                $rowModelMapping[$currentGroup] = $row;
             }
 
-            // O'lchamlarni to'g'ri yig'ish
-            if ($currentGroup && preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) && $aValue !== '') {
+            // Size qatorlarini yig'ish - bu yerda E ustuni qiymati bo'yicha
+            if ($currentGroup && (
+                    preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
+                    preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)
+                ) && $aValue !== '') {
                 $currentSizes[] = $aValue;
             }
 
-            // Miqdor va narx bo'yicha model qismi
+            // Qatorlarni yig'ish
             if ($fValue > 0 && $gValue > 0) {
                 $currentBlock[] = [
                     'size' => $aValue,
@@ -102,21 +102,6 @@ class OrderImportController extends Controller
                     'model_summa' => $mValue
                 ];
             }
-        }
-
-        // Oxirgi modelni ham saqlash
-        if (!empty($currentBlock)) {
-            $nonZeroItem = collect($currentBlock)->firstWhere(fn($item) => $item['quantity'] > 0);
-
-            $data[] = [
-                'model' => $currentGroup,
-                'submodel' => $currentSubModel,
-                'price' => $nonZeroItem['price'] ?? 0,
-                'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                'sizes' => array_values(array_unique($currentSizes)),
-                'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
-                'images' => $modelImages[$rowModelMapping[$currentGroup] ?? $row] ?? [],
-            ];
         }
 
         return response()->json([
