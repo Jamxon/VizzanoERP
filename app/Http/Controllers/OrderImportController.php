@@ -31,8 +31,9 @@ class OrderImportController extends Controller
         $currentSubModel = null;
         $currentBlock = [];
         $currentSizes = [];
+        $rowModelMapping = [];
 
-        // Rasmlarni to'g'ri joylashgan qator bo‘yicha bog‘lash
+        // Rasmlarni qator bilan bog‘lash
         foreach ($sheet->getDrawingCollection() as $drawing) {
             if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
                 $coordinates = $drawing->getCoordinates();
@@ -62,6 +63,7 @@ class OrderImportController extends Controller
             $gValue = (float)$sheet->getCell("G$row")->getValue();
             $mValue = (float)$sheet->getCell("M$row")->getCalculatedValue();
 
+            // Agar yangi model boshlangan bo'lsa, avvalgisini saqlaymiz
             if ($eValue && $eValue !== $currentGroup) {
                 if (!empty($currentBlock)) {
                     $nonZeroItem = collect($currentBlock)->firstWhere(fn($item) => $item['quantity'] > 0);
@@ -73,7 +75,7 @@ class OrderImportController extends Controller
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                         'sizes' => array_values(array_unique($currentSizes)),
                         'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
-                        'images' => $modelImages[$row] ?? [],
+                        'images' => $modelImages[$rowModelMapping[$currentGroup] ?? $row] ?? [],
                     ];
                 }
 
@@ -81,12 +83,17 @@ class OrderImportController extends Controller
                 $currentSubModel = $dValue;
                 $currentBlock = [];
                 $currentSizes = [];
+
+                // Model qatorini mapping qilish
+                $rowModelMapping[$currentGroup] = $row;
             }
 
+            // O'lchamlarni to'g'ri yig'ish
             if ($currentGroup && preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) && $aValue !== '') {
                 $currentSizes[] = $aValue;
             }
 
+            // Miqdor va narx bo'yicha model qismi
             if ($fValue > 0 && $gValue > 0) {
                 $currentBlock[] = [
                     'size' => $aValue,
@@ -97,6 +104,7 @@ class OrderImportController extends Controller
             }
         }
 
+        // Oxirgi modelni ham saqlash
         if (!empty($currentBlock)) {
             $nonZeroItem = collect($currentBlock)->firstWhere(fn($item) => $item['quantity'] > 0);
 
@@ -107,7 +115,7 @@ class OrderImportController extends Controller
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                 'sizes' => array_values(array_unique($currentSizes)),
                 'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
-                'images' => $modelImages[$row] ?? [],
+                'images' => $modelImages[$rowModelMapping[$currentGroup] ?? $row] ?? [],
             ];
         }
 
