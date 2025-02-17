@@ -51,7 +51,7 @@ class OrderImportController extends Controller
             }
 
             $data[] = [
-                'a' => $aColumn,
+                'a' => $sizes,
                 'b' => (string)$sheet->getCell("B$row")->getValue(),
                 'c' => (string)$sheet->getCell("C$row")->getValue(),
                 'd' => (string)$sheet->getCell("D$row")->getValue(),
