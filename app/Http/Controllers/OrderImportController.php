@@ -9,14 +9,12 @@ class OrderImportController extends Controller
 {
     public function import(Request $request)
     {
-        // Faylni olish
         $file = $request->file('file');
 
         if (!$file || !$file->isValid()) {
             return response()->json(['success' => false, 'message' => 'Fayl noto‘g‘ri yuklangan!'], 400);
         }
 
-        // Excel faylni yuklash
         try {
             $spreadsheet = IOFactory::load($file->getPathname());
             $sheet = $spreadsheet->getActiveSheet();
@@ -31,29 +29,32 @@ class OrderImportController extends Controller
 
         $data = [];
         $sizes = [];
-        $currentBlock = []; // Hozirgi blokdagi ma'lumotlar
-        $lastEValue = null; // Oxirgi `E` ustunidagi ma'lumotni saqlash
+        $currentBlock = [];
+        $hSum = 0; // H ustunidagi barcha qiymatlarning yig‘indisi
+        $lastEValue = null;
 
         for ($row = 2; $row <= $highestRow; $row++) {
             $eColumn = trim((string)$sheet->getCell("E$row")->getValue());
+            $aColumn = trim((string)$sheet->getCell("A$row")->getValue());
+            $hColumn = (float) trim((string)$sheet->getCell("H$row")->getValue()); // Float formatga o‘tkazamiz
 
-            // Agar `E` ustunidagi ma’lumot bo‘sh bo‘lsa, o'tkazib yuboramiz
             if ($eColumn === "") {
                 continue;
             }
 
-            // A ustunidagi ma’lumotni olish
-            $aColumn = trim((string)$sheet->getCell("A$row")->getValue());
-
-            // Agar A ustunidagi ma’lumot o‘lcham bo‘lsa, uni ro‘yxatga qo‘shamiz
+            // A ustunidagi o'lchamlarni yig'ish
             if (preg_match('/^\d{2,3}-\d{2,3}$/', $aColumn)) {
                 $sizes[] = $aColumn;
             }
 
-            // Agar `E` ustuni avvalgidan farqli bo‘lsa, eski blokni saqlaymiz va yangisini boshlaymiz
+            // Agar `E` ustuni avvalgidan farqli bo‘lsa, blokni saqlab, yangisini boshlaymiz
             if ($lastEValue !== null && $lastEValue !== $eColumn) {
-                $data[] = $currentBlock; // Oldingi blokni saqlaymiz
-                $currentBlock = []; // Yangi blokni boshlaymiz
+                $data[] = [
+                    'block' => $currentBlock,
+                    'h_sum' => $hSum // H ustunining yig‘indisini qo‘shamiz
+                ];
+                $currentBlock = [];
+                $hSum = 0;
             }
 
             // Hozirgi qatorni blokga qo‘shamiz
@@ -65,7 +66,7 @@ class OrderImportController extends Controller
                 'e' => (string)$eColumn,
                 'f' => (string)$sheet->getCell("F$row")->getValue(),
                 'g' => (string)$sheet->getCell("G$row")->getValue(),
-                'h' => (string)$sheet->getCell("H$row")->getValue(),
+                'h' => $hColumn,
                 'i' => (string)$sheet->getCell("I$row")->getValue(),
                 'j' => (string)$sheet->getCell("J$row")->getValue(),
                 'k' => (string)$sheet->getCell("K$row")->getValue(),
@@ -73,13 +74,19 @@ class OrderImportController extends Controller
                 'm' => (string)$sheet->getCell("M$row")->getValue(),
             ];
 
+            // `H` ustuni qiymatini qo‘shamiz
+            $hSum += $hColumn;
+
             // `E` ustunining oxirgi qiymatini yangilaymiz
             $lastEValue = $eColumn;
         }
 
         // Oxirgi blokni ham saqlash kerak
         if (!empty($currentBlock)) {
-            $data[] = $currentBlock;
+            $data[] = [
+                'block' => $currentBlock,
+                'h_sum' => $hSum
+            ];
         }
 
         if (empty($data)) {
@@ -89,7 +96,7 @@ class OrderImportController extends Controller
         return response()->json([
             'success' => true,
             'data' => $data,
-            'sizes' => array_values(array_unique($sizes)) // O'lchamlarni unikal qilib olamiz
+            'sizes' => array_values(array_unique($sizes))
         ]);
     }
 }
