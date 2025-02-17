@@ -13,87 +13,113 @@ class OrderImportController extends Controller
 
         if (!$file || !$file->isValid()) {
             return response()->json(['success' => false, 'message' => "Fayl noto'g'ri yuklangan!"], 400);
-        }
+   }
 
         try {
             $spreadsheet = IOFactory::load($file->getPathname());
             $sheet = $spreadsheet->getActiveSheet();
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => "Faylni o'qishda xatolik: " . $e->getMessage()], 500);
-        }
+   }
 
-        $highestRow = $sheet->getHighestRow();
-        $data = [];
-        $sizes = [];
-        $currentGroup = null;
-        $currentBlock = [];
+   $highestRow = $sheet->getHighestRow();
+   $data = [];
+   $sizes = [];
+   $currentGroup = null;
+   $currentBlock = [];
 
-        for ($row = 2; $row <= $highestRow; $row++) {
-            $aValue = trim((string)$sheet->getCell("A$row")->getValue());
-            $eValue = trim((string)$sheet->getCell("E$row")->getValue());
-            $fValue = trim((string)$sheet->getCell("F$row")->getValue());
-            $gValue = trim((string)$sheet->getCell("G$row")->getValue());
-            $hValue = trim((string)$sheet->getCell("H$row")->getCalculatedValue());
+   // Birinchi itemni qo'shish
+   $data[] = [
+       'article' => null,
+       'items' => [[
+           'size' => '',
+           'price' => 0,
+           'quantity' => 0,
+           'total' => 0,
+           'minut' => 0,
+           'umumiy_daqiqa' => 0,
+           'model_summa' => 0
+       ]],
+       'total' => [
+           'price' => 0,
+           'quantity' => 0,
+           'total' => 0,
+           'minut' => 0,
+           'umumiy_daqiqa' => 0,
+           'model_summa' => 0
+       ]
+   ];
 
-            // O'lchamlarni yig'ish
-            if (preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue)) {
-                $sizes[] = $aValue;
-            }
+   for ($row = 2; $row <= $highestRow; $row++) {
+       $aValue = trim((string)$sheet->getCell("A$row")->getValue());
+       $eValue = trim((string)$sheet->getCell("E$row")->getValue());
+       $fValue = (float)$sheet->getCell("F$row")->getValue();
+       $gValue = (float)$sheet->getCell("G$row")->getValue();
+       $hValue = (float)$sheet->getCell("H$row")->getValue();
+       $iValue = (float)$sheet->getCell("I$row")->getValue();
+       $jValue = (float)$sheet->getCell("J$row")->getValue();
+       $mValue = (float)$sheet->getCell("M$row")->getValue();
 
-            // Yangi guruh boshlanishini tekshirish
-            if ($eValue && $eValue !== $currentGroup) {
-                if (!empty($currentBlock)) {
-                    $data[] = [
-                        'article' => $currentGroup,
-                        'items' => $currentBlock,
-                        'total' => [
-                            'price' => $currentBlock[0]['price'] ?? 0,
-                            'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                            'total' => array_sum(array_column($currentBlock, 'total')),
-                            'minut' => $currentBlock[0]['minut'] ?? 0,
-                            'umumiy_daqiqa' => array_sum(array_column($currentBlock, 'umumiy_daqiqa')),
-                            'model_summa' => $currentBlock[0]['model_summa'] ?? 0
-                        ]
-                    ];
-                }
-                $currentGroup = $eValue;
-                $currentBlock = [];
-            }
+       // O'lchamlarni yig'ish
+       if (preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
+           preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) {
+           $sizes[] = $aValue;
+       }
 
-            // Faqat ahamiyatli qatorlarni qo'shish
-            if ($fValue || $gValue || $hValue) {
-                $currentBlock[] = [
-                    'size' => $aValue,
-                    'price' => (float)$fValue,
-                    'quantity' => (float)$gValue,
-                    'total' => (float)$hValue,
-                    'minut' => (float)$sheet->getCell("I$row")->getValue(),
-                    'umumiy_daqiqa' => (float)$sheet->getCell("J$row")->getValue(),
-                    'model_summa' => (float)$sheet->getCell("M$row")->getValue()
-                ];
-            }
-        }
+       // Yangi guruh boshlanishini tekshirish
+       if ($eValue && $eValue !== $currentGroup) {
+           if (!empty($currentBlock)) {
+               $data[] = [
+                   'article' => $currentGroup,
+                   'items' => $currentBlock,
+                   'total' => [
+                       'price' => $currentBlock[0]['price'] ?? 0,
+                       'quantity' => array_sum(array_column($currentBlock, 'quantity')),
+                       'total' => array_sum(array_column($currentBlock, 'total')),
+                       'minut' => $currentBlock[0]['minut'] ?? 0,
+                       'umumiy_daqiqa' => array_sum(array_column($currentBlock, 'umumiy_daqiqa')),
+                       'model_summa' => $currentBlock[0]['model_summa'] ?? 0
+                   ]
+               ];
+           }
+           $currentGroup = $eValue;
+           $currentBlock = [];
+       }
 
-            // Oxirgi blokni qo'shish
-            if (!empty($currentBlock)) {
-                $data[] = [
-                    'article' => $currentGroup,
-                    'items' => $currentBlock,
-                    'total' => [
-                        'price' => $currentBlock[0]['price'] ?? 0,
-                        'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                        'total' => array_sum(array_column($currentBlock, 'total')),
-                        'minut' => $currentBlock[0]['minut'] ?? 0,
-                        'umumiy_daqiqa' => array_sum(array_column($currentBlock, 'umumiy_daqiqa')),
-                        'model_summa' => $currentBlock[0]['model_summa'] ?? 0
-                    ]
-                ];
-            }
+       // Faqat ahamiyatli qatorlarni qo'shish
+       if ($fValue > 0 || $gValue > 0 || $hValue > 0) {
+           $currentBlock[] = [
+               'size' => $aValue,
+               'price' => $fValue,
+               'quantity' => $gValue,
+               'total' => $hValue,
+               'minut' => $iValue,
+               'umumiy_daqiqa' => $jValue,
+               'model_summa' => $mValue
+           ];
+       }
+   }
 
-            return response()->json([
-                'success' => true,
-                'data' => $data,
-                'sizes' => array_values(array_unique($sizes))
-            ]);
-    }
+   // Oxirgi blokni qo'shish
+   if (!empty($currentBlock)) {
+       $data[] = [
+           'article' => $currentGroup,
+           'items' => $currentBlock,
+           'total' => [
+               'price' => $currentBlock[0]['price'] ?? 0,
+               'quantity' => array_sum(array_column($currentBlock, 'quantity')),
+               'total' => array_sum(array_column($currentBlock, 'total')),
+               'minut' => $currentBlock[0]['minut'] ?? 0,
+               'umumiy_daqiqa' => array_sum(array_column($currentBlock, 'umumiy_daqiqa')),
+               'model_summa' => $currentBlock[0]['model_summa'] ?? 0
+           ]
+       ];
+   }
+
+   return response()->json([
+       'success' => true,
+       'data' => $data,
+       'sizes' => array_values(array_unique($sizes))
+   ]);
+}
 }
