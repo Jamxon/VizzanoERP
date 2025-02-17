@@ -32,6 +32,25 @@ class OrderImportController extends Controller
         $currentSubModel = null;
         $modelImages = [];
 
+        // **1. EXCEL ICHIDAGI RASM FAYLLARINI OLIB SAQLASH**
+        foreach ($sheet->getDrawingCollection() as $drawing) {
+            if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
+                $coordinates = $drawing->getCoordinates(); // Rasm qaysi katakka joylashgan
+                $imageExtension = $drawing->getExtension(); // Rasm kengaytmasi (jpg, png va h.k.)
+                $imageName = Str::uuid() . '.' . $imageExtension; // Unique nom yaratish
+                $imagePath = "models/$imageName";
+
+                // Rasmni storage/public/models/ papkaga saqlash
+                Storage::disk('public')->put($imagePath, file_get_contents($drawing->getPath()));
+
+                // Rasm turgan ustun C yoki D bo'lsa, modelga bog'lash
+                if (str_starts_with($coordinates, 'C') || str_starts_with($coordinates, 'D')) {
+                    $modelImages[$coordinates][] = Storage::url($imagePath);
+                }
+            }
+        }
+
+        // **2. EXCEL ICHIDAGI MA'LUMOTLARNI OLIB JSONGA YIG'ISH**
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
@@ -45,13 +64,6 @@ class OrderImportController extends Controller
 
             // Model uchun unique ID
             $modelUniqueId = md5($eValue); // Model nomidan unique ID yaratish
-
-            // Rasmlarni saqlash va modelga bog‘lash
-            $imageFile = $request->file("image_$row"); // Fayl input nomi image_2, image_3 kabi kelishi kerak
-            if ($imageFile) {
-                $imagePath = $imageFile->storeAs("models/$modelUniqueId", $imageFile->getClientOriginalName(), 'public');
-                $modelImages[$eValue][] = Storage::url($imagePath);
-            }
 
             // O'lchamlarni yig'ish
             if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
@@ -69,7 +81,7 @@ class OrderImportController extends Controller
                         'model_price' => array_sum(array_column($currentBlock, 'price')), // F ustunidan umumiy narx
                         'model_summa' => array_sum(array_column($currentBlock, 'model_summa')), // M ustunidagi umumiy summa
                         'sizes' => array_values(array_unique($currentSizes)),
-                        'images' => $modelImages[$currentGroup] ?? []
+                        'images' => $modelImages["C$row"] ?? $modelImages["D$row"] ?? []
                     ];
                 }
 
@@ -102,7 +114,7 @@ class OrderImportController extends Controller
                 'model_price' => array_sum(array_column($currentBlock, 'price')), // F ustunidan umumiy narx
                 'model_summa' => array_sum(array_column($currentBlock, 'model_summa')), // M ustunidagi umumiy summa
                 'sizes' => array_values(array_unique($currentSizes)),
-                'images' => $modelImages[$currentGroup] ?? []
+                'images' => $modelImages["C$row"] ?? $modelImages["D$row"] ?? []
             ];
         }
 
