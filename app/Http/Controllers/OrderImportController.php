@@ -33,10 +33,9 @@ class OrderImportController extends Controller
         }
 
         $data = [];
-        for ($row = 2; $row <= $highestRow; $row++) { // 1-qatorda sarlavhalar bo‘lishi mumkin
-            $eColumn = $sheet->getCell("E$row")->getValue();
+        for ($row = 2; $row <= $highestRow; $row++) { 
+            $eColumn = $sheet->getCell("F$row")->getValue();
 
-            // Agar asosiy ustunda ma’lumot bo‘sh bo‘lsa, tsikldan chiqamiz
             if (is_null($eColumn) || trim((string)$eColumn) === "") {
                 continue;
             }
