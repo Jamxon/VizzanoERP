@@ -32,54 +32,48 @@ class OrderImportController extends Controller
         $currentSubModel = null;
         $modelImages = [];
 
-        // **1. EXCEL ICHIDAGI RASM FAYLLARINI OLIB SAQLASH**
+        // **1. RASM FAYLLARNI TEZ YUKLASH VA SAQLASH**
         foreach ($sheet->getDrawingCollection() as $drawing) {
             if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
-                $coordinates = $drawing->getCoordinates(); // Rasm qaysi katakka joylashgan
-                $imageExtension = $drawing->getExtension(); // Rasm kengaytmasi (jpg, png va h.k.)
-                $imageName = Str::uuid() . '.' . $imageExtension; // Unique nom yaratish
+                $coordinates = $drawing->getCoordinates();
+                $imageExtension = $drawing->getExtension();
+                $imageName = Str::uuid() . '.' . $imageExtension;
                 $imagePath = "models/$imageName";
 
-                // Rasmni storage/public/models/ papkaga saqlash
                 Storage::disk('public')->put($imagePath, file_get_contents($drawing->getPath()));
 
-                // Rasm turgan ustun C yoki D bo'lsa, modelga bog'lash
                 if (str_starts_with($coordinates, 'C') || str_starts_with($coordinates, 'D')) {
-                    $modelImages[$coordinates][] = Storage::url($imagePath);
+                    $modelImages[$coordinates] = Storage::url($imagePath);
                 }
             }
         }
 
-        // **2. EXCEL ICHIDAGI MA'LUMOTLARNI OLIB JSONGA YIG'ISH**
+        // **2. MA’LUMOTLARNI TEZ O‘QISH**
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
             $eValue = trim((string)$sheet->getCell("E$row")->getValue());
-            $fValue = (float) trim($sheet->getCell("F$row")->getValue()); // F ustunidagi narx
-            $gValue = (float) $sheet->getCell("G$row")->getValue();
-            $hValue = (float) $sheet->getCell("H$row")->getValue();
-            $iValue = (float) $sheet->getCell("I$row")->getValue();
-            $jValue = (float) $sheet->getCell("J$row")->getValue();
-            $mValue = (float) $sheet->getCell("M$row")->getCalculatedValue(); // M ustunidagi formula natijasi
+            $fValue = (float)$sheet->getCell("F$row")->getValue();
+            $gValue = (float)$sheet->getCell("G$row")->getValue();
+            $hValue = (float)$sheet->getCell("H$row")->getValue();
+            $iValue = (float)$sheet->getCell("I$row")->getValue();
+            $jValue = (float)$sheet->getCell("J$row")->getValue();
+            $mValue = (float)$sheet->getCell("M$row")->getCalculatedValue();
 
-            // Model uchun unique ID
-            $modelUniqueId = md5($eValue); // Model nomidan unique ID yaratish
-
-            // O'lchamlarni yig'ish
-            if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
-                    preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
+            // **O'lchamlarni ajratish**
+            if (preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) || preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) {
                 $currentSizes[] = $aValue;
             }
 
-            // Yangi model boshlanishini tekshirish
+            // **Yangi model boshlanishini aniqlash**
             if ($eValue && $eValue !== $currentGroup) {
                 if (!empty($currentBlock)) {
                     $data[] = [
                         'model' => $currentGroup,
                         'submodel' => $currentSubModel,
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                        'model_price' => array_sum(array_column($currentBlock, 'price')), // F ustunidan umumiy narx
-                        'model_summa' => array_sum(array_column($currentBlock, 'model_summa')), // M ustunidagi umumiy summa
+                        'model_price' => array_sum(array_column($currentBlock, 'price')),
+                        'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
                         'sizes' => array_values(array_unique($currentSizes)),
                         'images' => $modelImages["C$row"] ?? $modelImages["D$row"] ?? []
                     ];
@@ -91,28 +85,28 @@ class OrderImportController extends Controller
                 $currentSizes = [];
             }
 
-            // Ahamiyatli qatorlarni qo'shish
+            // **Ahamiyatli qatorlarni qo‘shish**
             if ($fValue > 0 || $gValue > 0 || $hValue > 0) {
                 $currentBlock[] = [
                     'size' => $aValue,
-                    'price' => $fValue,  // F ustunidagi narx
+                    'price' => $fValue,
                     'quantity' => $gValue,
                     'total' => $hValue,
                     'minut' => $iValue,
                     'total_minut' => $jValue,
-                    'model_summa' => $mValue // M ustunidagi qiymat
+                    'model_summa' => $mValue
                 ];
             }
         }
 
-        // Oxirgi blokni qo'shish
+        // **Oxirgi modelni qo‘shish**
         if (!empty($currentBlock)) {
             $data[] = [
                 'model' => $currentGroup,
                 'submodel' => $currentSubModel,
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                'model_price' => array_sum(array_column($currentBlock, 'price')), // F ustunidan umumiy narx
-                'model_summa' => array_sum(array_column($currentBlock, 'model_summa')), // M ustunidagi umumiy summa
+                'model_price' => array_sum(array_column($currentBlock, 'price')),
+                'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
                 'sizes' => array_values(array_unique($currentSizes)),
                 'images' => $modelImages["C$row"] ?? $modelImages["D$row"] ?? []
             ];
