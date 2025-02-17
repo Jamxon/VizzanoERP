@@ -63,7 +63,7 @@ class OrderImportController extends Controller
         $iValue = (float)$sheet->getCell("I$row")->getValue();
         $jValue = (float)$sheet->getCell("J$row")->getValue();
         $mValue = (float)$sheet->getCell("M$row")->getValue();
-
+        dd($mValue);
         // O'lchamlarni yig'ish
         if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
                 preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
