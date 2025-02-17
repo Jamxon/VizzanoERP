@@ -11,27 +11,31 @@ class OrderImportController extends Controller
 {
     public function import(Request $request)
     {
+        // Faylni olish
         $file = $request->file('file');
 
+        // Fayl tekshiriladi
         if (!$file || !$file->isValid()) {
             return response()->json(['success' => false, 'message' => "Fayl noto'g'ri yuklangan!"], 400);
         }
 
         try {
+            // Excel faylini yuklash
             $spreadsheet = IOFactory::load($file->getPathname());
             $sheet = $spreadsheet->getActiveSheet();
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => "Faylni o'qishda xatolik: " . $e->getMessage()], 500);
         }
 
-        $highestRow = $sheet->getHighestRow();
+        $highestRow = $sheet->getHighestRow(); // Oxirgi qator
         $data = [];
         $modelImages = [];
         $currentGroup = null;
         $currentSubModel = null;
+        $currentBlock = [];
         $currentSizes = [];
 
-        // Rasmlarni olish
+        // Rasmlarni olish va saqlash
         foreach ($sheet->getDrawingCollection() as $drawing) {
             if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
                 $coordinates = $drawing->getCoordinates();
@@ -50,6 +54,7 @@ class OrderImportController extends Controller
             }
         }
 
+        // Excel ma'lumotlarini o'qish
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
@@ -61,12 +66,10 @@ class OrderImportController extends Controller
             $jValue = (float)$sheet->getCell("J$row")->getValue();
             $mValue = (float)$sheet->getCell("M$row")->getCalculatedValue();
 
-            // O'lchamlarni yig'ish (E guruhi uchun)
+            // Yangi model guruhi (E ustuni bo‘yicha)
             if ($eValue && $eValue !== $currentGroup) {
                 if (!empty($currentBlock)) {
-                    $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
-                        return $item['quantity'] > 0;
-                    });
+                    $nonZeroItem = collect($currentBlock)->firstWhere(fn($item) => $item['quantity'] > 0);
 
                     $data[] = [
                         'model' => $currentGroup,
@@ -85,7 +88,7 @@ class OrderImportController extends Controller
                 $currentSizes = [];
             }
 
-            // Size qatorlarini yig'ish - bu yerda E ustuni qiymati bo'yicha
+            // O'lchamni aniqlash
             if ($currentGroup && (
                     preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
                     preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)
@@ -93,7 +96,7 @@ class OrderImportController extends Controller
                 $currentSizes[] = $aValue;
             }
 
-            // Qatorlarni yig'ish
+            // Model ma'lumotlarini yig'ish
             if ($fValue > 0 && $gValue > 0) {
                 $currentBlock[] = [
                     'size' => $aValue,
@@ -104,6 +107,22 @@ class OrderImportController extends Controller
             }
         }
 
+        // Oxirgi modelni ham qo'shish
+        if (!empty($currentBlock)) {
+            $nonZeroItem = collect($currentBlock)->firstWhere(fn($item) => $item['quantity'] > 0);
+
+            $data[] = [
+                'model' => $currentGroup,
+                'submodel' => $currentSubModel,
+                'price' => $nonZeroItem['price'] ?? 0,
+                'quantity' => array_sum(array_column($currentBlock, 'quantity')),
+                'sizes' => array_values(array_unique($currentSizes)),
+                'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
+                'images' => $modelImages[$row] ?? [],
+            ];
+        }
+
+        // JSON qaytarish
         return response()->json([
             'success' => true,
             'data' => $data
