@@ -57,6 +57,7 @@ class OrderImportController extends Controller
                         'model' => $currentGroup,
                         'submodel' => $currentSubModel,
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
+                        'model_summa' => $mValue,
                         'sizes' => array_values(array_unique($currentSizes))
                     ];
                 }
