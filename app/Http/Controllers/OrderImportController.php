@@ -81,6 +81,7 @@ class OrderImportController extends Controller
                     'model' => $currentGroup,
                     'submodel' => $currentSubModel,
                     'price' => $nonZeroItem['price'] ?? 0,
+                    'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                     'items' => $currentBlock,
                     'total' => [
                         'price' => $nonZeroItem['price'] ?? 0,
@@ -128,7 +129,6 @@ class OrderImportController extends Controller
         $data[] = [
             'model' => $currentGroup,
             'submodel' => $currentSubModel,
-            'quantity' => $currentBlock[0],
             'items' => $currentBlock,
             'total' => [
                 'price' => $nonZeroItem['price'] ?? 0,
