@@ -36,14 +36,20 @@ class OrderImportController extends Controller
         for ($row = 2; $row <= $highestRow; $row++) {
             $eColumn = trim((string)$sheet->getCell("E$row")->getValue());
             $aColumn = trim((string)$sheet->getCell("A$row")->getValue());
-            $hColumn = (float) trim((string)$sheet->getCell("H$row")->getValue()); // Float formatga o‘tkazamiz
+
+            // **Formula yoki oddiy qiymatni olish uchun `getCalculatedValue()` ishlatamiz**
+            try {
+                $hColumn = (float) $sheet->getCell("H$row")->getCalculatedValue();
+            } catch (\Exception $e) {
+                $hColumn = 0; // Xatolik bo‘lsa, 0 deb qabul qilamiz
+            }
 
             if ($eColumn === "") {
                 continue;
             }
 
             // A ustunidagi o'lchamlarni yig'ish
-            if (preg_match('/^\d{2,3}-\d{2,3}$/', $aColumn)) {
+            if (preg_match('/^\d{2,3}\/\d{2,3}$/', $aColumn)) {
                 $sizes[] = $aColumn;
             }
 
@@ -67,11 +73,11 @@ class OrderImportController extends Controller
                 'f' => (string)$sheet->getCell("F$row")->getValue(),
                 'g' => (string)$sheet->getCell("G$row")->getValue(),
                 'h' => $hColumn,
-                'i' => (string)$sheet->getCell("I$row")->getValue(),
-                'j' => (string)$sheet->getCell("J$row")->getValue(),
-                'k' => (string)$sheet->getCell("K$row")->getValue(),
-                'l' => (string)$sheet->getCell("L$row")->getValue(),
-                'm' => (string)$sheet->getCell("M$row")->getValue(),
+                'i' => (string)$sheet->getCell("I$row")->getFormattedValue(),
+                'j' => (string)$sheet->getCell("J$row")->getFormattedValue(),
+                'k' => (string)$sheet->getCell("K$row")->getFormattedValue(),
+                'l' => (string)$sheet->getCell("L$row")->getFormattedValue(),
+                'm' => (string)$sheet->getCell("M$row")->getFormattedValue(),
             ];
 
             // `H` ustuni qiymatini qo‘shamiz
