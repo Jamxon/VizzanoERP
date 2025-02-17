@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use PhpOffice\PhpSpreadsheet\Calculation\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class OrderImportController extends Controller
@@ -29,27 +28,17 @@ class OrderImportController extends Controller
         $currentBlock = [];
         $currentSizes = [];
         $currentSubModel = null;
-        $currentModelSumma = 0; // Model bo'yicha umumiy summa
 
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
             $eValue = trim((string)$sheet->getCell("E$row")->getValue());
-            $fValue = (float)$sheet->getCell("F$row")->getValue();
-            $gValue = (float)$sheet->getCell("G$row")->getValue();
-            $hValue = (float)$sheet->getCell("H$row")->getValue();
-            $iValue = (float)$sheet->getCell("I$row")->getValue();
-            $jValue = (float)$sheet->getCell("J$row")->getValue();
-            try {
-                $mValue = $sheet->getCell("M$row")->getCalculatedValue();
-            } catch (Exception $e) {
-                $mValue = null;
-            }
-            if ($mValue === null) {
-                $mValue = $sheet->getCell("M$row")->getValue(); // Agar natija bo‘lmasa, oddiy qiymatini olishga harakat qilamiz
-            }
-            $mValue = (float) trim($mValue);
-
+            $fValue = (float) trim($sheet->getCell("F$row")->getValue()); // F ustunidagi narx
+            $gValue = (float) $sheet->getCell("G$row")->getValue();
+            $hValue = (float) $sheet->getCell("H$row")->getValue();
+            $iValue = (float) $sheet->getCell("I$row")->getValue();
+            $jValue = (float) $sheet->getCell("J$row")->getValue();
+            $mValue = (float) $sheet->getCell("M$row")->getCalculatedValue(); // M ustunidagi formula natijasi
 
             // O'lchamlarni yig'ish
             if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
@@ -63,34 +52,35 @@ class OrderImportController extends Controller
                     $data[] = [
                         'model' => $currentGroup,
                         'submodel' => $currentSubModel,
-                        'price' => $fValue,
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                        'model_summa' => $currentModelSumma, // To'g'ri hisoblash
+                        'model_price' => array_sum(array_column($currentBlock, 'price')), // F ustunidan umumiy narx
+                        'model_summa' => array_sum(array_column($currentBlock, 'model_summa')), // M ustunidagi umumiy summa
                         'sizes' => array_values(array_unique($currentSizes))
                     ];
                 }
 
-                // Yangi model uchun qiymatlarni nollash
                 $currentGroup = $eValue;
                 $currentSubModel = $dValue;
                 $currentBlock = [];
                 $currentSizes = [];
-                $currentModelSumma = 0; // Yangi model uchun hisobni nollash
+
+                if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
+                        preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
+                    $currentSizes[] = $aValue;
+                }
             }
 
             // Ahamiyatli qatorlarni qo'shish
             if ($fValue > 0 || $gValue > 0 || $hValue > 0) {
                 $currentBlock[] = [
                     'size' => $aValue,
-                    'price' => $fValue,
+                    'price' => $fValue,  // F ustunidagi narx
                     'quantity' => $gValue,
                     'total' => $hValue,
                     'minut' => $iValue,
                     'total_minut' => $jValue,
-                    'model_summa' => $mValue
+                    'model_summa' => $mValue // M ustunidagi qiymat
                 ];
-
-                $currentModelSumma += $mValue; // Model bo'yicha umumiy summani qo'shish
             }
         }
 
@@ -99,9 +89,9 @@ class OrderImportController extends Controller
             $data[] = [
                 'model' => $currentGroup,
                 'submodel' => $currentSubModel,
-                'price' => $currentBlock[0]['price'],
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                'model_summa' => $currentBlock[0]['model_summa'],
+                'model_price' => array_sum(array_column($currentBlock, 'price')), // F ustunidan umumiy narx
+                'model_summa' => array_sum(array_column($currentBlock, 'model_summa')), // M ustunidagi umumiy summa
                 'sizes' => array_values(array_unique($currentSizes))
             ];
         }
