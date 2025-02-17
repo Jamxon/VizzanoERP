@@ -43,7 +43,7 @@ class OrderImportController extends Controller
                 Storage::disk('public')->put($imagePath, file_get_contents($drawing->getPath()));
 
                 if (str_starts_with($coordinates, 'C') || str_starts_with($coordinates, 'D')) {
-                    $modelImages[$coordinates] = url() . '/storage/' . $imagePath;
+                    $modelImages[$coordinates] = "http://176.124.208.61:2005" . '/storage/' . $imagePath;
                 }
             }
         }
