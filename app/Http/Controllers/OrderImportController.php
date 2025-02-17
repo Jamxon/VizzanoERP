@@ -30,28 +30,28 @@ class OrderImportController extends Controller
         $currentSubModel = null;
 
         // Birinchi bo'sh element
-        $data[] = [
-            'model' => null,
-            'submodel' => null,
-            'items' => [[
-                'size' => '',
-                'price' => 0,
-                'quantity' => 0,
-                'total' => 0,
-                'minut' => 0,
-                'total_minut' => 0,
-                'model_summa' => 0
-            ]],
-            'total' => [
-                'price' => 0,
-                'quantity' => 0,
-                'total' => 0,
-                'minut' => 0,
-                'total_minut' => 0,
-                'model_summa' => 0
-            ],
-            'sizes' => []
-        ];
+//        $data[] = [
+//            'model' => null,
+//            'submodel' => null,
+//            'items' => [[
+//                'size' => '',
+//                'price' => 0,
+//                'quantity' => 0,
+//                'total' => 0,
+//                'minut' => 0,
+//                'total_minut' => 0,
+//                'model_summa' => 0
+//            ]],
+//            'total' => [
+//                'price' => 0,
+//                'quantity' => 0,
+//                'total' => 0,
+//                'minut' => 0,
+//                'total_minut' => 0,
+//                'model_summa' => 0
+//            ],
+//            'sizes' => []
+//        ];
 
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
