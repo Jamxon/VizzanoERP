@@ -35,7 +35,7 @@ class OrderImportController extends Controller
         $currentBlock = [];
         $currentSizes = [];
 
-        // Rasmlarni olish va saqlash
+        // Rasmlarni olish va to'g'ri modelga bog‘lash
         foreach ($sheet->getDrawingCollection() as $drawing) {
             if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
                 $coordinates = $drawing->getCoordinates();
@@ -49,6 +49,10 @@ class OrderImportController extends Controller
                 $rowNumber = $matches[0] ?? null;
 
                 if ($rowNumber) {
+                    // Har bir model uchun rasmlarni to'g'ri bog‘lash
+                    if (!isset($modelImages[$rowNumber])) {
+                        $modelImages[$rowNumber] = [];
+                    }
                     $modelImages[$rowNumber][] = url('storage/' . $imagePath);
                 }
             }
@@ -78,7 +82,7 @@ class OrderImportController extends Controller
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                         'sizes' => array_values(array_unique($currentSizes)),
                         'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
-                        'images' => $modelImages[$row] ?? [],
+                        'images' => $modelImages[$row - count($currentBlock)] ?? [],
                     ];
                 }
 
@@ -118,7 +122,7 @@ class OrderImportController extends Controller
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                 'sizes' => array_values(array_unique($currentSizes)),
                 'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
-                'images' => $modelImages[$row] ?? [],
+                'images' => $modelImages[$row - count($currentBlock)] ?? [],
             ];
         }
 
