@@ -48,21 +48,60 @@ class OrderImportController extends Controller
         }
 
         for ($row = 2; $row <= $highestRow; $row++) {
-            $eValue = trim((string)$sheet->getCell("E$row")->getValue());
+            $aValue = trim((string)$sheet->getCell("A$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
+            $eValue = trim((string)$sheet->getCell("E$row")->getValue());
+            $fValue = (float)$sheet->getCell("F$row")->getValue();
+            $gValue = (float)$sheet->getCell("G$row")->getValue();
+            $mValue = (float)$sheet->getCell("M$row")->getValue();
 
-            $fValue = (float) $sheet->getCell("F$row")->getCalculatedValue();
-            $gValue = (float) $sheet->getCell("G$row")->getCalculatedValue();
-            $mValue = (float) $sheet->getCell("M$row")->getCalculatedValue();
+            // O'lchamlarni yig'ish
+            if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
+                    preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
+                $currentSizes[] = $aValue;
+            }
+            // Yangi model boshlanishini tekshirish
+            if ($eValue && $eValue !== $currentGroup) {
+                if (!empty($currentBlock)) {
+                    $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
+                        return $item['price'] > 0 || $item['quantity'] > 0 || $item['total'] > 0;
+                    });
+                    $data[] = [
+                        'model' => $currentGroup,
+                        'submodel' => $currentSubModel,
+                        'items' => $currentBlock,
+                        'total' => [
+                            'price' => $nonZeroItem['price'] ?? 0,
+                            'quantity' => array_sum(array_column($currentBlock, 'quantity')),
+                            'total' => array_sum(array_column($currentBlock, 'total')),
+                            'minut' => $nonZeroItem['minut'] ?? 0,
+                            'total_minut' => $nonZeroItem['total_minut'] ?? 0,
+                            'model_summa' => array_sum(array_column($currentBlock, 'model_summa')) // model_summa to'plami
+                        ],
+                        'sizes' => array_values(array_unique($currentSizes))
+                    ];
+                }
+                $currentGroup = $eValue;
+                $currentSubModel = $dValue;
+                $currentBlock = [];
+                $currentSizes = [];
+                if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
+                        preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
+                    $currentSizes[] = $aValue;
+                }
+            }
+
 
             if ($eValue) {
                 $data[] = [
                     'model' => $eValue,
                     'submodel' => $dValue,
-                    'quantity' => $gValue,
                     'model_price' => $fValue,
                     'model_summa' => $mValue,
-                    'images' => $modelImages[$row] ?? []
+                    'images' => $modelImages[$row] ?? [],
+                    'size' => $aValue,
+                    'price' => $fValue,
+                    'quantity' => $gValue,
                 ];
             }
         }
