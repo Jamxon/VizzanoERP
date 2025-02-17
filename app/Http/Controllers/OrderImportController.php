@@ -47,7 +47,7 @@ class OrderImportController extends Controller
 
             // Agar A ustunidagi ma’lumot o‘lcham bo‘lsa, uni ro‘yxatga qo‘shamiz
             if (preg_match('/^\d{2,3}-\d{2,3}$/', $aColumn)) {
-                $sizes[] = $aColumn;
+                $sizes[] = array_push($sizes, $aColumn);
             }
 
             $data[] = [
