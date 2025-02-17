@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class OrderImportController extends Controller
 {
@@ -28,6 +30,7 @@ class OrderImportController extends Controller
         $currentBlock = [];
         $currentSizes = [];
         $currentSubModel = null;
+        $modelImages = [];
 
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
@@ -39,6 +42,16 @@ class OrderImportController extends Controller
             $iValue = (float) $sheet->getCell("I$row")->getValue();
             $jValue = (float) $sheet->getCell("J$row")->getValue();
             $mValue = (float) $sheet->getCell("M$row")->getCalculatedValue(); // M ustunidagi formula natijasi
+
+            // Model uchun unique ID
+            $modelUniqueId = md5($eValue); // Model nomidan unique ID yaratish
+
+            // Rasmlarni saqlash va modelga bog‘lash
+            $imageFile = $request->file("image_$row"); // Fayl input nomi image_2, image_3 kabi kelishi kerak
+            if ($imageFile) {
+                $imagePath = $imageFile->storeAs("models/$modelUniqueId", $imageFile->getClientOriginalName(), 'public');
+                $modelImages[$eValue][] = Storage::url($imagePath);
+            }
 
             // O'lchamlarni yig'ish
             if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
@@ -55,7 +68,8 @@ class OrderImportController extends Controller
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                         'model_price' => array_sum(array_column($currentBlock, 'price')), // F ustunidan umumiy narx
                         'model_summa' => array_sum(array_column($currentBlock, 'model_summa')), // M ustunidagi umumiy summa
-                        'sizes' => array_values(array_unique($currentSizes))
+                        'sizes' => array_values(array_unique($currentSizes)),
+                        'images' => $modelImages[$currentGroup] ?? []
                     ];
                 }
 
@@ -63,11 +77,6 @@ class OrderImportController extends Controller
                 $currentSubModel = $dValue;
                 $currentBlock = [];
                 $currentSizes = [];
-
-                if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
-                        preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
-                    $currentSizes[] = $aValue;
-                }
             }
 
             // Ahamiyatli qatorlarni qo'shish
@@ -92,7 +101,8 @@ class OrderImportController extends Controller
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                 'model_price' => array_sum(array_column($currentBlock, 'price')), // F ustunidan umumiy narx
                 'model_summa' => array_sum(array_column($currentBlock, 'model_summa')), // M ustunidagi umumiy summa
-                'sizes' => array_values(array_unique($currentSizes))
+                'sizes' => array_values(array_unique($currentSizes)),
+                'images' => $modelImages[$currentGroup] ?? []
             ];
         }
 
