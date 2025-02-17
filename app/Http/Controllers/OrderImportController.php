@@ -24,21 +24,21 @@ class OrderImportController extends Controller
             return response()->json(['success' => false, 'message' => 'Faylni o‘qishda xatolik: ' . $e->getMessage()], 500);
         }
 
-        // Oxirgi qatorni aniqlash
         $highestRow = $sheet->getHighestRow();
-
-        if ($highestRow < 3) {
+        if ($highestRow < 2) {
             return response()->json(['success' => false, 'message' => 'Fayl ichida yaroqli ma’lumot topilmadi!'], 400);
         }
 
         $data = [];
-        $sizes = []; // A ustunidagi o‘lchamlarni saqlash uchun massiv
+        $sizes = [];
+        $currentBlock = []; // Hozirgi blokdagi ma'lumotlar
+        $lastEValue = null; // Oxirgi `E` ustunidagi ma'lumotni saqlash
 
-        for ($row = 3; $row <= $highestRow; $row++) { // 1-qatorda sarlavhalar bo‘lishi mumkin
-            $eColumn = $sheet->getCell("E$row")->getValue();
+        for ($row = 2; $row <= $highestRow; $row++) {
+            $eColumn = trim((string)$sheet->getCell("E$row")->getValue());
 
-            // Agar asosiy ustunda ma’lumot bo‘sh bo‘lsa, tsikldan chiqamiz
-            if (is_null($eColumn) || trim((string)$eColumn) === "") {
+            // Agar `E` ustunidagi ma’lumot bo‘sh bo‘lsa, o'tkazib yuboramiz
+            if ($eColumn === "") {
                 continue;
             }
 
@@ -47,11 +47,18 @@ class OrderImportController extends Controller
 
             // Agar A ustunidagi ma’lumot o‘lcham bo‘lsa, uni ro‘yxatga qo‘shamiz
             if (preg_match('/^\d{2,3}-\d{2,3}$/', $aColumn)) {
-                $sizes[] = array_push($sizes, $aColumn);
+                $sizes[] = $aColumn;
             }
 
-            $data[] = [
-                'a' => $sizes,
+            // Agar `E` ustuni avvalgidan farqli bo‘lsa, eski blokni saqlaymiz va yangisini boshlaymiz
+            if ($lastEValue !== null && $lastEValue !== $eColumn) {
+                $data[] = $currentBlock; // Oldingi blokni saqlaymiz
+                $currentBlock = []; // Yangi blokni boshlaymiz
+            }
+
+            // Hozirgi qatorni blokga qo‘shamiz
+            $currentBlock[] = [
+                'a' => $aColumn,
                 'b' => (string)$sheet->getCell("B$row")->getValue(),
                 'c' => (string)$sheet->getCell("C$row")->getValue(),
                 'd' => (string)$sheet->getCell("D$row")->getValue(),
@@ -65,6 +72,14 @@ class OrderImportController extends Controller
                 'l' => (string)$sheet->getCell("L$row")->getValue(),
                 'm' => (string)$sheet->getCell("M$row")->getValue(),
             ];
+
+            // `E` ustunining oxirgi qiymatini yangilaymiz
+            $lastEValue = $eColumn;
+        }
+
+        // Oxirgi blokni ham saqlash kerak
+        if (!empty($currentBlock)) {
+            $data[] = $currentBlock;
         }
 
         if (empty($data)) {
@@ -74,7 +89,7 @@ class OrderImportController extends Controller
         return response()->json([
             'success' => true,
             'data' => $data,
-            'sizes' => $sizes // O‘lchamlarni alohida qaytaramiz
+            'sizes' => array_values(array_unique($sizes)) // O'lchamlarni unikal qilib olamiz
         ]);
     }
 }
