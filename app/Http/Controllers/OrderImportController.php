@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use PhpOffice\PhpSpreadsheet\Calculation\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class OrderImportController extends Controller
@@ -39,7 +40,16 @@ class OrderImportController extends Controller
             $hValue = (float)$sheet->getCell("H$row")->getValue();
             $iValue = (float)$sheet->getCell("I$row")->getValue();
             $jValue = (float)$sheet->getCell("J$row")->getValue();
-            $mValue = (float)$sheet->getCell("M$row")->getValue(); // To'g'ri formatda olish
+            try {
+                $mValue = $sheet->getCell("M$row")->getCalculatedValue();
+            } catch (Exception $e) {
+                $mValue = null;
+            }
+            if ($mValue === null) {
+                $mValue = $sheet->getCell("M$row")->getValue(); // Agar natija bo‘lmasa, oddiy qiymatini olishga harakat qilamiz
+            }
+            $mValue = (float) trim($mValue);
+
 
             // O'lchamlarni yig'ish
             if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
@@ -89,7 +99,7 @@ class OrderImportController extends Controller
                 'model' => $currentGroup,
                 'submodel' => $currentSubModel,
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                'model_summa' => $currentModelSumma, // Oxirgi model uchun ham qo'shish
+                'model_summa' => $currentBlock[0]['model_summa'],
                 'sizes' => array_values(array_unique($currentSizes))
             ];
         }
