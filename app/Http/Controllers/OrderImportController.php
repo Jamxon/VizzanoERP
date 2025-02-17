@@ -50,9 +50,8 @@ class OrderImportController extends Controller
         for ($row = 2; $row <= $highestRow; $row++) {
             $eValue = trim((string)$sheet->getCell("E$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
-            $fValue = (float)$sheet->getCell("F$row")->getValue();
-            $gValue = (float)$sheet->getCell("G$row")->getValue();
-            $hValue = (float)$sheet->getCell("H$row")->getValue();
+            $fValue = trim((float)$sheet->getCell("F$row")->getValue());
+            $gValue = trim((float)$sheet->getCell("G$row")->getValue());
             $mValue = (float)$sheet->getCell("M$row")->getCalculatedValue();
 
             if ($eValue) {
