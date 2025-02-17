@@ -32,7 +32,7 @@ class OrderImportController extends Controller
         $currentSubModel = null;
         $modelImages = [];
 
-        // **1. RASM FAYLLARNI TEZ YUKLASH VA SAQLASH**
+        // **1. Rasm fayllarni yuklash va har bir qator uchun bir nechta rasmlarni saqlash**
         foreach ($sheet->getDrawingCollection() as $drawing) {
             if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
                 $coordinates = $drawing->getCoordinates();
@@ -42,13 +42,20 @@ class OrderImportController extends Controller
 
                 Storage::disk('public')->put($imagePath, file_get_contents($drawing->getPath()));
 
-                if (str_starts_with($coordinates, 'C') || str_starts_with($coordinates, 'D')) {
-                    $modelImages[$coordinates] = url('storage/' . $imagePath);
+                // Qator raqamini olish
+                preg_match('/\d+/', $coordinates, $matches);
+                $rowNumber = $matches[0] ?? null;
+
+                if ($rowNumber) {
+                    if (!isset($modelImages[$rowNumber])) {
+                        $modelImages[$rowNumber] = [];
+                    }
+                    $modelImages[$rowNumber][] = url('storage/' . $imagePath);
                 }
             }
         }
 
-        // **2. MA’LUMOTLARNI TEZ O‘QISH**
+        // **2. Ma'lumotlarni tez o‘qish**
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
@@ -75,7 +82,7 @@ class OrderImportController extends Controller
                         'model_price' => array_sum(array_column($currentBlock, 'price')),
                         'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
                         'sizes' => array_values(array_unique($currentSizes)),
-                        'images' => $modelImages["C$row"] ?? $modelImages["D$row"] ?? []
+                        'images' => $modelImages[$row - 1] ?? [] // Oldingi modelning barcha rasmlari
                     ];
                 }
 
@@ -108,7 +115,7 @@ class OrderImportController extends Controller
                 'model_price' => array_sum(array_column($currentBlock, 'price')),
                 'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
                 'sizes' => array_values(array_unique($currentSizes)),
-                'images' => $modelImages["C$row"] ?? $modelImages["D$row"] ?? []
+                'images' => $modelImages[$row] ?? []
             ];
         }
 
