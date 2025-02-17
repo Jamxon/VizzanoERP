@@ -12,97 +12,88 @@ class OrderImportController extends Controller
         $file = $request->file('file');
 
         if (!$file || !$file->isValid()) {
-            return response()->json(['success' => false, 'message' => 'Fayl noto‘g‘ri yuklangan!'], 400);
+            return response()->json(['success' => false, 'message' => "Fayl noto'g'ri yuklangan!"], 400);
         }
 
         try {
             $spreadsheet = IOFactory::load($file->getPathname());
             $sheet = $spreadsheet->getActiveSheet();
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => 'Faylni o‘qishda xatolik: ' . $e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => "Faylni o'qishda xatolik: " . $e->getMessage()], 500);
         }
 
         $highestRow = $sheet->getHighestRow();
-        if ($highestRow < 2) {
-            return response()->json(['success' => false, 'message' => 'Fayl ichida yaroqli ma’lumot topilmadi!'], 400);
-        }
-
         $data = [];
         $sizes = [];
+        $currentGroup = null;
         $currentBlock = [];
-        $hSum = 0; // H ustunidagi barcha qiymatlarning yig‘indisi
-        $lastEValue = null;
 
         for ($row = 2; $row <= $highestRow; $row++) {
-            $eColumn = trim((string)$sheet->getCell("E$row")->getValue());
-            $aColumn = trim((string)$sheet->getCell("A$row")->getValue());
+            $aValue = trim((string)$sheet->getCell("A$row")->getValue());
+            $eValue = trim((string)$sheet->getCell("E$row")->getValue());
+            $fValue = trim((string)$sheet->getCell("F$row")->getValue());
+            $gValue = trim((string)$sheet->getCell("G$row")->getValue());
+            $hValue = trim((string)$sheet->getCell("H$row")->getCalculatedValue());
 
-            // **Formula yoki oddiy qiymatni olish uchun `getCalculatedValue()` ishlatamiz**
-            try {
-                $hColumn = (float) $sheet->getCell("H$row")->getCalculatedValue();
-            } catch (\Exception $e) {
-                $hColumn = 0; // Xatolik bo‘lsa, 0 deb qabul qilamiz
+            // O'lchamlarni yig'ish
+            if (preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue)) {
+                $sizes[] = $aValue;
             }
 
-            if ($eColumn === "") {
-                continue;
-            }
-
-            // A ustunidagi o'lchamlarni yig'ish
-            if (preg_match('/^\d{2,3}\/\d{2,3}$/', $aColumn)) {
-                $sizes[] = $aColumn;
-            }
-
-            // Agar `E` ustuni avvalgidan farqli bo‘lsa, blokni saqlab, yangisini boshlaymiz
-            if ($lastEValue !== null && $lastEValue !== $eColumn) {
-                $data[] = [
-                    'block' => $currentBlock,
-                    'h_sum' => $hSum // H ustunining yig‘indisini qo‘shamiz
-                ];
+            // Yangi guruh boshlanishini tekshirish
+            if ($eValue && $eValue !== $currentGroup) {
+                if (!empty($currentBlock)) {
+                    $data[] = [
+                        'article' => $currentGroup,
+                        'items' => $currentBlock,
+                        'total' => [
+                            'price' => $currentBlock[0]['price'] ?? 0,
+                            'quantity' => array_sum(array_column($currentBlock, 'quantity')),
+                            'total' => array_sum(array_column($currentBlock, 'total')),
+                            'minut' => $currentBlock[0]['minut'] ?? 0,
+                            'umumiy_daqiqa' => array_sum(array_column($currentBlock, 'umumiy_daqiqa')),
+                            'model_summa' => $currentBlock[0]['model_summa'] ?? 0
+                        ]
+                    ];
+                }
+                $currentGroup = $eValue;
                 $currentBlock = [];
-                $hSum = 0;
             }
 
-            // Hozirgi qatorni blokga qo‘shamiz
-            $currentBlock[] = [
-                'a' => $aColumn,
-                'b' => (string)$sheet->getCell("B$row")->getValue(),
-                'c' => (string)$sheet->getCell("C$row")->getValue(),
-                'd' => (string)$sheet->getCell("D$row")->getValue(),
-                'e' => (string)$eColumn,
-                'f' => (string)$sheet->getCell("F$row")->getValue(),
-                'g' => (string)$sheet->getCell("G$row")->getValue(),
-                'h' => $hColumn,
-                'i' => (string)$sheet->getCell("I$row")->getFormattedValue(),
-                'j' => (string)$sheet->getCell("J$row")->getFormattedValue(),
-                'k' => (string)$sheet->getCell("K$row")->getFormattedValue(),
-                'l' => (string)$sheet->getCell("L$row")->getFormattedValue(),
-                'm' => (string)$sheet->getCell("M$row")->getFormattedValue(),
-            ];
-
-            // `H` ustuni qiymatini qo‘shamiz
-            $hSum += $hColumn;
-
-            // `E` ustunining oxirgi qiymatini yangilaymiz
-            $lastEValue = $eColumn;
+            // Faqat ahamiyatli qatorlarni qo'shish
+            if ($fValue || $gValue || $hValue) {
+                $currentBlock[] = [
+                    'size' => $aValue,
+                    'price' => (float)$fValue,
+                    'quantity' => (float)$gValue,
+                    'total' => (float)$hValue,
+                    'minut' => (float)$sheet->getCell("I$row")->getValue(),
+                    'umumiy_daqiqa' => (float)$sheet->getCell("J$row")->getValue(),
+                    'model_summa' => (float)$sheet->getCell("M$row")->getValue()
+                ];
+            }
         }
 
-        // Oxirgi blokni ham saqlash kerak
-        if (!empty($currentBlock)) {
-            $data[] = [
-                'block' => $currentBlock,
-                'h_sum' => $hSum
-            ];
-        }
+            // Oxirgi blokni qo'shish
+            if (!empty($currentBlock)) {
+                $data[] = [
+                    'article' => $currentGroup,
+                    'items' => $currentBlock,
+                    'total' => [
+                        'price' => $currentBlock[0]['price'] ?? 0,
+                        'quantity' => array_sum(array_column($currentBlock, 'quantity')),
+                        'total' => array_sum(array_column($currentBlock, 'total')),
+                        'minut' => $currentBlock[0]['minut'] ?? 0,
+                        'umumiy_daqiqa' => array_sum(array_column($currentBlock, 'umumiy_daqiqa')),
+                        'model_summa' => $currentBlock[0]['model_summa'] ?? 0
+                    ]
+                ];
+            }
 
-        if (empty($data)) {
-            return response()->json(['success' => false, 'message' => 'Hech qanday yaroqli ma’lumot topilmadi!'], 400);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $data,
-            'sizes' => array_values(array_unique($sizes))
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'sizes' => array_values(array_unique($sizes))
+            ]);
     }
 }
