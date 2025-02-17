@@ -27,6 +27,9 @@ class OrderImportController extends Controller
         $highestRow = $sheet->getHighestRow();
         $data = [];
         $modelImages = [];
+        $currentGroup = null;
+        $currentSubModel = null;
+        $currentSizes = [];
 
         // Rasmlarni olish
         foreach ($sheet->getDrawingCollection() as $drawing) {
