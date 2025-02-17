@@ -75,6 +75,7 @@ class OrderImportController extends Controller
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                         'sizes' => array_values(array_unique($currentSizes)),
                         'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
+                        'images' => $modelImages[$row] ?? [],
                     ];
                 }
 
