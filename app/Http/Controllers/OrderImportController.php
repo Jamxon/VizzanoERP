@@ -24,125 +24,27 @@ class OrderImportController extends Controller
 
         $highestRow = $sheet->getHighestRow();
         $data = [];
-        $currentGroup = null;
-        $currentBlock = [];
-        $currentSizes = [];
-        $currentSubModel = null;
-
-        // Birinchi bo'sh element
-        $data[] = [
-            'model' => null,
-            'submodel' => null,
-            'items' => [[
-                'size' => '',
-                'price' => 0,
-                'quantity' => 0,
-                'total' => 0,
-                'minut' => 0,
-                'total_minut' => 0,
-                'model_summa' => 0
-            ]],
-            'total' => [
-                'price' => 0,
-                'quantity' => 0,
-                'total' => 0,
-                'minut' => 0,
-                'total_minut' => 0,
-                'model_summa' => 0
-            ],
-            'sizes' => []
-        ];
 
         for ($row = 2; $row <= $highestRow; $row++) {
-            $aValue = trim((string)$sheet->getCell("A$row")->getValue());
-            $dValue = trim((string)$sheet->getCell("D$row")->getValue());
-            $eValue = trim((string)$sheet->getCell("E$row")->getValue());
-            $fValue = (float)$sheet->getCell("F$row")->getValue();
-            $gValue = (float)$sheet->getCell("G$row")->getValue();
-            $hValue = (float)$sheet->getCell("H$row")->getValue();
-            $iValue = (float)$sheet->getCell("I$row")->getValue();
-            $jValue = (float)$sheet->getCell("J$row")->getValue();
-            $mValue = (float)$sheet->getCell("M$row")->getValue();
+            $model = trim((string)$sheet->getCell("E$row")->getValue());
+            $submodel = trim((string)$sheet->getCell("D$row")->getValue());
+            $price = (float)$sheet->getCell("F$row")->getValue();
+            $quantity = (float)$sheet->getCell("G$row")->getValue();
+            $minut = (float)$sheet->getCell("I$row")->getValue();
+            $model_summa = (float)$sheet->getCell("M$row")->getValue();
 
-            // O'lchamlarni yig'ish
-            if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
-                    preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
-                $currentSizes[] = $aValue;
-            }
-
-            // Yangi model boshlanishini tekshirish
-            if ($eValue && $eValue !== $currentGroup) {
-                if (!empty($currentBlock)) {
-                    $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
-                        return $item['price'] > 0 || $item['quantity'] > 0 || $item['total'] > 0;
-                    });
-
-                    $data[] = [
-                        'model' => $currentGroup,
-                        'submodel' => $currentSubModel,
-                        'items' => $currentBlock,
-                        'total' => [
-                            'price' => $nonZeroItem['price'] ?? 0,
-                            'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                            'total' => array_sum(array_column($currentBlock, 'total')),
-                            'minut' => $nonZeroItem['minut'] ?? 0,
-                            'total_minut' => $nonZeroItem['total_minut'] ?? 0,
-                            'model_summa' => array_sum(array_column($currentBlock, 'model_summa')) // model_summa to'plami
-                        ],
-                        'sizes' => array_values(array_unique($currentSizes))
-                    ];
-                }
-
-                $currentGroup = $eValue;
-                $currentSubModel = $dValue;
-                $currentBlock = [];
-                $currentSizes = [];
-
-                if ((preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
-                        preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) && $aValue !== '') {
-                    $currentSizes[] = $aValue;
-                }
-            }
-
-            // Ahamiyatli qatorlarni qo'shish
-            if ($fValue > 0 || $gValue > 0 || $hValue > 0) {
-                $currentBlock[] = [
-                    'size' => $aValue,
-                    'price' => $fValue,
-                    'quantity' => $gValue,
-                    'total' => $hValue,
-                    'minut' => $iValue,
-                    'total_minut' => $jValue,
-                    'model_summa' => $mValue // model_summa ni qo'shamiz
+            if (!empty($model) && ($price > 0 || $quantity > 0)) {
+                $data[] = [
+                    'model' => $model,
+                    'submodel' => $submodel,
+                    'price' => $price,
+                    'quantity' => $quantity,
+                    'minut' => $minut,
+                    'model_summa' => $model_summa
                 ];
             }
         }
 
-        // Oxirgi blokni qo'shish
-        if (!empty($currentBlock)) {
-            $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
-                return $item['price'] > 0 || $item['quantity'] > 0 || $item['total'] > 0;
-            });
-
-            $data[] = [
-                'model' => $currentGroup,
-                'submodel' => $currentSubModel,
-                'items' => $currentBlock,
-                'total' => [
-                    'price' => $nonZeroItem['price'] ?? 0,
-                    'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                    'total' => array_sum(array_column($currentBlock, 'total')),
-                    'minut' => $nonZeroItem['minut'] ?? 0,
-                    'total_minut' => $nonZeroItem['total_minut'] ?? 0,
-                    'model_summa' => array_sum(array_column($currentBlock, 'model_summa')) // umumiy model_summa hisoblash
-                ],
-                'sizes' => array_values(array_unique($currentSizes))
-            ];
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $data
-        ]);
+        return response()->json($data);
     }
 }
