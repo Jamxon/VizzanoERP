@@ -51,14 +51,9 @@ class OrderImportController extends Controller
             $eValue = trim((string)$sheet->getCell("E$row")->getValue());
             $dValue = trim((string)$sheet->getCell("D$row")->getValue());
 
-            // Qiymatlar to'g'ri olinayotganiga ishonch hosil qilish uchun
             $fValue = (float) $sheet->getCell("F$row")->getCalculatedValue();
             $gValue = (float) $sheet->getCell("G$row")->getCalculatedValue();
             $mValue = (float) $sheet->getCell("M$row")->getCalculatedValue();
-
-            $fValue = is_numeric($fValue) ? $fValue : 0;
-            $gValue = is_numeric($gValue) ? $gValue : 0;
-            $mValue = is_numeric($mValue) ? $mValue : 0;
 
             if ($eValue) {
                 $data[] = [
