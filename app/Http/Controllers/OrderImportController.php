@@ -24,24 +24,34 @@ class OrderImportController extends Controller
             return response()->json(['success' => false, 'message' => 'Faylni o‘qishda xatolik: ' . $e->getMessage()], 500);
         }
 
-        // Oxirgi qator va ustunni aniqlash
+        // Oxirgi qatorni aniqlash
         $highestRow = $sheet->getHighestRow();
-        $highestColumn = $sheet->getHighestColumn();
 
         if ($highestRow < 3) {
             return response()->json(['success' => false, 'message' => 'Fayl ichida yaroqli ma’lumot topilmadi!'], 400);
         }
 
         $data = [];
-        for ($row = 3; $row <= $highestRow; $row++) {
-            $eColumn = $sheet->getCell("F$row")->getValue();
+        $sizes = []; // A ustunidagi o‘lchamlarni saqlash uchun massiv
 
+        for ($row = 3; $row <= $highestRow; $row++) { // 1-qatorda sarlavhalar bo‘lishi mumkin
+            $eColumn = $sheet->getCell("E$row")->getValue();
+
+            // Agar asosiy ustunda ma’lumot bo‘sh bo‘lsa, tsikldan chiqamiz
             if (is_null($eColumn) || trim((string)$eColumn) === "") {
                 continue;
             }
 
+            // A ustunidagi ma’lumotni olish
+            $aColumn = trim((string)$sheet->getCell("A$row")->getValue());
+
+            // Agar A ustunidagi ma’lumot o‘lcham bo‘lsa, uni ro‘yxatga qo‘shamiz
+            if (preg_match('/^\d{2,3}-\d{2,3}$/', $aColumn)) {
+                $sizes[] = $aColumn;
+            }
+
             $data[] = [
-                'a' => (string)$sheet->getCell("A$row")->getValue(),
+                'a' => $aColumn,
                 'b' => (string)$sheet->getCell("B$row")->getValue(),
                 'c' => (string)$sheet->getCell("C$row")->getValue(),
                 'd' => (string)$sheet->getCell("D$row")->getValue(),
@@ -61,6 +71,10 @@ class OrderImportController extends Controller
             return response()->json(['success' => false, 'message' => 'Hech qanday yaroqli ma’lumot topilmadi!'], 400);
         }
 
-        return response()->json(['success' => true, 'data' => $data]);
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'sizes' => $sizes // O‘lchamlarni alohida qaytaramiz
+        ]);
     }
 }
