@@ -128,7 +128,7 @@ class OrderImportController extends Controller
         $data[] = [
             'model' => $currentGroup,
             'submodel' => $currentSubModel,
-            'quantity' => $currentBlock[0]->quantity,
+            'quantity' => $currentBlock[0],
             'items' => $currentBlock,
             'total' => [
                 'price' => $nonZeroItem['price'] ?? 0,
