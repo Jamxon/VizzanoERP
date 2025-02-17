@@ -82,15 +82,7 @@ class OrderImportController extends Controller
                     'submodel' => $currentSubModel,
                     'price' => $nonZeroItem['price'] ?? 0,
                     'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                    'items' => $currentBlock,
-                    'total' => [
-                        'price' => $nonZeroItem['price'] ?? 0,
-                        'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                        'total' => array_sum(array_column($currentBlock, 'total')),
-                        'minut' => $nonZeroItem['minut'] ?? 0,
-                        'total_minut' => $nonZeroItem['total_minut'] ?? 0,
-                        'model_summa' => $nonZeroItem['model_summa'] ?? 0
-                    ],
+                    'model_summa' => $nonZeroItem['model_summa'] ?? 0,
                     'sizes' => array_values(array_unique($currentSizes))
                 ];
             }
