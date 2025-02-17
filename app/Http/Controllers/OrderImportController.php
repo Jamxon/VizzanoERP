@@ -28,12 +28,12 @@ class OrderImportController extends Controller
         $highestRow = $sheet->getHighestRow();
         $highestColumn = $sheet->getHighestColumn();
 
-        if ($highestRow < 2) {
+        if ($highestRow < 3) {
             return response()->json(['success' => false, 'message' => 'Fayl ichida yaroqli ma’lumot topilmadi!'], 400);
         }
 
         $data = [];
-        for ($row = 2; $row <= $highestRow; $row++) { 
+        for ($row = 3; $row <= $highestRow; $row++) {
             $eColumn = $sheet->getCell("F$row")->getValue();
 
             if (is_null($eColumn) || trim((string)$eColumn) === "") {
