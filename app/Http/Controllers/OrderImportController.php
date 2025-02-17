@@ -63,6 +63,7 @@ class OrderImportController extends Controller
                     $data[] = [
                         'model' => $currentGroup,
                         'submodel' => $currentSubModel,
+                        'price' => $fValue,
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                         'model_summa' => $currentModelSumma, // To'g'ri hisoblash
                         'sizes' => array_values(array_unique($currentSizes))
@@ -98,6 +99,7 @@ class OrderImportController extends Controller
             $data[] = [
                 'model' => $currentGroup,
                 'submodel' => $currentSubModel,
+                'price' => $currentBlock[0]['price'],
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                 'model_summa' => $currentBlock[0]['model_summa'],
                 'sizes' => array_values(array_unique($currentSizes))
