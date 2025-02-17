@@ -26,13 +26,9 @@ class OrderImportController extends Controller
 
         $highestRow = $sheet->getHighestRow();
         $data = [];
-        $currentGroup = null;
-        $currentBlock = [];
-        $currentSizes = [];
-        $currentSubModel = null;
         $modelImages = [];
 
-        // **1. Rasm fayllarni yuklash va har bir qator uchun bir nechta rasmlarni saqlash**
+        // Rasmlarni olish
         foreach ($sheet->getDrawingCollection() as $drawing) {
             if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
                 $coordinates = $drawing->getCoordinates();
@@ -42,81 +38,33 @@ class OrderImportController extends Controller
 
                 Storage::disk('public')->put($imagePath, file_get_contents($drawing->getPath()));
 
-                // Qator raqamini olish
                 preg_match('/\d+/', $coordinates, $matches);
                 $rowNumber = $matches[0] ?? null;
 
                 if ($rowNumber) {
-                    if (!isset($modelImages[$rowNumber])) {
-                        $modelImages[$rowNumber] = [];
-                    }
                     $modelImages[$rowNumber][] = url('storage/' . $imagePath);
                 }
             }
         }
 
-        // **2. Ma'lumotlarni tez o‘qish**
         for ($row = 2; $row <= $highestRow; $row++) {
-            $aValue = trim((string)$sheet->getCell("A$row")->getValue());
-            $dValue = trim((string)$sheet->getCell("D$row")->getValue());
             $eValue = trim((string)$sheet->getCell("E$row")->getValue());
+            $dValue = trim((string)$sheet->getCell("D$row")->getValue());
             $fValue = (float)$sheet->getCell("F$row")->getValue();
             $gValue = (float)$sheet->getCell("G$row")->getValue();
             $hValue = (float)$sheet->getCell("H$row")->getValue();
-            $iValue = (float)$sheet->getCell("I$row")->getValue();
-            $jValue = (float)$sheet->getCell("J$row")->getValue();
             $mValue = (float)$sheet->getCell("M$row")->getCalculatedValue();
 
-            // **O'lchamlarni ajratish**
-            if (preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) || preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)) {
-                $currentSizes[] = $aValue;
-            }
-
-            // **Yangi model boshlanishini aniqlash**
-            if ($eValue && $eValue !== $currentGroup) {
-                if (!empty($currentBlock)) {
-                    $data[] = [
-                        'model' => $currentGroup,
-                        'submodel' => $currentSubModel,
-                        'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                        'model_price' => array_sum(array_column($currentBlock, 'price')),
-                        'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
-                        'sizes' => array_values(array_unique($currentSizes)),
-                        'images' => $modelImages[$row - 1] ?? [] // Oldingi modelning barcha rasmlari
-                    ];
-                }
-
-                $currentGroup = $eValue;
-                $currentSubModel = $dValue;
-                $currentBlock = [];
-                $currentSizes = [];
-            }
-
-            // **Ahamiyatli qatorlarni qo‘shish**
-            if ($fValue > 0 || $gValue > 0 || $hValue > 0) {
-                $currentBlock[] = [
-                    'size' => $aValue,
-                    'price' => $fValue,
+            if ($eValue) {
+                $data[] = [
+                    'model' => $eValue,
+                    'submodel' => $dValue,
                     'quantity' => $gValue,
-                    'total' => $hValue,
-                    'minut' => $iValue,
-                    'total_minut' => $jValue,
-                    'model_summa' => $mValue
+                    'model_price' => $fValue,
+                    'model_summa' => $mValue,
+                    'images' => $modelImages[$row] ?? []
                 ];
             }
-        }
-
-        // **Oxirgi modelni qo‘shish**
-        if (!empty($currentBlock)) {
-            $data[] = [
-                'model' => $currentGroup,
-                'submodel' => $currentSubModel,
-                'quantity' => array_sum(array_column($currentBlock, 'quantity')),
-                'model_price' => array_sum(array_column($currentBlock, 'price')),
-                'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
-                'sizes' => array_values(array_unique($currentSizes)),
-                'images' => $modelImages[$row] ?? []
-            ];
         }
 
         return response()->json([
