@@ -27,17 +27,19 @@ class OrderImportController extends Controller
     $currentGroup = null;
     $currentBlock = [];
     $currentSizes = [];
+    $currentSubModel = null;
 
-    // Birinchi itemni qo'shish
+    // Birinchi bo'sh element
     $data[] = [
-        'article' => null,
+        'model' => null,
+        'submodel' => null,
         'items' => [[
             'size' => '',
             'price' => 0,
             'quantity' => 0,
             'total' => 0,
             'minut' => 0,
-            'umumiy_daqiqa' => 0,
+            'total_minut' => 0,
             'model_summa' => 0
         ]],
         'total' => [
@@ -45,7 +47,7 @@ class OrderImportController extends Controller
             'quantity' => 0,
             'total' => 0,
             'minut' => 0,
-            'umumiy_daqiqa' => 0,
+            'total_minut' => 0,
             'model_summa' => 0
         ],
         'sizes' => []
@@ -53,6 +55,7 @@ class OrderImportController extends Controller
 
     for ($row = 2; $row <= $highestRow; $row++) {
         $aValue = trim((string)$sheet->getCell("A$row")->getValue());
+        $dValue = trim((string)$sheet->getCell("D$row")->getValue());
         $eValue = trim((string)$sheet->getCell("E$row")->getValue());
         $fValue = (float)$sheet->getCell("F$row")->getValue();
         $gValue = (float)$sheet->getCell("G$row")->getValue();
@@ -67,29 +70,31 @@ class OrderImportController extends Controller
             $currentSizes[] = $aValue;
         }
 
-        // Yangi guruh boshlanishini tekshirish
+        // Yangi model boshlanishini tekshirish
         if ($eValue && $eValue !== $currentGroup) {
             if (!empty($currentBlock)) {
-                // Total hisoblash
                 $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
                     return $item['price'] > 0 || $item['quantity'] > 0 || $item['total'] > 0;
                 });
 
                 $data[] = [
-                    'article' => $currentGroup,
+                    'model' => $currentGroup,
+                    'submodel' => $currentSubModel,
                     'items' => $currentBlock,
                     'total' => [
                         'price' => $nonZeroItem['price'] ?? 0,
                         'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                         'total' => array_sum(array_column($currentBlock, 'total')),
                         'minut' => $nonZeroItem['minut'] ?? 0,
-                        'umumiy_daqiqa' => $nonZeroItem['umumiy_daqiqa'] ?? 0,
+                        'total_minut' => $nonZeroItem['total_minut'] ?? 0,
                         'model_summa' => $nonZeroItem['model_summa'] ?? 0
                     ],
                     'sizes' => array_values(array_unique($currentSizes))
                 ];
             }
+
             $currentGroup = $eValue;
+            $currentSubModel = $dValue;
             $currentBlock = [];
             $currentSizes = [];
 
@@ -99,7 +104,7 @@ class OrderImportController extends Controller
             }
         }
 
-        // Faqat ahamiyatli qatorlarni qo'shish
+        // Ahamiyatli qatorlarni qo'shish
         if ($fValue > 0 || $gValue > 0 || $hValue > 0) {
             $currentBlock[] = [
                 'size' => $aValue,
@@ -107,7 +112,7 @@ class OrderImportController extends Controller
                 'quantity' => $gValue,
                 'total' => $hValue,
                 'minut' => $iValue,
-                'umumiy_daqiqa' => $jValue,
+                'total_minut' => $jValue,
                 'model_summa' => $mValue
             ];
         }
@@ -120,14 +125,15 @@ class OrderImportController extends Controller
         });
 
         $data[] = [
-            'article' => $currentGroup,
+            'model' => $currentGroup,
+            'submodel' => $currentSubModel,
             'items' => $currentBlock,
             'total' => [
                 'price' => $nonZeroItem['price'] ?? 0,
                 'quantity' => array_sum(array_column($currentBlock, 'quantity')),
                 'total' => array_sum(array_column($currentBlock, 'total')),
                 'minut' => $nonZeroItem['minut'] ?? 0,
-                'umumiy_daqiqa' => $nonZeroItem['umumiy_daqiqa'] ?? 0,
+                'total_minut' => $nonZeroItem['total_minut'] ?? 0,
                 'model_summa' => $nonZeroItem['model_summa'] ?? 0
             ],
             'sizes' => array_values(array_unique($currentSizes))
