@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static where(string $string, $orderModelId)
+ * @method static create(array $array)
  */
 class OrderSubModel extends Model
 {

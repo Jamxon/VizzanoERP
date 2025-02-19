@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static where(string $string, mixed $id)
+ * @method static create()
  */
 class OrderModel extends Model
 {
