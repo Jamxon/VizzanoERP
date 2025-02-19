@@ -20,19 +20,16 @@ class OrderImportController extends Controller
 {
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'data.model' => 'required|string',
-            'data.model_summa' => 'required|numeric',
-            'data.submodel' => 'required|string',
-            'data.quantity' => 'required|integer',
-            'data.price' => 'required|numeric',
-            'data.sizes' => 'required|array',
-            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-
-
-        dd($request->all());
-
+//        $request->validate([
+//            'data.model' => 'required|string',
+//            'data.model_summa' => 'required|numeric',
+//            'data.submodel' => 'required|string',
+//            'data.quantity' => 'required|integer',
+//            'data.price' => 'required|numeric',
+//            'data.sizes' => 'required|array',
+//            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+//        ]);
+        
         try {
             DB::beginTransaction();
 
