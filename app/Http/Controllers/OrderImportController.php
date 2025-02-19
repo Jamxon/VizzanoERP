@@ -33,9 +33,6 @@ class OrderImportController extends Controller
         try {
             DB::beginTransaction();
 
-            dd($request->file('images'));
-
-
             $data = is_array($request->data) ? $request->data : json_decode($request->data, true);
 
             $model = Models::create([
