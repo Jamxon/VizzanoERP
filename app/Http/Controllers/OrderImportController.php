@@ -10,7 +10,6 @@ use App\Models\OrderSize;
 use App\Models\OrderSubModel;
 use App\Models\Size;
 use App\Models\SubModel;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -30,6 +29,9 @@ class OrderImportController extends Controller
             'data.sizes' => 'required|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
+
+
+        dd($request->all());
 
         try {
             DB::beginTransaction();
