@@ -83,15 +83,17 @@ class OrderImportController extends Controller
                 ]);
             }
 
-            if ($request->has('images')) {
-                foreach ($request->images as $image) {
-                    $path = Storage::disk('public')->put('models', $image);
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $image) {
+                    $path = $image->store('models', 'public');
+
                     ModelImages::create([
                         'model_id' => $model->id,
                         'image' => $path,
                     ]);
                 }
             }
+
 
             DB::commit();
 
