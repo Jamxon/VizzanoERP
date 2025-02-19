@@ -33,7 +33,7 @@ class OrderImportController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->data;
+            $data = is_array($request->data) ? $request->data : json_decode($request->data, true);
 
             $model = Models::create([
                 'name' => $data['model'],
