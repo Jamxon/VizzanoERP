@@ -29,11 +29,13 @@ class OrderImportController extends Controller
 //            'data.sizes' => 'required|array',
 //            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 //        ]);
-        
+
         try {
             DB::beginTransaction();
 
             $data = $request->data;
+
+            dd($data);
 
             $model = Models::create([
                 'name' => $data['model'],
