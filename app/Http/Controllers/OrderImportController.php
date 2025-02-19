@@ -35,7 +35,7 @@ class OrderImportController extends Controller
 
             $data = $request->data;
 
-            dd($data);
+            var_dump($data['model']);
 
             $model = Models::create([
                 'name' => $data['model'],
