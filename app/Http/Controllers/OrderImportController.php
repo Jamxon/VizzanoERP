@@ -2,16 +2,106 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ModelImages;
+use App\Models\Models;
+use App\Models\Order;
+use App\Models\OrderModel;
+use App\Models\OrderSize;
+use App\Models\OrderSubModel;
+use App\Models\Size;
+use App\Models\SubModel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class OrderImportController extends Controller
 {
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        //
+        $request->validate([
+            'data.model' => 'required|string',
+            'data.model_summa' => 'required|numeric',
+            'data.submodel' => 'required|string',
+            'data.quantity' => 'required|integer',
+            'data.price' => 'required|numeric',
+            'data.sizes' => 'required|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $data = $request->data;
+
+            $model = Models::create([
+                'name' => $data['model'],
+                'rasxod' => $data['model_summa'],
+            ]);
+
+            $submodel = SubModel::create([
+                'name' => $data['submodel'],
+                'model_id' => $model->id,
+            ]);
+
+            $order = Order::create([
+                'name' => $data['model'] . ' ' . $data['quantity'],
+                'rasxod' => $data['rasxod'] ?? 0,
+                'quantity' => $data['quantity'],
+                'price' => $data['price'],
+                'status' => 'inactive',
+                'start_date' => now()->format('Y-m-d'),
+                'end_date' => null,
+                'branch_id' => auth()->user()->employee->branch_id,
+                'contragent_id' => null,
+            ]);
+
+            $orderModel = OrderModel::create([
+                'order_id' => $order->id,
+                'model_id' => $model->id,
+                'material_id' => null,
+                'status' => false,
+                'rasxod' => $data['model_summa'],
+            ]);
+
+            $orderSubModel = OrderSubModel::create([
+                'order_model_id' => $orderModel->id,
+                'submodel_id' => $submodel->id,
+            ]);
+
+            foreach ($data['sizes'] as $size) {
+                $sizeModel = Size::create([
+                    'name' => $size,
+                    'model_id' => $model->id,
+                ]);
+
+                OrderSize::create([
+                    'order_model_id' => $orderModel->id,
+                    'size_id' => $sizeModel->id,
+                    'quantity' => 0,
+                ]);
+            }
+
+            if ($request->has('images')) {
+                foreach ($request->images as $image) {
+                    $path = Storage::disk('public')->put('models', $image);
+                    ModelImages::create([
+                        'model_id' => $model->id,
+                        'image' => $path,
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'Ma\'lumotlar muvaffaqiyatli saqlandi'], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Xatolik yuz berdi: ' . $e->getMessage()], 500);
+        }
     }
 
     public function import(Request $request): \Illuminate\Http\JsonResponse
