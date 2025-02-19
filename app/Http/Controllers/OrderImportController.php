@@ -85,7 +85,7 @@ class OrderImportController extends Controller
 
             if ($request->hasFile('images')) {
                 foreach ($request->file('images') as $image) {
-                    $path = $image->store('models', 'public');
+                    $path = $image->store('images', 'public');
 
                     ModelImages::create([
                         'model_id' => $model->id,
