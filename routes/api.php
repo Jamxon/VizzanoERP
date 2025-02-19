@@ -68,6 +68,7 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::patch('orders/change/{order}', [OrderController::class, 'changeOrderStatus']);
 
     Route::post('/import-orders', [OrderImportController::class, 'import'])->name('orders.import');
+    Route::post('orderStore',[OrderImportController::class,'store']);
 
     Route::get('materials', [ModelController::class, 'getMaterials']);
 

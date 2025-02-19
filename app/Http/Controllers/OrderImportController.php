@@ -9,7 +9,12 @@ use Illuminate\Support\Str;
 
 class OrderImportController extends Controller
 {
-    public function import(Request $request)
+    public function store(Request $request)
+    {
+        //
+    }
+
+    public function import(Request $request): \Illuminate\Http\JsonResponse
     {
         $file = $request->file('file');
 
@@ -30,6 +35,7 @@ class OrderImportController extends Controller
         $currentGroup = null;
         $currentSubModel = null;
         $currentSizes = [];
+        $currentBlock = [];
 
         // Rasmlarni olish
         foreach ($sheet->getDrawingCollection() as $drawing) {
@@ -61,7 +67,7 @@ class OrderImportController extends Controller
             $jValue = (float)$sheet->getCell("J$row")->getValue();
             $mValue = (float)$sheet->getCell("M$row")->getCalculatedValue();
 
-            // O'lchamlarni yig'ish (E guruhi uchun)
+            // Agar yangi model guruhiga o'tilsa, avvalgi blokni saqlash
             if ($eValue && $eValue !== $currentGroup) {
                 if (!empty($currentBlock)) {
                     $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
@@ -79,13 +85,14 @@ class OrderImportController extends Controller
                     ];
                 }
 
+                // Yangi model uchun qiymatlarni tiklash
                 $currentGroup = $eValue;
                 $currentSubModel = $dValue;
                 $currentBlock = [];
                 $currentSizes = [];
             }
 
-            // Size qatorlarini yig'ish - bu yerda E ustuni qiymati bo'yicha
+            // O'lchamlarni yig'ish (E guruhi uchun)
             if ($currentGroup && (
                     preg_match('/^\d{2,3}(?:\/\d{2,3})?$/', $aValue) ||
                     preg_match('/^\d{2,3}-\d{2,3}$/', $aValue)
@@ -102,6 +109,23 @@ class OrderImportController extends Controller
                     'model_summa' => $mValue
                 ];
             }
+        }
+
+        // **Oxirgi blokni qo'shish**
+        if (!empty($currentBlock)) {
+            $nonZeroItem = collect($currentBlock)->firstWhere(function ($item) {
+                return $item['quantity'] > 0;
+            });
+
+            $data[] = [
+                'model' => $currentGroup,
+                'submodel' => $currentSubModel,
+                'price' => $nonZeroItem['price'] ?? 0,
+                'quantity' => array_sum(array_column($currentBlock, 'quantity')),
+                'sizes' => array_values(array_unique($currentSizes)),
+                'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
+                'images' => $modelImages[$highestRow] ?? [],
+            ];
         }
 
         return response()->json([
