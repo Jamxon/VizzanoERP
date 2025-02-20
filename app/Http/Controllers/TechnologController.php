@@ -522,4 +522,5 @@ class TechnologController extends Controller
 
         return response()->json(['message' => 'Tarifications fastened to employees successfully'], 200);
     }
+
 }
