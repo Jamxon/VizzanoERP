@@ -70,7 +70,6 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::post('/import-orders', [OrderImportController::class, 'import'])->name('orders.import');
     Route::post('orderStore',[OrderImportController::class,'store']);
 
-    Route::get('export-tarification',[TechnologController::class,'exportTarification']);
 
     Route::get('materials', [ModelController::class, 'getMaterials']);
 
@@ -134,6 +133,7 @@ Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {
 });
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {
+    Route::get('export-tarification',[TechnologController::class,'exportTarification']);
     Route::get('export-items', [ItemController::class, 'export']);
     Route::get('models', [ModelController::class, 'index']);
     Route::get('models/{model}', [ModelController::class, 'show']);
