@@ -37,7 +37,6 @@ class OrderController extends Controller
 
     public function show(Order $order): \Illuminate\Http\JsonResponse
     {
-//        $order->load('orderModels', 'orderModels.model', 'orderModels.material', 'orderModels.sizes', 'orderModels.submodels', 'instructions', 'orderRecipes', 'contragent');
         $order = new ShowOrderResource($order);
         return response()->json($order);
     }
@@ -155,13 +154,168 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
-        $order->update($request->all());
+        $validatedData = $request->validate([
+            'name' => 'sometimes|string',
+            'quantity' => 'sometimes|integer',
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date',
+            'rasxod' => 'sometimes|numeric',
+            'comment' => 'sometimes|string',
+            'contragent_id' => 'sometimes|integer|exists:contragents,id',
+            'contragent_name' => 'sometimes|string',
+            'contragent_description' => 'sometimes|string',
+            'model' => 'sometimes|array',
+            'model.id' => 'sometimes|integer',
+            'model.material_id' => 'sometimes|integer|exists:items,id',
+            'model.submodels' => 'sometimes|array',
+            'model.sizes' => 'sometimes|array',
+            'model.sizes.*.id' => 'sometimes|integer|exists:order_sizes,id',
+            'model.sizes.*.size_id' => 'required_with:model.sizes|integer',
+            'model.sizes.*.quantity' => 'required_with:model.sizes|integer',
+            'instructions' => 'sometimes|array',
+            'instructions.*.id' => 'sometimes|integer|exists:order_instructions,id',
+            'instructions.*.title' => 'required_with:instructions|string',
+            'instructions.*.description' => 'required_with:instructions|string',
+            'recipes' => 'sometimes|array',
+            'recipes.*.id' => 'sometimes|integer|exists:order_recipes,id',
+            'recipes.*.item_id' => 'required_with:recipes|integer',
+            'recipes.*.quantity' => 'required_with:recipes|integer',
+            'recipes.*.submodel_id' => 'required_with:recipes|integer',
+        ]);
+
+        if ($request->has('contragent_id')) {
+            $contragent = Contragent::find($request->contragent_id);
+        } elseif ($request->hasAny(['contragent_name', 'contragent_description'])) {
+            $contragent = Contragent::updateOrCreate(
+                ['name' => $request->contragent_name],
+                ['description' => $request->contragent_description]
+            );
+        }
+
+        $order->update([
+            'name' => $request->input('name', $order->name),
+            'quantity' => $request->input('quantity', $order->quantity),
+            'start_date' => $request->input('start_date', $order->start_date),
+            'end_date' => $request->input('end_date', $order->end_date),
+            'rasxod' => $request->input('rasxod', $order->rasxod),
+            'comment' => $request->input('comment', $order->comment),
+            'contragent_id' => isset($contragent) ? $contragent->id : $order->contragent_id,
+        ]);
+
+        if ($request->has('model')) {
+            $modelData = $request->input('model');
+
+            $orderModel = OrderModel::updateOrCreate(
+                ['order_id' => $order->id],
+                [
+                    'model_id'    => $modelData['id'] ?? $order->orderModel->model_id,
+                    'material_id' => $modelData['material_id'] ?? $order->orderModel->material_id,
+                    'rasxod'     => isset($modelData['id']) ? Models::find($modelData['id'])->rasxod : ($order->orderModel->rasxod ?? 0),
+                ]
+            );
+
+            if (isset($modelData['submodels'])) {
+                foreach ($modelData['submodels'] as $submodelId) {
+                    OrderSubModel::updateOrCreate(
+                        ['order_model_id' => $orderModel->id, 'submodel_id' => $submodelId],
+                        []
+                    );
+                }
+            }
+
+            if (isset($modelData['sizes'])) {
+                foreach ($modelData['sizes'] as $sizeData) {
+                    if (isset($sizeData['id'])) {
+                        OrderSize::updateOrCreate(
+                            ['id' => $sizeData['id']],
+                            [
+                                'order_model_id' => $orderModel->id,
+                                'size_id'        => $sizeData['size_id'],
+                                'quantity'       => $sizeData['quantity'],
+                            ]
+                        );
+                    } else {
+                        OrderSize::create([
+                            'order_model_id' => $orderModel->id,
+                            'size_id'        => $sizeData['size_id'],
+                            'quantity'       => $sizeData['quantity'],
+                        ]);
+                    }
+                }
+            }
+        }
+
+        if ($request->has('instructions')) {
+            foreach ($request->input('instructions') as $instructionData) {
+                if (isset($instructionData['id'])) {
+                    OrderInstruction::updateOrCreate(
+                        ['id' => $instructionData['id']],
+                        [
+                            'order_id'    => $order->id,
+                            'title'       => $instructionData['title'],
+                            'description' => $instructionData['description'],
+                        ]
+                    );
+                } else {
+                    OrderInstruction::create([
+                        'order_id'    => $order->id,
+                        'title'       => $instructionData['title'],
+                        'description' => $instructionData['description'],
+                    ]);
+                }
+            }
+        }
+
+        if ($request->has('recipes')) {
+            foreach ($request->input('recipes') as $recipeData) {
+                if (isset($recipeData['id'])) {
+                    OrderRecipes::updateOrCreate(
+                        ['id' => $recipeData['id']],
+                        [
+                            'order_id'   => $order->id,
+                            'item_id'    => $recipeData['item_id'],
+                            'quantity'   => $recipeData['quantity'],
+                            'submodel_id'=> $recipeData['submodel_id'],
+                        ]
+                    );
+                } else {
+                    OrderRecipes::create([
+                        'order_id'    => $order->id,
+                        'item_id'     => $recipeData['item_id'],
+                        'quantity'    => $recipeData['quantity'],
+                        'submodel_id' => $recipeData['submodel_id'],
+                    ]);
+                }
+            }
+        }
+
+        if ($request->has('order_sizes')) {
+            foreach ($request->input('order_sizes') as $orderSizeData) {
+                if (isset($orderSizeData['id'])) {
+                    OrderSize::updateOrCreate(
+                        ['id' => $orderSizeData['id']],
+                        [
+                            'order_model_id' => isset($orderModel) ? $orderModel->id : ($order->orderModel->id ?? null),
+                            'size_id'        => $orderSizeData['size_id'],
+                            'quantity'       => $orderSizeData['quantity'] ?? 0,
+                        ]
+                    );
+                } else {
+                    OrderSize::create([
+                        'order_model_id' => isset($orderModel) ? $orderModel->id : ($order->orderModel->id ?? null),
+                        'size_id'        => $orderSizeData['size_id'],
+                        'quantity'       => $orderSizeData['quantity'] ?? 0,
+                    ]);
+                }
+            }
+        }
 
         return response()->json([
             'message' => 'Order updated successfully',
-            'order' => $order,
+            'order'   => $order->fresh(),
         ]);
     }
+
 
     public function delete(Order $order): \Illuminate\Http\JsonResponse
     {
