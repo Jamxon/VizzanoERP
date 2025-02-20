@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\TarificationCategoryExport;
+use App\Imports\TarificationCategoryImport;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderGroup;
@@ -536,5 +537,28 @@ class TechnologController extends Controller
         }
 
         return Excel::download(new TarificationCategoryExport($orderSubModelId), 'tarification_export_' . $orderSubModelId . '.xlsx');
+    }
+
+    public function importTarification(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $orderSubModelId = $request->get('orderSubModelId');
+        $file = $request->file('file');
+
+        if (!$orderSubModelId || !$file) {
+            return response()->json([
+                'error' => 'order_sub_model_id va fayl majburiy.'
+            ], 400);
+        }
+
+        try {
+            Excel::import(new TarificationCategoryImport($orderSubModelId), $file);
+            return response()->json([
+                'message' => 'Import muvaffaqiyatli bajarildi.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Import jarayonida xatolik: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

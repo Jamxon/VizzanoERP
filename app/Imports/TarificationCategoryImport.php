@@ -2,8 +2,10 @@
 
 namespace App\Imports;
 
+use App\Models\Razryad;
 use App\Models\TarificationCategory;
 use App\Models\Tarification;
+use App\Models\TypeWriter;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 
@@ -11,76 +13,62 @@ class TarificationCategoryImport implements ToCollection
 {
     protected $orderSubModelId;
 
-    /**
-     * Import uchun orderSubModel ID sini qabul qiladi.
-     *
-     * @param mixed $orderSubModelId
-     */
     public function __construct($orderSubModelId)
     {
         $this->orderSubModelId = $orderSubModelId;
     }
 
-    /**
-     * Excel faylning barcha qatorlarini collection() orqali qaytaradi.
-     *
-     * Fayl strukturasiga mos:
-     * - Birinchi qator: kategoriya nomi (merged hujayra, faqat A ustunda qiymat bo'ladi).
-     * - Ikkinchi qator: ustun nomlari (code, employee, name, razryad, typewriter, second, summa).
-     * - Keyingi qatorlar: tarification yozuvlari.
-     *
-     * Yangi kategoriya paydo bo'lganda, yangi TarificationCategory yaratiladi.
-     *
-     * @param Collection $rows
-     * @return void
-     */
     public function collection(Collection $rows): void
     {
         $currentCategoryId = null;
         $skipHeader = false; // Har bir kategoriya blokidagi ustun nomlari qatorini o'tkazish uchun
 
         foreach ($rows as $row) {
-            // Agar qator bo'sh bo'lsa, o'tkazamiz
+            // Bo'sh qatorlarni o'tkazamiz
             if (empty(array_filter($row, function($value) {
                 return !is_null($value) && trim($value) !== '';
             }))) {
                 continue;
             }
 
-            // Agar qator faqat bitta not-empty hujayrani o'z ichiga olsa (merged header - kategoriya nomi)
+            // Agar qator faqat bitta qiymatdan iborat bo'lsa – bu kategoriya nomi (merged hujayra)
             $nonEmptyCount = count(array_filter($row, function ($value) {
                 return !is_null($value) && trim($value) !== '';
             }));
             if ($nonEmptyCount === 1 && !empty($row[0])) {
                 $categoryName = trim($row[0]);
                 $category = TarificationCategory::create([
-                    'order_sub_model_id' => $this->orderSubModelId,
+                    'submodel_id' => $this->orderSubModelId,
                     'name' => $categoryName,
                 ]);
                 $currentCategoryId = $category->id;
-                $skipHeader = true; // Keyingi qator – ustun nomlari, o'tkazib yuboramiz
+                $skipHeader = true; // Keyingi qator – ustun nomlari bo'ladi
                 continue;
             }
 
-            // Agar skipHeader flagi faollashtirilgan bo'lsa, bu ustun nomlari qatori bo'lib, o'tkazamiz
+            // Ustun nomlari qatorini o'tkazamiz
             if ($skipHeader) {
                 $skipHeader = false;
                 continue;
             }
 
-            // Endi bu qator tarification yozuvi hisoblanadi.
-            // Taxminiy ustun tartibi:
-            // 0: code, 1: employee, 2: name, 3: razryad, 4: typewriter, 5: second, 6: summa
+            $razryad = Razryad::where('name', $row[4])->first();
+
+            $typewriter = TypeWriter::where('name', $row[5])->first();
+
+            // Endi qator tarification yozuvi hisoblanadi.
+            // Yangi tartib:
+            // 0: code, 1: employee_id, 2: employee (nomi), 3: name, 4: razryad, 5: typewriter, 6: second, 7: summa
             if ($currentCategoryId) {
                 Tarification::create([
                     'tarification_category_id' => $currentCategoryId,
-                    'code'    => $row[0] ?? null,
-                    'employee'=> $row[1] ?? null,
-                    'name'    => $row[2] ?? null,
-                    'razryad' => $row[3] ?? null,
-                    'typewriter' => $row[4] ?? null,
-                    'second'  => $row[5] ?? null,
-                    'summa'   => $row[6] ?? null,
+                    'code'         => $row[0] ?? null,
+                    'user_id'  => $row[1] ?? null, // eksport qilingan employee id
+                    'name'         => $row[3] ?? null,
+                    'razryad_id'      => $razryad->id ?? 0,
+                    'typewriter_id'   => $typewriter->id ?? 0,
+                    'second'       => $row[6] ?? null,
+                    'summa'        => $row[7] ?? null,
                 ]);
             }
         }
