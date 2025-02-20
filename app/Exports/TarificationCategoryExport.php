@@ -51,8 +51,8 @@ class TarificationCategoryExport implements FromCollection, WithHeadings
                     $tarification->code,
                     $tarification->user,
                     $tarification->name,
-                    $tarification->razryad,
-                    $tarification->typewriter,
+                    $tarification->razryad->name,
+                    $tarification->typewriter->name,
                     $tarification->second,
                     $tarification->summa,
                 ]);
@@ -93,6 +93,6 @@ class TarificationCategoryExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['code', 'user', 'name', 'razryad', 'typewriter', 'second', 'summa'];
+        return [];
     }
 }
