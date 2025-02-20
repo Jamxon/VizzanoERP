@@ -24,17 +24,16 @@ class TarificationCategoryImport implements ToCollection
         $skipHeader = false; // Har bir kategoriya blokidagi ustun nomlari qatorini o'tkazish uchun
 
         foreach ($rows as $row) {
-            // Bo'sh qatorlarni o'tkazamiz
-            if (empty(array_filter($row, function($value) {
+            if (empty(array_filter($row->toArray(), function($value) {
                 return !is_null($value) && trim($value) !== '';
             }))) {
                 continue;
             }
 
-            // Agar qator faqat bitta qiymatdan iborat bo'lsa – bu kategoriya nomi (merged hujayra)
-            $nonEmptyCount = count(array_filter($row, function ($value) {
+            $nonEmptyCount = count(array_filter($row->toArray(), function ($value) {
                 return !is_null($value) && trim($value) !== '';
             }));
+
             if ($nonEmptyCount === 1 && !empty($row[0])) {
                 $categoryName = trim($row[0]);
                 $category = TarificationCategory::create([
