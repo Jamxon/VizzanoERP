@@ -3,12 +3,12 @@
 namespace App\Exports;
 
 use App\Models\OrderSubModel;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Illuminate\Support\Collection;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
-class TarificationCategoryExport implements FromCollection, WithHeadings
+class TarificationCategoryExport implements FromCollection, WithEvents
 {
     protected $orderSubModelId;
     protected $mergeRows = []; // Bu yerda kategoriya header qatorlarining indekslarini saqlaymiz
@@ -22,8 +22,7 @@ class TarificationCategoryExport implements FromCollection, WithHeadings
     public function collection(): Collection
     {
         // OrderSubModelni tarificationCategories va ularning tarificationlarini bilan yuklab olish
-        $orderSubModel = OrderSubModel::with(['tarificationCategories.tarifications'])
-            ->find($this->orderSubModelId);
+        $orderSubModel = OrderSubModel::with(['tarificationCategories.tarifications'])->find($this->orderSubModelId);
 
         // Agar orderSubModel topilmasa, bo'sh collection qaytaramiz
         if (!$orderSubModel) {
@@ -58,33 +57,43 @@ class TarificationCategoryExport implements FromCollection, WithHeadings
                 ]);
                 $currentRow++;
             }
-            // Agar har bir blokdan keyin bo'sh qator qo'shmoqchi bo'lsangiz:
-            // $rows->push([]);
-            // $currentRow++;
         }
 
         return $rows;
     }
 
-    // RegisterEvents orqali hujayralarni birlashtirish va stil qo'llash
     public function registerEvents(): array
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Har bir kategoriya header qatorini A–G ustunlari bo'ylab birlashtiramiz
+                // Har bir kategoriya header qatorini A–G ustunlari bo'ylab birlashtiramiz va stil beramiz
                 foreach ($this->mergeRows as $row) {
                     $cellRange = "A{$row}:G{$row}";
                     $sheet->mergeCells($cellRange);
-                    // Stil: qalin va markazlashtirilgan
                     $sheet->getStyle($cellRange)->applyFromArray([
-                        'font' => [
-                            'bold' => true,
-                        ],
+                        'font' => ['bold' => true],
                         'alignment' => [
                             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                         ],
+                    ]);
+                }
+
+                // Ustun kengliklarini sozlash:
+                $sheet->getColumnDimension('A')->setWidth(15); // code
+                $sheet->getColumnDimension('B')->setWidth(20); // employee
+                $sheet->getColumnDimension('C')->setWidth(30); // name
+                $sheet->getColumnDimension('D')->setWidth(15); // razryad
+                $sheet->getColumnDimension('E')->setWidth(20); // typewriter
+                $sheet->getColumnDimension('F')->setWidth(10); // second
+                $sheet->getColumnDimension('G')->setWidth(15); // summa
+
+                // Agar kerak bo'lsa, kategoriya headerlari uchun maxsus kenglikni ham belgilash mumkin
+                foreach ($this->mergeRows as $row) {
+                    // Masalan, birinchi hujayrani kengroq qilish:
+                    $sheet->getStyle("A{$row}:G{$row}")->applyFromArray([
+                        'font' => ['size' => 14, 'bold' => true],
                     ]);
                 }
             },
