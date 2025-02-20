@@ -527,7 +527,7 @@ class TechnologController extends Controller
 
     public function exportTarification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
     {
-        $orderSubModelId = $request->get('orderSubModelID');
+        $orderSubModelId = $request->get('orderSubModelId');
 
         if (!$orderSubModelId) {
             return response()->json([
