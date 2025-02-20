@@ -70,6 +70,8 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::post('/import-orders', [OrderImportController::class, 'import'])->name('orders.import');
     Route::post('orderStore',[OrderImportController::class,'store']);
 
+    Route::get('export-tarification',[TechnologController::class,'exportTarification']);
+
     Route::get('materials', [ModelController::class, 'getMaterials']);
 
     Route::get('models', [ModelController::class, 'index']);

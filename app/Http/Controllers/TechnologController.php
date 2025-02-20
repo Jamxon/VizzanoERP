@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TarificationCategoryExport;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderGroup;
@@ -15,6 +16,7 @@ use App\Models\TarificationCategory;
 use App\Models\TypeWriter;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
@@ -523,4 +525,16 @@ class TechnologController extends Controller
         return response()->json(['message' => 'Tarifications fastened to employees successfully'], 200);
     }
 
+    public function exportTarification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
+    {
+        $orderSubModelId = $request->get('orderSubModelID');
+
+        if (!$orderSubModelId) {
+            return response()->json([
+                'error' => 'order_sub_model_id talab qilinadi.'
+            ], 400);
+        }
+
+        return Excel::download(new TarificationCategoryExport($orderSubModelId), 'tarification_export_' . $orderSubModelId . '.xlsx');
+    }
 }
