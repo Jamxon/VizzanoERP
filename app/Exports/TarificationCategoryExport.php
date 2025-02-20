@@ -41,7 +41,7 @@ class TarificationCategoryExport implements FromCollection, WithHeadings
             $currentRow++;
 
             // 2. Tarification ustun nomlari
-            $header = ['code', 'user', 'name', 'razryad', 'typewriter', 'second', 'summa'];
+            $header = ['code', 'employee', 'name', 'razryad', 'typewriter', 'second', 'summa'];
             $rows->push($header);
             $currentRow++;
 
@@ -49,7 +49,7 @@ class TarificationCategoryExport implements FromCollection, WithHeadings
             foreach ($category->tarifications as $tarification) {
                 $rows->push([
                     $tarification->code,
-                    $tarification->user,
+                    $tarification->employee->name,
                     $tarification->name,
                     $tarification->razryad->name,
                     $tarification->typewriter->name,
