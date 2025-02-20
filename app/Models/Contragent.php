@@ -4,6 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static find(mixed $contragent_id)
+ * @method static updateOrCreate(array $array, array $array1)
+ */
 class Contragent extends Model
 {
     protected $table = "contragent";

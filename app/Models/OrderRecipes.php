@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static updateOrCreate(array $array, array $array1)
+ * @method static create(array $array)
+ */
 class OrderRecipes extends Model
 {
     use HasFactory;

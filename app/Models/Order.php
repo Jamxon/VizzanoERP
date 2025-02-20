@@ -7,9 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property mixed $orderRecipes
+ * @property mixed $id
+ * @property mixed $orderModel
+ * @property mixed $contragent_id
+ * @property mixed $comment
+ * @property mixed $branch_id
+ * @property mixed $end_date
+ * @property mixed $start_date
+ * @property mixed $status
+ * @property mixed $quantity
+ * @property mixed $name
+ * @property mixed $rasxod
+ * @property mixed $orderPrintingTime
+ * @property mixed $instructions
+ * @property mixed $branch
+ * @property mixed $contragent
+ * @property mixed $created_at
+ * @property mixed $updated_at
+ *
  * @method static find(mixed $order_id)
  * @method static where(string $string, mixed $status)
  * @method static create(array $array)
+ * @method orderSizes()
  */
 class Order extends Model
 {
