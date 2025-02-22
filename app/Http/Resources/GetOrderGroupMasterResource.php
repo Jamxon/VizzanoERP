@@ -30,8 +30,8 @@ class GetOrderGroupMasterResource extends JsonResource
                     'name' => $this->order->orderModel->model->name,
                 ],
                 'material' => [
-                    'id' => $this->order->orderModel->material->id,
-                    'name' => $this->order->orderModel->material->name,
+                    'id' => $this->order->orderModel->material->id ?? 0,
+                    'name' => $this->order->orderModel->material->name ?? null,
                 ],
                 'sizes' => $this->order->orderModel->sizes->map(function ($size) {
                     return [
