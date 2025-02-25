@@ -75,7 +75,7 @@ class SpecificationCategoryImport implements ToCollection
                     'code'     => isset($row[0]) ? trim($row[0]) : null,
                     'name'     => isset($row[1]) ? trim($row[1]) : null,
                     'quantity' => isset($row[2]) ? trim($row[2]) : null,
-                    'comment'  => isset($row[3]) ? trim($row[3]) : null,
+                    'comment'  => isset($row[3]) ? trim($row[3]) : '', // Agar bo'sh bo'lsa, bo'sh satr
                 ]);
             }
         }
