@@ -543,10 +543,8 @@ class TechnologController extends Controller
 
     public function importTarification(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orderSubModelId = $request->get('orderSubModelId');
+        $orderSubModelId = $request->get('orderSubmodelId');
         $file = $request->file('file');
-
-        dd($request->all());
 
         if (!$orderSubModelId || !$file) {
             return response()->json([
