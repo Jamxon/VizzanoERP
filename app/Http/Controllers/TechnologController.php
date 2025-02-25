@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SpecificationCategoryExport;
 use App\Exports\TarificationCategoryExport;
 use App\Imports\TarificationCategoryImport;
 use App\Models\Employee;
@@ -560,5 +561,18 @@ class TechnologController extends Controller
                 'error' => 'Import jarayonida xatolik: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function exportSpecification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
+    {
+        $orderSubmodelId = $request->get('orderSubmodelId');
+
+        if (!$orderSubmodelId) {
+            return response()->json([
+                'error' => 'orderSubmodelId talab qilinadi.'
+            ], 400);
+        }
+
+        return Excel::download(new SpecificationCategoryExport($orderSubmodelId), 'specification_export_' . $orderSubmodelId . '.xlsx');
     }
 }
