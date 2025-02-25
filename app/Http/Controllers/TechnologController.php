@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\SpecificationCategoryExport;
 use App\Exports\TarificationCategoryExport;
+use App\Imports\SpecificationCategoryImport;
 use App\Imports\TarificationCategoryImport;
 use App\Models\Employee;
 use App\Models\Order;
@@ -574,5 +575,28 @@ class TechnologController extends Controller
         }
 
         return Excel::download(new SpecificationCategoryExport($orderSubmodelId), 'specification_export_' . $orderSubmodelId . '.xlsx');
+    }
+
+    public function importSpecification(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $orderSubmodelId = $request->get('orderSubmodelId');
+        $file = $request->file('file');
+
+        if (!$orderSubmodelId || !$file) {
+            return response()->json([
+                'error' => 'orderSubmodelId va fayl majburiy.'
+            ], 400);
+        }
+
+        try {
+            Excel::import(new SpecificationCategoryImport($orderSubmodelId), $file);
+            return response()->json([
+                'message' => 'Import muvaffaqiyatli bajarildi.'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Import jarayonida xatolik: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
