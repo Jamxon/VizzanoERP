@@ -546,6 +546,8 @@ class TechnologController extends Controller
         $orderSubModelId = $request->get('orderSubModelId');
         $file = $request->file('file');
 
+        dd($orderSubModelId);
+
         if (!$orderSubModelId || !$file) {
             return response()->json([
                 'error' => 'orderSubModelId va fayl majburiy.'
