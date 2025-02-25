@@ -534,7 +534,7 @@ class TechnologController extends Controller
 
         if (!$orderSubModelId) {
             return response()->json([
-                'error' => 'order_sub_model_id talab qilinadi.'
+                'error' => 'orderSubModelId talab qilinadi.'
             ], 400);
         }
 
