@@ -288,15 +288,24 @@ class OrderController extends Controller
 
             // Yangi yoki mavjudlarni yangilash
             foreach ($request->input('recipes') as $recipeData) {
-                OrderRecipes::updateOrCreate(
-                    ['id' => $recipeData['id'] ?? null],
-                    [
-                        'order_id'   => $order->id,
-                        'item_id'    => $recipeData['item_id'],
-                        'quantity'   => $recipeData['quantity'],
-                        'submodel_id'=> $recipeData['submodel_id'],
-                    ]
-                );
+                if (!isset($recipeData['id'])) {
+                    OrderRecipes::create([
+                        'order_id'    => $order->id,
+                        'item_id'     => $recipeData['item_id'],
+                        'quantity'    => $recipeData['quantity'],
+                        'submodel_id' => $recipeData['submodel_id'],
+                    ]);
+                } else {
+                    OrderRecipes::updateOrCreate(
+                        ['id' => $recipeData['id']],
+                        [
+                            'order_id'    => $order->id,
+                            'item_id'     => $recipeData['item_id'],
+                            'quantity'    => $recipeData['quantity'],
+                            'submodel_id' => $recipeData['submodel_id'],
+                        ]
+                    );
+                }
             }
         }
 
