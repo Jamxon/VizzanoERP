@@ -235,8 +235,9 @@ class OrderController extends Controller
         if ($request->has('instructions')) {
             // 1. Requestdan kelgan IDlarni olish (null larni chiqarib tashlaymiz)
             $requestInstructionIds = collect($request->input('instructions'))
-                ->filter() // null qiymatlarni chiqarib tashlaydi
+                ->where('id', '!=', null)
                 ->pluck('id')
+                ->filter() // null qiymatlarni chiqarib tashlaydi
                 ->toArray();
 
             // 2. Bazadagi mavjud IDlarni olish
