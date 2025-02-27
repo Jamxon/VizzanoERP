@@ -288,7 +288,7 @@ class OrderController extends Controller
 
             // Yangi yoki mavjudlarni yangilash
             foreach ($request->input('recipes') as $recipeData) {
-                if (!isset($recipeData['id'])) {
+                if ($recipeData['id'] == null) {
                     OrderRecipes::create([
                         'order_id'    => $order->id,
                         'item_id'     => $recipeData['item_id'],
