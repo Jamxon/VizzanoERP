@@ -208,42 +208,8 @@ class OrderController extends Controller
                 ]
             );
 
-            // **4. Submodelni yangilash**
-            if (isset($modelData['submodels'])) {
-                $requestSubmodels = collect($modelData['submodels']);
-                $existingSubmodels = $orderModel->submodels->pluck('submodel_id')->toArray();
-
-                // O'chirilishi kerak bo'lgan submodellarning IDlarini topamiz
-                $submodelsToDelete = array_diff($existingSubmodels, $requestSubmodels->toArray());
-
-                // Eski submodellardan requestda kelmaganlarini o‘chiramiz
-                OrderSubModel::where('order_model_id', $orderModel->id)
-                    ->whereIn('submodel_id', $submodelsToDelete)
-                    ->delete();
-
-                // Yangi yoki mavjud submodellarning ma’lumotlarini yangilaymiz
-                foreach ($requestSubmodels as $submodelId) {
-                    OrderSubModel::updateOrCreate(
-                        ['order_model_id' => $orderModel->id, 'submodel_id' => $submodelId],
-                        [
-                            'order_model_id' => $orderModel->id,
-                            'submodel_id'    => $submodelId,
-                        ]
-                    );
-                }
-            }
-
             // **5. O'lchamlarni yangilash**
             if (isset($modelData['sizes'])) {
-                $requestSizes = collect($modelData['sizes'])->pluck('id')->toArray();
-                $existingSizes = $orderModel->sizes->pluck('id')->toArray();
-
-                // O'chirilishi kerak bo'lgan o‘lchamlarni topish
-                $sizesToDelete = array_diff($existingSizes, $requestSizes);
-                OrderSize::where('order_model_id', $orderModel->id)
-                    ->whereIn('id', $sizesToDelete)
-                    ->delete();
-
                 // Yangilash yoki yaratish
                 foreach ($modelData['sizes'] as $sizeData) {
                     OrderSize::update([
