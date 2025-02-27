@@ -246,14 +246,11 @@ class OrderController extends Controller
 
                 // Yangilash yoki yaratish
                 foreach ($modelData['sizes'] as $sizeData) {
-                    OrderSize::updateOrCreate(
-                        ['id' => $sizeData['id'] ?? null],
-                        [
-                            'order_model_id' => $orderModel->id,
-                            'size_id'        => $sizeData['size_id'],
-                            'quantity'       => $sizeData['quantity'],
-                        ]
-                    );
+                    OrderSize::update([
+                        'order_model_id' => $orderModel->id,
+                        'size_id'        => $sizeData['id'],
+                        'quantity'       => $sizeData['quantity'],
+                    ]);
                 }
             }
         }
