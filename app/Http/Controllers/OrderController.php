@@ -281,13 +281,15 @@ class OrderController extends Controller
             $recipes = collect($request->input('recipes'));
 
             // 1. Requestdan kelgan IDlarni olish (faqat mavjudlarini)
-            $requestRecipeIds = $recipes->pluck('id')->filter()->toArray();
+            $requestRecipeIds = $recipes->pluck('id')
+                ->where('id' !== null)
+                ->filter()->toArray();
 
             // 2. Bazadagi mavjud IDlarni olish
             $existingRecipeIds = $order->orderRecipes->pluck('id')->toArray();
 
             // 3. O‘chirilishi kerak bo'lganlar
-            $recipesToDelete = array_diff($existingRecipeIds, $requestRecipeIds);
+            $recipesToDelete = array_diff($requestRecipeIds, $existingRecipeIds);
             OrderRecipes::whereIn('id', $recipesToDelete)->delete();
 
             // 4. Yangi yoki mavjud bo‘lganlarni yangilash yoki yaratish
