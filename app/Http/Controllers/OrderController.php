@@ -280,7 +280,7 @@ class OrderController extends Controller
                 ->pluck('id')
                 ->filter()
                 ->toArray();
-            $existingRecipeIds = $order->recipes->pluck('id')->toArray();
+            $existingRecipeIds = $order->orderRecipes->pluck('id')->toArray();
 
             // O‘chirilishi kerak bo'lganlar
             $recipesToDelete = array_diff($existingRecipeIds, $requestRecipeIds);
