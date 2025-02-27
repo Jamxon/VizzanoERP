@@ -161,7 +161,7 @@ class OrderController extends Controller
             'end_date' => 'sometimes|date',
             'rasxod' => 'sometimes|numeric',
             'comment' => 'sometimes|string',
-            'contragent_id' => 'sometimes|integer|exists:contragents,id',
+            'contragent_id' => 'sometimes|integer|exists:contragent,id',
             'contragent_name' => 'sometimes|string',
             'contragent_description' => 'sometimes|string',
             'model' => 'sometimes|array',
