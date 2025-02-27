@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property mixed $contragent
  * @property mixed $created_at
  * @property mixed $updated_at
+ * @property mixed $price
  *
  * @method static find(mixed $order_id)
  * @method static where(string $string, mixed $status)
