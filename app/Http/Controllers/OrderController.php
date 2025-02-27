@@ -154,6 +154,7 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
+        dd($request->all());
         $validatedData = $request->validate([
             'name' => 'sometimes|string',
             'quantity' => 'sometimes|integer',
