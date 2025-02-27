@@ -275,7 +275,11 @@ class OrderController extends Controller
 
         // **7. Recipes yangilash**
         if ($request->has('recipes')) {
-            $requestRecipeIds = collect($request->input('recipes'))->pluck('id')->filter()->toArray();
+            $requestRecipeIds = collect($request->input('recipes'))
+                ->where('id', '!=', null)
+                ->pluck('id')
+                ->filter()
+                ->toArray();
             $existingRecipeIds = $order->recipes->pluck('id')->toArray();
 
             // O‘chirilishi kerak bo'lganlar
