@@ -176,7 +176,7 @@ class OrderController extends Controller
         // **1. Kontragentni yangilash yoki yaratish**
         if ($request->has('contragent_id')) {
             $contragent = Contragent::find($request->contragent_id);
-        } elseif ($request->hasAny(['contragent_name', 'contragent_description'])) {
+        } elseif ($request->hasAny(['contragent_name'])) {
             $contragent = Contragent::updateOrCreate(
                 ['name' => $request->contragent_name],
                 ['description' => $request->contragent_description]
