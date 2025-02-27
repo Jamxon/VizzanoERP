@@ -233,25 +233,44 @@ class OrderController extends Controller
 
         // **6. Instructions yangilash**
         if ($request->has('instructions')) {
-            $requestInstructionIds = collect($request->input('instructions'))->pluck('id')->filter()->toArray();
+            // 1. Requestdan kelgan IDlarni olish (null larni chiqarib tashlaymiz)
+            $requestInstructionIds = collect($request->input('instructions'))
+                ->filter() // null qiymatlarni chiqarib tashlaydi
+                ->pluck('id')
+                ->toArray();
+
+            // 2. Bazadagi mavjud IDlarni olish
             $existingInstructionIds = $order->instructions->pluck('id')->toArray();
 
-            // O‘chirilishi kerak bo'lganlar
+            // 3. O‘chirilishi kerak bo'lgan IDlarni aniqlash
             $instructionsToDelete = array_diff($existingInstructionIds, $requestInstructionIds);
+
+            // 4. O‘chirish
             OrderInstruction::whereIn('id', $instructionsToDelete)->delete();
 
-            // Yangi yoki mavjudlarni yangilash
+            // 5. Yangi yoki mavjud bo'lganlarni yangilash yoki yaratish
             foreach ($request->input('instructions') as $instructionData) {
-                OrderInstruction::updateOrCreate(
-                    ['id' => $instructionData['id'] ?? null],
-                    [
+                if (!isset($instructionData['id'])) {
+                    // ID yo‘q bo‘lsa, yangi ma’lumot yaratamiz
+                    OrderInstruction::create([
                         'order_id'    => $order->id,
                         'title'       => $instructionData['title'],
                         'description' => $instructionData['description'],
-                    ]
-                );
+                    ]);
+                } else {
+                    // ID mavjud bo‘lsa, update yoki create
+                    OrderInstruction::updateOrCreate(
+                        ['id' => $instructionData['id']],
+                        [
+                            'order_id'    => $order->id,
+                            'title'       => $instructionData['title'],
+                            'description' => $instructionData['description'],
+                        ]
+                    );
+                }
             }
         }
+
 
         // **7. Recipes yangilash**
         if ($request->has('recipes')) {
