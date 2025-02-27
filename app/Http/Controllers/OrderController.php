@@ -169,21 +169,11 @@ class OrderController extends Controller
             'model.material_id' => 'sometimes|integer|exists:items,id',
             'model.submodels' => 'sometimes|array',
             'model.sizes' => 'sometimes|array',
-            'model.sizes.*.id' => 'sometimes|integer|exists:order_sizes,id',
-            'model.sizes.*.size_id' => 'required_with:model.sizes|integer',
-            'model.sizes.*.quantity' => 'required_with:model.sizes|integer',
             'instructions' => 'sometimes|array',
-            'instructions.*.id' => 'sometimes|integer|exists:order_instructions,id',
-            'instructions.*.title' => 'required_with:instructions|string',
-            'instructions.*.description' => 'required_with:instructions|string',
             'recipes' => 'sometimes|array',
-            'recipes.*.id' => 'sometimes|integer|exists:order_recipes,id',
-            'recipes.*.item_id' => 'required_with:recipes|integer',
-            'recipes.*.quantity' => 'required_with:recipes|integer',
-            'recipes.*.submodel_id' => 'required_with:recipes|integer',
         ]);
 
-        // Kontragentni yangilash yoki yaratish
+        // **1. Kontragentni yangilash yoki yaratish**
         if ($request->has('contragent_id')) {
             $contragent = Contragent::find($request->contragent_id);
         } elseif ($request->hasAny(['contragent_name', 'contragent_description'])) {
@@ -193,7 +183,7 @@ class OrderController extends Controller
             );
         }
 
-        // Orderni yangilash
+        // **2. Orderni yangilash**
         $order->update([
             'name' => $request->input('name', $order->name),
             'quantity' => $request->input('quantity', $order->quantity),
@@ -204,7 +194,7 @@ class OrderController extends Controller
             'contragent_id' => isset($contragent) ? $contragent->id : $order->contragent_id,
         ]);
 
-        // Modelni yangilash
+        // **3. Modelni yangilash**
         if ($request->has('model')) {
             $modelData = $request->input('model');
 
@@ -213,33 +203,44 @@ class OrderController extends Controller
                 [
                     'model_id'    => $modelData['id'] ?? $order->orderModel->model_id,
                     'material_id' => $modelData['material_id'] ?? $order->orderModel->material_id,
-                    'rasxod'     => isset($modelData['id']) ? Models::find($modelData['id'])->rasxod : ($order->orderModel->rasxod ?? 0),
+                    'rasxod'      => isset($modelData['id']) ? Models::find($modelData['id'])->rasxod : ($order->orderModel->rasxod ?? 0),
                 ]
             );
 
-            // Submodelni yangilash
+            // **4. Submodelni yangilash**
             if (isset($modelData['submodels'])) {
+                $requestSubmodels = collect($modelData['submodels']);
                 $existingSubmodels = $orderModel->submodels->pluck('submodel_id')->toArray();
-                $newSubmodels = collect($modelData['submodels']);
 
-                // O'chirish
+                // O'chirilishi kerak bo'lgan submodellarning IDlarini topamiz
+                $submodelsToDelete = array_diff($existingSubmodels, $requestSubmodels->toArray());
+
+                // Eski submodellardan requestda kelmaganlarini o‘chiramiz
                 OrderSubModel::where('order_model_id', $orderModel->id)
-                    ->whereNotIn('submodel_id', $newSubmodels)
+                    ->whereIn('submodel_id', $submodelsToDelete)
                     ->delete();
 
-                // Qo'shish
-                foreach ($newSubmodels as $submodelId) {
-                    if (!in_array($submodelId, $existingSubmodels)) {
-                        OrderSubModel::create([
-                            'order_model_id' => $orderModel->id,
-                            'submodel_id' => $submodelId,
-                        ]);
-                    }
+                // Yangi yoki mavjud submodellarning ma’lumotlarini yangilaymiz
+                foreach ($requestSubmodels as $submodelId) {
+                    OrderSubModel::updateOrCreate(
+                        ['order_model_id' => $orderModel->id, 'submodel_id' => $submodelId],
+                        []
+                    );
                 }
             }
 
-            // O'lchamlarni yangilash
+            // **5. O'lchamlarni yangilash**
             if (isset($modelData['sizes'])) {
+                $requestSizes = collect($modelData['sizes'])->pluck('id')->toArray();
+                $existingSizes = $orderModel->sizes->pluck('id')->toArray();
+
+                // O'chirilishi kerak bo'lgan o‘lchamlarni topish
+                $sizesToDelete = array_diff($existingSizes, $requestSizes);
+                OrderSize::where('order_model_id', $orderModel->id)
+                    ->whereIn('id', $sizesToDelete)
+                    ->delete();
+
+                // Yangilash yoki yaratish
                 foreach ($modelData['sizes'] as $sizeData) {
                     OrderSize::updateOrCreate(
                         ['id' => $sizeData['id'] ?? null],
@@ -253,8 +254,16 @@ class OrderController extends Controller
             }
         }
 
-        // Instructions yangilash
+        // **6. Instructions yangilash**
         if ($request->has('instructions')) {
+            $requestInstructionIds = collect($request->input('instructions'))->pluck('id')->filter()->toArray();
+            $existingInstructionIds = $order->instructions->pluck('id')->toArray();
+
+            // O‘chirilishi kerak bo'lganlar
+            $instructionsToDelete = array_diff($existingInstructionIds, $requestInstructionIds);
+            OrderInstruction::whereIn('id', $instructionsToDelete)->delete();
+
+            // Yangi yoki mavjudlarni yangilash
             foreach ($request->input('instructions') as $instructionData) {
                 OrderInstruction::updateOrCreate(
                     ['id' => $instructionData['id'] ?? null],
@@ -267,8 +276,16 @@ class OrderController extends Controller
             }
         }
 
-        // Recipes yangilash
+        // **7. Recipes yangilash**
         if ($request->has('recipes')) {
+            $requestRecipeIds = collect($request->input('recipes'))->pluck('id')->filter()->toArray();
+            $existingRecipeIds = $order->recipes->pluck('id')->toArray();
+
+            // O‘chirilishi kerak bo'lganlar
+            $recipesToDelete = array_diff($existingRecipeIds, $requestRecipeIds);
+            OrderRecipes::whereIn('id', $recipesToDelete)->delete();
+
+            // Yangi yoki mavjudlarni yangilash
             foreach ($request->input('recipes') as $recipeData) {
                 OrderRecipes::updateOrCreate(
                     ['id' => $recipeData['id'] ?? null],
