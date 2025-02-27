@@ -154,9 +154,6 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
-
-        dd($request->all());
-
         $validatedData = $request->validate([
             'name' => 'sometimes|string',
             'quantity' => 'sometimes|integer',
@@ -278,39 +275,43 @@ class OrderController extends Controller
 
         // **7. Recipes yangilash**
         if ($request->has('recipes')) {
-            $requestRecipeIds = collect($request->input('recipes'))
-                ->where('id', '!=', null)
-                ->pluck('id')
-                ->filter()
-                ->toArray();
+            $recipes = collect($request->input('recipes'));
+
+            // 1. Requestdan kelgan IDlarni olish (faqat mavjudlarini)
+            $requestRecipeIds = $recipes->pluck('id')->filter()->toArray();
+
+            // 2. Bazadagi mavjud IDlarni olish
             $existingRecipeIds = $order->orderRecipes->pluck('id')->toArray();
 
-            // O‘chirilishi kerak bo'lganlar
+            // 3. O‘chirilishi kerak bo'lganlar
             $recipesToDelete = array_diff($existingRecipeIds, $requestRecipeIds);
             OrderRecipes::whereIn('id', $recipesToDelete)->delete();
 
-            // Yangi yoki mavjudlarni yangilash
-            foreach ($request->input('recipes') as $recipeData) {
-                if ($recipeData['id'] == null) {
+            // 4. Yangi yoki mavjud bo‘lganlarni yangilash yoki yaratish
+            foreach ($recipes as $recipeData) {
+                // 4.1 ID null bo‘lsa, yangi `recipe` yaratish
+                if (empty($recipeData['id'])) {
                     OrderRecipes::create([
                         'order_id'    => $order->id,
-                        'item_id'     => $recipeData['item_id'],
-                        'quantity'    => $recipeData['quantity'],
-                        'submodel_id' => $recipeData['submodel_id'],
+                        'item_id'     => $recipeData['item_id'] ?? null,
+                        'quantity'    => $recipeData['quantity'] ?? 0,
+                        'submodel_id' => $recipeData['submodel_id'] ?? null,
                     ]);
                 } else {
+                    // 4.2 Agar ID bo‘lsa, mavjud ma’lumotni yangilash
                     OrderRecipes::updateOrCreate(
                         ['id' => $recipeData['id']],
                         [
                             'order_id'    => $order->id,
-                            'item_id'     => $recipeData['item_id'],
-                            'quantity'    => $recipeData['quantity'],
-                            'submodel_id' => $recipeData['submodel_id'],
+                            'item_id'     => $recipeData['item_id'] ?? null,
+                            'quantity'    => $recipeData['quantity'] ?? 0,
+                            'submodel_id' => $recipeData['submodel_id'] ?? null,
                         ]
                     );
                 }
             }
         }
+
 
         return response()->json([
             'message' => 'Order updated successfully',
