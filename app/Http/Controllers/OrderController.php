@@ -154,9 +154,6 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
-
-        dd($request->all());
-
         $validatedData = $request->validate([
             'name' => 'sometimes|string',
             'quantity' => 'sometimes|integer',
@@ -195,6 +192,7 @@ class OrderController extends Controller
             'rasxod' => $request->input('rasxod', $order->rasxod),
             'comment' => $request->input('comment', $order->comment),
             'contragent_id' => isset($contragent) ? $contragent->id : $order->contragent_id,
+            'price' => $request->input('price', $order->price) ?? $order->price,
         ]);
 
         // **3. Modelni yangilash**
@@ -227,7 +225,10 @@ class OrderController extends Controller
                 foreach ($requestSubmodels as $submodelId) {
                     OrderSubModel::updateOrCreate(
                         ['order_model_id' => $orderModel->id, 'submodel_id' => $submodelId],
-                        []
+                        [
+                            'order_model_id' => $orderModel->id,
+                            'submodel_id'    => $submodelId,
+                        ]
                     );
                 }
             }
