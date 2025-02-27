@@ -295,25 +295,22 @@ class OrderController extends Controller
             // 4. Yangi yoki mavjud bo‘lganlarni yangilash yoki yaratish
             foreach ($recipes as $recipeData) {
                 // 4.1 ID null bo‘lsa, yangi `recipe` yaratish
-                if (empty($recipeData['id'])) {
-                    OrderRecipes::create([
-                        'order_id'    => $order->id,
-                        'item_id'     => $recipeData['item_id'] ?? null,
-                        'quantity'    => $recipeData['quantity'] ?? 0,
-                        'submodel_id' => $recipeData['submodel_id'] ?? null,
-                    ]);
+               $orderRecipe = OrderRecipes::find($recipeData['id']);
+
+               if ($orderRecipe){
+                     $orderRecipe->update([
+                          'item_id' => $recipeData['item_id'],
+                          'quantity' => $recipeData['quantity'],
+                          'submodel_id' => $recipeData['submodel_id'],
+                     ]);
                 } else {
-                    // 4.2 Agar ID bo‘lsa, mavjud ma’lumotni yangilash
-                    OrderRecipes::updateOrCreate(
-                        ['id' => $recipeData['id']],
-                        [
-                            'order_id'    => $order->id,
-                            'item_id'     => $recipeData['item_id'] ?? null,
-                            'quantity'    => $recipeData['quantity'] ?? 0,
-                            'submodel_id' => $recipeData['submodel_id'] ?? null,
-                        ]
-                    );
-                }
+                     OrderRecipes::create([
+                          'order_id' => $order->id,
+                          'item_id' => $recipeData['item_id'],
+                          'quantity' => $recipeData['quantity'],
+                          'submodel_id' => $recipeData['submodel_id'],
+                     ]);
+               }
             }
         }
 

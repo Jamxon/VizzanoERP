@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static updateOrCreate(array $array, array $array1)
  * @method static create(array $array)
+ * @method static find(mixed $id)
  */
 class OrderRecipes extends Model
 {
