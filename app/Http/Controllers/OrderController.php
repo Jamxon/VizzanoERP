@@ -165,7 +165,7 @@ class OrderController extends Controller
             'contragent_name' => 'sometimes|string',
             'contragent_description' => 'sometimes|string',
             'model' => 'sometimes|array',
-            'model.id' => 'sometimes|integer',
+            'model.id' => 'sometimes|integer|exists:models,id',
             'model.material_id' => 'sometimes|integer|exists:items,id',
             'model.submodels' => 'sometimes|array',
             'model.sizes' => 'sometimes|array',
@@ -183,6 +183,7 @@ class OrderController extends Controller
             'recipes.*.submodel_id' => 'required_with:recipes|integer',
         ]);
 
+        // Kontragentni yangilash yoki yaratish
         if ($request->has('contragent_id')) {
             $contragent = Contragent::find($request->contragent_id);
         } elseif ($request->hasAny(['contragent_name', 'contragent_description'])) {
@@ -192,6 +193,7 @@ class OrderController extends Controller
             );
         }
 
+        // Orderni yangilash
         $order->update([
             'name' => $request->input('name', $order->name),
             'quantity' => $request->input('quantity', $order->quantity),
@@ -202,6 +204,7 @@ class OrderController extends Controller
             'contragent_id' => isset($contragent) ? $contragent->id : $order->contragent_id,
         ]);
 
+        // Modelni yangilash
         if ($request->has('model')) {
             $modelData = $request->input('model');
 
@@ -214,99 +217,68 @@ class OrderController extends Controller
                 ]
             );
 
+            // Submodelni yangilash
             if (isset($modelData['submodels'])) {
-                foreach ($modelData['submodels'] as $submodelId) {
-                    OrderSubModel::updateOrCreate(
-                        ['order_model_id' => $orderModel->id, 'submodel_id' => $submodelId],
-                        []
-                    );
-                }
-            }
+                $existingSubmodels = $orderModel->submodels->pluck('submodel_id')->toArray();
+                $newSubmodels = collect($modelData['submodels']);
 
-            if (isset($modelData['sizes'])) {
-                foreach ($modelData['sizes'] as $sizeData) {
-                    if (isset($sizeData['id'])) {
-                        OrderSize::updateOrCreate(
-                            ['id' => $sizeData['id']],
-                            [
-                                'order_model_id' => $orderModel->id,
-                                'size_id'        => $sizeData['size_id'],
-                                'quantity'       => $sizeData['quantity'],
-                            ]
-                        );
-                    } else {
-                        OrderSize::create([
+                // O'chirish
+                OrderSubModel::where('order_model_id', $orderModel->id)
+                    ->whereNotIn('submodel_id', $newSubmodels)
+                    ->delete();
+
+                // Qo'shish
+                foreach ($newSubmodels as $submodelId) {
+                    if (!in_array($submodelId, $existingSubmodels)) {
+                        OrderSubModel::create([
                             'order_model_id' => $orderModel->id,
-                            'size_id'        => $sizeData['size_id'],
-                            'quantity'       => $sizeData['quantity'],
+                            'submodel_id' => $submodelId,
                         ]);
                     }
                 }
             }
-        }
 
-        if ($request->has('instructions')) {
-            foreach ($request->input('instructions') as $instructionData) {
-                if (isset($instructionData['id'])) {
-                    OrderInstruction::updateOrCreate(
-                        ['id' => $instructionData['id']],
+            // O'lchamlarni yangilash
+            if (isset($modelData['sizes'])) {
+                foreach ($modelData['sizes'] as $sizeData) {
+                    OrderSize::updateOrCreate(
+                        ['id' => $sizeData['id'] ?? null],
                         [
-                            'order_id'    => $order->id,
-                            'title'       => $instructionData['title'],
-                            'description' => $instructionData['description'],
+                            'order_model_id' => $orderModel->id,
+                            'size_id'        => $sizeData['size_id'],
+                            'quantity'       => $sizeData['quantity'],
                         ]
                     );
-                } else {
-                    OrderInstruction::create([
+                }
+            }
+        }
+
+        // Instructions yangilash
+        if ($request->has('instructions')) {
+            foreach ($request->input('instructions') as $instructionData) {
+                OrderInstruction::updateOrCreate(
+                    ['id' => $instructionData['id'] ?? null],
+                    [
                         'order_id'    => $order->id,
                         'title'       => $instructionData['title'],
                         'description' => $instructionData['description'],
-                    ]);
-                }
+                    ]
+                );
             }
         }
 
+        // Recipes yangilash
         if ($request->has('recipes')) {
             foreach ($request->input('recipes') as $recipeData) {
-                if (isset($recipeData['id'])) {
-                    OrderRecipes::updateOrCreate(
-                        ['id' => $recipeData['id']],
-                        [
-                            'order_id'   => $order->id,
-                            'item_id'    => $recipeData['item_id'],
-                            'quantity'   => $recipeData['quantity'],
-                            'submodel_id'=> $recipeData['submodel_id'],
-                        ]
-                    );
-                } else {
-                    OrderRecipes::create([
-                        'order_id'    => $order->id,
-                        'item_id'     => $recipeData['item_id'],
-                        'quantity'    => $recipeData['quantity'],
-                        'submodel_id' => $recipeData['submodel_id'],
-                    ]);
-                }
-            }
-        }
-
-        if ($request->has('order_sizes')) {
-            foreach ($request->input('order_sizes') as $orderSizeData) {
-                if (isset($orderSizeData['id'])) {
-                    OrderSize::updateOrCreate(
-                        ['id' => $orderSizeData['id']],
-                        [
-                            'order_model_id' => isset($orderModel) ? $orderModel->id : ($order->orderModel->id ?? null),
-                            'size_id'        => $orderSizeData['size_id'],
-                            'quantity'       => $orderSizeData['quantity'] ?? 0,
-                        ]
-                    );
-                } else {
-                    OrderSize::create([
-                        'order_model_id' => isset($orderModel) ? $orderModel->id : ($order->orderModel->id ?? null),
-                        'size_id'        => $orderSizeData['size_id'],
-                        'quantity'       => $orderSizeData['quantity'] ?? 0,
-                    ]);
-                }
+                OrderRecipes::updateOrCreate(
+                    ['id' => $recipeData['id'] ?? null],
+                    [
+                        'order_id'   => $order->id,
+                        'item_id'    => $recipeData['item_id'],
+                        'quantity'   => $recipeData['quantity'],
+                        'submodel_id'=> $recipeData['submodel_id'],
+                    ]
+                );
             }
         }
 
@@ -315,7 +287,6 @@ class OrderController extends Controller
             'order'   => $order->fresh(),
         ]);
     }
-
 
     public function delete(Order $order): \Illuminate\Http\JsonResponse
     {
