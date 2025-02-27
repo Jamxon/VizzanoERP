@@ -274,6 +274,8 @@ class OrderController extends Controller
         }
 
 
+
+
         // **7. Recipes yangilash**
         if ($request->has('recipes')) {
             $recipes = collect($request->input('recipes'));
@@ -291,6 +293,7 @@ class OrderController extends Controller
             OrderRecipes::whereIn('id', $recipesToDelete)->delete();
 
             // 4. Yangi yoki mavjud bo‘lganlarni yangilash yoki yaratish
+            dd($recipes);
             foreach ($recipes as $recipeData) {
                 // 4.1 ID null bo‘lsa, yangi `recipe` yaratish
                $orderRecipe = OrderRecipes::find($recipeData['id']);
