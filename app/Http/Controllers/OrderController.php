@@ -174,7 +174,6 @@ class OrderController extends Controller
             'recipes' => 'sometimes|array',
         ]);
 
-        // **1. Kontragentni yangilash yoki yaratish**
         if ($request->has('contragent_id')) {
             $contragent = Contragent::find($request->contragent_id);
         } elseif ($request->hasAny(['contragent_name'])) {
@@ -184,7 +183,6 @@ class OrderController extends Controller
             );
         }
 
-        // **2. Orderni yangilash**
         $order->update([
             'name' => $request->input('name', $order->name),
             'quantity' => $request->input('quantity', $order->quantity),
@@ -196,7 +194,6 @@ class OrderController extends Controller
             'price' => $request->input('price', $order->price) ?? $order->price,
         ]);
 
-        // **3. Modelni yangilash**
         if ($request->has('model')) {
             $modelData = $request->input('model');
 
@@ -209,9 +206,7 @@ class OrderController extends Controller
                 ]
             );
 
-            // **5. O'lchamlarni yangilash**
             if (isset($modelData['sizes'])) {
-                // Yangilash yoki yaratish
                 foreach ($modelData['sizes'] as $sizeData) {
                     $orderSize = OrderSize::where('size_id', $sizeData['id'])
                         ->where('order_model_id', $orderModel->id)
@@ -232,35 +227,27 @@ class OrderController extends Controller
             }
         }
 
-        // **6. Instructions yangilash**
         if ($request->has('instructions')) {
-            // 1. Requestdan kelgan IDlarni olish (null larni chiqarib tashlaymiz)
             $requestInstructionIds = collect($request->input('instructions'))
                 ->where('id', '!=', null)
                 ->pluck('id')
-                ->filter() // null qiymatlarni chiqarib tashlaydi
+                ->filter()
                 ->toArray();
 
-            // 2. Bazadagi mavjud IDlarni olish
             $existingInstructionIds = $order->instructions->pluck('id')->toArray();
 
-            // 3. O‘chirilishi kerak bo'lgan IDlarni aniqlash
             $instructionsToDelete = array_diff($existingInstructionIds, $requestInstructionIds);
 
-            // 4. O‘chirish
             OrderInstruction::whereIn('id', $instructionsToDelete)->delete();
 
-            // 5. Yangi yoki mavjud bo'lganlarni yangilash yoki yaratish
             foreach ($request->input('instructions') as $instructionData) {
                 if (!isset($instructionData['id'])) {
-                    // ID yo‘q bo‘lsa, yangi ma’lumot yaratamiz
                     OrderInstruction::create([
                         'order_id'    => $order->id,
                         'title'       => $instructionData['title'],
                         'description' => $instructionData['description'],
                     ]);
                 } else {
-                    // ID mavjud bo‘lsa, update yoki create
                     OrderInstruction::updateOrCreate(
                         ['id' => $instructionData['id']],
                         [
@@ -273,28 +260,19 @@ class OrderController extends Controller
             }
         }
 
-
-
-
-        // **7. Recipes yangilash**
         if ($request->has('recipes')) {
             $recipes = collect($request->input('recipes'));
 
-            // 1. Requestdan kelgan IDlarni olish (faqat mavjudlarini)
             $requestRecipeIds = $recipes->pluck('id')
                 ->where('id' !== null)
                 ->filter()->toArray();
 
-            // 2. Bazadagi mavjud IDlarni olish
             $existingRecipeIds = $order->orderRecipes->pluck('id')->toArray();
 
-            // 3. O‘chirilishi kerak bo'lganlar
             $recipesToDelete = array_diff($existingRecipeIds, $requestRecipeIds);
             OrderRecipes::whereIn('id', $recipesToDelete)->delete();
 
-            // 4. Yangi yoki mavjud bo‘lganlarni yangilash yoki yaratish
             foreach ($recipes as $recipeData) {
-                // 4.1 ID null bo‘lsa, yangi `recipe` yaratish
                $orderRecipe = OrderRecipes::find($recipeData['id']);
 
                if ($orderRecipe){
@@ -313,7 +291,6 @@ class OrderController extends Controller
                }
             }
         }
-
 
         return response()->json([
             'message' => 'Order updated successfully',
