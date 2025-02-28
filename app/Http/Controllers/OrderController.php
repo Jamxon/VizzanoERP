@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ShowOrderResource;
 use App\Models\Contragent;
-use App\Models\Materials;
 use App\Models\Models;
 use App\Models\Order;
 use App\Models\OrderInstruction;
@@ -12,7 +11,6 @@ use App\Models\OrderModel;
 use App\Models\OrderRecipes;
 use App\Models\OrderSize;
 use App\Models\OrderSubModel;
-use App\Models\Recipe;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
