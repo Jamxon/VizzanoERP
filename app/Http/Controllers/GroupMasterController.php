@@ -193,7 +193,7 @@ class GroupMasterController extends Controller
         $categoryId = $request->category_id;
 
         $order = Order::find($orderId)
-            ->whareHas('orderCuts', function ($q) use ($categoryId) {
+            ->whereHas('orderCuts', function ($q) use ($categoryId) {
                 $q->where('specification_category_id', $categoryId);
             })
             ->with(
