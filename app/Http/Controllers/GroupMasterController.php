@@ -194,6 +194,11 @@ class GroupMasterController extends Controller
 
         $orderCut = OrderCut::where('order_id', $orderId)
             ->where('specification_category_id', $categoryId)
+            ->with(
+                'category',
+                'user',
+                'order'
+            )
             ->get();
 
         if (!$orderCut) {
