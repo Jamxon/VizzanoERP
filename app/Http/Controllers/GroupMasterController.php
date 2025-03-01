@@ -198,6 +198,8 @@ class GroupMasterController extends Controller
             })
             ->with(
                 'orderCuts',
+                'orderCuts.category',
+                'orderCuts.user'
             )
             ->get();
 
