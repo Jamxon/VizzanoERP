@@ -201,7 +201,7 @@ class GroupMasterController extends Controller
                 'orderCuts.category',
                 'orderCuts.user'
             )
-            ->get();
+            ->first();
 
         if (!$order) {
             return response()->json(['message' => 'Order cut not found'], 404);
