@@ -83,4 +83,9 @@ class Order extends Model
     {
         return $this->hasOne(OrderPrintingTimes::class, 'order_id');
     }
+
+    public function orderCuts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderCut::class, 'order_id');
+    }
 }
