@@ -33,7 +33,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
     Route::post('sewingOutputs',[\App\Http\Controllers\GroupMasterController::class, 'SewingOutputsStore']);
     Route::get('orderCuts',[\App\Http\Controllers\GroupMasterController::class, 'getOrderCuts']);
     Route::get('orderCuts/show',[\App\Http\Controllers\GroupMasterController::class, 'showOrderCuts']);
-    Route::post('orderCuts',[\App\Http\Controllers\GroupMasterController::class, 'receiveOrderCut']);
+    Route::post('orderCuts/{id}',[\App\Http\Controllers\GroupMasterController::class, 'receiveOrderCut']);
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
