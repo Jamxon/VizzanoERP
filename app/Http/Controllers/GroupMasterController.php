@@ -192,20 +192,20 @@ class GroupMasterController extends Controller
         $orderId = $request->order_id;
         $categoryId = $request->category_id;
 
-        $orderCut = OrderCut::where('order_id', $orderId)
-            ->where('specification_category_id', $categoryId)
+        $order = Order::find($orderId)
+            ->whareHas('orderCuts', function ($q) use ($categoryId) {
+                $q->where('specification_category_id', $categoryId);
+            })
             ->with(
-                'category',
-                'user',
-                'order'
+                'orderCuts',
             )
             ->get();
 
-        if (!$orderCut) {
+        if (!$order) {
             return response()->json(['message' => 'Order cut not found'], 404);
         }
 
-        return response()->json($orderCut);
+        return response()->json($order);
     }
 
     public function getOrderCuts(): \Illuminate\Http\JsonResponse
