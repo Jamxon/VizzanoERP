@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static where(string $string, mixed $status)
  * @method static create(array $array)
  * @method orderSizes()
+ * @method static orderBy(string $string, string $string1)
  */
 class Order extends Model
 {
