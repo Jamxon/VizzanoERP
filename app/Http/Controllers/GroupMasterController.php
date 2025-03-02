@@ -228,7 +228,7 @@ class GroupMasterController extends Controller
 
     public function receiveOrderCut($id)
     {
-     return   $orderCut = OrderCut::find($id);
+        $orderCut = OrderCut::find($id);
 
         if (!$orderCut) {
             return response()->json(['message' => 'Order cut not found'], 404);
