@@ -21,6 +21,7 @@ class OrderCut extends Model
         'user_id',
         'cut_at',
         'quantity',
+        'status',
     ];
 
     protected $hidden = [
