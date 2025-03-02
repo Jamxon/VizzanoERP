@@ -226,7 +226,7 @@ class GroupMasterController extends Controller
         return response()->json($orderCuts);
     }
 
-    public function receiveOrderCut($id)
+    public function receiveOrderCut($id): \Illuminate\Http\JsonResponse
     {
         $orderCut = OrderCut::find($id);
 
@@ -240,7 +240,8 @@ class GroupMasterController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Order cut received successfully'
+            'message' => 'Order cut received successfully',
+            'order_cut' => $orderCut
         ]);
     }
 }
