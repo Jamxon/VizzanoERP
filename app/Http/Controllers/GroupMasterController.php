@@ -226,7 +226,7 @@ class GroupMasterController extends Controller
         return response()->json($orderCuts);
     }
 
-    public function receiveOrderCut($id): \Illuminate\Http\JsonResponse
+    public function receiveOrderCut($id)
     {
      return   $orderCut = OrderCut::find($id);
 
