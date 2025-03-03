@@ -27,6 +27,7 @@ Route::prefix('qualityController')->middleware('role:qualityController')->group(
     Route::get('orders',[QualityController::class, 'getOrders']);
     Route::get('orders/{id}',[QualityController::class, 'showOrder']);
     Route::post('qualityDescription',[QualityController::class, 'qualityDescriptionStore']);
+    Route::get('qualityDescription',[QualityController::class, 'getQualityDescription']);
 });
 
 Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
