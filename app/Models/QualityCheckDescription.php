@@ -16,7 +16,7 @@ class QualityCheckDescription extends Model
 
     protected $fillable = [
         'quality_check_id',
-        'quality_check_description_id',
+        'quality_description_id',
     ];
 
     public function quality_check(): \Illuminate\Database\Eloquent\Relations\BelongsTo
