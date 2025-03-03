@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('qualityController')->middleware('role:qualityController')->group(function () {
     Route::get('orders',[QualityController::class, 'getOrders']);
     Route::get('orders/{id}',[QualityController::class, 'showOrder']);
+    Route::post('qualityDescription',[QualityController::class, 'qualityDescriptionStore']);
 });
 
 Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
