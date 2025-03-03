@@ -83,7 +83,6 @@ class QualityController extends Controller
             'status' => 'required|boolean',
             'comment' => 'nullable|string',
             'descriptions' => 'nullable|array',
-            'descriptions.*.id' => 'required|integer|exists:quality_descriptions,id',
         ])->validate();
 
         $imageName = null;
