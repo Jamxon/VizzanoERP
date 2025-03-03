@@ -71,41 +71,41 @@ class QualityController extends Controller
 
     public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
     {
+        $data = json_decode($request->input('data'), true);
 
-        $request->validate([
-            'order_sub_model_id' => 'required|integer|exists:order_sub_models,id',
-            'status' => 'required|boolean',
+        if (!$data) {
+            return response()->json(['error' => 'Invalid JSON data'], 400);
+        }
+
+        $validatedData = $request->validate([
+            'data.order_sub_model_id' => 'required|integer|exists:order_sub_models,id',
+            'data.status' => 'required|boolean',
+            'data.comment' => 'nullable|string',
+            'data.descriptions' => 'nullable|array',
+            'data.descriptions.*.id' => 'required|integer|exists:quality_descriptions,id',
         ]);
 
-
-        if ($request->has('image')) {
-            $request->validate([
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ]);
+        $imageName = null;
+        if ($request->hasFile('image')) {
             $image = $request->file('image');
-            $imageName = time() . '.' . $image->extension();
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('images'), $imageName);
         }
 
-        $qualityCheck = QualityCheck::create(
-            [
-                'order_sub_model_id' => $request->order_sub_model_id,
-                'status' => $request->status,
-                'image' => $imageName ?? null,
-                'user_id' => auth()->user()->id,
-                'comment' => $request->comment ?? null,
-            ]
-        );
+        $qualityCheck = QualityCheck::create([
+            'order_sub_model_id' => $validatedData['order_sub_model_id'],
+            'status' => $validatedData['status'],
+            'image' => $imageName ?? null,
+            'user_id' => auth()->user()->id,
+            'comment' => $validatedData['comment'] ?? null,
+        ]);
 
-
-        if ($qualityCheck->status === false){
-            foreach ($request->descriptions as $description) {
-                QualityCheckDescription::create(
-                    [
-                        'quality_check_id' => $qualityCheck->id,
-                        'quality_description_id' => $description['id'],
-                    ]
-                );
+        if ($qualityCheck->status === false && !empty($validatedData['descriptions'])) {
+            foreach ($validatedData['descriptions'] as $description) {
+                QualityCheckDescription::create([
+                    'quality_check_id' => $qualityCheck->id,
+                    'quality_description_id' => $description['id'],
+                ]);
             }
         }
 
