@@ -112,6 +112,3 @@ class QualityController extends Controller
         return response()->json($qualityCheck);
     }
 }
-
-
-
