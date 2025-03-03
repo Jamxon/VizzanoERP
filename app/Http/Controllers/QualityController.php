@@ -7,6 +7,7 @@ use App\Models\QualityCheck;
 use App\Models\QualityCheckDescription;
 use App\Models\QualityDescription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class QualityController extends Controller
 {
@@ -77,12 +78,13 @@ class QualityController extends Controller
             return response()->json(['error' => 'Invalid JSON data'], 400);
         }
 
-        $validatedData = $request->validate([
-            'data.order_sub_model_id' => 'required|integer|exists:order_sub_models,id',
-            'data.status' => 'required|boolean',
-            'data.comment' => 'nullable|string',
-            'data.descriptions' => 'nullable|array'
-        ]);
+        $validatedData = Validator::make($data, [
+            'order_sub_model_id' => 'required|integer|exists:order_sub_models,id',
+            'status' => 'required|boolean',
+            'comment' => 'nullable|string',
+            'descriptions' => 'nullable|array',
+            'descriptions.*.id' => 'required|integer|exists:quality_descriptions,id',
+        ])->validate();
 
         $imageName = null;
         if ($request->hasFile('image')) {
