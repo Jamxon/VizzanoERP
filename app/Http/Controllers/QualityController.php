@@ -42,6 +42,11 @@ class QualityController extends Controller
 
     public function qualityDescriptionStore(Request $request): \Illuminate\Http\JsonResponse
     {
+
+        $request->validate([
+            'description' => 'required|string',
+        ]);
+
         $qualityDescription = QualityDescription::create(
             [
                 'description' => $request->description,
