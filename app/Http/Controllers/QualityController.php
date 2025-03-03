@@ -97,6 +97,7 @@ class QualityController extends Controller
             ]
         );
 
+        
         if ($qualityCheck->status === false){
             foreach ($request->descriptions as $description) {
                 QualityCheckDescription::create(
