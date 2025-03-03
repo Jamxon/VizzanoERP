@@ -12,7 +12,7 @@ class QualityCheckDescription extends Model
 {
     use HasFactory;
 
-    protected $table = 'quality_checks_description';
+    protected $table = 'quality_checks_descriptions';
 
     protected $fillable = [
         'quality_check_id',
