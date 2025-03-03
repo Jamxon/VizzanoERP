@@ -81,8 +81,7 @@ class QualityController extends Controller
             'data.order_sub_model_id' => 'required|integer|exists:order_sub_models,id',
             'data.status' => 'required|boolean',
             'data.comment' => 'nullable|string',
-            'data.descriptions' => 'nullable|array',
-            'data.descriptions.*.id' => 'required|integer|exists:quality_descriptions,id',
+            'data.descriptions' => 'nullable|array'
         ]);
 
         $imageName = null;
