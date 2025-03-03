@@ -30,32 +30,32 @@ class Item extends Model
         'type_id'
     ];
 
-    public function orders()
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderModel::class, 'material_id', 'id');
     }
 
-    public function unit()
+    public function unit(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Unit::class);
     }
 
-    public function color()
+    public function color(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Color::class);
     }
 
-    public function recipes()
+    public function recipes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Recipe::class);
     }
 
-    public function type()
+    public function type(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ItemType::class, 'type_id');
     }
 
-    public function stok()
+    public function stok(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(Stok::class, 'product_id');
     }

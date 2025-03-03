@@ -24,12 +24,12 @@ class OrderSize extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'order_model_id', 'size_id'];
 
-    public function orderModel()
+    public function orderModel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(OrderModel::class, 'order_model_id');
     }
 
-    public function size()
+    public function size(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Size::class, 'size_id');
     }

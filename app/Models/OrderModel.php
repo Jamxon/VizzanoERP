@@ -23,22 +23,22 @@ class OrderModel extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id','material_id'];
 
-    public function order()
+    public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id');
     }
 
-    public function sizes()
+    public function sizes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderSize::class, 'order_model_id');
     }
 
-    public function material()
+    public function material(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Item::class, 'material_id', 'id');
     }
 
-    public function model()
+    public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Models::class);
     }
