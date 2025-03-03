@@ -7,10 +7,9 @@ use Illuminate\Http\Request;
 
 class QualityController extends Controller
 {
-    public function getOrders()
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('status' , 'tailoring')
-            ->where('status' , 'tailored')
+        $orders = Order::where('status' , $request->status)
             ->orderBy('updated_at', 'desc')
             ->with(
                 'orderModel',
