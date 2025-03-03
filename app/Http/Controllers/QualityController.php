@@ -69,7 +69,7 @@ class QualityController extends Controller
 
     }
 
-    public function qualtiyCheckStore(Request $request): \Illuminate\Http\JsonResponse
+    public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
     {
 
         $request->validate([
