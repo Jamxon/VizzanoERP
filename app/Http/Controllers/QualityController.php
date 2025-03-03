@@ -62,6 +62,6 @@ class QualityController extends Controller
         $qualityDescriptions = QualityDescription::where('user_id', auth()->user()->id)
             ->where('created_at', now()->toDateString())
             ->get();
-        return response()->json(now()->toDateString());
+        return response()->json($qualityDescriptions);
     }
 }
