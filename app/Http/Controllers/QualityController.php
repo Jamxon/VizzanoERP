@@ -23,4 +23,19 @@ class QualityController extends Controller
 
         return response()->json($orders);
     }
+
+    public function showOrder($id): \Illuminate\Http\JsonResponse
+    {
+        $order = Order::find($id);
+        $order->load(
+            'orderModel',
+            'orderModel.model',
+            'orderModel.sizes.size',
+            'orderModel.material',
+            'orderModel.submodels.submodel',
+            'orderModel.submodels.group.group',
+        );
+
+        return response()->json($order);
+    }
 }
