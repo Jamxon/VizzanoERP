@@ -104,7 +104,7 @@ class QualityController extends Controller
             foreach ($validatedData['descriptions'] as $description) {
                 QualityCheckDescription::create([
                     'quality_check_id' => $qualityCheck->id,
-                    'quality_description_id' => $description['id'],
+                    'quality_description_id' => $description,
                 ]);
             }
         }
