@@ -11,6 +11,7 @@ use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderImportController;
+use App\Http\Controllers\QualityController;
 use App\Http\Controllers\RazryadController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SubModelController;
@@ -21,6 +22,10 @@ use App\Http\Controllers\VizzanoReportTvController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('qualityController')->middleware('role:qualityController')->group(function () {
+    Route::get('orders',[QualityController::class, 'getOrders']);
+});
 
 Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
    Route::get('orders',[\App\Http\Controllers\GroupMasterController::class, 'getOrders']);
