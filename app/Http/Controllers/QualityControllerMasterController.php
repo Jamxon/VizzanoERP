@@ -13,7 +13,9 @@ class QualityControllerMasterController extends Controller
         $department = Department::where('responsible_user_id', auth()->id())->first();
         $groups = $department->groups;
         $employees = $groups->map(function ($group) {
-            return $group->employees;
+            return $group->employees->map(function ($employee) {;
+                return $employee->user;
+            });
         })->flatten();
 
         $qualityChecks = QualityCheck::whereIn('user_id', $employees->pluck('id'))
