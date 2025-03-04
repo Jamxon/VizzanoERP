@@ -25,7 +25,7 @@ use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMaster')->group(function () {
-    Route::get('result', [QualityControllerMasterController::class, 'result']);
+    Route::get('results', [QualityControllerMasterController::class, 'results']);
 });
 
 Route::prefix('qualityController')->middleware('role:qualityController')->group(function () {
