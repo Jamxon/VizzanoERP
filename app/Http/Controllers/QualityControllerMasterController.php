@@ -15,6 +15,7 @@ class QualityControllerMasterController extends Controller
     {
         $date = $request->input('date') ?? now();
         $department = Department::where('responsible_user_id', auth()->id())->first();
+
         if (!$department) {
             return response()->json(['error' => 'Department not found'], 404);
         }
@@ -23,8 +24,8 @@ class QualityControllerMasterController extends Controller
             ->flatMap(fn($group) => $group->employees->map(fn($employee) => $employee->user->id));
 
         $orderSubModels = OrderSubModel::whereHas('qualityChecks', function ($query) use ($date, $employees) {
-            $query->whereIn('user_id', $employees);
-            $query->whereDate('created_at', $date);
+            $query->whereIn('user_id', $employees)
+                ->whereDate('created_at', $date);
         })
             ->with([
                 'submodel',
@@ -34,11 +35,21 @@ class QualityControllerMasterController extends Controller
                     $query->selectRaw('order_sub_model_id, status, COUNT(*) as count')
                         ->whereDate('created_at', now())
                         ->groupBy('order_sub_model_id', 'status');
-                }
+                },
+                'qualityChecks.qualityDescriptions' // Pivot orqali bog‘langan description'lar
             ])
             ->get()
             ->map(function ($orderSubModel) {
                 $counts = $orderSubModel->qualityChecks->pluck('count', 'status');
+
+                // QualityCheck status false (0) bo'lsa, description'lar bo'yicha guruhlash
+                $descriptionCounts = $orderSubModel->qualityChecks
+                    ->where('status', false)
+                    ->flatMap(fn($check) => $check->qualityDescriptions)
+                    ->groupBy('id')
+                    ->map(fn($desc) => ['id' => $desc->first()->id, 'name' => $desc->first()->name, 'count' => $desc->count()])
+                    ->values();
+
                 return [
                     'id' => $orderSubModel->id,
                     'submodel' => $orderSubModel->submodel,
@@ -46,11 +57,13 @@ class QualityControllerMasterController extends Controller
                     'model' => $orderSubModel->orderModel->model ?? null,
                     'qualityChecksTrue' => $counts[1] ?? 0,
                     'qualityChecksFalse' => $counts[0] ?? 0,
+                    'descriptions' => $descriptionCounts, // Tanlangan descriptionlar va soni
                 ];
             });
 
         return response()->json($orderSubModels);
     }
+
 
     public function fasteningOrderToGroup(Request $request): \Illuminate\Http\JsonResponse
     {
