@@ -5,9 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @method static create(array $array)
- */
 class QualityCheckDescription extends Model
 {
     use HasFactory;
@@ -19,13 +16,13 @@ class QualityCheckDescription extends Model
         'quality_description_id',
     ];
 
-    public function quality_check(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function qualityCheck(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(QualityCheck::class);
+        return $this->belongsTo(QualityCheck::class, 'quality_check_id');
     }
 
-    public function quality_description(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function qualityDescription(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(QualityDescription::class);
+        return $this->belongsTo(QualityDescription::class, 'quality_description_id');
     }
 }
