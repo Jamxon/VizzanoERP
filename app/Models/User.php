@@ -52,4 +52,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(Warehouse::class, 'warehouses_related_users', 'user_id', 'warehouse_id');
     }
+
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'responsible_user_id');
+    }
 }
