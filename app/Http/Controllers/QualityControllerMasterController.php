@@ -39,6 +39,8 @@ class QualityControllerMasterController extends Controller
                 return [
                     'id' => $orderSubModel->id,
                     'submodel' => $orderSubModel->submodel,
+                    'order' => $orderSubModel->orderModel->order ?? null,
+                    'model' => $orderSubModel->orderModel->model ?? null,
                     'qualityChecksTrue' => $counts[1] ?? 0,
                     'qualityChecksFalse' => $counts[0] ?? 0,
                 ];
