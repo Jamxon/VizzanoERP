@@ -72,7 +72,7 @@ class QualityController extends Controller
 
     public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = $request->input('data');
+        $data = json_decode($request->input('data'), true);
 
         if (!$data) {
             return response()->json(['error' => 'Invalid JSON data'], 400);
