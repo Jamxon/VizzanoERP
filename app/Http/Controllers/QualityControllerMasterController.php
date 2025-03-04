@@ -9,8 +9,9 @@ use Illuminate\Http\Request;
 
 class QualityControllerMasterController extends Controller
 {
-    public function results(): \Illuminate\Http\JsonResponse
+    public function results(Request $request): \Illuminate\Http\JsonResponse
     {
+        $date = $request->input('date') ?? now();
         $department = Department::where('responsible_user_id', auth()->id())->first();
         if (!$department) {
             return response()->json(['error' => 'Department not found'], 404);
@@ -19,9 +20,9 @@ class QualityControllerMasterController extends Controller
         $employees = $department->groups
             ->flatMap(fn($group) => $group->employees->map(fn($employee) => $employee->user->id));
 
-        $orderSubModels = OrderSubModel::whereHas('qualityChecks', function ($query) use ($employees) {
+        $orderSubModels = OrderSubModel::whereHas('qualityChecks', function ($query) use ($date, $employees) {
             $query->whereIn('user_id', $employees);
-            $query->whereDate('created_at', now());
+            $query->whereDate('created_at', $date);
         })
             ->with([
                 'submodel',
