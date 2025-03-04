@@ -28,9 +28,9 @@ class QualityDescription extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function qualityCheckDescriptions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function qualityCheckDescriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsToMany(QualityCheck::class, 'quality_checks_descriptions', 'quality_description_id', 'quality_check_id');
+        return $this->hasMany(QualityCheckDescription::class, 'quality_description_id');
     }
 
 }
