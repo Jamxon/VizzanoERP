@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Validator;
 
 class QualityController extends Controller
 {
-    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
+    public function getOrders(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
         $groupIds = optional($user->employee->group)->pluck('id') ?? collect([]); // Agar null bo'lsa, bo'sh array olish
