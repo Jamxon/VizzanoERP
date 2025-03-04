@@ -102,4 +102,13 @@ class QualityControllerMasterController extends Controller
 
         return response()->json($orders);
     }
+
+    public function getGroups(): \Illuminate\Http\JsonResponse
+    {
+        $groups = Department::where('responsible_user_id', auth()->id())
+            ->first()
+            ->groups;
+
+        return response()->json($groups);
+    }
 }
