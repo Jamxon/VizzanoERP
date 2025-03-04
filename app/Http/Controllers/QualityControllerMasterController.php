@@ -51,10 +51,10 @@ class QualityControllerMasterController extends Controller
                 $descriptionCounts = $orderSubModel->qualityChecks
                     ->where('status', false) // Faqat statusi false bo'lganlar
                     ->flatMap(fn($check) => $check->qualityCheckDescriptions)
-                    ->groupBy('id')
+                    ->groupBy('quality_description_id')
                     ->map(fn($desc) => [
                         'id' => $desc->first()->id,
-                        'name' => $desc->first()->name,
+                        'name' => $desc->first()->qualityDescription->description,
                         'description' => $desc->first()->description, // Description maydoni
                         'count' => $desc->count(), // Har bir descriptionning soni
                     ])
