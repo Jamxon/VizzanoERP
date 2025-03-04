@@ -81,6 +81,10 @@ class QualityControllerMasterController extends Controller
             'group_id' => 'required|integer|exists:groups,id',
         ]);
 
+        $orderSubModel = OtkOrderGroup::where('order_sub_model_id', $request->order_sub_model_id)->first();
+
+        $orderSubModel->delete();
+
         $otkOrderGroup = OtkOrderGroup::create([
             'order_sub_model_id' => $request->order_sub_model_id,
             'group_id' => $request->group_id,
