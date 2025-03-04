@@ -36,7 +36,7 @@ class QualityControllerMasterController extends Controller
                         ->whereDate('created_at', now())
                         ->groupBy('order_sub_model_id', 'status');
                 },
-                'qualityChecks.qualityDescriptions' // Pivot orqali bog‘langan description'lar
+                'qualityChecks.qualityCheckDescriptions' // Pivot orqali bog‘langan description'lar
             ])
             ->get()
             ->map(function ($orderSubModel) {
