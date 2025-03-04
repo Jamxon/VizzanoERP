@@ -128,7 +128,7 @@ class QualityController extends Controller
             ->whereDate('created_at', now()->toDateString())
             ->where('order_sub_model_id', $request->order_sub_model_id)
             ->where('status', false)
-            ->get();
+            ->count();
 
         return response()->json([
             'qualityChecksTrue' => $qualityChecksTrue,
