@@ -96,7 +96,8 @@ class QualityControllerMasterController extends Controller
                 'orderModel.model',
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',
-                'orderModel.submodels.group.group'
+                'orderModel.submodels.group.group',
+                'orderModel.submodels.otkOrderGroup.group',
             )
             ->get();
 
