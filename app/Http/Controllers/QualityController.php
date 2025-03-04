@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ModelImages;
 use App\Models\Order;
 use App\Models\QualityCheck;
 use App\Models\QualityCheckDescription;
@@ -86,10 +87,12 @@ class QualityController extends Controller
         ])->validate();
 
         $imageName = null;
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $imageName);
+        if ($request->hasFile('image') && !empty($request->file('image'))) {
+                $image = $request->file('image');
+                $fileName = time() . '_' . $image->getClientOriginalName();
+                $imageName = $fileName;
+                $image->storeAs('public/images', $fileName);
+
         }
 
         $qualityCheck = QualityCheck::create([
