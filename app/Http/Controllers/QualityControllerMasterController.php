@@ -16,7 +16,7 @@ class QualityControllerMasterController extends Controller
             return $group->employees;
         })->flatten();
 
-        $qualityChecks = QualityCheck::whereIn('employee_id', $employees->pluck('id'))
+        $qualityChecks = QualityCheck::whereIn('user_id', $employees->pluck('id'))
             ->whereDate('created_at', now())
             ->get();
 
