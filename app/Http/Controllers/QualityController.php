@@ -16,7 +16,7 @@ class QualityController extends Controller
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
-        $groupIds = optional($user->groups)->pluck('id') ?? collect([]); // Agar null bo'lsa, bo'sh array olish
+        $groupIds = optional($user->employee->group)->pluck('id') ?? collect([]); // Agar null bo'lsa, bo'sh array olish
 
         if ($groupIds->isEmpty()) {
             return response()->json(['message' => 'No groups found for user'], 404);
