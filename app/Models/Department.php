@@ -49,4 +49,9 @@ class Department extends Model
     {
         $this->attributes['end_time'] = $value ? date("H:i", strtotime($value)) : null;
     }
+
+    public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'responsible_user_id');
+    }
 }

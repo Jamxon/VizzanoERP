@@ -116,7 +116,7 @@ class QualityController extends Controller
         return response()->json($qualityCheck);
     }
 
-    public function getQualityChecks(Request $request)
+    public function getQualityChecks(Request $request): \Illuminate\Http\JsonResponse
     {
         $counts = QualityCheck::where('user_id', auth()->id())
             ->whereDate('created_at', now()->toDateString())
@@ -130,6 +130,4 @@ class QualityController extends Controller
             'qualityChecksFalse' => $counts[0] ?? 0, // false status
         ]);
     }
-
-
 }
