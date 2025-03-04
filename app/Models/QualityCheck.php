@@ -39,9 +39,9 @@ class QualityCheck extends Model
         return $this->belongsTo(OrderSubModel::class);
     }
 
-    public function qualityCheckDescriptions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function qualityCheckDescriptions(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsToMany(QualityDescription::class, 'quality_checks_descriptions', 'quality_check_id', 'quality_description_id');
+        return $this->hasMany(QualityCheckDescription::class, 'quality_check_id');
     }
 
 }
