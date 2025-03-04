@@ -25,7 +25,7 @@ class QualityControllerMasterController extends Controller
 //            ->with('order_sub_model.submodel')
 //            ->get();
 
-        $orderSubModel = OrderSubModel::whereHas('qualityChecks' , function($query) use ($employees) {)
+        $orderSubModel = OrderSubModel::whereHas('qualityChecks' , function($query) use ($employees) {
             $query->whereIn('user_id', $employees->pluck('id'));
             $query->whereDate('created_at', now());
         })->get();
