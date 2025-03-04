@@ -9,29 +9,39 @@ use Illuminate\Http\Request;
 
 class QualityControllerMasterController extends Controller
 {
-    public function result()
+    public function result(): \Illuminate\Http\JsonResponse
     {
         $department = Department::where('responsible_user_id', auth()->id())->first();
-        $groups = $department->groups;
-        $employees = $groups->map(function ($group) {
-            return $group->employees->map(function ($employee) {;
-                return $employee->user;
-            });
-        })->flatten();
+        if (!$department) {
+            return response()->json(['error' => 'Department not found'], 404);
+        }
 
-//        $qualityChecks = QualityCheck::whereIn('user_id', $employees->pluck('id'))
-//            ->whereDate('created_at', now())
-//            ->orderBy('order_sub_model_id', 'ASC')
-//            ->with('order_sub_model.submodel')
-//            ->get();
+        $employees = $department->groups
+            ->flatMap(fn($group) => $group->employees->map(fn($employee) => $employee->user->id));
 
-        $orderSubModel = OrderSubModel::whereHas('qualityChecks' , function($query) use ($employees) {
-            $query->whereIn('user_id', $employees->pluck('id'));
+        $orderSubModels = OrderSubModel::whereHas('qualityChecks', function ($query) use ($employees) {
+            $query->whereIn('user_id', $employees);
             $query->whereDate('created_at', now());
         })
-            ->with('submodel', 'qualityChecks')
-            ->get();
+            ->with([
+                'submodel',
+                'qualityChecks' => function ($query) {
+                    $query->selectRaw('order_sub_model_id, status, COUNT(*) as count')
+                        ->whereDate('created_at', now())
+                        ->groupBy('order_sub_model_id', 'status');
+                }
+            ])
+            ->get()
+            ->map(function ($orderSubModel) {
+                $counts = $orderSubModel->qualityChecks->pluck('count', 'status');
+                return [
+                    'id' => $orderSubModel->id,
+                    'submodel' => $orderSubModel->submodel,
+                    'qualityChecksTrue' => $counts[1] ?? 0,
+                    'qualityChecksFalse' => $counts[0] ?? 0,
+                ];
+            });
 
-        return response()->json($orderSubModel);
+        return response()->json($orderSubModels);
     }
 }
