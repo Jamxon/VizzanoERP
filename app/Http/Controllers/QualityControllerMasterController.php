@@ -8,7 +8,7 @@ class QualityControllerMasterController extends Controller
 {
     public function result()
     {
-      return   $department = auth()->user()->department;
+      return   $department = auth()->user();
         $groups = $department->groups;
         $employees = $groups->map(function ($group) {
             return $group->employees;
