@@ -25,6 +25,7 @@ use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMaster')->group(function () {
+    Route::get('orders',[QualityControllerMasterController::class,'orders']);
     Route::get('results', [QualityControllerMasterController::class, 'results']);
     Route::post('fasteningOrderToGroup', [QualityControllerMasterController::class, 'fasteningOrderToGroup']);
 });
