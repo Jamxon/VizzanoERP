@@ -25,6 +25,8 @@ class QualityControllerMasterController extends Controller
         })
             ->with([
                 'submodel',
+                'orderModel.order',
+                'orderModel.model',
                 'qualityChecks' => function ($query) {
                     $query->selectRaw('order_sub_model_id, status, COUNT(*) as count')
                         ->whereDate('created_at', now())
