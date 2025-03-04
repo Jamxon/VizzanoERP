@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\QualityCheck;
 use Illuminate\Http\Request;
 
 class QualityControllerMasterController extends Controller
@@ -15,6 +16,10 @@ class QualityControllerMasterController extends Controller
             return $group->employees;
         })->flatten();
 
-        return response()->json($employees);
+        $qualityChecks = QualityCheck::whereIn('employee_id', $employees->pluck('id'))
+            ->whereDate('created_at', now())
+            ->get();
+
+        return response()->json($qualityChecks);
     }
 }
