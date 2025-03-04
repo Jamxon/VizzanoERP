@@ -29,7 +29,7 @@ class QualityController extends Controller
                 'orderSubModel.orderModel.sizes.size',
                 'orderSubModel.orderModel.material',
                 'orderSubModel.submodel',
-                'group.group'
+                'orderSubModel.group.group'
             ])
             ->get();
 
@@ -74,13 +74,13 @@ class QualityController extends Controller
                             'id' => $subModel->orderSubModel->submodel->id,
                             'name' => $subModel->orderSubModel->submodel->name,
                         ],
-//                        'group' => [
-//                            'id' => $subModel->group->id ?? null,
-//                            'group' => [
-//                                'id' => $subModel->group->group->id ?? null,
-//                                'name' => $subModel->group->group->name ?? null,
-//                            ],
-//                        ],
+                        'group' => [
+                            'id' => $subModel->group->id ?? null,
+                            'group' => [
+                                'id' => $subModel->group->group->id ?? null,
+                                'name' => $subModel->group->group->name ?? null,
+                            ],
+                        ],
                     ]],
                 ],
             ];
