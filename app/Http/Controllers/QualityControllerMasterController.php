@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Order;
 use App\Models\OrderSubModel;
 use App\Models\OtkOrderGroup;
 use App\Models\QualityCheck;
@@ -65,5 +66,19 @@ class QualityControllerMasterController extends Controller
         ]);
 
         return response()->json($otkOrderGroup);
+    }
+
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $orders = Order::where('status', $request->status)
+            ->with(
+                'orderModel.model',
+                'orderModel.orderSubModels.submodel',
+                'orderModel.orderSubModels.sizes.size',
+                'orderModel.orderSubModels.group.group'
+            )
+            ->get();
+
+        return response()->json($orders);
     }
 }
