@@ -92,32 +92,30 @@ class QualityControllerMasterController extends Controller
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('status', $request->status)
-            ->with(
+            ->with([
                 'orderModel.model',
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',
-                'orderModel.submodels.otkOrderGroup.group'
-            )
+                'orderModel.submodels.otkOrderGroup.group',
+            ])
             ->get()
             ->map(function ($order) {
                 return [
                     'id' => $order->id,
                     'name' => $order->name,
                     'status' => $order->status,
-                    'orderModel' => $order->orderModel->map(function ($orderModel) {
-                        return [
-                            'id' => $orderModel->id,
-                            'model' => $orderModel->model,
-                            'submodels' => $orderModel->submodels->map(function ($submodel) {
-                                return [
-                                    'id' => $submodel->id,
-                                    'submodel' => $submodel->submodel,
-                                    'group' => $submodel->otkOrderGroup->group ?? null, // otkOrderGroup ni otk_group deb o'zgartiramiz
-                                ];
-                            }),
-                            'sizes' => $orderModel->sizes->map(fn($size) => $size->size),
-                        ];
-                    }),
+                    'orderModel' => $order->orderModel ? [
+                        'id' => $order->orderModel->id,
+                        'model' => $order->orderModel->model,
+                        'submodels' => $order->orderModel->submodels->map(function ($submodel) {
+                            return [
+                                'id' => $submodel->id,
+                                'submodel' => $submodel->submodel,
+                                'otk_group' => $submodel->otkOrderGroup->group ?? null, // **otkOrderGroup ni otk_group ga o'zgartiramiz**
+                            ];
+                        }),
+                        'sizes' => $order->orderModel->sizes->map(fn($size) => $size->size),
+                    ] : null,
                 ];
             });
 
