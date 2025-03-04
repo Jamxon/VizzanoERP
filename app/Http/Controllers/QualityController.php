@@ -92,7 +92,7 @@ class QualityController extends Controller
                 $fileName = time() . '_' . $image->getClientOriginalName();
                  //full path to image
                 $imageName = "/storage/images/" . $fileName;
-                $image->storeAs($fileName);
+                $image->storeAs("images" . $fileName);
 
         }
 
