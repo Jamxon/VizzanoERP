@@ -74,7 +74,7 @@ class QualityControllerMasterController extends Controller
             ->with(
                 'orderModel.model',
                 'orderModel.submodels.submodel',
-                'orderModel.submodels.sizes.size',
+                'orderModel.sizes.size',
                 'orderModel.submodels.group.group'
             )
             ->get();
