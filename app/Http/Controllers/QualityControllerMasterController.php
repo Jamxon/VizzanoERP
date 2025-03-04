@@ -6,9 +6,9 @@ use Illuminate\Http\Request;
 
 class QualityControllerMasterController extends Controller
 {
-    public function result(): \Illuminate\Http\JsonResponse
+    public function result()
     {
-        $department = auth()->user()->department;
+      return   $department = auth()->user()->department;
         $groups = $department->groups;
         $employees = $groups->map(function ($group) {
             return $group->employees;
