@@ -90,8 +90,9 @@ class QualityController extends Controller
         if ($request->hasFile('image') && !empty($request->file('image'))) {
                 $image = $request->file('image');
                 $fileName = time() . '_' . $image->getClientOriginalName();
-                $imageName = $fileName;
-                $image->storeAs('public/images', $fileName);
+                 //full path to image
+                $imageName = "/storage/images/" . $fileName;
+                $image->storeAs($fileName);
 
         }
 
