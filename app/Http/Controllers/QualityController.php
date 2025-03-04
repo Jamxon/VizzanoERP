@@ -123,7 +123,7 @@ class QualityController extends Controller
             ->where('order_sub_model_id', $request->order_sub_model_id)
             ->selectRaw('SUM(CASE WHEN status = true THEN 1 ELSE 0 END) as qualityChecksTrue, 
                      SUM(CASE WHEN status = false THEN 1 ELSE 0 END) as qualityChecksFalse')
-            ->first();
+            ->get();
 
         return response()->json([
             'qualityChecksTrue' => $counts->qualityChecksTrue ?? 0,
