@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class QualityControllerMasterController extends Controller
 {
-    public function result(): \Illuminate\Http\JsonResponse
+    public function results(): \Illuminate\Http\JsonResponse
     {
         $department = Department::where('responsible_user_id', auth()->id())->first();
         if (!$department) {
