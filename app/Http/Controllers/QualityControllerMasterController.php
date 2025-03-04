@@ -54,8 +54,7 @@ class QualityControllerMasterController extends Controller
                     ->groupBy('quality_description_id')
                     ->map(fn($desc) => [
                         'id' => $desc->first()->id,
-                        'name' => $desc->first()->qualityDescription->description,
-                        'description' => $desc->first()->description, // Description maydoni
+                        'description' => $desc->first()->qualityDescription->description,
                         'count' => $desc->count(), // Har bir descriptionning soni
                     ])
                     ->values(); // Indekslarni qayta tartiblash
