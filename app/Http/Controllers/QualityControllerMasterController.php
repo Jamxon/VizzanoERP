@@ -73,9 +73,9 @@ class QualityControllerMasterController extends Controller
         $orders = Order::where('status', $request->status)
             ->with(
                 'orderModel.model',
-                'orderModel.orderSubModels.submodel',
-                'orderModel.orderSubModels.sizes.size',
-                'orderModel.orderSubModels.group.group'
+                'orderModel.submodels.submodel',
+                'orderModel.submodels.sizes.size',
+                'orderModel.submodels.group.group'
             )
             ->get();
 
