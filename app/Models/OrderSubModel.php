@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static where(string $string, $orderModelId)
  * @method static create(array $array)
  * @method static updateOrCreate(array $array, array $array1)
+ * @method static whereHas(string $string, \Closure $param)
  */
 class OrderSubModel extends Model
 {
@@ -67,5 +68,10 @@ class OrderSubModel extends Model
     public function sewingOutputs(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SewingOutputs::class, 'order_submodel_id');
+    }
+
+    public function qualityChecks(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(QualityCheck::class);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\OrderSubModel;
 use App\Models\QualityCheck;
 use Illuminate\Http\Request;
 
@@ -18,12 +19,17 @@ class QualityControllerMasterController extends Controller
             });
         })->flatten();
 
-        $qualityChecks = QualityCheck::whereIn('user_id', $employees->pluck('id'))
-            ->whereDate('created_at', now())
-            ->orderBy('order_sub_model_id', 'ASC')
-            ->with('order_sub_model.submodel')
-            ->get();
+//        $qualityChecks = QualityCheck::whereIn('user_id', $employees->pluck('id'))
+//            ->whereDate('created_at', now())
+//            ->orderBy('order_sub_model_id', 'ASC')
+//            ->with('order_sub_model.submodel')
+//            ->get();
 
-        return response()->json($qualityChecks);
+        $orderSubModel = OrderSubModel::whereHas('qualityChecks' , function($query) use ($employees) {)
+            $query->whereIn('user_id', $employees->pluck('id'));
+            $query->whereDate('created_at', now());
+        })->get();
+
+        return response()->json($orderSubModel);
     }
 }
