@@ -118,7 +118,6 @@ class QualityController extends Controller
 
     public function getQualityChecks(Request $request)
     {
-        return $request->order_sub_model_id;
         $qualityChecksTrue = QualityCheck::where('user_id', auth()->id())
             ->whereDate('created_at', now()->toDateString())
             ->where('order_sub_model_id', $request->order_sub_model_id)
