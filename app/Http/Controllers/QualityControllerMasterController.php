@@ -111,7 +111,7 @@ class QualityControllerMasterController extends Controller
                             return [
                                 'id' => $submodel->id,
                                 'submodel' => $submodel->submodel,
-                                'otk_group' => $submodel->otkOrderGroup->group ?? null, // **otkOrderGroup ni otk_group ga o'zgartiramiz**
+                                'group' => $submodel->otkOrderGroup->group ?? null, // **otkOrderGroup ni otk_group ga o'zgartiramiz**
                             ];
                         }),
                         'sizes' => $order->orderModel->sizes->map(fn($size) => $size->size),
