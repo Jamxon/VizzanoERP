@@ -116,23 +116,19 @@ class QualityController extends Controller
         return response()->json($qualityCheck);
     }
 
-    public function getQualityChecks(Request $request)
+    public function getQualityChecks(Request $request): \Illuminate\Http\JsonResponse
     {
-        $qualityChecksTrue = QualityCheck::where('user_id', auth()->id())
+        $counts = QualityCheck::where('user_id', auth()->id())
             ->whereDate('created_at', now()->toDateString())
             ->where('order_sub_model_id', $request->order_sub_model_id)
-            ->where('status', true)
-            ->count();
-
-        $qualityChecksFalse = QualityCheck::where('user_id', auth()->id())
-            ->whereDate('created_at', now()->toDateString())
-            ->where('order_sub_model_id', $request->order_sub_model_id)
-            ->where('status', false)
-            ->count();
+            ->selectRaw('SUM(CASE WHEN status = true THEN 1 ELSE 0 END) as qualityChecksTrue, 
+                     SUM(CASE WHEN status = false THEN 1 ELSE 0 END) as qualityChecksFalse')
+            ->first();
 
         return response()->json([
-            'qualityChecksTrue' => $qualityChecksTrue,
-            'qualityChecksFalse' => $qualityChecksFalse,
+            'qualityChecksTrue' => $counts->qualityChecksTrue ?? 0,
+            'qualityChecksFalse' => $counts->qualityChecksFalse ?? 0,
         ]);
     }
+
 }
