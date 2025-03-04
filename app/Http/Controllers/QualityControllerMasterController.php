@@ -21,7 +21,7 @@ class QualityControllerMasterController extends Controller
         $qualityChecks = QualityCheck::whereIn('user_id', $employees->pluck('id'))
             ->whereDate('created_at', now())
             ->orderBy('order_sub_model_id', 'ASC')
-            ->with('order_sub_model')
+            ->with('order_sub_model.submodel')
             ->get();
 
         return response()->json($qualityChecks);
