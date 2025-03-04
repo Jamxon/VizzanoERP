@@ -45,7 +45,7 @@ class QualityControllerMasterController extends Controller
                 // QualityCheck status false (0) bo'lsa, description'lar bo'yicha guruhlash
                 $descriptionCounts = $orderSubModel->qualityChecks
                     ->where('status', false)
-                    ->flatMap(fn($check) => $check->qualityDescriptions)
+                    ->flatMap(fn($check) => $check->qualityCheckDescriptions)
                     ->groupBy('id')
                     ->map(fn($desc) => ['id' => $desc->first()->id, 'name' => $desc->first()->name, 'count' => $desc->count()])
                     ->values();
