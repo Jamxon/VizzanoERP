@@ -79,13 +79,12 @@ class QualityControllerMasterController extends Controller
                     'model' => $orderSubModel->orderModel->model ?? null,
                     'qualityChecksTrue' => $counts[1] ?? 0, // Status true (1) bo'lganlar soni
                     'qualityChecksFalse' => $counts[0] ?? 0, // Status false (0) bo'lganlar soni
-                    'descriptions' => $orderSubModel->qualityChecks, // Tanlangan descriptionlar va soni
+                    'descriptions' => $descriptionCounts, // Tanlangan descriptionlar va soni
                 ];
             });
 
         return response()->json($orderSubModels);
     }
-
 
     public function fasteningOrderToGroup(Request $request): \Illuminate\Http\JsonResponse
     {
