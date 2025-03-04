@@ -104,7 +104,7 @@ class QualityControllerMasterController extends Controller
                     'id' => $order->id,
                     'name' => $order->name,
                     'status' => $order->status,
-                    'orderModel' => $order->orderModel ? [
+                    'order_model' => $order->orderModel ? [
                         'id' => $order->orderModel->id,
                         'model' => $order->orderModel->model,
                         'submodels' => $order->orderModel->submodels->map(function ($submodel) {
