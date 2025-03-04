@@ -74,4 +74,9 @@ class OrderSubModel extends Model
     {
         return $this->hasMany(QualityCheck::class);
     }
+
+    public function otkOrderGroup(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(OtkOrderGroup::class, 'order_sub_model_id');
+    }
 }

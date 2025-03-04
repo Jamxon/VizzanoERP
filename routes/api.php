@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMaster')->group(function () {
     Route::get('results', [QualityControllerMasterController::class, 'results']);
+    Route::post('fasteningOrderToGroup', [QualityControllerMasterController::class, 'fasteningOrderToGroup']);
 });
 
 Route::prefix('qualityController')->middleware('role:qualityController')->group(function () {

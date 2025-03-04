@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ModelImages;
 use App\Models\Order;
+use App\Models\OtkOrderGroup;
 use App\Models\QualityCheck;
 use App\Models\QualityCheckDescription;
 use App\Models\QualityDescription;
@@ -14,17 +15,73 @@ class QualityController extends Controller
 {
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('status' , $request->status)
-            ->orderBy('updated_at', 'desc')
-            ->with(
-                'orderModel',
-                'orderModel.model',
-                'orderModel.sizes.size',
-                'orderModel.material',
-                'orderModel.submodels.submodel',
-                'orderModel.submodels.group.group',
-            )
+        $user = auth()->user();
+        $groupIds = $user->groups->pluck('id');
+
+        // Foydalanuvchining guruhiga tegishli order submodellari
+        $otkOrderGroups = OtkOrderGroup::whereIn('group_id', $groupIds)
+            ->with([
+                'orderSubModel.orderModel.order',
+                'orderSubModel.orderModel.model',
+                'orderSubModel.orderModel.sizes.size',
+                'orderSubModel.orderModel.material',
+                'orderSubModel.submodel',
+                'group.group'
+            ])
             ->get();
+
+        // Orderlarni guruhlarga ajratib, har bir submodelni alohida order sifatida chiqarish
+        $orders = $otkOrderGroups->map(function ($subModel) {
+            $orderModel = $subModel->orderSubModel->orderModel;
+            $order = $orderModel->order;
+
+            return [
+                'id' => $order->id,
+                'name' => $order->name,
+                'quantity' => $order->quantity,
+                'status' => $order->status,
+                'start_date' => $order->start_date,
+                'end_date' => $order->end_date,
+                'rasxod' => $order->rasxod,
+                'comment' => $order->comment,
+                'price' => $order->price,
+                'order_model' => [
+                    'id' => $orderModel->id,
+                    'rasxod' => $orderModel->rasxod,
+                    'status' => $orderModel->status,
+                    'model' => [
+                        'id' => $orderModel->model->id,
+                        'name' => $orderModel->model->name,
+                        'rasxod' => $orderModel->model->rasxod,
+                    ],
+                    'sizes' => $orderModel->sizes->map(function ($size) {
+                        return [
+                            'id' => $size->id,
+                            'quantity' => $size->quantity,
+                            'size' => [
+                                'id' => $size->size->id,
+                                'name' => $size->size->name,
+                            ],
+                        ];
+                    })->values(),
+                    'material' => $orderModel->material,
+                    'submodels' => [[ // Submodelni alohida array ichida yuboramiz
+                        'id' => $subModel->orderSubModel->id,
+                        'submodel' => [
+                            'id' => $subModel->orderSubModel->submodel->id,
+                            'name' => $subModel->orderSubModel->submodel->name,
+                        ],
+                        'group' => [
+                            'id' => $subModel->group->id ?? null,
+                            'group' => [
+                                'id' => $subModel->group->group->id ?? null,
+                                'name' => $subModel->group->group->name ?? null,
+                            ],
+                        ],
+                    ]],
+                ],
+            ];
+        })->values();
 
         return response()->json($orders);
     }
