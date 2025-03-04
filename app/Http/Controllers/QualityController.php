@@ -16,7 +16,7 @@ class QualityController extends Controller
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
-        $groupIds = $user->groups->pluck('id');
+        $groupIds = $user->group->pluck('id');
 
         // Foydalanuvchining guruhiga tegishli order submodellari
         $otkOrderGroups = OtkOrderGroup::whereIn('group_id', $groupIds)
