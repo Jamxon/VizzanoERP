@@ -13,16 +13,22 @@ class QualityControllerMasterController extends Controller
 {
     public function results(Request $request): \Illuminate\Http\JsonResponse
     {
+        // Sana parametrini olish yoki hozirgi sanani ishlatish
         $date = $request->input('date') ?? now();
+
+        // Avtorizatsiyadan o'tgan foydalanuvchi uchun departmentni topish
         $department = Department::where('responsible_user_id', auth()->id())->first();
 
+        // Agar department topilmasa, xatolik qaytarish
         if (!$department) {
             return response()->json(['error' => 'Department not found'], 404);
         }
 
+        // Departmentdagi barcha guruhlarning xodimlarini olish
         $employees = $department->groups
             ->flatMap(fn($group) => $group->employees->map(fn($employee) => $employee->user->id));
 
+        // OrderSubModel ma'lumotlarini olish
         $orderSubModels = OrderSubModel::whereHas('qualityChecks', function ($query) use ($date, $employees) {
             $query->whereIn('user_id', $employees)
                 ->whereDate('created_at', $date);
@@ -31,32 +37,48 @@ class QualityControllerMasterController extends Controller
                 'submodel',
                 'orderModel.order',
                 'orderModel.model',
-                'qualityChecks' => function ($query) {
+                'qualityChecks' => function ($query) use ($date) {
                     $query->selectRaw('order_sub_model_id, status, COUNT(*) as count')
-                        ->whereDate('created_at', now())
+                        ->whereDate('created_at', $date) // Sana parametri bilan ishlash
                         ->groupBy('order_sub_model_id', 'status');
                 },
-                'qualityChecks.qualityCheckDescriptions' // Pivot orqali bog‘langan description'lar
+                'qualityChecks.qualityCheckDescriptions' // Pivot orqali bog'langan description'lar
             ])
             ->get()
             ->map(function ($orderSubModel) {
+                // QualityCheck statuslari bo'yicha hisoblash
                 $counts = $orderSubModel->qualityChecks->pluck('count', 'status');
 
                 // QualityCheck status false (0) bo'lsa, description'lar bo'yicha guruhlash
                 $descriptionCounts = $orderSubModel->qualityChecks
-                    ->where('status', false)
-                    ->flatMap(fn($check) => $check->qualityCheckDescriptions)
-                    ->groupBy('id')
-                    ->map(fn($desc) => ['id' => $desc->first()->id, 'name' => $desc->first()->name, 'count' => $desc->count()])
-                    ->values();
+                    ->where('status', false) // Faqat statusi false bo'lganlar
+                    ->flatMap(function ($check) {
+                        return $check->qualityCheckDescriptions->map(function ($description) {
+                            return [
+                                'id' => $description->id,
+                                'name' => $description->name,
+                                'description' => $description->description, // description maydoni
+                            ];
+                        });
+                    })
+                    ->groupBy('id') // ID bo'yicha guruhlash
+                    ->map(function ($desc) {
+                        return [
+                            'id' => $desc->first()['id'],
+                            'name' => $desc->first()['name'],
+                            'description' => $desc->first()['description'], // description maydoni
+                            'count' => $desc->count(), // Har bir descriptionning soni
+                        ];
+                    })
+                    ->values(); // Indekslarni qayta tartiblash
 
                 return [
                     'id' => $orderSubModel->id,
                     'submodel' => $orderSubModel->submodel,
                     'order' => $orderSubModel->orderModel->order ?? null,
                     'model' => $orderSubModel->orderModel->model ?? null,
-                    'qualityChecksTrue' => $counts[1] ?? 0,
-                    'qualityChecksFalse' => $counts[0] ?? 0,
+                    'qualityChecksTrue' => $counts[1] ?? 0, // Status true (1) bo'lganlar soni
+                    'qualityChecksFalse' => $counts[0] ?? 0, // Status false (0) bo'lganlar soni
                     'descriptions' => $descriptionCounts, // Tanlangan descriptionlar va soni
                 ];
             });
