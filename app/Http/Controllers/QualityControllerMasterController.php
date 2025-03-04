@@ -13,22 +13,16 @@ class QualityControllerMasterController extends Controller
 {
     public function results(Request $request): \Illuminate\Http\JsonResponse
     {
-        // Sana parametrini olish yoki hozirgi sanani ishlatish
         $date = $request->input('date') ?? now();
-
-        // Avtorizatsiyadan o'tgan foydalanuvchi uchun departmentni topish
         $department = Department::where('responsible_user_id', auth()->id())->first();
 
-        // Agar department topilmasa, xatolik qaytarish
         if (!$department) {
             return response()->json(['error' => 'Department not found'], 404);
         }
 
-        // Departmentdagi barcha guruhlarning xodimlarini olish
         $employees = $department->groups
             ->flatMap(fn($group) => $group->employees->map(fn($employee) => $employee->user->id));
 
-        // OrderSubModel ma'lumotlarini olish
         $orderSubModels = OrderSubModel::whereHas('qualityChecks', function ($query) use ($date, $employees) {
             $query->whereIn('user_id', $employees)
                 ->whereDate('created_at', $date);
@@ -38,38 +32,25 @@ class QualityControllerMasterController extends Controller
                 'orderModel.order',
                 'orderModel.model',
                 'qualityChecks' => function ($query) use ($date) {
-                    $query->selectRaw('order_sub_model_id, status, COUNT(*) as count')
-                        ->whereDate('created_at', $date) // Sana parametri bilan ishlash
-                        ->groupBy('order_sub_model_id', 'status');
-                },
-                'qualityChecks.qualityCheckDescriptions' // Pivot orqali bog'langan description'lar
+                    $query->whereDate('created_at', $date)
+                        ->with('qualityCheckDescriptions'); // Muhim: description'larni olish!
+                }
             ])
             ->get()
             ->map(function ($orderSubModel) {
-                // QualityCheck statuslari bo'yicha hisoblash
                 $counts = $orderSubModel->qualityChecks->pluck('count', 'status');
 
-                // QualityCheck status false (0) bo'lsa, description'lar bo'yicha guruhlash
+                // Status false (0) bo'lgan barcha `qualityCheckDescriptions`ni yig‘ish
                 $descriptionCounts = $orderSubModel->qualityChecks
                     ->where('status', false) // Faqat statusi false bo'lganlar
-                    ->flatMap(function ($check) {
-                        return $check->qualityCheckDescriptions->map(function ($description) {
-                            return [
-                                'id' => $description->id,
-                                'name' => $description->name,
-                                'description' => $description->description, // description maydoni
-                            ];
-                        });
-                    })
-                    ->groupBy('id') // ID bo'yicha guruhlash
-                    ->map(function ($desc) {
-                        return [
-                            'id' => $desc->first()['id'],
-                            'name' => $desc->first()['name'],
-                            'description' => $desc->first()['description'], // description maydoni
-                            'count' => $desc->count(), // Har bir descriptionning soni
-                        ];
-                    })
+                    ->flatMap(fn($check) => $check->qualityCheckDescriptions) // Har bir checkning descriptionlarini olish
+                    ->groupBy('id') // ID bo‘yicha guruhlash
+                    ->map(fn($desc) => [
+                        'id' => $desc->first()->id,
+                        'name' => $desc->first()->name,
+                        'description' => $desc->first()->description, // description maydoni
+                        'count' => $desc->count() // Har bir descriptionning soni
+                    ])
                     ->values(); // Indekslarni qayta tartiblash
 
                 return [
@@ -77,15 +58,15 @@ class QualityControllerMasterController extends Controller
                     'submodel' => $orderSubModel->submodel,
                     'order' => $orderSubModel->orderModel->order ?? null,
                     'model' => $orderSubModel->orderModel->model ?? null,
-                    'qualityChecksTrue' => $counts[1] ?? 0, // Status true (1) bo'lganlar soni
-                    'qualityChecksFalse' => $counts[0] ?? 0, // Status false (0) bo'lganlar soni
-                    'descriptions' => $descriptionCounts, // Tanlangan descriptionlar va soni
+                    'qualityChecksTrue' => $counts[1] ?? 0,
+                    'qualityChecksFalse' => $counts[0] ?? 0,
+                    'descriptions' => $descriptionCounts, // Hammasini olamiz
                 ];
             });
 
         return response()->json($orderSubModels);
     }
-
+    
     public function fasteningOrderToGroup(Request $request): \Illuminate\Http\JsonResponse
     {
 
