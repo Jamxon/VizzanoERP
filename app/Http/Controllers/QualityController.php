@@ -74,13 +74,13 @@ class QualityController extends Controller
                             'id' => $subModel->orderSubModel->submodel->id,
                             'name' => $subModel->orderSubModel->submodel->name,
                         ],
-                        'group' => [
-                            'id' => $subModel->group->id ?? null,
-                            'group' => [
-                                'id' => $subModel->group->group->id ?? null,
-                                'name' => $subModel->group->group->name ?? null,
-                            ],
-                        ],
+//                        'group' => [
+//                            'id' => $subModel->group->id ?? null,
+//                            'group' => [
+//                                'id' => $subModel->group->group->id ?? null,
+//                                'name' => $subModel->group->group->name ?? null,
+//                            ],
+//                        ],
                     ]],
                 ],
             ];
