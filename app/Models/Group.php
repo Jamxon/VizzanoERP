@@ -50,4 +50,9 @@ class Group extends Model
     {
         return $this->hasMany(OrderGroup::class,'group_id');
     }
+
+    public function otkOrderGroups(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OtkOrderGroup::class);
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\OrderSubModel;
+use App\Models\OtkOrderGroup;
 use App\Models\QualityCheck;
 use Illuminate\Http\Request;
 
@@ -48,5 +49,21 @@ class QualityControllerMasterController extends Controller
             });
 
         return response()->json($orderSubModels);
+    }
+
+    public function fasteningOrderToGroup(Request $request): \Illuminate\Http\JsonResponse
+    {
+
+        $request->validate([
+            'order_sub_model_id' => 'required|integer|exists:order_sub_models,id',
+            'group_id' => 'required|integer|exists:groups,id',
+        ]);
+
+        $otkOrderGroup = OtkOrderGroup::create([
+            'order_sub_model_id' => $request->order_sub_model_id,
+            'group_id' => $request->group_id,
+        ]);
+
+        return response()->json($otkOrderGroup);
     }
 }
