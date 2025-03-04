@@ -96,13 +96,34 @@ class QualityControllerMasterController extends Controller
                 'orderModel.model',
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',
-                'orderModel.submodels.group.group',
-                'orderModel.submodels.otkOrderGroup.group',
+                'orderModel.submodels.otkOrderGroup.group'
             )
-            ->get();
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'name' => $order->name,
+                    'status' => $order->status,
+                    'orderModel' => $order->orderModel->map(function ($orderModel) {
+                        return [
+                            'id' => $orderModel->id,
+                            'model' => $orderModel->model,
+                            'submodels' => $orderModel->submodels->map(function ($submodel) {
+                                return [
+                                    'id' => $submodel->id,
+                                    'submodel' => $submodel->submodel,
+                                    'group' => $submodel->otkOrderGroup->group ?? null, // otkOrderGroup ni otk_group deb o'zgartiramiz
+                                ];
+                            }),
+                            'sizes' => $orderModel->sizes->map(fn($size) => $size->size),
+                        ];
+                    }),
+                ];
+            });
 
         return response()->json($orders);
     }
+
 
     public function getGroups(): \Illuminate\Http\JsonResponse
     {
