@@ -84,7 +84,7 @@ class ModelController extends Controller
         if ($request->hasFile('images') && !empty($request->file('images'))) {
             foreach ($request->file('images') as $image) {
                 $fileName = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('public/images', $fileName);
+                $image->storeAs('/images/', $fileName);
 
                 ModelImages::create([
                     'model_id' => $model->id,
@@ -144,7 +144,7 @@ class ModelController extends Controller
         if ($request->hasFile('images') && !empty($request->file('images'))) {
             foreach ($request->file('images') as $image) {
                 $fileName = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('public/images', $fileName);
+                $image->storeAs('/images/', $fileName);
 
                 ModelImages::create([
                     'model_id' => $model->id,
