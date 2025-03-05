@@ -141,7 +141,7 @@ class ModelController extends Controller
             'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
         ]);
 
-        if ($request->hasFile('images')) {
+        if ($request->hasFile('images') && !empty($request->file('images'))) {
             foreach ($request->file('images') as $image) {
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('public/images', $fileName);
