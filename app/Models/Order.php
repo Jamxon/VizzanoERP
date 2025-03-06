@@ -54,6 +54,10 @@ class Order extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'branch_id', 'contragent_id'];
 
+    protected $casts = [
+        'price' => 'float',
+    ];
+
     public function orderModel(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(OrderModel::class, 'order_id');
