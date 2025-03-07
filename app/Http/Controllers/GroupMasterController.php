@@ -251,7 +251,7 @@ class GroupMasterController extends Controller
             ->whereIn('employee_id', $group->employees()->pluck('id'))
             ->count();
 
-        $requiredAttendanceBudget = 50 * 115000;
+        $requiredAttendanceBudget = $todayAttendanceCount * 115000;
 
         $orderGroups = $group->orders()
             ->whereHas('order', fn($query) => $query->where('status', 'tailoring'))
