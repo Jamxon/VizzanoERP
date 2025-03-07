@@ -264,6 +264,8 @@ class GroupMasterController extends Controller
                 )->sum() ?? 0,
         ]);
 
+        $todayPlan = ($todayAttendanceCount * 30000) / $orderSubModelSpends->sum('spends');
+
         $totalSpends = $orderSubModelSpends->sum('spends');
 
         $orderCalculations = $orderGroups->map(fn($orderGroup) => [
@@ -278,11 +280,12 @@ class GroupMasterController extends Controller
         $requiredTailors = $requiredAttendanceBudget / $firstExpense;
 
         return response()->json([
-            'attendance_count' => $todayAttendanceCount,
-            'total_production_cost' => $totalProductionCost,
-            'required_attendance_budget' => $requiredAttendanceBudget,
-            'required_tailors' => $requiredTailors,
-            'total_spends' => $totalSpends,
+            'attendanceCount' => $todayAttendanceCount,
+            'totalProduction_cost' => $totalProductionCost,
+            'requiredAttendance_budget' => $requiredAttendanceBudget,
+            'requiredTailors' => $requiredTailors,
+            'totalSpends' => $totalSpends,
+            'todayRealPlan' => $todayPlan,
         ]);
     }
 
