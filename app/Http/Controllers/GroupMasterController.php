@@ -255,6 +255,9 @@ class GroupMasterController extends Controller
             ->whereHas('order', function ($query) {
                 $query->where('status', 'tailoring');
             })
+            ->with([
+                'order.orderModel',
+            ])
             ->get();
 
         return $orders->orderModel->rasxod;
