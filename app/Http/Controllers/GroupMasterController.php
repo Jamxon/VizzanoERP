@@ -291,6 +291,7 @@ class GroupMasterController extends Controller
             'totalSpends' => $totalSpends,
             'todayRealPlan' => $todayPlan,
             'todayRealBudget' => $todayRealBudget,
+            'oneEmployeeBudget' => $oneEmployeeBudget,
         ]);
     }
 
