@@ -50,6 +50,38 @@ class ShowOrderResource extends JsonResource
                                 'quantity' => $recipe->quantity,
                             ];
                         }),
+                        'group' => $submodel->group ? [
+                            'id' => $submodel->group->id,
+                            'group' => $submodel->group->group,
+                        ] : null,
+                        'sewingOutputs' => $submodel->sewingOutputs->map(function ($output) {
+                            return [
+                                'id' => $output->id,
+                                'quantity' => $output->quantity,
+                                'time' => $output->time,
+                                'comment' => $output->comment,
+                            ];
+                        }),
+                        'otkOrderGroup' => $submodel->otkOrderGroup ? [
+                            'id' => $submodel->otkOrderGroup->id,
+                            'group' => $submodel->otkOrderGroup->group,
+                        ] : null,
+                        'qualityChecks' => $submodel->qualityChecks->map(function ($check) {
+                            return [
+                                'id' => $check->id,
+                                'status' => $check->status,
+                                'image' => url('storage/' . $check->image),
+                                'comment' => $check->comment,
+                                'user' => $check->user,
+                                'qualityCheckDescriptions' => $check->qualityCheckDescriptions->map(function ($description) {
+                                    return [
+                                        'id' => $description->id,
+                                        'description' => $description->description,
+                                        'status' => $description->status,
+                                    ];
+                                }),
+                            ];
+                        }),
                     ];
                 }),
             ] : null,
@@ -60,7 +92,26 @@ class ShowOrderResource extends JsonResource
                     'description' => $instruction->description,
                 ];
             }),
-
+            'orderPrintingTimes' => $this->orderPrintingTime->map(function ($time) {
+                return [
+                    'id' => $time->id,
+                    'planned_time' => $time->planned_time,
+                    'actual_time' => $time->actual_time,
+                    'status' => $time->status,
+                    'comment' => $time->comment,
+                    'user' => $time->user,
+                ];
+            }),
+            'orderCuts' => $this->orderCuts->map(function ($cut) {
+                return [
+                    'id' => $cut->id,
+                    'specification_category' => $cut->category->category,
+                    'cut_at' => $cut->cut_at,
+                    'quantity' => $cut->quantity,
+                    'status' => $cut->status,
+                    'user' => $cut->user,
+                ];
+            }),
         ];
     }
 }
