@@ -92,16 +92,14 @@ class ShowOrderResource extends JsonResource
                     'description' => $instruction->description,
                 ];
             }),
-            'orderPrintingTimes' => $this->orderPrintingTime->map(function ($time) {
-                return [
-                    'id' => $time->id,
-                    'planned_time' => $time->planned_time,
-                    'actual_time' => $time->actual_time,
-                    'status' => $time->status,
-                    'comment' => $time->comment,
-                    'user' => $time->user,
-                ];
-            }),
+            'orderPrintingTimes' => $this->orderPrintingTime ? [
+                'id' => $this->orderPrintingTime->id,
+                'planned_time' => $this->orderPrintingTime->planned_time,
+                'actual_time' => $this->orderPrintingTime->actual_time,
+                'status' => $this->orderPrintingTime->status,
+                'user' => $this->orderPrintingTime->user,
+                'comment' => $this->orderPrintingTime->comment,
+            ] : null,
             'orderCuts' => $this->orderCuts->map(function ($cut) {
                 return [
                     'id' => $cut->id,
