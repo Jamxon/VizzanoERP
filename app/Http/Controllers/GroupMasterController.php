@@ -279,6 +279,8 @@ class GroupMasterController extends Controller
         $firstExpense = $orderCalculations->first()['expense'] ?? 1;
         $requiredTailors = $requiredAttendanceBudget / $firstExpense;
 
+        $todayRealBudget = $todayPlan * $firstExpense;
+
         return response()->json([
             'attendanceCount' => $todayAttendanceCount,
             'totalProduction_cost' => $totalProductionCost,
@@ -286,6 +288,7 @@ class GroupMasterController extends Controller
             'requiredTailors' => $requiredTailors,
             'totalSpends' => $totalSpends,
             'todayRealPlan' => $todayPlan,
+            'todayRealBudget' => $todayRealBudget,
         ]);
     }
 
