@@ -264,6 +264,7 @@ class GroupMasterController extends Controller
             return [
                 'rasxod' => $orderGroup->order->orderModel->rasxod ?? null,
                 'quantity' => $orderGroup->order->quantity,
+                'sum' => $orderGroup->order->orderModel->rasxod * $orderGroup->order->quantity,
             ];
         });
     }
