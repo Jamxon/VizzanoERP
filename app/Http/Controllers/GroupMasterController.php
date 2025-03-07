@@ -253,7 +253,7 @@ class GroupMasterController extends Controller
 
         $requiredAttendanceBudget = 50 * 115000;
 
-        $orderGroups = $group->orderGroups()
+        $orderGroups = $group->orders()
             ->whereHas('order', fn($query) => $query->where('status', 'tailoring'))
             ->with(['order.orderModel'])
             ->get();
