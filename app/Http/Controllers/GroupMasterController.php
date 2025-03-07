@@ -242,43 +242,39 @@ class GroupMasterController extends Controller
         ]);
     }
 
-    public function getPlans()
+    public function getPlans(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
         $group = $user->group;
-        $employees = $group->employees()->get();
-        $attendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
-            ->whereIn('employee_id', $employees->pluck('id'))
+
+        $todayAttendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
+            ->whereIn('employee_id', $group->employees()->pluck('id'))
             ->count();
 
-        $attendanceNeedMoney = 50 * 115000;
+        $requiredAttendanceBudget = 50 * 115000;
 
-        $orders = $group->orders()
-            ->whereHas('order', function ($query) {
-                $query->where('status', 'tailoring');
-            })
-//            ->with([
-//                'order.orderModel',
-//            ])
+        $orderGroups = $group->orderGroups()
+            ->whereHas('order', fn($query) => $query->where('status', 'tailoring'))
+            ->with(['order.orderModel'])
             ->get();
 
-        $ordersData = $orders->map(function ($orderGroup) {
-            return [
-                'rasxod' => $orderGroup->order->orderModel->rasxod ?? null,
-                'quantity' => $orderGroup->order->quantity,
-                'sum' => $orderGroup->order->orderModel->rasxod * $orderGroup->order->quantity,
-            ];
-        });
+        $orderCalculations = $orderGroups->map(fn($orderGroup) => [
+            'expense' => $orderGroup->order->orderModel->expense ?? 0,
+            'quantity' => $orderGroup->order->quantity ?? 0,
+            'total_cost' => ($orderGroup->order->orderModel->expense ?? 0) * ($orderGroup->order->quantity ?? 0),
+        ]);
 
-        $attendanceTailorNeed = $attendanceNeedMoney / $ordersData->first()['rasxod'];
+        $totalProductionCost = $orderCalculations->sum('total_cost');
 
-        $summa = $ordersData->sum('sum');
+        $firstExpense = $orderCalculations->first()['expense'] ?? 1;
+        $requiredTailors = $requiredAttendanceBudget / $firstExpense;
 
         return response()->json([
-            'attendance_count' => $attendanceCount,
-            'summary' => $summa,
-            'attendance_need_money' => $attendanceNeedMoney,
-            'attendance_tailor_need' => $attendanceTailorNeed,
+            'attendance_count' => $todayAttendanceCount,
+            'total_production_cost' => $totalProductionCost,
+            'required_attendance_budget' => $requiredAttendanceBudget,
+            'required_tailors' => $requiredTailors,
         ]);
     }
+
 }
