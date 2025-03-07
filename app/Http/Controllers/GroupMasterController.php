@@ -95,7 +95,6 @@ class GroupMasterController extends Controller
         return response()->json(new ShowOrderGroupMaster($order));
     }
 
-
     public function getEmployees(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
@@ -111,19 +110,16 @@ class GroupMasterController extends Controller
 
     public function getTarifications($id): \Illuminate\Http\JsonResponse
     {
-        // Orderni topish
         $order = Order::where('id', $id)
             ->with([
                 'orderModel.submodels.tarificationCategories'
             ])
             ->first();
 
-        // Agar order topilmasa, 404 qaytarish
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        // Resurs orqali chiqarish
         $resource = new GetTarificationGroupMasterResource($order);
 
         return response()->json($resource);
