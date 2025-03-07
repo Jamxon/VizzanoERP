@@ -263,6 +263,7 @@ class GroupMasterController extends Controller
         return $ordersData = $orders->map(function ($orderGroup) {
             return [
                 'rasxod' => $orderGroup->order->orderModel->rasxod ?? null,
+                'quantity' => $orderGroup->order->quantity,
             ];
         });
     }
