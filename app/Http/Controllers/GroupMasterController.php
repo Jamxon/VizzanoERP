@@ -260,12 +260,14 @@ class GroupMasterController extends Controller
 //            ])
             ->get();
 
-        return $ordersData = $orders->map(function ($orderGroup) {
+        $ordersData = $orders->map(function ($orderGroup) {
             return [
                 'rasxod' => $orderGroup->order->orderModel->rasxod ?? null,
                 'quantity' => $orderGroup->order->quantity,
                 'sum' => $orderGroup->order->orderModel->rasxod * $orderGroup->order->quantity,
             ];
         });
+
+        return $summa = $ordersData->sum('sum');
     }
 }
