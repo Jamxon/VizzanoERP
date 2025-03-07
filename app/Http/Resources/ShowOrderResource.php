@@ -6,17 +6,25 @@ use App\Models\OrderRecipes;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property mixed $orderPrintingTime
+ * @property mixed $orderModel
+ * @property mixed $orderCuts
+ * @property mixed $instructions
+ * @property mixed $id
+ * @property mixed $name
+ * @property mixed $quantity
+ * @property mixed $status
+ * @property mixed $start_date
+ * @property mixed $end_date
+ * @property mixed $rasxod
+ * @property mixed $comment
+ */
+
 class ShowOrderResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-
     public function toArray(Request $request): array
     {
-
         return [
             'id' => $this->id,
             'name' => $this->name,
