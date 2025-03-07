@@ -259,7 +259,7 @@ class GroupMasterController extends Controller
             ->get();
 
         $orderSubModelSpends = $orderGroups->map(fn($orderGroup) => [
-            'spends' => $orderGroup->order->orderModel->submodels->submodelSpend->sum('summa') ?? 0,
+            'spends' => $orderGroup->order->orderModel->submodels->sum('submodelSpend') ?? 0,
         ]);
 
         $totalSpends = $orderSubModelSpends->sum('spends');
