@@ -116,7 +116,10 @@ class ShowOrderResource extends JsonResource
             'orderCuts' => $this->orderCuts->map(function ($cut) {
                 return [
                     'id' => $cut->id,
-                    'specification_category' => $cut->category->category,
+                    'specification_category' => $cut->category ? [
+                        'id' => $cut->category->id,
+                        'name' => $cut->category->name,
+                    ] : null,
                     'cut_at' => $cut->cut_at,
                     'quantity' => $cut->quantity,
                     'status' => $cut->status,
