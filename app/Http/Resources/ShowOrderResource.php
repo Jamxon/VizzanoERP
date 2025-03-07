@@ -113,7 +113,7 @@ class ShowOrderResource extends JsonResource
                 'user' => $this->orderPrintingTime->user,
                 'comment' => $this->orderPrintingTime->comment,
             ] : null,
-            'specification_categories' => $this->categories->map(function ($category) {
+            'specification_categories' => $this->orderCuts->category->map(function ($category) {
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
