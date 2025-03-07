@@ -245,7 +245,7 @@ class GroupMasterController extends Controller
     public function getPlans()
     {
         $user = auth()->user();
-        $group = $user->employee->group;
+        return $group = $user->employee->group;
         $employees = $group->employees()->get();
         $attendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
             ->whereIn('employee_id', $employees->pluck('id'))
