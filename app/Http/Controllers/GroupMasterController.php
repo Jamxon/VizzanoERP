@@ -270,7 +270,7 @@ class GroupMasterController extends Controller
             ];
         });
 
-        $attendanceTailorNeed = $ordersData->first()['rasxod'] / $attendanceNeedMoney;
+        $attendanceTailorNeed = $attendanceNeedMoney / $ordersData->first()['rasxod'];
 
         $summa = $ordersData->sum('sum');
 
