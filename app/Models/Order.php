@@ -92,4 +92,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderCut::class, 'order_id');
     }
+
+    public function orderGroups(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderGroup::class, 'order_id');
+    }
 }
