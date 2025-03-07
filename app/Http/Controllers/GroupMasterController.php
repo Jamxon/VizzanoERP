@@ -259,9 +259,9 @@ class GroupMasterController extends Controller
             ->get();
 
         $orderCalculations = $orderGroups->map(fn($orderGroup) => [
-            'expense' => $orderGroup->order->orderModel->expense ?? 0,
+            'expense' => $orderGroup->order->orderModel->rasxod ?? 0,
             'quantity' => $orderGroup->order->quantity ?? 0,
-            'total_cost' => ($orderGroup->order->orderModel->expense ?? 0) * ($orderGroup->order->quantity ?? 0),
+            'total_cost' => ($orderGroup->order->orderModel->rasxod ?? 0) * ($orderGroup->order->quantity ?? 0),
         ]);
 
         $totalProductionCost = $orderCalculations->sum('total_cost');
