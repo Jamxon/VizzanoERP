@@ -268,6 +268,11 @@ class GroupMasterController extends Controller
             ];
         });
 
-        return $summa = $ordersData->sum('sum');
+        $summa = $ordersData->sum('sum');
+
+        return response()->json([
+            'attendance_count' => $attendanceCount,
+            'summary' => $summa,
+        ]);
     }
 }
