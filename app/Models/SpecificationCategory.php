@@ -38,4 +38,9 @@ class SpecificationCategory extends Model
     {
         return $this->hasMany(PartSpecification::class, 'specification_category_id');
     }
+
+    public function orderCuts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(OrderCut::class, 'specification_category_id');
+    }
 }
