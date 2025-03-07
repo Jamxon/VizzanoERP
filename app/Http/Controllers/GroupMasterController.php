@@ -258,6 +258,12 @@ class GroupMasterController extends Controller
             ->with(['order.orderModel'])
             ->get();
 
+        $orderSubModelSpends = $orderGroups->map(fn($orderGroup) => [
+            'spends' => $orderGroup->order->orderModel->submodels->submodelSpend ?? 0,
+        ]);
+
+        $totalSpends = $orderSubModelSpends->sum('spends');
+
         $orderCalculations = $orderGroups->map(fn($orderGroup) => [
             'expense' => $orderGroup->order->orderModel->rasxod ?? 0,
             'quantity' => $orderGroup->order->quantity ?? 0,
@@ -274,6 +280,7 @@ class GroupMasterController extends Controller
             'total_production_cost' => $totalProductionCost,
             'required_attendance_budget' => $requiredAttendanceBudget,
             'required_tailors' => $requiredTailors,
+            'total_spends' => $totalSpends,
         ]);
     }
 
