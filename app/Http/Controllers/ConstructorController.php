@@ -27,7 +27,7 @@ class ConstructorController extends Controller
         return response()->json($resource);
     }
 
-    public function showOrder($id)
+    public function showOrder($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::find($id);
 
@@ -39,7 +39,6 @@ class ConstructorController extends Controller
 
         return response()->json($resource);
     }
-
 
     public function sendToCuttingMaster($id): \Illuminate\Http\JsonResponse
     {
