@@ -281,6 +281,8 @@ class GroupMasterController extends Controller
 
         $todayRealBudget = $todayPlan * $firstExpense;
 
+        $oneEmployeeBudget = $todayRealBudget / $todayAttendanceCount;
+
         return response()->json([
             'attendanceCount' => $todayAttendanceCount,
             'totalProduction_cost' => $totalProductionCost,
