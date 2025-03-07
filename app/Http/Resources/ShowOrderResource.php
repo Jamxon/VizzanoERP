@@ -114,7 +114,7 @@ class ShowOrderResource extends JsonResource
                 'comment' => $this->orderPrintingTime->comment,
             ] : null,
             'specification_categories' => $this->orderCuts
-                ->groupBy('category_id')
+                ->groupBy('specification_category_id')
                 ->map(function ($cuts, $categoryId) {
                     $category = $cuts->first()->category;
                     return [
