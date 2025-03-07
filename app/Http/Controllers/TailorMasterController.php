@@ -40,8 +40,6 @@ class TailorMasterController extends Controller
         return response()->json($resource);
     }
 
-
-
     public function fasteningOrderToGroup(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);

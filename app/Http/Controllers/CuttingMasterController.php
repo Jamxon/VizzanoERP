@@ -241,10 +241,6 @@ class CuttingMasterController extends Controller
             'orderModel.submodels.specificationCategories.specifications'
         ]);
 
-        if (!$order) {
-            return response()->json(['error' => 'Order not found'], 404);
-        }
-
         $resource = new GetSpecificationResource($order);
 
         return response()->json($resource);

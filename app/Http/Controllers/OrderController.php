@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ShowOrderResource;
 use App\Models\Contragent;
+use App\Models\Department;
 use App\Models\Models;
 use App\Models\Order;
 use App\Models\OrderInstruction;
