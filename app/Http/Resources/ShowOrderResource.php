@@ -113,22 +113,24 @@ class ShowOrderResource extends JsonResource
                 'user' => $this->orderPrintingTime->user,
                 'comment' => $this->orderPrintingTime->comment,
             ] : null,
-            'specification_categories' => $this->orderCuts->category->map(function ($category) {
-                return [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'orderCuts' => $category->orderCuts->map(function ($cut) {
-                        return [
-                            'id' => $cut->id,
-                            'cut_at' => $cut->cut_at,
-                            'quantity' => $cut->quantity,
-                            'status' => $cut->status,
-                            'user' => $cut->user,
-                        ];
-                    }),
-                ];
-            }),
-
+            'specification_categories' => $this->orderCuts
+                ->groupBy('category_id')
+                ->map(function ($cuts, $categoryId) {
+                    $category = $cuts->first()->category;
+                    return [
+                        'id' => $category?->id,
+                        'name' => $category?->name,
+                        'orderCuts' => $cuts->map(function ($cut) {
+                            return [
+                                'id' => $cut->id,
+                                'cut_at' => $cut->cut_at,
+                                'quantity' => $cut->quantity,
+                                'status' => $cut->status,
+                                'user' => $cut->user,
+                            ];
+                        }),
+                    ];
+                })->values(),
         ];
     }
 }
