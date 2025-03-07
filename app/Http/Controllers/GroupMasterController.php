@@ -251,7 +251,7 @@ class GroupMasterController extends Controller
             ->whereIn('employee_id', $employees->pluck('id'))
             ->count();
 
-        return $orders = $group->orderGroups()
+        return $orders = $group->orders()
             ->whereHas('order', function ($query) {
                 $query->where('status', 'tailoring');
             })
