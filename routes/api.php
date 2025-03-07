@@ -6,6 +6,7 @@ use App\Http\Controllers\ConstructorController;
 use App\Http\Controllers\CuttingMasterController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\GroupMasterController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\ModelController;
@@ -52,6 +53,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
     Route::get('orderCuts',[\App\Http\Controllers\GroupMasterController::class, 'getOrderCuts']);
     Route::get('orderCuts/show',[\App\Http\Controllers\GroupMasterController::class, 'showOrderCuts']);
     Route::post('orderCuts/{id}',[\App\Http\Controllers\GroupMasterController::class, 'receiveOrderCut']);
+    Route::get('plans',[GroupMasterController::class, 'getPlans']);
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
+use App\Models\Attendance;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderGroup;
@@ -239,5 +240,18 @@ class GroupMasterController extends Controller
             'message' => 'Order cut received successfully',
             'order_cut' => $orderCut
         ]);
+    }
+
+    public function getPlans()
+    {
+        $user = auth()->user();
+        $group = $user->group;
+        $employees = $group->employees()->get();
+        $attendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
+            ->whereIn('employee_id', $employees->pluck('id'))
+            ->count();
+
+        return $orders = $user->group()->orders()->where('status', 'tailoring')->get();
+
     }
 }
