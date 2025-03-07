@@ -81,7 +81,12 @@ class ShowOrderResource extends JsonResource
                                     ];
                                 }),
                             ];
-                        }),
+                        })->toArray(),
+                        'qualityChecks_status_count' => [
+                            'true' => $submodel->qualityChecks->where('status', true)->count(),
+                            'false' => $submodel->qualityChecks->where('status', false)->count(),
+                        ],
+
                     ];
                 }),
             ] : null,
