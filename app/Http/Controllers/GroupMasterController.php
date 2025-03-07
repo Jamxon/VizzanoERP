@@ -251,6 +251,8 @@ class GroupMasterController extends Controller
             ->whereIn('employee_id', $employees->pluck('id'))
             ->count();
 
+        $attendanceNeedMoney = $attendanceCount * 115000;
+
         $orders = $group->orders()
             ->whereHas('order', function ($query) {
                 $query->where('status', 'tailoring');
@@ -268,11 +270,15 @@ class GroupMasterController extends Controller
             ];
         });
 
+        $attendanceTailorNeed = $ordersData->first()['rasxod'] / $attendanceNeedMoney;
+
         $summa = $ordersData->sum('sum');
 
         return response()->json([
             'attendance_count' => $attendanceCount,
             'summary' => $summa,
+            'attendance_need_money' => $attendanceNeedMoney,
+            'attendance_tailor_need' => $attendanceTailorNeed,
         ]);
     }
 }
