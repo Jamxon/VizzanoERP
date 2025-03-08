@@ -107,20 +107,20 @@ class QualityControllerMasterController extends Controller
             ->get()
             ->map(function ($order) {
                 return [
-                    'id' => $order->id,
-                    'name' => $order->name,
-                    'status' => $order->status,
-                    'order_model' => $order->orderModel ? [
-                        'id' => $order->orderModel->id,
-                        'model' => $order->orderModel->model,
-                        'submodels' => $order->orderModel->submodels->map(function ($submodel) {
-                            return [
-                                'id' => $submodel->id,
-                                'submodel' => $submodel->submodel,
-                                'group' => $submodel->otkOrderGroup->group ?? null, // **otkOrderGroup ni otk_group ga o'zgartiramiz**
-                            ];
-                        }),
-                        'sizes' => $order->orderModel->sizes->map(fn($size) => $size->size),
+                    'id' => $order->id ?? null,
+                    'name' => $order->name ?? null,
+                    'status' => $order->status ?? null,
+                    'order_model' => optional($order->orderModel)->id ? [
+                        'id' => optional($order->orderModel)->id,
+                        'model' => optional($order->orderModel->model)->name ?? null,
+                        'submodels' => optional($order->orderModel->submodels)->map(function ($submodel) {
+                                return [
+                                    'id' => optional($submodel)->id ?? null,
+                                    'submodel' => optional($submodel->submodel)->name ?? null,
+                                    'group' => optional($submodel->otkOrderGroup)->group ?? null, // **otkOrderGroup ni null tekshiramiz**
+                                ];
+                            }) ?? [],
+                        'sizes' => optional($order->orderModel->sizes)->map(fn($size) => optional($size->size)->name) ?? [],
                     ] : null,
                 ];
             });
@@ -128,12 +128,11 @@ class QualityControllerMasterController extends Controller
         return response()->json($orders);
     }
 
-
     public function getGroups(): \Illuminate\Http\JsonResponse
     {
-        $groups = Department::where('responsible_user_id', auth()->id())
-            ->first()
-            ->groups;
+        $department = Department::where('responsible_user_id', auth()->id())->first();
+
+        $groups = optional($department)->groups ?? [];
 
         return response()->json($groups);
     }
