@@ -30,7 +30,7 @@ class PackageMasterController extends Controller
          $order = Order::find($id)
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->with(
-                'packageOutcome',
+                'packageOutcomes',
                 'orderModel.model',
                 'orderModel.material',
                 'orderModel.submodels.submodel',

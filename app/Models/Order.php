@@ -104,8 +104,8 @@ class Order extends Model
         return $this->hasOne(FinishedProduct::class, 'order_id');
     }
 
-    public function packageOutcome(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function packageOutcomes(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasOne(PackageOutcome::class, 'order_id');
+        return $this->hasMany(PackageOutcome::class, 'order_id');
     }
 }
