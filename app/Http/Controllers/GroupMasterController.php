@@ -249,7 +249,7 @@ class GroupMasterController extends Controller
 
         $todayAttendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
             ->whereIn('employee_id', $group->employees()->pluck('id'))
-            ->count() ?? 1;
+            ->count();
 
         $requiredAttendanceBudget = $todayAttendanceCount * 115000;
 
@@ -264,7 +264,9 @@ class GroupMasterController extends Controller
                 )->sum() ?? 0,
         ]);
 
-        $todayPlan = ($todayAttendanceCount * 30000) / $orderSubModelSpends->sum('spends');
+        $totalSpends = $orderSubModelSpends->sum('spends');
+
+        $todayPlan = $totalSpends > 0 ? ($todayAttendanceCount * 30000) / $totalSpends : 0;
 
         $totalSpends = $orderSubModelSpends->sum('spends');
 
@@ -281,7 +283,7 @@ class GroupMasterController extends Controller
 
         $todayRealBudget = $todayPlan * $firstExpense;
 
-        $oneEmployeeBudget = $todayRealBudget / $todayAttendanceCount;
+        $oneEmployeeBudget = $todayAttendanceCount > 0 ? $todayRealBudget / $todayAttendanceCount : 0;
 
         return response()->json([
             'attendanceCount' => $todayAttendanceCount,
