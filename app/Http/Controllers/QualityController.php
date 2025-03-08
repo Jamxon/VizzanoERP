@@ -16,13 +16,15 @@ class QualityController extends Controller
     public function getOrders(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
-        $groupIds = optional($user->employee->group)->pluck('id') ?? collect([]); // Agar null bo'lsa, bo'sh array olish
+        $groupIds = optional($user->employee->group)->pluck('id') ?? collect([]);
 
         if ($groupIds->isEmpty()) {
             return response()->json(['message' => 'No groups found for user'], 404);
         }
-        // Foydalanuvchining guruhiga tegishli order submodellari
         $otkOrderGroups = OtkOrderGroup::whereIn('group_id', $groupIds)
+            ->whereHas('orderSubModel.orderModel.order', function ($query) {
+                $query->where('status', '!=', 'checked');
+            })
             ->with([
                 'orderSubModel.orderModel.order',
                 'orderSubModel.orderModel.model',
@@ -33,7 +35,6 @@ class QualityController extends Controller
             ])
             ->get();
 
-        // Orderlarni guruhlarga ajratib, har bir submodelni alohida order sifatida chiqarish
         $orders = $otkOrderGroups->map(function ($subModel) {
             $orderModel = $subModel->orderSubModel->orderModel;
             $order = $orderModel->order;
@@ -68,7 +69,7 @@ class QualityController extends Controller
                         ];
                     })->values(),
                     'material' => $orderModel->material,
-                    'submodels' => [[ // Submodelni alohida array ichida yuboramiz
+                    'submodels' => [[
                         'id' => $subModel->orderSubModel->id,
                         'submodel' => [
                             'id' => $subModel->orderSubModel->submodel->id,
