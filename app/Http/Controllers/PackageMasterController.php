@@ -58,7 +58,7 @@ class PackageMasterController extends Controller
                 $order->save();
             }
 
-            $order->packageOutcome()->create([
+            $order->packageOutcomes()->create([
                 'order_id' => $request->input('order_id'),
                 'package_size' => $request->input('package_size'),
                 'package_quantity' => $request->input('package_quantity'),
