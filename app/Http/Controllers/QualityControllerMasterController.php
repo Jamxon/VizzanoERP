@@ -112,7 +112,7 @@ class QualityControllerMasterController extends Controller
                     'status' => $order->status ?? null,
                     'order_model' => optional($order->orderModel)->id ? [
                         'id' => optional($order->orderModel)->id,
-                        'model' => $order->orderModel->model ? [,
+                        'model' => $order->orderModel->model ? [
                             'id' => $order->orderModel->model->id,
                             'name' => $order->orderModel->model->name,
                         ] : null,
