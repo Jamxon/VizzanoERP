@@ -151,6 +151,6 @@ class QualityControllerMasterController extends Controller
 
         $groups = optional($department)->groups ?? [];
 
-        return response()->json($groups);
+        return response()->json($department);
     }
 }
