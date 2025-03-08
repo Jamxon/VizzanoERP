@@ -27,7 +27,7 @@ class PackageMasterController extends Controller
     public function showOrder($id): \Illuminate\Http\JsonResponse
     {
 
-         dd($order = Order::where('id', $id)
+         dd($order = Order::find($id)
             ->where('branch_id', auth()->user()->branch_id)
             ->with(
                 'packageOutcome',
