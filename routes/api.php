@@ -12,6 +12,7 @@ use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderImportController;
+use App\Http\Controllers\PackageMasterController;
 use App\Http\Controllers\QualityController;
 use App\Http\Controllers\QualityControllerMasterController;
 use App\Http\Controllers\RazryadController;
@@ -24,6 +25,10 @@ use App\Http\Controllers\VizzanoReportTvController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('packageMaster')->middleware('role:packageMaster')->group(function () {
+    Route::get('orders', [PackageMasterController::class, 'getOrders']);
+});
 
 Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMaster')->group(function () {
     Route::get('orders',[QualityControllerMasterController::class,'getOrders']);
