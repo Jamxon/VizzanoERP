@@ -84,7 +84,7 @@ class ShowOrderResource extends JsonResource
                                 'qualityCheckDescriptions' => $check->qualityCheckDescriptions->map(function ($description) {
                                     return [
                                         'id' => $description->id,
-                                        'description' => $description->description,
+                                        'description' => $description->qualityDescription->description,
                                         'status' => $description->status,
                                     ];
                                 }),
