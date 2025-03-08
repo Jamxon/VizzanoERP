@@ -28,7 +28,7 @@ class PackageMasterController extends Controller
     {
 
          dd($order = Order::find($id)
-            ->where('branch_id', auth()->user()->branch_id)
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->with(
                 'packageOutcome',
                 'orderModel.model.material',
