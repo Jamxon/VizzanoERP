@@ -83,7 +83,7 @@ class ShowOrderResource extends JsonResource
                                 'user' => $check->user,
                                 'qualityCheckDescriptions' => $check->qualityCheckDescriptions->map(function ($description) {
                                     return [
-                                        'id' => $description->id,
+                                        'id' => $description->i,
                                         'description' => $description,
                                         'status' => $description->status,
                                     ];
