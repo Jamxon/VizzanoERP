@@ -153,4 +153,24 @@ class QualityControllerMasterController extends Controller
 
         return response()->json($groups);
     }
+
+    public function changeOrderStatus(Request $request): \Illuminate\Http\JsonResponse
+    {
+
+        $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'status' => 'required|string|in:checking,checked',
+        ]);
+
+        $order = Order::find($request->order_id);
+
+        if (!$order) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        $order->status = $request->status;
+        $order->save();
+
+        return response()->json($order);
+    }
 }

@@ -35,6 +35,7 @@ Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMast
     Route::get('results', [QualityControllerMasterController::class, 'results']);
     Route::post('fasteningOrderToGroup', [QualityControllerMasterController::class, 'fasteningOrderToGroup']);
     Route::get('groups',[QualityControllerMasterController::class, 'getGroups']);
+    Route::post('changeOrderStatus',[QualityControllerMasterController::class, 'changeOrderStatus']);
 });
 
 Route::prefix('qualityController')->middleware('role:qualityController')->group(function () {
