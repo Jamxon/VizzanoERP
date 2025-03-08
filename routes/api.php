@@ -28,6 +28,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('packageMaster')->middleware('role:packageMaster')->group(function () {
     Route::get('orders', [PackageMasterController::class, 'getOrders']);
+    Route::get('orders/{id}', [PackageMasterController::class, 'showOrder']);
+    Route::post('packageStore', [PackageMasterController::class, 'packageStore']);
 });
 
 Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMaster')->group(function () {
