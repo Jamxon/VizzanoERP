@@ -32,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static create(array $array)
  * @method orderSizes()
  * @method static orderBy(string $string, string $string1)
+ * @method static findOrFail(mixed $input)
  */
 class Order extends Model
 {
@@ -96,5 +97,15 @@ class Order extends Model
     public function orderGroups(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderGroup::class, 'order_id');
+    }
+
+    public function finishedProduct(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(FinishedProduct::class, 'order_id');
+    }
+
+    public function packageOutcome(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(PackageOutcome::class, 'order_id');
     }
 }

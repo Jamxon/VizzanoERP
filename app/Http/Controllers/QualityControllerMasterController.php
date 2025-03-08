@@ -13,22 +13,17 @@ class QualityControllerMasterController extends Controller
 {
     public function results(Request $request): \Illuminate\Http\JsonResponse
     {
-        // Sana parametrini olish yoki hozirgi sanani ishlatish
         $date = $request->input('date') ?? now();
 
-        // Avtorizatsiyadan o'tgan foydalanuvchi uchun departmentni topish
         $department = Department::where('responsible_user_id', auth()->id())->first();
 
-        // Agar department topilmasa, xatolik qaytarish
         if (!$department) {
             return response()->json(['error' => 'Department not found'], 404);
         }
 
-        // Departmentdagi barcha guruhlarning xodimlarini olish
         $employees = $department->groups
             ->flatMap(fn($group) => $group->employees->map(fn($employee) => $employee->user->id));
 
-        // OrderSubModel ma'lumotlarini olish
         $orderSubModels = OrderSubModel::whereHas('qualityChecks', function ($query) use ($date, $employees) {
             $query->whereIn('user_id', $employees)
                 ->whereDate('created_at', $date);
@@ -39,37 +34,34 @@ class QualityControllerMasterController extends Controller
                 'orderModel.model',
                 'qualityChecks' => function ($query) use ($date) {
                     $query->whereDate('created_at', $date)
-                        ->with('qualityCheckDescriptions'); // Description'larni yuklash
+                        ->with('qualityCheckDescriptions');
                 }
             ])
             ->get()
             ->map(function ($orderSubModel) {
-                // QualityCheck statuslari bo'yicha hisoblash
                 $counts = $orderSubModel->qualityChecks->groupBy('status')->map->count();
 
-                // QualityCheck status false (0) bo'lsa, description'lar bo'yicha guruhlash
                 $descriptionCounts = $orderSubModel->qualityChecks
-                    ->where('status', false) // Faqat statusi false bo'lganlar
+                    ->where('status', false)
                     ->flatMap(fn($check) => $check->qualityCheckDescriptions)
                     ->groupBy('quality_description_id')
                     ->map(fn($desc) => [
                         'id' => $desc->first()->id,
                         'description' => $desc->first()->qualityDescription->description,
-                        'count' => $desc->count(), // Har bir descriptionning soni
+                        'count' => $desc->count(),
                     ])
-                    ->values(); // Indekslarni qayta tartiblash
+                    ->values();
 
                 return [
                     'id' => $orderSubModel->id,
                     'submodel' => $orderSubModel->submodel,
                     'order' => $orderSubModel->orderModel->order ?? null,
                     'model' => $orderSubModel->orderModel->model ?? null,
-                    'qualityChecksTrue' => $counts[1] ?? 0, // Status true (1) bo'lganlar soni
-                    'qualityChecksFalse' => $counts[0] ?? 0, // Status false (0) bo'lganlar soni
-                    'descriptions' => $descriptionCounts, // Tanlangan descriptionlar va soni
+                    'qualityChecksTrue' => $counts[1] ?? 0,
+                    'qualityChecksFalse' => $counts[0] ?? 0,
+                    'descriptions' => $descriptionCounts,
                 ];
             });
-
         return response()->json($orderSubModels);
     }
 
