@@ -296,5 +296,4 @@ class GroupMasterController extends Controller
             'oneEmployeeBudget' => $oneEmployeeBudget,
         ]);
     }
-
 }
