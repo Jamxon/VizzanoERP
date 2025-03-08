@@ -116,11 +116,25 @@ class QualityControllerMasterController extends Controller
                         'submodels' => optional($order->orderModel->submodels)->map(function ($submodel) {
                                 return [
                                     'id' => optional($submodel)->id ?? null,
-                                    'submodel' => optional($submodel->submodel)->name ?? null,
-                                    'group' => optional($submodel->otkOrderGroup)->group ?? null, // **otkOrderGroup ni null tekshiramiz**
+                                    'submodel' => $submodel->submodel ? [
+                                        'id' => $submodel->submodel->id,
+                                        'name' => $submodel->submodel->name,
+                                    ] : null,
+                                    'group' => $submodel->group ? [
+                                        'id' => $submodel->group->id,
+                                        'name' => $submodel->group->name,
+                                    ] : null,
                                 ];
                             }) ?? [],
-                        'sizes' => optional($order->orderModel->sizes)->map(fn($size) => optional($size->size)->name) ?? [],
+                        'sizes' => optional($order->orderModel->sizes)->map(function ($size) {
+                                return [
+                                    'id' => optional($size)->id ?? null,
+                                    'size' => $size->size ? [
+                                        'id' => $size->size->id,
+                                        'name' => $size->size->name,
+                                    ] : null,
+                                ];
+                            }) ?? [],
                     ] : null,
                 ];
             });
