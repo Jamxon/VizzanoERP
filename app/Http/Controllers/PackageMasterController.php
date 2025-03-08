@@ -24,7 +24,7 @@ class PackageMasterController extends Controller
         return response()->json($orders);
     }
 
-    public function getPackages($id): \Illuminate\Http\JsonResponse
+    public function showOrder($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::where('id', $id)
             ->where('branch_id', auth()->user()->branch_id)
