@@ -37,7 +37,7 @@ class OrderController extends Controller
     public function show(Order $order): \Illuminate\Http\JsonResponse
     {
 //        $order = new ShowOrderResource($order);
-        return response()->json($order);
+//        return response()->json($order);
     }
 
     public function getContragents(): \Illuminate\Http\JsonResponse
