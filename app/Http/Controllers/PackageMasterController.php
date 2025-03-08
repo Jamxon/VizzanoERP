@@ -26,8 +26,8 @@ class PackageMasterController extends Controller
 
     public function showOrder($id): \Illuminate\Http\JsonResponse
     {
-        dd($id);
-        $order = Order::where('id', $id)
+
+         dd($order = Order::where('id', $id)
             ->where('branch_id', auth()->user()->branch_id)
             ->with(
                 'packageOutcome',
@@ -35,7 +35,7 @@ class PackageMasterController extends Controller
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',
             )
-            ->first();
+            ->first());
 
         return response()->json($order);
     }
