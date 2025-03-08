@@ -31,7 +31,8 @@ class PackageMasterController extends Controller
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->with(
                 'packageOutcome',
-                'orderModel.model.material',
+                'orderModel.model',
+                'orderModel.material',
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',
             )
