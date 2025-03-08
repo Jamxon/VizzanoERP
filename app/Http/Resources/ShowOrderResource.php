@@ -78,7 +78,7 @@ class ShowOrderResource extends JsonResource
                             return [
                                 'id' => $check->id,
                                 'status' => $check->status,
-                                'image' => url('storage/' . $check->image),
+                                'image' => url($check->image),
                                 'comment' => $check->comment,
                                 'user' => $check->user,
                                 'qualityCheckDescriptions' => $check->qualityCheckDescriptions->map(function ($description) {
