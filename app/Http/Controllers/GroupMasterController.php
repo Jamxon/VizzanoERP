@@ -249,7 +249,7 @@ class GroupMasterController extends Controller
 
         $todayAttendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
             ->whereIn('employee_id', $group->employees()->pluck('id'))
-            ->count() ?? 0;
+            ->count() ?? 1;
 
         $requiredAttendanceBudget = $todayAttendanceCount * 115000;
 
