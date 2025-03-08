@@ -124,8 +124,8 @@ class QualityControllerMasterController extends Controller
                                         'name' => $submodel->submodel->name,
                                     ] : null,
                                     'group' => $submodel->group ? [
-                                        'id' => $submodel->group->id,
-                                        'name' => $submodel->group->name,
+                                        'id' => $submodel->group->group->id,
+                                        'name' => $submodel->group->group->name,
                                     ] : null,
                                 ];
                             }) ?? [],
