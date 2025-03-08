@@ -85,7 +85,6 @@ class ShowOrderResource extends JsonResource
                                     return [
                                         'id' => $description->id,
                                         'description' => optional($description->qualityDescription)->description,
-                                        'status' => optional($description->qualityDescription)->status,
                                     ];
                                 }),
                             ];
