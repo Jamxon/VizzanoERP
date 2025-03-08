@@ -17,6 +17,7 @@ class PackageMasterController extends Controller
             ->with(
                 'orderModel.model',
                 'orderModel.submodels.submodel',
+                'orderModel.sizes.size',
             )
             ->get();
 
