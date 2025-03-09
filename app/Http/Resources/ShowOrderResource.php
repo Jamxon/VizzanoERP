@@ -130,6 +130,11 @@ class ShowOrderResource extends JsonResource
                         }),
                     ];
                 })->values(),
+            'contragent' => $this->contragent ? [
+                'id' => $this->contragent->id,
+                'name' => $this->contragent->name,
+                'description' => $this->contragent->description,
+            ] : null,
         ];
     }
 }
