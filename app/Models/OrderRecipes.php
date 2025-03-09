@@ -37,6 +37,6 @@ class OrderRecipes extends Model
 
     public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(OrderSubModel::class, 'submodel_id');
+        return $this->belongsTo(SubModel::class, 'submodel_id');
     }
 }

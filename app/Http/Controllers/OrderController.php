@@ -130,7 +130,7 @@ class OrderController extends Controller
                     'order_id' => $order->id,
                     'item_id' => $recipe['item_id'],
                     'quantity' => $recipe['quantity'],
-                    'submodel_id' => $orderSubModel->id,
+                    'submodel_id' => $recipe['submodel_id'],
                 ]);
             }
         }
