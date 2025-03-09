@@ -52,7 +52,7 @@ class ShowOrderResource extends JsonResource
                         'submodel' => $submodel->submodel ? [
                             'id' => $submodel->submodel->id,
                             'name' => $submodel->submodel->name,
-                            "order_recipes" => $submodel->orderRecipes->map(function ($recipe) {
+                            "order_recipes" => $submodel->submodel->orderRecipes->map(function ($recipe) {
                                 return [
                                     'id' => $recipe->id,
                                     'item' => $recipe->item,
