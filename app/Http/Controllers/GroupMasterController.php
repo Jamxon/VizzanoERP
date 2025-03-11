@@ -289,7 +289,7 @@ class GroupMasterController extends Controller
 
         $firstExpense = $orderCalculations->first()['expense'] ?? 1;
 
-        $requiredTailors = $requiredAttendanceBudget / $firstExpense;
+        $requiredTailors = $requiredAttendanceBudget / $orderSubModelSumma[0]['summa'] ?? 1;
 
         $todayRealBudget = $todayPlan * $firstExpense;
 
