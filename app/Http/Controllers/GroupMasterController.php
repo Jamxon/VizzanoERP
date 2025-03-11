@@ -292,7 +292,7 @@ class GroupMasterController extends Controller
             'attendanceCount' => $todayAttendanceCount,
             'totalProduction_cost' => $totalProductionCost,
             'requiredAttendance_budget' => $requiredAttendanceBudget,
-            'requiredTailors' => $requiredTailors,
+            'requiredTailors' => floor($requiredTailors),
             'totalSpends' => $totalSpends,
             'todayRealPlan' => $todayPlan,
             'todayRealBudget' => $todayRealBudget,
