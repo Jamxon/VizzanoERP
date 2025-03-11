@@ -302,7 +302,7 @@ class GroupMasterController extends Controller
             'requiredTailors' => floor($requiredTailors),
             'totalSpends' => $totalSpends,
             'todayRealPlan' => floor($todayPlan),
-            'todayRealBudget' => $todayRealBudget,
+            'todayRealBudget' => $orderSubModelSumma[0]['summa'],
             'oneEmployeeBudget' => $oneEmployeeBudget,
         ]);
     }
