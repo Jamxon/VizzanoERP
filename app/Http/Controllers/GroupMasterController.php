@@ -78,6 +78,13 @@ class GroupMasterController extends Controller
             ])
             ->first();
 
+
+        $totalQuantity = $order->orderModel->flatMap(function ($orderModel) {
+            return $orderModel->submodels->flatMap(function ($submodel) {
+                return $submodel->sewingOutputs;
+            });
+        })->sum('quantity');
+
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
