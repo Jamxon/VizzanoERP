@@ -301,8 +301,8 @@ class GroupMasterController extends Controller
             'requiredAttendance_budget' => $requiredAttendanceBudget,
             'requiredTailors' => floor($requiredTailors),
             'totalSpends' => $totalSpends,
-            'todayRealPlan' => floor($todayPlan),
-            'todayRealBudget' => $orderSubModelSumma[0]['summa'],
+            'todayRealPlan' => $todayPlan,
+            'todayRealBudget' => $todayRealBudget,
             'oneEmployeeBudget' => $oneEmployeeBudget,
         ]);
     }
