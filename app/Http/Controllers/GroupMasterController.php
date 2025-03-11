@@ -248,11 +248,13 @@ class GroupMasterController extends Controller
         $user = auth()->user();
         $group = $user->group;
 
-        $todayAttendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
-            ->whereIn('employee_id', $group->employees()->pluck('id'))
-            ->count();
+//        $todayAttendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
+//            ->whereIn('employee_id', $group->employees()->pluck('id'))
+//            ->count();
 
-        $requiredAttendanceBudget = 50 * 115000;
+        $todayAttendanceCount = 50;
+
+        $requiredAttendanceBudget = $todayAttendanceCount * 115000;
 
         $orderGroups = $group->orders()
             ->whereHas('order', fn($query) => $query->where('status', 'tailoring'))
