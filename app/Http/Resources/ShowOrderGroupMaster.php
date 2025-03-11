@@ -56,10 +56,8 @@ class ShowOrderGroupMaster extends JsonResource
                                         'time' => $sewingOutput->time->time,
                                     ],
                                 ])
-                                ->values() // <-- Indekslangan massiv shaklida qaytarish
+                                ->values()
                                 ->toArray() ?? [],
-                        'total_quantity' => $submodel->sewingOutputs
-                                ->sum('quantity') ?? 0, // <-- Umumiy quantity summasi
 
                     ]) ?? [],
             ] : null,
