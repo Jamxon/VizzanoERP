@@ -279,11 +279,11 @@ class GroupMasterController extends Controller
 
         $todayPlan = $totalSpends > 0 ? ($todayAttendanceCount * 30000) / $totalSpends : 0;
 
-        $orderCalculations = $orderGroups->map(fn($orderGroup) => [
+     dd(        $orderCalculations = $orderGroups->map(fn($orderGroup) => [
             'expense' => $orderGroup->order->orderModel->rasxod ?? 0,
             'quantity' => $orderGroup->order->quantity ?? 0,
             'total_cost' => ($orderGroup->order->orderModel->rasxod ?? 0) * ($orderGroup->order->quantity ?? 0),
-        ]);
+        ]));
 
         $totalProductionCost = $orderSubModelSumma * $orderCalculations[0]['quantity'];
 
