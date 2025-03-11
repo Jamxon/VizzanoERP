@@ -261,9 +261,17 @@ class GroupMasterController extends Controller
             ->with(['order.orderModel'])
             ->get();
 
+        //bir submodel bitishi uchun ketadigan vaqt
         $orderSubModelSpends = $orderGroups->map(fn($orderGroup) => [
             'spends' => $orderGroup->order->orderModel->submodels->flatMap(fn($submodel) =>
                 $submodel->submodelSpend->pluck('seconds')
+                )->sum() ?? 0,
+        ]);
+
+        //bir submodel bitishi uchun beriladigan summa
+        $orderSubModelSumma = $orderGroups->map(fn($orderGroup) => [
+            'summa' => $orderGroup->order->orderModel->submodels->flatMap(fn($submodel) =>
+                $submodel->submodelSpend->pluck('summa')
                 )->sum() ?? 0,
         ]);
 
@@ -271,17 +279,16 @@ class GroupMasterController extends Controller
 
         $todayPlan = $totalSpends > 0 ? ($todayAttendanceCount * 30000) / $totalSpends : 0;
 
-        $totalSpends = $orderSubModelSpends->sum('spends');
-
         $orderCalculations = $orderGroups->map(fn($orderGroup) => [
             'expense' => $orderGroup->order->orderModel->rasxod ?? 0,
             'quantity' => $orderGroup->order->quantity ?? 0,
             'total_cost' => ($orderGroup->order->orderModel->rasxod ?? 0) * ($orderGroup->order->quantity ?? 0),
         ]);
 
-        $totalProductionCost = $orderCalculations->sum('total_cost');
+        $totalProductionCost = $orderSubModelSumma['summa'] * $orderCalculations['quantity'];
 
         $firstExpense = $orderCalculations->first()['expense'] ?? 1;
+
         $requiredTailors = $requiredAttendanceBudget / $firstExpense;
 
         $todayRealBudget = $todayPlan * $firstExpense;
@@ -294,8 +301,8 @@ class GroupMasterController extends Controller
             'requiredAttendance_budget' => $requiredAttendanceBudget,
             'requiredTailors' => floor($requiredTailors),
             'totalSpends' => $totalSpends,
-            'todayRealPlan' => $todayPlan,
-            'todayRealBudget' => $todayRealBudget,
+            'todayRealPlan' => floor($todayPlan),
+            'todayRealBudget' => floor($todayRealBudget),
             'oneEmployeeBudget' => $oneEmployeeBudget,
         ]);
     }
