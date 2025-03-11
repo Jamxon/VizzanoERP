@@ -51,6 +51,7 @@ class ShowOrderGroupMaster extends JsonResource
                                 ->map(fn($sewingOutput) => [
                                     'id' => $sewingOutput->id,
                                     'quantity' => $sewingOutput->quantity,
+                                    'comment' => $sewingOutput->comment,
                                     'time' => [
                                         'id' => $sewingOutput->time?->id,
                                         'time' => $sewingOutput->time->time,
