@@ -269,11 +269,11 @@ class GroupMasterController extends Controller
         ]);
 
         //bir submodel bitishi uchun beriladigan summa
-dd(        $orderSubModelSumma = $orderGroups->map(fn($orderGroup) => [
+        $orderSubModelSumma = $orderGroups->map(fn($orderGroup) => [
             'summa' => $orderGroup->order->orderModel->submodels->flatMap(fn($submodel) =>
                 $submodel->submodelSpend->pluck('summa')
                 )->sum() ?? 0,
-        ]));
+        ]);
 
         $totalSpends = $orderSubModelSpends->sum('spends');
 
@@ -285,7 +285,7 @@ dd(        $orderSubModelSumma = $orderGroups->map(fn($orderGroup) => [
             'total_cost' => ($orderGroup->order->orderModel->rasxod ?? 0) * ($orderGroup->order->quantity ?? 0),
         ]);
 
-        $totalProductionCost = $orderSubModelSumma * $orderCalculations[0]['quantity'];
+        $totalProductionCost = $orderSubModelSumma[0]['summa'] * $orderCalculations[0]['quantity'];
 
         $firstExpense = $orderCalculations->first()['expense'] ?? 1;
 
