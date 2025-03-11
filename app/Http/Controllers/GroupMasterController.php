@@ -285,7 +285,7 @@ class GroupMasterController extends Controller
             'total_cost' => ($orderGroup->order->orderModel->rasxod ?? 0) * ($orderGroup->order->quantity ?? 0),
         ]);
 
-        $totalProductionCost = $orderSubModelSumma['summa'] * $orderCalculations['quantity'];
+        $totalProductionCost = $orderSubModelSumma * $orderCalculations['quantity'];
 
         $firstExpense = $orderCalculations->first()['expense'] ?? 1;
 
