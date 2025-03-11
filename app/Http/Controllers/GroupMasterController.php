@@ -297,8 +297,8 @@ class GroupMasterController extends Controller
 
         return response()->json([
             'attendanceCount' => $todayAttendanceCount,
-            'totalProduction_cost' => $totalProductionCost,
-            'requiredAttendance_budget' => $requiredAttendanceBudget,
+            'totalProductionCost' => $totalProductionCost,
+            'requiredAttendanceBudget' => $requiredAttendanceBudget,
             'requiredTailors' => floor($requiredTailors),
             'totalSpends' => $totalSpends,
             'todayRealPlan' => $todayPlan,
