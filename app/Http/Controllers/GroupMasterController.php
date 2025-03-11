@@ -291,7 +291,7 @@ class GroupMasterController extends Controller
 
         $requiredTailors = $requiredAttendanceBudget / $orderSubModelSumma[0]['summa'] ?? 1;
 
-        $todayRealBudget = $todayPlan * $firstExpense;
+        $todayRealBudget = $todayPlan * $orderSubModelSumma[0]['summa'];
 
         $oneEmployeeBudget = $todayAttendanceCount > 0 ? $todayRealBudget / $todayAttendanceCount : 0;
 
