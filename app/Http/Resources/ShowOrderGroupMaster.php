@@ -46,19 +46,24 @@ class ShowOrderGroupMaster extends JsonResource
                                 'name' => $category->name,
                                 'tarifications' => $category->tarifications,
                             ]) ?? [],
-                        'sewingOutputs' => $submodel->sewingOutputs
-                                ?->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
-                                ->map(fn($sewingOutput) => [
-                                    'id' => $sewingOutput->id,
-                                    'quantity' => $sewingOutput->quantity,
-                                    'time' => [
-                                        'id' => $sewingOutput->time?->id,
-                                        'time' => $sewingOutput->time->time,
-                                    ],
-                                ])
-                                ->values()
-                                ->toArray() ?? [],
+                        'sewingOutputs' => [
+                            'data' => $submodel->sewingOutputs
+                                    ?->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+                                    ->map(fn($sewingOutput) => [
+                                        'id' => $sewingOutput->id,
+                                        'quantity' => $sewingOutput->quantity,
+                                        'time' => [
+                                            'id' => $sewingOutput->time?->id,
+                                            'time' => $sewingOutput->time?->time,
+                                        ],
+                                    ])
+                                    ->values() // <-- Indekslangan massiv shaklida qaytarish
+                                    ->toArray() ?? [],
 
+                            'total_quantity' => $submodel->sewingOutputs
+                                    ?->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+                                    ->sum('quantity') ?? 0, // <-- Umumiy quantity summasi
+                        ],
                     ]) ?? [],
             ] : null,
             'instructions' => $this->instructions,
