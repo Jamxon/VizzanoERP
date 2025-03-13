@@ -98,7 +98,7 @@ class GroupMasterController extends Controller
     }
 
     public function getEmployees(): \Illuminate\Http\JsonResponse
-    {
+    {   
         $user = auth()->user();
 
         if (!$user->group) {
