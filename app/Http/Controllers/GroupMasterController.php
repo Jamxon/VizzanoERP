@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
-use App\Models\Attendance;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderGroup;
