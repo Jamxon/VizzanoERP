@@ -67,63 +67,91 @@ class ModelController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = json_decode($request->data, true);
-        if (!is_array($data) || empty($data)) {
-            return response()->json([
-                'message' => 'Invalid data format',
-                'error' => 'Data field is not a valid array',
-            ], 400);
-        }
+        try {
+            $data = json_decode($request->data, true);
 
-        $model = Models::create([
-            'name' => $data['name'] ?? null,
-            'rasxod' => (double)($data['rasxod'] ?? 0),
-        ]);
-
-        if ($request->hasFile('images') && !empty($request->file('images'))) {
-            foreach ($request->file('images') as $image) {
-                $fileName = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('/images/', $fileName);
-
-                ModelImages::create([
-                    'model_id' => $model->id,
-                    'image' => 'images/' . $fileName,
-                ]);
+            if (!is_array($data) || empty($data)) {
+                return response()->json([
+                    'message' => 'Invalid data format',
+                    'error' => 'Data field is not a valid array',
+                ], 400);
             }
-        }
-        dd($data);
 
-        if (!empty($data['sizes'])) {
-            foreach ($data['sizes'] as $size) {
-                Size::create([
-                    'name' => $size,
-                    'model_id' => $model->id,
+            try {
+                $model = Models::create([
+                    'name' => $data['name'] ?? null,
+                    'rasxod' => (double)($data['rasxod'] ?? 0),
                 ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => 'Model creation failed',
+                    'error' => $e->getMessage(),
+                ], 500);
             }
-        }
 
-        if (!empty($data['submodels'])) {
-            foreach ($data['submodels'] as $submodel) {
-                SubModel::create([
-                    'name' => $submodel ?? null,
-                    'model_id' => $model->id,
-                ]);
+            if ($request->hasFile('images') && !empty($request->file('images'))) {
+                try {
+                    foreach ($request->file('images') as $image) {
+                        $fileName = time() . '_' . $image->getClientOriginalName();
+                        $image->storeAs('/images/', $fileName);
+
+                        ModelImages::create([
+                            'model_id' => $model->id,
+                            'image' => 'images/' . $fileName,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'message' => 'Image upload failed',
+                        'error' => $e->getMessage(),
+                    ], 500);
+                }
             }
-        }
 
-        if ($model) {
+            if (!empty($data['sizes'])) {
+                try {
+                    foreach ($data['sizes'] as $size) {
+                        Size::create([
+                            'name' => $size,
+                            'model_id' => $model->id,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'message' => 'Size creation failed',
+                        'error' => $e->getMessage(),
+                    ], 500);
+                }
+            }
+
+            if (!empty($data['submodels'])) {
+                try {
+                    foreach ($data['submodels'] as $submodel) {
+                        SubModel::create([
+                            'name' => $submodel ?? null,
+                            'model_id' => $model->id,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'message' => 'Submodel creation failed',
+                        'error' => $e->getMessage(),
+                    ], 500);
+                }
+            }
+
             return response()->json([
                 'message' => 'Model created successfully',
                 'model' => $model,
             ], 201);
-        } else {
+
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Model creation failed',
-                'error' => 'There was an error creating the model.',
+                'message' => 'An unexpected error occurred',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
-
 
     public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
