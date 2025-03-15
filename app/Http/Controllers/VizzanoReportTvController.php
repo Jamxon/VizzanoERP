@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class VizzanoReportTvController extends Controller
 {
-    public function getSewingOutputs(Request $request)
+    public function getSewingOutputs(Request $request): \Illuminate\Http\JsonResponse
     {
         $startDate = $request->get('start_date') ?? now()->format('Y-m-d');
         $endDate = $request->get('end_date');
@@ -38,7 +38,6 @@ class VizzanoReportTvController extends Controller
             ->orderBy('total_quantity', 'desc')
             ->get();
 
-        // Ishchilar sonini hisoblash
         $employeeCounts = Attendance::whereDate('attendance.date', $today)
             ->where('attendance.status', '!=', 'ABSENT')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
@@ -68,7 +67,6 @@ class VizzanoReportTvController extends Controller
                 $workTime = $workTimeByGroup[$group_id] ?? 0; // Ish vaqti soniyalarda
                 $submodelSpend = optional($sewingOutput->orderSubmodel->submodelSpend->first())->seconds;
 
-                // Bugungi reja hisoblash
                 $today_plan = ($submodelSpend > 0 && $employeeCount > 0)
                     ? intval(($workTime * $employeeCount) / $submodelSpend)
                     : 0;
