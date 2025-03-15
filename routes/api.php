@@ -189,7 +189,6 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::post('tarification/fastening', [TechnologController::class, 'fasteningToEmployee']);
 });
 
-
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
     Route::get('orders', [ConstructorController::class, 'getOrders']);
     Route::get('orders/{id}', [ConstructorController::class, 'showOrder']);
@@ -210,9 +209,9 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
 
 Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
 
-    Route::get('/validate', function () {
-        return response()->json(['message' => auth()->user()], 200);
-    })->middleware('validate.status');
+Route::get('/validate', function () {
+    return response()->json(['message' => auth()->user()], 200);
+})->middleware('validate.status');
 
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
+Route::post('register', [AuthController::class, 'register']);
+Route::post('login', [AuthController::class, 'login']);
