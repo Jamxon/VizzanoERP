@@ -69,7 +69,7 @@ class TechnologController extends Controller
                     'name' => $specification['name'],
                     'code' => $specification['code'],
                     'quantity' => $specification['quantity'],
-                    'comment' => $specification['comment'],
+                    'comment' => $specification['comment'] ?? null,
                 ]);
             }
         }
