@@ -112,7 +112,7 @@ class ModelController extends Controller
                 try {
                     foreach ($data['sizes'] as $size) {
                         Size::create([
-                            'name' => $size,
+                            'name' => $size['name'],
                             'model_id' => $model->id,
                         ]);
                     }
@@ -128,7 +128,7 @@ class ModelController extends Controller
                 try {
                     foreach ($data['submodels'] as $submodel) {
                         SubModel::create([
-                            'name' => $submodel ?? null,
+                            'name' => $submodel['name'] ?? null,
                             'model_id' => $model->id,
                         ]);
                     }
