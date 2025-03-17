@@ -266,44 +266,50 @@ class TechnologController extends Controller
 
     public function updateTarification(Request $request, $id): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'submodel_id' => 'required|integer|exists:order_sub_models,id',
-        ]);
+        try {
+            // Validate request
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'submodel_id' => 'required|integer|exists:order_sub_models,id',
+            ]);
 
-        $data = $request->all();
+            $data = $request->all();
 
-        $tarificationCategory = TarificationCategory::find($id);
+            // Find TarificationCategory
+            $tarificationCategory = TarificationCategory::find($id);
+            if (!$tarificationCategory) {
+                return response()->json(['message' => 'TarificationCategory not found'], 404);
+            }
 
-        if (!$tarificationCategory) {
-            return response()->json([
-                'message' => 'TarificationCategory not found',
-            ], 404);
-        }
+            // Update TarificationCategory
+            $tarificationCategory->update([
+                'name' => $data['name'],
+                'submodel_id' => $data['submodel_id'],
+            ]);
 
-        $tarificationCategory->update([
-            'name' => $data['name'],
-            'submodel_id' => $data['submodel_id'],
-        ]);
+            $totalSecond = 0;
+            $totalSumma = 0;
 
-        $totalSecond = 0;
-        $totalSumma = 0;
+            // Delete old tarifications
+            Tarification::where('tarification_category_id', $tarificationCategory->id)->delete();
 
-        Tarification::where('tarification_category_id', $tarificationCategory->id)->delete();
-
-        if (!empty($data['tarifications'])) {
-            foreach ($data['tarifications'] as $tarification) {
-                if (!empty($tarification['name']) && !empty($tarification['razryad_id']) && !empty($tarification['typewriter_id']) && !empty($tarification['second'])) {
-                    $razryad = Razryad::find($tarification['razryad_id']);
-
-                    if (!$razryad) {
-                        return response()->json([
-                            'message' => 'Razryad not found',
-                        ], 404);
+            if (!empty($data['tarifications'])) {
+                foreach ($data['tarifications'] as $tarification) {
+                    // Check required fields
+                    if (!isset($tarification['name'], $tarification['razryad_id'], $tarification['typewriter_id'], $tarification['second'])) {
+                        continue;
                     }
 
+                    // Find Razryad
+                    $razryad = Razryad::find($tarification['razryad_id']);
+                    if (!$razryad) {
+                        return response()->json(['message' => 'Razryad not found'], 404);
+                    }
+
+                    // Calculate sum
                     $summa = $tarification['second'] * $razryad->salary;
 
+                    // Create Tarification
                     Tarification::create([
                         'tarification_category_id' => $tarificationCategory->id,
                         'name' => $tarification['name'],
@@ -319,16 +325,17 @@ class TechnologController extends Controller
                     $totalSumma += $summa;
                 }
             }
+
+            // Update SubmodelSpend
+            SubmodelSpend::where('submodel_id', $tarificationCategory->submodel_id)->update([
+                'seconds' => $totalSecond,
+                'summa' => $totalSumma,
+            ]);
+
+            return response()->json(['message' => 'Tarifications updated successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
         }
-
-        SubmodelSpend::updateOrCreate(
-            ['submodel_id' => $tarificationCategory->submodel_id],
-            ['seconds' => $totalSecond, 'summa' => $totalSumma]
-        );
-
-        return response()->json([
-            'message' => 'Tarifications updated successfully',
-        ], 200);
     }
 
     private function generateSequentialCode(): string
