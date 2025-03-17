@@ -3,6 +3,7 @@
 namespace App\Imports;
 
 use App\Models\Razryad;
+use App\Models\SubmodelSpend;
 use App\Models\TarificationCategory;
 use App\Models\Tarification;
 use App\Models\TypeWriter;
@@ -21,17 +22,15 @@ class TarificationCategoryImport implements ToCollection
     public function collection(Collection $rows): void
     {
         $currentCategoryId = null;
-        $skipHeader = false; // Har bir kategoriya blokidagi ustun nomlari qatorini o'tkazish uchun
+        $skipHeader = false;
 
         foreach ($rows as $row) {
-            // Bo'sh qatorlarni o'tkazamiz
-            if (empty(array_filter($row->toArray(), function($value) {
+            if (empty(array_filter($row->toArray(), function ($value) {
                 return !is_null($value) && trim($value) !== '';
             }))) {
                 continue;
             }
 
-            // Agar qator faqat bitta qiymatdan iborat bo'lsa – bu kategoriya nomi (merged hujayra)
             $nonEmptyCount = count(array_filter($row->toArray(), function ($value) {
                 return !is_null($value) && trim($value) !== '';
             }));
@@ -42,44 +41,50 @@ class TarificationCategoryImport implements ToCollection
                     'name' => $categoryName,
                 ]);
                 $currentCategoryId = $category->id;
-                $skipHeader = true; // Keyingi qator – ustun nomlari bo'ladi
+                $skipHeader = true;
                 continue;
             }
 
-            // Ustun nomlari qatorini o'tkazamiz
             if ($skipHeader) {
                 $skipHeader = false;
                 continue;
             }
 
-            // Excel fayldagi ustun tartibi:
-            // 0: (eski code - endi e'tiborga olinmaydi),
-            // 1: employee_id,
-            // 2: employee (nomi),
-            // 3: name,
-            // 4: razryad (nomi),
-            // 5: typewriter (nomi),
-            // 6: second,
-            // 7: summa
-
-            // Razryad va typewriter ma'lumotlarini id ga o'tkazamiz
             $razryad = Razryad::where('name', $row[4])->first();
             $typewriter = TypeWriter::where('name', $row[5])->first();
 
             if ($currentCategoryId) {
                 Tarification::create([
                     'tarification_category_id' => $currentCategoryId,
-                    // Avtomatik generatsiya qilinadigan code
                     'code'         => $this->generateSequentialCode(),
-                    'user_id'      => $row[1] ?? null, // eksport qilingan employee id
+                    'user_id'      => $row[1] ?? null,
                     'name'         => $row[3] ?? null,
                     'razryad_id'   => $razryad->id ?? 0,
                     'typewriter_id'=> $typewriter->id ?? 0,
-                    'second'       => $row[6] ?? null,
-                    'summa'        => $row[7] ?? null,
+                    'second'       => $row[6] ?? 0,
+                    'summa'        => $row[7] ?? 0,
                 ]);
             }
         }
+
+        $submodelSpends = TarificationCategory::where('submodel_id', $this->orderSubModelId)
+            ->with('tarifications')
+            ->get();
+
+        $totalSecond = 0;
+        $totalSumma = 0;
+
+        foreach ($submodelSpends as $category) {
+            foreach ($category->tarifications as $tarification) {
+                $totalSecond += $tarification->second;
+                $totalSumma += $tarification->summa;
+            }
+        }
+
+        SubmodelSpend::where('submodel_id', $this->orderSubModelId)->update([
+            'seconds' => $totalSecond,
+            'summa' => $totalSumma,
+        ]);
     }
 
     /**
