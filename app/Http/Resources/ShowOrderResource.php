@@ -19,6 +19,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $end_date
  * @property mixed $rasxod
  * @property mixed $comment
+ * @property mixed $price
  */
 
 class ShowOrderResource extends JsonResource
@@ -34,6 +35,7 @@ class ShowOrderResource extends JsonResource
             'end_date' => $this->end_date,
             'rasxod' => $this->rasxod,
             'comment' => $this->comment,
+            'price' => $this->price,
             'order_model' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
                 'model' => $this->orderModel->model,
