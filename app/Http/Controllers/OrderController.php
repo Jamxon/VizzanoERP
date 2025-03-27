@@ -94,6 +94,7 @@ class OrderController extends Controller
             'branch_id' => $user->employee->branch_id,
             'contragent_id' => $contragent->id ?? null,
             'comment' => $request->comment ?? null,
+            'price' => $request->price ?? 0,
         ]);
 
         $modelRasxod = Models::find($request->model['id'])->rasxod;
