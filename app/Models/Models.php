@@ -23,7 +23,7 @@ class Models extends Model
 
     protected $table = "models";
 
-    protected $fillable = ['name', 'rasxod'];
+    protected $fillable = ['name', 'rasxod','branch_id'];
 
     protected $hidden = ['created_at', 'updated_at'];
 
