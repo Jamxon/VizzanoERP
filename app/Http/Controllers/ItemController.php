@@ -15,6 +15,7 @@ class ItemController extends Controller
     public function index()
     {
         $items = Item::orderBy('updated_at', 'desc')
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->with('unit', 'color', 'type')
             ->get();
         return response()->json($items);
@@ -78,6 +79,7 @@ class ItemController extends Controller
             'type_id' => $validated['type_id'],
             'code' => $validated['code'] ?? uniqid(),
             'image' => $imagePath,
+            'branch_id' => auth()->user()->employee->branch_id,
         ]);
 
         return response()->json([

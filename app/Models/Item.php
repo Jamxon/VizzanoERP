@@ -19,7 +19,8 @@ class Item extends Model
         'color_id',
         'image',
         'type_id',
-        'code'
+        'code',
+        'branch_id'
     ];
 
     protected $hidden = [
@@ -27,7 +28,8 @@ class Item extends Model
         'updated_at',
         'unit_id',
         'color_id',
-        'type_id'
+        'type_id',
+        'branch_id'
     ];
 
     public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany

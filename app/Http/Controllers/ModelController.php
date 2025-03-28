@@ -169,7 +169,7 @@ class ModelController extends Controller
         $model->update([
             'name' => $data['name'] ?? $model->name,
             'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
-            
+
         ]);
 
         if ($request->hasFile('images') && !empty($request->file('images'))) {
