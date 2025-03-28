@@ -14,7 +14,8 @@ class ModelController extends Controller
 {
     public function index(): \Illuminate\Http\JsonResponse
     {
-        $models = Models::with([
+        $models = Models::where('branch_id', auth()->user()->employee->branch_id)
+        ->with([
             'sizes',
             'submodels',
             'images'
@@ -81,6 +82,7 @@ class ModelController extends Controller
                 $model = Models::create([
                     'name' => $data['name'] ?? null,
                     'rasxod' => (double)($data['rasxod'] ?? 0),
+                    'branch_id' => auth()->user()->employee->branch_id,
                 ]);
             } catch (\Exception $e) {
                 return response()->json([
@@ -167,6 +169,7 @@ class ModelController extends Controller
         $model->update([
             'name' => $data['name'] ?? $model->name,
             'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
+            
         ]);
 
         if ($request->hasFile('images') && !empty($request->file('images'))) {
