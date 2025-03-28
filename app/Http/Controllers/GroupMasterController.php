@@ -28,7 +28,7 @@ class GroupMasterController extends Controller
             ])
             ->get();
 
-        return response()->json(GetOrderGroupMasterResource::collection($orders));
+        return response()->json($orders);
     }
 
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
