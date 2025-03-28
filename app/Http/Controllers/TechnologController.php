@@ -275,23 +275,23 @@ class TechnologController extends Controller
 
             $data = $request->all();
 
-            // Find TarificationCategory
-            $tarificationCategory = TarificationCategory::find($id);
+            // Find or create TarificationCategory
+            $tarificationCategory = $id ? TarificationCategory::find($id) : null;
             if (!$tarificationCategory) {
-                return response()->json(['message' => 'TarificationCategory not found'], 404);
+                $tarificationCategory = TarificationCategory::create([
+                    'name' => $data['name'],
+                    'submodel_id' => $data['submodel_id'],
+                ]);
+            } else {
+                // Update existing TarificationCategory
+                $tarificationCategory->update([
+                    'name' => $data['name'],
+                    'submodel_id' => $data['submodel_id'],
+                ]);
             }
-
-            // Update TarificationCategory
-            $tarificationCategory->update([
-                'name' => $data['name'],
-                'submodel_id' => $data['submodel_id'],
-            ]);
 
             $totalSecond = 0;
             $totalSumma = 0;
-
-            // Delete old tarifications
-            Tarification::where('tarification_category_id', $tarificationCategory->id)->delete();
 
             if (!empty($data['tarifications'])) {
                 foreach ($data['tarifications'] as $tarification) {
@@ -309,34 +309,38 @@ class TechnologController extends Controller
                     // Calculate sum
                     $summa = $tarification['second'] * $razryad->salary;
 
-                    // Create Tarification
-                    Tarification::create([
-                        'tarification_category_id' => $tarificationCategory->id,
-                        'name' => $tarification['name'],
-                        'user_id' => $tarification['user_id'] ?? null,
-                        'razryad_id' => $tarification['razryad_id'],
-                        'typewriter_id' => $tarification['typewriter_id'],
-                        'second' => $tarification['second'],
-                        'summa' => $summa,
-                        'code' => $this->generateSequentialCode(),
-                    ]);
+                    // Agar `id` mavjud bo‘lsa, yangilash, aks holda yangi qo‘shish
+                    $tarificationRecord = Tarification::updateOrCreate(
+                        ['id' => $tarification['id'] ?? null], // Agar `id` null yoki umuman kelmasa, yangi yoziladi
+                        [
+                            'tarification_category_id' => $tarificationCategory->id,
+                            'name' => $tarification['name'],
+                            'user_id' => $tarification['user_id'] ?? null,
+                            'razryad_id' => $tarification['razryad_id'],
+                            'typewriter_id' => $tarification['typewriter_id'],
+                            'second' => $tarification['second'],
+                            'summa' => $summa,
+                            'code' => $this->generateSequentialCode(),
+                        ]
+                    );
 
                     $totalSecond += $tarification['second'];
                     $totalSumma += $summa;
                 }
             }
 
-            // Update SubmodelSpend
-            SubmodelSpend::where('submodel_id', $tarificationCategory->submodel_id)->update([
-                'seconds' => $totalSecond,
-                'summa' => $totalSumma,
-            ]);
+            // Update or create SubmodelSpend
+            SubmodelSpend::updateOrCreate(
+                ['submodel_id' => $tarificationCategory->submodel_id],
+                ['seconds' => $totalSecond, 'summa' => $totalSumma]
+            );
 
             return response()->json(['message' => 'Tarifications updated successfully'], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
+
 
     private function generateSequentialCode(): string
     {
