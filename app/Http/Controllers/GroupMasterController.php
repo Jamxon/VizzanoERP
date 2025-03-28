@@ -24,6 +24,7 @@ class GroupMasterController extends Controller
                 'orderModel.model',
                 'orderModel.material',
                 'orderModel.sizes.size',
+                'orderModel.submodels.submodel',
                 'instructions',
             ])
             ->get();
