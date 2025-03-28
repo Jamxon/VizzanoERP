@@ -51,6 +51,7 @@ Route::prefix('qualityController')->middleware('role:qualityController')->group(
 
 Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
    Route::get('orders',[\App\Http\Controllers\GroupMasterController::class, 'getOrders']);
+   Route::get('orders/pending',[\App\Http\Controllers\GroupMasterController::class, 'getPendingOrders']);
    Route::get('orders/show/{id}',[\App\Http\Controllers\GroupMasterController::class, 'showOrder']);
     Route::get('orders/{id}',[\App\Http\Controllers\GroupMasterController::class,'startOrder']);
     Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);

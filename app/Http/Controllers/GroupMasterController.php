@@ -15,6 +15,22 @@ use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
 {
+    public function getPendingOrders(): \Illuminate\Http\JsonResponse
+    {
+        $orders = Order::where('status', 'pending')
+            ->whereDoesntHave('orderGroups')
+            ->with([
+                'orderModel',
+                'orderModel.model',
+                'orderModel.material',
+                'orderModel.sizes.size',
+                'instructions',
+            ])
+            ->get();
+
+        return response()->json(GetOrderGroupMasterResource::collection($orders));
+    }
+
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
