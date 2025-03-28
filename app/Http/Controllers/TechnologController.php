@@ -543,7 +543,7 @@ class TechnologController extends Controller
             ], 400);
         }
 
-        return Excel::download(new TarificationCategoryExport($orderSubModelId),  $order->id . $orderSubmodel->submodel->name .  '.xlsx');
+        return Excel::download(new TarificationCategoryExport($orderSubModelId),  $order->id . ' ' . $orderSubmodel->submodel->name .  '.xlsx');
     }
 
     public function importTarification(Request $request): \Illuminate\Http\JsonResponse
