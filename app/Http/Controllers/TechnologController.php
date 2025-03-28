@@ -267,7 +267,6 @@ class TechnologController extends Controller
     public function updateTarification(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         try {
-            // Validate request
             $request->validate([
                 'name' => 'required|string|max:255',
                 'submodel_id' => 'required|integer|exists:order_sub_models,id',
@@ -275,7 +274,6 @@ class TechnologController extends Controller
 
             $data = $request->all();
 
-            // Find or create TarificationCategory
             $tarificationCategory = $id ? TarificationCategory::find($id) : null;
             if (!$tarificationCategory) {
                 $tarificationCategory = TarificationCategory::create([
@@ -283,7 +281,6 @@ class TechnologController extends Controller
                     'submodel_id' => $data['submodel_id'],
                 ]);
             } else {
-                // Update existing TarificationCategory
                 $tarificationCategory->update([
                     'name' => $data['name'],
                     'submodel_id' => $data['submodel_id'],
@@ -295,23 +292,19 @@ class TechnologController extends Controller
 
             if (!empty($data['tarifications'])) {
                 foreach ($data['tarifications'] as $tarification) {
-                    // Check required fields
                     if (!isset($tarification['name'], $tarification['razryad_id'], $tarification['typewriter_id'], $tarification['second'])) {
                         continue;
                     }
 
-                    // Find Razryad
                     $razryad = Razryad::find($tarification['razryad_id']);
                     if (!$razryad) {
                         return response()->json(['message' => 'Razryad not found'], 404);
                     }
 
-                    // Calculate sum
                     $summa = $tarification['second'] * $razryad->salary;
 
-                    // Agar `id` mavjud bo‘lsa, yangilash, aks holda yangi qo‘shish
                     $tarificationRecord = Tarification::updateOrCreate(
-                        ['id' => $tarification['id'] ?? null], // Agar `id` null yoki umuman kelmasa, yangi yoziladi
+                        ['id' => $tarification['id'] ?? null],
                         [
                             'tarification_category_id' => $tarificationCategory->id,
                             'name' => $tarification['name'],
@@ -329,7 +322,6 @@ class TechnologController extends Controller
                 }
             }
 
-            // Update or create SubmodelSpend
             SubmodelSpend::updateOrCreate(
                 ['submodel_id' => $tarificationCategory->submodel_id],
                 ['seconds' => $totalSecond, 'summa' => $totalSumma]
@@ -340,7 +332,6 @@ class TechnologController extends Controller
             return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
         }
     }
-
 
     private function generateSequentialCode(): string
     {
