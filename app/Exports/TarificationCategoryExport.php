@@ -47,7 +47,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
                 $rows->push([
                     $tarification->code,
                     $tarification->employee->id ?? null,   // Employee id
-                    $tarification->employee->name, // Employee nomi
+                    $tarification->employee->name ?? null, // Employee nomi
                     $tarification->name,
                     $tarification->razryad->name,
                     $tarification->typewriter->name,
