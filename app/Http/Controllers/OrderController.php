@@ -19,6 +19,7 @@ class OrderController extends Controller
     public function index(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::orderBy('created_at', 'asc')
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->with(
                 'orderModel',
                 'orderModel.model',
