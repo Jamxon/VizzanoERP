@@ -9,6 +9,7 @@ use App\Imports\TarificationCategoryImport;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderModel;
 use App\Models\OrderSubModel;
 use App\Models\PartSpecification;
 use App\Models\Razryad;
@@ -533,14 +534,16 @@ class TechnologController extends Controller
     public function exportTarification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
     {
         $orderSubModelId = $request->get('orderSubModelId');
-
+        $orderSubmodel = OrderSubModel::find($orderSubModelId);
+        $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
+        $order = Order::find($orderModelId->order_id);
         if (!$orderSubModelId) {
             return response()->json([
                 'error' => 'orderSubModelId talab qilinadi.'
             ], 400);
         }
 
-        return Excel::download(new TarificationCategoryExport($orderSubModelId), 'tarification_export_' . $orderSubModelId . '.xlsx');
+        return Excel::download(new TarificationCategoryExport($orderSubModelId),  $order->id . $orderSubmodel->submodel->name .  '.xlsx');
     }
 
     public function importTarification(Request $request): \Illuminate\Http\JsonResponse
