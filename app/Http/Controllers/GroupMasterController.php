@@ -68,7 +68,6 @@ class GroupMasterController extends Controller
         }
     }
 
-
     public function getPendingOrders(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('status', 'pending')
@@ -80,6 +79,7 @@ class GroupMasterController extends Controller
                 'orderModel.material',
                 'orderModel.sizes.size',
                 'orderModel.submodels.submodel',
+                'orderModel.submodels.group',
                 'instructions',
             ])
             ->get();
