@@ -32,7 +32,8 @@ class CuttingMasterController extends Controller
                 'orderModel.submodels',
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',
-                'orderPrintingTime'
+                'orderPrintingTime',
+                'orderPrintingTime.user'
             )
             ->get();
 
