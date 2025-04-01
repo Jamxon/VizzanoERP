@@ -8,15 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class SuperHRController extends Controller
 {
-    private function logAction($userId, $action)
-    {
-        DB::table('log')->insert([
-            'user_id' => $userId,
-            'action' => $action,
-            'created_at' => now(),
-        ]);
-    }
-
     public function employeeStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
@@ -46,13 +37,13 @@ class SuperHRController extends Controller
 
             $employeeId = DB::table('employee')->insertGetId($employeeData);
 
-            $this->logAction($user->id, "Foydalanuvchi ID: {$user->id} xodim qo‘shdi (ID: {$employeeId})");
+            Log::add($user->id, 'Yangi xodim qo‘shildi', null, $employeeData);
 
             DB::commit();
-            return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli yaratildi', 'employee' => $employeeId], 201);
+            return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli qo‘shildi', 'employee_id' => $employeeId], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Xodim yaratishda xatolik: ' . $e->getMessage()], 500);
+            return response()->json(['status' => 'error', 'message' => 'Xodimni qo‘shishda xatolik: ' . $e->getMessage()], 500);
         }
     }
 
@@ -72,22 +63,20 @@ class SuperHRController extends Controller
             'group_id' => 'sometimes|integer|exists:groups,id',
             'payment_type' => 'required|string|max:50',
             'salary' => 'required|numeric|min:0',
-            'image' => 'nullable|image|max:20480',
             'status' => 'sometimes|boolean',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $employeeData = $request->only(['full_name', 'phone', 'address', 'role_id', 'hiring_date', 'type', 'department_id', 'group_id', 'payment_type', 'salary', 'status']);
+            $employee = DB::table('employee')->where('id', $request->employee_id)->first();
+            $oldData = (array) $employee;
 
-            if ($request->hasFile('image')) {
-                $employeeData['image_path'] = $request->file('image')->store('images', 'public');
-            }
+            $newData = $request->only(['full_name', 'phone', 'address', 'role_id', 'hiring_date', 'type', 'department_id', 'group_id', 'payment_type', 'salary', 'status']);
 
-            DB::table('employee')->where('id', $request->employee_id)->update($employeeData);
+            DB::table('employee')->where('id', $request->employee_id)->update($newData);
 
-            $this->logAction($user->id, "Foydalanuvchi ID: {$user->id} xodimni yangiladi (ID: {$request->employee_id})");
+            Log::add($user->id, 'Xodim yangilandi', $oldData, $newData);
 
             DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli yangilandi'], 200);
@@ -105,9 +94,9 @@ class SuperHRController extends Controller
 
         try {
             DB::beginTransaction();
+            $employee = DB::table('employee')->where('id', $request->employee_id)->first();
             DB::table('employee')->where('id', $request->employee_id)->update(['status' => false]);
-
-            $this->logAction($user->id, "Foydalanuvchi ID: {$user->id} xodimni o‘chirdi (ID: {$request->employee_id})");
+            Log::add($user->id, 'Xodim o‘chirildi', (array) $employee, null);
 
             DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli o‘chirildi'], 200);
@@ -119,32 +108,21 @@ class SuperHRController extends Controller
 
     public function employeeReturn(Request $request): \Illuminate\Http\JsonResponse
     {
-        $employeeId = $request->input('employee_id');
+        $user = auth()->user();
 
-        $request->validate([
-            'employee_id' => 'required|integer|exists:employee,id',
-        ]);
+        $request->validate(['employee_id' => 'required|integer|exists:employee,id']);
 
         try {
             DB::beginTransaction();
-
-            DB::table('employee')->where('id', $employeeId)->update([
-                'status' => true,
-            ]);
+            $employee = DB::table('employee')->where('id', $request->employee_id)->first();
+            DB::table('employee')->where('id', $request->employee_id)->update(['status' => true]);
+            Log::add($user->id, 'Xodim qayta tiklandi', null, (array) $employee);
 
             DB::commit();
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Employee returned successfully',
-            ], 200);
-        }
-        catch (\Exception $e) {
+            return response()->json(['status' => 'success', 'message' => 'Xodim qayta tiklandi'], 200);
+        } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to return employee: ' . $e->getMessage(),
-            ], 500);
+            return response()->json(['status' => 'error', 'message' => 'Xodimni qayta tiklashda xatolik: ' . $e->getMessage()], 500);
         }
     }
 }
