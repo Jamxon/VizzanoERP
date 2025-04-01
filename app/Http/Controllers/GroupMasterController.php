@@ -21,7 +21,7 @@ class GroupMasterController extends Controller
     {
         $orderId = $request->input('order_id');
         $submodelId = $request->input('submodel_id');
-        
+
         try {
             DB::beginTransaction();
 
