@@ -79,6 +79,7 @@ class GroupMasterController extends Controller
                 'orderModel.sizes.size',
                 'orderModel.submodels.submodel',
                 'orderModel.submodels.group.group',
+                'orderModel.submodels.group.group.responsibleUser',
                 'instructions',
             ])
             ->get();
