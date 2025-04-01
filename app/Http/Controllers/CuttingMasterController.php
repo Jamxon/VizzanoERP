@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetOrderCutResource;
 use App\Http\Resources\GetSpecificationResource;
 use App\Http\Resources\showOrderCuttingMasterResource;
+use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderModel;
@@ -234,37 +235,55 @@ class CuttingMasterController extends Controller
         }
     }
 
-    public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
-    {
-        $order = Order::find($id);
-
-        $order->load([
-            'orderModel.submodels.specificationCategories',
-            'orderModel.submodels.specificationCategories.specifications'
-        ]);
-
-        $resource = new GetSpecificationResource($order);
-
-        return response()->json($resource);
-    }
-
     public function markAsCut(Request $request): \Illuminate\Http\JsonResponse
     {
+        $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'category_id' => 'required|integer|exists:specification_categories,id',
+            'quantity' => 'required|numeric|min:1',
+        ]);
+
         $orderId = $request->order_id;
         $categoryId = $request->category_id;
         $quantity = $request->quantity;
         $user = auth()->user();
 
-        OrderCut::create([
-            'order_id' => $orderId,
-            'specification_category_id' => $categoryId,
-            'user_id' => $user->id,
-            'cut_at' => Carbon::now(),
-            'quantity' => $quantity,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        return response()->json(["message" => "Cut marked successfully"]);
+            $oldData = DB::table('order_cuts')
+                ->where('order_id', $orderId)
+                ->where('specification_category_id', $categoryId)
+                ->sum('quantity') ?? 0;
+
+            $newData = $oldData + $quantity;
+
+            OrderCut::create([
+                'order_id' => $orderId,
+                'specification_category_id' => $categoryId,
+                'user_id' => $user->id,
+                'cut_at' => now(),
+                'quantity' => $quantity,
+            ]);
+
+            Log::add(
+                $user->id,
+                "Buyurtma kesildi (Order ID: $orderId, Category ID: $categoryId, Kesilgan miqdor: $quantity, Jami: $newData)",
+                ['old_total_quantity' => $oldData],
+                ['new_total_quantity' => $newData]
+            );
+
+            DB::commit();
+
+            return response()->json(["message" => "Kesish muvaffaqiyatli belgilandi"], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                "message" => "Kesish belgilanmadi: " . $e->getMessage()
+            ], 500);
+        }
     }
+
 
     public function getCuts($id): \Illuminate\Http\JsonResponse
     {
