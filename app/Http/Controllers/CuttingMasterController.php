@@ -235,6 +235,20 @@ class CuttingMasterController extends Controller
         }
     }
 
+    public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
+    {
+        $order = Order::find($id);
+
+        $order->load([
+            'orderModel.submodels.specificationCategories',
+            'orderModel.submodels.specificationCategories.specifications'
+        ]);
+
+        $resource = new GetSpecificationResource($order);
+
+        return response()->json($resource);
+    }
+
     public function markAsCut(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
