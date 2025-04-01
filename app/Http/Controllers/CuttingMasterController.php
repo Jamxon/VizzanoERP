@@ -305,7 +305,7 @@ class CuttingMasterController extends Controller
             ->get();
 
         $groupedCuts = $cuts->groupBy(function ($cut) {
-            return $cut->category->submodel->id ?? null;
+            return $cut->category->submodel->id;
         });
 
         $resource = $groupedCuts->map(function ($group, $submodelId) {
