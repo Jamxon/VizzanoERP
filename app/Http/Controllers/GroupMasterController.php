@@ -8,32 +8,67 @@ use App\Http\Resources\ShowOrderGroupMaster;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderGroup;
+use App\Models\OrderSubModel;
 use App\Models\SewingOutputs;
 use App\Models\Tarification;
 use App\Models\Time;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GroupMasterController extends Controller
 {
-    public function receiveOrder($orderId, $submodelId)
+    public function receiveOrder($orderId, $submodelId): \Illuminate\Http\JsonResponse
     {
-        $order = Order::find($orderId);
+        try {
+            DB::beginTransaction();
 
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
+            $order = Order::find($orderId);
+
+            if (!$order) {
+                return response()->json(['message' => 'Order not found'], 404);
+            }
+
+            $orderSubmodel = OrderSubmodel::find($submodelId);
+
+            if (!$orderSubmodel) {
+                return response()->json(['message' => 'OrderSubmodel not found'], 404);
+            }
+
+            $allOrderSubmodels = OrderSubmodel::where('order_model_id', $orderSubmodel->order_model_id)->pluck('id')->toArray();
+
+            $existingOrderGroup = OrderGroup::where('submodel_id', $submodelId)->first();
+
+            if ($existingOrderGroup) {
+                $existingOrderGroup->update([
+                    'group_id' => auth()->user()->group->id,
+                ]);
+            } else {
+                OrderGroup::create([
+                    'order_id' => $order->id,
+                    'group_id' => auth()->user()->group->id,
+                    'submodel_id' => $submodelId,
+                ]);
+            }
+
+            $linkedSubmodels = OrderGroup::whereIn('submodel_id', $allOrderSubmodels)->distinct('submodel_id')->count();
+
+            if (count($allOrderSubmodels) > 0 && count($allOrderSubmodels) == $linkedSubmodels) {
+                $order->update(['status' => 'tailoring']);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Order received successfully',
+                'order' => $order,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error receiving order: ' . $e->getMessage()], 500);
         }
-
-        $orderGroup = OrderGroup::create([
-            'order_id' => $order->id,
-            'group_id' => auth()->user()->group->id,
-            'submodel_id' => $submodelId,
-        ]);
-
-        return response()->json([
-            'message' => 'Order received successfully',
-            'order' => $order
-        ]);
     }
+
+
     public function getPendingOrders(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('status', 'pending')
