@@ -27,7 +27,7 @@ class CuttingMasterController extends Controller
             ->orderBy('start_date', 'asc')
             ->with(
                 'instructions',
-                'orderModel.model',
+//                'orderModel.model',
                 'orderModel.model.material',
                 'orderModel.submodels',
                 'orderModel.submodels.submodel',
