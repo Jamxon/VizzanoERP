@@ -25,6 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
             'comment' => $this->comment,
             'orderModel' => $this->orderModel->load(
                 'model',
+                'materials',
                 'submodels',
                 'submodels.submodel',
                 'submodels.specificationCategories',
