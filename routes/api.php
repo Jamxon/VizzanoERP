@@ -64,6 +64,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
     Route::get('orderCuts/show',[\App\Http\Controllers\GroupMasterController::class, 'showOrderCuts']);
     Route::post('orderCuts/{id}',[\App\Http\Controllers\GroupMasterController::class, 'receiveOrderCut']);
     Route::get('plans',[GroupMasterController::class, 'getPlans']);
+    Route::post('receiveOrder',[GroupMasterController::class, 'receiveOrder']);
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
