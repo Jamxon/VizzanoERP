@@ -17,8 +17,11 @@ use Illuminate\Support\Facades\DB;
 
 class GroupMasterController extends Controller
 {
-    public function receiveOrder($orderId, $submodelId): \Illuminate\Http\JsonResponse
+    public function receiveOrder(Request $request): \Illuminate\Http\JsonResponse
     {
+        $orderId = $request->input('order_id');
+        $submodelId = $request->input('submodel_id');
+        
         try {
             DB::beginTransaction();
 
