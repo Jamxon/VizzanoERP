@@ -19,6 +19,7 @@ class GroupMasterController extends Controller
     {
         $orders = Order::where('status', 'pending')
             ->whereDoesntHave('orderGroups')
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->with([
                 'orderModel',
                 'orderModel.model',
