@@ -71,7 +71,6 @@ class GroupMasterController extends Controller
     public function getPendingOrders(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('status', 'pending')
-            ->whereDoesntHave('orderGroups')
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->with([
                 'orderModel',
