@@ -15,6 +15,25 @@ use Illuminate\Http\Request;
 
 class GroupMasterController extends Controller
 {
+    public function receiveOrder($orderId, $submodelId)
+    {
+        $order = Order::find($orderId);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        $orderGroup = OrderGroup::create([
+            'order_id' => $order->id,
+            'group_id' => auth()->user()->group->id,
+            'submodel_id' => $submodelId,
+        ]);
+
+        return response()->json([
+            'message' => 'Order received successfully',
+            'order' => $order
+        ]);
+    }
     public function getPendingOrders(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('status', 'pending')
