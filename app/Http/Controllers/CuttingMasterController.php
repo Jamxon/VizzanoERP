@@ -28,6 +28,7 @@ class CuttingMasterController extends Controller
             ->with(
                 'instructions',
                 'orderModel.model',
+                'orderModel.model.material',
                 'orderModel.submodels',
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',

@@ -18,6 +18,7 @@ use App\Http\Controllers\QualityControllerMasterController;
 use App\Http\Controllers\RazryadController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SubModelController;
+use App\Http\Controllers\SuperHRController;
 use App\Http\Controllers\TechnologController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -153,8 +154,11 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::delete('departments/{department}', [DepartmentController::class, 'destroy']);
 });
 
-Route::prefix('hr')->middleware('role:hr')->group(function () {
-    Route::get('export-employees', [UserController::class, 'export']);
+Route::prefix('superhr')->middleware('role:superhr')->group(function () {
+    Route::post('employees', [SuperHRController::class, 'employeeStore']);
+    Route::patch('employees/{employee}', [SuperHRController::class, 'employeeUpdate']);
+    Route::delete('employees/{employee}', [SuperHRController::class, 'employeeDelete']);
+    Route::post('employees/return/{employee}', [SuperHRController::class, 'employeeReturn']);
 });
 
 Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {
