@@ -253,7 +253,6 @@ class GroupMasterController extends Controller
             'comment' => 'nullable|string'
         ]);
 
-        // Submodel, model va orderni olish
         $orderSubModel = OrderSubModel::find($validatedData['order_submodel_id']);
         $orderModel = OrderModel::find($orderSubModel->order_model_id);
         $order = Order::find($orderModel->order_id);
@@ -264,20 +263,16 @@ class GroupMasterController extends Controller
 
         $orderQuantity = $order->quantity;
 
-        // Ushbu submodel uchun SewingOutputs dagi jami kiritilgan quantity ni olish
         $totalSewnQuantity = SewingOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
 
-        // Qolgan miqdorni hisoblash
         $remainingQuantity = $orderQuantity - $totalSewnQuantity;
 
-        // Agar yangi kiritilayotgan miqdor mavjud buyurtma quantity dan oshsa, xatolik qaytarish
         if ($validatedData['quantity'] > $remainingQuantity) {
             return response()->json([
                 'message' => "Siz faqat {$remainingQuantity} dona qo‘shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."
             ], 400);
         }
 
-        // Ma'lumotni saqlash
         SewingOutputs::create($validatedData);
 
         return response()->json([
