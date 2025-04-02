@@ -14,4 +14,9 @@ class Time extends Model
     protected $fillable = [
         'time',
     ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 }
