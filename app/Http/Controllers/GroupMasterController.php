@@ -8,6 +8,7 @@ use App\Http\Resources\ShowOrderGroupMaster;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderGroup;
+use App\Models\OrderModel;
 use App\Models\OrderSubModel;
 use App\Models\SewingOutputs;
 use App\Models\Tarification;
@@ -247,17 +248,43 @@ class GroupMasterController extends Controller
     {
         $validatedData = $request->validate([
             'order_submodel_id' => 'required|exists:order_sub_models,id',
-            'quantity' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
             'time_id' => 'required|exists:times,id',
             'comment' => 'nullable|string'
         ]);
 
+        // Submodel, model va orderni olish
+        $orderSubModel = OrderSubModel::find($validatedData['order_submodel_id']);
+        $orderModel = OrderModel::find($orderSubModel->order_model_id);
+        $order = Order::find($orderModel->order_id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Buyurtma topilmadi!'], 404);
+        }
+
+        $orderQuantity = $order->quantity;
+
+        // Ushbu submodel uchun SewingOutputs dagi jami kiritilgan quantity ni olish
+        $totalSewnQuantity = SewingOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
+
+        // Qolgan miqdorni hisoblash
+        $remainingQuantity = $orderQuantity - $totalSewnQuantity;
+
+        // Agar yangi kiritilayotgan miqdor mavjud buyurtma quantity dan oshsa, xatolik qaytarish
+        if ($validatedData['quantity'] > $remainingQuantity) {
+            return response()->json([
+                'message' => "Siz faqat {$remainingQuantity} dona qo‘shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."
+            ], 400);
+        }
+
+        // Ma'lumotni saqlash
         SewingOutputs::create($validatedData);
 
         return response()->json([
-            'message' => 'Sewing output created successfully'
+            'message' => "Sewing output muvaffaqiyatli qo‘shildi. Qolgan miqdor: " . ($remainingQuantity - $validatedData['quantity'])
         ]);
     }
+
 
     public function showOrderCuts(Request $request): \Illuminate\Http\JsonResponse
     {
