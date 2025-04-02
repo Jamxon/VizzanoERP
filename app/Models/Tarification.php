@@ -41,22 +41,22 @@ class Tarification extends Model
 
     protected $with = ['employee', 'razryad', 'typewriter'];
 
-    public function tarificationCategory()
+    public function tarificationCategory(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(TarificationCategory::class,'tarification_category_id');
     }
 
-    public function employee()
+    public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Employee::class,'user_id');
     }
 
-    public function razryad()
+    public function razryad(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Razryad::class,'razryad_id');
     }
 
-    public function typewriter()
+    public function typewriter(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(TypeWriter::class,'typewriter_id');
     }
