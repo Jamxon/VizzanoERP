@@ -51,20 +51,20 @@ Route::prefix('qualityController')->middleware('role:qualityController')->group(
 });
 
 Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
-   Route::get('orders',[\App\Http\Controllers\GroupMasterController::class, 'getOrders']);
-   Route::get('orders/pending',[\App\Http\Controllers\GroupMasterController::class, 'getPendingOrders']);
-   Route::get('orders/show/{id}',[\App\Http\Controllers\GroupMasterController::class, 'showOrder']);
-    Route::get('orders/{id}',[\App\Http\Controllers\GroupMasterController::class,'startOrder']);
-    Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);
-    Route::get('tarifications/{id}',[\App\Http\Controllers\GroupMasterController::class, 'getTarifications']);
-    Route::post('tarifications',[\App\Http\Controllers\GroupMasterController::class,'assignEmployeesToTarifications']);
-    Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
-    Route::post('sewingOutputs',[\App\Http\Controllers\GroupMasterController::class, 'SewingOutputsStore']);
-    Route::get('orderCuts',[\App\Http\Controllers\GroupMasterController::class, 'getOrderCuts']);
-    Route::get('orderCuts/show',[\App\Http\Controllers\GroupMasterController::class, 'showOrderCuts']);
-    Route::post('orderCuts/{id}',[\App\Http\Controllers\GroupMasterController::class, 'receiveOrderCut']);
-    Route::get('plans',[GroupMasterController::class, 'getPlans']);
-    Route::post('receiveOrder',[GroupMasterController::class, 'receiveOrder']);
+       Route::get('orders',[\App\Http\Controllers\GroupMasterController::class, 'getOrders']);
+       Route::get('orders/pending',[\App\Http\Controllers\GroupMasterController::class, 'getPendingOrders']);
+       Route::get('orders/show/{id}',[\App\Http\Controllers\GroupMasterController::class, 'showOrder']);
+       Route::get('orders/{id}',[\App\Http\Controllers\GroupMasterController::class,'startOrder']);
+       Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);
+       Route::get('tarifications/{id}',[\App\Http\Controllers\GroupMasterController::class, 'getTarifications']);
+       Route::post('tarifications',[\App\Http\Controllers\GroupMasterController::class,'assignEmployeesToTarifications']);
+       Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
+       Route::post('sewingOutputs',[\App\Http\Controllers\GroupMasterController::class, 'SewingOutputsStore']);
+       Route::get('orderCuts',[\App\Http\Controllers\GroupMasterController::class, 'getOrderCuts']);
+       Route::get('orderCuts/show',[\App\Http\Controllers\GroupMasterController::class, 'showOrderCuts']);
+       Route::post('orderCuts/{id}',[\App\Http\Controllers\GroupMasterController::class, 'receiveOrderCut']);
+       Route::get('plans',[GroupMasterController::class, 'getPlans']);
+       Route::post('receiveOrder',[GroupMasterController::class, 'receiveOrder']);
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
