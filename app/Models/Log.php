@@ -27,7 +27,7 @@ class Log extends Model
             'action' => $action,
             'old_data' => $oldData ? json_encode($oldData) : null,
             'new_data' => $newData ? json_encode($newData) : null,
-            'ip_address' => $request->ip(),
+            'ip_address' => \request()->ip(),
             'user_agent' => Request::header('User-Agent'),
             'created_at' => now(),
         ]);
