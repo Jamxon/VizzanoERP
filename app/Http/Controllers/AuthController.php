@@ -91,10 +91,7 @@ class AuthController extends Controller
             'Muvaffaqiyatli tizimga kirish',
             null,
             [
-                'username' => $request->username,
-                'status' => 'success',
-                'ip_address' => $request->ip(),
-                'token' => $token,
+                'user' => $user,
             ]
         );
 
