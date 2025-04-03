@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Log;
 use App\Models\User;
 use http\Env\Response;
 use Illuminate\Http\Request;
@@ -55,14 +56,40 @@ class AuthController extends Controller
             'password' => 'required|string|min:6',
         ]);
 
-
         $user = User::where('username', $request->username)->first();
 
+        // Foydalanuvchi topilmasa yoki parol noto'g'ri bo'lsa log yozish
         if (!$user || !$this->checkDjangoPassword($request->password, $user->password) || ($user->employee->status == 'kicked')) {
+            // Log yozish: Foydalanuvchi tizimga kira olmagan
+            Log::add(
+                $request->user() ? $request->user()->id : null,  // Agar foydalanuvchi mavjud bo'lsa, uning ID sini yozish
+                'Tizimga kirishga urinish',
+                null,
+                [
+                    'username' => $request->username,
+                    'status' => 'failed',
+                    'error' => 'Unauthorized',
+                    'ip_address' => $request->ip(),  // IP manzilini ham yozish
+                ]
+            );
+
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        // Foydalanuvchi muvaffaqiyatli tizimga kirganini loglash
         $token = JWTAuth::fromUser($user);
+
+        Log::add(
+            $user->id,  // Foydalanuvchi ID sini yozish
+            'Muvaffaqiyatli tizimga kirish',
+            null,
+            [
+                'username' => $request->username,
+                'status' => 'success',
+                'ip_address' => $request->ip(),  // IP manzilini yozish
+                'token' => $token,
+            ]
+        );
 
         return response()->json([
             'token' => $token,
