@@ -49,21 +49,39 @@ class CuttingMasterController extends Controller
             'comment' => 'nullable|string'
         ]);
 
-        $order = Order::find($data['order_id']);
+        DB::beginTransaction();
+        try {
+            $order = Order::find($data['order_id']);
+            $oldStatus = $order->status;
 
-        $order->update([
-            'status' => 'printing'
-        ]);
+            $order->update([
+                'status' => 'printing'
+            ]);
 
-        $orderPrintingTime = OrderPrintingTimes::create([
-            'order_id' => $data['order_id'],
-            'planned_time' => $data['planned_time'],
-            'status' => 'printing',
-            'comment' => $data['comment'],
-            'user_id' => auth()->user()->id
-        ]);
+            $orderPrintingTime = OrderPrintingTimes::create([
+                'order_id' => $data['order_id'],
+                'planned_time' => $data['planned_time'],
+                'status' => 'printing',
+                'comment' => $data['comment'],
+                'user_id' => auth()->user()->id
+            ]);
 
-        return response()->json($orderPrintingTime);
+            // Add log entry
+            Log::add(
+                auth()->user()->id,
+                "Buyurtma konstruktorga yuborildi (Order ID: {$data['order_id']})",
+                ['old_status' => $oldStatus, 'order_id' => $data['order_id']],
+                ['new_status' => 'printing', 'planned_time' => $data['planned_time'], 'comment' => $data['comment']]
+            );
+
+            DB::commit();
+            return response()->json($orderPrintingTime);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function getCompletedItems(Request $request): \Illuminate\Http\JsonResponse
@@ -175,16 +193,28 @@ class CuttingMasterController extends Controller
         DB::beginTransaction();
         try {
             $outcome = Outcome::findOrFail($id);
-
+            $oldStatus = $outcome->status;
             $newStatus = $request->status;
+
+            $affectedProducts = [];
 
             if ($newStatus == "cancelled") {
                 foreach ($outcome->items as $item) {
                     $stock = Stok::where('warehouse_id', $outcome->warehouse_id)
                         ->where('product_id', $item->product_id)
                         ->firstOrFail();
+
+                    $oldQuantity = $stock->quantity;
                     $stock->quantity += $item->quantity;
                     $stock->save();
+
+                    $affectedProducts[] = [
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product->name ?? 'Unknown',
+                        'old_quantity' => $oldQuantity,
+                        'new_quantity' => $stock->quantity,
+                        'difference' => $item->quantity
+                    ];
                 }
             }
 
@@ -216,10 +246,28 @@ class CuttingMasterController extends Controller
                     $stock = Stok::where('warehouse_id', $outcome->warehouse_id)
                         ->where('product_id', $item->product_id)
                         ->firstOrFail();
+
+                    $oldQuantity = $stock->quantity;
                     $stock->quantity -= $item->quantity;
                     $stock->save();
+
+                    $affectedProducts[] = [
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product->name ?? 'Unknown',
+                        'old_quantity' => $oldQuantity,
+                        'new_quantity' => $stock->quantity,
+                        'difference' => -$item->quantity
+                    ];
                 }
             }
+
+            // Add log entry
+            Log::add(
+                auth()->user()->id,
+                "Mahsulot statusi o'zgartirildi (Outcome ID: $id, Status: $oldStatus -> $newStatus)",
+                ['old_status' => $oldStatus, 'outcome_id' => $id],
+                ['new_status' => $newStatus, 'affected_products' => $affectedProducts]
+            );
 
             DB::commit();
             return response()->json([
@@ -334,13 +382,32 @@ class CuttingMasterController extends Controller
 
     public function finishCutting($id): \Illuminate\Http\JsonResponse
     {
-        $order = Order::find($id);
-        $order->update([
-            'status' => 'pending'
-        ]);
+        DB::beginTransaction();
+        try {
+            $order = Order::find($id);
+            $oldStatus = $order->status;
 
-        return response()->json([
-            'message' => 'Order cutting finished'
-        ]);
+            $order->update([
+                'status' => 'pending'
+            ]);
+
+            // Add log entry
+            Log::add(
+                auth()->user()->id,
+                "Buyurtmani kesish yakunlandi (Order ID: $id)",
+                ['old_status' => $oldStatus, 'order_id' => $id],
+                ['new_status' => 'pending']
+            );
+
+            DB::commit();
+            return response()->json([
+                'message' => 'Order cutting finished'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 }
