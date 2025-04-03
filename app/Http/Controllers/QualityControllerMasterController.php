@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderSubModel;
 use App\Models\OtkOrderGroup;
@@ -62,30 +63,53 @@ class QualityControllerMasterController extends Controller
                     'descriptions' => $descriptionCounts,
                 ];
             });
+
         return response()->json($orderSubModels);
     }
 
     public function fasteningOrderToGroup(Request $request): \Illuminate\Http\JsonResponse
     {
-
         $request->validate([
             'order_sub_model_id' => 'required|integer|exists:order_sub_models,id',
             'group_id' => 'required|integer|exists:groups,id',
         ]);
 
-        $orderSubModel = OtkOrderGroup::where('order_sub_model_id', $request->order_sub_model_id)->first();
+        $oldConnection = OtkOrderGroup::where('order_sub_model_id', $request->order_sub_model_id)->first();
 
-        if ($orderSubModel){
-            $orderSubModel->delete();
+        if ($oldConnection) {
+            $oldGroupName = $oldConnection->group->name ?? 'Unknown group';
+            $oldData = [
+                'order_sub_model' => $oldConnection->orderSubModel->submodel->name ?? 'Unknown model',
+                'group' => $oldGroupName,
+            ];
+            $oldConnection->delete();
+        } else {
+            $oldData = null;
         }
 
-        $otkOrderGroup = OtkOrderGroup::create([
+        $newConnection = OtkOrderGroup::create([
             'order_sub_model_id' => $request->order_sub_model_id,
             'group_id' => $request->group_id,
         ]);
 
-        return response()->json($otkOrderGroup);
+        $newGroupName = $newConnection->group->name ?? 'Unknown group';
+        $newModelName = $newConnection->orderSubModel->submodel->name ?? 'Unknown model';
+
+        Log::add(
+            auth()->id(),
+            'Order sub-model assigned to a new group',
+            $oldData,
+            [
+                'order_sub_model' => $newModelName,
+                'group' => $newGroupName,
+            ]
+        );
+
+        return response()->json($newConnection);
     }
+
+
+
 
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -148,7 +172,6 @@ class QualityControllerMasterController extends Controller
 
     public function changeOrderStatus(Request $request): \Illuminate\Http\JsonResponse
     {
-
         $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
             'status' => 'required|string|in:checking,checked',
@@ -157,11 +180,26 @@ class QualityControllerMasterController extends Controller
         $order = Order::find($request->order_id);
 
         if (!$order) {
-            return response()->json(['error' => 'Order not found'], 404);
+            return response()->json(['error' => 'Buyurtma topilmadi'], 404);
         }
+
+        $oldStatus = $order->status;
 
         $order->status = $request->status;
         $order->save();
+
+        Log::add(
+            auth()->id(),
+            'Buyurtma holati o‘zgartirildi',
+            [
+                'orderId' => $order->id ?? 'Noma’lum buyurtma',
+                'old_status' => $oldStatus,
+            ],
+            [
+                'orderId' => $order->id ?? 'Noma’lum buyurtma',
+                'new_status' => $order->status,
+            ]
+        );
 
         return response()->json($order);
     }
