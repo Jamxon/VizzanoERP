@@ -87,7 +87,7 @@ class GroupMasterController extends Controller
             // Log the main action
             Log::add(
                 auth()->id(),
-                'Order received',
+                'Buyurtma qabul qilindi',
                 $oldData,
                 $newData
             );
@@ -277,7 +277,7 @@ class GroupMasterController extends Controller
         // Log the action with all assignments
         Log::add(
             auth()->id(),
-            'Assigned employees to tarifications',
+            'Tarificationga xodim tayinlandi',
             null,
             $logData
         );
@@ -328,7 +328,7 @@ class GroupMasterController extends Controller
         // Log the action
         Log::add(
             auth()->id(),
-            'Added sewing output',
+            'Patok Master natija kiritdi',
             null,
             [
                 'sewing_output_id' => $sewingOutput->id,
@@ -405,7 +405,7 @@ class GroupMasterController extends Controller
         // Log the action
         Log::add(
             auth()->id(),
-            'Received order cut',
+            'Kesilgan detallar qabul qilindi',
             $oldData,
             $newData
         );
