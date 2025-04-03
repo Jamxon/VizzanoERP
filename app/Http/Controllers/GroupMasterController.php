@@ -118,14 +118,6 @@ class GroupMasterController extends Controller
             ])
             ->get();
 
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Viewed pending orders',
-            null,
-            ['branch_id' => auth()->user()->employee->branch_id, 'count' => $orders->count()]
-        );
-
         return response()->json($orders);
     }
 
@@ -166,14 +158,6 @@ class GroupMasterController extends Controller
             return $firstOrderGroup;
         })->values();
 
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Retrieved orders for group',
-            null,
-            ['group_id' => $user->group->id, 'order_count' => $orders->count()]
-        );
-
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
 
@@ -208,14 +192,6 @@ class GroupMasterController extends Controller
                 ->values();
         }
 
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Viewed order details',
-            null,
-            ['order_id' => $id]
-        );
-
         return response()->json(new ShowOrderGroupMaster($order));
     }
 
@@ -228,14 +204,6 @@ class GroupMasterController extends Controller
         }
 
         $employees = $user->group->employees()->get();
-
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Retrieved group employees',
-            null,
-            ['group_id' => $user->group->id, 'employee_count' => $employees->count()]
-        );
 
         return response()->json($employees);
     }
@@ -253,14 +221,6 @@ class GroupMasterController extends Controller
         }
 
         $resource = new GetTarificationGroupMasterResource($order);
-
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Retrieved tarifications for order',
-            null,
-            ['order_id' => $id]
-        );
 
         return response()->json($resource);
     }
@@ -330,14 +290,6 @@ class GroupMasterController extends Controller
     public function getTimes(): \Illuminate\Http\JsonResponse
     {
         $times = Time::all();
-
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Retrieved time records',
-            null,
-            ['count' => $times->count()]
-        );
 
         return response()->json($times);
     }
@@ -414,17 +366,6 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Order cut not found'], 404);
         }
 
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Viewed order cuts',
-            null,
-            [
-                'order_id' => $orderId,
-                'category_id' => $categoryId
-            ]
-        );
-
         return response()->json($order);
     }
 
@@ -440,14 +381,6 @@ class GroupMasterController extends Controller
                 'order'
             )
             ->get();
-
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Retrieved today\'s order cuts',
-            null,
-            ['count' => $orderCuts->count(), 'date' => now()->format('Y-m-d')]
-        );
 
         return response()->json($orderCuts);
     }
@@ -541,19 +474,6 @@ class GroupMasterController extends Controller
             'todayRealBudget' => $todayRealBudget,
             'oneEmployeeBudget' => $oneEmployeeBudget,
         ];
-
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Retrieved plans data',
-            null,
-            [
-                'group_id' => $group->id,
-                'attendance_count' => $todayAttendanceCount,
-                'total_production_cost' => $totalProductionCost,
-                'required_tailors' => floor($requiredTailors)
-            ]
-        );
 
         return response()->json($resultData);
     }
