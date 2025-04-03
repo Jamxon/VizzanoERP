@@ -58,35 +58,42 @@ class AuthController extends Controller
 
         $user = User::where('username', $request->username)->first();
 
-        // Foydalanuvchi topilmasa yoki parol noto'g'ri bo'lsa log yozish
-        if (!$user || !$this->checkDjangoPassword($request->password, $user->password) || ($user->employee->status == 'kicked')) {
-            // Log yozish: Foydalanuvchi tizimga kira olmagan
+        if (!$user) {
+            $errorMessage = 'Foydalanuvchi topilmadi';
+        } elseif (!$this->checkDjangoPassword($request->password, $user->password)) {
+            $errorMessage = 'Parol noto‘g‘ri';
+        } elseif ($user->employee->status == 'kicked') {
+            $errorMessage = 'Foydalanuvchi ishdan chiqarilgan';
+        } else {
+            $errorMessage = 'Boshqa noma’lum xato';
+        }
+
+        if ($user === null || !$this->checkDjangoPassword($request->password, $user->password) || ($user->employee->status == 'kicked')) {
             Log::add(
-                $request->user() ? $request->user()->id : null,  // Agar foydalanuvchi mavjud bo'lsa, uning ID sini yozish
+                $request->user() ? $request->user()->id : null,
                 'Tizimga kirishga urinish',
                 null,
                 [
                     'username' => $request->username,
                     'status' => 'failed',
-                    'error' => 'Unauthorized',
-                    'ip_address' => $request->ip(),  // IP manzilini ham yozish
+                    'error' => $errorMessage,
+                    'ip_address' => $request->ip(),
                 ]
             );
 
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => $errorMessage], 401);
         }
 
-        // Foydalanuvchi muvaffaqiyatli tizimga kirganini loglash
         $token = JWTAuth::fromUser($user);
 
         Log::add(
-            $user->id,  // Foydalanuvchi ID sini yozish
+            $user->id,
             'Muvaffaqiyatli tizimga kirish',
             null,
             [
                 'username' => $request->username,
                 'status' => 'success',
-                'ip_address' => $request->ip(),  // IP manzilini yozish
+                'ip_address' => $request->ip(),
                 'token' => $token,
             ]
         );
@@ -96,6 +103,7 @@ class AuthController extends Controller
             'user' => $user
         ]);
     }
+
     /**
      * Django parollarni tekshirish funksiyasi
      */
