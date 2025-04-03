@@ -70,14 +70,14 @@ class AuthController extends Controller
 
         if ($user === null || !$this->checkDjangoPassword($request->password, $user->password) || ($user->employee->status == 'kicked')) {
             Log::add(
-                $request->user() ? $request->user()->id : null,
+                null,  // Foydalanuvchi tizimga kira olmayapti, shuning uchun null ID
                 'Tizimga kirishga urinish',
                 null,
                 [
                     'username' => $request->username,
                     'status' => 'failed',
-                    'error' => $errorMessage,
-                    'ip_address' => $request->ip(),
+                    'error' => $errorMessage,  // Xato sababi
+                    'ip_address' => $request->ip(),  // IP manzili
                 ]
             );
 
