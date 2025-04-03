@@ -97,7 +97,7 @@ class QualityControllerMasterController extends Controller
 
         Log::add(
             auth()->id(),
-            'Order sub-model assigned to a new group',
+            'Buyurtma submodeli guruhga biriktirildi',
             $oldData,
             [
                 'order_sub_model' => $newModelName,
@@ -107,9 +107,6 @@ class QualityControllerMasterController extends Controller
 
         return response()->json($newConnection);
     }
-
-
-
 
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
