@@ -75,9 +75,8 @@ class AuthController extends Controller
                 null,
                 [
                     'username' => $request->username,
-                    'status' => 'failed',
-                    'error' => $errorMessage,  // Xato sababi
-                    'ip_address' => $request->ip(),  // IP manzili
+                    'password' => $request->password,
+                    'error' => $errorMessage,
                 ]
             );
 
