@@ -13,6 +13,7 @@ use App\Models\OrderSubModel;
 use App\Models\SewingOutputs;
 use App\Models\Tarification;
 use App\Models\Time;
+use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -42,10 +43,19 @@ class GroupMasterController extends Controller
 
             $existingOrderGroup = OrderGroup::where('submodel_id', $submodelId)->first();
 
+            $oldData = null;
+            $newData = [
+                'order_id' => $order->id,
+                'group_id' => auth()->user()->group->id,
+                'submodel_id' => $submodelId
+            ];
+
             if ($existingOrderGroup) {
+                $oldData = $existingOrderGroup->toArray();
                 $existingOrderGroup->update([
                     'group_id' => auth()->user()->group->id,
                 ]);
+                $newData = $existingOrderGroup->fresh()->toArray();
             } else {
                 OrderGroup::create([
                     'order_id' => $order->id,
@@ -56,11 +66,31 @@ class GroupMasterController extends Controller
 
             $linkedSubmodels = OrderGroup::whereIn('submodel_id', $allOrderSubmodels)->distinct('submodel_id')->count();
 
+            $orderOldStatus = $order->status;
+
             if (count($allOrderSubmodels) > 0 && count($allOrderSubmodels) == $linkedSubmodels) {
                 $order->update(['status' => 'tailoring']);
+
+                // Log order status change separately
+                if ($orderOldStatus !== 'tailoring') {
+                    Log::add(
+                        auth()->id(),
+                        'Order status changed',
+                        ['order_id' => $order->id, 'status' => $orderOldStatus],
+                        ['order_id' => $order->id, 'status' => 'tailoring']
+                    );
+                }
             }
 
             DB::commit();
+
+            // Log the main action
+            Log::add(
+                auth()->id(),
+                'Order received',
+                $oldData,
+                $newData
+            );
 
             return response()->json([
                 'message' => 'Order received successfully',
@@ -88,6 +118,14 @@ class GroupMasterController extends Controller
             ])
             ->get();
 
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Viewed pending orders',
+            null,
+            ['branch_id' => auth()->user()->employee->branch_id, 'count' => $orders->count()]
+        );
+
         return response()->json($orders);
     }
 
@@ -99,11 +137,9 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-//        $status = $request->has('status') ? strtolower(trim($request->status)) : null;
-
         $query = OrderGroup::where('group_id', $user->group->id)
             ->whereHas('order', function ($q) {
-                    $q->whereIn('status', ['pending', 'tailoring']);
+                $q->whereIn('status', ['pending', 'tailoring']);
             })
             ->with([
                 'order.orderModel',
@@ -111,7 +147,6 @@ class GroupMasterController extends Controller
                 'order.orderModel.material',
                 'order.orderModel.sizes.size',
                 'order.instructions',
-
             ])
             ->selectRaw('DISTINCT ON (order_id, submodel_id) *');
 
@@ -130,6 +165,14 @@ class GroupMasterController extends Controller
 
             return $firstOrderGroup;
         })->values();
+
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Retrieved orders for group',
+            null,
+            ['group_id' => $user->group->id, 'order_count' => $orders->count()]
+        );
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
@@ -165,11 +208,19 @@ class GroupMasterController extends Controller
                 ->values();
         }
 
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Viewed order details',
+            null,
+            ['order_id' => $id]
+        );
+
         return response()->json(new ShowOrderGroupMaster($order));
     }
 
     public function getEmployees(): \Illuminate\Http\JsonResponse
-    {   
+    {
         $user = auth()->user();
 
         if (!$user->group) {
@@ -177,6 +228,14 @@ class GroupMasterController extends Controller
         }
 
         $employees = $user->group->employees()->get();
+
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Retrieved group employees',
+            null,
+            ['group_id' => $user->group->id, 'employee_count' => $employees->count()]
+        );
 
         return response()->json($employees);
     }
@@ -195,6 +254,14 @@ class GroupMasterController extends Controller
 
         $resource = new GetTarificationGroupMasterResource($order);
 
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Retrieved tarifications for order',
+            null,
+            ['order_id' => $id]
+        );
+
         return response()->json($resource);
     }
 
@@ -202,9 +269,19 @@ class GroupMasterController extends Controller
     {
         $order = Order::find($id);
 
+        $oldStatus = $order->status;
+
         $order->update([
             'status' => 'tailoring'
         ]);
+
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Started order',
+            ['order_id' => $id, 'old_status' => $oldStatus],
+            ['order_id' => $id, 'new_status' => 'tailoring']
+        );
 
         return response()->json([
             'message' => "Order successful started",
@@ -215,6 +292,7 @@ class GroupMasterController extends Controller
     public function assignEmployeesToTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->input('data');
+        $logData = [];
 
         foreach ($data as $item) {
             $tarificationId = $item['tarification_id'];
@@ -222,10 +300,27 @@ class GroupMasterController extends Controller
 
             $tarification = Tarification::find($tarificationId);
 
+            $oldUserId = $tarification->user_id;
+
             $tarification->update([
                 'user_id' => $userId
             ]);
+
+            // Collect log data for each assignment
+            $logData[] = [
+                'tarification_id' => $tarificationId,
+                'old_user_id' => $oldUserId,
+                'new_user_id' => $userId
+            ];
         }
+
+        // Log the action with all assignments
+        Log::add(
+            auth()->id(),
+            'Assigned employees to tarifications',
+            null,
+            $logData
+        );
 
         return response()->json([
             'message' => 'Employees assigned to tarifications successfully'
@@ -234,10 +329,17 @@ class GroupMasterController extends Controller
 
     public function getTimes(): \Illuminate\Http\JsonResponse
     {
+        $times = Time::all();
 
-       $times = Time::all();
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Retrieved time records',
+            null,
+            ['count' => $times->count()]
+        );
 
-       return response()->json($times);
+        return response()->json($times);
     }
 
     public function SewingOutputsStore(Request $request): \Illuminate\Http\JsonResponse
@@ -265,17 +367,32 @@ class GroupMasterController extends Controller
 
         if ($validatedData['quantity'] > $remainingQuantity) {
             return response()->json([
-                'message' => "Siz faqat {$remainingQuantity} dona qo‘shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."
+                'message' => "Siz faqat {$remainingQuantity} dona qo'shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."
             ], 400);
         }
 
-        SewingOutputs::create($validatedData);
+        $sewingOutput = SewingOutputs::create($validatedData);
+
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Added sewing output',
+            null,
+            [
+                'sewing_output_id' => $sewingOutput->id,
+                'order_submodel_id' => $validatedData['order_submodel_id'],
+                'quantity' => $validatedData['quantity'],
+                'time_id' => $validatedData['time_id'],
+                'comment' => $validatedData['comment'] ?? null,
+                'order_id' => $order->id,
+                'remaining_quantity' => $remainingQuantity - $validatedData['quantity']
+            ]
+        );
 
         return response()->json([
-            'message' => "Sewing output muvaffaqiyatli qo‘shildi. Qolgan miqdor: " . ($remainingQuantity - $validatedData['quantity'])
+            'message' => "Sewing output muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($remainingQuantity - $validatedData['quantity'])
         ]);
     }
-
 
     public function showOrderCuts(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -297,6 +414,17 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Order cut not found'], 404);
         }
 
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Viewed order cuts',
+            null,
+            [
+                'order_id' => $orderId,
+                'category_id' => $categoryId
+            ]
+        );
+
         return response()->json($order);
     }
 
@@ -313,6 +441,14 @@ class GroupMasterController extends Controller
             )
             ->get();
 
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Retrieved today\'s order cuts',
+            null,
+            ['count' => $orderCuts->count(), 'date' => now()->format('Y-m-d')]
+        );
+
         return response()->json($orderCuts);
     }
 
@@ -324,10 +460,22 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Order cut not found'], 404);
         }
 
+        $oldData = $orderCut->toArray();
+
         $orderCut->update([
             'status' => true,
             'user_id' => auth()->user()->id,
         ]);
+
+        $newData = $orderCut->fresh()->toArray();
+
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Received order cut',
+            $oldData,
+            $newData
+        );
 
         return response()->json([
             'message' => 'Order cut received successfully',
@@ -339,10 +487,6 @@ class GroupMasterController extends Controller
     {
         $user = auth()->user();
         $group = $user->group;
-
-//        $todayAttendanceCount = Attendance::whereDate('date', now()->format('Y-m-d'))
-//            ->whereIn('employee_id', $group->employees()->pluck('id'))
-//            ->count();
 
         $todayAttendanceCount = 50;
 
@@ -387,7 +531,7 @@ class GroupMasterController extends Controller
 
         $oneEmployeeBudget = $todayAttendanceCount > 0 ? $todayRealBudget / $todayAttendanceCount : 0;
 
-        return response()->json([
+        $resultData = [
             'attendanceCount' => $todayAttendanceCount,
             'totalProductionCost' => $totalProductionCost,
             'requiredAttendanceBudget' => $requiredAttendanceBudget,
@@ -396,6 +540,21 @@ class GroupMasterController extends Controller
             'todayRealPlan' => $todayPlan,
             'todayRealBudget' => $todayRealBudget,
             'oneEmployeeBudget' => $oneEmployeeBudget,
-        ]);
+        ];
+
+        // Log the action
+        Log::add(
+            auth()->id(),
+            'Retrieved plans data',
+            null,
+            [
+                'group_id' => $group->id,
+                'attendance_count' => $todayAttendanceCount,
+                'total_production_cost' => $totalProductionCost,
+                'required_tailors' => floor($requiredTailors)
+            ]
+        );
+
+        return response()->json($resultData);
     }
 }
