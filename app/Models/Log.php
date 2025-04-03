@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Request;
 
 /**
  * @method static create(array $array)
@@ -15,11 +16,9 @@ class Log extends Model
 
     protected $table = 'log';
 
-    protected $fillable = ['user_id', 'action', 'old_data', 'new_data', 'created_at'];
+    protected $fillable = ['user_id', 'action', 'old_data', 'new_data', 'ip_address', 'user_agent', 'created_at'];
 
-    protected $with = [
-        'user',
-    ];
+    protected $with = ['user'];
 
     public static function add($userId, $action, $oldData = null, $newData = null): void
     {
@@ -28,6 +27,8 @@ class Log extends Model
             'action' => $action,
             'old_data' => $oldData ? json_encode($oldData) : null,
             'new_data' => $newData ? json_encode($newData) : null,
+            'ip_address' => Request::ip(),
+            'user_agent' => Request::header('User-Agent'),
             'created_at' => now(),
         ]);
     }
