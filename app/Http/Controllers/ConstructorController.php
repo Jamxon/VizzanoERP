@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\OrderPrintingTime;
 use App\Http\Resources\ShowOrderPrintingTime;
+use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
@@ -55,6 +56,15 @@ class ConstructorController extends Controller
             'actual_time' => now(),
             'user_id' => auth()->user()->id
         ]);
+
+
+        //add log
+        Log::add(
+            auth()->user()->id,
+            "Buyurtmani kesishga jo'natildi",
+            ['old_data' => $orderPrintingTime->status, 'order_id' => $id],
+            ['new_data' => 'cutting']
+        );
 
         return response()->json($orderPrintingTime);
     }
