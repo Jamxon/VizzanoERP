@@ -70,8 +70,8 @@ class CuttingMasterController extends Controller
             Log::add(
                 auth()->user()->id,
                 "Buyurtma konstruktorga yuborildi (Order ID: {$data['order_id']})",
-                ['old_status' => $oldStatus, 'order_id' => $data['order_id']],
-                ['new_status' => 'printing', 'planned_time' => $data['planned_time'], 'comment' => $data['comment']]
+                ['old_data' => $oldStatus, 'order_id' => $data['order_id']],
+                ['new_data' => 'printing', 'planned_time' => $data['planned_time'], 'comment' => $data['comment']]
             );
 
             DB::commit();
@@ -265,8 +265,8 @@ class CuttingMasterController extends Controller
             Log::add(
                 auth()->user()->id,
                 "Mahsulot statusi o'zgartirildi (Outcome ID: $id, Status: $oldStatus -> $newStatus)",
-                ['old_status' => $oldStatus, 'outcome_id' => $id],
-                ['new_status' => $newStatus, 'affected_products' => $affectedProducts]
+                ['old_data' => $oldStatus, 'outcome_id' => $id],
+                ['new_data' => $newStatus, 'affected_products' => $affectedProducts]
             );
 
             DB::commit();
@@ -395,8 +395,8 @@ class CuttingMasterController extends Controller
             Log::add(
                 auth()->user()->id,
                 "Buyurtmani kesish yakunlandi (Order ID: $id)",
-                ['old_status' => $oldStatus, 'order_id' => $id],
-                ['new_status' => 'pending']
+                ['old_data' => $oldStatus, 'order_id' => $id],
+                ['new_data' => 'pending']
             );
 
             DB::commit();
