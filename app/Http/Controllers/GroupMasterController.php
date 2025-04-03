@@ -324,7 +324,7 @@ class GroupMasterController extends Controller
         }
 
         $sewingOutput = SewingOutputs::create($validatedData);
-
+        $time = Time::find($validatedData['time_id']);
         // Log the action with names instead of IDs
         Log::add(
             auth()->id(),
@@ -334,7 +334,7 @@ class GroupMasterController extends Controller
                 'sewing_output' => $sewingOutput->id, // ID is retained as part of data, but we can include 'name' if it makes sense
                 'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
                 'quantity' => $validatedData['quantity'],
-                'time' => $validatedData['time_id'],
+                'time' => $time,
                 'comment' => $validatedData['comment'] ?? null,
                 'order' => $order->name ?? 'Noma’lum buyurtma',
                 'remaining_quantity' => $remainingQuantity - $validatedData['quantity']
