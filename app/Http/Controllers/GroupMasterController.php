@@ -325,18 +325,18 @@ class GroupMasterController extends Controller
 
         $sewingOutput = SewingOutputs::create($validatedData);
 
-        // Log the action
+        // Log the action with names instead of IDs
         Log::add(
             auth()->id(),
             'Patok Master natija kiritdi',
             null,
             [
-                'sewing_output_id' => $sewingOutput->id,
-                'order_submodel_id' => $validatedData['order_submodel_id'],
+                'sewing_output' => $sewingOutput->id, // ID is retained as part of data, but we can include 'name' if it makes sense
+                'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
                 'quantity' => $validatedData['quantity'],
-                'time_id' => $validatedData['time_id'],
+                'time' => $validatedData['time_id'],
                 'comment' => $validatedData['comment'] ?? null,
-                'order_id' => $order->id,
+                'order' => $order->name ?? 'Noma’lum buyurtma',
                 'remaining_quantity' => $remainingQuantity - $validatedData['quantity']
             ]
         );
@@ -345,6 +345,7 @@ class GroupMasterController extends Controller
             'message' => "Sewing output muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($remainingQuantity - $validatedData['quantity'])
         ]);
     }
+
 
     public function showOrderCuts(Request $request): \Illuminate\Http\JsonResponse
     {
