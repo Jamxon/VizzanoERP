@@ -75,7 +75,7 @@ class GroupMasterController extends Controller
                 if ($orderOldStatus !== 'tailoring') {
                     Log::add(
                         auth()->id(),
-                        'Order status changed',
+                        "Buyurtma statusi o'zgartirildi!",
                         ['order_id' => $order->id, 'status' => $orderOldStatus],
                         ['order_id' => $order->id, 'status' => 'tailoring']
                     );
@@ -345,7 +345,6 @@ class GroupMasterController extends Controller
             'message' => "Sewing output muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($remainingQuantity - $validatedData['quantity'])
         ]);
     }
-
 
     public function showOrderCuts(Request $request): \Illuminate\Http\JsonResponse
     {
