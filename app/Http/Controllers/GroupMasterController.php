@@ -76,6 +76,7 @@ class GroupMasterController extends Controller
                     Log::add(
                         auth()->id(),
                         "Buyurtma statusi o'zgartirildi!",
+                        'receive',
                         ['order_id' => $order->id, 'status' => $orderOldStatus],
                         ['order_id' => $order->id, 'status' => 'tailoring']
                     );
@@ -225,30 +226,6 @@ class GroupMasterController extends Controller
         return response()->json($resource);
     }
 
-    public function startOrder($id): \Illuminate\Http\JsonResponse
-    {
-        $order = Order::find($id);
-
-        $oldStatus = $order->status;
-
-        $order->update([
-            'status' => 'tailoring'
-        ]);
-
-        // Log the action
-        Log::add(
-            auth()->id(),
-            'Started order',
-            ['order_id' => $id, 'old_status' => $oldStatus],
-            ['order_id' => $id, 'new_status' => 'tailoring']
-        );
-
-        return response()->json([
-            'message' => "Order successful started",
-            'order' => $order
-        ]);
-    }
-
     public function assignEmployeesToTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->input('data');
@@ -278,6 +255,7 @@ class GroupMasterController extends Controller
         Log::add(
             auth()->id(),
             'Tarificationga xodim tayinlandi',
+            'assign',
             null,
             $logData
         );
@@ -329,6 +307,7 @@ class GroupMasterController extends Controller
         Log::add(
             auth()->id(),
             'Patok Master natija kiritdi',
+            'sewing',
             null,
             [
                 'sewing_output' => $sewingOutput->id, // ID is retained as part of data, but we can include 'name' if it makes sense
@@ -406,6 +385,7 @@ class GroupMasterController extends Controller
         Log::add(
             auth()->id(),
             'Kesilgan detallar qabul qilindi',
+            'receive',
             $oldData,
             $newData
         );

@@ -70,6 +70,7 @@ class CuttingMasterController extends Controller
             Log::add(
                 auth()->user()->id,
                 "Buyurtma konstruktorga yuborildi (Order ID: {$data['order_id']})",
+                'send',
                 ['old_data' => $oldStatus, 'order_id' => $data['order_id']],
                 ['new_data' => 'printing', 'planned_time' => $data['planned_time'], 'comment' => $data['comment']]
             );
@@ -187,102 +188,6 @@ class CuttingMasterController extends Controller
         return response()->json($resource);
     }
 
-    public function acceptCompletedItem(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $id = $request->id;
-        DB::beginTransaction();
-        try {
-            $outcome = Outcome::findOrFail($id);
-            $oldStatus = $outcome->status;
-            $newStatus = $request->status;
-
-            $affectedProducts = [];
-
-            if ($newStatus == "cancelled") {
-                foreach ($outcome->items as $item) {
-                    $stock = Stok::where('warehouse_id', $outcome->warehouse_id)
-                        ->where('product_id', $item->product_id)
-                        ->firstOrFail();
-
-                    $oldQuantity = $stock->quantity;
-                    $stock->quantity += $item->quantity;
-                    $stock->save();
-
-                    $affectedProducts[] = [
-                        'product_id' => $item->product_id,
-                        'product_name' => $item->product->name ?? 'Unknown',
-                        'old_quantity' => $oldQuantity,
-                        'new_quantity' => $stock->quantity,
-                        'difference' => $item->quantity
-                    ];
-                }
-            }
-
-            if (in_array($newStatus, ["sent", "completed", "accepted"])) {
-                foreach ($outcome->items as $item) {
-                    $stock = Stok::where('warehouse_id', $outcome->warehouse_id)
-                        ->where('product_id', $item->product_id)
-                        ->first();
-
-                    if (!$stock) {
-                        return response()->json([
-                            'error' => "{$item->product->name} mahsuloti omborda mavjud emas"
-                        ], 400);
-                    }
-
-                    if ($stock->quantity < $item->quantity) {
-                        return response()->json([
-                            'error' => "{$item->product->name} mahsuloti omborda yetarli emas. Mavjud: {$stock->quantity}, Kerak: {$item->quantity}"
-                        ], 400);
-                    }
-                }
-            }
-
-            $outcome->status = $newStatus;
-            $outcome->save();
-
-            if (in_array($newStatus, ["sent", "completed", "accepted"])) {
-                foreach ($outcome->items as $item) {
-                    $stock = Stok::where('warehouse_id', $outcome->warehouse_id)
-                        ->where('product_id', $item->product_id)
-                        ->firstOrFail();
-
-                    $oldQuantity = $stock->quantity;
-                    $stock->quantity -= $item->quantity;
-                    $stock->save();
-
-                    $affectedProducts[] = [
-                        'product_id' => $item->product_id,
-                        'product_name' => $item->product->name ?? 'Unknown',
-                        'old_quantity' => $oldQuantity,
-                        'new_quantity' => $stock->quantity,
-                        'difference' => -$item->quantity
-                    ];
-                }
-            }
-
-            // Add log entry
-            Log::add(
-                auth()->user()->id,
-                "Mahsulot statusi o'zgartirildi (Outcome ID: $id, Status: $oldStatus -> $newStatus)",
-                ['old_data' => $oldStatus, 'outcome_id' => $id],
-                ['new_data' => $newStatus, 'affected_products' => $affectedProducts]
-            );
-
-            DB::commit();
-            return response()->json([
-                'success' => true,
-                'data' => $outcome->load('items')
-            ], 200);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 400);
-        }
-    }
-
     public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::find($id);
@@ -331,6 +236,7 @@ class CuttingMasterController extends Controller
             Log::add(
                 $user->id,
                 "Buyurtma kesildi (Order ID: $orderId, Category ID: $categoryId, Kesilgan miqdor: $quantity, Jami: $newData)",
+                'cut',
                 ['old_total_quantity' => $oldData],
                 ['new_total_quantity' => $newData]
             );
@@ -345,7 +251,6 @@ class CuttingMasterController extends Controller
             ], 500);
         }
     }
-
 
     public function getCuts($id): \Illuminate\Http\JsonResponse
     {
@@ -395,6 +300,7 @@ class CuttingMasterController extends Controller
             Log::add(
                 auth()->user()->id,
                 "Buyurtmani kesish yakunlandi (Order ID: $id)",
+                'cut',
                 ['old_data' => $oldStatus, 'order_id' => $id],
                 ['new_data' => 'pending']
             );

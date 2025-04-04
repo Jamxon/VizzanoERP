@@ -37,7 +37,13 @@ class SuperHRController extends Controller
 
             $employeeId = DB::table('employee')->insertGetId($employeeData);
 
-            Log::add($user->id, 'Yangi xodim qo‘shildi', null, $employeeData);
+            Log::add(
+                $user->id,
+                'Yangi xodim qo‘shildi',
+                'create',
+                null,
+                $employeeData
+            );
 
             DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli qo‘shildi', 'employee_id' => $employeeId], 201);
@@ -76,7 +82,13 @@ class SuperHRController extends Controller
 
             DB::table('employee')->where('id', $request->employee_id)->update($newData);
 
-            Log::add($user->id, 'Xodim yangilandi', $oldData, $newData);
+            Log::add(
+                $user->id,
+                'Xodim yangilandi',
+                'edit',
+                $oldData,
+                $newData
+            );
 
             DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli yangilandi'], 200);
@@ -96,7 +108,13 @@ class SuperHRController extends Controller
             DB::beginTransaction();
             $employee = DB::table('employee')->where('id', $request->employee_id)->first();
             DB::table('employee')->where('id', $request->employee_id)->update(['status' => false]);
-            Log::add($user->id, 'Xodim o‘chirildi', (array) $employee, null);
+            Log::add(
+                $user->id,
+                'Xodim o‘chirildi',
+                'delete',
+                (array) $employee,
+                null
+            );
 
             DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli o‘chirildi'], 200);
@@ -116,7 +134,13 @@ class SuperHRController extends Controller
             DB::beginTransaction();
             $employee = DB::table('employee')->where('id', $request->employee_id)->first();
             DB::table('employee')->where('id', $request->employee_id)->update(['status' => true]);
-            Log::add($user->id, 'Xodim qayta tiklandi', null, (array) $employee);
+            Log::add(
+                $user->id,
+                'Xodim qayta tiklandi',
+                'return',
+                null,
+                (array) $employee
+            );
 
             DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Xodim qayta tiklandi'], 200);

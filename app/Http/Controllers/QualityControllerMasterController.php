@@ -98,6 +98,7 @@ class QualityControllerMasterController extends Controller
         Log::add(
             auth()->id(),
             'Buyurtma submodeli guruhga biriktirildi',
+            'fastening',
             $oldData,
             [
                 'order_sub_model' => $newModelName,
@@ -188,6 +189,7 @@ class QualityControllerMasterController extends Controller
         Log::add(
             auth()->id(),
             'Buyurtma holati o‘zgartirildi',
+            'change',
             [
                 'orderId' => $order->id ?? 'Noma’lum buyurtma',
                 'old_status' => $oldStatus,

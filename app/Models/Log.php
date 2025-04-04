@@ -20,13 +20,14 @@ class Log extends Model
 
     protected $with = ['user'];
 
-    public static function add($userId, $action, $oldData = null, $newData = null): void
+    public static function add($userId, $action, $type, $oldData = null, $newData = null): void
     {
         DB::table('log')->insert([
             'user_id' => $userId,
             'action' => $action,
             'old_data' => $oldData ? json_encode($oldData) : null,
             'new_data' => $newData ? json_encode($newData) : null,
+            'type' => $type,
             'ip_address' => Request::getClientIp(),
             'user_agent' => Request::header('User-Agent'),
             'created_at' => now(),
