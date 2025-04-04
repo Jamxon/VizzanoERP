@@ -38,7 +38,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
             $currentRow++;
 
             // 2. Tarification ustun nomlari (yangi header: code, employee_id, employee, name, razryad, typewriter, second, summa)
-            $header = ['code', 'employee_id', 'employee', 'name', 'razryad', 'typewriter', 'second', 'summa'];
+            $header = ['code', 'name', 'razryad', 'typewriter', 'second', 'summa'];
             $rows->push($header);
             $currentRow++;
 
@@ -46,8 +46,6 @@ class TarificationCategoryExport implements FromCollection, WithEvents
             foreach ($category->tarifications as $tarification) {
                 $rows->push([
                     $tarification->code,
-                    $tarification->employee->id ?? null,   // Employee id
-                    $tarification->employee->name ?? null, // Employee nomi
                     $tarification->name,
                     $tarification->razryad->name,
                     $tarification->typewriter->name,
