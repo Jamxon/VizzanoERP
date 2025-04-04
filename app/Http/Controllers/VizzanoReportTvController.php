@@ -55,7 +55,7 @@ class VizzanoReportTvController extends Controller
         });
 
 
-        return $employeeCounts = Attendance::whereDate('attendance.date', $today)
+        $employeeCounts = Attendance::whereDate('attendance.date', $today)
             ->where('attendance.status', '!=', 'ABSENT')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
             ->whereIn('employees.group_id', $groupIds)
@@ -79,7 +79,7 @@ class VizzanoReportTvController extends Controller
 
         $resource = [
             'sewing_outputs' => $sewingOutputs->map(function ($sewingOutput) use ($employeeCounts, $workTimeByGroup) {
-                $group_id = optional($sewingOutput->orderSubmodel->group->group)->id;
+                return $group_id = optional($sewingOutput->orderSubmodel->group->group)->id;
                 $employeeCount = $employeeCounts[$group_id] ?? 0;
                 $workTime = $workTimeByGroup[$group_id] ?? 0; // Ish vaqti soniyalarda
                 $submodelSpend = optional($sewingOutput->orderSubmodel->submodelSpend->first())->seconds;
