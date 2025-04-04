@@ -16,7 +16,7 @@ class Log extends Model
 
     protected $table = 'log';
 
-    protected $fillable = ['user_id', 'action', 'old_data', 'new_data', 'ip_address', 'user_agent', 'created_at'];
+    protected $fillable = ['user_id', 'action', 'type', 'old_data', 'new_data', 'ip_address', 'user_agent', 'created_at'];
 
     protected $with = ['user'];
 
