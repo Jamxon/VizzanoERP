@@ -7,6 +7,7 @@ use App\Exports\TarificationCategoryExport;
 use App\Imports\SpecificationCategoryImport;
 use App\Imports\TarificationCategoryImport;
 use App\Models\Employee;
+use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderGroup;
 use App\Models\OrderModel;
@@ -28,6 +29,9 @@ class TechnologController extends Controller
     {
         $specifications = SpecificationCategory::where('submodel_id', $submodelId)->with('specifications')->get();
 
+        // Log the action
+        Log::add(auth()->id(), 'Get specifications by submodel', null, ['submodel_id' => $submodelId]);
+
         if ($specifications) {
             return response()->json($specifications, 200);
         }else {
@@ -41,22 +45,38 @@ class TechnologController extends Controller
     {
         $data = json_decode($request->getContent(), true);
 
+        // Kiruvchi so‘rovni loglash
+        Log::add(auth()->id(), 'Spetsifikatsiya saqlash so‘rovi qabul qilindi', null, $data);
+
         if (is_null($data)) {
+            Log::add(auth()->id(), 'JSON formati noto‘g‘ri', null, $request->getContent());
+
             return response()->json([
-                'message' => 'Invalid JSON format',
+                'message' => 'JSON formati noto‘g‘ri',
             ], 400);
         }
 
-        $validatedData = validator($data, [
-            'data' => 'required|array',
-            'data.*.name' => 'required|string',
-            'data.*.submodel_id' => 'required|integer',
-            'data.*.specifications' => 'required|array',
-            'data.*.specifications.*.name' => 'required|string',
-            'data.*.specifications.*.code' => 'required|string',
-            'data.*.specifications.*.quantity' => 'required|integer|min:0',
-            'data.*.specifications.*.comment' => 'nullable|string',
-        ])->validate();
+        try {
+            $validatedData = validator($data, [
+                'data' => 'required|array',
+                'data.*.name' => 'required|string',
+                'data.*.submodel_id' => 'required|integer',
+                'data.*.specifications' => 'required|array',
+                'data.*.specifications.*.name' => 'required|string',
+                'data.*.specifications.*.code' => 'required|string',
+                'data.*.specifications.*.quantity' => 'required|integer|min:0',
+                'data.*.specifications.*.comment' => 'nullable|string',
+            ])->validate();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::add(auth()->id(), 'Spetsifikatsiya validatsiyasida xatolik', null, $e->errors());
+
+            return response()->json([
+                'message' => 'Validatsiya xatoligi',
+                'errors' => $e->errors(),
+            ], 422);
+        }
+
+        $createdData = [];
 
         foreach ($validatedData['data'] as $datum) {
             $specificationCategory = SpecificationCategory::create([
@@ -64,38 +84,55 @@ class TechnologController extends Controller
                 'submodel_id' => $datum['submodel_id'],
             ]);
 
+            $specifications = [];
             foreach ($datum['specifications'] as $specification) {
-                $specifications = PartSpecification::create([
+                $spec = PartSpecification::create([
                     'specification_category_id' => $specificationCategory->id,
                     'name' => $specification['name'],
                     'code' => $specification['code'],
                     'quantity' => $specification['quantity'],
                     'comment' => $specification['comment'] ?? null,
                 ]);
+                $specifications[] = $spec;
             }
+
+            $createdData[] = [
+                'category' => $specificationCategory,
+                'specifications' => $specifications
+            ];
         }
+
+        // Muvaffaqiyatli saqlash logi
+        Log::add(auth()->id(), 'Spetsifikatsiyalar muvaffaqiyatli saqlandi', null, $createdData);
 
         if (isset($specificationCategory) && isset($specifications)) {
             return response()->json([
-                'message' => 'Specifications and SpecificationCategory created successfully',
+                'message' => 'Spetsifikatsiyalar va kategoriya muvaffaqiyatli yaratildi',
             ], 201);
         } elseif (!isset($specificationCategory)) {
+            Log::add(auth()->id(), 'Spetsifikatsiya kategoriyasi yaratishda xatolik', null, null);
+
             return response()->json([
-                'message' => 'SpecificationCategory error',
+                'message' => 'Kategoriya yaratishda xatolik yuz berdi',
             ], 404);
         } elseif (!isset($specifications)) {
+            Log::add(auth()->id(), 'Spetsifikatsiyalar yaratishda xatolik', null, null);
+
             return response()->json([
-                'message' => 'Specifications error',
+                'message' => 'Spetsifikatsiyalar yaratilmadi',
             ], 404);
         } else {
+            Log::add(auth()->id(), 'Nomaʼlum xatolik yuz berdi', null, null);
+
             return response()->json([
-                'message' => 'Something went wrong',
+                'message' => 'Nomaʼlum xatolik yuz berdi',
             ], 500);
         }
     }
 
     public function updateSpecification(Request $request, $id): \Illuminate\Http\JsonResponse
     {
+        // So‘rovni validatsiya qilish
         $request->validate([
             'name' => 'required|string',
             'submodel_id' => 'required|integer',
@@ -103,67 +140,98 @@ class TechnologController extends Controller
 
         $data = $request->all();
 
+        // Spetsifikatsiya kategoriyasini topish
         $specificationCategory = SpecificationCategory::find($id);
 
+        // Log uchun eski maʼlumotlarni olish
+        $oldData = null;
         if ($specificationCategory) {
-            $specificationCategory->update([
-                'name' => $data['name'],
-                'submodel_id' => $data['submodel_id'],
-            ]);
-
-            PartSpecification::where('specification_category_id', $specificationCategory->id)->delete();
-
-            if (!empty($data['specifications'])) {
-                foreach ($data['specifications'] as $specification) {
-                    if (!empty($specification['name']) && !empty($specification['code']) && !empty($specification['quantity'])) {
-                        PartSpecification::create([
-                            'specification_category_id' => $specificationCategory->id,
-                            'name' => $specification['name'],
-                            'code' => $specification['code'],
-                            'quantity' => $specification['quantity'],
-                            'comment' => $specification['comment'] ?? null,
-                        ]);
-                    }
-                }
-            }
-
-            return response()->json([
-                'message' => 'Specifications updated successfully',
-            ], 200);
+            $oldSpecifications = $specificationCategory->specifications()->get()->toArray();
+            $oldData = [
+                'category' => $specificationCategory->toArray(),
+                'specifications' => $oldSpecifications
+            ];
         } else {
+            Log::add(auth()->id(), "Spetsifikatsiya kategoriyasi topilmadi (ID: $id)", null, null);
+
             return response()->json([
-                'message' => 'SpecificationCategory not found',
+                'message' => 'Spetsifikatsiya kategoriyasi topilmadi',
             ], 404);
         }
+
+        // Yangilash jarayoni
+        $specificationCategory->update([
+            'name' => $data['name'],
+            'submodel_id' => $data['submodel_id'],
+        ]);
+
+        // Eski spetsifikatsiyalarni o‘chirish
+        PartSpecification::where('specification_category_id', $specificationCategory->id)->delete();
+
+        // Yangi spetsifikatsiyalarni qo‘shish
+        $newSpecifications = [];
+        if (!empty($data['specifications'])) {
+            foreach ($data['specifications'] as $specification) {
+                if (!empty($specification['name']) && !empty($specification['code']) && !empty($specification['quantity'])) {
+                    $spec = PartSpecification::create([
+                        'specification_category_id' => $specificationCategory->id,
+                        'name' => $specification['name'],
+                        'code' => $specification['code'],
+                        'quantity' => $specification['quantity'],
+                        'comment' => $specification['comment'] ?? null,
+                    ]);
+                    $newSpecifications[] = $spec;
+                }
+            }
+        }
+
+        // Log yozish: eski va yangi holatlarni saqlash
+        $newData = [
+            'category' => $specificationCategory->fresh()->toArray(),
+            'specifications' => $newSpecifications
+        ];
+
+        Log::add(auth()->id(), 'Spetsifikatsiya yangilandi', $oldData, $newData);
+
+        return response()->json([
+            'message' => 'Spetsifikatsiya muvaffaqiyatli yangilandi',
+        ], 200);
     }
 
     public function destroySpecificationCategory($id): \Illuminate\Http\JsonResponse
     {
         $specificationCategory = SpecificationCategory::find($id);
 
-        if ($specificationCategory) {
-            $specifications = PartSpecification::where('specification_category_id', $id)->get();
+        if (!$specificationCategory) {
+            Log::add(auth()->id(), "Spetsifikatsiya kategoriyasi topilmadi (ID: $id)", null, null);
 
-            if ($specifications) {
-                foreach ($specifications as $specification) {
-                    $specification->delete();
-                }
-
-                $specificationCategory->delete();
-
-                return response()->json([
-                    'message' => 'Specifications and SpecificationCategory deleted successfully'
-                ], 200);
-            }else {
-                return response()->json([
-                    'message' => 'Specifications not found'
-                ], 404);
-            }
-        }else {
             return response()->json([
-                'message' => 'SpecificationCategory not found'
+                'message' => 'Spetsifikatsiya kategoriyasi topilmadi'
             ], 404);
         }
+
+        $specifications = PartSpecification::where('specification_category_id', $id)->get();
+
+        // Log uchun eski maʼlumotlar
+        $oldData = [
+            'category' => $specificationCategory->toArray(),
+            'specifications' => $specifications->toArray()
+        ];
+
+        if ($specifications->isNotEmpty()) {
+            foreach ($specifications as $specification) {
+                $specification->delete();
+            }
+        }
+
+        $specificationCategory->delete();
+
+        // Log yozish: o‘chirish amaliyoti
+        Log::add(auth()->id(), 'Spetsifikatsiya kategoriyasi va unga tegishli maʼlumotlar o‘chirildi', $oldData, null);
+
+        return response()->json([
+            'message' => 'Spetsifikatsiya va u bilan bogʻliq maʼlumotlar muvaffaqiyatli o‘chirildi'
+        ], 200);
     }
 
     public function destroySpecification($id): \Illuminate\Http\JsonResponse
@@ -171,28 +239,35 @@ class TechnologController extends Controller
         $specification = PartSpecification::find($id);
 
         if ($specification) {
+            // Log uchun eski maʼlumot
+            $oldData = $specification->toArray();
+
             $specification->delete();
 
+            // Log yozish
+            Log::add(auth()->id(), "Spetsifikatsiya o‘chirildi (ID: $id)", $oldData, null);
+
             return response()->json([
-                'message' => 'Specification deleted successfully'
+                'message' => 'Spetsifikatsiya muvaffaqiyatli o‘chirildi'
             ], 200);
-        }else {
+        } else {
+            Log::add(auth()->id(), "Spetsifikatsiya topilmadi (ID: $id)", null, null);
+
             return response()->json([
-                'message' => 'Specification not found'
+                'message' => 'Spetsifikatsiya topilmadi'
             ], 404);
         }
     }
 
-    /**
-     * @throws ValidationException
-     */
     public function storeTarification(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         if (is_null($data)) {
+            Log::add(auth()->id(), 'Tarifikatsiya yaratishda JSON formati noto‘g‘ri', null, null);
+
             return response()->json([
-                'message' => 'Invalid JSON format',
+                'message' => 'JSON formati noto‘g‘ri',
             ], 400);
         }
 
@@ -208,13 +283,16 @@ class TechnologController extends Controller
         ]);
 
         if ($validator->fails()) {
+            Log::add(auth()->id(), 'Tarifikatsiya yaratishda validatsiya xatoliklari', null, $validator->errors()->toArray());
+
             return response()->json([
-                'message' => 'Validation errors',
+                'message' => 'Validatsiya xatolari mavjud',
                 'errors' => $validator->errors(),
             ], 422);
         }
 
         $validatedData = $validator->validated();
+        $createdData = [];
 
         foreach ($validatedData['data'] as $datum) {
             $totalSecond = 0;
@@ -227,18 +305,21 @@ class TechnologController extends Controller
                 'submodel_id' => $submodelId,
             ]);
 
+            $tarifications = [];
             foreach ($datum['tarifications'] as $tarification) {
                 $razryad = Razryad::find($tarification['razryad_id']);
 
                 if (!$razryad) {
+                    Log::add(auth()->id(), 'Razryad topilmadi (ID: ' . $tarification['razryad_id'] . ')', null, null);
+
                     return response()->json([
-                        'message' => 'Razryad not found',
+                        'message' => 'Razryad topilmadi',
                     ], 404);
                 }
 
                 $summa = $tarification['second'] * $razryad->salary;
 
-                Tarification::create([
+                $tarif = Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
                     'name' => $tarification['name'],
                     'user_id' => $tarification['user_id'] ?? null,
@@ -249,19 +330,30 @@ class TechnologController extends Controller
                     'code' => $this->generateSequentialCode(),
                 ]);
 
+                $tarifications[] = $tarif;
+
                 $totalSecond += $tarification['second'];
                 $totalSumma += $summa;
             }
 
-            SubmodelSpend::create([
+            $submodelSpend = SubmodelSpend::create([
                 'submodel_id' => $submodelId,
                 'seconds' => $totalSecond,
                 'summa' => $totalSumma,
             ]);
+
+            $createdData[] = [
+                'category' => $tarificationCategory,
+                'tarifications' => $tarifications,
+                'submodel_spend' => $submodelSpend
+            ];
         }
 
+        // Log yozish
+        Log::add(auth()->id(), 'Tarifikatsiya muvaffaqiyatli yaratildi', null, $createdData);
+
         return response()->json([
-            'message' => 'Tarifications and TarificationCategory created successfully',
+            'message' => 'Tarifikatsiya va kategoriya muvaffaqiyatli yaratildi',
         ], 201);
     }
 
@@ -275,12 +367,25 @@ class TechnologController extends Controller
 
             $data = $request->all();
 
+            // Eski ma'lumotlarni olish (log uchun)
+            $oldData = null;
             $tarificationCategory = $id ? TarificationCategory::find($id) : null;
+            if ($tarificationCategory) {
+                $oldTarifications = $tarificationCategory->tarifications()->get()->toArray();
+                $oldSubmodelSpend = SubmodelSpend::where('submodel_id', $tarificationCategory->submodel_id)->first();
+                $oldData = [
+                    'category' => $tarificationCategory->toArray(),
+                    'tarifications' => $oldTarifications,
+                    'submodel_spend' => $oldSubmodelSpend ? $oldSubmodelSpend->toArray() : null
+                ];
+            }
+
             if (!$tarificationCategory) {
                 $tarificationCategory = TarificationCategory::create([
                     'name' => $data['name'],
                     'submodel_id' => $data['submodel_id'],
                 ]);
+                Log::add(auth()->id(), 'Yangi tarifikatsiya kategoriyasi yaratildi', null, $tarificationCategory->toArray());
             } else {
                 $tarificationCategory->update([
                     'name' => $data['name'],
@@ -290,6 +395,7 @@ class TechnologController extends Controller
 
             $totalSecond = 0;
             $totalSumma = 0;
+            $updatedTarifications = [];
 
             if (!empty($data['tarifications'])) {
                 foreach ($data['tarifications'] as $tarification) {
@@ -299,7 +405,8 @@ class TechnologController extends Controller
 
                     $razryad = Razryad::find($tarification['razryad_id']);
                     if (!$razryad) {
-                        return response()->json(['message' => 'Razryad not found'], 404);
+                        Log::add(auth()->id(), 'Tarifikatsiya yangilanishida razryad topilmadi (ID: ' . $tarification['razryad_id'] . ')', null, null);
+                        return response()->json(['message' => 'Razryad topilmadi'], 404);
                     }
 
                     $summa = $tarification['second'] * $razryad->salary;
@@ -318,19 +425,31 @@ class TechnologController extends Controller
                         ]
                     );
 
+                    $updatedTarifications[] = $tarificationRecord;
+
                     $totalSecond += $tarification['second'];
                     $totalSumma += $summa;
                 }
             }
 
-            SubmodelSpend::updateOrCreate(
+            $submodelSpend = SubmodelSpend::updateOrCreate(
                 ['submodel_id' => $tarificationCategory->submodel_id],
                 ['seconds' => $totalSecond, 'summa' => $totalSumma]
             );
 
-            return response()->json(['message' => 'Tarifications updated successfully'], 200);
+            // Log yozish
+            $newData = [
+                'category' => $tarificationCategory->fresh()->toArray(),
+                'tarifications' => $updatedTarifications,
+                'submodel_spend' => $submodelSpend->fresh()->toArray()
+            ];
+            Log::add(auth()->id(), 'Tarifikatsiya muvaffaqiyatli yangilandi', $oldData, $newData);
+
+            return response()->json(['message' => 'Tarifikatsiyalar muvaffaqiyatli yangilandi'], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
+            Log::add(auth()->id(), 'Tarifikatsiya yangilanishida xatolik: ' . $e->getMessage(), null, null);
+
+            return response()->json(['message' => 'Xatolik yuz berdi: ' . $e->getMessage()], 500);
         }
     }
 
@@ -386,6 +505,10 @@ class TechnologController extends Controller
             ->with('tarifications')
             ->get()
             ->makeHidden(['created_at', 'updated_at', 'submodel_id']);
+
+        // Log the action
+        Log::add(auth()->id(), 'Get tarification by submodel', null, ['submodel_id' => $submodelId]);
+
         return response()->json($tarificationCategories, 200);
     }
 
@@ -394,17 +517,25 @@ class TechnologController extends Controller
         $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)
             ->with('tarificationCategories', 'tarificationCategories.tarifications','submodel')
             ->get();
+
+        // Log the action
+        Log::add(auth()->id(), 'Get tarification by order model', null, ['order_model_id' => $orderModelId]);
+
         return response()->json($orderSubModel, 200 );
     }
 
     public function getEmployerByDepartment(Request $request): \Illuminate\Http\JsonResponse
     {
-        $groupIds = OrderGroup::where('submodel_id', $request->query('id'))
+        $submodelId = $request->query('id');
+        $groupIds = OrderGroup::where('submodel_id', $submodelId)
             ->pluck('group_id');
 
         $employees = Employee::whereIn('group_id', $groupIds)
             ->where('status', 'working')
             ->get();
+
+        // Log the action
+        Log::add(auth()->id(), 'Get employer by department', null, ['submodel_id' => $submodelId]);
 
         return response()->json($employees, 200);
     }
@@ -412,6 +543,9 @@ class TechnologController extends Controller
     public function getTypeWriter(): \Illuminate\Http\JsonResponse
     {
         $typeWriters = TypeWriter::all();
+
+        // Log the action
+        Log::add(auth()->id(), 'Get type writers', null, null);
 
         if ($typeWriters) {
             return response()->json($typeWriters, 200);
@@ -429,6 +563,12 @@ class TechnologController extends Controller
         if ($tarificationCategory) {
             $tarifications = Tarification::where('tarification_category_id', $id)->get();
 
+            // Eski ma'lumotlarni log uchun olish
+            $oldData = [
+                'category' => $tarificationCategory->toArray(),
+                'tarifications' => $tarifications->toArray()
+            ];
+
             if ($tarifications) {
                 foreach ($tarifications as $tarification) {
                     $tarification->delete();
@@ -436,17 +576,24 @@ class TechnologController extends Controller
 
                 $tarificationCategory->delete();
 
+                // Log yozish
+                Log::add(auth()->id(), 'Tarifikatsiya kategoriyasi va tarifikatsiyalar o‘chirildi', $oldData, null);
+
                 return response()->json([
-                    'message' => 'Tarifications and TarificationCategory deleted successfully'
+                    'message' => 'Tarifikatsiyalar va kategoriya muvaffaqiyatli o‘chirildi'
                 ], 200);
-            }else {
+            } else {
+                Log::add(auth()->id(), 'Tarifikatsiyalar topilmadi, lekin kategoriya mavjud', $oldData, null);
+
                 return response()->json([
-                    'message' => 'Tarifications not found'
+                    'message' => 'Tarifikatsiyalar topilmadi'
                 ], 404);
             }
-        }else {
+        } else {
+            Log::add(auth()->id(), 'Tarifikatsiya kategoriyasi topilmadi (ID: ' . $id . ')', null, null);
+
             return response()->json([
-                'message' => 'TarificationCategory not found'
+                'message' => 'Tarifikatsiya kategoriyasi topilmadi'
             ], 404);
         }
     }
@@ -456,14 +603,22 @@ class TechnologController extends Controller
         $tarification = Tarification::find($id);
 
         if ($tarification) {
+            // Eski ma'lumotlarni log uchun olish
+            $oldData = $tarification->toArray();
+
             $tarification->delete();
 
+            // Log yozish
+            Log::add(auth()->id(), 'Tarifikatsiya o‘chirildi', $oldData, null);
+
             return response()->json([
-                'message' => 'Tarification deleted successfully'
+                'message' => 'Tarifikatsiya muvaffaqiyatli o‘chirildi'
             ], 200);
-        }else {
+        } else {
+            Log::add(auth()->id(), 'Tarifikatsiya topilmadi (ID: ' . $id . ')', null, null);
+
             return response()->json([
-                'message' => 'Tarification not found'
+                'message' => 'Tarifikatsiya topilmadi'
             ], 404);
         }
     }
@@ -476,12 +631,18 @@ class TechnologController extends Controller
             ->with('orderModel', 'orderModel.model','orderModel.submodels.submodel')
             ->get();
 
+        // Log the action
+        Log::add(auth()->id(), 'Get orders', null, null);
+
         return response()->json($orders, 200);
     }
 
     public function showTarification($id): \Illuminate\Http\JsonResponse
     {
         $tarification = Tarification::find($id);
+
+        // Log the action
+        Log::add(auth()->id(), 'Show tarification', null, ['id' => $id]);
 
         if ($tarification) {
             return response()->json($tarification, 200);
@@ -492,15 +653,12 @@ class TechnologController extends Controller
         }
     }
 
-    /**
-     * @throws ValidationException
-     */
     public function fasteningToEmployee(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
         if (is_null($data)) {
-            return response()->json(['message' => 'Invalid JSON format'], 400);
+            return response()->json(['message' => 'Noto‘g‘ri JSON format'], 400);
         }
 
         $validator = validator($data, [
@@ -511,7 +669,7 @@ class TechnologController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'message' => 'Validation errors',
+                'message' => 'Validatsiya xatoliklari',
                 'errors' => $validator->errors(),
             ], 422);
         }
@@ -519,16 +677,35 @@ class TechnologController extends Controller
         $validatedData = $validator->validated();
         $userIds = collect($validatedData['data'])->pluck('user_id')->unique();
 
+        // Eski ma'lumotlarni log uchun olish
+        $oldData = [];
+        foreach ($userIds as $userId) {
+            $oldTarifications = Tarification::where('user_id', $userId)->get();
+            if ($oldTarifications->count() > 0) {
+                $oldData[$userId] = $oldTarifications->toArray();
+            }
+        }
+
+        // Avvalgi bog‘lamalarni tozalash
         Tarification::whereIn('user_id', $userIds)->update(['user_id' => null]);
 
+        $newData = [];
         foreach ($validatedData['data'] as $datum) {
             $userId = $datum['user_id'];
             $tarifications = $datum['tarifications'];
 
             Tarification::whereIn('id', $tarifications)->update(['user_id' => $userId]);
+
+            $updatedTarifications = Tarification::whereIn('id', $tarifications)->get();
+            if ($updatedTarifications->count() > 0) {
+                $newData[$userId] = $updatedTarifications->toArray();
+            }
         }
 
-        return response()->json(['message' => 'Tarifications fastened to employees successfully'], 200);
+        // Log yozish
+        Log::add(auth()->id(), 'Tarifikatsiyalar xodimga biriktirildi', $oldData, $newData);
+
+        return response()->json(['message' => 'Tarifikatsiyalar muvaffaqiyatli biriktirildi'], 200);
     }
 
     public function exportTarification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
@@ -537,11 +714,19 @@ class TechnologController extends Controller
         $orderSubmodel = OrderSubModel::find($orderSubModelId);
         $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
         $order = Order::find($orderModelId->order_id);
+
         if (!$orderSubModelId) {
             return response()->json([
                 'error' => 'orderSubModelId talab qilinadi.'
             ], 400);
         }
+
+        // Log yozish
+        Log::add(auth()->id(), 'Tarifikatsiyani eksport qilish', null, [
+            'orderSubModelId' => $orderSubModelId,
+            'order_name' => $order->name,  // Orderning nomini qo‘shdim
+            'submodel_name' => $orderSubmodel->submodel->name
+        ]);
 
         return Excel::download(new TarificationCategoryExport($orderSubModelId),  $order->id . ' ' . $orderSubmodel->submodel->name .  '.xlsx');
     }
@@ -559,6 +744,13 @@ class TechnologController extends Controller
 
         try {
             Excel::import(new TarificationCategoryImport($orderSubModelId), $file);
+
+            // Log the action
+            Log::add(auth()->id(), 'Import tarification', null, [
+                'orderSubModelId' => $orderSubModelId,
+                'filename' => $file->getClientOriginalName()
+            ]);
+
             return response()->json([
                 'message' => 'Import muvaffaqiyatli bajarildi.'
             ], 200);
@@ -579,6 +771,11 @@ class TechnologController extends Controller
             ], 400);
         }
 
+        // Log the action
+        Log::add(auth()->id(), 'Export specification', null, [
+            'orderSubmodelId' => $orderSubmodelId
+        ]);
+
         return Excel::download(new SpecificationCategoryExport($orderSubmodelId), 'specification_export_' . $orderSubmodelId . '.xlsx');
     }
 
@@ -595,6 +792,13 @@ class TechnologController extends Controller
 
         try {
             Excel::import(new SpecificationCategoryImport($orderSubmodelId), $file);
+
+            // Log the action
+            Log::add(auth()->id(), 'Import specification', null, [
+                'orderSubmodelId' => $orderSubmodelId,
+                'filename' => $file->getClientOriginalName()
+            ]);
+
             return response()->json([
                 'message' => 'Import muvaffaqiyatli bajarildi.'
             ], 200);

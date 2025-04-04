@@ -213,7 +213,10 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::get('finishCutting/{id}', [CuttingMasterController::class, 'finishCutting']);
 });
 
-Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
+Route::prefix('tv')->middleware('role:tv')->group(function () {
+    Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
+});
+
 
 Route::get('/validate', function () {
     return response()->json(['message' => auth()->user()], 200);
