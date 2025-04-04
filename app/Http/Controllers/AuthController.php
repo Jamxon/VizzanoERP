@@ -72,6 +72,7 @@ class AuthController extends Controller
             Log::add(
                 null,  // Foydalanuvchi tizimga kira olmayapti, shuning uchun null ID
                 'Tizimga kirishga urinish',
+                'login',
                 null,
                 [
                     'username' => $request->username,
@@ -88,6 +89,7 @@ class AuthController extends Controller
         Log::add(
             $user->id,
             'Muvaffaqiyatli tizimga kirish',
+            'login',
             null,
             [
                 'user' => $user,

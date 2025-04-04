@@ -62,6 +62,7 @@ class ConstructorController extends Controller
         Log::add(
             auth()->user()->id,
             "Buyurtmani kesishga jo'natildi",
+            'constructor',
             ['old_data' => $orderPrintingTime->status, 'order_id' => $id],
             ['new_data' => 'cutting']
         );
