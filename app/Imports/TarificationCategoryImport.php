@@ -57,7 +57,7 @@ class TarificationCategoryImport implements ToCollection
                 Tarification::create([
                     'tarification_category_id' => $currentCategoryId,
                     'code'         => $this->generateSequentialCode(),
-                    'user_id'      => $row[1] ?? null,
+                    'user_id'      => null,
                     'name'         => $row[3] ?? null,
                     'razryad_id'   => $razryad->id ?? 0,
                     'typewriter_id'=> $typewriter->id ?? 0,
