@@ -55,13 +55,13 @@ class VizzanoReportTvController extends Controller
         });
 
 
-        $employeeCounts = Attendance::whereDate('attendance.date', $today)
+        dd($employeeCounts = Attendance::whereDate('attendance.date', $today)
             ->where('attendance.status', '!=', 'ABSENT')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
             ->whereIn('employees.group_id', $groupIds)
             ->groupBy('employees.group_id')
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
-            ->pluck('employee_count', 'employees.group_id');
+            ->pluck('employee_count', 'employees.group_id'));
 
         $workTimeByGroup = \App\Models\Group::whereIn('groups.id', $groupIds)
             ->join('departments', 'groups.department_id', '=', 'departments.id')
