@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class VizzanoReportTvController extends Controller
 {
-    public function getSewingOutputs(Request $request)
+    public function getSewingOutputs(Request $request): \Illuminate\Http\JsonResponse
     {
         $startDate = $request->get('start_date') ?? now()->format('Y-m-d');
         $endDate = $request->get('end_date');
@@ -103,5 +103,4 @@ class VizzanoReportTvController extends Controller
 
         return response()->json($resource);
     }
-
 }
