@@ -769,7 +769,7 @@ class TechnologController extends Controller
 
     public function exportSpecification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
     {
-        $orderSubmodelId = $request->get('orderSubmodelId');
+        $orderSubmodelId = $request->get('orderSubModelId');
 
         if (!$orderSubmodelId) {
             return response()->json([
