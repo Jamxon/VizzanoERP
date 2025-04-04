@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\Motivation;
 use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class VizzanoReportTvController extends Controller
 {
@@ -31,12 +32,10 @@ class VizzanoReportTvController extends Controller
             ->unique();
 
 
+
         $sewingOutputs = $query
-            ->selectRaw("
-        order_submodel_id,
-        SUM(quantity) as total_quantity,
-        SUM(CASE WHEN DATE(sewing_outputs.created_at) = '{$today}' THEN quantity ELSE 0 END) as today_quantity
-    ")
+            ->select('order_submodel_id')
+            ->selectRaw("SUM(CASE WHEN DATE(sewing_outputs.created_at) = '{$today}' THEN quantity ELSE 0 END) as today_quantity")
             ->groupBy('order_submodel_id')
             ->with([
                 'orderSubmodel.orderModel',
@@ -44,8 +43,16 @@ class VizzanoReportTvController extends Controller
                 'orderSubmodel.group',
                 'orderSubmodel.submodelSpend'
             ])
-            ->orderByDesc('total_quantity')
             ->get();
+
+        $totalQuantities = \App\Models\SewingOutputs::select('order_submodel_id', DB::raw('SUM(quantity) as total_quantity'))
+            ->groupBy('order_submodel_id')
+            ->pluck('total_quantity', 'order_submodel_id');
+
+        $sewingOutputs->transform(function ($item) use ($totalQuantities) {
+            $item->total_quantity = $totalQuantities[$item->order_submodel_id] ?? 0;
+            return $item;
+        });
 
 
         $employeeCounts = Attendance::whereDate('attendance.date', $today)
