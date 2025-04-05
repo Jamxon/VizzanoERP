@@ -109,4 +109,25 @@ class AuthController extends Controller
     {
         return password_verify($plainPassword, $hashedPassword);
     }
+
+    public function logout(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = Auth::user();
+
+        if ($user) {
+            JWTAuth::invalidate(JWTAuth::getToken());
+            Log::add(
+                $user->id,
+                'Tizimdan chiqish',
+                'logout',
+                null,
+                [
+                    'user' => $user,
+                ]
+            );
+            return response()->json(['message' => 'Tizimdan muvaffaqiyatli chiqdingiz!']);
+        }
+
+        return response()->json(['error' => 'Foydalanuvchi topilmadi'], 401);
+    }
 }
