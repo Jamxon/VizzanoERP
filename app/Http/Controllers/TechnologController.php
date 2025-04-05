@@ -101,14 +101,13 @@ class TechnologController extends Controller
 
         try {
             $validatedData = validator($data, [
-                'data' => 'required|array',
-                'data.*.name' => 'required|string',
-                'data.*.submodel_id' => 'required|integer',
-                'data.*.specifications' => 'required|array',
-                'data.*.specifications.*.name' => 'required|string',
-                'data.*.specifications.*.code' => 'required|string',
-                'data.*.specifications.*.quantity' => 'required|integer|min:0',
-                'data.*.specifications.*.comment' => 'nullable|string',
+                '*.name' => 'required|string',
+                '*.submodel_id' => 'required|integer',
+                '*.specifications' => 'required|array',
+                '*.specifications.*.name' => 'required|string',
+                '*.specifications.*.code' => 'required|string',
+                '*.specifications.*.quantity' => 'required|integer|min:0',
+                '*.specifications.*.comment' => 'nullable|string',
             ])->validate();
         } catch (\Illuminate\Validation\ValidationException $e) {
             Log::add(
