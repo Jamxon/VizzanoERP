@@ -24,9 +24,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
-    public function showSpecificationCategory($id)
+    public function showSpecificationCategory($id): \Illuminate\Http\JsonResponse
     {
-return        $specificationCategory = SpecificationCategory::find($id)
+        $specificationCategory = SpecificationCategory::findOrFail($id)
             ->with('specifications');
 
         if ($specificationCategory) {
@@ -40,7 +40,7 @@ return        $specificationCategory = SpecificationCategory::find($id)
 
     public function showTarificationCategory($id): \Illuminate\Http\JsonResponse
     {
-        $tarificationCategory = TarificationCategory::find($id)
+        $tarificationCategory = TarificationCategory::findOrFail($id)
             ->with(
                 'tarifications',
                 'tarifications.employee',
