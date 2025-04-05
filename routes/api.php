@@ -176,6 +176,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::get('models/{model}', [ModelController::class, 'show']);
     Route::post('specification', [TechnologController::class, 'storeSpecification']);
     Route::get('specification/{submodelId}', [TechnologController::class, 'getSpecificationBySubmodelId']);
+    Route::get('specification/category/{id}', [TechnologController::class, 'showSpecificationCategory']);
     Route::patch('specification/{id}', [TechnologController::class, 'updateSpecification']);
     Route::delete('specification/category/{id}', [TechnologController::class, 'destroySpecificationCategory']);
     Route::delete('specification/{id}', [TechnologController::class, 'destroySpecification']);
@@ -186,9 +187,11 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::get('orders', [TechnologController::class, 'getOrders']);
     Route::get('orders/{order}', [OrderController::class, 'show']);
     Route::get('tarification/show/{id}', [TechnologController::class, 'showTarification']);
-    Route::get('tarification/{orderModelId}', [TechnologController::class, 'getTarificationByOrderModelId']);
+    Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
     Route::get('tarification/category/{submodelId}', [TechnologController::class, 'getTarificationBySubmodelId']);
     Route::get('typewriter', [TechnologController::class, 'getTypeWriter']);
+    Route::post('typewriter', [TechnologController::class, 'storeTypeWriter']);
+    Route::patch('typewriter/{id}', [TechnologController::class, 'updateTypeWriter']);
     Route::get('razryads', [RazryadController::class, 'index']);
     Route::delete('tarification/category/{id}', [TechnologController::class, 'destroyTarificationCategory']);
     Route::delete('tarification/{id}', [TechnologController::class, 'deleteTarification']);
