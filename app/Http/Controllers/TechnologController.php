@@ -72,7 +72,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function storeSpecification(Request $request): \Illuminate\Http\JsonResponse
+    public function storeSpecification(Request $request)
     {
         $data = json_decode($request->getContent(), true);
 
@@ -100,7 +100,7 @@ class TechnologController extends Controller
         }
 
         try {
-            dd($data);
+            print $data;
             $validatedData = validator($data, [
                 'data' => 'required|array',
                 'data.*.name' => 'required|string',
