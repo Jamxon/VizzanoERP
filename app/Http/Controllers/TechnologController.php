@@ -348,14 +348,14 @@ class TechnologController extends Controller
         }
 
         $validator = validator($data, [
-            'data.*.name' => 'required|string|max:255',
-            'data.*.submodel_id' => 'required|integer|exists:order_sub_models,id',
-            'data.*.tarifications' => 'required|array',
-            'data.*.tarifications.*.employee_id' => 'nullable|integer|exists:employees,id',
-            'data.*.tarifications.*.name' => 'required|string|max:255',
-            'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
-            'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
-            'data.*.tarifications.*.second' => 'required|numeric|min:0',
+            '*.name' => 'required|string|max:255',
+            '*.submodel_id' => 'required|integer|exists:order_sub_models,id',
+            '*.tarifications' => 'required|array',
+            '*.tarifications.*.employee_id' => 'nullable|integer|exists:employees,id',
+            '*.tarifications.*.name' => 'required|string|max:255',
+            '*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
+            '*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
+            '*.tarifications.*.second' => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {
@@ -370,7 +370,7 @@ class TechnologController extends Controller
         $validatedData = $validator->validated();
         $createdData = [];
 
-        foreach ($validatedData['data'] as $datum) {
+        foreach ($validatedData as $datum) {
             $totalSecond = 0;
             $totalSumma = 0;
 
