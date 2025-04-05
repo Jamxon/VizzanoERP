@@ -126,9 +126,9 @@ class TechnologController extends Controller
 
         $createdData = [];
 
-        foreach ($validatedData['data'] as $datum) {
+        foreach ($validatedData as $datum) {
             $specificationCategory = SpecificationCategory::create([
-                'name' => (string) $datum['name'],
+                'name' => $datum['name'],
                 'submodel_id' => $datum['submodel_id'],
             ]);
 
