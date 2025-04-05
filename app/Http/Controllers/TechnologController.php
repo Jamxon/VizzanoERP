@@ -72,7 +72,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function storeSpecification(Request $request)
+    public function storeSpecification(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
