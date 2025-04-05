@@ -24,9 +24,9 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
-    public function showSpecificationCategory($id)
+    public function showSpecificationCategory($id): \Illuminate\Http\JsonResponse
     {
-       return $specificationCategory = SpecificationCategory::where('id', $id)
+       $specificationCategory = SpecificationCategory::where('id', $id)
            ->with(
                'specifications',
            )->first();
