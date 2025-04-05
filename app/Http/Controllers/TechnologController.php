@@ -497,7 +497,7 @@ class TechnologController extends Controller
                             'typewriter_id' => $tarification['typewriter_id'],
                             'second' => $tarification['second'],
                             'summa' => $summa,
-                            'code' => $this->generateSequentialCode(),
+                            'code' => $tarification['code'] ?? $this->generateSequentialCode(),
                         ]
                     );
 
