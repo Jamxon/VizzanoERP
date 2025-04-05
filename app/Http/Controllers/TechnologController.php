@@ -100,7 +100,7 @@ class TechnologController extends Controller
         }
 
         try {
-            print $data;
+            return $data;
             $validatedData = validator($data, [
                 'data' => 'required|array',
                 'data.*.name' => 'required|string',
