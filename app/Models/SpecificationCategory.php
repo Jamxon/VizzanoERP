@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static find($categoryId)
  * @method static create(array $array)
  * @method static where(string $string, $submodelId)
+ * @method static findOrFail($id)
  */
 class SpecificationCategory extends Model
 {
