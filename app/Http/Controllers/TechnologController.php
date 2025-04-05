@@ -287,6 +287,15 @@ class TechnologController extends Controller
     {
         $data = json_decode($request->getContent(), true);
 
+        // Kiruvchi so‘rovni loglash
+        Log::add(
+            auth()->id(),
+            'Tarifikatsiya saqlash so‘rovi qabul qilindi',
+            'attempt',
+            null,
+            $data
+        );
+
         if (is_null($data)) {
             Log::add(auth()->id(), 'Tarifikatsiya yaratishda JSON formati noto‘g‘ri', 'attempt', null, null);
 
@@ -728,7 +737,7 @@ class TechnologController extends Controller
         }
 
         // Log yozish
-        Log::add(auth()->id(), 'Tarifikatsiyani eksport qilish', 'export',null, [
+        Log::add(auth()->id(), 'Tarifikatsiyani eksport qilindi', 'export',null, [
             'orderSubModelId' => $orderSubModelId,
             'order_name' => $order->name,  // Orderning nomini qo‘shdim
             'submodel_name' => $orderSubmodel->submodel->name
@@ -740,6 +749,9 @@ class TechnologController extends Controller
     public function importTarification(Request $request): \Illuminate\Http\JsonResponse
     {
         $orderSubModelId = $request->get('orderSubmodelId');
+        $orderSubmodel = OrderSubModel::find($orderSubModelId);
+        $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
+        $order = Order::find($orderModelId->order_id);
         $file = $request->file('file');
 
         if (!$orderSubModelId || !$file) {
@@ -754,6 +766,8 @@ class TechnologController extends Controller
             // Log the action
             Log::add(auth()->id(), 'Import tarification', 'import',null, [
                 'orderSubModelId' => $orderSubModelId,
+                'order_name' => $order->name,
+                'submodel_name' => $orderSubmodel->submodel->name,
                 'filename' => $file->getClientOriginalName()
             ]);
 
@@ -769,17 +783,22 @@ class TechnologController extends Controller
 
     public function exportSpecification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
     {
-        $orderSubmodelId = $request->get('orderSubModelId');
+        $orderSubModelId = $request->get('orderSubModelId');
+        $orderSubmodel = OrderSubModel::find($orderSubModelId);
+        $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
+        $order = Order::find($orderModelId->order_id);
 
-        if (!$orderSubmodelId) {
+        if (!$orderSubModelId) {
             return response()->json([
                 'error' => 'orderSubmodelId talab qilinadi.'
             ], 400);
         }
 
         // Log the action
-        Log::add(auth()->id(), 'Export specification', 'export',null, [
-            'orderSubmodelId' => $orderSubmodelId
+        Log::add(auth()->id(), 'Spesifikantiya export qilindi', 'export',null, [
+            'orderSubModelId' => $orderSubModelId,
+            'order_name' => $order->name,
+            'submodel_name' => $orderSubmodel->submodel->name
         ]);
 
         return Excel::download(new SpecificationCategoryExport($orderSubmodelId), 'specification_export_' . $orderSubmodelId . '.xlsx');
@@ -788,6 +807,9 @@ class TechnologController extends Controller
     public function importSpecification(Request $request): \Illuminate\Http\JsonResponse
     {
         $orderSubmodelId = $request->get('orderSubmodelId');
+        $orderSubmodel = OrderSubModel::find($orderSubmodelId);
+        $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
+        $order = Order::find($orderModelId->order_id);
         $file = $request->file('file');
 
         if (!$orderSubmodelId || !$file) {
@@ -802,6 +824,8 @@ class TechnologController extends Controller
             // Log the action
             Log::add(auth()->id(), 'Import specification', 'import',null, [
                 'orderSubmodelId' => $orderSubmodelId,
+                'order_name' => $order->name,
+                'submodel_name' => $orderSubmodel->submodel->name,
                 'filename' => $file->getClientOriginalName()
             ]);
 
