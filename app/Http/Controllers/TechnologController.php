@@ -817,117 +817,117 @@ class TechnologController extends Controller
 
     public function exportTarification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
     {
-        $orderSubModelId = $request->get('orderSubModelId');
-        $orderSubmodel = OrderSubModel::find($orderSubModelId);
-        $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
-        $order = Order::find($orderModelId->order_id);
+        try {
+            $orderSubModelId = $request->get('orderSubModelId');
 
-        if (!$orderSubModelId) {
-            return response()->json([
-                'error' => 'orderSubModelId talab qilinadi.'
-            ], 400);
+            if (!$orderSubModelId) {
+                return response()->json(['error' => 'orderSubModelId talab qilinadi.'], 400);
+            }
+
+            $orderSubmodel = OrderSubModel::findOrFail($orderSubModelId);
+            $orderModel = OrderModel::findOrFail($orderSubmodel->order_model_id);
+            $order = Order::findOrFail($orderModel->order_id);
+
+            Log::add(auth()->id(), 'Tarifikatsiyani eksport qilindi', 'export', null, [
+                'orderSubModelId' => $orderSubModelId,
+                'order_name' => $order->name,
+                'submodel_name' => $orderSubmodel->submodel->name
+            ]);
+
+            return Excel::download(new TarificationCategoryExport($orderSubModelId),  $order->id . ' ' . $orderSubmodel->submodel->name .  '.xlsx');
+
+        } catch (\Exception $e) {
+            Log::add(auth()->id(), 'Xatolik: Tarifikatsiyani eksport qilishda', 'error', $e->getMessage());
+            return response()->json(['error' => 'Xatolik: ' . $e->getMessage()], 500);
         }
-
-        // Log yozish
-        Log::add(auth()->id(), 'Tarifikatsiyani eksport qilindi', 'export',null, [
-            'orderSubModelId' => $orderSubModelId,
-            'order_name' => $order->name,  // Orderning nomini qo‘shdim
-            'submodel_name' => $orderSubmodel->submodel->name
-        ]);
-
-        return Excel::download(new TarificationCategoryExport($orderSubModelId),  $order->id . ' ' . $orderSubmodel->submodel->name .  '.xlsx');
     }
 
     public function importTarification(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orderSubModelId = $request->get('orderSubmodelId');
-        $orderSubmodel = OrderSubModel::find($orderSubModelId);
-        $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
-        $order = Order::find($orderModelId->order_id);
-        $file = $request->file('file');
-
-        if (!$orderSubModelId || !$file) {
-            return response()->json([
-                'error' => 'orderSubModelId va fayl majburiy.'
-            ], 400);
-        }
-
         try {
+            $orderSubModelId = $request->get('orderSubmodelId');
+            $file = $request->file('file');
+
+            if (!$orderSubModelId || !$file) {
+                return response()->json(['error' => 'orderSubModelId va fayl majburiy.'], 400);
+            }
+
+            $orderSubmodel = OrderSubModel::findOrFail($orderSubModelId);
+            $orderModel = OrderModel::findOrFail($orderSubmodel->order_model_id);
+            $order = Order::findOrFail($orderModel->order_id);
+
             Excel::import(new TarificationCategoryImport($orderSubModelId), $file);
 
-            // Log the action
-            Log::add(auth()->id(), 'Import tarification', 'import',null, [
+            Log::add(auth()->id(), 'Import tarification', 'import', null, [
                 'orderSubModelId' => $orderSubModelId,
                 'order_name' => $order->name,
                 'submodel_name' => $orderSubmodel->submodel->name,
                 'filename' => $file->getClientOriginalName()
             ]);
 
-            return response()->json([
-                'message' => 'Import muvaffaqiyatli bajarildi.'
-            ], 200);
+            return response()->json(['message' => 'Import muvaffaqiyatli bajarildi.'], 200);
+
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Import jarayonida xatolik: ' . $e->getMessage()
-            ], 500);
+            Log::add(auth()->id(), 'Xatolik: Tarifikatsiyani import qilishda', 'error', $e->getMessage());
+            return response()->json(['error' => 'Import xatoligi: ' . $e->getMessage()], 500);
         }
     }
 
     public function exportSpecification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
     {
-        $orderSubModelId = $request->get('orderSubModelId');
-        $orderSubmodel = OrderSubModel::find($orderSubModelId);
-        $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
-        $order = Order::find($orderModelId->order_id);
+        try {
+            $orderSubModelId = $request->get('orderSubModelId');
 
-        if (!$orderSubModelId) {
-            return response()->json([
-                'error' => 'orderSubmodelId talab qilinadi.'
-            ], 400);
+            if (!$orderSubModelId) {
+                return response()->json(['error' => 'orderSubModelId talab qilinadi.'], 400);
+            }
+
+            $orderSubmodel = OrderSubModel::findOrFail($orderSubModelId);
+            $orderModel = OrderModel::findOrFail($orderSubmodel->order_model_id);
+            $order = Order::findOrFail($orderModel->order_id);
+
+            Log::add(auth()->id(), 'Spesifikatsiya export qilindi', 'export', null, [
+                'orderSubModelId' => $orderSubModelId,
+                'order_name' => $order->name,
+                'submodel_name' => $orderSubmodel->submodel->name
+            ]);
+
+            return Excel::download(new SpecificationCategoryExport($orderSubModelId), 'specification_export_' . $orderSubModelId . '.xlsx');
+
+        } catch (\Exception $e) {
+            Log::add(auth()->id(), 'Xatolik: Spesifikatsiyani eksport qilishda', 'error', $e->getMessage());
+            return response()->json(['error' => 'Xatolik: ' . $e->getMessage()], 500);
         }
-
-        // Log the action
-        Log::add(auth()->id(), 'Spesifikantiya export qilindi', 'export',null, [
-            'orderSubModelId' => $orderSubModelId,
-            'order_name' => $order->name,
-            'submodel_name' => $orderSubmodel->submodel->name
-        ]);
-
-        return Excel::download(new SpecificationCategoryExport($orderSubModelId), 'specification_export_' . $orderSubmodelId . '.xlsx');
     }
 
     public function importSpecification(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orderSubmodelId = $request->get('orderSubmodelId');
-        $orderSubmodel = OrderSubModel::find($orderSubmodelId);
-        $orderModelId = OrderModel::find($orderSubmodel->order_model_id);
-        $order = Order::find($orderModelId->order_id);
-        $file = $request->file('file');
-
-        if (!$orderSubmodelId || !$file) {
-            return response()->json([
-                'error' => 'orderSubmodelId va fayl majburiy.'
-            ], 400);
-        }
-
         try {
+            $orderSubmodelId = $request->get('orderSubmodelId');
+            $file = $request->file('file');
+
+            if (!$orderSubmodelId || !$file) {
+                return response()->json(['error' => 'orderSubmodelId va fayl majburiy.'], 400);
+            }
+
+            $orderSubmodel = OrderSubModel::findOrFail($orderSubmodelId);
+            $orderModel = OrderModel::findOrFail($orderSubmodel->order_model_id);
+            $order = Order::findOrFail($orderModel->order_id);
+
             Excel::import(new SpecificationCategoryImport($orderSubmodelId), $file);
 
-            // Log the action
-            Log::add(auth()->id(), 'Import specification', 'import',null, [
+            Log::add(auth()->id(), 'Import specification', 'import', null, [
                 'orderSubmodelId' => $orderSubmodelId,
                 'order_name' => $order->name,
                 'submodel_name' => $orderSubmodel->submodel->name,
                 'filename' => $file->getClientOriginalName()
             ]);
 
-            return response()->json([
-                'message' => 'Import muvaffaqiyatli bajarildi.'
-            ], 200);
+            return response()->json(['message' => 'Import muvaffaqiyatli bajarildi.'], 200);
+
         } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Import jarayonida xatolik: ' . $e->getMessage()
-            ], 500);
+            Log::add(auth()->id(), 'Xatolik: Spesifikatsiyani import qilishda', 'error', $e->getMessage());
+            return response()->json(['error' => 'Import xatoligi: ' . $e->getMessage()], 500);
         }
     }
 }
