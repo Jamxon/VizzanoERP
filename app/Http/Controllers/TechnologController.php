@@ -24,6 +24,39 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
+    public function showSpecificationCategory($id): \Illuminate\Http\JsonResponse
+    {
+        $specificationCategory = SpecificationCategory::find($id)
+            ->with('specifications');
+
+        if ($specificationCategory) {
+            return response()->json($specificationCategory, 200);
+        } else {
+            return response()->json([
+                'message' => 'Specification category not found'
+            ], 404);
+        }
+    }
+
+    public function showTarificationCategory($id): \Illuminate\Http\JsonResponse
+    {
+        $tarificationCategory = TarificationCategory::find($id)
+            ->with(
+                'tarifications',
+                'tarifications.employee',
+                'tarifications.razryad',
+                'tarifications.typewriter',
+            );
+
+        if ($tarificationCategory) {
+            return response()->json($tarificationCategory, 200);
+        } else {
+            return response()->json([
+                'message' => 'Tarification category not found'
+            ], 404);
+        }
+    }
+
     public function getSpecificationBySubmodelId($submodelId): \Illuminate\Http\JsonResponse
     {
         $specifications = SpecificationCategory::where('submodel_id', $submodelId)->with('specifications')->get();
@@ -540,15 +573,6 @@ class TechnologController extends Controller
             ->makeHidden(['created_at', 'updated_at', 'submodel_id']);
 
         return response()->json($tarificationCategories, 200);
-    }
-
-    public function getTarificationByOrderModelId($orderModelId): \Illuminate\Http\JsonResponse
-    {
-        $orderSubModel = OrderSubModel::where('order_model_id', $orderModelId)
-            ->with('tarificationCategories', 'tarificationCategories.tarifications','submodel')
-            ->get();
-
-        return response()->json($orderSubModel, 200 );
     }
 
     public function getEmployerByDepartment(Request $request): \Illuminate\Http\JsonResponse
