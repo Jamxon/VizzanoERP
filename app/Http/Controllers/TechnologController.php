@@ -577,6 +577,74 @@ class TechnologController extends Controller
         }
     }
 
+    public function storeTypeWriter(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (is_null($data)) {
+            return response()->json(['message' => 'Noto‘g‘ri JSON format'], 400);
+        }
+
+        $validator = validator($data, [
+            'name' => 'required|string|max:255',
+            'comment' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validatsiya xatoliklari',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validatedData = $validator->validated();
+
+        $typeWriter = TypeWriter::create($validatedData);
+
+        // Log yozish
+        Log::add(auth()->id(), 'Tikuv mashina muvaffaqiyatli saqlandi', 'create', null, $typeWriter->toArray());
+
+        return response()->json([
+            'message' => 'TypeWriter muvaffaqiyatli saqlandi',
+            'data' => $typeWriter
+        ], 201);
+    }
+
+    public function updateTypeWriter(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+
+        if (is_null($data)) {
+            return response()->json(['message' => 'Noto‘g‘ri JSON format'], 400);
+        }
+
+        $validator = validator($data, [
+            'id' => 'required|integer|exists:type_writers,id',
+            'name' => 'required|string|max:255',
+            'comment' => 'nullable|string|max:255',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validatsiya xatoliklari',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $validatedData = $validator->validated();
+
+        $typeWriter = TypeWriter::find($validatedData['id']);
+        $typeWriter->update($validatedData);
+
+        // Log yozish
+        Log::add(auth()->id(), 'Tikuv mashina muvaffaqiyatli yangilandi', 'edit', null, $typeWriter->toArray());
+
+        return response()->json([
+            'message' => 'TypeWriter muvaffaqiyatli yangilandi',
+            'data' => $typeWriter
+        ], 200);
+    }
+
     public function destroyTarificationCategory($id): \Illuminate\Http\JsonResponse
     {
         $tarificationCategory = TarificationCategory::find($id);
@@ -801,7 +869,7 @@ class TechnologController extends Controller
             'submodel_name' => $orderSubmodel->submodel->name
         ]);
 
-        return Excel::download(new SpecificationCategoryExport($orderSubmodelId), 'specification_export_' . $orderSubmodelId . '.xlsx');
+        return Excel::download(new SpecificationCategoryExport($orderSubModelId), 'specification_export_' . $orderSubmodelId . '.xlsx');
     }
 
     public function importSpecification(Request $request): \Illuminate\Http\JsonResponse
