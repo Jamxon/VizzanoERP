@@ -191,7 +191,6 @@ class TechnologController extends Controller
 
     public function updateSpecification(Request $request, $id): \Illuminate\Http\JsonResponse
     {
-        // So‘rovni validatsiya qilish
         $request->validate([
             'name' => 'required|string',
             'submodel_id' => 'required|integer',
@@ -199,55 +198,65 @@ class TechnologController extends Controller
 
         $data = $request->all();
 
-        // Spetsifikatsiya kategoriyasini topish
         $specificationCategory = SpecificationCategory::find($id);
 
-        // Log uchun eski maʼlumotlarni olish
-        $oldData = null;
-        if ($specificationCategory) {
-            $oldSpecifications = $specificationCategory->specifications()->get()->toArray();
-            $oldData = [
-                'category' => $specificationCategory->toArray(),
-                'specifications' => $oldSpecifications
-            ];
-        } else {
+        if (!$specificationCategory) {
             Log::add(auth()->id(), "Spetsifikatsiya kategoriyasi topilmadi (ID: $id)", 'attempt', null, null);
-
             return response()->json([
                 'message' => 'Spetsifikatsiya kategoriyasi topilmadi',
             ], 404);
         }
 
-        // Yangilash jarayoni
+        // Log uchun eski maʼlumotlar
+        $oldSpecifications = $specificationCategory->specifications()->get()->toArray();
+        $oldData = [
+            'category' => $specificationCategory->toArray(),
+            'specifications' => $oldSpecifications
+        ];
+
         $specificationCategory->update([
             'name' => $data['name'],
             'submodel_id' => $data['submodel_id'],
         ]);
 
-        // Eski spetsifikatsiyalarni o‘chirish
-        PartSpecification::where('specification_category_id', $specificationCategory->id)->delete();
+        $existingSpecs = $specificationCategory->specifications->keyBy('id');
+        $updatedIds = [];
 
-        // Yangi spetsifikatsiyalarni qo‘shish
         $newSpecifications = [];
+
         if (!empty($data['specifications'])) {
-            foreach ($data['specifications'] as $specification) {
-                if (!empty($specification['name']) && !empty($specification['code']) && !empty($specification['quantity'])) {
-                    $spec = PartSpecification::create([
-                        'specification_category_id' => $specificationCategory->id,
-                        'name' => $specification['name'],
-                        'code' => $specification['code'],
-                        'quantity' => $specification['quantity'],
-                        'comment' => $specification['comment'] ?? null,
-                    ]);
-                    $newSpecifications[] = $spec;
+            foreach ($data['specifications'] as $spec) {
+                if (!empty($spec['name']) && !empty($spec['code']) && !empty($spec['quantity'])) {
+                    if (!empty($spec['id']) && isset($existingSpecs[$spec['id']])) {
+                        // mavjudini update qilish
+                        $existing = $existingSpecs[$spec['id']];
+                        $existing->update([
+                            'name' => $spec['name'],
+                            'code' => $spec['code'],
+                            'quantity' => $spec['quantity'],
+                            'comment' => $spec['comment'] ?? null,
+                        ]);
+                        $newSpecifications[] = $existing;
+                        $updatedIds[] = $spec['id'];
+                    } else {
+                        // yangi qo‘shish
+                        $created = PartSpecification::create([
+                            'specification_category_id' => $specificationCategory->id,
+                            'name' => $spec['name'],
+                            'code' => $spec['code'],
+                            'quantity' => $spec['quantity'],
+                            'comment' => $spec['comment'] ?? null,
+                        ]);
+                        $newSpecifications[] = $created;
+                    }
                 }
             }
         }
 
-        // Log yozish: eski va yangi holatlarni saqlash
+        // Logga yangi holatlarni yozish
         $newData = [
             'category' => $specificationCategory->fresh()->toArray(),
-            'specifications' => $newSpecifications
+            'specifications' => $specificationCategory->specifications()->get()->toArray()
         ];
 
         Log::add(auth()->id(), 'Spetsifikatsiya yangilandi', 'edit', $oldData, $newData);
