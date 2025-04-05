@@ -42,13 +42,13 @@ class TechnologController extends Controller
 
     public function showTarificationCategory($id): \Illuminate\Http\JsonResponse
     {
-        $tarificationCategory = TarificationCategory::findOrFail($id)
+        $tarificationCategory = TarificationCategory::where('id', $id)
             ->with(
                 'tarifications',
                 'tarifications.employee',
                 'tarifications.razryad',
                 'tarifications.typewriter',
-            );
+            )->first();
 
         if ($tarificationCategory) {
             return response()->json($tarificationCategory, 200);
