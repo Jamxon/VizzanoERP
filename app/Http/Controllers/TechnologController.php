@@ -26,7 +26,10 @@ class TechnologController extends Controller
 {
     public function showSpecificationCategory($id)
     {
-       return $specificationCategory = SpecificationCategory::findOrFail($id);
+       return $specificationCategory = SpecificationCategory::where('id', $id)
+           ->with(
+               'specifications',
+           )->first();
 
         if ($specificationCategory) {
             return response()->json($specificationCategory, 200);
