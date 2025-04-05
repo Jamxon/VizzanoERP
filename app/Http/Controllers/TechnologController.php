@@ -24,7 +24,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
-    public function showSpecificationCategory($id): \Illuminate\Http\JsonResponse
+    public function showSpecificationCategory($id)
     {
       return   $specificationCategory = SpecificationCategory::findOrFail($id)
             ->with('specifications');
