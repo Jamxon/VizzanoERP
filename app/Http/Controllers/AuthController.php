@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Log;
 use App\Models\User;
-use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
@@ -38,9 +36,6 @@ class AuthController extends Controller
         ], 201);
     }
 
-    /**
-     * Django bilan mos keladigan parol hashlash funksiyasi.
-     */
     protected function hashPassword($password): string
     {
         $options = [
@@ -102,9 +97,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Django parollarni tekshirish funksiyasi
-     */
     protected function checkDjangoPassword($plainPassword, $hashedPassword)
     {
         return password_verify($plainPassword, $hashedPassword);
