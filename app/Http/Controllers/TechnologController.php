@@ -351,7 +351,7 @@ class TechnologController extends Controller
             'data.*.name' => 'required|string|max:255',
             'data.*.submodel_id' => 'required|integer|exists:order_sub_models,id',
             'data.*.tarifications' => 'required|array',
-            'data.*.tarifications.*.user_id' => 'nullable|integer|exists:employees,id',
+            'data.*.tarifications.*.employee_id' => 'nullable|integer|exists:employees,id',
             'data.*.tarifications.*.name' => 'required|string|max:255',
             'data.*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             'data.*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
@@ -398,7 +398,7 @@ class TechnologController extends Controller
                 $tarif = Tarification::create([
                     'tarification_category_id' => $tarificationCategory->id,
                     'name' => $tarification['name'],
-                    'user_id' => $tarification['user_id'] ?? null,
+                    'user_id' => $tarification['employee_id'] ?? null,
                     'razryad_id' => $tarification['razryad_id'],
                     'typewriter_id' => $tarification['typewriter_id'],
                     'second' => $tarification['second'],
@@ -492,7 +492,7 @@ class TechnologController extends Controller
                         [
                             'tarification_category_id' => $tarificationCategory->id,
                             'name' => $tarification['name'],
-                            'user_id' => $tarification['user_id'] ?? null,
+                            'user_id' => $tarification['employee_id'] ?? null,
                             'razryad_id' => $tarification['razryad_id'],
                             'typewriter_id' => $tarification['typewriter_id'],
                             'second' => $tarification['second'],
