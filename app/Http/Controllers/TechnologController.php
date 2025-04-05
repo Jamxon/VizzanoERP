@@ -24,11 +24,11 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
-    public function showSpecificationCategory($id): \Illuminate\Http\JsonResponse
+    public function showSpecificationCategory($id)
     {
         $specificationCategory = SpecificationCategory::find($id)
             ->with('specifications');
-        dd($specificationCategory);
+        return $specificationCategory;
 
         if ($specificationCategory) {
             return response()->json($specificationCategory, 200);
