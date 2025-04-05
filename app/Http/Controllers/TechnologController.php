@@ -26,6 +26,7 @@ class TechnologController extends Controller
 {
     public function showSpecificationCategory($id): \Illuminate\Http\JsonResponse
     {
+        dd($id);
         $specificationCategory = SpecificationCategory::find($id)
             ->with('specifications');
 
