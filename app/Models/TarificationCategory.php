@@ -25,7 +25,6 @@ class TarificationCategory extends Model
     protected $hidden = [
         'created_at',
         'updated_at',
-        'submodel_id',
     ];
 
     public function submodel()
