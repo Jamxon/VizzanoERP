@@ -29,33 +29,33 @@ class ShowOrderPrintingTime extends JsonResource
                 ];
             }),
             "comment" => $this->comment,
-            "order_printing_times" => $this->orderModel ? $this->orderModel->orderPrintingTimes->map(function ($orderPrintingTime) {
-                return [
-                    "id" => $orderPrintingTime->id,
-                    "planned_time" => $orderPrintingTime->planned_time,
-                    "actual_time" => $orderPrintingTime->actual_time,
-                    "status" => $orderPrintingTime->status,
-                    "comment" => $orderPrintingTime->comment,
-                    "user" => $orderPrintingTime->user,
-                    "model" => $this->orderModel->model->makeHidden(['submodels']),
-                    "submodels" => $this->orderModel->submodels
-                        ->groupBy('submodel_id')
-                        ->map(function ($groupedSubmodels) {
-                            $firstSubmodel = $groupedSubmodels->first();
-                            return [
-                                "id" => $firstSubmodel->id,
-                                "submodel" => $firstSubmodel->submodel->makeHidden(['sizes', 'modelColors']),
-                            ];
-                        })->values(),
-                    'sizes' => $this->orderModel->sizes->map(function ($size) {
-                        return [
-                            'id' => $size->id,
-                            'size' => $size->size,
-                            'quantity' => $size->quantity,
-                        ];
-                    }),
-                ];
-            }) : [],
+//            "order_printing_times" => $this->orderModel ? $this->orderModel->orderPrintingTimes->map(function ($orderPrintingTime) {
+//                return [
+//                    "id" => $orderPrintingTime->id,
+//                    "planned_time" => $orderPrintingTime->planned_time,
+//                    "actual_time" => $orderPrintingTime->actual_time,
+//                    "status" => $orderPrintingTime->status,
+//                    "comment" => $orderPrintingTime->comment,
+//                    "user" => $orderPrintingTime->user,
+//                    "model" => $this->orderModel->model->makeHidden(['submodels']),
+//                    "submodels" => $this->orderModel->submodels
+//                        ->groupBy('submodel_id')
+//                        ->map(function ($groupedSubmodels) {
+//                            $firstSubmodel = $groupedSubmodels->first();
+//                            return [
+//                                "id" => $firstSubmodel->id,
+//                                "submodel" => $firstSubmodel->submodel->makeHidden(['sizes', 'modelColors']),
+//                            ];
+//                        })->values(),
+//                    'sizes' => $this->orderModel->sizes->map(function ($size) {
+//                        return [
+//                            'id' => $size->id,
+//                            'size' => $size->size,
+//                            'quantity' => $size->quantity,
+//                        ];
+//                    }),
+//                ];
+//            }) : [],
             'orderModel' => [
                 'id' => $this->orderModel->id,
                 'model' => [
