@@ -204,6 +204,7 @@ Route::prefix('constructor')->middleware('role:constructor')->group(function () 
     Route::post('orderPrintingTimes/{id}', [ConstructorController::class, 'sendToCuttingMaster']);
     Route::post('specification', [TechnologController::class, 'storeSpecification']);
     Route::patch('specification/{id}', [TechnologController::class, 'updateSpecification']);
+    Route::get('specification/category/{id}', [TechnologController::class, 'showSpecificationCategory']);
 });
 
 Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function () {
