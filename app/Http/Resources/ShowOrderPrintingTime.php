@@ -29,14 +29,13 @@ class ShowOrderPrintingTime extends JsonResource
                 ];
             }) ?? null,
             "comment" => $this->comment,
-            "order_printing_times" => $this->orderPrintingTime->map(function ($orderPrintingTime) {
-                return [
-                    "id" => $orderPrintingTime->id,
-                    "planned_time" => $orderPrintingTime->planned_time,
-                    "actual_time" => $orderPrintingTime->actual_time,
-                    "status" => $orderPrintingTime->status,
-                    "comment" => $orderPrintingTime->comment,
-                    "user" => $orderPrintingTime->user,
+            "order_printing_times" => [
+                    "id" => $this->orderPrintingTime->id,
+                    "planned_time" => $this->orderPrintingTime->planned_time,
+                    "actual_time" => $this->orderPrintingTime->actual_time,
+                    "status" => $this->orderPrintingTime->status,
+                    "comment" => $this->orderPrintingTime->comment,
+                    "user" => $this->orderPrintingTime->user,
                     "model" => $this->orderModel->model->makeHidden(['submodels']),
                     "submodels" => $this->orderModel->submodels
                         ->groupBy('submodel_id')
@@ -54,8 +53,7 @@ class ShowOrderPrintingTime extends JsonResource
                             'quantity' => $size->quantity,
                         ];
                     }),
-                ];
-            }) ?? null,
+                ] ?? null,
             'orderModel' => [
                 'id' => $this->orderModel->id,
                 'model' => [
