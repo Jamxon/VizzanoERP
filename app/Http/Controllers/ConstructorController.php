@@ -36,7 +36,7 @@ class ConstructorController extends Controller
     {
         $order = Order::where('id', $id)
         ->where('branch_id', auth()->user()->employee->branch_id)
-            ->get();
+            ->first();
 
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
