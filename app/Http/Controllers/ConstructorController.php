@@ -14,13 +14,17 @@ class ConstructorController extends Controller
 {
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
-
         $plannedTime = $request->input('planned_time') ?? now()->toDateString();
         $orders = Order::whereHas('orderPrintingTime', function ($query) use ($plannedTime) {
                 $query->whereDate('planned_time', $plannedTime);
             })
             ->where('branch_id', auth()->user()->employee->branch_id)
-            ->with('orderModel','orderModel.submodels.specificationCategories.specifications')
+            ->with(
+                'orderModel',
+                'orderModel.submodels.specificationCategories.specifications',
+                'orderModel.model',
+                'orderModel.material',
+            )
             ->get();
 
         $resource = OrderPrintingTime::collection($orders);
