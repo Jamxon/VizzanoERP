@@ -42,7 +42,7 @@ class Order extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-        'id',
+//        'id',
         'name',
         'quantity',
         'status',
