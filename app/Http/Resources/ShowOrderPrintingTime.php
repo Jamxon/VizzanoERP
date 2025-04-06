@@ -63,6 +63,7 @@ class ShowOrderPrintingTime extends JsonResource
                 'material' => [
                     'id' => $this->orderModel->material->id ?? 0,
                     'name' => $this->orderModel->material->name ?? null,
+                    'code' => $this->orderModel->material->code ?? null,
                 ],
                 'sizes' => $this->orderModel->sizes->map(function ($size) {
                     return [
