@@ -20,7 +20,7 @@ class ConstructorController extends Controller
                 $query->whereDate('planned_time', $plannedTime);
             })
             ->where('branch_id', auth()->user()->employee->branch_id)
-            ->with('orderModel')
+            ->with('orderModel','orderModel.submodels.specificationCategories.specifications')
             ->get();
 
         $resource = OrderPrintingTime::collection($orders);
