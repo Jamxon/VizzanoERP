@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method orderSizes()
  * @method static orderBy(string $string, string $string1)
  * @method static findOrFail(mixed $input)
+ * @method static whereHas(string $string, \Closure $param)
  */
 class Order extends Model
 {
