@@ -29,6 +29,7 @@ class ModelController extends Controller
                 'id' => $model->id,
                 'name' => $model->name,
                 'rasxod' => $model->rasxod,
+                'description' => $model->description,
                 'sizes' => $model->sizes->map(function ($size) {
                     return [
                         'id' => $size->id,
