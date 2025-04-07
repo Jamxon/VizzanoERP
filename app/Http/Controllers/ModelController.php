@@ -97,7 +97,6 @@ class ModelController extends Controller
                 ], 500);
             }
 
-            if ($request->hasFile('images')) {
                 try {
                     $index = 1;
                     while ($request->hasFile('images' . $index)) {
@@ -118,9 +117,6 @@ class ModelController extends Controller
                         'error' => $e->getMessage(),
                     ], 500);
                 }
-            }
-
-
 
             if (!empty($data['sizes'])) {
                 try {
