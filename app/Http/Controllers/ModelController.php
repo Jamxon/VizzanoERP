@@ -171,7 +171,7 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
-        $data = is_string($request->data) ? json_decode($request->data, true) : $request->data;
+        $data = json_decode($request->data, true);
 
         if (!is_array($data)) {
             return response()->json([
@@ -227,7 +227,7 @@ class ModelController extends Controller
             DB::commit();
 
             Log::add(auth()->id(), 'Model muvaffaqiyatli yangilandi', 'edit', $oldModel, $model->toArray());
-    
+
             return response()->json([
                 'message' => 'Model updated successfully',
                 'model' => $model->load(['sizes', 'submodels', 'images']),
