@@ -173,7 +173,7 @@ class ModelController extends Controller
     public function update(Request $request, Models $model)
     {
 //        return $request->all();
-      
+
         $data = json_decode($request->data, true);
 
         if (!is_array($data) || empty($data)) {
