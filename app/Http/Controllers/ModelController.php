@@ -87,6 +87,7 @@ class ModelController extends Controller
                     'name' => $data['name'] ?? null,
                     'rasxod' => (double)($data['rasxod'] ?? 0),
                     'branch_id' => auth()->user()->employee->branch_id,
+                    'description' => $data['description'] ?? null,
                 ]);
             } catch (\Exception $e) {
                 return response()->json([
@@ -182,6 +183,7 @@ class ModelController extends Controller
             $model->update([
                 'name' => $data['name'] ?? $model->name,
                 'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
+                'description' => $data['description'] ?? null,
             ]);
         } catch (\Exception $e) {
             return response()->json([
