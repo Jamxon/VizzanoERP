@@ -45,7 +45,7 @@ class ModelController extends Controller
                 'images' => $model->images->map(function ($image) {
                     return [
                         'id' => $image->id,
-                        'image' => url('storage/' . $image->image),
+                        'image' => $image->image,
                     ];
                 }),
             ];
