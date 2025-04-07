@@ -173,13 +173,6 @@ class ModelController extends Controller
     {
         $data = json_decode($request->data, true);
 
-        if (!is_array($data)) {
-            return response()->json([
-                'message' => 'Invalid data format',
-                'error' => 'Data should be a valid JSON object',
-            ], 400);
-        }
-
         Log::add(auth()->id(), 'Model yangilanishiga urinish qilindi', 'attempt', $data);
 
         DB::beginTransaction();
