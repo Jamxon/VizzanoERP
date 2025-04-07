@@ -169,9 +169,9 @@ class ModelController extends Controller
         }
     }
 
-    public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
+    public function update(Request $request, Models $model)
     {
-        $data = json_decode($request->data, true);
+        return        $data = json_decode($request->data, true);
 
         Log::add(auth()->id(), 'Model yangilanishiga urinish qilindi', 'attempt', $data);
 
@@ -179,6 +179,7 @@ class ModelController extends Controller
 
         try {
             $oldModel = $model->toArray();
+
             $model->update([
                 'name' => $data['name'] ?? $model->name,
                 'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
