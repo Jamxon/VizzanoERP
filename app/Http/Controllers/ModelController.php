@@ -10,6 +10,7 @@ use App\Models\Models;
 use App\Models\Size;
 use App\Models\SubModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ModelController extends Controller
 {
@@ -179,70 +180,71 @@ class ModelController extends Controller
             ], 400);
         }
 
-        // ✅ Urinish logi
         Log::add(auth()->id(), 'Model yangilanishiga urinish qilindi', 'attempt', $data);
 
+        DB::beginTransaction();
+
         try {
+            $oldModel = $model->toArray();
             $model->update([
                 'name' => $data['name'] ?? $model->name,
                 'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
                 'description' => $data['description'] ?? null,
             ]);
+
+            $index = 1;
+            while ($request->hasFile('images' . $index)) {
+                $image = $request->file('images' . $index);
+                $fileName = time() . '_' . $image->getClientOriginalName();
+                $image->storeAs('/images/', $fileName);
+
+                ModelImages::create([
+                    'model_id' => $model->id,
+                    'image' => 'images/' . $fileName,
+                ]);
+
+                $index++;
+            }
+
+            if (!empty($data['sizes'])) {
+                foreach ($data['sizes'] as $sizeData) {
+                    Size::updateOrCreate(
+                        ['id' => $sizeData['id'], 'model_id' => $model->id],
+                        ['name' => $sizeData['name']]
+                    );
+                }
+            }
+
+            if (!empty($data['submodels'])) {
+                foreach ($data['submodels'] as $submodelData) {
+                    SubModel::updateOrCreate(
+                        ['id' => $submodelData['id'], 'model_id' => $model->id],
+                        ['name' => $submodelData['name']]
+                    );
+                }
+            }
+
+            DB::commit();
+
+            Log::add(auth()->id(), 'Model muvaffaqiyatli yangilandi', 'edit', $oldModel, $model->toArray());
+    
+            return response()->json([
+                'message' => 'Model updated successfully',
+                'model' => $model->load(['sizes', 'submodels', 'images']),
+            ]);
+
         } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::add(auth()->id(), 'Xatolik yuz berdi: Model yangilanishi muvaffaqiyatsiz', 'error', $data, $e->getMessage());
+
             return response()->json([
                 'message' => 'Model update failed',
                 'error' => $e->getMessage(),
             ], 500);
         }
-
-        // ✅ Fotorasmlarni qo‘shish logi
-        if ($request->hasFile('images') && !empty($request->file('images'))) {
-            foreach ($request->file('images') as $image) {
-                try {
-                    $fileName = time() . '_' . $image->getClientOriginalName();
-                    $image->storeAs('/images/', $fileName);
-
-                    ModelImages::create([
-                        'model_id' => $model->id,
-                        'image' => 'images/' . $fileName,
-                    ]);
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'message' => 'Image upload failed',
-                        'error' => $e->getMessage(),
-                    ], 500);
-                }
-            }
-        }
-
-        // ✅ O'lchamlarni yangilash
-        if (!empty($data['sizes'])) {
-            foreach ($data['sizes'] as $sizeData) {
-                Size::updateOrCreate(
-                    ['id' => $sizeData['id'], 'model_id' => $model->id],
-                    ['name' => $sizeData['name']]
-                );
-            }
-        }
-
-        // ✅ Submodelarni yangilash
-        if (!empty($data['submodels'])) {
-            foreach ($data['submodels'] as $submodelData) {
-                SubModel::updateOrCreate(
-                    ['id' => $submodelData['id'], 'model_id' => $model->id],
-                    ['name' => $submodelData['name']]
-                );
-            }
-        }
-
-        // ✅ Muvaffaqiyatli yangilash logi
-        Log::add(auth()->id(), 'Model muvaffaqiyatli yangilandi', 'update', $data, $model->toArray());
-
-        return response()->json([
-            'message' => 'Model updated successfully',
-            'model' => $model->load(['sizes', 'submodels', 'images']),
-        ]);
     }
+
 
     public function destroy(Models $model): \Illuminate\Http\JsonResponse
     {
