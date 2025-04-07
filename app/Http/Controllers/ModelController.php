@@ -169,7 +169,7 @@ class ModelController extends Controller
         }
     }
 
-    public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
+    public function update(Request $request, Models $model)
     {
         return $request->all();
 
