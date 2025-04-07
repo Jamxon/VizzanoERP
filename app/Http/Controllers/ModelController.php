@@ -172,9 +172,9 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $model)
     {
-        return $request;
-
-        $data = json_decode($request->input('data'), true);
+//        return $request->all();
+      
+        $data = json_decode($request->data, true);
 
         if (!is_array($data) || empty($data)) {
             Log::add( auth()->id(),'Model yangilanishida xatolik', 'error', $data, ['error' => 'Data field is not a valid array']);
