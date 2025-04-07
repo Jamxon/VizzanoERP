@@ -206,39 +206,46 @@ class TechnologController extends Controller
             ], 404);
         }
 
-        // Log uchun eski maʼlumotlar
-        $oldSpecifications = $specificationCategory->specifications()->get()->toArray();
-        $oldData = [
-            'category' => $specificationCategory->toArray(),
-            'specifications' => $oldSpecifications
-        ];
+        // Kategoriya o‘zgarishlaridan oldingi holat
+        $oldCategory = $specificationCategory->getOriginal();
 
+        // Kategoriya ma’lumotlarini yangilash
         $specificationCategory->update([
             'name' => $data['name'],
             'submodel_id' => $data['submodel_id'],
         ]);
 
         $existingSpecs = $specificationCategory->specifications->keyBy('id');
-        $updatedIds = [];
 
-        $newSpecifications = [];
+        $oldSpecsChanged = [];
+        $newSpecsChanged = [];
 
         if (!empty($data['specifications'])) {
             foreach ($data['specifications'] as $spec) {
                 if (!empty($spec['name']) && !empty($spec['code']) && !empty($spec['quantity'])) {
                     if (!empty($spec['id']) && isset($existingSpecs[$spec['id']])) {
-                        // mavjudini update qilish
                         $existing = $existingSpecs[$spec['id']];
-                        $existing->update([
-                            'name' => $spec['name'],
-                            'code' => $spec['code'],
-                            'quantity' => $spec['quantity'],
-                            'comment' => $spec['comment'] ?? null,
-                        ]);
-                        $newSpecifications[] = $existing;
-                        $updatedIds[] = $spec['id'];
+
+                        // Faqat haqiqatan o‘zgarganlarini tekshirish
+                        $hasChanges = $existing->name !== $spec['name'] ||
+                            $existing->code !== $spec['code'] ||
+                            $existing->quantity != $spec['quantity'] ||
+                            $existing->comment !== ($spec['comment'] ?? null);
+
+                        if ($hasChanges) {
+                            $oldSpecsChanged[] = $existing->toArray();
+
+                            $existing->update([
+                                'name' => $spec['name'],
+                                'code' => $spec['code'],
+                                'quantity' => $spec['quantity'],
+                                'comment' => $spec['comment'] ?? null,
+                            ]);
+
+                            $newSpecsChanged[] = $existing->fresh()->toArray();
+                        }
                     } else {
-                        // yangi qo‘shish
+                        // Yangi spesifikatsiya yaratish
                         $created = PartSpecification::create([
                             'specification_category_id' => $specificationCategory->id,
                             'name' => $spec['name'],
@@ -246,19 +253,24 @@ class TechnologController extends Controller
                             'quantity' => $spec['quantity'],
                             'comment' => $spec['comment'] ?? null,
                         ]);
-                        $newSpecifications[] = $created;
+                        $newSpecsChanged[] = $created->toArray();
                     }
                 }
             }
         }
 
-        // Logga yangi holatlarni yozish
-        $newData = [
-            'category' => $specificationCategory->fresh()->toArray(),
-            'specifications' => $specificationCategory->specifications()->get()->toArray()
+        // Faqat o‘zgargan yoki yangi qo‘shilgan elementlar logga yoziladi
+        $logOldData = [
+            'category' => $oldCategory,
+            'specifications' => $oldSpecsChanged,
         ];
 
-        Log::add(auth()->id(), 'Spetsifikatsiya yangilandi', 'edit', $oldData, $newData);
+        $logNewData = [
+            'category' => $specificationCategory->fresh()->toArray(),
+            'specifications' => $newSpecsChanged,
+        ];
+
+        Log::add(auth()->id(), 'Spetsifikatsiya yangilandi', 'edit', $logOldData, $logNewData);
 
         return response()->json([
             'message' => 'Spetsifikatsiya muvaffaqiyatli yangilandi',
@@ -443,17 +455,15 @@ class TechnologController extends Controller
 
             $data = $request->all();
 
-            // Eski ma'lumotlarni olish (log uchun)
-            $oldData = null;
-            $tarificationCategory = $id ? TarificationCategory::find($id) : null;
+            $tarificationCategory = TarificationCategory::find($id);
+            $oldTarifications = [];
+            $oldSubmodelSpend = null;
+            $oldCategory = null;
+
             if ($tarificationCategory) {
-                $oldTarifications = $tarificationCategory->tarifications()->get()->toArray();
+                $oldCategory = $tarificationCategory->getOriginal();
+                $oldTarifications = $tarificationCategory->tarifications()->get()->keyBy('id');
                 $oldSubmodelSpend = SubmodelSpend::where('submodel_id', $tarificationCategory->submodel_id)->first();
-                $oldData = [
-                    'category' => $tarificationCategory->toArray(),
-                    'tarifications' => $oldTarifications,
-                    'submodel_spend' => $oldSubmodelSpend ? $oldSubmodelSpend->toArray() : null
-                ];
             }
 
             if (!$tarificationCategory) {
@@ -461,6 +471,7 @@ class TechnologController extends Controller
                     'name' => $data['name'],
                     'submodel_id' => $data['submodel_id'],
                 ]);
+
                 Log::add(auth()->id(), 'Yangi tarifikatsiya kategoriyasi yaratildi', 'create', null, $tarificationCategory->toArray());
             } else {
                 $tarificationCategory->update([
@@ -471,7 +482,8 @@ class TechnologController extends Controller
 
             $totalSecond = 0;
             $totalSumma = 0;
-            $updatedTarifications = [];
+            $oldTarificationsChanged = [];
+            $newTarificationsChanged = [];
 
             if (!empty($data['tarifications'])) {
                 foreach ($data['tarifications'] as $tarification) {
@@ -481,15 +493,42 @@ class TechnologController extends Controller
 
                     $razryad = Razryad::find($tarification['razryad_id']);
                     if (!$razryad) {
-                        Log::add(auth()->id(), 'Tarifikatsiya yangilanishida razryad topilmadi (ID: ' . $tarification['razryad_id'] . ')', 'attempt',null, null);
+                        Log::add(auth()->id(), 'Tarifikatsiya yangilanishida razryad topilmadi (ID: ' . $tarification['razryad_id'] . ')', 'attempt', null, null);
                         return response()->json(['message' => 'Razryad topilmadi'], 404);
                     }
 
                     $summa = $tarification['second'] * $razryad->salary;
 
-                    $tarificationRecord = Tarification::updateOrCreate(
-                        ['id' => $tarification['id'] ?? null],
-                        [
+                    // update yoki create holatini ajratish
+                    $existing = isset($tarification['id']) && $oldTarifications->has($tarification['id'])
+                        ? $oldTarifications[$tarification['id']] : null;
+
+                    if ($existing) {
+                        // o'zgarish bormi, tekshiramiz
+                        $hasChanges = $existing->name !== $tarification['name'] ||
+                            $existing->razryad_id != $tarification['razryad_id'] ||
+                            $existing->typewriter_id != $tarification['typewriter_id'] ||
+                            $existing->second != $tarification['second'] ||
+                            $existing->user_id != ($tarification['employee_id'] ?? null);
+
+                        if ($hasChanges) {
+                            $oldTarificationsChanged[] = $existing->toArray();
+
+                            $existing->update([
+                                'name' => $tarification['name'],
+                                'user_id' => $tarification['employee_id'] ?? null,
+                                'razryad_id' => $tarification['razryad_id'],
+                                'typewriter_id' => $tarification['typewriter_id'],
+                                'second' => $tarification['second'],
+                                'summa' => $summa,
+                                'code' => $tarification['code'] ?? $this->generateSequentialCode(),
+                            ]);
+
+                            $newTarificationsChanged[] = $existing->fresh()->toArray();
+                        }
+                    } else {
+                        // yangi yaratilgan
+                        $created = Tarification::create([
                             'tarification_category_id' => $tarificationCategory->id,
                             'name' => $tarification['name'],
                             'user_id' => $tarification['employee_id'] ?? null,
@@ -498,10 +537,10 @@ class TechnologController extends Controller
                             'second' => $tarification['second'],
                             'summa' => $summa,
                             'code' => $tarification['code'] ?? $this->generateSequentialCode(),
-                        ]
-                    );
+                        ]);
 
-                    $updatedTarifications[] = $tarificationRecord;
+                        $newTarificationsChanged[] = $created->toArray();
+                    }
 
                     $totalSecond += $tarification['second'];
                     $totalSumma += $summa;
@@ -513,17 +552,34 @@ class TechnologController extends Controller
                 ['seconds' => $totalSecond, 'summa' => $totalSumma]
             );
 
-            // Log yozish
-            $newData = [
-                'category' => $tarificationCategory->fresh()->toArray(),
-                'tarifications' => $updatedTarifications,
-                'submodel_spend' => $submodelSpend->fresh()->toArray()
+            $submodelSpendChanged = [];
+            if ($oldSubmodelSpend) {
+                if ($oldSubmodelSpend->seconds != $totalSecond || $oldSubmodelSpend->summa != $totalSumma) {
+                    $submodelSpendChanged['old'] = $oldSubmodelSpend->toArray();
+                    $submodelSpendChanged['new'] = $submodelSpend->fresh()->toArray();
+                }
+            } else {
+                $submodelSpendChanged['new'] = $submodelSpend->fresh()->toArray();
+            }
+
+            // Logga faqat o‘zgargan qismlar yoziladi
+            $logOldData = [
+                'category' => $oldCategory,
+                'tarifications' => $oldTarificationsChanged,
+                'submodel_spend' => $submodelSpendChanged['old'] ?? null
             ];
-            Log::add(auth()->id(), 'Tarifikatsiya muvaffaqiyatli yangilandi', 'edit', $oldData, $newData);
+
+            $logNewData = [
+                'category' => $tarificationCategory->fresh()->toArray(),
+                'tarifications' => $newTarificationsChanged,
+                'submodel_spend' => $submodelSpendChanged['new'] ?? null
+            ];
+
+            Log::add(auth()->id(), 'Tarifikatsiya muvaffaqiyatli yangilandi', 'edit', $logOldData, $logNewData);
 
             return response()->json(['message' => 'Tarifikatsiyalar muvaffaqiyatli yangilandi'], 200);
         } catch (\Exception $e) {
-            Log::add(auth()->id(), 'Tarifikatsiya yangilanishida xatolik: ' . $e->getMessage(), 'attempt',null, null);
+            Log::add(auth()->id(), 'Tarifikatsiya yangilanishida xatolik: ' . $e->getMessage(), 'attempt', null, null);
 
             return response()->json(['message' => 'Xatolik yuz berdi: ' . $e->getMessage()], 500);
         }
@@ -668,10 +724,12 @@ class TechnologController extends Controller
         $validatedData = $validator->validated();
 
         $typeWriter = TypeWriter::find($validatedData['id']);
+
+        $oldData = $typeWriter->toArray();
         $typeWriter->update($validatedData);
 
         // Log yozish
-        Log::add(auth()->id(), 'Tikuv mashina muvaffaqiyatli yangilandi', 'edit', null, $typeWriter->toArray());
+        Log::add(auth()->id(), 'Tikuv mashina muvaffaqiyatli yangilandi', 'edit', $oldData, $typeWriter->toArray());
 
         return response()->json([
             'message' => 'TypeWriter muvaffaqiyatli yangilandi',
