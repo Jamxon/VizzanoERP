@@ -96,9 +96,11 @@ class ModelController extends Controller
                 ], 500);
             }
 
-            if ($request->hasFile('images') && !empty($request->file('images'))) {
+            if ($request->hasFile('images')) {
                 try {
-                    foreach ($request->file('images') as $image) {
+                    $index = 1;
+                    while ($request->hasFile('images' . $index)) {
+                        $image = $request->file('images' . $index);
                         $fileName = time() . '_' . $image->getClientOriginalName();
                         $image->storeAs('/images/', $fileName);
 
@@ -106,6 +108,8 @@ class ModelController extends Controller
                             'model_id' => $model->id,
                             'image' => 'images/' . $fileName,
                         ]);
+
+                        $index++;
                     }
                 } catch (\Exception $e) {
                     return response()->json([
@@ -114,6 +118,8 @@ class ModelController extends Controller
                     ], 500);
                 }
             }
+
+
 
             if (!empty($data['sizes'])) {
                 try {
