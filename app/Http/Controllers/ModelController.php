@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use App\Models\Log;
 use App\Models\Materials;
 use App\Models\ModelImages;
 use App\Models\Models;
@@ -78,6 +79,9 @@ class ModelController extends Controller
                 ], 400);
             }
 
+            // ✅ Urinish logi
+            Log::add(auth()->id(), 'Model yaratishga urinish qilindi', 'attempt', $data);
+
             try {
                 $model = Models::create([
                     'name' => $data['name'] ?? null,
@@ -142,12 +146,17 @@ class ModelController extends Controller
                 }
             }
 
+            // ✅ Muvaffaqiyatli log
+            Log::add(auth()->id(), 'Yangi model yaratildi', 'create', null, $model->toArray());
+
             return response()->json([
                 'message' => 'Model created successfully',
                 'model' => $model,
             ], 201);
 
         } catch (\Exception $e) {
+            Log::add(auth()->id(), 'Model yaratishda umumiy xatolik', 'attempt', $request->all(), ['error' => $e->getMessage()]);
+
             return response()->json([
                 'message' => 'An unexpected error occurred',
                 'error' => $e->getMessage(),
@@ -166,24 +175,42 @@ class ModelController extends Controller
             ], 400);
         }
 
-        $model->update([
-            'name' => $data['name'] ?? $model->name,
-            'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
+        // ✅ Urinish logi
+        Log::add(auth()->id(), 'Model yangilanishiga urinish qilindi', 'attempt', $data);
 
-        ]);
+        try {
+            $model->update([
+                'name' => $data['name'] ?? $model->name,
+                'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Model update failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
 
+        // ✅ Fotorasmlarni qo‘shish logi
         if ($request->hasFile('images') && !empty($request->file('images'))) {
             foreach ($request->file('images') as $image) {
-                $fileName = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('/images/', $fileName);
+                try {
+                    $fileName = time() . '_' . $image->getClientOriginalName();
+                    $image->storeAs('/images/', $fileName);
 
-                ModelImages::create([
-                    'model_id' => $model->id,
-                    'image' => 'images/' . $fileName,
-                ]);
+                    ModelImages::create([
+                        'model_id' => $model->id,
+                        'image' => 'images/' . $fileName,
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'message' => 'Image upload failed',
+                        'error' => $e->getMessage(),
+                    ], 500);
+                }
             }
         }
 
+        // ✅ O'lchamlarni yangilash
         if (!empty($data['sizes'])) {
             foreach ($data['sizes'] as $sizeData) {
                 Size::updateOrCreate(
@@ -193,6 +220,7 @@ class ModelController extends Controller
             }
         }
 
+        // ✅ Submodelarni yangilash
         if (!empty($data['submodels'])) {
             foreach ($data['submodels'] as $submodelData) {
                 SubModel::updateOrCreate(
@@ -202,6 +230,9 @@ class ModelController extends Controller
             }
         }
 
+        // ✅ Muvaffaqiyatli yangilash logi
+        Log::add(auth()->id(), 'Model muvaffaqiyatli yangilandi', 'update', $data, $model->toArray());
+
         return response()->json([
             'message' => 'Model updated successfully',
             'model' => $model->load(['sizes', 'submodels', 'images']),
@@ -210,7 +241,21 @@ class ModelController extends Controller
 
     public function destroy(Models $model): \Illuminate\Http\JsonResponse
     {
-        $model->delete();
+        // ✅ Urinish logi
+        Log::add(auth()->id(), 'Model o‘chirishga urinish qilindi', 'attempt', ['model_id' => $model->id]);
+
+        try {
+            $model->delete();
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Model deletion failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+        // ✅ Muvaffaqiyatli o‘chirish logi
+        Log::add(auth()->id(), 'Model muvaffaqiyatli o‘chirildi', 'delete', ['model_id' => $model->id]);
+
         return response()->json([
             'message' => 'Model deleted successfully',
         ]);
@@ -218,7 +263,21 @@ class ModelController extends Controller
 
     public function destroyImage(ModelImages $modelImage): \Illuminate\Http\JsonResponse
     {
-        $modelImage->delete();
+        // ✅ Urinish logi
+        Log::add(auth()->id(), 'Image o‘chirishga urinish qilindi', 'attempt', ['image_id' => $modelImage->id]);
+
+        try {
+            $modelImage->delete();
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Image deletion failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+        // ✅ Muvaffaqiyatli o‘chirish logi
+        Log::add(auth()->id(), 'Image muvaffaqiyatli o‘chirildi', 'delete', ['image_id' => $modelImage->id]);
+
         return response()->json([
             'message' => 'Image deleted successfully',
         ]);
