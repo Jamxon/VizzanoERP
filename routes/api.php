@@ -143,8 +143,6 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::patch('razryads/{razryad}', [RazryadController::class, 'update']);
     Route::delete('razryads/{razryad}', [RazryadController::class, 'destroy']);
 
-    Route::get('export-items', [ItemController::class, 'export']);
-
     Route::get('warehouses', [WarehouseController::class, 'getWarehouse']);
     Route::post('warehouses', [WarehouseController::class, 'warehouseStore']);
     Route::patch('warehouses/{warehouse}', [WarehouseController::class, 'warehouseUpdate']);
@@ -224,6 +222,28 @@ Route::prefix('tv')->middleware('role:tv')->group(function () {
     Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
 });
 
+Route::prefix('orderManager')->middleware('role:orderManager')->group(function () {
+    Route::get('orders', [OrderController::class, 'index']);
+    Route::post('orders', [OrderController::class, 'store']);
+    Route::get('orders/{order}', [OrderController::class, 'show']);
+    Route::patch('orders/{order}', [OrderController::class, 'update']);
+    Route::delete('orders/{order}', [OrderController::class, 'delete']);
+    Route::patch('orders/change/{order}', [OrderController::class, 'changeOrderStatus']);
+
+    Route::get('contragents', [OrderController::class, 'getContragents']);
+
+    Route::get('models', [ModelController::class, 'index']);
+    Route::post('models', [ModelController::class, 'store']);
+    Route::get('models/{model}', [ModelController::class, 'show']);
+    Route::patch('models/{model}', [ModelController::class, 'update']);
+    Route::delete('models/{model}', [ModelController::class, 'destroy']);
+    Route::delete('models/image/{modelImage}', [ModelController::class, 'destroyImage']);
+
+    Route::get('materials', [ModelController::class, 'getMaterials']);
+
+    Route::post('/import-orders', [OrderImportController::class, 'import'])->name('orders.import');
+    Route::post('orderStore',[OrderImportController::class,'store']);
+});
 
 Route::get('/validate', function () {
     return response()->json(['message' => auth()->user()], 200);
