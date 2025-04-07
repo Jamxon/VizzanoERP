@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static with(string[] $array)
  * @method static find(mixed $modelId)
  */
+
 class Models extends Model
 {
     use HasFactory;
