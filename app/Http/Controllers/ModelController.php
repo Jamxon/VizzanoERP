@@ -169,9 +169,17 @@ class ModelController extends Controller
         }
     }
 
-    public function update(Request $request, Models $model)
+    public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
-        return        $data = json_decode($request->data, true);
+        $data = json_decode($request->data, true);
+
+        if (!is_array($data) || empty($data)) {
+            Log::add( auth()->id(),'Model yangilanishida xatolik', 'error', $data, ['error' => 'Data field is not a valid array']);
+            return response()->json([
+                'message' => 'Invalid data format',
+                'error' => 'Data field is not a valid array',
+            ], 400);
+        }
 
         Log::add(auth()->id(), 'Model yangilanishiga urinish qilindi', 'attempt', $data);
 
@@ -238,7 +246,6 @@ class ModelController extends Controller
             ], 500);
         }
     }
-
 
     public function destroy(Models $model): \Illuminate\Http\JsonResponse
     {
