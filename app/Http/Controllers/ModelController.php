@@ -71,6 +71,7 @@ class ModelController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
+        $request->all();
         try {
             $data = json_decode($request->data, true);
 
