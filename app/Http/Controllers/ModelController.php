@@ -208,7 +208,6 @@ class ModelController extends Controller
         ]);
     }
 
-
     public function destroy(Models $model): \Illuminate\Http\JsonResponse
     {
         $model->delete();
