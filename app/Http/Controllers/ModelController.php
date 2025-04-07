@@ -172,7 +172,7 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $model)
     {
-        return $request->data;
+        return $request->name;
 
         $data = json_decode($request->input('data'), true);
 
