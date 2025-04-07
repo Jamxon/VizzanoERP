@@ -171,6 +171,8 @@ class ModelController extends Controller
 
     public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
+        return $request->all();
+
         $data = json_decode($request->input('data'), true);
 
         if (!is_array($data) || empty($data)) {
