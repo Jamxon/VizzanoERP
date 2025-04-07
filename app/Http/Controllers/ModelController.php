@@ -69,9 +69,8 @@ class ModelController extends Controller
         return response()->json($model);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-       return  $request->all();
         try {
             $data = json_decode($request->data, true);
 
@@ -170,10 +169,8 @@ class ModelController extends Controller
         }
     }
 
-    public function update(Request $request, Models $model)
+    public function update(Request $request, Models $model): \Illuminate\Http\JsonResponse
     {
-//        return $request->all();
-
         $data = json_decode($request->data, true);
 
         if (!is_array($data) || empty($data)) {
