@@ -14,6 +14,7 @@ use App\Models\OrderRecipes;
 use App\Models\OrderSize;
 use App\Models\OrderSubModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -50,76 +51,93 @@ class OrderController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string',
-            'quantity' => 'required|integer',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
-            'rasxod' => 'nullable|numeric',
-            'comment' => 'nullable|string',
-            'model' => 'required|array',
-            'model.id' => 'required|integer',
-            'model.material_id' => 'required|integer|exists:items,id',
-            'model.submodels' => 'required|array',
-            'model.sizes' => 'required|array',
-            'model.*.sizes.*.id' => 'required|integer',
-            'model.*.sizes.*.quantity' => 'required|integer',
-            'instructions' => 'nullable|array',
-            'instructions.*.title' => 'required|string',
-            'instructions.*.description' => 'required|string',
-            'recipes' => 'nullable|array',
-            'recipes.*.item_id' => 'required|integer',
-            'recipes.*.quantity' => 'required|integer',
-            'recipes.*.submodel_id' => 'required|integer',
-        ]);
-
         $user = auth()->user();
 
-        if ($request->contragent_id) {
-            $contragent = Contragent::find($request->contragent_id);
-        } else {
-            $contragent = Contragent::create([
-                'name' => $request->contragent_name ?? null,
-                'description' => $request->contragent_description ?? null,
+        try {
+            $request->validate([
+                'name' => 'required|string',
+                'quantity' => 'required|integer',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'rasxod' => 'nullable|numeric',
+                'comment' => 'nullable|string',
+                'model' => 'required|array',
+                'model.id' => 'required|integer',
+                'model.material_id' => 'required|integer|exists:items,id',
+                'model.submodels' => 'required|array',
+                'model.sizes' => 'required|array',
+                'model.*.sizes.*.id' => 'required|integer',
+                'model.*.sizes.*.quantity' => 'required|integer',
+                'instructions' => 'nullable|array',
+                'instructions.*.title' => 'required|string',
+                'instructions.*.description' => 'required|string',
+                'recipes' => 'nullable|array',
+                'recipes.*.item_id' => 'required|integer',
+                'recipes.*.quantity' => 'required|integer',
+                'recipes.*.submodel_id' => 'required|integer',
             ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::add($user->id, 'Buyurtma validatsiyasida xatolik', 'error', $request->all(), ['errors' => $e->errors()]);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
         }
 
-        $order = Order::create([
-            'name' => $request->name,
-            'quantity' => $request->quantity,
-            'status' => "inactive",
-            'start_date' => $request->start_date ?? null,
-            'end_date' => $request->end_date ?? null,
-            'rasxod' => $request->rasxod ?? 0,
-            'branch_id' => $user->employee->branch_id,
-            'contragent_id' => $contragent->id ?? null,
-            'comment' => $request->comment ?? null,
-            'price' => $request->price ?? 0,
-        ]);
+        DB::beginTransaction();
 
-        $modelRasxod = Models::find($request->model['id'])->rasxod;
+        try {
+            // ✅ Contragentni aniqlash yoki yaratish
+            Log::add($user->id, 'Buyurtma yaratishga urinish', 'attempt', $request->all(),);
 
-        $orderModel = OrderModel::create([
-            'order_id' => $order->id,
-            'model_id' => $request->model['id'],
-            'rasxod' => $modelRasxod ?? 0,
-            'material_id' => $request->model['material_id'],
-        ]);
-
-        $instructions = [];
-        if (!empty($request->instructions)) {
-            foreach ($request->instructions as $instruction) {
-                $created = OrderInstruction::create([
-                    'order_id' => $order->id,
-                    'title' => $instruction['title'],
-                    'description' => $instruction['description'],
+            if ($request->contragent_id) {
+                $contragent = Contragent::find($request->contragent_id);
+            } else {
+                $contragent = Contragent::create([
+                    'name' => $request->contragent_name ?? null,
+                    'description' => $request->contragent_description ?? null,
                 ]);
-                $instructions[] = $created->toArray();
             }
-        }
 
-        $submodels = [];
-        if (!empty($request->model['submodels'])) {
+            // ✅ Order yaratish
+            $order = Order::create([
+                'name' => $request->name,
+                'quantity' => $request->quantity,
+                'status' => "inactive",
+                'start_date' => $request->start_date ?? null,
+                'end_date' => $request->end_date ?? null,
+                'rasxod' => $request->rasxod ?? 0,
+                'branch_id' => $user->employee->branch_id,
+                'contragent_id' => $contragent->id ?? null,
+                'comment' => $request->comment ?? null,
+                'price' => $request->price ?? 0,
+            ]);
+
+            // ✅ OrderModel yaratish
+            $modelRasxod = Models::find($request->model['id'])->rasxod;
+
+            $orderModel = OrderModel::create([
+                'order_id' => $order->id,
+                'model_id' => $request->model['id'],
+                'rasxod' => $modelRasxod ?? 0,
+                'material_id' => $request->model['material_id'],
+            ]);
+
+            // ✅ Instructions qo‘shish
+            $instructions = [];
+            if (!empty($request->instructions)) {
+                foreach ($request->instructions as $instruction) {
+                    $created = OrderInstruction::create([
+                        'order_id' => $order->id,
+                        'title' => $instruction['title'],
+                        'description' => $instruction['description'],
+                    ]);
+                    $instructions[] = $created->toArray();
+                }
+            }
+
+            // ✅ Submodellar
+            $submodels = [];
             foreach ($request->model['submodels'] as $submodel) {
                 $created = OrderSubModel::create([
                     'order_model_id' => $orderModel->id,
@@ -127,23 +145,23 @@ class OrderController extends Controller
                 ]);
                 $submodels[] = $created->toArray();
             }
-        }
 
-        $recipes = [];
-        if (!empty($request->recipes)) {
-            foreach ($request->recipes as $recipe) {
-                $created = OrderRecipes::create([
-                    'order_id' => $order->id,
-                    'item_id' => $recipe['item_id'],
-                    'quantity' => $recipe['quantity'],
-                    'submodel_id' => $recipe['submodel_id'],
-                ]);
-                $recipes[] = $created->toArray();
+            // ✅ Receptlar
+            $recipes = [];
+            if (!empty($request->recipes)) {
+                foreach ($request->recipes as $recipe) {
+                    $created = OrderRecipes::create([
+                        'order_id' => $order->id,
+                        'item_id' => $recipe['item_id'],
+                        'quantity' => $recipe['quantity'],
+                        'submodel_id' => $recipe['submodel_id'],
+                    ]);
+                    $recipes[] = $created->toArray();
+                }
             }
-        }
 
-        $sizes = [];
-        if (!empty($request->model['sizes'])) {
+            // ✅ O‘lchamlar
+            $sizes = [];
             foreach ($request->model['sizes'] as $size) {
                 $created = OrderSize::create([
                     'order_model_id' => $orderModel->id,
@@ -152,25 +170,38 @@ class OrderController extends Controller
                 ]);
                 $sizes[] = $created->toArray();
             }
+
+            DB::commit();
+
+            // ✅ Muvaffaqiyatli log
+            Log::add($user->id, 'Yangi buyurtma yaratildi', 'create', null, [
+                'order' => $order->toArray(),
+                'order_model' => $orderModel->toArray(),
+                'instructions' => $instructions,
+                'submodels' => $submodels,
+                'recipes' => $recipes,
+                'sizes' => $sizes,
+                'contragent' => $contragent ? $contragent->toArray() : null,
+            ]);
+
+            return response()->json([
+                'message' => 'Order created successfully',
+                'order' => $order,
+            ], 201);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            Log::add($user->id, 'Buyurtma yaratishda xatolik yuz berdi', 'error', $request->all(), [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Order creation failed',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        // ✅ Log yozish
-        $logData = [
-            'order' => $order->toArray(),
-            'order_model' => $orderModel->toArray(),
-            'instructions' => $instructions,
-            'submodels' => $submodels,
-            'recipes' => $recipes,
-            'sizes' => $sizes,
-            'contragent' => $contragent ? $contragent->toArray() : null,
-        ];
-
-        Log::add(auth()->id(), 'Yangi buyurtma yaratildi', 'create', null, $logData);
-
-        return response()->json([
-            'message' => 'Order created successfully',
-            'order' => $order,
-        ], 201);
     }
 
     public function update(Request $request, Order $order): \Illuminate\Http\JsonResponse
