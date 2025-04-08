@@ -141,6 +141,13 @@ class ShowOrderResource extends JsonResource
                 'name' => $this->contragent->name,
                 'description' => $this->contragent->description,
             ] : null,
+            'packageOutcomes' => $this->packageOutcomes->map(function ($package) {
+                return [
+                    'id' => $package->id,
+                    'package_size' => $package->package_size,
+                    'package_quantity' => $package->package_quantity,
+                ];
+            }),
         ];
     }
 }
