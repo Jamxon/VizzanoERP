@@ -18,26 +18,6 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function downloadPDF($id)
-    {
-        return "dsdds";
-        
-        $order = Order::with([
-            'orderModel.model',
-            'orderModel.material',
-            'orderModel.sizes.size',
-            'orderModel.submodels.submodel.orderRecipes.item',
-            'orderModel.submodels.submodelSpend',
-            'instructions',
-            'contragent'
-        ])->findOrFail($id);
-
-        $data = new ShowOrderResource($order);
-
-        $pdf = PDF::loadView('orders.pdf', ['order' => $data]);
-        return $pdf->download("order-$id.pdf");
-    }
-
     public function index(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::orderBy('created_at', 'asc')
