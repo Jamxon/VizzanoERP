@@ -152,8 +152,8 @@
             <div>
                 <h1 class="document-title">BUYURTMA HUJJATI</h1>
                 <div class="document-number">Hujjat № {order.id}</div>
-                <p>Sana: {order.start_date}</p>
-                <p>{{ var_dump($order) }}</p>
+                <p>Sana: {{ $order.start_date }}</p>
+                <p>{{}}</p>
             </div>
         </div>
     </div>
