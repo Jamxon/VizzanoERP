@@ -196,7 +196,7 @@
             </div>
             <div class="info-item">
                 <span class="info-label">Material:</span>
-                <span class="info-value">{order.order_model.material}</span>
+                <span class="info-value">{{ $order['order_model']['material']->name }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Rasxod:</span>
