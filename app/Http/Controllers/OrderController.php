@@ -20,7 +20,7 @@ class OrderController extends Controller
 {
     public function downloadPDF($id)
     {
-        return $id;
+        return "dsdds";
         $order = Order::with([
             'orderModel.model',
             'orderModel.material',
