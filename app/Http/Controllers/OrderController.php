@@ -222,11 +222,11 @@ class OrderController extends Controller
 
             $oldData = [
                 'order' => $order->toArray(),
-                'order_model' => optional($order->orderModel)->toArray(),
-                'instructions' => $order->instructions->toArray(),
-                'recipes' => $order->orderRecipes->toArray(),
+                'order_model' => optional($order->orderModel)->toArray() ?? [],
+                'instructions' => $order->instructions->toArray() ?? [],
+                'recipes' => $order->orderRecipes->toArray() ?? [],
                 'sizes' => $order->orderModel ? $order->orderModel->orderSizes->toArray() : [],
-                'contragent' => optional($order->contragent)->toArray(),
+                'contragent' => optional($order->contragent)->toArray() ?? [],
             ];
 
             if ($request->has('contragent_id')) {
