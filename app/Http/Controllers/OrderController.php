@@ -336,11 +336,11 @@ class OrderController extends Controller
 
             $newData = [
                 'order' => $order->fresh()->toArray(),
-                'order_model' => optional($order->fresh()->orderModel)->toArray(),
-                'instructions' => $order->fresh()->instructions->toArray(),
-                'recipes' => $order->fresh()->orderRecipes->toArray(),
+                'order_model' => optional($order->fresh()->orderModel)->toArray() ?? [],
+                'instructions' => $order->fresh()->instructions->toArray() ?? [],
+                'recipes' => $order->fresh()->orderRecipes->toArray() ?? [],
                 'sizes' => $order->orderModel ? $order->orderModel->orderSizes->toArray() : [],
-                'contragent' => isset($contragent) ? $contragent->toArray() : optional($order->contragent)->toArray(),
+                'contragent' => isset($contragent) ? $contragent->toArray() : optional($order->contragent)->toArray() ?? [],
             ];
 
             Log::add(auth()->id(), 'Buyurtma yangilandi', 'edit', $oldData, $newData);
