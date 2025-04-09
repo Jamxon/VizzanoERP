@@ -18,11 +18,12 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function getLogs()
+    public function getLogs(): \Illuminate\Http\JsonResponse
     {
         $logs = Log::orderBy('created_at', 'desc')->get();
         return response()->json($logs);
     }
+    
     public function index(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::orderBy('created_at', 'asc')
