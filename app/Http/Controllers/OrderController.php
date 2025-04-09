@@ -40,7 +40,7 @@ class OrderController extends Controller
             'packageOutcomes'
         ])->findOrFail($id);
 
-      return    $resource = new ShowOrderResource($order);
+        $resource = new ShowOrderResource($order);
         $orderData = $resource->toArray(request());
 
         $pdf = PDF::loadView('order.order', ['order' => $orderData]);
