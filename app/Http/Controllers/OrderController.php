@@ -23,7 +23,31 @@ class OrderController extends Controller
         $logs = Log::orderBy('created_at', 'desc')->get();
         return response()->json($logs);
     }
-    
+
+    public function generateOrderPdf($id): \Illuminate\Http\Response
+    {
+        $order = Order::with([
+            'orderModel.sizes',
+            'orderModel.submodels.submodel.orderRecipes',
+            'orderModel.submodels.group',
+            'orderModel.submodels.qualityChecks.qualityCheckDescriptions.qualityDescription',
+            'orderModel.submodels.sewingOutputs',
+            'orderModel.submodels.otkOrderGroup',
+            'instructions',
+            'orderPrintingTime.user',
+            'orderCuts.category',
+            'contragent',
+            'packageOutcomes'
+        ])->findOrFail($id);
+
+        $resource = new ShowOrderResource($order);
+        $orderData = $resource->toArray(request());
+
+        $pdf = PDF::loadView('order.order', ['order' => $orderData]);
+
+        return $pdf->download('buyurtma-'.$id.'.pdf');
+    }
+
     public function index(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::orderBy('created_at', 'asc')
