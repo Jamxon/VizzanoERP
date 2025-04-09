@@ -105,7 +105,7 @@ class OrderImportController extends Controller
             }
 
             // Rasmlarni saqlash
-            if (isset($data['images']) && is_array($data['images'])) {
+            if (!empty($data['images']) && is_array($data['images'])) {
                 foreach ($data['images'] as $image) {
                     $imageName = Str::uuid() . '.' . pathinfo($image, PATHINFO_EXTENSION);
                     $imagePath = "models/$imageName";
