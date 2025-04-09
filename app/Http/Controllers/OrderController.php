@@ -20,6 +20,7 @@ class OrderController extends Controller
 {
     public function downloadPDF($id): \Illuminate\Http\Response
     {
+        dd($id);
         $order = Order::with([
             'orderModel.model',
             'orderModel.material',
