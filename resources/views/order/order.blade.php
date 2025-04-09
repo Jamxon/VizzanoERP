@@ -200,7 +200,7 @@
             </div>
             @foreach($order['order_model']['submodels'] as $submodel)
                 <div class="info-item">
-                    <span class="info-value">{{ $submodel['submodel'] }}</span>
+                    <span class="info-value">{{ $submodel['submodel']['name'] }}</span>
                 </div>
             @endforeach
         </div>
