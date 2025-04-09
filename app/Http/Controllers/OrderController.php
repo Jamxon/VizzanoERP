@@ -23,7 +23,6 @@ class OrderController extends Controller
         $logs = Log::orderBy('created_at', 'desc')->get();
         return response()->json($logs);
     }
-
     
     public function index(): \Illuminate\Http\JsonResponse
     {
