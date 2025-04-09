@@ -109,7 +109,6 @@ class OrderImportController extends Controller
 
                 $sizeModel = Size::where('name', $size)
                     ->where('model_id', $model->id)
-                    ->where('branch_id', auth()->user()->employee->branch_id)
                     ->first();
 
                 OrderSize::create([
