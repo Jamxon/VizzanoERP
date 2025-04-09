@@ -26,7 +26,7 @@ class OrderImportController extends Controller
 
             $data = is_array($request->data) ? $request->data : json_decode($request->data, true);
 
-            $issetModel = Model::where('name', $data['model'])
+            $issetModel = Models::where('name', $data['model'])
                 ->where('branch_id', auth()->user()->employee->branch_id)
                 ->first();
 
