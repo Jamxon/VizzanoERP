@@ -192,7 +192,7 @@
         <div class="info-group">
             <div class="info-item">
                 <span class="info-label">Model nomi:</span>
-                <span class="info-value">{{ $order['order_model']['model'] }}</span>
+                <span class="info-value">{{ $order['order_model']['model']->name }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Material:</span>
