@@ -191,12 +191,8 @@
         <h2 class="section-title">Model ma'lumotlari</h2>
         <div class="info-group">
             <div class="info-item">
-                <span class="info-label">Model №:</span>
-                <span class="info-value">{{ $order['order_model']['id'] }}</span>
-            </div>
-            <div class="info-item">
                 <span class="info-label">Model nomi:</span>
-                <span class="info-value">{order.order_model.model}</span>
+                <span class="info-value">{{ $order['order_model']['model'] }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Material:</span>
