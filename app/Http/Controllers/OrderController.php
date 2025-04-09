@@ -12,9 +12,9 @@ use App\Models\OrderModel;
 use App\Models\OrderRecipes;
 use App\Models\OrderSize;
 use App\Models\OrderSubModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use PhpOffice\PhpSpreadsheet\Writer\Pdf;
 
 class OrderController extends Controller
 {
