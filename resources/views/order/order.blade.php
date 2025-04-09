@@ -192,17 +192,18 @@
         <div class="info-group">
             <div class="info-item">
                 <span class="info-label">Model nomi:</span>
-                <span class="info-value">{{ $order['order_model']['model']->name }}</span>
+                <span class="info-value">{{ $order['order_model']['model']->name }}  (</span>
+                @foreach($order['order_model']['submodels'] as $submodel)
+                    <div class="info-item">
+                        <span class="info-value">{{ $submodel['submodel']['name'] }}, </span>
+                    </div>
+                @endforeach
+            <span>)</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Material:</span>
                 <span class="info-value">{{ $order['order_model']['material']->name }}</span>
             </div>
-            @foreach($order['order_model']['submodels'] as $submodel)
-                <div class="info-item">
-                    <span class="info-value">{{ $submodel['submodel']['name'] }}</span>
-                </div>
-            @endforeach
         </div>
 
         <h3 class="section-title">O'lchamlar</h3>
