@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Request;
 
 /**
  * @method static create(array $array)
+ * @method static orderBy(string $string, string $string1)
  */
 class Log extends Model
 {

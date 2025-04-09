@@ -18,6 +18,11 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function getLogs()
+    {
+        $logs = Log::orderBy('created_at', 'desc')->get();
+        return response()->json($logs);
+    }
     public function index(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::orderBy('created_at', 'asc')
@@ -87,7 +92,7 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-            Log::add($user->id, 'Buyurtma yaratishga urinish', 'attempt', $request->all(),);
+            Log::add($user->id, 'Buyurtma yaratishga urinish', 'attempt', $request->all());
 
             if ($request->contragent_id) {
                 $contragent = Contragent::find($request->contragent_id);
