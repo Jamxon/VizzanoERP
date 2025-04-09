@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ShowOrderResource;
 use App\Models\Contragent;
-use App\Models\Department;
 use App\Models\Log;
 use App\Models\Models;
 use App\Models\Order;
@@ -13,11 +12,30 @@ use App\Models\OrderModel;
 use App\Models\OrderRecipes;
 use App\Models\OrderSize;
 use App\Models\OrderSubModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function downloadPDF($id): \Illuminate\Http\Response
+    {
+        $order = Order::with([
+            'orderModel.model',
+            'orderModel.material',
+            'orderModel.sizes.size',
+            'orderModel.submodels.submodel.orderRecipes.item',
+            'orderModel.submodels.submodelSpend',
+            'instructions',
+            'contragent'
+        ])->findOrFail($id);
+
+        $data = new ShowOrderResource($order);
+
+        $pdf = PDF::loadView('orders.pdf', ['order' => $data]);
+        return $pdf->download("order-{$id}.pdf");
+    }
+
     public function index(): \Illuminate\Http\JsonResponse
     {
         $orders = Order::orderBy('created_at', 'asc')
