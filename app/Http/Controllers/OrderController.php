@@ -18,9 +18,9 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function downloadPDF($id): \Illuminate\Http\Response
+    public function downloadPDF($id)
     {
-        dd($id);
+        return $id;
         $order = Order::with([
             'orderModel.model',
             'orderModel.material',
