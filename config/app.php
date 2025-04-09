@@ -169,10 +169,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
-<<<<<<< HEAD
-=======
-       
->>>>>>> 5b9aeca5 (Your commit message)
     ])->toArray(),
 
     /*
