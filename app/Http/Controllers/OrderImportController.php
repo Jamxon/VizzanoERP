@@ -121,16 +121,23 @@ class OrderImportController extends Controller
             // Rasmlarni saqlash
             if (!empty($data['images']) && is_array($data['images'])) {
                 foreach ($data['images'] as $image) {
-                    $imageName = Str::uuid() . '.' . pathinfo($image, PATHINFO_EXTENSION);
-                    $imagePath = "models/$imageName";
+                    $sourcePath = storage_path('app/public/models/' . $image);
 
-                    Storage::disk('public')->put($imagePath, file_get_contents($image));
+                    if (!file_exists($sourcePath)) {
+                        throw new \Exception("Rasm topilmadi: $image");
+                    }
+
+                    $imageName = Str::uuid() . '.' . pathinfo($image, PATHINFO_EXTENSION);
+                    $newPath = "models/$imageName";
+
+                    Storage::disk('public')->put($newPath, file_get_contents($sourcePath));
 
                     ModelImages::create([
                         'model_id' => $model->id,
-                        'path' => $imagePath,
+                        'path' => $newPath,
                     ]);
                 }
+
             }
 
             DB::commit();
