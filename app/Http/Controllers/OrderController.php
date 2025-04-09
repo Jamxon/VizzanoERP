@@ -201,7 +201,7 @@ class OrderController extends Controller
         try {
             Log::add(auth()->id(), "Buyurtma yangilashga urinish bo'lmoqda", 'attempt', $order->toArray(), null);
 
-         return    $validatedData = $request->validate([
+             $validatedData = $request->validate([
                 'name' => 'sometimes|string',
                 'quantity' => 'sometimes|integer',
                 'start_date' => 'sometimes|date',
@@ -225,7 +225,7 @@ class OrderController extends Controller
                 'order_model' => optional($order->orderModel)->toArray() ?? [],
                 'instructions' => $order->instructions->toArray() ?? [],
                 'recipes' => $order->orderRecipes->toArray() ?? [],
-                'sizes' => $order->orderModel ? $order->orderModel->orderSizes->toArray() : [],
+                'sizes' => $order->orderModel ? $order->orderModel->sizes->toArray() : [],
                 'contragent' => optional($order->contragent)->toArray() ?? [],
             ];
 
@@ -339,7 +339,7 @@ class OrderController extends Controller
                 'order_model' => optional($order->fresh()->orderModel)->toArray() ?? [],
                 'instructions' => $order->fresh()->instructions->toArray() ?? [],
                 'recipes' => $order->fresh()->orderRecipes->toArray() ?? [],
-                'sizes' => $order->orderModel ? $order->orderModel->orderSizes->toArray() : [],
+                'sizes' => $order->orderModel ? $order->orderModel->sizes->toArray() : [],
                 'contragent' => isset($contragent) ? $contragent->toArray() : optional($order->contragent)->toArray() ?? [],
             ];
 
