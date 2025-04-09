@@ -10,6 +10,7 @@ use App\Models\OrderSize;
 use App\Models\OrderSubModel;
 use App\Models\Size;
 use App\Models\SubModel;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -20,30 +21,39 @@ class OrderImportController extends Controller
 {
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-//        $request->validate([
-//            'data.model' => 'required|string',
-//            'data.model_summa' => 'required|numeric',
-//            'data.submodel' => 'required|string',
-//            'data.quantity' => 'required|integer',
-//            'data.price' => 'required|numeric',
-//            'data.sizes' => 'required|array',
-//            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-//        ]);
-
         try {
             DB::beginTransaction();
 
             $data = is_array($request->data) ? $request->data : json_decode($request->data, true);
 
-            $model = Models::create([
-                'name' => $data['model'],
-                'rasxod' => $data['model_summa'],
-            ]);
+            $issetModel = Model::where('name', $data['model'])
+                ->where('branch_id', auth()->user()->employee->branch_id)
+                ->first();
 
-            $submodel = SubModel::create([
-                'name' => $data['submodel'],
-                'model_id' => $model->id,
-            ]);
+            if ($issetModel) {
+                $model = Models::create([
+                    'name' => $data['model'],
+                    'rasxod' => $data['model_summa'],
+                ]);
+            }
+            $model = Models::where('name', $data['model'])
+                ->where('branch_id', auth()->user()->employee->branch_id)
+                ->first();
+
+            $issetSubModel = SubModel::where('name', $data['submodel'])
+                ->where('model_id', $model->id)
+                ->first();
+
+            if ($issetSubModel) {
+                $submodel = SubModel::create([
+                    'name' => $data['submodel'],
+                    'model_id' => $model->id,
+                ]);
+            }
+
+            $submodel = SubModel::where('name', $data['submodel'])
+                ->where('model_id', $model->id)
+                ->first();
 
             $order = Order::create([
                 'name' => $data['model'] . ' ' . $data['quantity'],
@@ -54,7 +64,7 @@ class OrderImportController extends Controller
                 'start_date' => now()->format('Y-m-d'),
                 'end_date' => null,
                 'branch_id' => auth()->user()->employee->branch_id,
-                'contragent_id' => null,
+                'contragent_id' => $data['contragent_id'] ?? null,
             ]);
 
             $orderModel = OrderModel::create([
@@ -71,10 +81,21 @@ class OrderImportController extends Controller
             ]);
 
             foreach ($data['sizes'] as $size) {
-                $sizeModel = Size::create([
-                    'name' => $size,
-                    'model_id' => $model->id,
-                ]);
+
+                $sizeModel = Size::where('name', $size)
+                    ->where('branch_id', auth()->user()->employee->branch_id)
+                    ->first();
+
+                if (!$sizeModel) {
+                    $sizeModel = Size::create([
+                        'name' => $size,
+                        'branch_id' => auth()->user()->employee->branch_id,
+                    ]);
+                }
+
+                $sizeModel = Size::where('name', $size)
+                    ->where('branch_id', auth()->user()->employee->branch_id)
+                    ->first();
 
                 OrderSize::create([
                     'order_model_id' => $orderModel->id,
@@ -83,17 +104,20 @@ class OrderImportController extends Controller
                 ]);
             }
 
-            if ($request->hasFile('images')) {
-                foreach ($request->file('images') as $image) {
-                    $path = $image->store('images', 'public');
+            // Rasmlarni saqlash
+            if (isset($data['images']) && is_array($data['images'])) {
+                foreach ($data['images'] as $image) {
+                    $imageName = Str::uuid() . '.' . pathinfo($image, PATHINFO_EXTENSION);
+                    $imagePath = "models/$imageName";
+
+                    Storage::disk('public')->put($imagePath, file_get_contents($image));
 
                     ModelImages::create([
                         'model_id' => $model->id,
-                        'image' => $path,
+                        'path' => $imagePath,
                     ]);
                 }
             }
-
 
             DB::commit();
 
