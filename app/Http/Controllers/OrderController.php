@@ -196,7 +196,7 @@ class OrderController extends Controller
         }
     }
 
-    public function update(Request $request, Order $order)
+    public function update(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
         try {
             Log::add(auth()->id(), "Buyurtma yangilashga urinish bo'lmoqda", 'attempt', $order->toArray(), null);
