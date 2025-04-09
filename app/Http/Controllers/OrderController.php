@@ -12,7 +12,7 @@ use App\Models\OrderModel;
 use App\Models\OrderRecipes;
 use App\Models\OrderSize;
 use App\Models\OrderSubModel;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Barryvdh\DomPDF\PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
