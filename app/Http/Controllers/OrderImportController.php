@@ -31,20 +31,30 @@ class OrderImportController extends Controller
                 ->first();
 
             if ($issetModel) {
+                $model = $issetModel;
+            }else{
                 $model = Models::create([
                     'name' => $data['model'],
                     'rasxod' => $data['model_summa'],
+                    'branch_id' => auth()->user()->employee->branch_id,
                 ]);
             }
+
             $model = Models::where('name', $data['model'])
                 ->where('branch_id', auth()->user()->employee->branch_id)
                 ->first();
+
+            if (!$model){
+                return response()->json(['error' => 'Model topilmadi'], 404);
+            }
 
             $issetSubModel = SubModel::where('name', $data['submodel'])
                 ->where('model_id', $model->id)
                 ->first();
 
             if ($issetSubModel) {
+                $submodel = $issetSubModel;
+            }else{
                 $submodel = SubModel::create([
                     'name' => $data['submodel'],
                     'model_id' => $model->id,
@@ -54,6 +64,10 @@ class OrderImportController extends Controller
             $submodel = SubModel::where('name', $data['submodel'])
                 ->where('model_id', $model->id)
                 ->first();
+
+            if (!$submodel) {
+                return response()->json(['error' => 'Submodel topilmadi'], 404);
+            }
 
             $order = Order::create([
                 'name' => $data['model'] . ' ' . $data['quantity'],
