@@ -229,6 +229,7 @@ Route::prefix('orderManager')->middleware('role:orderManager')->group(function (
     Route::patch('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'delete']);
     Route::patch('orders/change/{order}', [OrderController::class, 'changeOrderStatus']);
+    Route::get('/orders/{id}/pdf', [OrderController::class, 'generateOrderPdf']);
 
     Route::get('contragents', [OrderController::class, 'getContragents']);
 
