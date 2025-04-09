@@ -198,6 +198,11 @@
                 <span class="info-label">Material:</span>
                 <span class="info-value">{{ $order['order_model']['material']->name }}</span>
             </div>
+            @foreach($order['order_model']['submodels'] as $submodel)
+                <div class="info-item">
+                    <span class="info-value">{{ $submodel }}</span>
+                </div>
+            @endforeach
         </div>
 
         <h3 class="section-title">O'lchamlar</h3>
@@ -218,31 +223,6 @@
                     <td>{{ $size['quantity'] }}</td>
                 </tr>
             @endforeach
-            <!-- {End for} -->
-            </tbody>
-        </table>
-    </div>
-
-    <div class="section">
-        <h2 class="section-title">Qo'shimcha modellar</h2>
-        <table>
-            <thead>
-            <tr>
-                <th>№</th>
-                <th>Submodel nomi</th>
-                <th>Guruh</th>
-                <th>Sifat tekshiruvi</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- {For each submodel in order.order_model.submodels} -->
-            <tr>
-                <td>{submodel.id}</td>
-                <td>{submodel.submodel.name}</td>
-                <td>{submodel.group.group}</td>
-                <td>Tasdiqlangan: {submodel.qualityChecks_status_count.true}<br>
-                    Tasdiqlanmagan: {submodel.qualityChecks_status_count.false}</td>
-            </tr>
             <!-- {End for} -->
             </tbody>
         </table>
