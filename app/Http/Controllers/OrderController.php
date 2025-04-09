@@ -33,7 +33,7 @@ class OrderController extends Controller
         $data = new ShowOrderResource($order);
 
         $pdf = PDF::loadView('orders.pdf', ['order' => $data]);
-        return $pdf->download("order-{$id}.pdf");
+        return $pdf->download("order-$id.pdf");
     }
 
     public function index(): \Illuminate\Http\JsonResponse
