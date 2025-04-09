@@ -87,7 +87,6 @@ class OrderController extends Controller
         DB::beginTransaction();
 
         try {
-            // ✅ Contragentni aniqlash yoki yaratish
             Log::add($user->id, 'Buyurtma yaratishga urinish', 'attempt', $request->all(),);
 
             if ($request->contragent_id) {
@@ -99,7 +98,6 @@ class OrderController extends Controller
                 ]);
             }
 
-            // ✅ Order yaratish
             $order = Order::create([
                 'name' => $request->name,
                 'quantity' => $request->quantity,
@@ -113,7 +111,6 @@ class OrderController extends Controller
                 'price' => $request->price ?? 0,
             ]);
 
-            // ✅ OrderModel yaratish
             $modelRasxod = Models::find($request->model['id'])->rasxod;
 
             $orderModel = OrderModel::create([
@@ -123,7 +120,6 @@ class OrderController extends Controller
                 'material_id' => $request->model['material_id'],
             ]);
 
-            // ✅ Instructions qo‘shish
             $instructions = [];
             if (!empty($request->instructions)) {
                 foreach ($request->instructions as $instruction) {
@@ -136,7 +132,6 @@ class OrderController extends Controller
                 }
             }
 
-            // ✅ Submodellar
             $submodels = [];
             foreach ($request->model['submodels'] as $submodel) {
                 $created = OrderSubModel::create([
@@ -146,7 +141,6 @@ class OrderController extends Controller
                 $submodels[] = $created->toArray();
             }
 
-            // ✅ Receptlar
             $recipes = [];
             if (!empty($request->recipes)) {
                 foreach ($request->recipes as $recipe) {
@@ -160,7 +154,6 @@ class OrderController extends Controller
                 }
             }
 
-            // ✅ O‘lchamlar
             $sizes = [];
             foreach ($request->model['sizes'] as $size) {
                 $created = OrderSize::create([
@@ -173,7 +166,6 @@ class OrderController extends Controller
 
             DB::commit();
 
-            // ✅ Muvaffaqiyatli log
             Log::add($user->id, 'Yangi buyurtma yaratildi', 'create', null, [
                 'order' => $order->toArray(),
                 'order_model' => $orderModel->toArray(),
@@ -228,7 +220,6 @@ class OrderController extends Controller
                 'recipes' => 'sometimes|array',
             ]);
 
-            // OLD MA'LUMOTLARNI OLIB QOLISH (log uchun)
             $oldData = [
                 'order' => $order->toArray(),
                 'order_model' => optional($order->orderModel)->toArray(),
@@ -238,7 +229,6 @@ class OrderController extends Controller
                 'contragent' => optional($order->contragent)->toArray(),
             ];
 
-            // CONTRAGENT UPDATE OR CREATE
             if ($request->has('contragent_id')) {
                 $contragent = Contragent::find($request->contragent_id);
             } elseif ($request->hasAny(['contragent_name'])) {
@@ -344,7 +334,6 @@ class OrderController extends Controller
                 }
             }
 
-            // YANGILANGAN MA'LUMOTLARNI YIG‘ISH
             $newData = [
                 'order' => $order->fresh()->toArray(),
                 'order_model' => optional($order->fresh()->orderModel)->toArray(),
@@ -354,7 +343,6 @@ class OrderController extends Controller
                 'contragent' => isset($contragent) ? $contragent->toArray() : optional($order->contragent)->toArray(),
             ];
 
-            // ✅ LOG YOZISH
             Log::add(auth()->id(), 'Buyurtma yangilandi', 'edit', $oldData, $newData);
 
             return response()->json([
@@ -362,7 +350,6 @@ class OrderController extends Controller
                 'order'   => $order->fresh(),
             ]);
         } catch (\Exception $e) {
-            // Log the error
             Log::add(auth()->id(), "Buyurtma yangilashda hatolik yuz berdi", 'edit', $e->getMessage(), $e);
 
             return response()->json([
@@ -375,19 +362,16 @@ class OrderController extends Controller
     public function delete(Order $order): \Illuminate\Http\JsonResponse
     {
         try {
-            // Urinish logi — foydalanuvchi buyrutmani o‘chirishga harakat qilyapti
             Log::add(auth()->id(), 'Buyurtmani o‘chirishga urinish qilindi', 'attempt', $order->toArray(), null);
 
             $order->delete();
 
-            // Muvaffaqiyatli o‘chirish logi
             Log::add(auth()->id(), 'Buyurtma muvaffaqiyatli o‘chirildi', 'delete', $order->toArray(), null);
 
             return response()->json([
                 'message' => 'Order deleted successfully',
             ]);
         } catch (\Exception $e) {
-            // Xatolik yuz bersa ham log yoziladi
             Log::add(auth()->id(), 'Buyurtmani o‘chirishda xatolik: ' . $e->getMessage(), 'attempt', $order->toArray(), null);
 
             return response()->json([
@@ -404,14 +388,12 @@ class OrderController extends Controller
         ]);
 
         try {
-            // Urinish logi
             Log::add(auth()->id(), 'Buyurtma holatini o‘zgartirishga urinish qilindi', 'attempt', $order->toArray(), ['new_status' => $request->status]);
 
             $oldStatus = $order->status;
             $order->status = $request->status;
             $order->save();
 
-            // Muvaffaqiyatli tahrirlash logi
             Log::add(auth()->id(), 'Buyurtma holati yangilandi', 'edit', ['status' => $oldStatus], ['status' => $request->status]);
 
             return response()->json([
