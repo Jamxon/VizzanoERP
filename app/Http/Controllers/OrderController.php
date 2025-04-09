@@ -26,6 +26,7 @@ class OrderController extends Controller
 
     public function generateOrderPdf($id)
     {
+        ini_set('memory_limit', '-1');
         $order = Order::with([
             'orderModel.sizes',
             'orderModel.submodels.submodel.orderRecipes',
