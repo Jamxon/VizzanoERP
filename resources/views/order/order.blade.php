@@ -142,18 +142,17 @@
     <div class="header">
         <div class="company-info">
             <div>
-                <div class="logo-placeholder">KOMPANIYA LOGOSI</div>
+                <div class="logo-placeholder">Vizzano</div>
                 <div>
-                    <p>Tashkilot nomi</p>
-                    <p>Manzil: Toshkent shahri</p>
-                    <p>Tel: +998 XX XXX XX XX</p>
+                    <p>Vizzano</p>
+                    <p>Manzil: Namangan shahar</p>
+                    <p>Tel: +998 50 007 99 55</p>
                 </div>
             </div>
             <div>
                 <h1 class="document-title">BUYURTMA HUJJATI</h1>
-                <div class="document-number">Hujjat № {order.id}</div>
-                <p>Sana: {{ $order['start_date'] }}</p>
-                <p>{{}}</p>
+                <div class="document-number">Hujjat № {{ $order['id'] }}</div>
+                <p>Sana: {{ now()->format('d.m.Y') }}</p>
             </div>
         </div>
     </div>
@@ -163,35 +162,27 @@
         <div class="info-group">
             <div class="info-item">
                 <span class="info-label">Buyurtma №:</span>
-                <span class="info-value">{order.id}</span>
+                <span class="info-value">{{ $order['id'] }}</span>
             </div>
             <div class="info-item">
-                <span class="info-label">Nomi:</span>
-                <span class="info-value">{order.name}</span>
+                <span class="info-label">Buyurtma nomi:</span>
+                <span class="info-value">{{ $order['name'] }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Miqdori:</span>
-                <span class="info-value">{order.quantity}</span>
+                <span class="info-value">{{ $order['quantity'] }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Holati:</span>
-                <span class="info-value status-approved">{order.status}</span>
+                <span class="info-value status-approved">{{ $order['status'] }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Boshlangan sana:</span>
-                <span class="info-value">{order.start_date}</span>
+                <span class="info-value">{{ $order['start_date'] }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Tugash sanasi:</span>
-                <span class="info-value">{order.end_date}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Rasxod:</span>
-                <span class="info-value">{order.rasxod}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Narxi:</span>
-                <span class="info-value">{order.price}</span>
+                <span class="info-value">{{ $order['end_date'] }}</span>
             </div>
         </div>
     </div>
@@ -201,7 +192,7 @@
         <div class="info-group">
             <div class="info-item">
                 <span class="info-label">Model №:</span>
-                <span class="info-value">{order.order_model.id}</span>
+                <span class="info-value">{{ $order['order_model']['id'] }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Model nomi:</span>
