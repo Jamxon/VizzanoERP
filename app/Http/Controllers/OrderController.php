@@ -196,12 +196,12 @@ class OrderController extends Controller
         }
     }
 
-    public function update(Request $request, Order $order): \Illuminate\Http\JsonResponse
+    public function update(Request $request, Order $order)
     {
         try {
             Log::add(auth()->id(), "Buyurtma yangilashga urinish bo'lmoqda", 'attempt', $order->toArray(), null);
 
-            $validatedData = $request->validate([
+         return    $validatedData = $request->validate([
                 'name' => 'sometimes|string',
                 'quantity' => 'sometimes|integer',
                 'start_date' => 'sometimes|date',
