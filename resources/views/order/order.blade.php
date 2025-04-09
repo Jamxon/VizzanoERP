@@ -198,10 +198,6 @@
                 <span class="info-label">Material:</span>
                 <span class="info-value">{{ $order['order_model']['material']->name }}</span>
             </div>
-            <div class="info-item">
-                <span class="info-label">Rasxod:</span>
-                <span class="info-value">{order.order_model.rasxod}</span>
-            </div>
         </div>
 
         <h3 class="section-title">O'lchamlar</h3>
@@ -215,11 +211,13 @@
             </thead>
             <tbody>
             <!-- {For each size in order.order_model.sizes} -->
-            <tr>
-                <td>{size.id}</td>
-                <td>{size.size}</td>
-                <td>{size.quantity}</td>
-            </tr>
+            @foreach($order['order_model']['sizes'] as $size)
+                <tr>
+                    <td>{{ $size['id'] }}</td>
+                    <td>{{ $size['size']['name'] }}</td>
+                    <td>{{ $size['quantity'] }}</td>
+                </tr>
+            @endforeach
             <!-- {End for} -->
             </tbody>
         </table>
