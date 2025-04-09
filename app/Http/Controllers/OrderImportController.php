@@ -134,7 +134,7 @@ class OrderImportController extends Controller
 
                     ModelImages::create([
                         'model_id' => $model->id,
-                        'name' => $newPath,
+                        'image' => $newPath,
                     ]);
                 }
 
