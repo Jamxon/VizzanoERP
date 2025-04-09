@@ -24,7 +24,7 @@ class OrderController extends Controller
         return response()->json($logs);
     }
 
-    public function generateOrderPdf($id): \Illuminate\Http\Response
+    public function generateOrderPdf($id)
     {
         $order = Order::with([
             'orderModel.sizes',
@@ -40,7 +40,7 @@ class OrderController extends Controller
             'packageOutcomes'
         ])->findOrFail($id);
 
-        $resource = new ShowOrderResource($order);
+      return    $resource = new ShowOrderResource($order);
         $orderData = $resource->toArray(request());
 
         $pdf = PDF::loadView('order.order', ['order' => $orderData]);
