@@ -233,6 +233,8 @@ Route::prefix('orderManager')->middleware('role:orderManager')->group(function (
 
 
     Route::get('contragents', [OrderController::class, 'getContragents']);
+    Route::post('contragents', [OrderController::class, 'storeContragents']);
+    Route::patch('contragents/{contragent}', [OrderController::class, 'updateContragents']);
 
     Route::get('models', [ModelController::class, 'index']);
     Route::post('models', [ModelController::class, 'store']);
@@ -244,7 +246,7 @@ Route::prefix('orderManager')->middleware('role:orderManager')->group(function (
     Route::get('materials', [ModelController::class, 'getMaterials']);
 
     Route::post('/import-orders', [OrderImportController::class, 'import']);
-    
+
     Route::post('orderStore',[OrderImportController::class,'store']);
 });
 

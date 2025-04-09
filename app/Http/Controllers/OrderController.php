@@ -79,6 +79,30 @@ class OrderController extends Controller
         return response()->json($contragents);
     }
 
+    public function storeContragents(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'description' => 'nullable|string',
+        ]);
+
+        $contragent = Contragent::create($request->all());
+
+        return response()->json($contragent, 201);
+    }
+
+    public function updateContragents(Request $request, Contragent $contragent): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'description' => 'nullable|string',
+        ]);
+
+        $contragent->update($request->all());
+
+        return response()->json($contragent);
+    }
+
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
