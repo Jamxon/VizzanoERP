@@ -29,7 +29,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'username' => 'sometimes|string|max:255|unique:users,username,' . $employee->user_id,
+                'username' => 'required|string|max:255|unique:users,username,' . $employee->user_id,
                 'password' => 'required|string|min:6',
             ]);
 
@@ -39,7 +39,7 @@ class UserController extends Controller
             $oldEmployeeData = $employee->only(['img']);
 
             $user->update([
-                'username' => $request->username ?? $user->username,
+                'username' => $request->username,
                 'password' => $this->hashPassword($request->password),
             ]);
 
