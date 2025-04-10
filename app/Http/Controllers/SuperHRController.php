@@ -163,23 +163,47 @@ class SuperHRController extends Controller
         }
     }
 
-    public function storeRoles( Request $request): \Illuminate\Http\JsonResponse
+    public function storeRoles(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
             'description' => 'nullable|string|max:255',
         ]);
 
         try {
             DB::beginTransaction();
 
-            $role = Role::create($request->only(['name', 'description']));
+            // Oxirgi role nomini topamiz (masalan: role3)
+            $lastRole = Role::where('name', 'like', 'role%')
+                ->orderByDesc(DB::raw('CAST(SUBSTRING(name, 5) AS UNSIGNED)'))
+                ->first();
+
+            // Oxirgi raqamni aniqlaymiz
+            $lastNumber = 0;
+            if ($lastRole && preg_match('/role(\d+)/', $lastRole->name, $matches)) {
+                $lastNumber = (int)$matches[1];
+            }
+
+            // Yangi name hosil qilamiz
+            $newRoleName = 'role' . ($lastNumber + 1);
+
+            $role = Role::create([
+                'name' => $newRoleName,
+                'description' => $request->description,
+            ]);
 
             DB::commit();
-            return response()->json(['status' => 'success', 'message' => 'Rol muvaffaqiyatli qo‘shildi', 'role' => $role], 201);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Rol muvaffaqiyatli qo‘shildi',
+                'role' => $role
+            ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Rolni qo‘shishda xatolik: ' . $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Rolni qo‘shishda xatolik: ' . $e->getMessage()
+            ], 500);
         }
     }
 
