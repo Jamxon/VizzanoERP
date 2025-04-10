@@ -167,7 +167,7 @@ class SuperHRController extends Controller
     {
         $request->validate([
             'description' => 'required|string|max:255',
-            'task' => 'nullable|string|max:255',
+            'task' => 'nullable|text',
         ]);
 
         try {
@@ -242,7 +242,7 @@ class SuperHRController extends Controller
                 $role->toArray(),
                 $role->toArray()
             );
-            
+
             return response()->json(['status' => 'success', 'message' => 'Rol muvaffaqiyatli yangilandi', 'role' => $role], 200);
         } catch (\Exception $e) {
             DB::rollBack();
