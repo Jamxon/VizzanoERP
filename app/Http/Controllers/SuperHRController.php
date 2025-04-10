@@ -274,16 +274,15 @@ class SuperHRController extends Controller
         try {
             DB::beginTransaction();
 
-            $department = Department::create(
-                $request->only([
-                    'name',
-                    'responsible_user_id',
-                    'main_department_id',
-                    'start_time',
-                    'end_time',
-                    'break_time'
-                ])
-            );
+            $department = Department::create([
+                'name' => $request->name,
+                'branch_id' => auth()->user()->employee->branch_id,
+                'responsible_user_id' => $request->responsible_user_id ?? null,
+                'main_department_id' => $request->main_department_id ?? null,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'break_time' => $request->break_time,
+            ]);
 
             DB::commit();
 
@@ -307,7 +306,7 @@ class SuperHRController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'responsible_user_id' => 'sometimes|integer|exists:users,id',
-            'main_department_id' => 'sometimes|integer|exists:main_departments,id',
+            'main_department_id' => 'sometimes|integer|exists:main_department,id',
             'start_time' => 'sometimes|date_format:H:i',
             'end_time' => 'sometimes|date_format:H:i',
             'break_time' => 'sometimes|integer|min:0',
@@ -318,14 +317,15 @@ class SuperHRController extends Controller
 
             $department = Department::findOrFail($id);
             $oldData = $department->toArray();
-            $department->update($request->only([
-                'name',
-                'responsible_user_id',
-                'main_department_id',
-                'start_time',
-                'end_time',
-                'break_time'
-            ]));
+            $department->update([
+                'name' => $request->name,
+                'responsible_user_id' => $request->responsible_user_id ?? null,
+                'main_department_id' => $request->main_department_id ?? null,
+                'start_time' => $request->start_time,
+                'end_time' => $request->end_time,
+                'break_time' => $request->break_time,
+                'branch_id' => auth()->user()->employee->branch_id,
+            ]);
 
             DB::commit();
 
