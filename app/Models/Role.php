@@ -7,6 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Permission;
 
+/**
+ * @method static create(array $only)
+ * @method static findOrFail($id)
+ */
 class Role extends Model
 {
     use HasFactory;
