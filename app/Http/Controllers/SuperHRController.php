@@ -156,7 +156,8 @@ class SuperHRController extends Controller
     public function getRoles(): \Illuminate\Http\JsonResponse
     {
         try {
-            $roles = Role::all();
+            $roles = Role::orderBy('updated_at', 'desc')
+                ->get();
             return response()->json($roles, 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Rollarni olishda xatolik: ' . $e->getMessage()], 500);
