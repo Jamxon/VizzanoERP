@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class SuperHRController extends Controller
 {
-    public function getAupEmployee()
+    public function getAupEmployee(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
         $employees = DB::table('employees')
@@ -280,7 +280,6 @@ class SuperHRController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'branch_id' => 'required|integer|exists:branches,id',
         ]);
 
         try {
