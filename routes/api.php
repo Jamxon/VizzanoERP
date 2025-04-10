@@ -158,6 +158,9 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::patch('employees/{employee}', [SuperHRController::class, 'employeeUpdate']);
     Route::delete('employees/{employee}', [SuperHRController::class, 'employeeDelete']);
     Route::post('employees/return/{employee}', [SuperHRController::class, 'employeeReturn']);
+    Route::get('roles' , [SuperHRController::class, 'getRoles']);
+    Route::post('roles', [SuperHRController::class, 'storeRoles']);
+    Route::patch('roles/{role}', [SuperHRController::class, 'updateRoles']);
 });
 
 Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {

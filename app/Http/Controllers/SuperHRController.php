@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Log;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -147,6 +148,57 @@ class SuperHRController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['status' => 'error', 'message' => 'Xodimni qayta tiklashda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function getRoles(): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $roles = Role::all();
+            return response()->json($roles, 200);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Rollarni olishda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function storeRoles( Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $role = Role::create($request->only(['name', 'description']));
+
+            DB::commit();
+            return response()->json(['status' => 'success', 'message' => 'Rol muvaffaqiyatli qo‘shildi', 'role' => $role], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Rolni qo‘shishda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function updateRoles(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $role = Role::findOrFail($id);
+            $role->update($request->only(['name', 'description']));
+
+            DB::commit();
+            return response()->json(['status' => 'success', 'message' => 'Rol muvaffaqiyatli yangilandi', 'role' => $role], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Rolni yangilashda xatolik: ' . $e->getMessage()], 500);
         }
     }
 }

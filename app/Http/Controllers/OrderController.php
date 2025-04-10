@@ -25,7 +25,7 @@ class OrderController extends Controller
         return response()->json($logs);
     }
 
-    public function generateOrderPdf($id)
+    public function generateOrderPdf($id): \Illuminate\Http\Response
     {
         ini_set('memory_limit', '-1');
         $order = Order::with([
