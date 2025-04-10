@@ -33,7 +33,7 @@ class UserController extends Controller
                 'password' => 'sometimes|string|min:6',
             ]);
 
-           dd($user = User::where('id', $employee->user_id)->first());
+           $user = User::where('id', $employee->user_id)->first();
 
             $oldUserData = $user->only(['username', 'password']);
             $oldEmployeeData = $employee->only(['img']);
@@ -42,6 +42,8 @@ class UserController extends Controller
                 'username' => $request->username ?? $user->username,
                 'password' => $request->password ? $this->hashPassword($request->password) : $user->password,
             ]);
+
+            dd($user);
 
             if ($request->hasFile('img')) {
                 if (!file_exists(public_path('images'))) {
