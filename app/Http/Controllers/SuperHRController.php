@@ -11,6 +11,18 @@ use Illuminate\Support\Facades\DB;
 
 class SuperHRController extends Controller
 {
+    public function getAupEmployee()
+    {
+        $user = auth()->user();
+        $employees = DB::table('employees')
+            ->where('branch_id', $user->employee->branch_id)
+            ->where('status', 'working')
+            ->where('type', 'aup')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return response()->json($employees, 200);
+    }
     public function employeeStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
