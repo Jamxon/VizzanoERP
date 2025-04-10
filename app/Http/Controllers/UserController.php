@@ -28,6 +28,11 @@ class UserController extends Controller
     public function updateProfile(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
     {
         try {
+            $request->validate([
+                'username' => 'sometimes|string|max:255|unique:users,username',
+                'password' => 'sometimes|string|min:6|confirmed',
+            ]);
+
             $user = User::where('id', $employee->user_id)->first();
 
             $oldUserData = $user->only(['username', 'password']);
