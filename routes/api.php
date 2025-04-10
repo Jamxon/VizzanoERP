@@ -156,6 +156,7 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
 
 Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::post('employees', [SuperHRController::class, 'employeeStore']);
+    Route::get('employees/aup', [SuperHRController::class, 'getAupEmployee']);
     Route::patch('employees/{employee}', [SuperHRController::class, 'employeeUpdate']);
     Route::delete('employees/{employee}', [SuperHRController::class, 'employeeDelete']);
     Route::post('employees/return/{employee}', [SuperHRController::class, 'employeeReturn']);
