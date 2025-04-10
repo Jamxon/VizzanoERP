@@ -40,7 +40,7 @@ class UserController extends Controller
 
             $user->update([
                 'username' => $request->username ?? $user->username,
-                'password' => $request->password ? Hash::make($request->password) : $user->password,
+                'password' => $request->password ? $this->hashPassword($request->password) : $user->password,
             ]);
 
             if ($request->hasFile('img')) {
@@ -71,4 +71,11 @@ class UserController extends Controller
         }
     }
 
+    protected function hashPassword($password): string
+    {
+        $options = [
+            'cost' => 12, // Django'dagi `bcrypt.gensalt(rounds=12)` parametri bilan mos.
+        ];
+        return password_hash($password, PASSWORD_BCRYPT, $options);
+    }
 }
