@@ -30,20 +30,18 @@ class UserController extends Controller
         try {
             $request->validate([
                 'username' => 'sometimes|string|max:255|unique:users,username,' . $employee->user_id,
-                'password' => 'sometimes|string|min:6',
+                'password' => 'required|string|min:6',
             ]);
 
-           $user = User::where('id', $employee->user_id)->first();
+            $user = User::where('id', $employee->user_id)->first();
 
             $oldUserData = $user->only(['username', 'password']);
             $oldEmployeeData = $employee->only(['img']);
 
             $user->update([
                 'username' => $request->username ?? $user->username,
-                'password' => $request->password ? $this->hashPassword($request->password) : $user->password,
+                'password' => $this->hashPassword($request->password),
             ]);
-
-            return $request->all();
 
             if ($request->hasFile('img')) {
                 if (!file_exists(public_path('images'))) {
