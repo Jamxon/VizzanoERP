@@ -51,7 +51,6 @@ class GetUserResource extends JsonResource
             'payment_type' => $this->payment_type,
             'passport_code' => $this->passport_code,
             'type' => $this->type,
-            'salary' => $this->salary,
             'birthday' => $this->birthday
         ];
     }
