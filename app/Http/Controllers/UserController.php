@@ -8,10 +8,6 @@ use App\Models\Log;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-
-use App\Exports\EmployersExport;
-use Maatwebsite\Excel\Facades\Excel;
 class UserController extends Controller
 {
     public function getProfile(): \Illuminate\Http\JsonResponse
@@ -40,7 +36,7 @@ class UserController extends Controller
 
             $user->update([
                 'username' => $request->username,
-                'password' => $this->hashPassword($request->password),
+                'password' => $this->hashPassword($request->password) ?: $oldUserData['password'],
             ]);
 
             if ($request->hasFile('img')) {
