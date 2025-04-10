@@ -23,7 +23,7 @@ class Department extends Model
         'break_time',
     ];
 
-    protected $hidden = ['created_at', 'updated_at','branch_id','responsible_user_id'];
+    protected $hidden = ['created_at', 'updated_at','branch_id'];
 
     public function groups(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

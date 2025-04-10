@@ -318,12 +318,12 @@ class SuperHRController extends Controller
             $department = Department::findOrFail($id);
             $oldData = $department->toArray();
             $department->update([
-                'name' => $request->name,
-                'responsible_user_id' => $request->responsible_user_id ?? null,
-                'main_department_id' => $request->main_department_id ?? null,
-                'start_time' => $request->start_time,
-                'end_time' => $request->end_time,
-                'break_time' => $request->break_time,
+                'name' => $request->name ?? $department->name,
+                'responsible_user_id' => $request->responsible_user_id ?? $department->responsible_user_id,
+                'main_department_id' => $request->main_department_id ?? $department->main_department_id,
+                'start_time' => $request->start_time ?? $department->start_time,
+                'end_time' => $request->end_time ?? $department->end_time,
+                'break_time' => $request->break_time ?? $department->break_time,
                 'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
