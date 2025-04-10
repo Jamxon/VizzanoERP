@@ -65,7 +65,7 @@
             margin-bottom: 15px;
         }
         .info-item {
-            width: 50%;
+            width: 70%;
             margin-bottom: 10px;
         }
         .info-label {
@@ -191,7 +191,7 @@
         <h2 class="section-title">Model ma'lumotlari</h2>
         <div class="info-group">
             <div class="info-item">
-                <span class="info-label">Model nomi:</span>
+                <span class="info-label">Model:</span>
                 <span class="info-value">{{ $order['order_model']['model']->name }}  (</span>
                 @foreach($order['order_model']['submodels'] as $submodel)
 
