@@ -17,7 +17,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-          dd($employee = Employee::where('id', $user->employee->id)->first());
+        $employee = Employee::where('id', $user->employee->id)->first();
 
         $resource = new GetUserResource($employee);
 
