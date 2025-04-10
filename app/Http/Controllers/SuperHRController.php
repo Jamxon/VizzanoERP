@@ -221,6 +221,7 @@ class SuperHRController extends Controller
     {
         $request->validate([
             'description' => 'required|string|max:255',
+            'task' => 'nullable|text',
         ]);
 
         try {
