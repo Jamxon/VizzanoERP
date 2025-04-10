@@ -17,18 +17,13 @@ class Department extends Model
     protected $fillable = [
         'name',
         'responsible_user_id',
-        'branch_id',
+        'main_department_id',
         'start_time',
         'end_time',
         'break_time',
     ];
 
     protected $hidden = ['created_at', 'updated_at','branch_id','responsible_user_id'];
-
-    public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Branch::class);
-    }
 
     public function groups(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -53,5 +48,10 @@ class Department extends Model
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'responsible_user_id');
+    }
+
+    public function mainDepartment(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(MainDepartment::class, 'main_department_id');
     }
 }
