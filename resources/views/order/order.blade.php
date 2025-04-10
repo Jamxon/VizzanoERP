@@ -142,7 +142,6 @@
     <div class="header">
         <div class="company-info">
             <div>
-                <div class="logo-placeholder">Vizzano</div>
                 <div>
                     <p>Vizzano</p>
                     <p>Manzil: Namangan shahar</p>
