@@ -166,7 +166,8 @@ class SuperHRController extends Controller
     public function storeRoles(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'description' => 'nullable|string|max:255',
+            'description' => 'required|string|max:255',
+            'task' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -188,9 +189,18 @@ class SuperHRController extends Controller
             $role = Role::create([
                 'name' => $newRoleName,
                 'description' => $request->description,
+                'task' => $request->task ?? null,
             ]);
 
             DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Yangi rol qo‘shildi',
+                'create',
+                null,
+                $role->toArray()
+            );
 
             return response()->json([
                 'status' => 'success',
@@ -206,21 +216,33 @@ class SuperHRController extends Controller
             ], 500);
         }
     }
-    
+
     public function updateRoles(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:255',
+            'description' => 'required|string|max:255',
         ]);
 
         try {
             DB::beginTransaction();
 
             $role = Role::findOrFail($id);
-            $role->update($request->only(['name', 'description']));
+            $role->update([
+                'name' => $role->name,
+                'description' => $request->description,
+                'task' => $request->task ?? $role->task,
+            ]);
 
             DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Rol yangilandi',
+                'edit',
+                $role->toArray(),
+                $role->toArray()
+            );
+            
             return response()->json(['status' => 'success', 'message' => 'Rol muvaffaqiyatli yangilandi', 'role' => $role], 200);
         } catch (\Exception $e) {
             DB::rollBack();
