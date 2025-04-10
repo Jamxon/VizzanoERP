@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\GetUserResource;
 use App\Models\Employee;
+use App\Models\Log;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +14,7 @@ use App\Exports\EmployersExport;
 use Maatwebsite\Excel\Facades\Excel;
 class UserController extends Controller
 {
-    public function getProfile()
+    public function getProfile(): \Illuminate\Http\JsonResponse
     {
         $user = Auth::user();
 
@@ -23,4 +24,46 @@ class UserController extends Controller
 
         return response()->json($resource);
     }
+
+    public function updateProfile(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $user = User::where('id', $employee->user_id)->first();
+
+            $oldUserData = $user->only(['username', 'password']);
+            $oldEmployeeData = $employee->only(['img']);
+
+            $user->update([
+                'username' => $request->username ?? $user->username,
+                'password' => $request->password ? Hash::make($request->password) : $user->password,
+            ]);
+
+            if ($request->hasFile('img')) {
+                $file = $request->file('img');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('images'), $filename);
+                $employee->img = 'images/' . $filename;
+                $employee->save();
+            }
+
+            Log::add(
+                auth()->id(),
+                "Profil ma'lumotlari yangilandi",
+                'edit',
+                [
+                    'username' => $request->username ?? $user->username,
+                    'img' => $employee->img ?? $oldEmployeeData['img'],
+                ],
+                [
+                    'username' => $oldUserData['username'],
+                    'img' => $oldEmployeeData['img'],
+                ]
+            );
+
+            return response()->json(['message' => 'Profile updated successfully']);
+        } catch (\Exception $exception) {
+            return response()->json(['error' => 'Failed to update profile: ' . $exception->getMessage()], 500);
+        }
+    }
+
 }

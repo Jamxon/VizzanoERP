@@ -258,7 +258,10 @@ Route::get('/validate', function () {
     return response()->json(['message' => auth()->user()], 200);
 })->middleware('validate.status');
 
-Route::middleware('auth:api')->get('/profile', [UserController::class, 'getProfile']);
+Route::middleware('auth:api')->group(function () {
+    Route::get('profile', [UserController::class, 'getProfile']);
+    Route::patch('profile/employee', [UserController::class, 'updateProfile']);
+});
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
