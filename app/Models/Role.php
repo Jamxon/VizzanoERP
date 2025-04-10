@@ -15,7 +15,7 @@ class Role extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'description','task'];
 
     protected $hidden = ['created_at', 'updated_at'];
 
