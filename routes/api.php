@@ -155,11 +155,7 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
 });
 
 Route::prefix('superhr')->middleware('role:superhr')->group(function () {
-    Route::post('employees', [SuperHRController::class, 'employeeStore']);
     Route::get('employees/aup', [SuperHRController::class, 'getAupEmployee']);
-    Route::patch('employees/{employee}', [SuperHRController::class, 'employeeUpdate']);
-    Route::delete('employees/{employee}', [SuperHRController::class, 'employeeDelete']);
-    Route::post('employees/return/{employee}', [SuperHRController::class, 'employeeReturn']);
     Route::get('roles' , [SuperHRController::class, 'getRoles']);
     Route::post('roles', [SuperHRController::class, 'storeRoles']);
     Route::patch('roles/{role}', [SuperHRController::class, 'updateRoles']);
@@ -261,6 +257,8 @@ Route::prefix('orderManager')->middleware('role:orderManager')->group(function (
 Route::get('/validate', function () {
     return response()->json(['message' => auth()->user()], 200);
 })->middleware('validate.status');
+
+Route::middleware('auth:api')->get('/profile', [UserController::class, 'getProfile']);
 
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);

@@ -13,44 +13,14 @@ use App\Exports\EmployersExport;
 use Maatwebsite\Excel\Facades\Excel;
 class UserController extends Controller
 {
-
-    public function export()
+    public function getProfile(): \Illuminate\Http\JsonResponse
     {
-        return Excel::download(new EmployersExport, 'employers.xlsx');
-    }
-    public function getUsersMaster()
-    {
-        $users = User::whereHas('employee', function ($query) {
-                $query->where('status', 'working');
-                $query->where('type', "aup");
-                $query->where('branch_id', '=', Auth::user()->employee->branch_id);
-            })
-            ->get();
+        $user = Auth::user();
 
-        if ($users) {
-            return response()->json($users);
-        } else {
-            return response()->json([
-                'message' => 'Users not found',
-            ], 404);
-        }
-    }
+        $employee = Employee::where('id', $user->employee_id)->first();
 
-    public function getUsersSubMaster()
-    {
-        $users = User::whereHas('employee', function ($query) {
-                $query->where('status', 'working');
-                $query->where('type', "aup");
-                $query->where('branch_id', '=', Auth::user()->employee->branch_id);
-            })
-            ->get();
+        $resource = new GetUserResource($employee);
 
-        if ($users) {
-            return response()->json($users);
-        } else {
-            return response()->json([
-                'message' => 'Users not found',
-            ], 404);
-        }
+        return response()->json($resource);
     }
 }
