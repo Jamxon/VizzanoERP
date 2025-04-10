@@ -13,11 +13,11 @@ use App\Exports\EmployersExport;
 use Maatwebsite\Excel\Facades\Excel;
 class UserController extends Controller
 {
-    public function getProfile(): \Illuminate\Http\JsonResponse
+    public function getProfile()
     {
         $user = Auth::user();
 
-        $employee = Employee::where('id', $user->employee_id)->first();
+          dd($employee = Employee::where('id', $user->employee_id)->first());
 
         $resource = new GetUserResource($employee);
 
