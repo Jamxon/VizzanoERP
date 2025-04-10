@@ -166,11 +166,11 @@
             </div>
             <div class="info-item">
                 <span class="info-label">Boshlangan sana:</span>
-                <span class="info-value">{{ date($order['start_date']) }}</span>
+                <span class="info-value">{{ \Carbon\Carbon::parse($order['start_date'])->format('d.m.Y') }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Tugash sanasi:</span>
-                <span class="info-value">{{ date($order['end_date'])->format('d.m.Y') }}</span>
+                <span class="info-value">{{ \Carbon\Carbon::parse($order['end_date'])->format('d.m.Y') }}</span>
             </div>
         </div>
     </div>
