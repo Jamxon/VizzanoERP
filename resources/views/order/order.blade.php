@@ -165,16 +165,12 @@
                 <span class="info-value">{{ $order['quantity'] }}</span>
             </div>
             <div class="info-item">
-                <span class="info-label">Holati:</span>
-                <span class="info-value status-approved">{{ $order['status'] }}</span>
-            </div>
-            <div class="info-item">
                 <span class="info-label">Boshlangan sana:</span>
-                <span class="info-value">{{ $order['start_date'] }}</span>
+                <span class="info-value">{{ date($order['start_date']) }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Tugash sanasi:</span>
-                <span class="info-value">{{ $order['end_date'] }}</span>
+                <span class="info-value">{{ date($order['end_date']) }}</span>
             </div>
         </div>
     </div>
