@@ -43,7 +43,7 @@ class UserController extends Controller
                 'password' => $request->password ? $this->hashPassword($request->password) : $user->password,
             ]);
 
-            dd($user);
+            dd($request->all());
 
             if ($request->hasFile('img')) {
                 if (!file_exists(public_path('images'))) {
