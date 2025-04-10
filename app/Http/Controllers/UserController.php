@@ -40,9 +40,6 @@ class UserController extends Controller
             ]);
 
             if ($request->hasFile('img')) {
-                if (!file_exists(public_path('images'))) {
-                    mkdir(public_path('images'), 0755, true);
-                }
                 $file = $request->file('img');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images'), $filename);
