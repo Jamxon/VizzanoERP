@@ -29,7 +29,7 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'username' => 'sometimes|string|max:255|unique:users,username',
+                'username' => 'sometimes|string|max:255|unique:users,username,' . $employee->user_id,
                 'password' => 'sometimes|string|min:6',
             ]);
 
@@ -44,6 +44,9 @@ class UserController extends Controller
             ]);
 
             if ($request->hasFile('img')) {
+                if (!file_exists(public_path('images'))) {
+                    mkdir(public_path('images'), 0755, true);
+                }
                 $file = $request->file('img');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('images'), $filename);
@@ -56,12 +59,12 @@ class UserController extends Controller
                 "Profil ma'lumotlari yangilandi",
                 'edit',
                 [
-                    'username' => $request->username ?? $user->username,
-                    'img' => $employee->img ?? $oldEmployeeData['img'],
-                ],
-                [
                     'username' => $oldUserData['username'],
                     'img' => $oldEmployeeData['img'],
+                ],
+                [
+                    'username' => $user->username,
+                    'img' => $employee->img,
                 ]
             );
 
@@ -73,9 +76,7 @@ class UserController extends Controller
 
     protected function hashPassword($password): string
     {
-        $options = [
-            'cost' => 12, // Django'dagi `bcrypt.gensalt(rounds=12)` parametri bilan mos.
-        ];
+        $options = ['cost' => 12];
         return password_hash($password, PASSWORD_BCRYPT, $options);
     }
 }
