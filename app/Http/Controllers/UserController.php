@@ -26,7 +26,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'username' => 'required|string|max:255|unique:users,username,' . $employee->user_id,
-                'password' => 'required|string|min:6',
+                'password' => 'sometimes|string|min:6',
             ]);
 
             $user = User::where('id', $employee->user_id)->first();
