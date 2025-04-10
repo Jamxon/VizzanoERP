@@ -142,13 +142,6 @@
     <div class="header">
         <div class="company-info">
             <div>
-                <div>
-                    <p>Vizzano</p>
-                    <p>Manzil: Namangan shahar</p>
-                    <p>Tel: +998 50 007 99 55</p>
-                </div>
-            </div>
-            <div>
                 <h1 class="document-title">BUYURTMA HUJJATI</h1>
                 <div class="document-number">Hujjat № {{ $order['id'] }}</div>
                 <p>Sana: {{ now()->format('d.m.Y') }}</p>
