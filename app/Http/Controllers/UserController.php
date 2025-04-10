@@ -42,7 +42,7 @@ class UserController extends Controller
             if ($request->hasFile('img')) {
                 $file = $request->file('img');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('images'), $filename);
+                $file->storeAs('/images/', $filename);
                 $employee->img = 'images/' . $filename;
                 $employee->save();
             }
