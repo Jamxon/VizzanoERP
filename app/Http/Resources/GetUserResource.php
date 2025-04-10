@@ -42,7 +42,7 @@ class GetUserResource extends JsonResource
             'phone' => $this->phone,
             'department' => $this->department->name ?? null,
             'group' => $this->group->name ?? null,
-            'role' => $this->role->name,
+            'role' => $this->user->role->name,
             'hiring_date' => $this->hiring_date,
             'address' => $this->address,
             'passport_number' => $this->passport_number,

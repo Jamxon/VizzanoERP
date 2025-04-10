@@ -16,9 +16,21 @@ class Employee extends Model
     protected $table = 'employees';
 
     protected $fillable = [
-        'name', 'phone', 'group_id', 'user_id', 'payment_type',
-        'salary', 'hiring_date', 'status', 'address', 'passport_number'
-        ,'branch_id', 'type'
+        'name',
+        'phone',
+        'group_id',
+        'user_id',
+        'payment_type',
+        'salary',
+        'hiring_date',
+        'status',
+        'address',
+        'passport_number',
+        'branch_id',
+        'type',
+        'salary',
+        'birthday',
+        'img'
     ];
     public function group(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -33,11 +45,6 @@ class Employee extends Model
     public function attendances(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Attendance::class);
-    }
-
-    public function role(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Role::class);
     }
 
     public function tarifications(): \Illuminate\Database\Eloquent\Relations\HasMany
