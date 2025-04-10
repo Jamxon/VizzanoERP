@@ -33,7 +33,7 @@ class UserController extends Controller
                 'password' => 'sometimes|string|min:6',
             ]);
 
-            $user = User::where('id', $employee->user_id)->first();
+           dd($user = User::where('id', $employee->user_id)->first());
 
             $oldUserData = $user->only(['username', 'password']);
             $oldEmployeeData = $employee->only(['img']);

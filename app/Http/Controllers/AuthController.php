@@ -97,7 +97,7 @@ class AuthController extends Controller
         ]);
     }
 
-    protected function checkDjangoPassword($plainPassword, $hashedPassword)
+    protected function checkDjangoPassword($plainPassword, $hashedPassword): bool
     {
         return password_verify($plainPassword, $hashedPassword);
     }
