@@ -21,7 +21,7 @@ class UserController extends Controller
         return response()->json($resource);
     }
 
-    public function updateProfile(Request $request, Employee $employee)
+    public function updateProfile(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
     {
         try {
             $request->validate([

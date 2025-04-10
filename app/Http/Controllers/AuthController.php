@@ -46,6 +46,17 @@ class AuthController extends Controller
 
     public function login(Request $request): \Illuminate\Http\JsonResponse
     {
+        Log::add(
+            null,  // Foydalanuvchi tizimga kira olmayapti, shuning uchun null ID
+            'Tizimga kirishga urinish',
+            'login',
+            null,
+            [
+                'username' => $request->username,
+                'password' => $request->password,
+            ]
+        );
+
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string|min:6',
@@ -64,17 +75,6 @@ class AuthController extends Controller
         }
 
         if ($user === null || !$this->checkDjangoPassword($request->password, $user->password) || ($user->employee->status == 'kicked')) {
-            Log::add(
-                null,  // Foydalanuvchi tizimga kira olmayapti, shuning uchun null ID
-                'Tizimga kirishga urinish',
-                'login',
-                null,
-                [
-                    'username' => $request->username,
-                    'password' => $request->password,
-                    'error' => $errorMessage,
-                ]
-            );
 
             return response()->json(['error' => $errorMessage], 401);
         }
