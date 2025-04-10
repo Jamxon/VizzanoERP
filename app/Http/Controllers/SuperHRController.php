@@ -23,6 +23,7 @@ class SuperHRController extends Controller
 
         return response()->json($employees, 200);
     }
+
     public function employeeStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
