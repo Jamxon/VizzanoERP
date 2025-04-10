@@ -6,7 +6,7 @@
     <title>Buyurtma Hujjati</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'DejaVu Sans', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;

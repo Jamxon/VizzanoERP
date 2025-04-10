@@ -13,6 +13,7 @@ use App\Models\OrderRecipes;
 use App\Models\OrderSize;
 use App\Models\OrderSubModel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -40,6 +41,9 @@ class OrderController extends Controller
             'contragent',
             'packageOutcomes'
         ])->findOrFail($id);
+
+        $options = new Options();
+        $options->set('defaultFont', 'DejaVu Sans');
 
         $resource = new ShowOrderResource($order);
         $orderData = $resource->toArray(request());
