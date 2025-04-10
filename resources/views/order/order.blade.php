@@ -230,35 +230,6 @@
     </div>
 
     <div class="section">
-        <h2 class="section-title">Spetsifikatsiyalar</h2>
-        <!-- {For each category in order.specification_categories} -->
-        <h3>{category.name}</h3>
-        <table>
-            <thead>
-            <tr>
-                <th>№</th>
-                <th>Sana</th>
-                <th>Miqdori</th>
-                <th>Holati</th>
-                <th>Mas'ul shaxs</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- {For each cut in category.orderCuts} -->
-            <tr>
-                <td>{cut.id}</td>
-                <td>{cut.cut_at}</td>
-                <td>{cut.quantity}</td>
-                <td>{cut.status}</td>
-                <td>{cut.user}</td>
-            </tr>
-            <!-- {End for} -->
-            </tbody>
-        </table>
-        <!-- {End for} -->
-    </div>
-
-    <div class="section">
         <h2 class="section-title">Ko'rsatmalar</h2>
         <table>
             <thead>
@@ -270,11 +241,13 @@
             </thead>
             <tbody>
             <!-- {For each instruction in order.instructions} -->
-            <tr>
-                <td>{instruction.id}</td>
-                <td>{instruction.title}</td>
-                <td>{instruction.description}</td>
-            </tr>
+            @foreach($order['instructions'] as $instruction)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $instruction['title'] }}</td>
+                    <td>{{ $instruction['description'] }}</td>
+                </tr>
+            @endforeach
             <!-- {End for} -->
             </tbody>
         </table>
