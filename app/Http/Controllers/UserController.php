@@ -30,7 +30,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'username' => 'sometimes|string|max:255|unique:users,username',
-                'password' => 'sometimes|string|min:6|confirmed',
+                'password' => 'sometimes|string|min:6',
             ]);
 
             $user = User::where('id', $employee->user_id)->first();
