@@ -255,7 +255,7 @@ class SuperHRController extends Controller
     public function getDepartments(): \Illuminate\Http\JsonResponse
     {
         try {
-            $departments = MainDepartment::where('branch_id', auth()->user()->branch_id)
+            $departments = MainDepartment::where('branch_id', auth()->user()->employee->branch_id)
                 ->with('departments')
                 ->get();
             return response()->json($departments, 200);
