@@ -19,12 +19,12 @@ class Role extends Model
 
     protected $hidden = ['created_at', 'updated_at'];
 
-    public function users()
+    public function users(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(User::class);
     }
 
-    public function permissions()
+    public function permissions(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(Permission::class);
     }
