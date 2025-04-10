@@ -170,7 +170,7 @@
             </div>
             <div class="info-item">
                 <span class="info-label">Tugash sanasi:</span>
-                <span class="info-value">{{ date($order['end_date']) }}</span>
+                <span class="info-value">{{ date($order['end_date'])->format('d.m.Y') }}</span>
             </div>
         </div>
     </div>
