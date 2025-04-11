@@ -51,7 +51,7 @@ class GetUserResource extends JsonResource
             'img' => url('storage/' . $this->img),
             'passport_code' => $this->passport_code,
             'birthday' => $this->birthday,
-            'position' => $this->position->name
+            'position' => $this->position->name ?? null
         ];
     }
 }
