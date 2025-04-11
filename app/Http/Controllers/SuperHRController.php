@@ -6,6 +6,7 @@ use App\Http\Resources\GetEmployeeResource;
 use App\Models\Department;
 use App\Models\Log;
 use App\Models\MainDepartment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,11 +19,120 @@ class SuperHRController extends Controller
             ->where('branch_id', $user->employee->branch_id)
             ->where('status', 'working')
             ->orderBy('id', 'desc')
-            ->get();
+            ->paginate(50);
 
         $resource = GetEmployeeResource::collection($employees);
 
         return response()->json($resource);
+    }
+
+    public function storeEmployees(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'phone' => 'required|string',
+            'group_id' => 'nullable|integer|exists:groups,id',
+            'position_id' => 'nullable|integer|exists:positions,id',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'hiring_date' => 'nullable|date',
+            'address' => 'nullable|string',
+            'passport_number' => 'nullable|string',
+            'passport_code' => 'nullable|string',
+            'payment_type' => 'nullable|string',
+            'comment' => 'nullable|string',
+            'type' => 'nullable|string',
+            'birthday' => 'nullable|date'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $username = $this->generateCodeWithBranch(auth()->user()->employee->branch_id);
+
+            $user = DB::table('users')->insert([
+                'username' => $username,
+                'password' => $this->hashPassword($request->phone),
+                'role_id' => $request->role_id,
+            ]);
+
+            $employee = DB::table('employees')->insert([
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'group_id' => $request->group_id,
+                'position_id' => $request->position_id,
+                'department_id' => $request->department_id,
+                'hiring_date' => $request->hiring_date,
+                'address' => $request->address,
+                'passport_number' => $request->passport_number,
+                'passport_code' => $request->passport_code,
+                'payment_type' => $request->payment_type,
+                'comment' => $request->comment,
+                'type' => $request->type,
+                'birthday' => $request->birthday,
+                'branch_id' => auth()->user()->employee->branch_id,
+                'user_id' => $user->id,
+            ]);
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Yangi xodim qo‘shildi',
+                'create',
+                null,
+                $employee
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli qo‘shildi', 'employee' => $employee], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+             Log::add(
+                auth()->user()->id,
+                'Xodim qo‘shishda xatolik',
+                'error',
+                null,
+                $e->getMessage()
+             );
+
+            return response()->json(['status' => 'error', 'message' => 'Xodimni qo‘shishda xatolik: ' . $e->getMessage()], 500);
+        }
+
+    }
+
+    protected function hashPassword($password): string
+    {
+        $options = ['cost' => 12];
+        return password_hash($password, PASSWORD_BCRYPT, $options);
+    }
+
+    private function generateCodeWithBranch(int $branchId): string
+    {
+        $lastUser = User::where('username', 'like', $branchId . '%')
+            ->whereHas('employee', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
+            })
+            ->orderByDesc('id')
+            ->first();
+
+        if ($lastUser && preg_match('/^' . $branchId . '(\d{4})$/', $lastUser->code, $matches)) {
+            $lastCode = (int) $matches[1];
+        } else {
+            $lastCode = 999;
+        }
+
+        $newCodePart = $lastCode + 1;
+
+        return $branchId . str_pad($newCodePart, 4, '0', STR_PAD_LEFT); // Masalan: 11000 yoki 21001
+    }
+
+    public function getRoles(): \Illuminate\Http\JsonResponse
+    {
+        $roles = DB::table('roles')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($roles, 200);
     }
 
     public function getAupEmployee(): \Illuminate\Http\JsonResponse
