@@ -157,8 +157,8 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
 Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('employees/aup', [SuperHRController::class, 'getAupEmployee']);
     Route::get('positions' , [SuperHRController::class, 'getPositions']);
-    Route::post('roles', [SuperHRController::class, 'storeRoles']);
-    Route::patch('roles/{role}', [SuperHRController::class, 'updateRoles']);
+    Route::post('positions' , [SuperHRController::class, 'storePositions']);
+    Route::patch('positions/{position}', [SuperHRController::class, 'updatePositions']);
 
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::post('departments', [SuperHRController::class, 'storeDepartments']);

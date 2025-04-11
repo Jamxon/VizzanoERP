@@ -33,6 +33,66 @@ class SuperHRController extends Controller
         return response()->json($positions, 200);
     }
 
+    public function storePositions(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $position = DB::table('positions')->insert([
+                'name' => $request->name,
+            ]);
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Yangi lavozim qo‘shildi',
+                'create',
+                null,
+                $position
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Lavozim muvaffaqiyatli qo‘shildi'], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Lavozimni qo‘shishda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function updatePositions(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $position = DB::table('positions')->where('id', $id)->update([
+                'name' => $request->name,
+            ]);
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Lavozim yangilandi',
+                'edit',
+                null,
+                $position
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Lavozim muvaffaqiyatli yangilandi'], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Lavozimni yangilashda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function getDepartments(): \Illuminate\Http\JsonResponse
     {
         try {
