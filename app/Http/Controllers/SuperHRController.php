@@ -88,6 +88,16 @@ class SuperHRController extends Controller
                 'role_id' => $request->role_id ?? null,
             ]);
 
+            if ($request->hasFile('img')) {
+                $file = $request->file('img');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('/images/', $filename);
+
+                $img = 'images/' . $filename;
+            } else {
+                $img = null;
+            }
+
             $employee = DB::table('employees')->insert([
                 'name' => $request->name,
                 'phone' => $request->phone,
@@ -105,6 +115,7 @@ class SuperHRController extends Controller
                 'branch_id' => auth()->user()->employee->branch_id,
                 'user_id' => $userId, // <-- endi bu joyda xatolik bo‘lmaydi
                 'status' => $request->status,
+                'img' => $img
             ]);
 
 
