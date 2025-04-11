@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GetEmployeeResource;
+use App\Http\Resources\GetEmployeeResourceCollection;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Log;
@@ -22,10 +23,9 @@ class SuperHRController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(50);
 
-        $resource = GetEmployeeResource::collection($employees);
-
-        return response()->json($resource);
+        return (new GetEmployeeResourceCollection($employees))->response();
     }
+
 
     public function storeEmployees(Request $request): \Illuminate\Http\JsonResponse
     {
