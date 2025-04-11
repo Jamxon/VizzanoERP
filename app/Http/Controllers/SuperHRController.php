@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GetEmployeeResource;
 use App\Models\Department;
 use App\Models\Log;
 use App\Models\MainDepartment;
@@ -19,7 +20,9 @@ class SuperHRController extends Controller
             ->orderBy('id', 'desc')
             ->get();
 
-        return response()->json($employees);
+        $resource = GetEmployeeResource::collection($employees);
+
+        return response()->json($resource);
     }
 
     public function getAupEmployee(): \Illuminate\Http\JsonResponse
