@@ -104,6 +104,7 @@ class SuperHRController extends Controller
                 'birthday' => $request->birthday ?? null,
                 'branch_id' => auth()->user()->employee->branch_id,
                 'user_id' => $userId, // <-- endi bu joyda xatolik bo‘lmaydi
+                'status' => $request->status,
             ]);
 
 
