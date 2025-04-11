@@ -254,8 +254,8 @@ class CuttingMasterController extends Controller
 
     public function getCuts($id): \Illuminate\Http\JsonResponse
     {
-        $cuts = OrderCut::with('category.submodel.submodel') // eager load null xavfsizligi uchun
-        ->where('order_id', $id)
+        $cuts = OrderCut::with('category.submodel.submodel')
+            ->where('order_id', $id)
             ->get();
 
         if ($cuts->isEmpty()) {
@@ -265,8 +265,7 @@ class CuttingMasterController extends Controller
         }
 
         $groupedCuts = $cuts->groupBy(function ($cut) {
-            // Use a default key in case submodel is null
-            return optional(optional(optional($cut->category)->submodel)->id, 0);
+            return optional(optional($cut->category)->submodel)->id ?? 0;
         });
 
         $resource = $groupedCuts->map(function ($group, $submodelId) {
