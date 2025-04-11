@@ -166,7 +166,7 @@ class SuperHRController extends Controller
     public function searchEmployees(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'search' => 'required|string',
+            'search' => 'nullable|string',
             'department_id' => 'nullable|integer|exists:departments,id',
             'group_id' => 'nullable|integer|exists:groups,id',
             'status' => 'nullable|string|in:working,kicked,reserv',
