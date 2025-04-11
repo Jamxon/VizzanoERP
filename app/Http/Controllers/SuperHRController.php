@@ -24,33 +24,37 @@ class SuperHRController extends Controller
             'role_id' => 'nullable|integer|exists:roles,id',
         ]);
 
+        $filters = $request->only(['search', 'department_id', 'group_id', 'status', 'role_id']);
         $user = auth()->user();
 
-        $employees = Employee::with('user', 'position') // agar kerak bo‘lsa eager load
-        ->where('branch_id', $user->employee->branch_id)
-            ->when(!$request->search && !$request->department_id && !$request->group_id && !$request->status && !$request->role_id, function ($query) {
-                $query->where('status', 'working');
-            })
-            ->when($request->search, function ($query) use ($request) {
-                $query->where(function ($query) use ($request) {
-                    $query->where('name', 'like', '%' . $request->search . '%')
-                        ->orWhere('phone', 'like', '%' . $request->search . '%')
-                        ->orWhereHas('position', function ($q) use ($request) {
-                            $q->where('name', 'like', '%' . $request->search . '%');
-                        })
-                        ->orWhereHas('user', function ($q) use ($request) {
-                            $q->where('username', 'like', '%' . $request->search . '%');
-                        });
-                });
-            })
-            ->when($request->department_id, fn($q) => $q->where('department_id', $request->department_id))
-            ->when($request->group_id, fn($q) => $q->where('group_id', $request->group_id))
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->role_id, function ($query) use ($request) {
-                $query->whereHas('user', fn($q) => $q->where('role_id', $request->role_id));
-            })
-            ->orderByDesc('updated_at')
-            ->paginate(10);
+        $query = Employee::with('user.role', 'position') // role ham kerak bo'ladi endi
+        ->where('branch_id', $user->employee->branch_id);
+
+        if (empty(array_filter($filters))) {
+            $query->where('status', 'working');
+        }
+
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%")
+                    ->orWhereHas('position', fn($q) => $q->where('name', 'like', "%$search%"))
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('username', 'like', "%$search%")
+                            ->orWhereHas('role', fn($q) => $q->where('name', 'like', "%$search%"));
+                    });
+            });
+        }
+
+        $query->when($filters['department_id'] ?? false, fn($q) => $q->where('department_id', $filters['department_id']))
+            ->when($filters['group_id'] ?? false, fn($q) => $q->where('group_id', $filters['group_id']))
+            ->when($filters['status'] ?? false, fn($q) => $q->where('status', $filters['status']))
+            ->when($filters['role_id'] ?? false, function ($q) use ($filters) {
+                $q->whereHas('user', fn($q) => $q->where('role_id', $filters['role_id']));
+            });
+
+        $employees = $query->orderByDesc('updated_at')->paginate(10);
 
         return (new GetEmployeeResourceCollection($employees))->response();
     }
