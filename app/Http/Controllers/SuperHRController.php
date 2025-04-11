@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\MainDepartment;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,7 @@ class SuperHRController extends Controller
             ->when($request->role_id, function ($query) use ($request) {
                 $query->whereHas('user', fn($q) => $q->where('role_id', $request->role_id));
             })
-            ->orderByDesc('id')
+            ->orderByDesc('updated_at')
             ->paginate(10);
 
         return (new GetEmployeeResourceCollection($employees))->response();
@@ -219,8 +220,7 @@ class SuperHRController extends Controller
 
     public function getRoles(): \Illuminate\Http\JsonResponse
     {
-        $roles = DB::table('roles')
-            ->orderBy('id', 'desc')
+        $roles = Role::orderBy('name')
             ->get();
 
         return response()->json($roles, 200);
