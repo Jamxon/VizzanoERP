@@ -39,20 +39,20 @@ class GetEmployeeResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'username' => $this->user->username,
-            'phone' => $this->phone,
+            'name' => $this->name ?? null,
+            'username' => $this->user->username ?? null,
+            'phone' => $this->phone ?? null,
             'group' => $this->group->name ?? null,
             'department' => $this->department->name ?? null,
-            'hiring_date' => $this->hiring_date,
-            'address' => $this->address,
-            'payment_type' => $this->payment_type,
-            'passport_number' => $this->passport_number,
-            'status' => $this->status,
-            'img' => $this->img,
-            'passport_code' => $this->passport_code,
-            'type' => $this->type,
-            'birthday' => $this->birthday,
+            'hiring_date' => $this->hiring_date ?? null,
+            'address' => $this->address ?? null,
+            'payment_type' => $this->payment_type ?? null,
+            'passport_number' => $this->passport_number ?? null,
+            'status' => $this->status ?? null,
+            'img' => $this->img ?? null,
+            'passport_code' => $this->passport_code ?? null,
+            'type' => $this->type ?? null,
+            'birthday' => $this->birthday ?? null,
             'position' => $this->position->name ?? null
         ];
     }
