@@ -195,7 +195,7 @@ class SuperHRController extends Controller
                 }
             })
             ->orderBy('id', 'desc')
-            ->paginate(50);
+            ->get(50);
 
         return (new GetEmployeeResourceCollection($employees))->response();
     }
