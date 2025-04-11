@@ -160,6 +160,8 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::post('positions' , [SuperHRController::class, 'storePositions']);
     Route::patch('positions/{position}', [SuperHRController::class, 'updatePositions']);
 
+    Route::get('employees', [SuperHRController::class, 'getEmployees']);
+
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::post('departments', [SuperHRController::class, 'storeDepartments']);
     Route::patch('departments/{department}', [SuperHRController::class, 'updateDepartments']);
