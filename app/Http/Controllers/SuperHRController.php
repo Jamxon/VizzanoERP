@@ -15,6 +15,7 @@ class SuperHRController extends Controller
     public function getEmployees(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
+
         $employees = DB::table('employees')
             ->where('branch_id', $user->employee->branch_id)
             ->where('status', 'working')
