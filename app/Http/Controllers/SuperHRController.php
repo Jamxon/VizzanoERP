@@ -224,7 +224,7 @@ class SuperHRController extends Controller
             ->orderByDesc('id')
             ->first();
 
-        if ($lastUser && preg_match('/^' . $branchId . '(\d{4})$/', $lastUser->code, $matches)) {
+        if ($lastUser && preg_match('/^' . $branchId . '(\d{4})$/', $lastUser->username, $matches)) {
             $lastCode = (int) $matches[1];
         } else {
             $lastCode = 999;
@@ -232,7 +232,7 @@ class SuperHRController extends Controller
 
         $newCodePart = $lastCode + 1;
 
-        return $branchId . str_pad($newCodePart, 4, '0', STR_PAD_LEFT); // Masalan: 11000 yoki 21001
+        return $branchId . str_pad($newCodePart, 4, '0', STR_PAD_LEFT); // Masalan: 41001, 41002, ...
     }
 
     public function getRoles(): \Illuminate\Http\JsonResponse
