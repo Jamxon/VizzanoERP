@@ -163,6 +163,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('roles', [SuperHRController::class, 'getRoles']);
 
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
+    Route::get('employees/{id}', [SuperHRController::class, 'showEmployee']);
     Route::post('employees', [SuperHRController::class, 'storeEmployees']);
     Route::patch('employees/{employee}', [SuperHRController::class, 'updateEmployees']);
 

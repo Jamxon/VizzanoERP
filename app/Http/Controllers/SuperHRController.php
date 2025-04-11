@@ -59,6 +59,18 @@ class SuperHRController extends Controller
         return (new GetEmployeeResourceCollection($employees))->response();
     }
 
+    public function showEmployee($id): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+
+        $employee = Employee::with('user.role', 'position', 'department', 'group')
+            ->where('id', $id)
+            ->where('branch_id', $user->employee->branch_id)
+            ->firstOrFail();
+
+        return (new \App\Http\Resources\GetEmployeeResource($employee))->response();
+    }
+
     public function storeEmployees(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
