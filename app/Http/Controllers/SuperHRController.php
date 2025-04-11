@@ -24,103 +24,13 @@ class SuperHRController extends Controller
         return response()->json($employees, 200);
     }
 
-    public function getRoles(): \Illuminate\Http\JsonResponse
+    public function getPositions(): \Illuminate\Http\JsonResponse
     {
-        try {
-            $roles = Role::orderBy('updated_at', 'desc')
-                ->get();
-            return response()->json($roles, 200);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Rollarni olishda xatolik: ' . $e->getMessage()], 500);
-        }
-    }
+        $positions = DB::table('positions')
+            ->orderBy('updated_at', 'desc')
+            ->get();
 
-    public function storeRoles(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $request->validate([
-            'description' => 'required|string|max:255',
-            'task' => 'nullable',
-        ]);
-
-        try {
-            DB::beginTransaction();
-
-            // PostgreSQL uchun substring orqali sonni ajratib olish
-            $lastRole = DB::table('roles')
-                ->where('name', 'like', 'role%')
-                ->orderByRaw("CAST(REGEXP_REPLACE(name, '\\D', '', 'g') AS INTEGER) DESC")
-                ->first();
-
-            $lastNumber = 0;
-            if ($lastRole && preg_match('/role(\d+)/', $lastRole->name, $matches)) {
-                $lastNumber = (int)$matches[1];
-            }
-
-            $newRoleName = 'role' . ($lastNumber + 1);
-
-            $role = Role::create([
-                'name' => $newRoleName,
-                'description' => $request->description,
-                'task' => $request->task ?? null,
-            ]);
-
-            DB::commit();
-
-            Log::add(
-                auth()->user()->id,
-                'Yangi rol qo‘shildi',
-                'create',
-                null,
-                $role->toArray()
-            );
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Rol muvaffaqiyatli qo‘shildi',
-                'role' => $role
-            ], 201);
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Rolni qo‘shishda xatolik: ' . $e->getMessage()
-            ], 500);
-        }
-    }
-
-    public function updateRoles(Request $request, $id): \Illuminate\Http\JsonResponse
-    {
-        $request->validate([
-            'description' => 'required|string|max:255',
-            'task' => 'nullable',
-        ]);
-
-        try {
-            DB::beginTransaction();
-
-            $role = Role::findOrFail($id);
-            $role->update([
-                'name' => $role->name,
-                'description' => $request->description,
-                'task' => $request->task ?? $role->task,
-            ]);
-
-            DB::commit();
-
-            Log::add(
-                auth()->user()->id,
-                'Rol yangilandi',
-                'edit',
-                $role->toArray(),
-                $role->toArray()
-            );
-
-            return response()->json(['status' => 'success', 'message' => 'Rol muvaffaqiyatli yangilandi', 'role' => $role], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Rolni yangilashda xatolik: ' . $e->getMessage()], 500);
-        }
+        return response()->json($positions, 200);
     }
 
     public function getDepartments(): \Illuminate\Http\JsonResponse
