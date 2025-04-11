@@ -254,19 +254,27 @@ class CuttingMasterController extends Controller
 
     public function getCuts($id): \Illuminate\Http\JsonResponse
     {
-        $cuts = OrderCut::where('order_id', $id)
+        $cuts = OrderCut::with('category.submodel.submodel') // eager load null xavfsizligi uchun
+        ->where('order_id', $id)
             ->get();
 
+        if ($cuts->isEmpty()) {
+            return response()->json([
+                'message' => 'Kesish ma\'lumotlari topilmadi'
+            ], 404);
+        }
+
         $groupedCuts = $cuts->groupBy(function ($cut) {
-            return $cut->category->submodel->id;
+            return optional(optional(optional($cut->category)->submodel)->id);
         });
 
         $resource = $groupedCuts->map(function ($group, $submodelId) {
-            $submodel = $group->first()->category->submodel;
+            $submodel = optional(optional($group->first()->category)->submodel);
+
             return [
                 'submodel' => [
-                    'id' => $submodel->submodel->id ?? null,
-                    'name' => $submodel->submodel->name ?? null,
+                    'id' => optional($submodel->submodel)->id,
+                    'name' => optional($submodel->submodel)->name,
                 ],
                 'cuts' => $group->map(function ($cut) {
                     return [
@@ -274,8 +282,8 @@ class CuttingMasterController extends Controller
                         'cut_at' => $cut->cut_at,
                         'quantity' => $cut->quantity,
                         'category' => [
-                            'id' => $cut->category->id,
-                            'name' => $cut->category->name,
+                            'id' => optional($cut->category)->id,
+                            'name' => optional($cut->category)->name,
                         ],
                     ];
                 })->values()->all(),
