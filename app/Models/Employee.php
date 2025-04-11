@@ -33,10 +33,14 @@ class Employee extends Model
         'img',
         'position_id'
     ];
-
-    public function getImgAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application
+    
+    public function getImgAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
     {
-        if (filter_var($value, FILTER_VALIDATE_URL) && $value != null) {
+        if (is_null($value)) {
+            return null;
+        }
+
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
             return $value;
         }
 
