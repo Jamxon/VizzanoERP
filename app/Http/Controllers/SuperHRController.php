@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\GetEmployeeResource;
 use App\Models\Department;
+use App\Models\Employee;
 use App\Models\Log;
 use App\Models\MainDepartment;
 use App\Models\User;
@@ -16,8 +17,7 @@ class SuperHRController extends Controller
     {
         $user = auth()->user();
 
-        $employees = DB::table('employees')
-            ->where('branch_id', $user->employee->branch_id)
+        $employees = Employee::where('branch_id', $user->employee->branch_id)
             ->where('status', 'working')
             ->orderBy('id', 'desc')
             ->paginate(50);
