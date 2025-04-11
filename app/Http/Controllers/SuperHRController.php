@@ -42,7 +42,7 @@ class SuperHRController extends Controller
                     ->orWhereHas('position', fn($q) => $q->where('name', 'like', "%$search%"))
                     ->orWhereHas('user', function ($q) use ($search) {
                         $q->where('username', 'like', "%$search%")
-                            ->orWhereHas('role', fn($q) => $q->where('name', 'like', "%$search%"));
+                            ->orWhereHas('role', fn($q) => $q->where('description', 'like', "%$search%"));
                     });
             });
         }
