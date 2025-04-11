@@ -179,6 +179,16 @@ class SuperHRController extends Controller
         try {
             DB::beginTransaction();
 
+            if ($request->hasFile('img')) {
+                $file = $request->file('img');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('/images/', $filename);
+
+                $img = 'images/' . $filename;
+            } else {
+                $img = null;
+            }
+
             $employee = Employee::findOrFail($id);
             $oldData = $employee->toArray();
             $employee->update([
@@ -195,6 +205,7 @@ class SuperHRController extends Controller
                 'comment' => $request->comment,
                 'type' => $request->type,
                 'birthday' => $request->birthday,
+                'img' => $img ?? $employee->img,
             ]);
 
             DB::commit();
