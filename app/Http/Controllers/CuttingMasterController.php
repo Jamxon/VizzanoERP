@@ -265,7 +265,8 @@ class CuttingMasterController extends Controller
         }
 
         $groupedCuts = $cuts->groupBy(function ($cut) {
-            return optional(optional(optional($cut->category)->submodel)->id);
+            // Use a default key in case submodel is null
+            return optional(optional(optional($cut->category)->submodel)->id, 0);
         });
 
         $resource = $groupedCuts->map(function ($group, $submodelId) {
