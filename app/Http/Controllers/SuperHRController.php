@@ -26,7 +26,6 @@ class SuperHRController extends Controller
         return (new GetEmployeeResourceCollection($employees))->response();
     }
 
-
     public function storeEmployees(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
@@ -99,6 +98,93 @@ class SuperHRController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Xodimni qo‘shishda xatolik: ' . $e->getMessage()], 500);
         }
 
+    }
+
+    public function updateEmployees(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'phone' => 'required|string',
+            'group_id' => 'nullable|integer|exists:groups,id',
+            'position_id' => 'nullable|integer|exists:positions,id',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'hiring_date' => 'nullable|date',
+            'address' => 'nullable|string',
+            'passport_number' => 'nullable|string',
+            'passport_code' => 'nullable|string',
+            'payment_type' => 'nullable|string',
+            'comment' => 'nullable|string',
+            'type' => 'nullable|string',
+            'birthday' => 'nullable|date'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $employee = Employee::findOrFail($id);
+            $oldData = $employee->toArray();
+            $employee->update([
+                'name' => $request->name,
+                'phone' => $request->phone,
+                'group_id' => $request->group_id,
+                'position_id' => $request->position_id,
+                'department_id' => $request->department_id,
+                'hiring_date' => $request->hiring_date,
+                'address' => $request->address,
+                'passport_number' => $request->passport_number,
+                'passport_code' => $request->passport_code,
+                'payment_type' => $request->payment_type,
+                'comment' => $request->comment,
+                'type' => $request->type,
+                'birthday' => $request->birthday,
+            ]);
+
+            DB::commit();
+
+             Log::add(
+                auth()->user()->id,
+                'Xodim yangilandi',
+                'edit',
+                $oldData,
+                $employee
+             );
+
+            return response()->json(['status' => 'success', 'message' => 'Xodim muvaffaqiyatli yangilandi', 200]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+             Log::add(
+                auth()->user()->id,
+                "Xodimni yangilashda xatolik",
+                "error",
+                null,
+                $e->getMessage()
+             );
+            return response()->json(['status' => 'error', 'message' => 'Xodimni yangilashda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function searchEmployees(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'search' => 'required|string',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'group_id' => 'nullable|integer|exists:groups,id',
+        ]);
+
+        $employees = Employee::where('branch_id', auth()->user()->employee->branch_id)
+            ->where(function ($query) use ($request) {
+                $query->where('name', 'like', '%' . $request->search . '%')
+                    ->orWhere('phone', 'like', '%' . $request->search . '%')
+                    ->orWhere('department_id', 'like', '%' . $request->department_id . '%')
+                    ->orWhere('group_id', 'like', '%' . $request->group_id . '%')
+                    ->orWhereHas('user', function ($query) use ($request) {
+                        $query->where('username', 'like', '%' . $request->search . '%');
+                    });
+            })
+            ->orderBy('id', 'desc')
+            ->paginate(50);
+
+        return (new GetEmployeeResourceCollection($employees))->response();
     }
 
     protected function hashPassword($password): string
