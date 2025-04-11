@@ -40,10 +40,10 @@ class GetEmployeeResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name ?? null,
-            'username' => $this->user->username ?? null,
+            'user' => $this->user->load('role') ?? null,
             'phone' => $this->phone ?? null,
-            'group' => $this->group->name ?? null,
-            'department' => $this->department->name ?? null,
+            'group' => $this->group ?? null,
+            'department' => $this->department ?? null,
             'hiring_date' => $this->hiring_date ?? null,
             'address' => $this->address ?? null,
             'payment_type' => $this->payment_type ?? null,
