@@ -169,6 +169,7 @@ class SuperHRController extends Controller
             'search' => 'required|string',
             'department_id' => 'nullable|integer|exists:departments,id',
             'group_id' => 'nullable|integer|exists:groups,id',
+            'status' => 'nullable|string|in:working,kicked',
         ]);
 
         $employees = Employee::where('branch_id', auth()->user()->employee->branch_id)
@@ -177,6 +178,7 @@ class SuperHRController extends Controller
                     ->orWhere('phone', 'like', '%' . $request->search . '%')
                     ->orWhere('department_id', 'like', '%' . $request->department_id . '%')
                     ->orWhere('group_id', 'like', '%' . $request->group_id . '%')
+                    ->orWhere('status', 'like', '%' . $request->status . '%')
                     ->orWhereHas('user', function ($query) use ($request) {
                         $query->where('username', 'like', '%' . $request->search . '%');
                     });
