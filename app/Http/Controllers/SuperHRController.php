@@ -61,7 +61,7 @@ class SuperHRController extends Controller
         }
 
         // Xodimlarni saralash va paginate qilish
-        $employees = $query->orderBy('id', 'desc')->paginate(50);
+        $employees = $query->orderBy('id', 'desc')->paginate(10);
 
         // Resursni qaytarish
         return (new GetEmployeeResourceCollection($employees))->response();
