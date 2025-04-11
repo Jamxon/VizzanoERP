@@ -53,7 +53,7 @@ class GetEmployeeResource extends JsonResource
             'passport_code' => $this->passport_code,
             'type' => $this->type,
             'birthday' => $this->birthday,
-            'position' => $this->position->name
+            'position' => $this->position->name ?? null
         ];
     }
 }
