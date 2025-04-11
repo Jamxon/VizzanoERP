@@ -27,7 +27,7 @@ class SuperHRController extends Controller
     public function getPositions(): \Illuminate\Http\JsonResponse
     {
         $positions = DB::table('positions')
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('name', 'desc')
             ->get();
 
         return response()->json($positions, 200);
