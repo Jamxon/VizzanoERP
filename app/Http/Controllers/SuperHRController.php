@@ -310,7 +310,10 @@ class SuperHRController extends Controller
     {
         try {
             $departments = MainDepartment::where('branch_id', auth()->user()->employee->branch_id)
-                ->with('departments')
+                ->with(
+                    'departments',
+                    'departments.groups',
+                )
                 ->get();
             return response()->json($departments, 200);
         } catch (\Exception $e) {
