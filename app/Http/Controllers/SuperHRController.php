@@ -172,6 +172,8 @@ class SuperHRController extends Controller
             'status' => 'nullable|string|in:working,kicked,reserv',
         ]);
 
+        return $request->all();
+
         $employees = Employee::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($query) use ($request) {
                 // Qidiruv faqat 'name', 'phone', 'username' ustunlari bo‘yicha
@@ -195,7 +197,7 @@ class SuperHRController extends Controller
                 }
             })
             ->orderBy('id', 'desc')
-            ->get(50);
+            ->paginate(50);
 
         return (new GetEmployeeResourceCollection($employees))->response();
     }
