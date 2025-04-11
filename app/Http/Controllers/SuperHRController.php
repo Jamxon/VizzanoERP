@@ -14,15 +14,56 @@ use Illuminate\Support\Facades\DB;
 
 class SuperHRController extends Controller
 {
-    public function getEmployees(): \Illuminate\Http\JsonResponse
+    public function getEmployees(Request $request): \Illuminate\Http\JsonResponse
     {
+        // Parametrlar uchun validatsiya
+        $request->validate([
+            'search' => 'nullable|string',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'group_id' => 'nullable|integer|exists:groups,id',
+            'status' => 'nullable|string|in:working,kicked,reserv',
+        ]);
+
+        // Foydalanuvchini olish
         $user = auth()->user();
 
-        $employees = Employee::where('branch_id', $user->employee->branch_id)
-            ->where('status', 'working')
-            ->orderBy('id', 'desc')
-            ->paginate(50);
+        // Qidiruv so'rovini yaratish
+        $query = Employee::where('branch_id', $user->employee->branch_id);
 
+        // Qidiruvni faqat parametrlar bor bo'lsa amalga oshirish
+        if ($request->search || $request->department_id || $request->group_id || $request->status) {
+            $query->where(function ($query) use ($request) {
+                // Qidiruv faqat 'name', 'phone', 'username' ustunlari bo‘yicha
+                if ($request->search) {
+                    $query->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('phone', 'like', '%' . $request->search . '%')
+                        ->orWhereHas('user', function ($query) use ($request) {
+                            $query->where('username', 'like', '%' . $request->search . '%');
+                        });
+                }
+
+                // Boshqa filtrlash parametrlarini faqat so‘rov bo‘yicha qo‘shish
+                if ($request->department_id) {
+                    $query->where('department_id', $request->department_id);
+                }
+
+                if ($request->group_id) {
+                    $query->where('group_id', $request->group_id);
+                }
+
+                if ($request->status) {
+                    $query->where('status', $request->status);
+                }
+            });
+        } else {
+            // Agar qidiruv parametri bo'lmasa, faqat 'working' statusdagi xodimlarni olish
+            $query->where('status', 'working');
+        }
+
+        // Xodimlarni saralash va paginate qilish
+        $employees = $query->orderBy('id', 'desc')->paginate(50);
+
+        // Resursni qaytarish
         return (new GetEmployeeResourceCollection($employees))->response();
     }
 
@@ -162,46 +203,6 @@ class SuperHRController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Xodimni yangilashda xatolik: ' . $e->getMessage()], 500);
         }
     }
-
-    public function searchEmployees(Request $request)
-    {
-        $request->validate([
-            'search' => 'nullable|string',
-            'department_id' => 'nullable|integer|exists:departments,id',
-            'group_id' => 'nullable|integer|exists:groups,id',
-            'status' => 'nullable|string|in:working,kicked,reserv',
-        ]);
-
-        return $request->all();
-
-        $employees = Employee::where('branch_id', auth()->user()->employee->branch_id)
-            ->where(function ($query) use ($request) {
-                // Qidiruv faqat 'name', 'phone', 'username' ustunlari bo‘yicha
-                $query->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('phone', 'like', '%' . $request->search . '%')
-                    ->orWhereHas('user', function ($query) use ($request) {
-                        $query->where('username', 'like', '%' . $request->search . '%');
-                    });
-
-                // Boshqa filtrlash parametrlarini faqat so‘rov bo‘yicha qo‘shish
-                if ($request->department_id) {
-                    $query->where('department_id', $request->department_id);
-                }
-
-                if ($request->group_id) {
-                    $query->where('group_id', $request->group_id);
-                }
-
-                if ($request->status) {
-                    $query->where('status', $request->status);
-                }
-            })
-            ->orderBy('id', 'desc')
-            ->paginate(50);
-
-        return (new GetEmployeeResourceCollection($employees))->response();
-    }
-
 
     protected function hashPassword($password): string
     {
