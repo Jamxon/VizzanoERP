@@ -5,12 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\Department;
 use App\Models\Log;
 use App\Models\MainDepartment;
-use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class SuperHRController extends Controller
 {
+    public function getEmployees(): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+        $employees = DB::table('employees')
+            ->where('branch_id', $user->employee->branch_id)
+            ->where('status', 'working')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($employees);
+    }
+
     public function getAupEmployee(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
@@ -18,7 +29,7 @@ class SuperHRController extends Controller
             ->where('branch_id', $user->employee->branch_id)
             ->where('status', 'working')
             ->where('type', 'aup')
-            ->orderBy('updated_at', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         return response()->json($employees, 200);
