@@ -163,7 +163,7 @@ class SuperHRController extends Controller
         }
     }
 
-    public function searchEmployees(Request $request): \Illuminate\Http\JsonResponse
+    public function searchEmployees(Request $request)
     {
         $request->validate([
             'search' => 'nullable|string',
