@@ -174,20 +174,32 @@ class SuperHRController extends Controller
 
         $employees = Employee::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($query) use ($request) {
+                // Qidiruv faqat 'name', 'phone', 'username' ustunlari bo‘yicha
                 $query->where('name', 'like', '%' . $request->search . '%')
                     ->orWhere('phone', 'like', '%' . $request->search . '%')
-                    ->orWhere('department_id', 'like', '%' . $request->department_id . '%')
-                    ->orWhere('group_id', 'like', '%' . $request->group_id . '%')
-                    ->orWhere('status', 'like', '%' . $request->status . '%')
                     ->orWhereHas('user', function ($query) use ($request) {
                         $query->where('username', 'like', '%' . $request->search . '%');
                     });
+
+                // Boshqa filtrlash parametrlarini faqat so‘rov bo‘yicha qo‘shish
+                if ($request->department_id) {
+                    $query->where('department_id', $request->department_id);
+                }
+
+                if ($request->group_id) {
+                    $query->where('group_id', $request->group_id);
+                }
+
+                if ($request->status) {
+                    $query->where('status', $request->status);
+                }
             })
             ->orderBy('id', 'desc')
             ->paginate(50);
 
         return (new GetEmployeeResourceCollection($employees))->response();
     }
+
 
     protected function hashPassword($password): string
     {
