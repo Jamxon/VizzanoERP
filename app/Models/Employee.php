@@ -30,7 +30,8 @@ class Employee extends Model
         'type',
         'salary',
         'birthday',
-        'img'
+        'img',
+        'position_id'
     ];
 
     public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -61,5 +62,10 @@ class Employee extends Model
     public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Branch::class);
+    }
+
+    public function position(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Position::class);
     }
 }

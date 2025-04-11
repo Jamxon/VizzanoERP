@@ -25,6 +25,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
  * @property mixed $id
  * @property mixed $username
  * @property mixed $department_id
+ * @property mixed $position
  */
 class GetUserResource extends JsonResource
 {
@@ -49,7 +50,8 @@ class GetUserResource extends JsonResource
             'status' => $this->status,
             'img' => url('storage/' . $this->img),
             'passport_code' => $this->passport_code,
-            'birthday' => $this->birthday
+            'birthday' => $this->birthday,
+            'position' => $this->position->name
         ];
     }
 }
