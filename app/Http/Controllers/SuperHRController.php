@@ -85,23 +85,23 @@ class SuperHRController extends Controller
             $user = DB::table('users')->insert([
                 'username' => $username,
                 'password' => $this->hashPassword($request->phone),
-                'role_id' => $request->role_id,
+                'role_id' => $request->role_id ?? null,
             ]);
 
             $employee = DB::table('employees')->insert([
                 'name' => $request->name,
                 'phone' => $request->phone,
-                'group_id' => $request->group_id,
+                'group_id' => $request->group_id ?? null,
                 'position_id' => $request->position_id,
                 'department_id' => $request->department_id,
                 'hiring_date' => $request->hiring_date,
                 'address' => $request->address,
-                'passport_number' => $request->passport_number,
-                'passport_code' => $request->passport_code,
+                'passport_number' => $request->passport_number ?? null,
+                'passport_code' => $request->passport_code ?? null,
                 'payment_type' => $request->payment_type,
-                'comment' => $request->comment,
+                'comment' => $request->comment ?? null,
                 'type' => $request->type,
-                'birthday' => $request->birthday,
+                'birthday' => $request->birthday ?? null,
                 'branch_id' => auth()->user()->employee->branch_id,
                 'user_id' => $user->id,
             ]);
