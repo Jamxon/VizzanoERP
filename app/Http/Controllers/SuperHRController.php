@@ -82,7 +82,7 @@ class SuperHRController extends Controller
 
             $username = $this->generateCodeWithBranch(auth()->user()->employee->branch_id);
 
-            $user = DB::table('users')->insert([
+            $userId = DB::table('users')->insertGetId([
                 'username' => $username,
                 'password' => $this->hashPassword($request->phone),
                 'role_id' => $request->role_id ?? null,
@@ -103,8 +103,9 @@ class SuperHRController extends Controller
                 'type' => $request->type,
                 'birthday' => $request->birthday ?? null,
                 'branch_id' => auth()->user()->employee->branch_id,
-                'user_id' => $user->id,
+                'user_id' => $userId, // <-- endi bu joyda xatolik bo‘lmaydi
             ]);
+
 
             DB::commit();
 
