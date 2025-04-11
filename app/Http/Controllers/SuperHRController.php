@@ -169,7 +169,7 @@ class SuperHRController extends Controller
             'search' => 'required|string',
             'department_id' => 'nullable|integer|exists:departments,id',
             'group_id' => 'nullable|integer|exists:groups,id',
-            'status' => 'nullable|string|in:working,kicked',
+            'status' => 'nullable|string|in:working,kicked,reserv',
         ]);
 
         $employees = Employee::where('branch_id', auth()->user()->employee->branch_id)
