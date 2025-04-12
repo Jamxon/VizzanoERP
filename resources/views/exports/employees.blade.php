@@ -50,7 +50,6 @@
         <th>Адрес</th>
         <th>Дата рождения</th>
         <th>Комментарий</th>
-        <th>Фото</th>
     </tr>
     </thead>
     <tbody>
@@ -75,16 +74,6 @@
             <td>{{ $employee->address }}</td>
             <td>{{ $employee->birthday }}</td>
             <td>{{ $employee->comment }}</td>
-            <td>
-                @php
-                    $imgPath = Str::after($employee->img, 'https://api.vizzano-apparel.uz/storage/');
-                @endphp
-
-                @if($employee->img)
-                    <img src="{{ asset('storage/' . $imgPath) }}" alt="Фото">
-                @endif
-
-            </td>
         </tr>
     @endforeach
     </tbody>
