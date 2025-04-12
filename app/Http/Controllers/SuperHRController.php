@@ -11,9 +11,18 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Exports\EmployeeExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
+
+    public function exportToExcel(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    {
+        return Excel::download(new EmployeeExport($request), 'xodimlar.xlsx');
+    }
+
+
     public function getEmployees(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
