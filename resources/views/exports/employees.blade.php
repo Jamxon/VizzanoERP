@@ -33,7 +33,7 @@
         <th>ID</th>
         <th>ФИО</th>
         <th>Логин</th>
-        <th>Роль (Права)</th>
+        <th>Разрешение</th>
         <th>Телефон</th>
         <th>Группа</th>
         <th>Отдел</th>
@@ -58,9 +58,6 @@
             <td>{{ $employee->user->username ?? '' }}</td>
             <td>
                 {{ $employee->user->role->description ?? '' }}
-                @if($employee->user && $employee->user->role && $employee->user->role->permissions)
-                    ({{ $employee->user->role->permissions->pluck('description')->implode(', ') }})
-                @endif
             </td>
             <td>{{ $employee->phone }}</td>
             <td>{{ $employee->group->name ?? '' }}</td>
