@@ -106,9 +106,9 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
     {
         return [
             'A' => 5,   // ID
-            'B' => 20,  // ФИО
+            'B' => 40,  // ФИО
             'C' => 15,  // Логин
-            'D' => 18,  // Разрешение
+            'D' => 35,  // Разрешение
             'E' => 15,  // Телефон
             'F' => 18,  // Группа
             'G' => 18,  // Отдел
@@ -119,7 +119,7 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
             'L' => 12,  // Тип оплаты
             'M' => 12,  // Маош
             'N' => 15,  // Паспорт
-            'O' => 20,  // Адрес
+            'O' => 30,  // Адрес
             'P' => 15,  // Дата рождения
             'Q' => 25,  // Комментарий
             'R' => 20,  // Фото
