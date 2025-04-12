@@ -14,6 +14,7 @@
             border: 1px solid #000;
             padding: 6px;
             text-align: left;
+            width: 150px;
         }
         th {
             background-color: #f2f2f2;
