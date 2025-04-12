@@ -5,6 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @method static orderBy(string $string, string $string1)
+ * @method static create(array $data)
+ * @method static findOrFail($id)
+ * @method static where(string $string, $branch_id)
+ */
 class Transport extends Model
 {
     use HasFactory;
@@ -30,6 +36,8 @@ class Transport extends Model
         'driver_passport_number',       // Haydovchining pasport raqami
         'driver_license_number',        // Haydovchilik guvohnomasi raqami
         'driver_experience_years',      // Haydovchilik tajribasi (yil bilan)
+        'salary',                       // Haydovchining kunlik maoshi
+        'fuel_bonus',                   // Haydovchiga beriladigan yoqilg‘i bonusi
     ];
 
     /**
@@ -51,10 +59,5 @@ class Transport extends Model
     public function region(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Region::class);
-    }
-
-    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Order::class);
     }
 }
