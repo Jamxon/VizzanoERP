@@ -37,7 +37,6 @@ class Transport extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
-        'year' => 'integer',
         'driver_experience_years' => 'integer',
         'registration_date' => 'date',
         'insurance_expiry' => 'date',

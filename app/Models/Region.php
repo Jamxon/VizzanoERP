@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Region extends Model
 {
     use HasFactory;
+
+    protected $table = 'routes';
+
+    protected $fillable = [
+        'name',
+    ];
+
 }
