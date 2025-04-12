@@ -40,6 +40,7 @@ class Transport extends Model
         'driver_experience_years',      // Haydovchilik tajribasi (yil bilan)
         'salary',                       // Haydovchining kunlik maoshi
         'fuel_bonus',                   // Haydovchiga beriladigan yoqilg‘i bonusi
+        'balance',                      // Transport balansidagi mablag‘ (default 0)
     ];
 
     /**
