@@ -77,8 +77,6 @@ class TransportController extends Controller
     public function update(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         try {
-
-            dd($request->all());
             $transport = Transport::findOrFail($id);
             $oldData = $transport->toArray();
 
@@ -106,7 +104,7 @@ class TransportController extends Controller
                 'salary' => 'nullable|numeric',
                 'fuel_bonus' => 'nullable|numeric',
             ]);
-
+            dd($data);
             $transport->update($data);
             Log::add(Auth::id(), 'Transport tahrirlandi', 'edit', $oldData, $transport);
 
