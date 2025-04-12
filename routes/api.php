@@ -20,6 +20,7 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\SuperHRController;
 use App\Http\Controllers\TechnologController;
+use App\Http\Controllers\TransportAttendanceController;
 use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -33,6 +34,8 @@ Route::prefix('transport')->middleware('role:transport')->group(function () {
     Route::get('transports/{id}', [TransportController::class, 'show']);
     Route::post('transports', [TransportController::class, 'store']);
     Route::patch('transports/{id}', [TransportController::class, 'update']);
+
+    Route::get('attendances', [TransportAttendanceController::class, 'index']);
 });
 
 Route::prefix('packageMaster')->middleware('role:packageMaster')->group(function () {
