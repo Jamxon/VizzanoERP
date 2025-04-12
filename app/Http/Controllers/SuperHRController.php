@@ -160,8 +160,6 @@ class SuperHRController extends Controller
 
     public function updateEmployees(Request $request, $id)
     {
-        return $request->all();
-
         $request->validate([
             'name' => 'required|string',
             'phone' => 'required|string',
@@ -190,6 +188,8 @@ class SuperHRController extends Controller
             } else {
                 $img = null;
             }
+
+            return $request->department_id;
 
             $employee = Employee::findOrFail($id);
             $oldData = $employee->toArray();
