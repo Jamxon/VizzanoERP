@@ -63,4 +63,9 @@ class Transport extends Model
     {
         return $this->belongsTo(Region::class);
     }
+
+    public function transportAttendances(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TransportAttendance::class);
+    }
 }
