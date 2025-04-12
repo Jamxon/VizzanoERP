@@ -73,6 +73,7 @@
             <td>{{ $employee->birthday }}</td>
             <td>{{ $employee->comment }}</td>
             <td>
+                {{ $employee->img ?? "ssss" }}
                 @if($employee->img)
                     <img src="{{ $employee->img }}" alt="Фото">
                 @endif
