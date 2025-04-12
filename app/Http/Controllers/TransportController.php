@@ -82,13 +82,13 @@ class TransportController extends Controller
 
             $data = $request->validate([
                 'name' => 'sometimes|string',
-                'state_number' => 'sometimes|string|unique:transports,state_number,' . $id,
+                'state_number' => 'sometimes|string|unique:transport,state_number,' . $id,
                 'driver_full_name' => 'sometimes|string',
                 'phone' => 'sometimes|string',
                 'phone_2' => 'nullable|string',
                 'capacity' => 'sometimes|numeric',
                 'branch_id' => 'sometimes|exists:branches,id',
-                'region_id' => 'sometimes|exists:regions,id',
+                'region_id' => 'sometimes|exists:routes,id',
                 'is_active' => 'boolean',
                 'vin_number' => 'nullable|string',
                 'tech_passport_number' => 'nullable|string',
