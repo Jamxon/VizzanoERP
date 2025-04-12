@@ -5,11 +5,14 @@ namespace App\Exports;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithDrawings;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 
-class EmployeeExport implements FromCollection, WithHeadings, WithMapping
+class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithDrawings, WithColumnWidths
 {
     protected Request $request;
     protected $employees;
@@ -19,7 +22,7 @@ class EmployeeExport implements FromCollection, WithHeadings, WithMapping
         $this->request = $request;
     }
 
-    public function collection(): \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|array
+    public function collection()
     {
         $filters = $this->request->only(['search', 'department_id', 'group_id', 'status', 'role_id']);
         $user = auth()->user();
@@ -76,7 +79,50 @@ class EmployeeExport implements FromCollection, WithHeadings, WithMapping
             $employee->address,
             $employee->birthday,
             $employee->comment,
-            $employee->img ? asset('storage/' . Str::after($employee->img, 'storage/')) : '',
+            '', // Bu yerga rasm joylashadi
+        ];
+    }
+
+    public function drawings()
+    {
+        $drawings = [];
+
+        foreach ($this->employees as $index => $employee) {
+            if ($employee->img && file_exists(public_path('storage/' . Str::after($employee->img, 'storage/')))) {
+                $drawing = new Drawing();
+                $drawing->setName($employee->name);
+                $drawing->setDescription('Rasm');
+                $drawing->setPath(public_path('storage/' . Str::after($employee->img, 'storage/')));
+                $drawing->setHeight(50);
+                $drawing->setCoordinates('R' . ($index + 2)); // 'R' = 18-column
+                $drawings[] = $drawing;
+            }
+        }
+
+        return $drawings;
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 5,   // ID
+            'B' => 20,  // ФИО
+            'C' => 15,  // Логин
+            'D' => 18,  // Разрешение
+            'E' => 15,  // Телефон
+            'F' => 18,  // Группа
+            'G' => 18,  // Отдел
+            'H' => 15,  // Ишга келган сана
+            'I' => 12,  // Статус
+            'J' => 18,  // Позиция
+            'K' => 10,  // Тип
+            'L' => 12,  // Тип оплаты
+            'M' => 12,  // Маош
+            'N' => 15,  // Паспорт
+            'O' => 20,  // Адрес
+            'P' => 15,  // Дата рождения
+            'Q' => 25,  // Комментарий
+            'R' => 20,  // Фото
         ];
     }
 }
