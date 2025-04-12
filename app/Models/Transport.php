@@ -20,7 +20,7 @@ class Transport extends Model
     protected $fillable = [
         'name',                         // Transport nomi (masalan, "Damas", "MAN yuk mashinasi")
         'state_number',                 // Avtomobil davlat raqami (masalan, "50 000 AAA")
-        'driver_full_name',            // Haydovchining to‘liq ismi
+        'driver_full_name',             // Haydovchining to‘liq ismi
         'phone',                        // Haydovchining asosiy telefon raqami
         'phone_2',                      // Qo‘shimcha telefon raqami (ixtiyoriy)
         'capacity',                     // Yuk sig‘imi (masalan, tonna yoki boshqa birlik)
@@ -53,6 +53,15 @@ class Transport extends Model
         'insurance_expiry' => 'date',
         'inspection_expiry' => 'date',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function ($transport) {
+            if (auth()->check() && auth()->user()->employee) {
+                $transport->branch_id = auth()->user()->employee->branch_id;
+            }
+        });
+    }
 
     public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
