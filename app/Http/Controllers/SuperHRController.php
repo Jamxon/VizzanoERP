@@ -158,7 +158,7 @@ class SuperHRController extends Controller
 
     }
 
-    public function updateEmployees(Request $request, $id)
+    public function updateEmployees(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'name' => 'required|string',
@@ -439,6 +439,31 @@ class SuperHRController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['status' => 'error', 'message' => 'Bo‘limni yangilashda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function resetPassword($id): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $employee = Employee::findOrFail($id);
+
+            $user = User::findOrFail($employee->user_id);
+
+            $user->password = $this->hashPassword($employee->phone);
+
+            $user->save();
+
+            Log::add(
+                auth()->user()->id,
+                'Parol tiklandi',
+                'edit',
+                null,
+                $user
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Parol tiklandi'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Parolni tiklashda xatolik: ' . $e->getMessage()], 500);
         }
     }
 }
