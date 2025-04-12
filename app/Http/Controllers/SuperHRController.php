@@ -17,11 +17,11 @@ use Maatwebsite\Excel\Facades\Excel;
 class SuperHRController extends Controller
 {
 
-    public function exportToExcel(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
-    {
-        ini_set('memory_limit', '-1');
-        return Excel::download(new EmployeeExport($request), 'xodimlar.xlsx');
-    }
+//    public function exportToExcel(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
+//    {
+//        ini_set('memory_limit', '-1');
+//        return Excel::download(new EmployeeExport($request), 'xodimlar.xlsx');
+//    }
 
 
     public function getEmployees(Request $request): \Illuminate\Http\JsonResponse
