@@ -170,7 +170,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
 
     Route::get('roles', [SuperHRController::class, 'getRoles']);
 
-    Route::post('resetPassword{id}', [SuperHRController::class, 'resetPassword']);
+    Route::post('resetPassword/{id}', [SuperHRController::class, 'resetPassword']);
 
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
     Route::get('employees/{id}', [SuperHRController::class, 'showEmployee']);
