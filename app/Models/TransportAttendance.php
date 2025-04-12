@@ -25,14 +25,6 @@ class TransportAttendance extends Model
         'method',
     ];
 
-    protected $casts = [
-        'date' => 'date',
-        'attendance_type' => 'double',
-        'salary' => 'numeric',
-        'fuel_bonus' => 'numeric',
-        'method' => 'string',
-    ];
-
     public function transport(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Transport::class);
