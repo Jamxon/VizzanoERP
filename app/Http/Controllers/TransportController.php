@@ -8,7 +8,6 @@ use App\Models\Transport;
 use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class TransportController extends Controller
 {
@@ -17,7 +16,7 @@ class TransportController extends Controller
         try {
             $transports = Transport::where('branch_id', auth()->user()->employee->branch_id)
                 ->orderBy('id', 'desc')
-                ->paginate(10);
+                ->get();
 
             return (new TransportResourceCollection($transports))->response();
         } catch (\Exception $e) {
@@ -104,7 +103,7 @@ class TransportController extends Controller
                 'salary' => 'nullable|numeric',
                 'fuel_bonus' => 'nullable|numeric',
             ]);
-            
+
             $transport->update($data);
             Log::add(Auth::id(), 'Transport tahrirlandi', 'edit', $oldData, $transport);
 
