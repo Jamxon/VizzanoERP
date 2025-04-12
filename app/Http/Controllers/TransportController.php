@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TransportResource;
 use App\Http\Resources\TransportResourceCollection;
 use App\Models\Transport;
 use App\Models\Log;
@@ -66,8 +67,8 @@ class TransportController extends Controller
             $transport = Transport::where('id', $id)
                 ->where('branch_id', auth()->user()->employee->branch_id)
                 ->firstOrFail();
-            dd($transport);
-            return (new TransportResourceCollection($transport))->response();
+
+            return (new TransportResource($transport))->response();
         } catch (\Exception $e) {
             return response()->json(['error' => 'Ma\'lumot topilmadi'], 404);
         }
