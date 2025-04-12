@@ -40,10 +40,6 @@ class SuperHRController extends Controller
         $query = Employee::with('user.role', 'position') // role ham kerak bo'ladi endi
         ->where('branch_id', $user->employee->branch_id);
 
-        if (empty(array_filter($filters))) {
-            $query->where('status', 'working');
-        }
-
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
