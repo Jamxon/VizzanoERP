@@ -32,7 +32,8 @@ class Employee extends Model
         'salary',
         'birthday',
         'img',
-        'position_id'
+        'position_id',
+        'department_id'
     ];
 
     public function getImgAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
