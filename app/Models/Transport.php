@@ -15,6 +15,8 @@ class Transport extends Model
 {
     use HasFactory;
 
+    protected $table = 'transport';
+
     protected $fillable = [
         'name',                         // Transport nomi (masalan, "Damas", "MAN yuk mashinasi")
         'state_number',                 // Avtomobil davlat raqami (masalan, "50 000 AAA")
