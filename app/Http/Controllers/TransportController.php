@@ -62,9 +62,10 @@ class TransportController extends Controller
 
     public function show($id): \Illuminate\Http\JsonResponse
     {
-        dd($id);
         try {
-            $transport = Transport::findOrFail($id);
+            $transport = Transport::where('id', $id)
+                ->where('branch_id', auth()->user()->employee->branch_id)
+                ->firstOrFail();
             return (new TransportResourceCollection($transport))->response();
         } catch (\Exception $e) {
             return response()->json(['error' => 'Ma\'lumot topilmadi'], 404);
