@@ -34,7 +34,8 @@ class TransportController extends Controller
             'phone_2' => 'nullable|string',
             'capacity' => 'required|numeric',
             'branch_id' => 'required|exists:branches,id',
-            'region_id' => 'required|exists:routes,id',
+            'region_id' => 'nullable|exists:regions,id',
+            'region_name' => 'nullable|string',
             'is_active' => 'boolean',
             'vin_number' => 'nullable|string',
             'tech_passport_number' => 'nullable|string',
@@ -52,9 +53,23 @@ class TransportController extends Controller
         ]);
 
         try {
+            // Agar region_id yo‘q bo‘lsa, region_name orqali yangi Region yaratamiz
+            if (empty($data['region_id']) && !empty($data['region_name'])) {
+                $region = \App\Models\Region::firstOrCreate(
+                    ['name' => $data['region_name']],
+                    ['branch_id' => auth()->user()->employee->branch_id]
+                );
+                $data['region_id'] = $region->id;
+            }
+
+            unset($data['region_name']); // region_name kerak emas modelga
+
             $transport = Transport::create($data);
+
             Log::add(Auth::id(), 'Transport qo‘shildi', 'create', null, $transport);
+
             return response()->json($transport, 201);
+
         } catch (\Exception $e) {
             return response()->json(['error' => 'Saqlashda xatolik yuz berdi'], 500);
         }
