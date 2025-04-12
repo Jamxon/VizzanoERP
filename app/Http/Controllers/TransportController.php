@@ -77,6 +77,8 @@ class TransportController extends Controller
     public function update(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         try {
+
+            dd($request->all());
             $transport = Transport::findOrFail($id);
             $oldData = $transport->toArray();
 
