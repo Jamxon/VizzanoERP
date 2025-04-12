@@ -24,10 +24,6 @@ class EmployeeExport implements FromView
         $query = Employee::with('user.role', 'position', 'group', 'department')
             ->where('branch_id', $user->employee->branch_id);
 
-        if (empty(array_filter($filters))) {
-            $query->where('status', 'working');
-        }
-
         if (!empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
