@@ -75,7 +75,7 @@
             <td>
                 {{ $employee->img ?? "ssss" }}
                 @if($employee->img)
-                    <img src="{{ $employee->img }}" alt="Фото">
+                    <img src="{{ asset('storage/'.$employee->img) }}" alt="Фото">
                 @endif
             </td>
         </tr>
