@@ -3,29 +3,31 @@
 namespace App\Exports;
 
 use App\Models\Employee;
-use Illuminate\Contracts\View\View;
-use Maatwebsite\Excel\Concerns\FromView;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class EmployeeExport implements FromView
+class EmployeeExport implements FromCollection, WithHeadings, WithMapping
 {
     protected Request $request;
+    protected $employees;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
     }
 
-    public function view(): View
+    public function collection(): \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|array
     {
         $filters = $this->request->only(['search', 'department_id', 'group_id', 'status', 'role_id']);
         $user = auth()->user();
 
-        $query = Employee::with('user.role', 'position', 'group', 'department')
+        $query = Employee::with(['user.role', 'position', 'group', 'department'])
             ->where('branch_id', $user->employee->branch_id);
 
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
+        if ($search = $filters['search'] ?? null) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                     ->orWhere('phone', 'like', "%$search%")
@@ -37,17 +39,44 @@ class EmployeeExport implements FromView
             });
         }
 
-        $query->when($filters['department_id'] ?? false, fn($q) => $q->where('department_id', $filters['department_id']))
-            ->when($filters['group_id'] ?? false, fn($q) => $q->where('group_id', $filters['group_id']))
-            ->when($filters['status'] ?? false, fn($q) => $q->where('status', $filters['status']))
-            ->when($filters['role_id'] ?? false, function ($q) use ($filters) {
-                $q->whereHas('user', fn($q) => $q->where('role_id', $filters['role_id']));
-            });
+        $query->when($filters['department_id'] ?? null, fn($q, $val) => $q->where('department_id', $val))
+            ->when($filters['group_id'] ?? null, fn($q, $val) => $q->where('group_id', $val))
+            ->when($filters['status'] ?? null, fn($q, $val) => $q->where('status', $val))
+            ->when($filters['role_id'] ?? null, fn($q, $val) => $q->whereHas('user', fn($q) => $q->where('role_id', $val)));
 
-        $employees = $query->orderByDesc('updated_at')->get();
+        return $this->employees = $query->latest('updated_at')->get();
+    }
 
-        return view('exports.employees', [
-            'employees' => $employees
-        ]);
+    public function headings(): array
+    {
+        return [
+            'ID', 'ФИО', 'Логин', 'Разрешение', 'Телефон', 'Группа', 'Отдел', 'Ишга келган сана',
+            'Статус', 'Позиция', 'Тип', 'Тип оплаты', 'Маош', 'Паспорт', 'Адрес', 'Дата рождения',
+            'Комментарий', 'Фото',
+        ];
+    }
+
+    public function map($employee): array
+    {
+        return [
+            $employee->id,
+            $employee->name,
+            $employee->user->username ?? '',
+            $employee->user->role->description ?? '',
+            $employee->phone,
+            $employee->group->name ?? '',
+            $employee->department->name ?? '',
+            $employee->hiring_date,
+            $employee->status,
+            $employee->position->name ?? '',
+            $employee->type,
+            $employee->payment_type,
+            $employee->salary,
+            $employee->passport_number,
+            $employee->address,
+            $employee->birthday,
+            $employee->comment,
+            $employee->img ? asset('storage/' . Str::after($employee->img, 'storage/')) : '',
+        ];
     }
 }
