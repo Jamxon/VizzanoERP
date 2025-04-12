@@ -189,8 +189,6 @@ class SuperHRController extends Controller
                 $img = null;
             }
 
-            return $request->department_id;
-
             $employee = Employee::findOrFail($id);
             $oldData = $employee->toArray();
             $employee->update([
