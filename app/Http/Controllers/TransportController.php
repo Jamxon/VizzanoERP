@@ -17,7 +17,8 @@ class TransportController extends Controller
             $transports = Transport::where('branch_id', auth()->user()->employee->branch_id)
                 ->orderBy('id', 'desc')
                 ->get();
-            return (new TransportResourceCollection($transports))->response();
+            $resource = TransportResource::collection($transports);
+            return response()->json($resource);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Ma\'lumotlarni olishda xatolik yuz berdi'], 500);
         }
