@@ -1,4 +1,7 @@
 <html>
+@php
+    use Illuminate\Support\Str;
+@endphp
 <head>
     <meta charset="UTF-8">
     <style>
@@ -37,12 +40,12 @@
         <th>Телефон</th>
         <th>Группа</th>
         <th>Отдел</th>
-        <th>Дата найма</th>
+        <th>Ишга келган сана</th>
         <th>Статус</th>
         <th>Позиция</th>
         <th>Тип</th>
         <th>Тип оплаты</th>
-        <th>Оклад</th>
+        <th>Маош</th>
         <th>Паспорт</th>
         <th>Адрес</th>
         <th>Дата рождения</th>
@@ -73,10 +76,14 @@
             <td>{{ $employee->birthday }}</td>
             <td>{{ $employee->comment }}</td>
             <td>
-                {{ $employee->img ?? "ssss" }}
+                @php
+                    $imgPath = Str::after($employee->img, 'https://api.vizzano-apparel.uz/storage/');
+                @endphp
+
                 @if($employee->img)
-                    <img src="{{ asset('storage/'.$employee->img) }}" alt="Фото">
+                    <img src="{{ asset('storage/' . $imgPath) }}" alt="Фото">
                 @endif
+
             </td>
         </tr>
     @endforeach
