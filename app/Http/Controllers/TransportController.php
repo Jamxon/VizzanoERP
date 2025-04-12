@@ -62,6 +62,7 @@ class TransportController extends Controller
 
     public function show($id): \Illuminate\Http\JsonResponse
     {
+        dd($id);
         try {
             $transport = Transport::findOrFail($id);
             return (new TransportResourceCollection($transport))->response();
