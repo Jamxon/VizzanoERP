@@ -66,6 +66,7 @@ class TransportController extends Controller
             $transport = Transport::where('id', $id)
                 ->where('branch_id', auth()->user()->employee->branch_id)
                 ->firstOrFail();
+            dd($transport);
             return (new TransportResourceCollection($transport))->response();
         } catch (\Exception $e) {
             return response()->json(['error' => 'Ma\'lumot topilmadi'], 404);
