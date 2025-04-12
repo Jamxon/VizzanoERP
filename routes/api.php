@@ -20,12 +20,19 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\SuperHRController;
 use App\Http\Controllers\TechnologController;
+use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VizzanoReportTvController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('transport')->middleware('role:transport')->group(function () {
+    Route::get('transports', [TransportController::class, 'index']);
+    Route::post('transports', [TransportController::class, 'store']);
+    Route::patch('transports/{id}', [TransportController::class, 'update']);
+});
 
 Route::prefix('packageMaster')->middleware('role:packageMaster')->group(function () {
     Route::get('orders', [PackageMasterController::class, 'getOrders']);
