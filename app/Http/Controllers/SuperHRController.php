@@ -7,6 +7,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\MainDepartment;
+use App\Models\Region;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,12 +18,17 @@ use Maatwebsite\Excel\Facades\Excel;
 class SuperHRController extends Controller
 {
 
+    public function getRegions(): \Illuminate\Http\JsonResponse
+    {
+        $regions = Region::all();
+        return response()->json($regions);
+    }
+
     public function exportToExcel(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {
         ini_set('memory_limit', '-1');
         return Excel::download(new EmployeeExport($request), 'xodimlar.xlsx');
     }
-
 
     public function getEmployees(Request $request): \Illuminate\Http\JsonResponse
     {

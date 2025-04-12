@@ -180,6 +180,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::post('departments', [SuperHRController::class, 'storeDepartments']);
     Route::patch('departments/{department}', [SuperHRController::class, 'updateDepartments']);
+    Route::get('regions', [SuperHRController::class, 'getRegions']);
 });
 
 Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {
