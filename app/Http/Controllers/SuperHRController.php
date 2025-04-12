@@ -158,8 +158,10 @@ class SuperHRController extends Controller
 
     }
 
-    public function updateEmployees(Request $request, $id): \Illuminate\Http\JsonResponse
+    public function updateEmployees(Request $request, $id)
     {
+        return $request->all();
+
         $request->validate([
             'name' => 'required|string',
             'phone' => 'required|string',
