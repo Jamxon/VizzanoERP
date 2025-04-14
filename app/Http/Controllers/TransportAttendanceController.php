@@ -16,28 +16,24 @@ class TransportAttendanceController extends Controller
     public function index(Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
     {
         try {
-            // Hozirgi oy va yilni olish
             $currentYear = now()->year;
             $currentMonth = now()->month;
 
-            // Agar 'date' parametri mavjud bo'lsa, shunga mos ravishda filter qilish
             if ($request->has('date')) {
                 $date = \Carbon\Carbon::parse($request->date);
-                $attendances = TransportAttendance::with('transport') // transport ma'lumotlarini ham olish
+                $attendances = TransportAttendance::with('transport')
                 ->whereYear('date', $date->year)
                     ->whereMonth('date', $date->month)
                     ->orderBy('date', 'desc')
                     ->paginate(10);
             } else {
-                // Agar 'date' parametri bo'lmasa, joriy oy va yilga mos ma'lumotlarni olish
-                $attendances = TransportAttendance::with('transport') // transport ma'lumotlarini ham olish
+                $attendances = TransportAttendance::with('transport')
                 ->whereYear('date', $currentYear)
                     ->whereMonth('date', $currentMonth)
                     ->orderBy('date', 'desc')
                     ->get();
             }
 
-            // Resurs yordamida chiroyli ko'rinishda natija qaytarish
             return TransportAttendanceResource::collection($attendances);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Davomatlarni olishda xatolik yuz berdi: ' . $e->getMessage()], 500);
