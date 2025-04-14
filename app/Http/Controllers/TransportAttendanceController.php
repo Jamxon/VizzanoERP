@@ -34,7 +34,7 @@ class TransportAttendanceController extends Controller
                 ->whereYear('date', $currentYear)
                     ->whereMonth('date', $currentMonth)
                     ->orderBy('date', 'desc')
-                    ->paginate(10);
+                    ->get();
             }
 
             // Resurs yordamida chiroyli ko'rinishda natija qaytarish
