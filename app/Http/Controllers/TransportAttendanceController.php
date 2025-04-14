@@ -522,7 +522,7 @@ class TransportAttendanceController extends Controller
             'transport_id' => 'required|exists:transport,id',
             'date' => 'required|date',
             'type' => 'required|in:advance,salary',
-            'amount' => 'required|numeric|min:0.01',
+            'amount' => 'required|numeric|min:0',
         ]);
 
         $date = Carbon::parse($validated['date']);
