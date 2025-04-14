@@ -34,7 +34,7 @@ class TransportController extends Controller
             'phone_2' => 'nullable|string',
             'capacity' => 'required|numeric',
             'branch_id' => 'required|exists:branches,id',
-            'region_id' => 'nullable|exists:regions,id',
+            'region_id' => 'nullable|exists:routes,id',
             'region_name' => 'nullable|string',
             'is_active' => 'boolean',
             'vin_number' => 'nullable|string',
