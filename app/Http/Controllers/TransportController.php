@@ -124,7 +124,6 @@ class TransportController extends Controller
                 'phone' => 'sometimes|string',
                 'phone_2' => 'nullable|string',
                 'capacity' => 'sometimes|numeric',
-                'branch_id' => 'sometimes|exists:branches,id',
                 'region_id' => 'sometimes|exists:routes,id',
                 'is_active' => 'boolean',
                 'vin_number' => 'nullable|string',
@@ -143,6 +142,7 @@ class TransportController extends Controller
             ]);
 
             $transport->update($data);
+
             Log::add(Auth::id(), 'Transport tahrirlandi', 'edit', $oldData, $transport);
 
             return response()->json($transport);
