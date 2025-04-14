@@ -57,7 +57,6 @@ class TransportController extends Controller
             if (empty($data['region_id']) && !empty($data['region_name'])) {
                 $region = \App\Models\Region::firstOrCreate(
                     ['name' => $data['region_name']],
-                    ['branch_id' => auth()->user()->employee->branch_id]
                 );
                 $data['region_id'] = $region->id;
             }
