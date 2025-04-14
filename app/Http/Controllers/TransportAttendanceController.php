@@ -138,7 +138,7 @@ class TransportAttendanceController extends Controller
 
     public function update(Request $request, $id): \Illuminate\Http\JsonResponse
     {
-        dd($id);
+        dd($request->all());
         $attendance = TransportAttendance::findOrFail($id);
 
         $date = Carbon::parse($request->date ?? $attendance->date);
