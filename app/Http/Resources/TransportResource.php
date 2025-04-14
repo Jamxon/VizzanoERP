@@ -49,7 +49,6 @@ class TransportResource extends JsonResource
             'balance' => $this->balance ?? 0,
             'distance' => $this->distance ?? 0,
 
-            // 🎯 Filter qilingan payment lar
             'payment' => $this->whenLoaded('payments', function () use ($currentYear, $currentMonth) {
                 return $this->payments
                     ->where('date', '>=', Carbon::create($currentYear, $currentMonth, 1)->startOfDay())

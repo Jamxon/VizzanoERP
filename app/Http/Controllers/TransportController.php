@@ -7,22 +7,40 @@ use App\Http\Resources\TransportResourceCollection;
 use App\Models\Transport;
 use App\Models\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class TransportController extends Controller
 {
-    public function index(): \Illuminate\Http\JsonResponse
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $transports = Transport::where('branch_id', auth()->user()->employee->branch_id)
-                ->orderBy('id', 'desc')
-                ->get();
+            $query = Transport::where('branch_id', auth()->user()->employee->branch_id);
+
+            if ($request->has('date')) {
+                try {
+                    $date = Carbon::createFromFormat('Y-m', $request->input('date'));
+                    $year = $date->year;
+                    $month = $date->month;
+
+                    $query->with(['payments' => function ($q) use ($year, $month) {
+                        $q->whereDate('date', '>=', Carbon::create($year, $month, 1)->startOfDay())
+                            ->whereDate('date', '<=', Carbon::create($year, $month, 1)->endOfMonth());
+                    }]);
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Noto‘g‘ri sana formati. To‘g‘ri format: YYYY-MM'], 422);
+                }
+            }
+
+            $transports = $query->orderBy('id', 'desc')->get();
             $resource = TransportResource::collection($transports);
+
             return response()->json($resource);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Ma\'lumotlarni olishda xatolik yuz berdi'], 500);
         }
     }
+
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
