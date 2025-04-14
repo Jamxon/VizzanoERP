@@ -82,17 +82,17 @@ class TransportAttendanceController extends Controller
 
             $transport = Transport::where('id', $request->transport_id)->firstOrFail();
 
+            $salary = $request->has('salary') ? $request->salary : $transport->salary;
+            $fuelBonus = $request->has('fuel_bonus') ? $request->fuel_bonus : $transport->fuel_bonus;
+
             $attendance = TransportAttendance::create([
                 'transport_id' => $transport->id,
                 'date' => $date->toDateString(),
-                'fuel_bonus' => $transport->fuel_bonus,
-                'salary' => $transport->salary,
-                'method' => '',
+                'fuel_bonus' => $fuelBonus,
+                'salary' => $salary,
                 'attendance_type' => $request->attendance_type,
             ]);
 
-            $salary = $attendance->salary ?? 0;
-            $fuelBonus = $attendance->fuel_bonus ?? 0;
             $increment = ($salary + $fuelBonus) * $attendance->attendance_type;
 
             $oldBalance = $transport->balance;
