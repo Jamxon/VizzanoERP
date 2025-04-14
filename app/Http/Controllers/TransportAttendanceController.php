@@ -118,7 +118,10 @@ class TransportAttendanceController extends Controller
                 ]
             );
 
-            return response()->json(['error' => 'Davomat qo\'shishda xatolik yuz berdi'], 500);
+            return response()->json([
+                'message' => 'Davomat qo\'shishda xatolik yuz berdi',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
