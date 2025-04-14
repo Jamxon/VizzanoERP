@@ -371,7 +371,6 @@ class TransportAttendanceController extends Controller
                     continue;
                 }
 
-                // Eski attendance bo‘lsa, ustidan yozamiz
                 $existing = TransportAttendance::where('transport_id', $transport->id)
                     ->whereDate('date', $date->toDateString())
                     ->first();
@@ -381,7 +380,6 @@ class TransportAttendanceController extends Controller
 
                 $increment = ($salary + $fuelBonus) * $request->attendance_type;
 
-                // Agar eski attendance bo‘lsa — balansni qaytarib olib tashlaymiz
                 if ($existing) {
                     $oldIncrement = ($existing->salary + $existing->fuel_bonus) * $existing->attendance_type;
                     $transport->balance -= $oldIncrement;
