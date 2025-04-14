@@ -94,7 +94,10 @@ class TransportController extends Controller
             return response()->json($transport, 201);
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Saqlashda xatolik yuz berdi'], 500);
+            return response()->json([
+                'message' => 'Saqlashda xatolik yuz berdi',
+                'error' => $e
+            ], 500);
         }
     }
 
