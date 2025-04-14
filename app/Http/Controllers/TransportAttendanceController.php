@@ -341,4 +341,101 @@ class TransportAttendanceController extends Controller
         ], 207); // 207 Multi-Status — ba'zilari muvaffaqiyatli, ba'zilari xatolik
     }
 
+    public function massStoreByDates(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'transport_id' => 'required|exists:transport,id',
+            'dates' => 'required|array',
+            'dates.*' => 'required|date',
+            'attendance_type' => 'required|in:0,0.5,1',
+            'salary' => 'nullable|numeric',
+            'fuel_bonus' => 'nullable|numeric',
+        ]);
+
+        $transport = Transport::findOrFail($request->transport_id);
+
+        $success = [];
+        $errors = [];
+
+        foreach ($request->dates as $rawDate) {
+            try {
+                $date = Carbon::parse($rawDate);
+                $year = $date->year;
+                $month = $date->month;
+
+                if (MonthlyClosure::isMonthClosed($year, $month)) {
+                    $errors[] = [
+                        'date' => $date->toDateString(),
+                        'error' => 'Oy yopilgan'
+                    ];
+                    continue;
+                }
+
+                // Eski attendance bo‘lsa, ustidan yozamiz
+                $existing = TransportAttendance::where('transport_id', $transport->id)
+                    ->whereDate('date', $date->toDateString())
+                    ->first();
+
+                $salary = $request->salary ?? $transport->salary;
+                $fuelBonus = $request->fuel_bonus ?? $transport->fuel_bonus;
+
+                $increment = ($salary + $fuelBonus) * $request->attendance_type;
+
+                // Agar eski attendance bo‘lsa — balansni qaytarib olib tashlaymiz
+                if ($existing) {
+                    $oldIncrement = ($existing->salary + $existing->fuel_bonus) * $existing->attendance_type;
+                    $transport->balance -= $oldIncrement;
+
+                    $existing->update([
+                        'attendance_type' => $request->attendance_type,
+                        'salary' => $salary,
+                        'fuel_bonus' => $fuelBonus,
+                    ]);
+
+                    $attendance = $existing;
+                    $logType = 'edit';
+                } else {
+                    $attendance = TransportAttendance::create([
+                        'transport_id' => $transport->id,
+                        'date' => $date->toDateString(),
+                        'fuel_bonus' => $fuelBonus,
+                        'salary' => $salary,
+                        'attendance_type' => $request->attendance_type,
+                    ]);
+
+                    $logType = 'create';
+                }
+
+                $oldBalance = $transport->balance;
+                $transport->balance += $increment;
+                $transport->save();
+
+                Log::add(
+                    Auth::id(),
+                    'Sana asosida davomat qo‘shildi',
+                    $logType,
+                    null,
+                    [
+                        'attendance' => $attendance,
+                        'balance_old' => $oldBalance,
+                        'balance_new' => $transport->balance,
+                    ]
+                );
+
+                $success[] = $attendance;
+
+            } catch (\Exception $e) {
+                $errors[] = [
+                    'date' => $rawDate,
+                    'error' => $e->getMessage(),
+                ];
+            }
+        }
+
+        return response()->json([
+            'message' => 'Jarayon yakunlandi',
+            'success_count' => count($success),
+            'errors' => $errors,
+        ]);
+    }
 }
