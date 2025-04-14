@@ -5,10 +5,16 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+use Carbon\Carbon;
+
 class TransportResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $currentDate = Carbon::now();
+        $currentYear = $currentDate->year;
+        $currentMonth = $currentDate->month;
+
         return [
             'id' => $this->id ?? null,
             'name' => $this->name ?? null,
@@ -26,7 +32,6 @@ class TransportResource extends JsonResource
             'year' => $this->year ?? null,
             'color' => $this->color ?? null,
 
-            // 🛠️ Formatted Dates
             'registration_date' => optional($this->registration_date)->format('Y-m-d'),
             'insurance_expiry' => optional($this->insurance_expiry)->format('Y-m-d'),
             'inspection_expiry' => optional($this->inspection_expiry)->format('Y-m-d'),
@@ -37,11 +42,17 @@ class TransportResource extends JsonResource
             'salary' => $this->salary ?? null,
             'fuel_bonus' => $this->fuel_bonus ?? null,
 
-            // ⏱️ Created at datetime format
             'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
-
             'balance' => $this->balance ?? 0,
             'distance' => $this->distance ?? 0,
+
+            // 🎯 Filter qilingan payment lar
+            'payment' => $this->whenLoaded('payment', function () use ($currentYear, $currentMonth) {
+                return $this->payment
+                    ->where('date', '>=', Carbon::create($currentYear, $currentMonth, 1)->startOfDay())
+                    ->where('date', '<=', Carbon::create($currentYear, $currentMonth, 1)->endOfMonth())
+                    ->values(); // indexni reset qilish
+            }),
         ];
     }
 }
