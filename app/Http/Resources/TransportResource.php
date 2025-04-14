@@ -25,15 +25,21 @@ class TransportResource extends JsonResource
             'engine_number' => $this->engine_number ?? null,
             'year' => $this->year ?? null,
             'color' => $this->color ?? null,
-            'registration_date' => $this->registration_date ?? null,
-            'insurance_expiry' => $this->insurance_expiry ?? null,
-            'inspection_expiry' => $this->inspection_expiry ?? null,
+
+            // 🛠️ Formatted Dates
+            'registration_date' => optional($this->registration_date)->format('Y-m-d'),
+            'insurance_expiry' => optional($this->insurance_expiry)->format('Y-m-d'),
+            'inspection_expiry' => optional($this->inspection_expiry)->format('Y-m-d'),
+
             'driver_passport_number' => $this->driver_passport_number ?? null,
             'driver_license_number' => $this->driver_license_number ?? null,
             'driver_experience_years' => $this->driver_experience_years ?? null,
             'salary' => $this->salary ?? null,
             'fuel_bonus' => $this->fuel_bonus ?? null,
+
+            // ⏱️ Created at datetime format
             'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
+
             'balance' => $this->balance ?? 0,
             'distance' => $this->distance ?? 0,
         ];
