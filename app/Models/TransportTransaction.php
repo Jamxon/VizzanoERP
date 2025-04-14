@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static create(array $array)
+ * @method static findOrFail(mixed $id)
  */
 class TransportTransaction extends Model
 {
