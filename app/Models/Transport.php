@@ -54,6 +54,10 @@ class Transport extends Model
         'inspection_expiry' => 'date',
     ];
 
+    public function setBranchIdAttribute(): void
+    {
+        $this->attributes['branch_id'] = auth()->user()->employee->baranch->id;
+    }
     protected static function booted(): void
     {
         static::creating(function ($transport) {
