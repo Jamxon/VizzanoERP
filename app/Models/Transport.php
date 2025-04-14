@@ -41,6 +41,7 @@ class Transport extends Model
         'salary',                       // Haydovchining kunlik maoshi
         'fuel_bonus',                   // Haydovchiga beriladigan yoqilg‘i bonusi
         'balance',                      // Transport balansidagi mablag‘ (default 0)
+        'distance'
     ];
 
     /**
@@ -53,19 +54,6 @@ class Transport extends Model
         'insurance_expiry' => 'date',
         'inspection_expiry' => 'date',
     ];
-
-    public function setBranchIdAttribute(): void
-    {
-        $this->attributes['branch_id'] = auth()->user()->employee->baranch->id;
-    }
-    protected static function booted(): void
-    {
-        static::creating(function ($transport) {
-            if (auth()->check() && auth()->user()->employee) {
-                $transport->branch_id = auth()->user()->employee->branch_id;
-            }
-        });
-    }
 
     public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {

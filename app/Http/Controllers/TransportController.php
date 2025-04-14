@@ -50,6 +50,7 @@ class TransportController extends Controller
             'driver_experience_years' => 'nullable|integer',
             'salary' => 'nullable|numeric',
             'fuel_bonus' => 'nullable|numeric',
+            'distance' => 'nullable|numeric',
         ]);
 
         try {
@@ -63,7 +64,31 @@ class TransportController extends Controller
 
             unset($data['region_name']); // region_name kerak emas modelga
 
-            $transport = Transport::create($data);
+            $transport = Transport::create([
+                'name' => $data['name'],
+                'state_number' => $data['state_number'],
+                'driver_full_name' => $data['driver_full_name'],
+                'phone' => $data['phone'],
+                'phone_2' => $data['phone_2'],
+                'capacity' => $data['capacity'],
+                'branch_id' => auth()->user()->employee->branch_id,
+                'region_id' => $data['region_id'],
+                'is_active' => $data['is_active'],
+                'vin_number' => $data['vin_number'],
+                'tech_passport_number' => $data['tech_passport_number'],
+                'engine_number' => $data['engine_number'],
+                'year' => $data['year'],
+                'color' => $data['color'],
+                'registration_date' => $data['registration_date'],
+                'insurance_expiry' => $data['insurance_expiry'],
+                'inspection_expiry' => $data['inspection_expiry'],
+                'driver_passport_number' => $data['driver_passport_number'],
+                'driver_license_number' => $data['driver_license_number'],
+                'driver_experience_years' => $data['driver_experience_years'],
+                'salary' => $data['salary'],
+                'fuel_bonus' => $data['fuel_bonus'],
+                'distance' => $data['distance'],
+            ]);
 
             Log::add(Auth::id(), 'Transport qo‘shildi', 'create', null, $transport);
 
