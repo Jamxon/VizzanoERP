@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\TransportAttendanceResource;
+use App\Models\Log;
 use App\Models\MonthlyClosure;
+use App\Models\Transport;
 use App\Models\TransportAttendance;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class TransportAttendanceController extends Controller
 {
@@ -42,14 +46,26 @@ class TransportAttendanceController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        $year = date('Y', strtotime($request->date));
-        $month = date('m', strtotime($request->date));
+        $date = Carbon::parse($request->date);
+        $year = $date->year;
+        $month = $date->month;
 
         if (MonthlyClosure::isMonthClosed($year, $month)) {
+            Log::add(
+                Auth::id(),
+                'Oy yopilgan oyga davomat qo‘shishga urinish',
+                'error',
+                null,
+                [
+                    'transport_id' => $request->transport_id,
+                    'date' => $request->date
+                ]
+            );
+
             return response()->json(['error' => 'Bu oyga davomatni qo\'shish mumkin emas. Oyning yopilishi amalga oshirilgan.'], 400);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'transport_id' => 'required|exists:transports,id',
             'date' => 'required|date',
             'attendance_type' => 'required|in:0,0.5,1',
@@ -58,9 +74,50 @@ class TransportAttendanceController extends Controller
         ]);
 
         try {
-            $attendance = TransportAttendance::create($request->all());
-            return response()->json(['message' => 'Davomat muvaffaqiyatli qo\'shildi', 'data' => $attendance], 201);
+            $attendance = TransportAttendance::create($request->only([
+                'transport_id', 'date', 'attendance_type', 'salary', 'fuel_bonus'
+            ]));
+
+            $transport = Transport::where('id', $attendance->transport_id)->firstOrFail();
+
+            $salary = $attendance->salary ?? 0;
+            $fuelBonus = $attendance->fuel_bonus ?? 0;
+            $increment = ($salary + $transport->fuel_bonus) * $attendance->attendance_type;
+
+            $oldBalance = $transport->balance;
+            $transport->balance += $increment;
+            $transport->save();
+
+            Log::add(
+                Auth::id(),
+                'Davomat qo‘shildi',
+                'create',
+                null,
+                [
+                    'attendance' => $attendance,
+                    'balance_old' => $oldBalance,
+                    'balance_new' => $transport->balance,
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Davomat muvaffaqiyatli qo\'shildi',
+                'data' => $attendance
+            ], 201);
+
         } catch (\Exception $e) {
+            Log::add(
+                Auth::id(),
+                'Davomat qo‘shishda xatolik',
+                'error',
+                null,
+                [
+                    'message' => $e->getMessage(),
+                    'transport_id' => $request->transport_id,
+                    'date' => $request->date
+                ]
+            );
+
             return response()->json(['error' => 'Davomat qo\'shishda xatolik yuz berdi'], 500);
         }
     }
