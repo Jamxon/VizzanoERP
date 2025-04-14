@@ -554,8 +554,6 @@ class TransportAttendanceController extends Controller
                     'amount' => $validated['amount'],
                 ]);
 
-                // ✅ Yangi miqdorni balansga qo‘llash
-                if ($validated['type'] === 'advance') {
                     if ($transport->balance < $validated['amount']) {
                         return response()->json([
                             'error' => 'Balansda yetarli mablag‘ yo‘q'
@@ -563,14 +561,14 @@ class TransportAttendanceController extends Controller
                     }
 
                     $transport->balance -= $validated['amount'];
-                }
+
 
                 $transport->save();
 
                 Log::add(
                     Auth::id(),
                     'Tranzaksiya yangilandi',
-                    'update',
+                    'edit',
                     null,
                     [
                         'transaction' => $transaction,
