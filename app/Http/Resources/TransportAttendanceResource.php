@@ -5,6 +5,15 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @property mixed $attendance_type
+ * @property mixed $salary
+ * @property mixed $date
+ * @property mixed $id
+ * @property mixed $fuel_bonus
+ * @property mixed $method
+ * @property mixed $transport
+ */
 class TransportAttendanceResource extends JsonResource
 {
     /**
