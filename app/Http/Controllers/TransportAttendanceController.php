@@ -67,7 +67,6 @@ class TransportAttendanceController extends Controller
             'attendance_type' => 'required|in:0,0.5,1',
         ]);
 
-        // 🚨 Tekshiruv: Shu kunga allaqachon attendance yozilganmi?
         $existing = TransportAttendance::where('transport_id', $request->transport_id)
             ->whereDate('date', $date->toDateString())
             ->first();
@@ -75,7 +74,7 @@ class TransportAttendanceController extends Controller
         if ($existing) {
             return response()->json([
                 'error' => 'Bu mashina uchun bu kunga allaqachon davomat yozilgan.'
-            ], 409); // 409 Conflict
+            ], 409);
         }
 
         try {
@@ -165,7 +164,6 @@ class TransportAttendanceController extends Controller
         $newTransportId = $request->transport_id;
         $newDate = Carbon::parse($request->date)->toDateString();
 
-        // ❗ Boshqa davomat yozilganmi shu transport va sana uchun (shu iddan tashqari)?
         $exists = TransportAttendance::where('transport_id', $newTransportId)
             ->whereDate('date', $newDate)
             ->where('id', '!=', $attendance->id)
@@ -174,7 +172,7 @@ class TransportAttendanceController extends Controller
         if ($exists) {
             return response()->json([
                 'error' => 'Bu mashina uchun bu kunga allaqachon davomat yozilgan.'
-            ], 409); // 409 Conflict
+            ], 409);
         }
 
         try {
