@@ -448,6 +448,16 @@ class TransportAttendanceController extends Controller
             'amount' => 'required|numeric|min:0.01',
         ]);
 
+        $date = Carbon::parse($validated['date']);
+        $year = $date->year;
+        $month = $date->month;
+
+        if (MonthlyClosure::isMonthClosed($year, $month)) {
+            return response()->json([
+                'error' => 'Ushbu sana oyi yopilgan. Tranzaksiya kiritish mumkin emas.',
+            ], 400);
+        }
+
         $transport = Transport::findOrFail($validated['transport_id']);
         $oldBalance = $transport->balance;
 
@@ -466,9 +476,8 @@ class TransportAttendanceController extends Controller
                 'amount' => $validated['amount'],
             ]);
 
-                $transport->balance -= $validated['amount'];
-                $transport->save();
-
+            $transport->balance -= $validated['amount'];
+            $transport->save();
 
             Log::add(
                 Auth::id(),
@@ -506,4 +515,93 @@ class TransportAttendanceController extends Controller
             ], 500);
         }
     }
+
+    public function updateTransaction(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'transport_id' => 'required|exists:transport,id',
+            'date' => 'required|date',
+            'type' => 'required|in:advance,salary',
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        $date = Carbon::parse($validated['date']);
+        $year = $date->year;
+        $month = $date->month;
+
+        if (MonthlyClosure::isMonthClosed($year, $month)) {
+            return response()->json([
+                'error' => 'Ushbu sana oyi yopilgan. Tranzaksiya o‘zgartirib bo‘lmaydi.',
+            ], 400);
+        }
+
+        $transport = Transport::findOrFail($validated['transport_id']);
+        DB::beginTransaction();
+
+            try {
+                $transaction = TransportTransaction::findOrFail($id);
+
+                // 🔁 Avvalgi miqdorni balansdan qaytarib olish
+                if ($transaction->type === 'advance') {
+                    $transport->balance += $transaction->amount;
+                }
+
+                // 🔄 Yangilash
+                $transaction->update([
+                    'transport_id' => $transport->id,
+                    'date' => $validated['date'],
+                    'type' => $validated['type'],
+                    'amount' => $validated['amount'],
+                ]);
+
+                // ✅ Yangi miqdorni balansga qo‘llash
+                if ($validated['type'] === 'advance') {
+                    if ($transport->balance < $validated['amount']) {
+                        return response()->json([
+                            'error' => 'Balansda yetarli mablag‘ yo‘q'
+                        ], 400);
+                    }
+
+                    $transport->balance -= $validated['amount'];
+                }
+
+                $transport->save();
+
+                Log::add(
+                    Auth::id(),
+                    'Tranzaksiya yangilandi',
+                    'update',
+                    null,
+                    [
+                        'transaction' => $transaction,
+                        'balance_new' => $transport->balance,
+                    ]
+                );
+
+                DB::commit();
+                return response()->json([
+                    'message' => 'Tranzaksiya muvaffaqiyatli yangilandi',
+                    'data' => $transaction
+                ]);
+            } catch (\Exception $e) {
+                DB::rollBack();
+
+                Log::add(
+                    Auth::id(),
+                    'Tranzaksiya xatosi',
+                    'error',
+                    null,
+                    [
+                        'message' => $e->getMessage(),
+                        'request' => $validated
+                    ]
+                );
+
+                return response()->json([
+                    'error' => 'Tranzaksiya amalga oshmadi',
+                    'message' => $e->getMessage()
+                ], 500);
+            }
+    }
+
 }
