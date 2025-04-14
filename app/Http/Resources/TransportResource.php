@@ -7,6 +7,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 use Carbon\Carbon;
 
+/**
+ * @property mixed $payments
+ */
 class TransportResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -47,11 +50,11 @@ class TransportResource extends JsonResource
             'distance' => $this->distance ?? 0,
 
             // 🎯 Filter qilingan payment lar
-            'payment' => $this->whenLoaded('payment', function () use ($currentYear, $currentMonth) {
-                return $this->payment
+            'payment' => $this->whenLoaded('payments', function () use ($currentYear, $currentMonth) {
+                return $this->payments
                     ->where('date', '>=', Carbon::create($currentYear, $currentMonth, 1)->startOfDay())
                     ->where('date', '<=', Carbon::create($currentYear, $currentMonth, 1)->endOfMonth())
-                    ->values(); // indexni reset qilish
+                    ->values();
             }),
         ];
     }
