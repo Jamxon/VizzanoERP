@@ -40,6 +40,7 @@ Route::prefix('transport')->middleware('role:transport')->group(function () {
     Route::patch('attendances/{id}', [TransportAttendanceController::class, 'update']);
     Route::post('massStore', [TransportAttendanceController::class, 'massStore']);
     Route::post('massStoreByDates', [TransportAttendanceController::class, 'massStoreByDates']);
+    Route::post('payment', [TransportAttendanceController::class, 'storeTransaction']);
     Route::get('regions', [SuperHRController::class, 'getRegions']);
 
 });

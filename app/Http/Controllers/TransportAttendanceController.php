@@ -7,9 +7,11 @@ use App\Models\Log;
 use App\Models\MonthlyClosure;
 use App\Models\Transport;
 use App\Models\TransportAttendance;
+use App\Models\TransportTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TransportAttendanceController extends Controller
 {
@@ -435,5 +437,73 @@ class TransportAttendanceController extends Controller
             'success_count' => count($success),
             'errors' => $errors,
         ]);
+    }
+
+    public function storeTransaction(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'transport_id' => 'required|exists:transport,id',
+            'date' => 'required|date',
+            'type' => 'required|in:advance,salary',
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        $transport = Transport::findOrFail($validated['transport_id']);
+        $oldBalance = $transport->balance;
+
+        if ($validated['type'] === 'advance' && $oldBalance < $validated['amount']) {
+            return response()->json([
+                'error' => 'Balansda yetarli mablag‘ yo‘q'
+            ], 400);
+        }
+
+        DB::beginTransaction();
+        try {
+            $transaction = TransportTransaction::create([
+                'transport_id' => $transport->id,
+                'date' => $validated['date'],
+                'type' => $validated['type'],
+                'amount' => $validated['amount'],
+            ]);
+
+                $transport->balance -= $validated['amount'];
+                $transport->save();
+
+
+            Log::add(
+                Auth::id(),
+                $validated['type'] === 'advance' ? 'Avans berildi' : 'Oylik yozildi',
+                'create',
+                null,
+                [
+                    'transaction' => $transaction,
+                    'balance_old' => $oldBalance,
+                    'balance_new' => $transport->balance,
+                ]
+            );
+
+            DB::commit();
+            return response()->json([
+                'message' => $validated['type'] === 'advance' ? 'Avans muvaffaqiyatli berildi' : 'Oylik yozildi',
+                'data' => $transaction
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::add(
+                Auth::id(),
+                'Transport tranzaksiya xatosi',
+                'error',
+                null,
+                [
+                    'message' => $e->getMessage(),
+                    'request' => $validated
+                ]
+            );
+            return response()->json([
+                'error' => 'Tranzaksiya amalga oshmadi',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
