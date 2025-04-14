@@ -36,6 +36,7 @@ Route::prefix('transport')->middleware('role:transport')->group(function () {
     Route::patch('transports/{id}', [TransportController::class, 'update']);
 
     Route::get('attendances', [TransportAttendanceController::class, 'index']);
+    Route::post('attendances', [TransportAttendanceController::class, 'store']);
     Route::get('regions', [SuperHRController::class, 'getRegions']);
 
 });
