@@ -237,4 +237,108 @@ class TransportAttendanceController extends Controller
             ], 500);
         }
     }
+
+    public function massStore(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'transport_ids' => 'required|array',
+            'transport_ids.*' => 'exists:transport,id',
+            'date' => 'required|date',
+            'attendance_type' => 'required|in:0,0.5,1',
+        ]);
+
+        $date = Carbon::parse($request->date);
+        $year = $date->year;
+        $month = $date->month;
+
+        if (MonthlyClosure::isMonthClosed($year, $month)) {
+            Log::add(
+                Auth::id(),
+                'Oy yopilgan oyga ommaviy davomat qo‘shishga urinish',
+                'error',
+                null,
+                [
+                    'transport_ids' => $request->transport_ids,
+                    'date' => $request->date
+                ]
+            );
+
+            return response()->json(['error' => 'Bu oyga davomatni qo\'shish mumkin emas. Oyning yopilishi amalga oshirilgan.'], 400);
+        }
+
+        $created = [];
+        $errors = [];
+
+        foreach ($request->transport_ids as $transportId) {
+            try {
+                $transport = Transport::findOrFail($transportId);
+
+                $salary = $transport->salary;
+                $fuelBonus = $transport->fuel_bonus;
+
+                // Agar mavjud bo‘lsa, eski yozuvni o‘chir
+                $existing = TransportAttendance::where('transport_id', $transportId)
+                    ->whereDate('date', $date->toDateString())
+                    ->first();
+
+                if ($existing) {
+                    // Eski balansni teskari hisobga olish
+                    $decrement = ($existing->salary + $existing->fuel_bonus) * $existing->attendance_type;
+                    $transport->balance -= $decrement;
+                    $existing->delete();
+                }
+
+                // Yangi davomat yaratish
+                $attendance = TransportAttendance::create([
+                    'transport_id' => $transportId,
+                    'date' => $date->toDateString(),
+                    'fuel_bonus' => $fuelBonus,
+                    'salary' => $salary,
+                    'attendance_type' => $request->attendance_type,
+                ]);
+
+                $increment = ($salary + $fuelBonus) * $attendance->attendance_type;
+                $transport->balance += $increment;
+                $transport->save();
+
+                $created[] = $attendance;
+
+                Log::add(
+                    Auth::id(),
+                    'Ommaviy davomat yozildi (yoki yangilandi)',
+                    'create',
+                    null,
+                    [
+                        'transport_id' => $transportId,
+                        'attendance' => $attendance,
+                        'balance' => $transport->balance,
+                    ]
+                );
+
+            } catch (\Exception $e) {
+                $errors[] = [
+                    'transport_id' => $transportId,
+                    'error' => $e->getMessage(),
+                ];
+
+                Log::add(
+                    Auth::id(),
+                    'Ommaviy davomatda xatolik',
+                    'error',
+                    null,
+                    [
+                        'transport_id' => $transportId,
+                        'message' => $e->getMessage()
+                    ]
+                );
+            }
+        }
+
+        return response()->json([
+            'message' => 'Ommaviy davomat yakunlandi',
+            'created' => $created,
+            'errors' => $errors
+        ], 207); // 207 Multi-Status — ba'zilari muvaffaqiyatli, ba'zilari xatolik
+    }
+
 }
