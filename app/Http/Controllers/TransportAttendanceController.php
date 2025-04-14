@@ -25,7 +25,7 @@ class TransportAttendanceController extends Controller
                 ->whereYear('date', $date->year)
                     ->whereMonth('date', $date->month)
                     ->orderBy('date', 'desc')
-                    ->paginate(10);
+                    ->get();
             } else {
                 $attendances = TransportAttendance::with('transport')
                 ->whereYear('date', $currentYear)
