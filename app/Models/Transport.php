@@ -69,4 +69,9 @@ class Transport extends Model
     {
         return $this->hasMany(TransportAttendance::class);
     }
+
+    public function payments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(TransportTransaction::class, 'transport_id');
+    }
 }
