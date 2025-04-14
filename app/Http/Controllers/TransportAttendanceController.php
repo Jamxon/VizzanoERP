@@ -461,7 +461,7 @@ class TransportAttendanceController extends Controller
         $transport = Transport::findOrFail($validated['transport_id']);
         $oldBalance = $transport->balance;
 
-        if ($validated['type'] === 'advance' && $oldBalance < $validated['amount']) {
+        if ($oldBalance < $validated['amount']) {
             return response()->json([
                 'error' => 'Balansda yetarli mablag‘ yo‘q'
             ], 400);
@@ -541,10 +541,8 @@ class TransportAttendanceController extends Controller
             try {
                 $transaction = TransportTransaction::findOrFail($id);
 
-                // 🔁 Avvalgi miqdorni balansdan qaytarib olish
-                if ($transaction->type === 'advance') {
-                    $transport->balance += $transaction->amount;
-                }
+                $transport->balance += $transaction->amount;
+
 
                 // 🔄 Yangilash
                 $transaction->update([
