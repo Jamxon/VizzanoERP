@@ -31,6 +31,7 @@ class Log extends Model
             'type' => $type,
             'ip_address' => Request::getClientIp(),
             'user_agent' => Request::header('User-Agent'),
+            'program' => auth()->user()->role ?? null,
             'created_at' => now(),
         ]);
     }

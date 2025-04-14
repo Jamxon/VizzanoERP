@@ -177,7 +177,7 @@ class TransportAttendanceController extends Controller
             Log::add(
                 Auth::id(),
                 'Davomat yangilandi',
-                'update',
+                'edit',
                 $oldData,
                 [
                     'new_attendance' => $attendance,
