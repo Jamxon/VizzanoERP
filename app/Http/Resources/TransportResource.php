@@ -35,6 +35,7 @@ class TransportResource extends JsonResource
             'fuel_bonus' => $this->fuel_bonus ?? null,
             'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
             'balance' => $this->balance ?? 0,
+            'distance' => $this->distance ?? 0,
         ];
     }
 }
