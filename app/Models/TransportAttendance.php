@@ -22,7 +22,6 @@ class TransportAttendance extends Model
         'attendance_type',
         'salary',
         'fuel_bonus',
-        'method',
     ];
 
     protected $casts = [
@@ -30,7 +29,6 @@ class TransportAttendance extends Model
         'attendance_type' => 'double',
         'salary' => 'float',
         'fuel_bonus' => 'float',
-        'method' => 'string',
     ];
 
     public function transport(): \Illuminate\Database\Eloquent\Relations\BelongsTo
