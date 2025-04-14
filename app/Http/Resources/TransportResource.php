@@ -47,7 +47,7 @@ class TransportResource extends JsonResource
 
             'created_at' => optional($this->created_at)->format('Y-m-d H:i:s'),
             'balance' => $this->balance ?? 0,
-//            'distance' => $this->distance ?? 0,
+            'distance' => $this->distance ?? 0,
 
             'payment' => $this->whenLoaded('payments', function () use ($currentYear, $currentMonth) {
                 return $this->payments
