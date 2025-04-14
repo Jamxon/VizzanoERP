@@ -69,6 +69,17 @@ class TransportAttendanceController extends Controller
             'fuel_bonus' => 'nullable|numeric',
         ]);
 
+        // 🚨 Tekshiruv: Shu kunga allaqachon attendance yozilganmi?
+        $existing = TransportAttendance::where('transport_id', $request->transport_id)
+            ->whereDate('date', $date->toDateString())
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'error' => 'Bu mashina uchun bu kunga allaqachon davomat yozilgan.'
+            ], 409); // 409 Conflict
+        }
+
         try {
             $attendance = TransportAttendance::create($request->only([
                 'transport_id', 'date', 'attendance_type', 'salary', 'fuel_bonus'
