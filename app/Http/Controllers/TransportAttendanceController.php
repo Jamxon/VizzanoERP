@@ -65,8 +65,6 @@ class TransportAttendanceController extends Controller
             'transport_id' => 'required|exists:transport,id',
             'date' => 'required|date',
             'attendance_type' => 'required|in:0,0.5,1',
-            'salary' => 'nullable|numeric',
-            'fuel_bonus' => 'nullable|numeric',
         ]);
 
         // 🚨 Tekshiruv: Shu kunga allaqachon attendance yozilganmi?
@@ -81,15 +79,21 @@ class TransportAttendanceController extends Controller
         }
 
         try {
-            $attendance = TransportAttendance::create($request->only([
-                'transport_id', 'date', 'attendance_type', 'salary', 'fuel_bonus'
-            ]));
 
-            $transport = Transport::where('id', $attendance->transport_id)->firstOrFail();
+            $transport = Transport::where('id', $request->transport_id)->firstOrFail();
+
+            $attendance = TransportAttendance::create([
+                'transport_id' => $transport->id,
+                'date' => $date->toDateString(),
+                'fuel_bonus' => $transport->fuel_bonus,
+                'salary' => $transport->salary,
+                'method' => '',
+                'attendance_type' => $request->attendance_type,
+            ]);
 
             $salary = $attendance->salary ?? 0;
             $fuelBonus = $attendance->fuel_bonus ?? 0;
-            $increment = ($salary + $transport->fuel_bonus) * $attendance->attendance_type;
+            $increment = ($salary + $fuelBonus) * $attendance->attendance_type;
 
             $oldBalance = $transport->balance;
             $transport->balance += $increment;
