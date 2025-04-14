@@ -157,36 +157,52 @@ class TransportAttendanceController extends Controller
         }
 
         $validated = $request->validate([
-            'transport_id' => 'required|exists:transports,id',
+            'transport_id' => 'required|exists:transport,id',
             'date' => 'required|date',
             'attendance_type' => 'required|in:0,0.5,1',
-            'salary' => 'nullable|numeric',
-            'fuel_bonus' => 'nullable|numeric',
         ]);
+
+        $newTransportId = $request->transport_id;
+        $newDate = Carbon::parse($request->date)->toDateString();
+
+        // ❗ Boshqa davomat yozilganmi shu transport va sana uchun (shu iddan tashqari)?
+        $exists = TransportAttendance::where('transport_id', $newTransportId)
+            ->whereDate('date', $newDate)
+            ->where('id', '!=', $attendance->id)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'error' => 'Bu mashina uchun bu kunga allaqachon davomat yozilgan.'
+            ], 409); // 409 Conflict
+        }
 
         try {
             $oldData = $attendance->toArray();
 
-            $attendance->update($request->only([
-                'transport_id', 'date', 'attendance_type', 'salary', 'fuel_bonus'
-            ]));
+            $transport = Transport::where('id', $newTransportId)->firstOrFail();
 
-            $transport = Transport::where('id', $attendance->transport_id)->firstOrFail();
+            $salary = $request->has('salary') ? $request->salary : $transport->salary;
+            $fuelBonus = $request->has('fuel_bonus') ? $request->fuel_bonus : $transport->fuel_bonus;
 
-            $salary = $attendance->salary ?? 0;
-            $fuelBonus = $attendance->fuel_bonus ?? 0;
+            $oldSalary = $attendance->salary ?? 0;
+            $oldFuelBonus = $attendance->fuel_bonus ?? 0;
+            $oldAttendanceType = $attendance->attendance_type ?? 0;
+
+            $oldIncrement = ($oldSalary + $oldFuelBonus) * $oldAttendanceType;
+            $newIncrement = ($salary + $fuelBonus) * $request->attendance_type;
 
             $balanceBefore = $transport->balance;
-
-            $oldSalary = $oldData['salary'] ?? 0;
-            $oldAttendanceType = $oldData['attendance_type'] ?? 0;
-            $oldFuelBonus = $oldData['fuel_bonus'] ?? 0;
-
-            $oldIncrement = ($oldSalary + $transport->fuel_bonus) * $oldAttendanceType;
-            $newIncrement = ($salary + $transport->fuel_bonus) * $attendance->attendance_type;
-
             $transport->balance = $transport->balance - $oldIncrement + $newIncrement;
             $transport->save();
+
+            $attendance->update([
+                'transport_id' => $newTransportId,
+                'date' => $newDate,
+                'attendance_type' => $request->attendance_type,
+                'salary' => $salary,
+                'fuel_bonus' => $fuelBonus,
+            ]);
 
             Log::add(
                 Auth::id(),
@@ -217,8 +233,10 @@ class TransportAttendanceController extends Controller
                 ]
             );
 
-            return response()->json(['error' => 'Davomat yangilashda xatolik yuz berdi'], 500);
+            return response()->json([
+                'error' => 'Davomat yangilashda xatolik yuz berdi',
+                'message' => $e->getMessage()
+            ], 500);
         }
     }
-
 }
