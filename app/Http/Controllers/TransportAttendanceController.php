@@ -66,7 +66,7 @@ class TransportAttendanceController extends Controller
         }
 
         $validated = $request->validate([
-            'transport_id' => 'required|exists:transports,id',
+            'transport_id' => 'required|exists:transport,id',
             'date' => 'required|date',
             'attendance_type' => 'required|in:0,0.5,1',
             'salary' => 'nullable|numeric',
