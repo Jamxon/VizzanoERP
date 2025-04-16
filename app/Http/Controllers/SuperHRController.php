@@ -17,7 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
-    public function receiveFaceEvent(Request $request)
+    public function receiveFaceEvent(Request $request): \Illuminate\Http\JsonResponse
     {
         Log::add(
             null,
