@@ -19,18 +19,24 @@ class SuperHRController extends Controller
 {
     public function receiveFaceEvent(Request $request): \Illuminate\Http\JsonResponse
     {
-        Log::add(
-            null,
-            'Receive Face Event',
-            'attempt',
-            null,
-            $request->all()
-        );
+        $data = $request->all();
 
-        // Ma’lumotni bazaga yozish yoki qayta ishlash
+        // Faqat yuz bilan kirish va muvaffaqiyatli holatlar uchun
+        if (
+            isset($data['authType']) && strtolower($data['authType']) === 'face' &&
+            isset($data['passResult']) && strtolower($data['passResult']) === 'success'
+        ) {
+            Log::add(
+                null,
+                'Receive Face Event',
+                'success',
+                null,
+                $data
+            );
+        }
+
         return response()->json(['status' => 'ok']);
     }
-
 
     public function getRegions(): \Illuminate\Http\JsonResponse
     {
