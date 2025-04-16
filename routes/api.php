@@ -293,3 +293,8 @@ Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout']);
 Route::get('logs',[OrderController::class, 'getLogs']);
+
+
+// routes/api.php
+Route::post('/hikvision/face-event', [SuperHRController::class, 'receiveFaceEvent']);
+

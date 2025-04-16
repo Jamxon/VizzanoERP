@@ -17,6 +17,20 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
+    public function receiveFaceEvent(Request $request)
+    {
+        Log::add(
+            null,
+            'Receive Face Event',
+            'attempt',
+            null,
+            $request->all()
+        );
+
+        // Ma’lumotni bazaga yozish yoki qayta ishlash
+        return response()->json(['status' => 'ok']);
+    }
+
 
     public function getRegions(): \Illuminate\Http\JsonResponse
     {
