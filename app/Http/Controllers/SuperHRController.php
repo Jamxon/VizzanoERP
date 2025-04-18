@@ -97,16 +97,27 @@ class SuperHRController extends Controller
 
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
-            $query->where(function ($q) use ($search) {
+            $searchTrans = transliterate($search);
+
+            $query->where(function ($q) use ($search, $searchTrans) {
                 $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"])
+                    ->orWhereRaw('LOWER(name) LIKE ?', ["%$searchTrans%"])
                     ->orWhereRaw('LOWER(phone) LIKE ?', ["%$search%"])
-                    ->orWhereHas('position', fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"]))
-                    ->orWhereHas('user', function ($q) use ($search) {
+                    ->orWhereHas('position', function ($q) use ($search, $searchTrans) {
+                        $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"])
+                            ->orWhereRaw('LOWER(name) LIKE ?', ["%$searchTrans%"]);
+                    })
+                    ->orWhereHas('user', function ($q) use ($search, $searchTrans) {
                         $q->whereRaw('LOWER(username) LIKE ?', ["%$search%"])
-                            ->orWhereHas('role', fn($q) => $q->whereRaw('LOWER(description) LIKE ?', ["%$search%"]));
+                            ->orWhereRaw('LOWER(username) LIKE ?', ["%$searchTrans%"])
+                            ->orWhereHas('role', function ($q) use ($search, $searchTrans) {
+                                $q->whereRaw('LOWER(description) LIKE ?', ["%$search%"])
+                                    ->orWhereRaw('LOWER(description) LIKE ?', ["%$searchTrans%"]);
+                            });
                     });
             });
         }
+
 
         $query->when($filters['department_id'] ?? false, fn($q) => $q->where('department_id', $filters['department_id']))
             ->when($filters['group_id'] ?? false, fn($q) => $q->where('group_id', $filters['group_id']))
