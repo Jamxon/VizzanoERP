@@ -97,25 +97,21 @@ class SuperHRController extends Controller
 
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
-            $searchTrans = transliterate($search);
+            $searchLatin = transliterate_to_latin($search);
+            $searchCyrillic = transliterate_to_cyrillic($search);
 
-            $query->where(function ($q) use ($search, $searchTrans) {
-                $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"])
-                    ->orWhereRaw('LOWER(name) LIKE ?', ["%$searchTrans%"])
-                    ->orWhereRaw('LOWER(phone) LIKE ?', ["%$search%"])
-                    ->orWhereHas('position', function ($q) use ($search, $searchTrans) {
-                        $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"])
-                            ->orWhereRaw('LOWER(name) LIKE ?', ["%$searchTrans%"]);
-                    })
-                    ->orWhereHas('user', function ($q) use ($search, $searchTrans) {
-                        $q->whereRaw('LOWER(username) LIKE ?', ["%$search%"])
-                            ->orWhereRaw('LOWER(username) LIKE ?', ["%$searchTrans%"])
-                            ->orWhereHas('role', function ($q) use ($search, $searchTrans) {
-                                $q->whereRaw('LOWER(description) LIKE ?', ["%$search%"])
-                                    ->orWhereRaw('LOWER(description) LIKE ?', ["%$searchTrans%"]);
-                            });
-                    });
+            $query->where(function ($q) use ($search, $searchLatin, $searchCyrillic) {
+                foreach ([$search, $searchLatin, $searchCyrillic] as $term) {
+                    $q->orWhereRaw('LOWER(name) LIKE ?', ["%$term%"])
+                        ->orWhereRaw('LOWER(phone) LIKE ?', ["%$term%"])
+                        ->orWhereHas('position', fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ["%$term%"]))
+                        ->orWhereHas('user', function ($q) use ($term) {
+                            $q->whereRaw('LOWER(username) LIKE ?', ["%$term%"])
+                                ->orWhereHas('role', fn($q) => $q->whereRaw('LOWER(description) LIKE ?', ["%$term%"]));
+                        });
+                }
             });
+
         }
 
 

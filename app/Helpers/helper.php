@@ -1,14 +1,32 @@
 <?php
 
 if (!function_exists('transliterate')) {
-    function transliterate($string): string
+    /**
+     * Transliterate a given text from Cyrillic to Latin or vice versa.
+     *
+     * @param string $text The text to transliterate.
+     * @return string The transliterated text.
+     */
+    function transliterate_to_latin(string $text): string
     {
-        $cyr = ['А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я',
-            'а','б','в','г','д','е','ё','ж','з','и','й','к','л','м','н','о','п','р','с','т','у','ф','х','ц','ч','ш','щ','ъ','ы','ь','э','ю','я'];
-        $lat = ['A','B','V','G','D','E','Yo','J','Z','I','Y','K','L','M','N','O','P','R','S','T','U','F','X','Ts','Ch','Sh','Shch','','I','','E','Yu','Ya',
-            'a','b','v','g','d','e','yo','j','z','i','y','k','l','m','n','o','p','r','s','t','u','f','x','ts','ch','sh','shch','','i','','e','yu','ya'];
+        return strtr($text, [
+            'а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'yo',
+            'ж'=>'j','з'=>'z','и'=>'i','й'=>'y','к'=>'k','л'=>'l','м'=>'m',
+            'н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','у'=>'u',
+            'ф'=>'f','х'=>'x','ц'=>'ts','ч'=>'ch','ш'=>'sh','щ'=>'sh','ъ'=>'',
+            'ы'=>'i','ь'=>'','э'=>'e','ю'=>'yu','я'=>'ya',
+            'қ'=>'q','ў'=>'o‘','ғ'=>'g‘','ҳ'=>'h',
+        ]);
+    }
 
-        $converted = str_replace($cyr, $lat, $string);
-        return strtolower($converted);
+    function transliterate_to_cyrillic($text): string
+    {
+        return strtr($text, [
+            'a'=>'а','b'=>'б','v'=>'в','g'=>'г','d'=>'д','e'=>'е','yo'=>'ё',
+            'j'=>'ж','z'=>'з','i'=>'и','y'=>'й','k'=>'к','l'=>'л','m'=>'м',
+            'n'=>'н','o‘'=>'ў','o'=>'о','p'=>'п','r'=>'р','s'=>'с','t'=>'т',
+            'u'=>'у','f'=>'ф','x'=>'х','ts'=>'ц','ch'=>'ч','sh'=>'ш','h'=>'ҳ',
+            'yu'=>'ю','ya'=>'я','q'=>'қ','g‘'=>'ғ',
+        ]);
     }
 }
