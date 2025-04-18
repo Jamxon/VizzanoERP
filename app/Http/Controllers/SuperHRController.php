@@ -14,9 +14,28 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Services\HikvisionPersonService;
 
 class SuperHRController extends Controller
 {
+
+
+    public function addPerson(Request $request, HikvisionPersonService $hikvision): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'person_id' => 'required|string',
+            'name' => 'required|string',
+            'gender' => 'nullable|in:male,female',
+        ]);
+
+        $result = $hikvision->addPerson(
+            $data['person_id'],
+            $data['name'],
+            $data['gender'] ?? 'male'
+        );
+
+        return response()->json($result);
+    }
     public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
     {
         // 1. Kelyotgan data
@@ -47,8 +66,6 @@ class SuperHRController extends Controller
 
         return response()->json(['message' => 'ok']);
     }
-
-
 
     public function getRegions(): \Illuminate\Http\JsonResponse
     {
