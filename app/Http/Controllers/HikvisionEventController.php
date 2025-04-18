@@ -7,34 +7,17 @@ use Illuminate\Support\Facades\Http;
 
 class HikvisionEventController extends Controller
 {
-    public function getEvents()
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        // ISAPI endpoint URL
-        $url = 'http://192.168.118.156/ISAPI/AccessControl/AcsEvent?format=json';
+        // Event ma'lumotlarini olish
+        $eventData = $request->all();
 
-        // ISAPI serverga HTTP so'rov yuborish
-        $response = Http::get($url);
+        // Event ma'lumotlarini saqlash (agar kerak bo'lsa)
+        // HikvisionEvent::create($eventData);
 
-        // Agar so'rov muvaffaqiyatli bo'lsa, javobni qayta ishlash
-        if ($response->successful()) {
-            $events = $response->json();  // JSON formatdagi javobni olish
+        // Log yoki ma'lumotni saqlash
+        \Log::info('Received Hikvision event: ', $eventData);
 
-            // Har bir hodisani qayta ishlash
-            foreach ($events as $event) {
-                // Event ma'lumotlarini qayta ishlash (masalan, ma'lumotlar bazasiga saqlash)
-                // Masalan, eventni saqlash
-                \App\Models\Log::add(
-                    null,
-                    "Receive Event",
-                    'attempt',
-                    null,
-                    $event,
-                );
-
-            return response()->json(['message' => 'Events processed successfully!']);
-            }
-        }else {
-            return response()->json(['message' => 'Failed to fetch events.'], 500);
-        }
+        return response()->json(['message' => 'Event received successfully']);
     }
 }

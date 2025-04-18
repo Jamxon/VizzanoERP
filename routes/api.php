@@ -296,5 +296,5 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout']);
 Route::get('logs',[OrderController::class, 'getLogs']);
 
-Route::get('/hikvision/events', [HikvisionEventController::class, 'getEvents']);
+Route::post('/hikvision/events', [HikvisionEventController::class, 'store']);
 
