@@ -220,7 +220,7 @@ class SuperHRController extends Controller
             $oldData = $employee->toArray();
             $user = User::findOrFail($employee->user_id);
             $user->update([
-                'role_id' => $request->role_id ?? null,
+                'role_id' => $request->role_id ?? 0,
             ]);
             $employee->update([
                 'name' => $request->name,
