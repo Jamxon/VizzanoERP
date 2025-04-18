@@ -31,7 +31,6 @@ class SuperHRController extends Controller
         return response()->json(['status' => 'ok']);
     }
 
-
     public function getRegions(): \Illuminate\Http\JsonResponse
     {
         $regions = Region::all();
