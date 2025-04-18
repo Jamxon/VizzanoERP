@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -16,7 +17,13 @@ class HikvisionEventController extends Controller
         // HikvisionEvent::create($eventData);
 
         // Log yoki ma'lumotni saqlash
-        \Log::info('Received Hikvision event: ', $eventData);
+        Log::add(
+            null,
+            'hikvision_event',
+            'hikvision_event',
+            null,
+            $eventData,
+        );
 
         return response()->json(['message' => 'Event received successfully']);
     }
