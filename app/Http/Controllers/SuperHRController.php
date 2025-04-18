@@ -17,24 +17,37 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
-    public function handleEvent(Request $request)
+    public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
     {
+        // 1. Kelyotgan data
         $data = $request->all();
 
-        if (isset($data['employeeNoString'])) {
+        // 2. event_log mavjudligini tekshiramiz
+        if (isset($data['event_log'])) {
 
-            // log qo‘shamiz
-            Log::add(
-                $data['data']['EmployeeNoString'], // kerak bo‘lsa
-                 'Check event',
-                 'attendance',
-                 null,
-                 json_encode($data, JSON_UNESCAPED_UNICODE),
-            );
+            // 3. Stringni JSON obyektga parse qilamiz
+            $parsed = json_decode($data['event_log'], true);
+
+            // 4. employeeNoString mavjudligini tekshiramiz
+            if (isset($parsed['AccessControllerEvent']['employeeNoString'])) {
+
+                // employee raqami
+                $employeeNo = $parsed['AccessControllerEvent']['employeeNoString'];
+
+                // 5. Logga yozamiz
+                Log::add(
+                    $employeeNo,
+                    'Check event',
+                    'attendance',
+                    null,
+                    json_encode($parsed, JSON_UNESCAPED_UNICODE),
+                );
+            }
         }
 
         return response()->json(['message' => 'ok']);
     }
+
 
 
     public function getRegions(): \Illuminate\Http\JsonResponse
