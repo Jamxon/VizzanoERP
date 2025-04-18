@@ -17,19 +17,26 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
-    public function receiveFaceEvent(Request $request): \Illuminate\Http\JsonResponse
+    public function handleEvent(Request $request)
     {
-        Log::add(
-            null,
-            'Receive Face Event',
-            'attempt',
-            null,
-            $request->all()
-        );
+        $data = $request->all();
 
-        // Ma’lumotni bazaga yozish yoki qayta ishlash
-        return response()->json(['status' => 'ok']);
+        // faqat 'Check' va 'Success' holatlarigina qabul qilinadi
+        if (($data['Code'] ?? '') === 'Check' && ($data['Status'] ?? '') === 'Success') {
+
+            // log qo‘shamiz
+            Log::add(
+                $data['data']['EmployeeNoString'], // kerak bo‘lsa
+                 'Check event',
+                 'attendance',
+                 null,
+                 json_encode($data, JSON_UNESCAPED_UNICODE),
+            );
+        }
+
+        return response()->json(['message' => 'ok']);
     }
+
 
     public function getRegions(): \Illuminate\Http\JsonResponse
     {
