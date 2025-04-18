@@ -28,10 +28,9 @@ class HikvisionEventController extends Controller
             // Rasmni saqlash (agar rasm bo‘lsa)
             $imagePath = null;
             if ($image && $image->isValid()) {
-                // Faylni saqlash
-                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
-                $path = $image->storeAs('public/hikvision_images', $filename);
-                $imagePath = str_replace('public/', 'storage/', $path);  // Image path
+                $filename = time() . '.' . $image->getClientOriginalExtension();
+                $image->storeAs('/hikvision/', $filename);
+                $imagePath = '/hikvision/' . $filename;
             }
 
             // Log yozish
