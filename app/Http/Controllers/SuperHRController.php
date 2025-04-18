@@ -203,6 +203,8 @@ class SuperHRController extends Controller
             'role_id' => 'nullable',
         ]);
 
+        return $request->role_id;
+
         try {
             DB::beginTransaction();
 
