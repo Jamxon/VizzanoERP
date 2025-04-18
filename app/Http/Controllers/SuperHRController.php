@@ -36,6 +36,7 @@ class SuperHRController extends Controller
 
         return response()->json($result);
     }
+
     public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
     {
         // 1. Kelyotgan data
