@@ -200,7 +200,7 @@ class SuperHRController extends Controller
             'comment' => 'nullable|string',
             'type' => 'nullable|string',
             'birthday' => 'nullable|date',
-            'role_id' => 'nullable|integer|exists:roles,id',
+            'role_id' => 'nullable',
         ]);
 
         try {
