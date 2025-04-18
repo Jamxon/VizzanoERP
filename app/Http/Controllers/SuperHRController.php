@@ -199,7 +199,8 @@ class SuperHRController extends Controller
             'payment_type' => 'nullable|string',
             'comment' => 'nullable|string',
             'type' => 'nullable|string',
-            'birthday' => 'nullable|date'
+            'birthday' => 'nullable|date',
+            'role_id' => 'nullable|integer|exists:roles,id',
         ]);
 
         try {
@@ -217,6 +218,10 @@ class SuperHRController extends Controller
 
             $employee = Employee::findOrFail($id);
             $oldData = $employee->toArray();
+            $user = User::findOrFail($employee->user_id);
+            $user->update([
+                'role_id' => $request->role_id ?? null,
+            ]);
             $employee->update([
                 'name' => $request->name,
                 'phone' => $request->phone,
