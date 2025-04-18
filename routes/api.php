@@ -7,6 +7,7 @@ use App\Http\Controllers\CuttingMasterController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupMasterController;
+use App\Http\Controllers\HikvisionEventController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\ModelController;
@@ -295,5 +296,5 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout']);
 Route::get('logs',[OrderController::class, 'getLogs']);
 
-Route::post('/hikvision/face-event', [SuperHRController::class, 'handleEvent']);
+Route::get('/hikvision/events', [HikvisionEventController::class, 'getEvents']);
 
