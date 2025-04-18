@@ -21,8 +21,7 @@ class SuperHRController extends Controller
     {
         $data = $request->all();
 
-        // faqat 'Check' va 'Success' holatlarigina qabul qilinadi
-        if (($data['Code'] ?? '') === 'Check' && ($data['Status'] ?? '') === 'Success') {
+        if (isset($data['employeeNoString'])) {
 
             // log qo‘shamiz
             Log::add(
