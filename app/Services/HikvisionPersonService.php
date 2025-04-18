@@ -12,7 +12,7 @@ class HikvisionPersonService
 
     public function __construct()
     {
-        $this->ip = '192.168.118.156';
+        $this->ip = '192.168.118.162:3000';
         $this->username = 'admin';
         $this->password = 'vizzano2025';
     }
