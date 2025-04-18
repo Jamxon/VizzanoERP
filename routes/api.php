@@ -294,5 +294,5 @@ Route::post('login', [AuthController::class, 'login']);
 Route::post('logout', [AuthController::class, 'logout']);
 Route::get('logs',[OrderController::class, 'getLogs']);
 
-Route::post('/hikvision/face-event', [SuperHRController::class, 'receiveFaceEvent']);
+Route::post('/hikvision/face-event', [SuperHRController::class, 'handleEvent']);
 
