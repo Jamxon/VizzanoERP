@@ -32,7 +32,8 @@ class HikvisionEventController extends Controller
                 );
 
             return response()->json(['message' => 'Events processed successfully!']);
-        } else {
+            }
+        }else {
             return response()->json(['message' => 'Failed to fetch events.'], 500);
         }
     }
