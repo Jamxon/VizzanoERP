@@ -30,7 +30,8 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
         $query = Employee::with(['user.role', 'position', 'group', 'department'])
             ->where('branch_id', $user->employee->branch_id);
 
-        if ($search = $filters['search'] ?? null) {
+        if ($filters['search'] ?? null) {
+            $search = strtolower($filters['search']);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                     ->orWhere('phone', 'like', "%$search%")

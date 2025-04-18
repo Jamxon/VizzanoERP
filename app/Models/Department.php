@@ -54,4 +54,9 @@ class Department extends Model
     {
         return $this->belongsTo(MainDepartment::class, 'main_department_id');
     }
+
+    public function positions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Position::class, 'department_id');
+    }
 }

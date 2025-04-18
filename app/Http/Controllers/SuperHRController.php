@@ -96,7 +96,7 @@ class SuperHRController extends Controller
         ->where('branch_id', $user->employee->branch_id);
 
         if (!empty($filters['search'])) {
-            $search = $filters['search'];
+            $search = strtolower($filters['search']);
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%$search%")
                     ->orWhere('phone', 'like', "%$search%")

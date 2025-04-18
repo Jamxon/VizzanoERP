@@ -13,7 +13,13 @@ class Position extends Model
 
     protected $fillable = [
         'name',
+        'department_id'
     ];
+
+    public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Department::class, 'department_id');
+    }
 
     public function employees(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
