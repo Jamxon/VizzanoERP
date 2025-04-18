@@ -98,12 +98,12 @@ class SuperHRController extends Controller
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%$search%")
-                    ->orWhere('phone', 'like', "%$search%")
-                    ->orWhereHas('position', fn($q) => $q->where('name', 'like', "%$search%"))
+                $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"])
+                    ->orWhereRaw('LOWER(phone) LIKE ?', ["%$search%"])
+                    ->orWhereHas('position', fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"]))
                     ->orWhereHas('user', function ($q) use ($search) {
-                        $q->where('username', 'like', "%$search%")
-                            ->orWhereHas('role', fn($q) => $q->where('description', 'like', "%$search%"));
+                        $q->whereRaw('LOWER(username) LIKE ?', ["%$search%"])
+                            ->orWhereHas('role', fn($q) => $q->whereRaw('LOWER(description) LIKE ?', ["%$search%"]));
                     });
             });
         }
