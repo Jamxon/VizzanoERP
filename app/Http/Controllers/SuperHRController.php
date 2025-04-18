@@ -184,7 +184,7 @@ class SuperHRController extends Controller
 
     }
 
-    public function updateEmployees(Request $request, $id)
+    public function updateEmployees(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'name' => 'required|string',
@@ -202,8 +202,6 @@ class SuperHRController extends Controller
             'birthday' => 'nullable|date',
             'role_id' => 'nullable',
         ]);
-
-        return $request->role_id;
 
         try {
             DB::beginTransaction();
