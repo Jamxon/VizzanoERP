@@ -14,8 +14,6 @@ class HikvisionEventController extends Controller
         // Multipart/form-data holatida
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
-
-            // Rasm fayl bo'lishi mumkin
             $image = $request->file('Picture');
 
             Log::add(null, 'Hikvision Event', 'Form-data received', [
@@ -27,7 +25,7 @@ class HikvisionEventController extends Controller
             $eventData = json_decode($eventLogRaw, true);
             $accessData = $eventData['AccessControllerEvent'] ?? [];
 
-            // Agar rasm bo‘lsa – uni saqlaymiz
+            // Rasmni saqlash (agar rasm bo‘lsa)
             $imagePath = null;
             if ($image && $image->isValid()) {
                 $filename = uniqid() . '.' . $image->getClientOriginalExtension();
