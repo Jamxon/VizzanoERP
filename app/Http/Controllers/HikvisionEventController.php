@@ -12,7 +12,6 @@ class HikvisionEventController extends Controller
         $contentType = $request->header('Content-Type');
         $rawData = $request->getContent();
 
-        // 1. Dastlabki log
         Log::add(null,
             'Hikvision Event',
             'Hikvision event received',
@@ -24,30 +23,27 @@ class HikvisionEventController extends Controller
 
         $data = [];
 
-        // 2. multipart/form-data bo‘lsa → faqat log qilamiz hozircha
         if (str_contains($contentType, 'multipart/form-data')) {
-            // multipart ichidagi JSON'ni qo‘l bilan ajratish kerak bo'lishi mumkin (agar mavjud bo‘lsa)
-            // Hozircha faqat log qilyapmiz, agar aniq tuzilmani bilsak, bu yerda parsing yoziladi
+            $formData = $request->all(); // ⚠️ bu yer multipart inputlar uchun
             Log::add(null,
                 'Hikvision Event',
-                'Multipart event kelgan, JSON topilmadi',
+                'Multipart form-data received',
                 [
-                    'note' => 'Multipart/form-data format. Parsing qo‘shilishi kerak agar JSON bo‘lsa.',
+                    'form_data' => $formData,
                 ]
             );
+
+            $data = $formData;
         }
-        // 3. XML bo‘lsa
         elseif (str_contains($contentType, 'xml')) {
             $xml = simplexml_load_string($rawData, "SimpleXMLElement", LIBXML_NOCDATA);
             $json = json_encode($xml);
             $data = json_decode($json, true);
         }
-        // 4. JSON bo‘lsa
         else {
             $data = json_decode($rawData, true);
         }
 
-        // 5. Agar data mavjud bo‘lsa, asosiy maydonlarni log qilamiz
         if (!empty($data)) {
             Log::add(
                 null,
@@ -63,4 +59,5 @@ class HikvisionEventController extends Controller
 
         return response()->json(['status' => 'received']);
     }
+
 }
