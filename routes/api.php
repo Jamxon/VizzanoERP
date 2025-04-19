@@ -192,6 +192,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::patch('departments/{department}', [SuperHRController::class, 'updateDepartments']);
     Route::get('regions', [SuperHRController::class, 'getRegions']);
     Route::get('attendances', [AttendanceController::class, 'getAttendances']);
+    Route::get('attendances/history', [AttendanceController::class, 'getAttendanceHistory']);
 });
 
 Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {
