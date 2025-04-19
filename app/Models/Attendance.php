@@ -32,7 +32,7 @@ class Attendance extends Model
         'check_out_image',
     ];
 
-    public function getCheckInImageUrlAttribute()
+    public function getCheckInImageAttribute()
     {
         if (empty($this->check_in_image)) {
             return null;
@@ -45,7 +45,7 @@ class Attendance extends Model
         return url('storage/' . $this->check_in_image);
     }
 
-    public function getCheckOutImageUrlAttribute()
+    public function getCheckOutImageAttribute()
     {
         if (empty($this->check_out_image)) {
             return null;
