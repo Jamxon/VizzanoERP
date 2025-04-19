@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\GetEmployeeResource;
 use App\Models\Attendance;
 use App\Models\Log;
 use Illuminate\Http\Request;
