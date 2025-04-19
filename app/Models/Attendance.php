@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @method static whereDate(string $string, mixed $today)
+ * @method static firstOrCreate(array $array, array $array1)
  */
 class Attendance extends Model
 {
@@ -19,10 +20,6 @@ class Attendance extends Model
         'date',
         'check_in',
         'check_out',
-        'status',
-        'work_hours',
-        'overtime_hours',
-        'comment'
     ];
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
