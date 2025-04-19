@@ -38,7 +38,7 @@ class SuperHRController extends Controller
             ->orderByDesc('updated_at')
             ->get();
 
-        return (new GetEmployeeResourceCollection($employees))->response();
+        return response()->json($employees);
     }
 
     public function getEmployees(Request $request): \Illuminate\Http\JsonResponse

@@ -194,6 +194,8 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('regions', [SuperHRController::class, 'getRegions']);
     Route::get('attendances', [AttendanceController::class, 'getAttendances']);
     Route::get('attendances/history', [AttendanceController::class, 'getAttendanceHistory']);
+    Route::post('attendances', [AttendanceController::class, 'storeAttendance']);
+    Route::patch('attendances/{attendance}', [AttendanceController::class, 'updateAttendance']);
 });
 
 Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {
