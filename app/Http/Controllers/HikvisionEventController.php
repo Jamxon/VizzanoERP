@@ -13,7 +13,7 @@ class HikvisionEventController extends Controller
     public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
     {
         $contentType = $request->header('Content-Type');
-        
+
         Log::add(null, 'Hikvision Debug', 'Request Info', null, [
             'headers' => $request->headers->all(),
             'content_type' => $contentType,
@@ -32,7 +32,7 @@ class HikvisionEventController extends Controller
             $accessData = $eventData['AccessControllerEvent'] ?? [];
 
             $employeeNo = $accessData['employeeNoString'] ?? null;
-            $deviceId = $accessData['deviceId'] ?? null;
+            $deviceId = $eventData['deviceID'] ?? null;
             $eventTime = $accessData['dateTime'] ?? now()->toDateTimeString();
 
             $imagePath = null;
