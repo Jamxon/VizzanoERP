@@ -4,43 +4,69 @@ namespace App\Http\Controllers;
 
 use App\Models\Log;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
+use App\Models\Employee;
+use App\Models\Attendance;
 
 class HikvisionEventController extends Controller
 {
+
     public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
     {
         $contentType = $request->header('Content-Type');
 
-        // Multipart/form-data holatida
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
             $image = $request->file('Picture');
 
-            Log::add(null, 'Hikvision Event', 'Form-data received', [
-                'content_type' => $contentType,
-                'event_log_raw' => $eventLogRaw,
-                'has_picture' => $image ? true : false,
-            ]);
-
             $eventData = json_decode($eventLogRaw, true);
             $accessData = $eventData['AccessControllerEvent'] ?? [];
 
-            // Rasmni saqlash (agar rasm bo‘lsa)
+            $employeeNo = $accessData['employeeNoString'] ?? null;
+            $eventTime = $accessData['dateTime'] ?? now()->toDateTimeString(); // fallback
+
+            // Rasmni saqlash
             $imagePath = null;
             if ($image && $image->isValid()) {
                 $filename = time() . '.' . $image->getClientOriginalExtension();
-                $image->storeAs('/hikvision/', $filename);
-                $imagePath = '/hikvision/' . $filename;
+                $image->storeAs('public/hikvision', $filename);
+                $imagePath = 'storage/hikvision/' . $filename;
             }
 
-            // Log yozish
-            Log::add(null, 'Hikvision Event', 'Parsed event', [
-                'event_type' => $eventData['eventType'] ?? null,
-                'employee_no' => $accessData['employeeNoString'] ?? null,
-                'device_name' => $accessData['deviceName'] ?? null,
-                'verify_mode' => $accessData['currentVerifyMode'] ?? null,
-                'image_path' => $imagePath,  // Image path added here
-            ]);
+            // Hodimni topish
+            $employee = Employee::where('id', $employeeNo)->first(); // yoki boshqa mapping maydon
+
+            if ($employee && $imagePath) {
+                $eventCarbon = Carbon::parse($eventTime);
+                $today = $eventCarbon->toDateString();
+
+                // Bor bo‘lsa - update, yo‘q bo‘lsa - create
+                $attendance = Attendance::firstOrCreate(
+                    ['employee_id' => $employee->id, 'date' => $today],
+                    ['source_type' => 'device', 'check_in' => $eventCarbon, 'comment' => 'Face ID']
+                );
+
+                // Agar allaqachon bor bo‘lsa va check_in yo‘q bo‘lsa, uni yozamiz
+                if (!$attendance->check_in) {
+                    $attendance->check_in = $eventCarbon;
+                    $attendance->save();
+                }
+
+                // Log yozish (muvoffaqiyatli holat)
+                Log::add($employee->user_id ?? null, 'Hikvision Attendance', 'Check-in via face recognition', [
+                    'employee_id' => $employee->id,
+                    'image_path' => $imagePath,
+                    'time' => $eventTime,
+                ]);
+
+            } else {
+                // Xatolik log
+                Log::add(null, 'Hikvision Attendance', 'No employee matched or image missing', [
+                    'employee_no' => $employeeNo,
+                    'has_image' => $imagePath ? true : false,
+                ]);
+            }
+
         } else {
             // Fallback – JSON yoki XML bo‘lishi mumkin
             $rawData = $request->getContent();
@@ -52,5 +78,4 @@ class HikvisionEventController extends Controller
 
         return response()->json(['status' => 'received']);
     }
-
 }
