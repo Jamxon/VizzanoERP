@@ -29,8 +29,8 @@ class HikvisionEventController extends Controller
             $imagePath = null;
             if ($image && $image->isValid()) {
                 $filename = time() . '.' . $image->getClientOriginalExtension();
-                $image->storeAs('public/hikvision', $filename);
-                $imagePath = 'storage/hikvision/' . $filename;
+                $image->storeAs('/hikvision/', $filename);
+                $imagePath = 'hikvision/' . $filename;
             }
 
             // Hodimni topish
