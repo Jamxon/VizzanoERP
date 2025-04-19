@@ -27,6 +27,11 @@ class Attendance extends Model
         'status',
     ];
 
+    protected $appends = [
+        'check_in_image',
+        'check_out_image',
+    ];
+    
     public function getCheckInIMageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
     {
         if (empty($value)) {
