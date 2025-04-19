@@ -18,56 +18,6 @@ use App\Services\HikvisionPersonService;
 
 class SuperHRController extends Controller
 {
-
-
-    public function addPerson(Request $request, HikvisionPersonService $hikvision): \Illuminate\Http\JsonResponse
-    {
-        $data = $request->validate([
-            'person_id' => 'required|string',
-            'name' => 'required|string',
-            'gender' => 'nullable|in:male,female',
-        ]);
-
-        $result = $hikvision->addPerson(
-            $data['person_id'],
-            $data['name'],
-            $data['gender'] ?? 'male'
-        );
-
-        return response()->json($result);
-    }
-
-    public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
-    {
-        // 1. Kelyotgan data
-        $data = $request->all();
-
-        // 2. event_log mavjudligini tekshiramiz
-        if (isset($data['event_log'])) {
-
-            // 3. Stringni JSON obyektga parse qilamiz
-            $parsed = json_decode($data['event_log'], true);
-
-            // 4. employeeNoString mavjudligini tekshiramiz
-            if (isset($parsed['AccessControllerEvent']['employeeNoString'])) {
-
-                // employee raqami
-                $employeeNo = $parsed['AccessControllerEvent']['employeeNoString'];
-
-                // 5. Logga yozamiz
-                Log::add(
-                    $employeeNo,
-                    'Check event',
-                    'attendance',
-                    null,
-                    json_encode($parsed, JSON_UNESCAPED_UNICODE),
-                );
-            }
-        }
-
-        return response()->json(['message' => 'ok']);
-    }
-
     public function getRegions(): \Illuminate\Http\JsonResponse
     {
         $regions = Region::all();
