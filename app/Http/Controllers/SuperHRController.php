@@ -34,7 +34,7 @@ class SuperHRController extends Controller
         $user = auth()->user();
         $employees = Employee::where('branch_id', $user->employee->branch_id)
             ->where('status', '!=','kicked')
-            ->with('user.role', 'position')
+            ->with('position')
             ->orderByDesc('updated_at')
             ->get();
 
