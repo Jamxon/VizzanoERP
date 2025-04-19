@@ -49,15 +49,17 @@ class Attendance extends Model
 
     public function getCheckOutImageAttribute()
     {
-        if (empty($this->check_out_image)) {
+        $image = $this->attributes['check_out_image'] ?? null;
+
+        if (!$image) {
             return null;
         }
 
-        if (filter_var($this->check_out_image, FILTER_VALIDATE_URL)) {
-            return $this->check_out_image;
+        if (filter_var($image, FILTER_VALIDATE_URL)) {
+            return $image;
         }
 
-        return url('storage/' . $this->check_out_image);
+        return url('storage/' . $image);
     }
 
 
