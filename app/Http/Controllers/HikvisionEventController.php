@@ -101,7 +101,7 @@ class HikvisionEventController extends Controller
             }
 
         }
-        
+
         return response()->json(['status' => 'received']);
     }
 }
