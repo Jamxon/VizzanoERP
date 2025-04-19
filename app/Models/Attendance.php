@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static whereDate(string $string, mixed $today)
  * @method static firstOrCreate(array $array, array $array1)
+ * @method static create(array $array)
  */
 class Attendance extends Model
 {
@@ -22,6 +23,7 @@ class Attendance extends Model
         'check_out',
         'check_in_image',
         'check_out_image',
+        'status',
     ];
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo

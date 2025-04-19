@@ -47,6 +47,7 @@ class HikvisionEventController extends Controller
                 if ((int)$deviceId === 255 && !$attendance->check_in) {
                     $attendance->check_in = $eventCarbon;
                     $attendance->check_in_image = $imagePath;
+                    $attendance->status = 'present';
                     $attendance->save();
 
                     Log::add(
