@@ -34,10 +34,6 @@ class Attendance extends Model
 
     public function getCheckInImageAttribute()
     {
-        if (empty($this->check_in_image)) {
-            return null;
-        }
-
         if (filter_var($this->check_in_image, FILTER_VALIDATE_URL)) {
             return $this->check_in_image;
         }
