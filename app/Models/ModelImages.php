@@ -28,7 +28,7 @@ class ModelImages extends Model
         return url('storage/' . $value);
     }
 
-    public function model()
+    public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Models::class);
     }
