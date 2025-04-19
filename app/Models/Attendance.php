@@ -32,31 +32,32 @@ class Attendance extends Model
         'check_out_image',
     ];
 
-    public function getCheckInImageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
+    public function getCheckInImageUrlAttribute()
     {
-        if (empty($value)) {
+        if (empty($this->check_in_image)) {
             return null;
         }
 
-        if (filter_var($value, FILTER_VALIDATE_URL)) {
-            return $value;
+        if (filter_var($this->check_in_image, FILTER_VALIDATE_URL)) {
+            return $this->check_in_image;
         }
 
-        return url('storage/' . $value);
+        return url('storage/' . $this->check_in_image);
     }
 
-    public function getCheckOutImageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
+    public function getCheckOutImageUrlAttribute()
     {
-        if (empty($value)) {
+        if (empty($this->check_out_image)) {
             return null;
         }
 
-        if (filter_var($value, FILTER_VALIDATE_URL)) {
-            return $value;
+        if (filter_var($this->check_out_image, FILTER_VALIDATE_URL)) {
+            return $this->check_out_image;
         }
 
-        return url('storage/' . $value);
+        return url('storage/' . $this->check_out_image);
     }
+
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
