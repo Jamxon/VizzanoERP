@@ -44,6 +44,7 @@ class AttendanceController extends Controller
             [
                 'check_in' => $request->check_in,
                 'check_out' => null,
+                'status' => "present",
             ]
         );
 
