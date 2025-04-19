@@ -11,7 +11,6 @@ class AttendanceController extends Controller
     {
         $date = $request->date ?? now()->toDateString();
         $attendances = Attendance::whereDate('date', $date)
-            ->with(['employee'])
             ->orderBy('updated_at', 'desc')
             ->get();
 
