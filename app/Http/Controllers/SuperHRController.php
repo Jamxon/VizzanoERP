@@ -29,6 +29,18 @@ class SuperHRController extends Controller
         return Excel::download(new EmployeeExport($request), 'xodimlar.xlsx');
     }
 
+    public function getWorkingEmployees(): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+        $employees = Employee::where('branch_id', $user->employee->branch_id)
+            ->where('status', '!=','kicked')
+            ->with('user.role', 'position')
+            ->orderByDesc('updated_at')
+            ->get();
+
+        return (new GetEmployeeResourceCollection($employees))->response();
+    }
+
     public function getEmployees(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
