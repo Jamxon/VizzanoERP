@@ -62,4 +62,29 @@ class AttendanceController extends Controller
 
         return response()->json($attendance);
     }
+
+    public function updateAttendance(Request $request, Attendance $attendance): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'check_out' => 'required|date',
+        ]);
+
+        $attendance->update([
+            'check_out' => $request->check_out,
+        ]);
+
+        Log::add(
+            auth()->user()->id,
+            'Hodim ishdan ketdi',
+            'Check Out',
+            null,
+            [
+                'employee_id' => $attendance->employee_id,
+                'check_in' => $attendance->check_in,
+                'check_out' => $attendance->check_out,
+            ]
+        );
+
+        return response()->json($attendance);
+    }
 }
