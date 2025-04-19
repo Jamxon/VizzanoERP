@@ -14,16 +14,6 @@ class HikvisionEventController extends Controller
     {
         $contentType = $request->header('Content-Type');
 
-        Log::add(null, 'Hikvision Debug', 'Request Info', null, [
-            'headers' => $request->headers->all(),
-            'content_type' => $contentType,
-            'all_input' => $request->all(),
-            'all_files' => array_keys($request->allFiles()),
-            'has_picture' => $request->hasFile('Picture'),
-            'event_log_raw' => $request->input('event_log'),
-        ]);
-
-
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
             $image = $request->file('Picture');
@@ -108,28 +98,10 @@ class HikvisionEventController extends Controller
                     );
                 }
 
-            } else {
-                Log::add(
-                    null,
-                    'Hikvision Attendance',
-                    'Employee not found or image missing',
-                    null,
-                    [
-                        'employee_no' => $employeeNo,
-                        'has_image' => $imagePath ? true : false,
-                        'device_id' => $deviceId,
-                    ]
-                );
             }
 
-        } else {
-            $rawData = $request->getContent();
-            Log::add(null, 'Hikvision Event', 'Unknown format', [
-                'content_type' => $contentType,
-                'raw_data' => $rawData,
-            ]);
         }
-
+        
         return response()->json(['status' => 'received']);
     }
 }
