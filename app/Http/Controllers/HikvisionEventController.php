@@ -10,7 +10,6 @@ use App\Models\Attendance;
 
 class HikvisionEventController extends Controller
 {
-
     public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
     {
         $contentType = $request->header('Content-Type');
@@ -23,9 +22,9 @@ class HikvisionEventController extends Controller
             $accessData = $eventData['AccessControllerEvent'] ?? [];
 
             $employeeNo = $accessData['employeeNoString'] ?? null;
-            $eventTime = $accessData['dateTime'] ?? now()->toDateTimeString(); // fallback
+            $deviceId = $accessData['deviceId'] ?? null;
+            $eventTime = $accessData['dateTime'] ?? now()->toDateTimeString();
 
-            // Rasmni saqlash
             $imagePath = null;
             if ($image && $image->isValid()) {
                 $filename = time() . '.' . $image->getClientOriginalExtension();
@@ -33,42 +32,63 @@ class HikvisionEventController extends Controller
                 $imagePath = 'hikvision/' . $filename;
             }
 
-            // Hodimni topish
-            $employee = Employee::where('id', $employeeNo)->first(); // yoki boshqa mapping maydon
+            $employee = Employee::find($employeeNo);
 
-            if ($employee && $imagePath) {
+            if ($employee) {
                 $eventCarbon = Carbon::parse($eventTime);
                 $today = $eventCarbon->toDateString();
 
-                // Bor bo‘lsa - update, yo‘q bo‘lsa - create
                 $attendance = Attendance::firstOrCreate(
                     ['employee_id' => $employee->id, 'date' => $today],
-                    ['source_type' => 'device', 'check_in' => $eventCarbon, 'comment' => 'Face ID']
+                    ['source_type' => 'device']
                 );
 
-                // Agar allaqachon bor bo‘lsa va check_in yo‘q bo‘lsa, uni yozamiz
-                if (!$attendance->check_in) {
+                // CHECK IN — deviceId == 255
+                if ((int)$deviceId === 255 && !$attendance->check_in) {
                     $attendance->check_in = $eventCarbon;
+                    $attendance->comment = 'Face ID (IN)';
                     $attendance->save();
+
+                    Log::add($employee->user_id ?? null, 'Hikvision Attendance', 'Checked in', [
+                        'employee_id' => $employee->id,
+                        'image_path' => $imagePath,
+                        'device_id' => $deviceId,
+                        'time' => $eventTime,
+                    ]);
                 }
 
-                // Log yozish (muvoffaqiyatli holat)
-                Log::add($employee->user_id ?? null, 'Hikvision Attendance', 'Check-in via face recognition', [
-                    'employee_id' => $employee->id,
-                    'image_path' => $imagePath,
-                    'time' => $eventTime,
-                ]);
+                // CHECK OUT — deviceId == 256
+                elseif ((int)$deviceId === 256 && !$attendance->check_out) {
+                    $attendance->check_out = $eventCarbon;
+                    $attendance->comment = 'Face ID (OUT)';
+                    $attendance->save();
+
+                    Log::add($employee->user_id ?? null, 'Hikvision Attendance', 'Checked out', [
+                        'employee_id' => $employee->id,
+                        'image_path' => $imagePath,
+                        'device_id' => $deviceId,
+                        'time' => $eventTime,
+                    ]);
+                }
+
+                // Agar ikkalasi ham bor bo‘lsa — qayta yozmaymiz
+                else {
+                    Log::add($employee->user_id ?? null, 'Hikvision Attendance', 'Already recorded', [
+                        'employee_id' => $employee->id,
+                        'device_id' => $deviceId,
+                        'time' => $eventTime,
+                    ]);
+                }
 
             } else {
-                // Xatolik log
-                Log::add(null, 'Hikvision Attendance', 'No employee matched or image missing', [
+                Log::add(null, 'Hikvision Attendance', 'Employee not found or image missing', [
                     'employee_no' => $employeeNo,
                     'has_image' => $imagePath ? true : false,
+                    'device_id' => $deviceId,
                 ]);
             }
 
         } else {
-            // Fallback – JSON yoki XML bo‘lishi mumkin
             $rawData = $request->getContent();
             Log::add(null, 'Hikvision Event', 'Unknown format', [
                 'content_type' => $contentType,
