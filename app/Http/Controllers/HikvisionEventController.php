@@ -49,12 +49,18 @@ class HikvisionEventController extends Controller
                     $attendance->check_in_image = $imagePath;
                     $attendance->save();
 
-                    Log::add($employee->user_id ?? null, 'Hodim ishga keldi', 'Check In', [
+                    Log::add(
+                        $employee->user_id ?? null,
+                        'Hodim ishga keldi',
+                        'Check In',
+                        null,
+                        [
                         'employee_id' => $employee->id,
                         'image_path' => $imagePath,
                         'device_id' => $deviceId,
                         'time' => $eventTime,
-                    ]);
+                        ]
+                    );
                 }
 
                 // CHECK OUT — deviceId == 256
@@ -63,29 +69,47 @@ class HikvisionEventController extends Controller
                     $attendance->check_out_image = $imagePath;
                     $attendance->save();
 
-                    Log::add($employee->user_id ?? null, 'Hodim ishdan ketdi', 'Check Out', [
-                        'employee_id' => $employee->id,
-                        'image_path' => $imagePath,
-                        'device_id' => $deviceId,
-                        'time' => $eventTime,
-                    ]);
+                    Log::add(
+                        $employee->user_id ?? null,
+                        'Hodim ishdan ketdi',
+                        'Check Out',
+                        null,
+                        [
+                            'employee_id' => $employee->id,
+                            'image_path' => $imagePath,
+                            'device_id' => $deviceId,
+                            'time' => $eventTime,
+                        ]
+                    );
                 }
 
                 // Agar ikkalasi ham bor bo‘lsa — qayta yozmaymiz
                 else {
-                    Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already', [
-                        'employee_id' => $employee->id,
-                        'device_id' => $deviceId,
-                        'time' => $eventTime,
-                    ]);
+                    Log::add(
+                        $employee->user_id ?? null,
+                        'Qaytadan faceId aniqlandi',
+                        'already',
+                        null,
+                        [
+                            'employee_id' => $employee->id,
+                            'device_id' => $deviceId,
+                            'time' => $eventTime,
+                        ]
+                    );
                 }
 
             } else {
-                Log::add(null, 'Hikvision Attendance', 'Employee not found or image missing', [
-                    'employee_no' => $employeeNo,
-                    'has_image' => $imagePath ? true : false,
-                    'device_id' => $deviceId,
-                ]);
+                Log::add(
+                    null,
+                    'Hikvision Attendance',
+                    'Employee not found or image missing',
+                    null,
+                    [
+                        'employee_no' => $employeeNo,
+                        'has_image' => $imagePath ? true : false,
+                        'device_id' => $deviceId,
+                    ]
+                );
             }
 
         } else {
