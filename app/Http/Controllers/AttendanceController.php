@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\GetEmployeeResource;
 use App\Models\Attendance;
+use App\Models\Log;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -27,5 +28,38 @@ class AttendanceController extends Controller
             ->get();
 
         return response()->json($attendances);
+    }
+
+    public function storeAttendance(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'check_in' => 'required|date',
+        ]);
+
+        $attendance = Attendance::updateOrCreate(
+            [
+                'employee_id' => $request->employee_id,
+                'date' => now()->toDateString(),
+            ],
+            [
+                'check_in' => $request->check_in,
+                'check_out' => null,
+            ]
+        );
+
+        Log::add(
+            auth()->user()->id,
+            'Hodim ishga keldi',
+            'Check In',
+            null,
+            [
+                'employee_id' => $attendance->employee_id,
+                'check_in' => $attendance->check_in,
+                'check_out' => $attendance->check_out,
+            ]
+        );
+
+        return response()->json($attendance);
     }
 }

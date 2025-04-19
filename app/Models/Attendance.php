@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static whereDate(string $string, mixed $today)
  * @method static firstOrCreate(array $array, array $array1)
  * @method static create(array $array)
+ * @method static updateOrCreate(array $array, array $array1)
  */
 class Attendance extends Model
 {
