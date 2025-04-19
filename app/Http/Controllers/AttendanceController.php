@@ -36,10 +36,23 @@ class AttendanceController extends Controller
             'check_in' => 'required|date',
         ]);
 
+        $today = now()->toDateString();
+        // Shu kunga allaqachon kelganmi?
+        $existing = Attendance::where('employee_id', $request->employee_id)
+            ->whereDate('date', $today)
+            ->first();
+
+        if ($existing && $existing->check_in) {
+            return response()->json([
+                'message' => "Bu xodim allaqachon davomatdan o'tgan",
+                'data' => $existing,
+            ], 200);
+        }
+
         $attendance = Attendance::updateOrCreate(
             [
                 'employee_id' => $request->employee_id,
-                'date' => now()->toDateString(),
+                'date' => $today,
             ],
             [
                 'check_in' => $request->check_in,
