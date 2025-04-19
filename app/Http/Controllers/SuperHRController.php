@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Services\HikvisionPersonService;
 
 class SuperHRController extends Controller
 {
