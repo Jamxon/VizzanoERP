@@ -46,10 +46,10 @@ class HikvisionEventController extends Controller
                 // CHECK IN — deviceId == 255
                 if ((int)$deviceId === 255 && !$attendance->check_in) {
                     $attendance->check_in = $eventCarbon;
-                    $attendance->comment = 'Face ID (IN)';
+                    $attendance->check_in_image = $imagePath;
                     $attendance->save();
 
-                    Log::add($employee->user_id ?? null, 'Hikvision Attendance', 'Checked in', [
+                    Log::add($employee->user_id ?? null, 'Hodim ishga keldi', 'Check In', [
                         'employee_id' => $employee->id,
                         'image_path' => $imagePath,
                         'device_id' => $deviceId,
@@ -60,10 +60,10 @@ class HikvisionEventController extends Controller
                 // CHECK OUT — deviceId == 256
                 elseif ((int)$deviceId === 256 && !$attendance->check_out) {
                     $attendance->check_out = $eventCarbon;
-                    $attendance->comment = 'Face ID (OUT)';
+                    $attendance->check_out_image = $imagePath;
                     $attendance->save();
 
-                    Log::add($employee->user_id ?? null, 'Hikvision Attendance', 'Checked out', [
+                    Log::add($employee->user_id ?? null, 'Hodim ishdan ketdi', 'Check Out', [
                         'employee_id' => $employee->id,
                         'image_path' => $imagePath,
                         'device_id' => $deviceId,
@@ -73,7 +73,7 @@ class HikvisionEventController extends Controller
 
                 // Agar ikkalasi ham bor bo‘lsa — qayta yozmaymiz
                 else {
-                    Log::add($employee->user_id ?? null, 'Hikvision Attendance', 'Already recorded', [
+                    Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already', [
                         'employee_id' => $employee->id,
                         'device_id' => $deviceId,
                         'time' => $eventTime,

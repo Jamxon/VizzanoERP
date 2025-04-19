@@ -20,6 +20,8 @@ class Attendance extends Model
         'date',
         'check_in',
         'check_out',
+        'check_in_image',
+        'check_out_image',
     ];
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
