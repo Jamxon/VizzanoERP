@@ -396,6 +396,7 @@ class SuperHRController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'department_id' => 'required|integer|exists:departments,id',
         ]);
 
         try {
@@ -403,6 +404,7 @@ class SuperHRController extends Controller
 
             $position = DB::table('positions')->where('id', $id)->update([
                 'name' => $request->name,
+                'department_id' => $request->department_id
             ]);
 
             DB::commit();
