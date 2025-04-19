@@ -16,7 +16,7 @@ class MarkAbsentEmployees extends Command
     {
         $today = Carbon::today()->toDateString();
 
-        $allEmployees = Employee::all()->pluck('id')->toArray();
+        $allEmployees = Employee::where('status', 'working')->pluck('id')->toArray();
 
         $presentEmployeeIds = Attendance::whereDate('date', $today)
             ->pluck('employee_id')
