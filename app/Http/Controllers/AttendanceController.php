@@ -7,12 +7,14 @@ use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
 {
-    public  function index()
+    public  function getAttendances(Request $request): \Illuminate\Http\JsonResponse
     {
-        $date = request('date', now()->toDateString());
+        $date = $request->date ?? now()->toDateString();
         $attendances = Attendance::whereDate('date', $date)
             ->with(['employee'])
             ->orderBy('updated_at', 'desc')
             ->get();
+
+        return response()->json($attendances);
     }
 }

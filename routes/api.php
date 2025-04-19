@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ConstructorController;
@@ -190,6 +191,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::post('departments', [SuperHRController::class, 'storeDepartments']);
     Route::patch('departments/{department}', [SuperHRController::class, 'updateDepartments']);
     Route::get('regions', [SuperHRController::class, 'getRegions']);
+    Route::get('attendances', [AttendanceController::class, 'getAttendances']);
 });
 
 Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {
