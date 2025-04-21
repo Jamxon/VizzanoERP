@@ -38,7 +38,6 @@ class WarehouseController extends Controller
             'order_id' => 'nullable|exists:orders,id',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
-            'items.*.warehouse_id' => 'required|exists:warehouses,id',
             'items.*.quantity' => 'required|numeric|min:0.01',
             'items.*.price' => 'nullable|numeric|min:0',
             'items.*.currency_id' => 'nullable|exists:currencies,id',
@@ -70,7 +69,7 @@ class WarehouseController extends Controller
                 $balance = StockBalance::firstOrCreate(
                     [
                         'item_id' => $item['item_id'],
-                        'warehouse_id' => $item['warehouse_id'],
+                        'warehouse_id' => $validated['warehouse_id'],
                         'order_id' => $validated['order_id'] ?? null,
                     ],
                     ['quantity' => 0]
