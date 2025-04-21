@@ -55,6 +55,7 @@ class ItemController extends Controller
             'unit',
             'color',
             'type',
+            'currency',
             'stockBalances',
             'stockEntries',
         );
