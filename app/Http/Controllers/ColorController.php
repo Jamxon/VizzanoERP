@@ -7,18 +7,18 @@ use Illuminate\Http\Request;
 
 class ColorController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
         $colors = Color::all();
         return response()->json($colors);
     }
 
-    public function show(Color $color)
+    public function show(Color $color): \Illuminate\Http\JsonResponse
     {
         return response()->json($color);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'name' => 'required',
@@ -43,7 +43,7 @@ class ColorController extends Controller
         }
     }
 
-    public function update(Request $request, Color $color)
+    public function update(Request $request, Color $color): \Illuminate\Http\JsonResponse
     {
         $color->update($request->all());
         return response()->json([
@@ -52,12 +52,4 @@ class ColorController extends Controller
         ]);
     }
 
-    public function destroy(Color $color)
-    {
-        $color->delete();
-        return response()->json([
-            'message' => 'Color deleted successfully',
-            'color' => $color,
-        ]);
-    }
 }
