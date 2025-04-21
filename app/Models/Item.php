@@ -35,6 +35,14 @@ class Item extends Model
         'branch_id'
     ];
 
+    public function getImageAttribute($value)
+    {
+        if (str_starts_with($value, 'items/')) {
+            return url('storage/' . $value);
+        }
+        return null;
+    }
+
     public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderModel::class, 'material_id', 'id');
