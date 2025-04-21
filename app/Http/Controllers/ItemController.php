@@ -24,10 +24,14 @@ class ItemController extends Controller
     public function search(Request $request): \Illuminate\Http\JsonResponse
     {
         $query = $request->input('query');
+        $type = $request->input('type');
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%$query%")
                     ->orWhere('code', 'like', "%$query%");
+            })
+            ->when($type, function ($q) use ($type) {
+                $q->where('type_id', $type);
             })
             ->with('unit', 'color', 'type')
             ->orderBy('updated_at', 'desc')
