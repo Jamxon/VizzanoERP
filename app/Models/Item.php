@@ -35,7 +35,7 @@ class Item extends Model
         'branch_id'
     ];
 
-    public function getImageAttribute($value)
+    public function getImageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
     {
         if (str_starts_with($value, 'items/')) {
             return url('storage/' . $value);
