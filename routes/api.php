@@ -4,6 +4,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ConstructorController;
+use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CuttingMasterController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
@@ -45,6 +46,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('colors',[ColorController::class, 'index']);
     Route::get('types',[ItemTypeController::class, 'index']);
     Route::get('units',[UnitController::class, 'index']);
+    Route::get('currencies',[CurrencyController::class, 'index']);
 });
 
 Route::prefix('transport')->middleware('role:transport')->group(function () {

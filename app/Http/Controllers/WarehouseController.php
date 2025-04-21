@@ -31,7 +31,7 @@ class WarehouseController extends Controller
             'comment' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
             'price' => 'nullable|numeric',
-            'currency' => 'nullable|string',
+            'currency_id' => 'nullable|integer',
         ]);
 
         try {
@@ -47,7 +47,7 @@ class WarehouseController extends Controller
                     'created_by' => auth()->id(),
                     'order_id' => $validated['order_id'],
                     'price' => $validated['price'],
-                    'currency' => $validated['currency'],
+                    'currency_id' => $validated['currency_id'],
                 ]);
 
                 $balance = StockBalance::firstOrCreate([
@@ -101,7 +101,7 @@ class WarehouseController extends Controller
             'comment' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
             'price' => 'nullable|numeric',
-            'currency' => 'nullable|string',
+            'currency_id' => 'nullable|integer',
         ]);
 
         try {
@@ -126,7 +126,7 @@ class WarehouseController extends Controller
                     'created_by' => auth()->id(),
                     'order_id' => $validated['order_id'],
                     'price' => $validated['price'],
-                    'currency' => $validated['currency'],
+                    'currency_id' => $validated['currency_id'],
                 ]);
 
                 $oldQty = $balance->quantity;

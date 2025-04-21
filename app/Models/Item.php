@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static whereHas(string $string, \Closure $param)
  * @method static create(array $array)
- * @property mixed $currency
+ * @property mixed $currency_id
  */
 class Item extends Model
 {
@@ -77,6 +77,11 @@ class Item extends Model
     public function stockEntries(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(StockEntry::class);
+    }
+
+    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Currency::class, 'currency', 'name');
     }
 
 }
