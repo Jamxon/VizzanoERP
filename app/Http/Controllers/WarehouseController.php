@@ -32,61 +32,71 @@ class WarehouseController extends Controller
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'item_id' => 'required|exists:items,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'quantity' => 'required|numeric|min:0.01',
-            'source_id' => 'required|integer',
+            'warehouse_id' => 'nullable|exists:warehouses,id', // umumiy ombor (ixtiyoriy)
+            'source_id' => 'nullable|exists:sources,id',
             'comment' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
-            'price' => 'nullable|numeric',
-            'currency_id' => 'nullable|integer',
+            'items' => 'required|array|min:1',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.warehouse_id' => 'required|exists:warehouses,id',
+            'items.*.quantity' => 'required|numeric|min:0.01',
+            'items.*.price' => 'nullable|numeric|min:0',
+            'items.*.currency_id' => 'nullable|exists:currencies,id',
         ]);
 
+        DB::beginTransaction();
         try {
-            $entry = DB::transaction(function () use ($validated) {
-                $entry = StockEntry::create([
-                    'item_id' => $validated['item_id'],
-                    'warehouse_id' => $validated['warehouse_id'],
-                    'quantity' => $validated['quantity'],
-                    'type' => 'incoming',
-                    'source_id' => $validated['source_id'],
-                    'destination_id' => null,
-                    'comment' => $validated['comment'],
-                    'created_by' => auth()->id(),
-                    'order_id' => $validated['order_id'],
-                    'price' => $validated['price'],
-                    'currency_id' => $validated['currency_id'],
-                    'user_id' => auth()->id(),
+            $entry = StockEntry::create([
+                'type' => 'incoming',
+                'warehouse_id' => $validated['warehouse_id'] ?? null, // umumiy ombor (ixtiyoriy)
+                'source_id' => $validated['source_id'] ?? null,
+                'destination_id' => null,
+                'comment' => $validated['comment'] ?? null,
+                'created_by' => auth()->id(),
+                'order_id' => $validated['order_id'] ?? null,
+                'user_id' => auth()->id(),
+            ]);
+
+            foreach ($validated['items'] as $item) {
+                // Itemni entryga bog‘lash
+                $entry->items()->create([
+                    'item_id' => $item['item_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'] ?? null,
+                    'currency_id' => $item['currency_id'] ?? null,
                 ]);
 
-                $balance = StockBalance::firstOrCreate([
-                    'item_id' => $validated['item_id'],
-                    'warehouse_id' => $validated['warehouse_id'],
-                    'order_id' => $validated['order_id'],
-                ]);
+                // Zaxirani yangilash
+                $balance = StockBalance::firstOrCreate(
+                    [
+                        'item_id' => $item['item_id'],
+                        'warehouse_id' => $item['warehouse_id'],
+                        'order_id' => $validated['order_id'] ?? null,
+                    ],
+                    ['quantity' => 0]
+                );
 
                 $oldQty = $balance->quantity;
-                $balance->quantity += $validated['quantity'];
+                $balance->quantity += $item['quantity'];
                 $balance->save();
 
                 Log::add(
                     auth()->id(),
-                    'Kirim qo‘shildi',
+                    'Omborga kirim qilindi',
                     'stock_in',
-                    ['quantity' => $oldQty],
-                    ['quantity' => $balance->quantity]
+                    ['item_id' => $item['item_id'], 'quantity' => $oldQty],
+                    ['item_id' => $item['item_id'], 'quantity' => $balance->quantity]
                 );
+            }
 
-                return $entry;
-            });
-
-            return response()->json(['message' => 'Kirim muvaffaqiyatli qo‘shildi', 'data' => $entry]);
-        } catch (\Throwable $e) {
-            LaravelLog::error('Kirim qo‘shishda xatolik: ' . $e->getMessage(), [
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
+            DB::commit();
+            return response()->json([
+                'message' => 'Kirim muvaffaqiyatli amalga oshirildi',
+                'entry' => $entry->load('items'),
             ]);
-            return response()->json(['message' => 'Xatolik yuz berdi.'], 500);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Xatolik', 'error' => $e->getMessage()], 500);
         }
     }
 
@@ -110,77 +120,72 @@ class WarehouseController extends Controller
     public function storeOutgoing(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'item_id' => 'required|exists:items,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'quantity' => 'required|numeric|min:0.01',
-            'destination_id' => 'nullable|integer',
-            'destination_name' => 'nullable|string',
+            'warehouse_id' => 'nullable|exists:warehouses,id', // umumiy ombor (ixtiyoriy)
+            'destination_id' => 'nullable|exists:destinations,id', // destination (maqsad ombori)
+            'source_id' => 'nullable|exists:sources,id',
             'comment' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
-            'price' => 'nullable|numeric',
-            'currency_id' => 'nullable|integer',
-            'user_id' => 'nullable|integer',
+            'items' => 'required|array|min:1',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.warehouse_id' => 'required|exists:warehouses,id',
+            'items.*.quantity' => 'required|numeric|min:0.01',
+            'items.*.price' => 'nullable|numeric|min:0',
+            'items.*.currency_id' => 'nullable|exists:currencies,id',
         ]);
 
+        DB::beginTransaction();
         try {
-            $entry = DB::transaction(function () use ($validated) {
-                $balance = StockBalance::where('item_id', $validated['item_id'])
-                    ->where('warehouse_id', $validated['warehouse_id'])
-                    ->where('order_id', $validated['order_id'])
-                    ->first();
+            $entry = StockEntry::create([
+                'type' => 'outgoing',
+                'warehouse_id' => $validated['warehouse_id'] ?? null, // umumiy ombor (ixtiyoriy)
+                'destination_id' => $validated['destination_id'] ?? null,
+                'source_id' => $validated['source_id'] ?? null,
+                'comment' => $validated['comment'] ?? null,
+                'created_by' => auth()->id(),
+                'order_id' => $validated['order_id'] ?? null,
+                'user_id' => auth()->id(),
+            ]);
 
-                if (!$balance || $balance->quantity < $validated['quantity']) {
-                    throw new \Exception('Zaxirada yetarli mahsulot mavjud emas');
-                }
-
-                if ($validated['destination_id'] === null && $validated['destination_name'] !== null) {
-                    $destination = new Destination();
-                    $destination->name = $validated['destination_name'];
-                    $destination->save();
-                    $validated['destination_id'] = $destination->id;
-                }
-
-                $entry = StockEntry::create([
-                    'item_id' => $validated['item_id'],
-                    'warehouse_id' => $validated['warehouse_id'],
-                    'quantity' => $validated['quantity'],
-                    'type' => 'outgoing',
-                    'source_id' => null,
-                    'destination_id' => $validated['destination_id'],
-                    'comment' => $validated['comment'],
-                    'created_by' => auth()->id(),
-                    'order_id' => $validated['order_id'],
-                    'price' => $validated['price'],
-                    'currency_id' => $validated['currency_id'],
-                    'user_id' => $validated['user_id'] ?? auth()->id(),
+            foreach ($validated['items'] as $item) {
+                // Itemni entryga bog‘lash
+                $entry->items()->create([
+                    'item_id' => $item['item_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $item['price'] ?? null,
+                    'currency_id' => $item['currency_id'] ?? null,
                 ]);
 
+                // Zaxirani yangilash
+                $balance = StockBalance::firstOrCreate(
+                    [
+                        'item_id' => $item['item_id'],
+                        'warehouse_id' => $item['warehouse_id'],
+                        'order_id' => $validated['order_id'] ?? null,
+                    ],
+                    ['quantity' => 0]
+                );
+
                 $oldQty = $balance->quantity;
-                $balance->quantity -= $validated['quantity'];
+                $balance->quantity -= $item['quantity']; // Chiqim bo‘lgani uchun quantity minus
                 $balance->save();
 
                 Log::add(
                     auth()->id(),
-                    'Chiqim qo‘shildi',
+                    'Ombordan chiqim amalga oshirildi',
                     'stock_out',
-                    ['quantity' => $oldQty],
-                    ['quantity' => $balance->quantity]
+                    ['item_id' => $item['item_id'], 'quantity' => $oldQty],
+                    ['item_id' => $item['item_id'], 'quantity' => $balance->quantity]
                 );
-
-                return $entry;
-            });
-
-            return response()->json(['message' => 'Chiqim muvaffaqiyatli amalga oshirildi', 'data' => $entry]);
-        } catch (\Throwable $e) {
-            if ($e->getMessage() === 'Zaxirada yetarli mahsulot mavjud emas') {
-                return response()->json(['message' => $e->getMessage()], 400);
             }
 
-            LaravelLog::error('Chiqimda xatolik: ' . $e->getMessage(), [
-                'line' => $e->getLine(),
-                'file' => $e->getFile(),
+            DB::commit();
+            return response()->json([
+                'message' => 'Chiqim muvaffaqiyatli amalga oshirildi',
+                'entry' => $entry->load('items'),
             ]);
-            return response()->json(['message' => 'Xatolik yuz berdi.'], 500);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Xatolik', 'error' => $e->getMessage()], 500);
         }
     }
 
