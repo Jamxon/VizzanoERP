@@ -109,6 +109,7 @@ class ItemController extends Controller
 
     public function update(Request $request, Item $item): \Illuminate\Http\JsonResponse
     {
+        dd($request->all());
         $validated = $request->validate([
             'name' => 'sometimes|string',
             'price' => 'sometimes|numeric',
