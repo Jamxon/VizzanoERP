@@ -23,7 +23,7 @@ class ItemController extends Controller
 
     public function search(Request $request): \Illuminate\Http\JsonResponse
     {
-        $query = $request->input('query');
+        $query = $request->input('search');
         $type = $request->input('type');
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($q) use ($query) {
