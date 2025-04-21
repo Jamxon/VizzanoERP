@@ -40,6 +40,7 @@ class AttendanceController extends Controller
         // Shu kunga allaqachon kelganmi?
         $existing = Attendance::where('employee_id', $request->employee_id)
             ->whereDate('date', $today)
+            ->with('employee')
             ->first();
 
         if ($existing && $existing->check_in) {
@@ -73,7 +74,7 @@ class AttendanceController extends Controller
             ]
         );
 
-        return response()->json($attendance->with('employee'));
+        return response()->json($attendance);
     }
 
     public function updateAttendance(Request $request, Attendance $attendance): \Illuminate\Http\JsonResponse
