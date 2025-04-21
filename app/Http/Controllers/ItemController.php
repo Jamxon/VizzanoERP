@@ -17,7 +17,7 @@ class ItemController extends Controller
         $items = Item::orderBy('updated_at', 'desc')
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->with('unit', 'color', 'type')
-            ->get();
+            ->paginate(10);
         return response()->json($items);
     }
 
