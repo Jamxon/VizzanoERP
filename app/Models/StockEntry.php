@@ -20,13 +20,14 @@ class StockEntry extends Model
         'warehouse_id',
         'type',
         'source_id',
-        'destination',
+        'destination_id',
         'quantity',
         'comment',
         'created_by',
         'order_id',
         'price',
-        'currency_id'
+        'currency_id',
+        'user_id',
     ];
 
     public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -47,5 +48,15 @@ class StockEntry extends Model
     public function source(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Source::class);
+    }
+
+    public function destination(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Destination::class);
+    }
+
+    public function  user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }
