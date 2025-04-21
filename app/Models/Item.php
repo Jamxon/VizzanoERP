@@ -82,7 +82,7 @@ class Item extends Model
 
     public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Currency::class, 'currency', 'name');
+        return $this->belongsTo(Currency::class);
     }
 
 }
