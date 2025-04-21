@@ -19,7 +19,7 @@ class StockEntry extends Model
         'item_id',
         'warehouse_id',
         'type',
-        'source',
+        'source_id',
         'destination',
         'quantity',
         'comment',
@@ -44,4 +44,8 @@ class StockEntry extends Model
         return $this->belongsTo(Currency::class);
     }
 
+    public function source(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Source::class);
+    }
 }
