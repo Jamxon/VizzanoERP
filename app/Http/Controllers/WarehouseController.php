@@ -32,10 +32,10 @@ class WarehouseController extends Controller
     {
         $incoming = StockEntry::where('type', 'incoming')
             ->with([
-                'item',
+                'items.currency',
+                'items.item',
                 'warehouse',
                 'source',
-                'currency',
                 'destination',
                 'user',
                 ])
@@ -127,10 +127,10 @@ class WarehouseController extends Controller
     {
         $outgoing = StockEntry::where('type', 'outgoing')
             ->with([
-                'item',
+                'items.currency',
+                'items.item',
                 'warehouse',
                 'source',
-                'currency',
                 'destination',
                 'user',
                 ])
