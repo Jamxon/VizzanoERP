@@ -73,7 +73,7 @@ class AttendanceController extends Controller
             ]
         );
 
-        return response()->json($attendance);
+        return response()->json($attendance->with('employee'));
     }
 
     public function updateAttendance(Request $request, Attendance $attendance): \Illuminate\Http\JsonResponse
