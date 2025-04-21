@@ -124,7 +124,7 @@ class ItemController extends Controller
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/items', $imageName);
+            $imagePath = $image->storeAs('/items', $imageName);
             $imagePath = str_replace('public/', '', $imagePath);
 
             // Eski rasmni o'chirish
