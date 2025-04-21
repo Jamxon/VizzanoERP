@@ -68,4 +68,9 @@ class Item extends Model
         return $this->hasMany(StockBalance::class);
     }
 
+    public function stockEntries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(StockEntry::class);
+    }
+
 }

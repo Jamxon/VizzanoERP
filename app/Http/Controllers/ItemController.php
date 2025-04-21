@@ -21,7 +21,7 @@ class ItemController extends Controller
         return response()->json($items);
     }
 
-    public function search(Request $request): \Illuminate\Http\JsonResponse9
+    public function search(Request $request): \Illuminate\Http\JsonResponse
     {
         $query = $request->input('search');
         $type = $request->input('type');
@@ -57,6 +57,18 @@ class ItemController extends Controller
             'message' => 'Eksport jarayoni navbatga olindi',
             'fileUrl' => $fileUrl,
         ]);
+    }
+
+    public function show(Item $item): \Illuminate\Http\JsonResponse
+    {
+        $item->load(
+            'unit',
+            'color',
+            'type',
+            'stockBalances',
+            'stockEntries',
+        );
+        return response()->json($item);
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse

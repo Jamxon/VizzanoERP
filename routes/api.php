@@ -39,6 +39,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('/balances', [WarehouseController::class, 'getStockBalances']);
     Route::get('items', [ItemController::class, 'index']);
     Route::post('items', [ItemController::class, 'store']);
+    Route::get('items/{item}', [ItemController::class, 'show']);
     Route::patch('items/{item}', [ItemController::class, 'update']);
     Route::get('items-export', [ItemController::class, 'export']);
     Route::get('items/search', [ItemController::class, 'search']);
