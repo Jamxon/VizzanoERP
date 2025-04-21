@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static whereHas(string $string, \Closure $param)
  * @method static create(array $array)
+ * @property mixed $currency
  */
 class Item extends Model
 {
@@ -21,7 +22,8 @@ class Item extends Model
         'image',
         'type_id',
         'code',
-        'branch_id'
+        'branch_id',
+        'currency'
     ];
 
     protected $hidden = [
