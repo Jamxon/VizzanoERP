@@ -16,7 +16,6 @@ class StockEntry extends Model
     protected $table = 'stock_entries';
 
     protected $fillable = [
-        'item_id',
         'warehouse_id',
         'type',
         'source_id',
