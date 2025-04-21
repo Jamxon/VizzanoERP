@@ -43,6 +43,12 @@ class Item extends Model
         return null;
     }
 
+    public function getImageRawAttribute(): ?string
+    {
+        return $this->attributes['image'] ?? null;
+    }
+
+
     public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(OrderModel::class, 'material_id', 'id');
