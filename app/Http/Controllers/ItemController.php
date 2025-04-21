@@ -23,7 +23,7 @@ class ItemController extends Controller
             ->when($type, function ($q) use ($type) {
                 $q->where('type_id', $type);
             })
-            ->with('unit', 'color', 'type')
+            ->with('unit', 'color', 'type','currency')
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
