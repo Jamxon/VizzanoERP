@@ -18,7 +18,8 @@ class StockBalance extends Model
     protected $fillable = [
         'item_id',
         'warehouse_id',
-        'quantity'
+        'quantity',
+        'order_id',
     ];
 
     public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo

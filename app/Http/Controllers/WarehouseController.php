@@ -49,6 +49,7 @@ class WarehouseController extends Controller
         $balance = StockBalance::firstOrCreate([
             'item_id' => $validated['item_id'],
             'warehouse_id' => $validated['warehouse_id'],
+            'order_id' => $validated['order_id'],
         ]);
         $oldQty = $balance->quantity;
         $balance->quantity += $validated['quantity'];
@@ -90,6 +91,7 @@ class WarehouseController extends Controller
 
         $balance = StockBalance::where('item_id', $validated['item_id'])
             ->where('warehouse_id', $validated['warehouse_id'])
+            ->where('order_id', $validated['order_id'])
             ->first();
 
         if (!$balance || $balance->quantity < $validated['quantity']) {
@@ -129,9 +131,14 @@ class WarehouseController extends Controller
     {
         $warehouseId = $request->input('warehouse_id');
 
+        $orderId = $request->input('order_id');
+
         $query = StockBalance::with('item', 'warehouse');
         if ($warehouseId) {
             $query->where('warehouse_id', $warehouseId);
+            if ($orderId) {
+                $query->where('order_id', $orderId);
+            }
         }
 
         return response()->json($query->get());
