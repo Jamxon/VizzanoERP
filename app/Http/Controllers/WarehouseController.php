@@ -127,5 +127,4 @@ class WarehouseController extends Controller
 
         return response()->json($query->get());
     }
-
 }
