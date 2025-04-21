@@ -109,13 +109,7 @@ class ItemController extends Controller
 
     public function update(Request $request, Item $item): \Illuminate\Http\JsonResponse
     {
-        $data = json_decode($request->input('data'), true);
-
-        if (!$data) {
-            return response()->json(['error' => 'Invalid JSON data'], 400);
-        }
-
-        $validated = $request->merge($data)->validate([
+        $validated = $request->validate([
             'name' => 'sometimes|string',
             'price' => 'sometimes|numeric',
             'unit_id' => 'sometimes|exists:units,id',
@@ -130,11 +124,11 @@ class ItemController extends Controller
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('/items', $imageName);
+            $imagePath = $image->storeAs('public/items', $imageName);
             $imagePath = str_replace('public/', '', $imagePath);
 
             // Eski rasmni o'chirish
-            if ($item->image && Storage::exists('public/items' . $item->image)) {
+            if ($item->image && Storage::exists('public/' . $item->image)) {
                 Storage::delete('public/' . $item->image);
             }
 
@@ -147,8 +141,8 @@ class ItemController extends Controller
         $item->color_id = $validated['color_id'] ?? $item->color_id;
         $item->type_id = $validated['type_id'] ?? $item->type_id;
         $item->code = $validated['code'] ?? $item->code;
-        $item->branch_id = auth()->user()->employee->branch_id;
         $item->currency = $validated['currency'] ?? $item->currency;
+        $item->branch_id = auth()->user()->employee->branch_id;
         $item->save();
 
         return response()->json([
