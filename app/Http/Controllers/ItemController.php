@@ -17,7 +17,7 @@ class ItemController extends Controller
         $type = $request->input('type');
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($q) use ($query) {
-                $q->where('LOWER(name)', 'like', "%$query%")
+                $q->orWhereRaw('LOWER(name) LIKE ?', ["%$query%"])
                     ->orWhere('code', 'like', "%$query%");
             })
             ->when($type, function ($q) use ($type) {
