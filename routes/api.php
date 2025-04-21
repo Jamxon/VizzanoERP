@@ -33,8 +33,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
     Route::post('/incoming', [WarehouseController::class, 'storeIncoming']);
+    Route::get('/incoming', [WarehouseController::class, 'getIncoming']);
     Route::post('/outgoing', [WarehouseController::class, 'storeOutgoing']);
+    Route::get('/outgoing', [WarehouseController::class, 'getOutgoing']);
     Route::get('/balances', [WarehouseController::class, 'getStockBalances']);
+    Route::get('items', [ItemController::class, 'index']);
+    Route::post('items', [ItemController::class, 'store']);
+    Route::patch('items/{item}', [ItemController::class, 'update']);
+    Route::get('items-export', [ItemController::class, 'export']);
 });
 
 Route::prefix('transport')->middleware('role:transport')->group(function () {
