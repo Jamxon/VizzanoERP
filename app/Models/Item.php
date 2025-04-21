@@ -23,7 +23,7 @@ class Item extends Model
         'type_id',
         'code',
         'branch_id',
-        'currency'
+        'currency_id'
     ];
 
     protected $hidden = [
@@ -32,7 +32,8 @@ class Item extends Model
         'unit_id',
         'color_id',
         'type_id',
-        'branch_id'
+        'branch_id',
+        'currency_id',
     ];
 
     public function getImageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
