@@ -65,7 +65,6 @@ class SuperHRController extends Controller
             $query->where(function ($q) use ($search, $searchLatin, $searchCyrillic) {
                 foreach ([$search, $searchLatin, $searchCyrillic] as $term) {
                     $q->orWhereRaw('LOWER(name) LIKE ?', ["%$term%"])
-                        ->orWhereRaw('LOWER(phone) LIKE ?', ["%$term%"])
                         ->orWhereRaw('CAST(id AS TEXT) LIKE ?', ["%$term%"])
                         ->orWhereHas('position', fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ["%$term%"]))
                         ->orWhereHas('user', function ($q) use ($term) {
