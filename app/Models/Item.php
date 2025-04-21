@@ -37,7 +37,7 @@ class Item extends Model
 
     public function getImageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
     {
-        if (str_starts_with($value, 'items/')) {
+        if (request()->expectsJson()) {
             return url('storage/' . $value);
         }
         return null;
