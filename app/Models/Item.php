@@ -47,18 +47,14 @@ class Item extends Model
         return $this->belongsTo(Color::class);
     }
 
-    public function recipes(): \Illuminate\Database\Eloquent\Relations\HasMany
-    {
-        return $this->hasMany(Recipe::class);
-    }
-
     public function type(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(ItemType::class, 'type_id');
     }
 
-    public function stok(): \Illuminate\Database\Eloquent\Relations\HasOne
+    public function stockBalances(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasOne(Stok::class, 'product_id');
+        return $this->hasMany(StockBalance::class);
     }
+
 }

@@ -31,6 +31,12 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
+    Route::post('/incoming', [WarehouseController::class, 'storeIncoming']);
+    Route::post('/outgoing', [WarehouseController::class, 'storeOutgoing']);
+    Route::get('/balances', [WarehouseController::class, 'getStockBalances']);
+});
+
 Route::prefix('transport')->middleware('role:transport')->group(function () {
     Route::get('transports', [TransportController::class, 'index']);
     Route::get('transports/{id}', [TransportController::class, 'show']);

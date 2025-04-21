@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StockBalance;
+use App\Models\StockEntry;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\WarehouseRelatedUser;
@@ -9,111 +11,82 @@ use Illuminate\Http\Request;
 
 class WarehouseController extends Controller
 {
-    public function warehouseStore(Request $request): \Illuminate\Http\JsonResponse
+    public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
-
-        $data = $request->validate([
-            'name' => 'required|string',
-            'location' => 'required|string',
-            'users' => 'required|array',
-            'users.*' => 'required|integer|exists:users,id',
+        $validated = $request->validate([
+            'item_id' => 'required|exists:items,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'quantity' => 'required|numeric|min:0.01',
+            'source' => 'required|string',
+            'comment' => 'nullable|string',
         ]);
 
-        $warehouse = Warehouse::create([
-            'name' => $data['name'],
-            'location' => $data['location'],
-            'branch_id' => auth()->user()->employee->branch_id,
+        $entry = StockEntry::create([
+            'item_id' => $validated['item_id'],
+            'warehouse_id' => $validated['warehouse_id'],
+            'quantity' => $validated['quantity'],
+            'type' => 'incoming',
+            'source' => $validated['source'],
+            'destination' => null,
+            'comment' => $validated['comment'],
+            'created_by' => auth()->id(),
         ]);
 
-        foreach ($data['users'] as $user) {
-            WarehouseRelatedUser::create([
-                'warehouse_id' => $warehouse->id,
-                'user_id' => $user,
-            ]);
-        }
+        $balance = StockBalance::firstOrCreate([
+            'item_id' => $validated['item_id'],
+            'warehouse_id' => $validated['warehouse_id'],
+        ]);
+        $balance->quantity += $validated['quantity'];
+        $balance->save();
 
-        return response()->json([
-            'message' => 'Warehouse created successfully',
-            'warehouse' => $warehouse,
-        ], 201);
+        return response()->json(['message' => 'Kirim muvaffaqiyatli qo‘shildi', 'data' => $entry]);
     }
 
-    public function warehouseUpdate(Request $request, $warehouseId): \Illuminate\Http\JsonResponse
+    public function storeOutgoing(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = $request->validate([
-            'name' => 'sometimes|string',
-            'location' => 'sometimes|string',
-            'users' => 'sometimes|array',
-            'users.*' => 'integer|exists:users,id',
+        $validated = $request->validate([
+            'item_id' => 'required|exists:items,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'quantity' => 'required|numeric|min:0.01',
+            'destination' => 'required|string',
+            'comment' => 'nullable|string',
         ]);
 
-        $warehouse = Warehouse::find($warehouseId);
+        $balance = StockBalance::where('item_id', $validated['item_id'])
+            ->where('warehouse_id', $validated['warehouse_id'])
+            ->first();
 
-        if (!$warehouse) {
-            return response()->json(['message' => 'Warehouse not found'], 404);
+        if (!$balance || $balance->quantity < $validated['quantity']) {
+            return response()->json(['message' => 'Zaxirada yetarli mahsulot mavjud emas'], 400);
         }
 
-        if ($warehouse->branch_id !== auth()->user()->employee->branch_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $entry = StockEntry::create([
+            'item_id' => $validated['item_id'],
+            'warehouse_id' => $validated['warehouse_id'],
+            'quantity' => $validated['quantity'],
+            'type' => 'outgoing',
+            'source' => null,
+            'destination' => $validated['destination'],
+            'comment' => $validated['comment'],
+            'created_by' => auth()->id(),
+        ]);
 
-        if (isset($data['name'])) {
-            $warehouse->name = $data['name'];
-        }
-        if (isset($data['location'])) {
-            $warehouse->location = $data['location'];
-        }
-        $warehouse->save();
+        $balance->quantity -= $validated['quantity'];
+        $balance->save();
 
-        if (isset($data['users'])) {
-            WarehouseRelatedUser::where('warehouse_id', $warehouse->id)->delete();
-
-            foreach ($data['users'] as $userId) {
-                WarehouseRelatedUser::create([
-                    'warehouse_id' => $warehouse->id,
-                    'user_id' => $userId,
-                ]);
-            }
-        }
-
-        return response()->json([
-            'message' => 'Warehouse updated successfully',
-            'warehouse' => $warehouse,
-        ], 200);
+        return response()->json(['message' => 'Chiqim muvaffaqiyatli amalga oshirildi', 'data' => $entry]);
     }
 
-    public function getWarehouse(): \Illuminate\Http\JsonResponse
+    public function getStockBalances(Request $request): \Illuminate\Http\JsonResponse
     {
-        $employee = auth()->user()->employee;
+        $warehouseId = $request->input('warehouse_id');
 
-        if (!$employee) {
-            return response()->json(['message' => 'Employee not found'], 404);
+        $query = StockBalance::with('item', 'warehouse');
+        if ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
         }
 
-        $warehouses = Warehouse::where('branch_id', $employee->branch_id)
-            ->with('stoks','stoks.item','users','stoks.item.unit','stoks.item.color','stoks.item.type')
-            ->get();
-
-        return response()->json($warehouses, 200);
-    }
-
-    public function getWarehouseUsers(): \Illuminate\Http\JsonResponse
-    {
-        $employee = auth()->user()->employee;
-
-        if (!$employee) {
-            return response()->json(['message' => 'Employee not found'], 404);
-        }
-
-        $branchId = $employee->branch_id;
-
-        $warehouses = User::whereHas('employee', function ($query) use ($branchId) {
-                $query->where('branch_id', $branchId);
-                $query->where('type', 'aup');
-            })
-            ->get();
-
-        return response()->json($warehouses, 200);
+        return response()->json($query->get());
     }
 
 }
