@@ -21,7 +21,7 @@ class ItemController extends Controller
         return response()->json($items);
     }
 
-    public function search(Request $request): \Illuminate\Http\JsonResponse
+    public function search(Request $request): \Illuminate\Http\JsonResponse9
     {
         $query = $request->input('search');
         $type = $request->input('type');
