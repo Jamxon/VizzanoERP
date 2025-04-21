@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Destination;
+use App\Models\Order;
 use App\Models\StockBalance;
 use App\Models\StockEntry;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log as LaravelLog;
@@ -12,6 +14,20 @@ use App\Models\Log;
 
 class WarehouseController extends Controller
 {
+    public function getWarehouses(): \Illuminate\Http\JsonResponse
+    {
+        $warehouses = Warehouse::where('branch_id', auth()->user()->employee->branch_id)->get();
+
+        return response()->json($warehouses);
+    }
+
+    public function getOrders(): \Illuminate\Http\JsonResponse
+    {
+        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)->get();
+
+        return response()->json($orders);
+    }
+
     public function getIncoming(): \Illuminate\Http\JsonResponse
     {
         $incoming = StockEntry::where('type', 'incoming')

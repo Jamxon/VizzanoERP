@@ -50,6 +50,8 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('units',[UnitController::class, 'index']);
     Route::get('currencies',[CurrencyController::class, 'index']);
     Route::get('sources',[SourceController::class, 'index']);
+    Route::get('warehouses', [WarehouseController::class, 'getWarehouses']);
+    Route::get('orders', [WarehouseController::class, 'getOrders']);
 });
 
 Route::prefix('transport')->middleware('role:transport')->group(function () {
