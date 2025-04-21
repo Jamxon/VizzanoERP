@@ -22,7 +22,7 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEve
             ->select([
                 'items.id as №',
                 'items.name as Nomi',
-                DB::raw("'image' as Rasmi"), // Rasmlar uchun ustun bo‘sh qoldiriladi
+                DB::raw("'' as Rasmi"), // Rasmlar uchun ustun bo‘sh qoldiriladi
                 'items.code as Kodi',
                 'units.name as Birligi',
                 'items.price as Narxi',
