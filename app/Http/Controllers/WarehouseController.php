@@ -34,6 +34,7 @@ class WarehouseController extends Controller
         $validated = $request->validate([
             'warehouse_id' => 'nullable|exists:warehouses,id', // umumiy ombor (ixtiyoriy)
             'source_id' => 'nullable|exists:sources,id',
+            'source_name' => 'nullable|string',
             'comment' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
             'items' => 'required|array|min:1',
@@ -45,6 +46,13 @@ class WarehouseController extends Controller
 
         DB::beginTransaction();
         try {
+
+            // Agar source_id berilmagan bo‘lsa, source_name ni saqlash
+            if (empty($validated['source_id']) && !empty($validated['source_name'])) {
+                $source = Destination::firstOrCreate(['name' => $validated['source_name']]);
+                $validated['source_id'] = $source->id;
+            }
+
             $entry = StockEntry::create([
                 'type' => 'incoming',
                 'warehouse_id' => $validated['warehouse_id'] ?? null, // umumiy ombor (ixtiyoriy)

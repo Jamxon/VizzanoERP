@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property mixed $name
+ * @method static firstOrCreate(array $array)
  */
 class Destination extends Model
 {
