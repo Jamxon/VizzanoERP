@@ -33,14 +33,15 @@ class Warehouse extends Model
         return $this->belongsTo(Branch::class, 'branch_id');
     }
 
-    public function stoks(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function stockBalances(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(Stok::class, 'warehouse_id');
+        return $this->hasMany(StockBalance::class);
     }
 
-    public function users(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function stockEntries(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->belongsToMany(User::class, 'warehouses_related_users', 'warehouse_id', 'user_id');
+        return $this->hasMany(StockEntry::class);
     }
+
 
 }
