@@ -37,7 +37,7 @@ class ItemController extends Controller
             unlink($filePath);
         }
 
-        Excel::queue(new ItemsExport, 'public/materiallar.xlsx')->chain([
+        Excel::queue(new ItemsExport, 'materiallar.xlsx')->chain([
             new NotifyUserOfCompletedExport(auth()->user())
         ]);
 
