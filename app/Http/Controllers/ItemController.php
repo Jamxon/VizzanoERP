@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
         $items = Item::orderBy('updated_at', 'desc')
             ->where('branch_id', auth()->user()->employee->branch_id)
@@ -21,7 +21,7 @@ class ItemController extends Controller
         return response()->json($items);
     }
 
-    public function export()
+    public function export(): \Illuminate\Http\JsonResponse
     {
         $filePath = storage_path('app/public/materiallar.xlsx');
         if (file_exists($filePath)) {
@@ -35,21 +35,19 @@ class ItemController extends Controller
         $fileUrl = url('storage/materiallar.xlsx');
 
         return response()->json([
-            'message' => 'Eksport jarayoni navbatga bodybuilder.',
+            'message' => 'Eksport jarayoni navbatga olindi',
             'fileUrl' => $fileUrl,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        // JSON ma'lumotlarni dekodlash
         $data = json_decode($request->input('data'), true);
 
         if (!$data) {
             return response()->json(['error' => 'Invalid JSON data'], 400);
         }
 
-        // Validatsiya
         $validated = $request->merge($data)->validate([
             'name' => 'required|string',
             'price' => 'required|numeric',
@@ -61,16 +59,14 @@ class ItemController extends Controller
             'code.unique' => 'Code must be unique',
         ]);
 
-        // Rasmni yuklash
         $imagePath = null;
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/images', $imageName);
+            $imagePath = $image->storeAs('public/items', $imageName);
             $imagePath = str_replace('public/', '', $imagePath);
         }
 
-        // Ma'lumotni bazaga yozish
         $item = Item::create([
             'name' => $validated['name'],
             'price' => $validated['price'],
@@ -88,53 +84,47 @@ class ItemController extends Controller
         ], $item ? 201 : 500);
     }
 
-
-
-    public function update(Request $request, Item $item)
+    public function update(Request $request, Item $item): \Illuminate\Http\JsonResponse
     {
-        // JSON ma'lumotlarni dekodlash
         $data = json_decode($request->input('data'), true);
 
         if (!$data) {
             return response()->json(['error' => 'Invalid JSON data'], 400);
         }
 
-        // Validatsiya
         $validated = $request->merge($data)->validate([
-            'name' => 'required|string',
-            'price' => 'required|numeric',
-            'unit_id' => 'required|exists:units,id',
-            'color_id' => 'required|exists:colors,id',
-            'type_id' => 'required|exists:item_types,id',
-            'code' => 'nullable|unique:items,code,' . $item->id,
+            'name' => 'sometimes|string',
+            'price' => 'sometimes|numeric',
+            'unit_id' => 'sometimes|exists:units,id',
+            'color_id' => 'sometimes|exists:colors,id',
+            'type_id' => 'sometimes|exists:item_types,id',
+            'code' => 'sometimes|unique:items,code,' . $item->id,
         ], [
             'code.unique' => 'Code must be unique',
         ]);
 
-        // Rasmni yangilash
         if ($request->hasFile('image') && $request->file('image')->isValid()) {
             $image = $request->file('image');
             $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('public/images', $imageName);
+            $imagePath = $image->storeAs('public/items', $imageName);
             $imagePath = str_replace('public/', '', $imagePath);
 
             // Eski rasmni o'chirish
-            if ($item->image && Storage::exists('public/' . $item->image)) {
+            if ($item->image && Storage::exists('public/items' . $item->image)) {
                 Storage::delete('public/' . $item->image);
             }
 
             $item->image = $imagePath;
         }
 
-        // Ma'lumotni yangilash
-        $item->update([
-            'name' => $validated['name'],
-            'price' => $validated['price'],
-            'unit_id' => $validated['unit_id'],
-            'color_id' => $validated['color_id'],
-            'type_id' => $validated['type_id'],
-            'code' => $validated['code'] ?? $item->code,
-        ]);
+        $item->name = $validated['name'] ?? $item->name;
+        $item->price = $validated['price'] ?? $item->price;
+        $item->unit_id = $validated['unit_id'] ?? $item->unit_id;
+        $item->color_id = $validated['color_id'] ?? $item->color_id;
+        $item->type_id = $validated['type_id'] ?? $item->type_id;
+        $item->code = $validated['code'] ?? $item->code;
+        $item->branch_id = auth()->user()->employee->branch_id;
+        $item->save();
 
         return response()->json([
             'message' => 'Item updated successfully',

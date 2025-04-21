@@ -52,18 +52,8 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEve
         $items = Item::all();
 
         foreach ($items as $index => $item) {
-            if (str_starts_with($item->image, 'images/')) {
+            if (str_starts_with($item->image, 'items/')) {
                 $imagePath = public_path('storage/' . $item->image);
-            } elseif (str_starts_with($item->image, 'rasmlar/')) {
-                $remoteImageUrl = 'http://176.124.208.61:2025/media/' . $item->image;
-                $tempImagePath = storage_path('app/public/images/' . basename($item->image));
-
-                // URL orqali rasmni yuklab olish
-                if (!File::exists($tempImagePath)) {
-                    file_put_contents($tempImagePath, file_get_contents($remoteImageUrl));
-                }
-
-                $imagePath = $tempImagePath;
             } else {
                 continue;
             }

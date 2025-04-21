@@ -12,6 +12,15 @@ use App\Models\Log;
 
 class WarehouseController extends Controller
 {
+    public function getIncoming(): \Illuminate\Http\JsonResponse
+    {
+        $incoming = StockEntry::where('type', 'incoming')
+            ->with(['item', 'warehouse'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($incoming);
+    }
 
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -51,6 +60,16 @@ class WarehouseController extends Controller
         );
 
         return response()->json(['message' => 'Kirim muvaffaqiyatli qo‘shildi', 'data' => $entry]);
+    }
+
+    public function getOutgoing(): \Illuminate\Http\JsonResponse
+    {
+        $outgoing = StockEntry::where('type', 'outgoing')
+            ->with(['item', 'warehouse'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($outgoing);
     }
 
     public function storeOutgoing(Request $request): \Illuminate\Http\JsonResponse
