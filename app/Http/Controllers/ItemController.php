@@ -55,6 +55,7 @@ class ItemController extends Controller
             'color_id' => 'required|exists:colors,id',
             'type_id' => 'required|exists:item_types,id',
             'code' => 'nullable|unique:items,code',
+            'currency' => 'nullable|string',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
@@ -76,6 +77,7 @@ class ItemController extends Controller
             'code' => $validated['code'] ?? uniqid(),
             'image' => $imagePath,
             'branch_id' => auth()->user()->employee->branch_id,
+            'currency' => $validated['currency'],
         ]);
 
         return response()->json([
@@ -99,6 +101,7 @@ class ItemController extends Controller
             'color_id' => 'sometimes|exists:colors,id',
             'type_id' => 'sometimes|exists:item_types,id',
             'code' => 'sometimes|unique:items,code,' . $item->id,
+            'currency' => 'sometimes|string',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
@@ -124,6 +127,7 @@ class ItemController extends Controller
         $item->type_id = $validated['type_id'] ?? $item->type_id;
         $item->code = $validated['code'] ?? $item->code;
         $item->branch_id = auth()->user()->employee->branch_id;
+        $item->currency = $validated['currency'] ?? $item->currency;
         $item->save();
 
         return response()->json([

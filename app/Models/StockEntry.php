@@ -23,7 +23,10 @@ class StockEntry extends Model
         'destination',
         'quantity',
         'comment',
-        'created_by'
+        'created_by',
+        'order_id',
+        'price',
+        'currency'
     ];
 
     public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo
