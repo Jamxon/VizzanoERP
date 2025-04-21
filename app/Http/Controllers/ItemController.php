@@ -11,16 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ItemController extends Controller
 {
-    public function index(): \Illuminate\Http\JsonResponse
-    {
-        $items = Item::orderBy('updated_at', 'desc')
-            ->where('branch_id', auth()->user()->employee->branch_id)
-            ->with('unit', 'color', 'type')
-            ->paginate(10);
-        return response()->json($items);
-    }
-
-    public function search(Request $request): \Illuminate\Http\JsonResponse
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $query = $request->input('search');
         $type = $request->input('type');
