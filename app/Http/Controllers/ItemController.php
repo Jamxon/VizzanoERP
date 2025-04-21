@@ -13,11 +13,11 @@ class ItemController extends Controller
 {
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $query = $request->input('search');
+        $query = strtolower($request->get('query'));
         $type = $request->input('type');
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($q) use ($query) {
-                $q->where('name', 'like', "%$query%")
+                $q->where('LOWER(name)', 'like', "%$query%")
                     ->orWhere('code', 'like', "%$query%");
             })
             ->when($type, function ($q) use ($type) {
