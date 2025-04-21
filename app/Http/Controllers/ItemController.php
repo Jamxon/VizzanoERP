@@ -14,7 +14,7 @@ class ItemController extends Controller
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $query = strtolower($request->get('search'));
-        $type = $request->input('type');
+        $type = $request->input('type_id');
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($q) use ($query) {
                 $q->orWhereRaw('LOWER(name) LIKE ?', ["%$query%"])
