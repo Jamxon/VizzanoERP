@@ -30,6 +30,25 @@ class ItemController extends Controller
         return response()->json($items);
     }
 
+    public function search(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $query = strtolower($request->get('search'));
+        $type = $request->input('type_id');
+        $items = Item::where('branch_id', auth()->user()->employee->branch_id)
+            ->where(function ($q) use ($query) {
+                $q->orWhereRaw('LOWER(name) LIKE ?', ["%$query%"])
+                    ->orWhere('code', 'like', "%$query%");
+            })
+            ->when($type, function ($q) use ($type) {
+                $q->where('type_id', $type);
+            })
+            ->with('unit', 'color', 'type','currency')
+            ->orderBy('updated_at', 'desc')
+            ->get();
+
+        return response()->json($items);
+    }
+
     public function export(): \Illuminate\Http\JsonResponse
     {
         $filePath = storage_path('app/public/materiallar.xlsx');
