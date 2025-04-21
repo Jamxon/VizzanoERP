@@ -7,18 +7,18 @@ use Illuminate\Http\Request;
 
 class ItemTypeController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\Http\JsonResponse
     {
         $itemTypes = ItemType::all();
         return response()->json($itemTypes);
     }
 
-    public function show(ItemType $itemType)
+    public function show(ItemType $itemType): \Illuminate\Http\JsonResponse
     {
         return response()->json($itemType);
     }
 
-    public function store(Request $request)
+    public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'name' => 'required',
@@ -41,20 +41,11 @@ class ItemTypeController extends Controller
         }
     }
 
-    public function update(Request $request, ItemType $itemType)
+    public function update(Request $request, ItemType $itemType): \Illuminate\Http\JsonResponse
     {
         $itemType->update($request->all());
         return response()->json([
             'message' => 'Item Type updated successfully',
-            'itemType' => $itemType,
-        ]);
-    }
-
-    public function destroy(ItemType $itemType)
-    {
-        $itemType->delete();
-        return response()->json([
-            'message' => 'Item Type deleted successfully',
             'itemType' => $itemType,
         ]);
     }
