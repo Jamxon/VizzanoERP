@@ -8,9 +8,11 @@ use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\WarehouseRelatedUser;
 use Illuminate\Http\Request;
+use App\Models\Log;
 
 class WarehouseController extends Controller
 {
+
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
@@ -36,8 +38,17 @@ class WarehouseController extends Controller
             'item_id' => $validated['item_id'],
             'warehouse_id' => $validated['warehouse_id'],
         ]);
+        $oldQty = $balance->quantity;
         $balance->quantity += $validated['quantity'];
         $balance->save();
+
+        Log::add(
+            auth()->user()->id,
+            'Kirim qo‘shildi',
+            'stock_in',
+            ['quantity' => $oldQty],
+            ['quantity' => $balance->quantity]
+        );
 
         return response()->json(['message' => 'Kirim muvaffaqiyatli qo‘shildi', 'data' => $entry]);
     }
@@ -71,8 +82,17 @@ class WarehouseController extends Controller
             'created_by' => auth()->id(),
         ]);
 
+        $oldQty = $balance->quantity;
         $balance->quantity -= $validated['quantity'];
         $balance->save();
+
+        Log::add(
+            auth()->user()->id,
+            'Chiqim qo‘shildi',
+            'stock_out',
+            ['quantity' => $oldQty],
+            ['quantity' => $balance->quantity]
+        );
 
         return response()->json(['message' => 'Chiqim muvaffaqiyatli amalga oshirildi', 'data' => $entry]);
     }
