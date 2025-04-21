@@ -55,7 +55,7 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEve
 
             if (!$item->image) continue;
 
-            $imagePath = public_path('storage/' . $item->image);
+            $imagePath = public_path('storage/' . $item->image_raw);
 
             if (file_exists($imagePath)) {
                 $drawing = new Drawing();
