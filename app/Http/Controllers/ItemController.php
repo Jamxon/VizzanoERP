@@ -76,7 +76,7 @@ class ItemController extends Controller
             'color_id' => 'required|exists:colors,id',
             'type_id' => 'required|exists:item_types,id',
             'code' => 'nullable|unique:items,code',
-            'currency' => 'nullable|string',
+            'currency_id' => 'nullable|integer',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
@@ -98,7 +98,7 @@ class ItemController extends Controller
             'code' => $validated['code'] ?? uniqid(),
             'image' => $imagePath,
             'branch_id' => auth()->user()->employee->branch_id,
-            'currency' => $validated['currency'],
+            'currency_id' => $validated['currency_id'],
         ]);
 
         return response()->json([
@@ -116,7 +116,7 @@ class ItemController extends Controller
             'color_id' => 'sometimes|exists:colors,id',
             'type_id' => 'sometimes|exists:item_types,id',
             'code' => 'sometimes|unique:items,code,' . $item->id,
-            'currency' => 'sometimes|string',
+            'currency_id' => 'sometimes|integer',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
@@ -141,8 +141,8 @@ class ItemController extends Controller
         $item->color_id = $validated['color_id'] ?? $item->color_id;
         $item->type_id = $validated['type_id'] ?? $item->type_id;
         $item->code = $validated['code'] ?? $item->code;
-        $item->currency = $validated['currency'] ?? $item->currency;
         $item->branch_id = auth()->user()->employee->branch_id;
+        $item->currency_id = $validated['currency_id'] ?? $item->currency_id;
         $item->save();
 
         return response()->json([

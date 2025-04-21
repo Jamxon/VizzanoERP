@@ -26,7 +26,7 @@ class StockEntry extends Model
         'created_by',
         'order_id',
         'price',
-        'currency'
+        'currency_id'
     ];
 
     public function item(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -37,6 +37,11 @@ class StockEntry extends Model
     public function warehouse(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
+    }
+
+    public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Currency::class);
     }
 
 }
