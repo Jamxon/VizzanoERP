@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Destination;
 use App\Models\StockBalance;
 use App\Models\StockEntry;
 use Illuminate\Http\Request;
@@ -14,7 +15,14 @@ class WarehouseController extends Controller
     public function getIncoming(): \Illuminate\Http\JsonResponse
     {
         $incoming = StockEntry::where('type', 'incoming')
-            ->with(['item', 'warehouse'])
+            ->with([
+                'item',
+                'warehouse',
+                'source',
+                'currency',
+                'destination',
+                'user',
+                ])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -42,12 +50,13 @@ class WarehouseController extends Controller
                     'quantity' => $validated['quantity'],
                     'type' => 'incoming',
                     'source_id' => $validated['source_id'],
-                    'destination' => null,
+                    'destination_id' => null,
                     'comment' => $validated['comment'],
                     'created_by' => auth()->id(),
                     'order_id' => $validated['order_id'],
                     'price' => $validated['price'],
                     'currency_id' => $validated['currency_id'],
+                    'user_id' => auth()->id(),
                 ]);
 
                 $balance = StockBalance::firstOrCreate([
@@ -84,7 +93,14 @@ class WarehouseController extends Controller
     public function getOutgoing(): \Illuminate\Http\JsonResponse
     {
         $outgoing = StockEntry::where('type', 'outgoing')
-            ->with(['item', 'warehouse'])
+            ->with([
+                'item',
+                'warehouse',
+                'source',
+                'currency',
+                'destination',
+                'user',
+                ])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -97,11 +113,13 @@ class WarehouseController extends Controller
             'item_id' => 'required|exists:items,id',
             'warehouse_id' => 'required|exists:warehouses,id',
             'quantity' => 'required|numeric|min:0.01',
-            'destination' => 'required|string',
+            'destination_id' => 'nullable|integer',
+            'destination_name' => 'nullable|string',
             'comment' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
             'price' => 'nullable|numeric',
             'currency_id' => 'nullable|integer',
+            'user_id' => 'nullable|integer',
         ]);
 
         try {
@@ -115,18 +133,26 @@ class WarehouseController extends Controller
                     throw new \Exception('Zaxirada yetarli mahsulot mavjud emas');
                 }
 
+                if ($validated['destination_id'] === null && $validated['destination_name'] !== null) {
+                    $destination = new Destination();
+                    $destination->name = $validated['destination_name'];
+                    $destination->save();
+                    $validated['destination_id'] = $destination->id;
+                }
+
                 $entry = StockEntry::create([
                     'item_id' => $validated['item_id'],
                     'warehouse_id' => $validated['warehouse_id'],
                     'quantity' => $validated['quantity'],
                     'type' => 'outgoing',
                     'source_id' => null,
-                    'destination' => $validated['destination'],
+                    'destination_id' => $validated['destination_id'],
                     'comment' => $validated['comment'],
                     'created_by' => auth()->id(),
                     'order_id' => $validated['order_id'],
                     'price' => $validated['price'],
                     'currency_id' => $validated['currency_id'],
+                    'user_id' => $validated['user_id'] ?? auth()->id(),
                 ]);
 
                 $oldQty = $balance->quantity;
