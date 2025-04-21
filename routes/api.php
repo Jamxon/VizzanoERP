@@ -20,6 +20,7 @@ use App\Http\Controllers\QualityController;
 use App\Http\Controllers\QualityControllerMasterController;
 use App\Http\Controllers\RazryadController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\SourceController;
 use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\SuperHRController;
 use App\Http\Controllers\TechnologController;
@@ -47,6 +48,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('types',[ItemTypeController::class, 'index']);
     Route::get('units',[UnitController::class, 'index']);
     Route::get('currencies',[CurrencyController::class, 'index']);
+    Route::get('sources',[SourceController::class, 'index']);
 });
 
 Route::prefix('transport')->middleware('role:transport')->group(function () {
