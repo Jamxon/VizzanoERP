@@ -75,9 +75,9 @@ class Item extends Model
         return $this->hasMany(StockBalance::class);
     }
 
-    public function stockEntries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function stockEntryItem(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(StockEntry::class);
+        return $this->hasMany(StockEntryItem::class);
     }
 
     public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
