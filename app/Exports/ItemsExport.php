@@ -52,11 +52,8 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEve
         $items = Item::all();
 
         foreach ($items as $index => $item) {
-            if (str_starts_with($item->image, 'items/')) {
-                $imagePath = public_path('storage/' . $item->image);
-            } else {
-                continue;
-            }
+
+            $imagePath = public_path('storage/' . $item->image);
 
             if (file_exists($imagePath)) {
                 $drawing = new Drawing();
