@@ -26,7 +26,9 @@
     <p><strong>Manba:</strong> {{ $entry->source->name ?? '-' }}</p>
     <p><strong>Manzil:</strong> {{ $entry->destination->name ?? '-' }}</p>
     <p><strong>Omborchi:</strong> {{ $entry->employee->name ?? '-' }}</p>
-    {{ $entry->type === 'outcome' ? "<p>Ma'sul: " . ($entry->user->employee->name ?? '-') . '</p>' : '' }}
+    @if ($entry->type === 'outcome')
+        <p><strong>Ma'sul:</strong> {{ $entry->responsibleUser->employee->name ?? '-' }}</p>
+    @endif
     <p><strong>Kontragent:</strong> {{ $entry->contragent->name ?? '-' }}</p>
 </div>
 
