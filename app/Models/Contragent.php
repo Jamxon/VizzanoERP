@@ -16,7 +16,8 @@ class Contragent extends Model
     protected $fillable = [
         'name',
         'description',
-        'is_market'
+        'is_market',
+        'branch_id'
     ];
 
     protected $hidden = [
