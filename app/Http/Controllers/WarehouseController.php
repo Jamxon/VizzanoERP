@@ -72,26 +72,31 @@ class WarehouseController extends Controller
                         // Searching in comment
                         $q->whereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]);
 
-                        // Searching in id field (both exact match and partial)
-                        $q->orWhere('id', $search); // Exact match for numeric search
-                        $q->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ["%{$search}%"]); // Partial match
+                        // Only try to match IDs if the search is numeric
+                        if (is_numeric($search)) {
+                            // Searching in id field (exact match for numeric search)
+                            $q->orWhere('id', (int)$search);
+                            // Searching in user_id (exact match for numeric search)
+                            $q->orWhere('user_id', (int)$search);
+                            // Searching in order_id (exact match for numeric search)
+                            $q->orWhere('order_id', (int)$search);
+                        }
 
-                        // Searching in user_id both exact and partial match
-                        $q->orWhere('user_id', $search); // Exact match
-                        $q->orWhereRaw('CAST(user_id AS VARCHAR) LIKE ?', ["%{$search}%"]); // Partial match
+                        // Always include string-based searches
+                        $q->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ["%{$search}%"]);
+                        $q->orWhereRaw('CAST(user_id AS VARCHAR) LIKE ?', ["%{$search}%"]);
 
                         // Searching for employee name in the user relationship
                         $q->orWhereHas('user.employee', function ($subQ) use ($lowerSearch) {
                             $subQ->whereRaw('LOWER(name) LIKE ?', ["%{$lowerSearch}%"]);
                         });
 
-                        // Searching for order_id in the order relationship
-                        $q->orWhere('order_id', $search); // Exact match if order_id is a direct column
-
-                        // If order_id is a relationship, use whereHas
+                        // Searching for order relationship
                         $q->orWhereHas('order', function ($subQ) use ($search) {
-                            $subQ->where('id', $search); // Exact match for order id
-                            $subQ->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ["%{$search}%"]); // Partial match
+                            if (is_numeric($search)) {
+                                $subQ->where('id', (int)$search);
+                            }
+                            $subQ->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ["%{$search}%"]);
                         });
                     });
                 })
@@ -119,7 +124,7 @@ class WarehouseController extends Controller
             ], 500);
         }
     }
-    
+
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
