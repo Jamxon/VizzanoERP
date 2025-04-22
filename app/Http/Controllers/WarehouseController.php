@@ -40,50 +40,66 @@ class WarehouseController extends Controller
         return response()->json($balance);
     }
 
+    use Illuminate\Support\Facades\Log;
+    use Illuminate\Http\JsonResponse;
+    use Illuminate\Http\Request;
+
     public function showBalance(Request $request): \Illuminate\Http\JsonResponse
     {
-        $branchId = auth()->user()?->employee?->branch_id;
-        $stockBalanceId = $request->input('stock_balance_id');
+        try {
+            $branchId = auth()->user()?->employee?->branch_id;
+            $stockBalanceId = $request->input('stock_balance_id');
 
-        $balance = StockBalance::where('id', $stockBalanceId)
-            ->whereHas('warehouse', fn($q) => $q->where('branch_id', $branchId))
-            ->with(['item.unit', 'warehouse', 'order'])
-            ->firstOrFail();
+            $balance = StockBalance::where('id', $stockBalanceId)
+                ->whereHas('warehouse', fn($q) => $q->where('branch_id', $branchId))
+                ->with(['item.unit', 'warehouse', 'order'])
+                ->first();
 
-        // Asosiy filter parametrlari
-        $itemId = $balance->item_id;
-        $warehouseId = $balance->warehouse_id;
-        $orderId = $balance->order_id; // bu null bo‘lishi mumkin
+            if (!$balance) {
+                return response()->json([
+                    'message' => 'Ombor zaxirasi topilmadi yoki ruxsatingiz yo‘q.'
+                ], 404);
+            }
 
-        // Kirim-chiqimlar tarixi
-        $history = StockEntryItem::where('item_id', $itemId)
-            ->whereHas('stockEntry', function ($query) use ($warehouseId, $orderId) {
-                $query->where('warehouse_id', $warehouseId);
-                if ($orderId !== null) {
-                    $query->where('order_id', $orderId);
-                } else {
-                    $query->whereNull('order_id');
-                }
-            })
-            ->with([
-                'entry' => function ($q) {
-                    $q->with([
-                        'warehouse',
-                        'source',
-                        'destination',
-                        'employee',
-                        'responsibleUser.employee',
-                        'contragent'
-                    ]);
-                }
-            ])
-            ->orderByDesc('id') // yoki created_at
-            ->get();
+            $itemId = $balance->item_id;
+            $warehouseId = $balance->warehouse_id;
+            $orderId = $balance->order_id;
 
-        return response()->json([
-            'balance' => $balance,
-            'history' => $history,
-        ]);
+            $history = StockEntryItem::where('item_id', $itemId)
+                ->whereHas('stockEntry', function ($query) use ($warehouseId, $orderId) {
+                    $query->where('warehouse_id', $warehouseId);
+                    if ($orderId !== null) {
+                        $query->where('order_id', $orderId);
+                    } else {
+                        $query->whereNull('order_id');
+                    }
+                })
+                ->with([
+                    'entry' => function ($q) {
+                        $q->with([
+                            'warehouse',
+                            'source',
+                            'destination',
+                            'employee',
+                            'responsibleUser.employee',
+                            'contragent'
+                        ]);
+                    }
+                ])
+                ->orderByDesc('id')
+                ->get();
+
+            return response()->json([
+                'balance' => $balance,
+                'history' => $history,
+            ]);
+        } catch (\Throwable $e) {
+
+            return response()->json([
+                'message' => 'Xatolik yuz berdi. Administrator bilan bog‘laning.',
+                'error' => $e->getMessage() // agar faqat dev versiyada ko‘rsatmoqchi bo‘lsang
+            ], 500);
+        }
     }
 
     public function getUsers(Request $request): \Illuminate\Http\JsonResponse
