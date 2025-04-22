@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static firstOrCreate(array $array)
  * @method static where(string $string, mixed $item_id)
+ * @method static findOrFail(array $array)
  */
 class StockBalance extends Model
 {
