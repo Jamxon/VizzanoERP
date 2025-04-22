@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static firstOrCreate(array $array)
  * @method static where(string $string, mixed $item_id)
  * @method static findOrFail(array $array)
+ * @method static whereHas(string $string, \Closure $param)
  */
 class StockBalance extends Model
 {
@@ -31,5 +32,10 @@ class StockBalance extends Model
     public function warehouse(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
+    }
+
+    public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Order::class);
     }
 }

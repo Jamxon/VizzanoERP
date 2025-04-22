@@ -16,6 +16,23 @@ use App\Models\Log;
 
 class WarehouseController extends Controller
 {
+    public function getBalance(): \Illuminate\Http\JsonResponse
+    {
+        $branchId = auth()->user()?->employee?->branch_id;
+
+        $balance = StockBalance::whereHas('order', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
+            })
+            ->with([
+                'item',
+                'warehouse',
+                'order'
+            ])
+            ->get();
+
+        return response()->json($balance);
+    }
+
     public function getUsers(Request $request): \Illuminate\Http\JsonResponse
     {
         $search = trim($request->input('search'));
@@ -449,21 +466,4 @@ class WarehouseController extends Controller
         }
     }
 
-    public function getStockBalances(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $warehouseId = $request->input('warehouse_id');
-        $orderId = $request->input('order_id');
-
-        $query = StockBalance::with('item', 'warehouse');
-
-        if ($warehouseId) {
-            $query->where('warehouse_id', $warehouseId);
-        }
-
-        if ($orderId) {
-            $query->where('order_id', $orderId);
-        }
-
-        return response()->json($query->get());
-    }
 }
