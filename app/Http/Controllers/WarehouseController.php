@@ -30,7 +30,7 @@ class WarehouseController extends Controller
                 $query->where('warehouse_id', $warehouseId);
             })
             ->with([
-                'item',
+                'item.unit',
                 'warehouse',
                 'order'
             ])
