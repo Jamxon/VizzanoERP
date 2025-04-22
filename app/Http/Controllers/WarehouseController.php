@@ -68,11 +68,11 @@ class WarehouseController extends Controller
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
                     $lowerSearch = mb_strtolower($search);
-                    dd($lowerSearch);
                     return $query->where(function ($q) use ($lowerSearch, $search) {
                         // Comment bo'yicha qidirish
                         $q->orWhereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]);
 
+                        dd($lowerSearch);
                         // Raqamli qidiruvlar uchun
                         if (is_numeric($search)) {
                             $q->orWhere('id', (int)$search);
