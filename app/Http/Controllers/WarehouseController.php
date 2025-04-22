@@ -377,7 +377,7 @@ class WarehouseController extends Controller
                 $oldQty = $balance->quantity;
 
                 if ($oldQty < $item['quantity']) {
-                    throw new \Exception("Zaxirada yetarli mahsulot mavjud emas: {$itemModel->name}");
+                    throw new \Exception("Zaxirada yetarli mahsulot mavjud emas: {$itemModel->name}. Max: {$oldQty}, kerak: {$item['quantity']}");
                 }
 
                 $balance->decrement('quantity', $item['quantity']);
