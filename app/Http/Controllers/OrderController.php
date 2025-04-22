@@ -154,6 +154,7 @@ class OrderController extends Controller
                 $contragent = Contragent::create([
                     'name' => $request->contragent_name ?? null,
                     'description' => $request->contragent_description ?? null,
+                    'branch_id' => $user->employee->branch_id,
                 ]);
             }
 
@@ -293,7 +294,8 @@ class OrderController extends Controller
             } elseif ($request->hasAny(['contragent_name'])) {
                 $contragent = Contragent::updateOrCreate(
                     ['name' => $request->contragent_name],
-                    ['description' => $request->contragent_description]
+                    ['description' => $request->contragent_description],
+                    ['branch_id' => auth()->user()->employee->branch_id]
                 );
             }
 

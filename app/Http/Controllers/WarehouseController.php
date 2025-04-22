@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Contragent;
 use App\Models\Destination;
 use App\Models\Order;
 use App\Models\Source;
@@ -24,9 +25,21 @@ class WarehouseController extends Controller
 
     public function getOrders(): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)->get();
+        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
+            ->with([
+                'contragent'
+            ])
+            ->get();
 
         return response()->json($orders);
+    }
+
+    public function getContragents(): \Illuminate\Http\JsonResponse
+    {
+        $contragents = Contragent::where('branch_id', auth()->user()->employee->branch_id)
+            ->get();
+
+        return response()->json($contragents);
     }
 
     public function getIncoming(): \Illuminate\Http\JsonResponse
