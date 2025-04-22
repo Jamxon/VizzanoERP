@@ -186,7 +186,7 @@ class WarehouseController extends Controller
                 'comment'       => $validated['comment'] ?? null,
                 'order_id'      => $validated['order_id'] ?? null,
                 'contragent_id' => $validated['contragent_id'] ?? null,
-                'user_id'       => auth()->id(),
+                'user_id'       => auth()->user()->employee->id,
             ]);
 
             foreach ($validated['items'] as $item) {
@@ -292,7 +292,7 @@ class WarehouseController extends Controller
                 'comment' => $validated['comment'] ?? null,
                 'created_by' => auth()->id(),
                 'order_id' => $validated['order_id'] ?? null,
-                'user_id' => auth()->id(),
+                'user_id' => auth()->user()->employee->id,
             ]);
 
             foreach ($validated['items'] as $item) {
