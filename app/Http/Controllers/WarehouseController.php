@@ -9,6 +9,7 @@ use App\Models\Source;
 use App\Models\StockBalance;
 use App\Models\StockEntry;
 use App\Models\Warehouse;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Log;
@@ -132,6 +133,25 @@ class WarehouseController extends Controller
             ], 500);
         }
     }
+
+    public function downloadPdf($id): \Illuminate\Http\Response
+    {
+        $entry = StockEntry::with([
+            'items.currency',
+            'items.item',
+            'warehouse',
+            'source',
+            'destination',
+            'user.employee',
+            'order',
+        ])->findOrFail($id);
+
+        $pdf = Pdf::loadView('pdf.stock-entry', compact('entry'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->download("stock-entry-{$entry->id}.pdf");
+    }
+
 
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
