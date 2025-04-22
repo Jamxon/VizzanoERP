@@ -237,7 +237,7 @@ class WarehouseController extends Controller
         }
     }
 
-    public function getOutgoing(Request $request): \Illuminate\Http\JsonResponse
+    public function getOutcome(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
             $filters = $request->only([
@@ -253,7 +253,7 @@ class WarehouseController extends Controller
             $createdTo = $request->input('end_date');
 
             $outgoing = StockEntry::query()
-                ->where('type', 'outgoing')
+                ->where('type', 'outcome')
 
                 // Filter: manba
                 ->when($sourceId, fn ($q, $v) => $q->where('source_id', $v))
@@ -314,7 +314,7 @@ class WarehouseController extends Controller
         }
     }
 
-    public function storeOutgoing(Request $request): \Illuminate\Http\JsonResponse
+    public function storeOutcome(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
             'warehouse_id'      => 'required|exists:warehouses,id',
@@ -342,7 +342,7 @@ class WarehouseController extends Controller
 
             // Yangi chiqim yozuvini yaratish
             $entry = StockEntry::create([
-                'type'          => 'outgoing',
+                'type'          => 'outcome',
                 'warehouse_id'  => $validated['warehouse_id'],
                 'destination_id'=> $validated['destination_id'] ?? null,
                 'comment'       => $validated['comment'] ?? null,
