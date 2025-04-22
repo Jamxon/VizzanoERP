@@ -15,16 +15,14 @@
 </head>
 <body>
 
-<h2>Kirim Hujjati (Stock Entry)</h2>
+<h2>{{ $entry->type === 'incoming' ? 'Kirim' : 'Chiqim' }} Hujjati</h2>
 
 <div class="section">
     <p><strong>ID:</strong> {{ $entry->id }}</p>
-    <p><strong>Yaratilgan sana:</strong> {{ $entry->created_at->format('d.m.Y H:i') }}</p>
+    <p><strong>{{ $entry->type === 'incoming' ? 'Kirim' : 'Chiqim' }} bo'lgan sana:</strong> {{ $entry->created_at->format('d.m.Y H:i') }}</p>
     <p><strong>Ombor:</strong> {{ $entry->warehouse->name ?? '-' }}</p>
-    <p><strong>Turi:</strong> {{ $entry->type === 'incoming' ? 'Kirim' : 'Chiqim' }}</p>
     <p><strong>Izoh:</strong> {{ $entry->comment }}</p>
     <p><strong>Buyurtma ID:</strong> {{ $entry->order_id }}</p>
-    <p><strong>Yangilangan sana:</strong> {{ $entry->updated_at->format('d.m.Y H:i') }}</p>
     <p><strong>Manba:</strong> {{ $entry->source->name ?? '-' }}</p>
     <p><strong>Manzil:</strong> {{ $entry->destination->name ?? '-' }}</p>
     <p><strong>Foydalanuvchi:</strong> {{ $entry->user->name ?? '-' }}</p>
