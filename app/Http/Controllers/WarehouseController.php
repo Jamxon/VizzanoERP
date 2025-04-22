@@ -44,37 +44,44 @@ class WarehouseController extends Controller
         $branchId = auth()->user()?->employee?->branch_id;
         $stockBalanceId = $request->input('stock_balance_id');
 
-        // Asosiy balance ni topamiz
         $balance = StockBalance::where('id', $stockBalanceId)
             ->whereHas('warehouse', fn($q) => $q->where('branch_id', $branchId))
             ->with(['item.unit', 'warehouse', 'order'])
             ->firstOrFail();
 
-        // Kirim-chiqim entrylarini topamiz (entry darajasida)
-        $entries = StockEntry::where('warehouse_id', $balance->warehouse_id)
-            ->whereHas('items', function ($q) use ($balance) {
-                $q->where('item_id', $balance->item_id);
-            })
-            ->when($balance->order_id, function ($q) use ($balance) {
-                $q->where('order_id', $balance->order_id);
-            }, function ($q) {
-                $q->whereNull('order_id');
+        // Asosiy filter parametrlari
+        $itemId = $balance->item_id;
+        $warehouseId = $balance->warehouse_id;
+        $orderId = $balance->order_id; // bu null bo‘lishi mumkin
+
+        // Kirim-chiqimlar tarixi
+        $history = StockEntryItem::where('item_id', $itemId)
+            ->whereHas('entry', function ($query) use ($warehouseId, $orderId) {
+                $query->where('warehouse_id', $warehouseId);
+                if ($orderId !== null) {
+                    $query->where('order_id', $orderId);
+                } else {
+                    $query->whereNull('order_id');
+                }
             })
             ->with([
-                'items.item.unit',
-                'warehouse',
-                'source',
-                'destination',
-                'employee',
-                'responsibleUser.employee',
-                'contragent'
+                'entry' => function ($q) {
+                    $q->with([
+                        'warehouse',
+                        'source',
+                        'destination',
+                        'employee',
+                        'responsibleUser.employee',
+                        'contragent'
+                    ]);
+                }
             ])
-            ->orderByDesc('id')
+            ->orderByDesc('id') // yoki created_at
             ->get();
 
         return response()->json([
             'balance' => $balance,
-            'entries' => $entries,
+            'history' => $history,
         ]);
     }
 
