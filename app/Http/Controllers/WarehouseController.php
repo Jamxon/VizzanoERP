@@ -16,12 +16,17 @@ use App\Models\Log;
 
 class WarehouseController extends Controller
 {
-    public function getBalance(): \Illuminate\Http\JsonResponse
+    public function getBalance(Request $request): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()?->employee?->branch_id;
 
+        $warehouseId = $request->input('warehouse_id');
+
         $balance = StockBalance::whereHas('order', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
+            })
+            ->when($warehouseId, function ($query) use ($warehouseId) {
+                $query->where('warehouse_id', $warehouseId);
             })
             ->with([
                 'item',
