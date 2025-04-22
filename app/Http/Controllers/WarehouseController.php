@@ -69,30 +69,30 @@ class WarehouseController extends Controller
                 ->when($search, function ($query, $search) {
                     $lowerSearch = mb_strtolower($search);
                     return $query->where(function ($q) use ($lowerSearch, $search) {
-                        // Searching in comment - note that we're using orWhereRaw here instead
+                        // Comment bo'yicha qidirish
                         $q->orWhereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]);
 
-                        // Only try to match IDs if the search is numeric
+                        // Raqamli qidiruvlar uchun
                         if (is_numeric($search)) {
-                            // Searching in id field (exact match for numeric search)
                             $q->orWhere('id', (int)$search);
-                            // Searching in user_id (exact match for numeric search)
                             $q->orWhere('user_id', (int)$search);
-                            // Searching in order_id (exact match for numeric search)
                             $q->orWhere('order_id', (int)$search);
                         }
 
-                        // Always include string-based searches
+                        // ID larni string sifatida qidirish
                         $q->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ["%{$search}%"]);
                         $q->orWhereRaw('CAST(user_id AS VARCHAR) LIKE ?', ["%{$search}%"]);
+                        $q->orWhereRaw('CAST(order_id AS VARCHAR) LIKE ?', ["%{$search}%"]);
 
-                        // Searching for employee name in the user relationship
-                        $q->orWhereHas('user.employee', function ($subQ) use ($lowerSearch) {
-                            $subQ->whereRaw('LOWER(name) LIKE ?', ["%{$lowerSearch}%"]);
+                        // User va employee bo'yicha qidirish
+                        $q->orWhereHas('user', function($userQuery) use ($lowerSearch) {
+                            $userQuery->whereHas('employee', function($employeeQuery) use ($lowerSearch) {
+                                $employeeQuery->whereRaw('LOWER(name) LIKE ?', ["%{$lowerSearch}%"]);
+                            });
                         });
 
-                        // Searching for order relationship
-                        $q->orWhereHas('order', function ($subQ) use ($search) {
+                        // Order bo'yicha qidirish
+                        $q->orWhereHas('order', function ($subQ) use ($search, $lowerSearch) {
                             if (is_numeric($search)) {
                                 $subQ->where('id', (int)$search);
                             }
