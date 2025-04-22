@@ -16,6 +16,25 @@ use App\Models\Log;
 
 class WarehouseController extends Controller
 {
+    public function getUsers(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $search = trim($request->input('search'));
+        $branchId = auth()->user()?->employee?->branch_id;
+
+        $users = \App\Models\User::whereHas('employee', function ($query) use ($branchId, $search) {
+            $query->where('branch_id', $branchId)
+                ->where('status', 'working')
+                ->when($search, function ($q, $s) {
+                    $q->where('name', 'ILIKE', '%' . $s . '%');
+                });
+        })
+            ->with('employee')
+            ->get();
+
+        return response()->json($users);
+    }
+
+
     public function getWarehouses(): \Illuminate\Http\JsonResponse
     {
         $warehouses = Warehouse::where('branch_id', auth()->user()->employee->branch_id)->get();
