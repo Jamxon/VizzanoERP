@@ -27,7 +27,6 @@ class StockEntry extends Model
     ];
 
     protected $hidden = [
-        'created_at',
         'updated_at',
         'warehouse_id',
         'source_id',
