@@ -53,7 +53,7 @@ class WarehouseController extends Controller
                 'destination',
                 'user',
                 ])
-            ->orderBy('created_at', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
         return response()->json($incoming);
