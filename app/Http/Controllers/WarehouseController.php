@@ -110,6 +110,8 @@ class WarehouseController extends Controller
                     'destination',
                     'employee',
                     'order',
+                    'contragent',
+                    'responsibleUser',
                 ])
 
                 ->latest('updated_at')
@@ -152,6 +154,7 @@ class WarehouseController extends Controller
             'comment'           => 'nullable|string',
             'order_id'          => 'nullable|exists:orders,id',
             'contragent_id'     => 'nullable|exists:contragents,id',
+            'responsible_user_id' => 'nullable|exists:users,id',
             'items'             => 'required|array|min:1',
             'items.*.item_id'   => 'required|exists:items,id',
             'items.*.quantity'  => 'required|numeric|min:0.01',
@@ -177,6 +180,7 @@ class WarehouseController extends Controller
                 'order_id'      => $validated['order_id'] ?? null,
                 'contragent_id' => $validated['contragent_id'] ?? null,
                 'user_id'       => auth()->user()->employee->id,
+                'responsible_user_id' => $validated['responsible_user_id'] ?? null,
             ]);
 
             foreach ($validated['items'] as $item) {
@@ -233,96 +237,176 @@ class WarehouseController extends Controller
         }
     }
 
-    public function getOutgoing(): \Illuminate\Http\JsonResponse
+    public function getOutgoing(Request $request): \Illuminate\Http\JsonResponse
     {
-        $outgoing = StockEntry::where('type', 'outgoing')
-            ->with([
-                'items.currency',
-                'items.item',
-                'warehouse',
-                'source',
-                'destination',
-                'user',
-                ])
-            ->orderBy('created_at', 'desc')
-            ->get();
+        try {
+            $filters = $request->only([
+                'source_id',
+                'warehouse_id',
+                'search'
+            ]);
 
-        return response()->json($outgoing);
+            $search = trim($filters['search'] ?? '');
+            $sourceId = $filters['source_id'] ?? null;
+            $warehouseId = $filters['warehouse_id'] ?? null;
+            $createdFrom = $request->input('start_date');
+            $createdTo = $request->input('end_date');
+
+            $outgoing = StockEntry::query()
+                ->where('type', 'outgoing')
+
+                // Filter: manba
+                ->when($sourceId, fn ($q, $v) => $q->where('source_id', $v))
+
+                // Filter: ombor
+                ->when($warehouseId, fn ($q, $v) => $q->where('warehouse_id', $v))
+
+                // Filter: created_at date range
+                ->when($createdFrom, fn($q) => $q->whereDate('created_at', '>=', $createdFrom))
+                ->when($createdTo, fn($q) => $q->whereDate('created_at', '<=', $createdTo))
+
+                // Qidiruv: comment, id, user_id, user->employee->name, order_id
+                ->when($search, function ($query, $search) {
+                    $lowerSearch = mb_strtolower($search);
+                    $likeSearch = '%' . $lowerSearch . '%';
+
+                    return $query->where(function ($q) use ($lowerSearch, $search, $likeSearch) {
+                        $q->orWhere('comment', 'ILIKE', "%$search%");
+
+                        if (is_numeric($search)) {
+                            $q->orWhere('id', (int)$search);
+                            $q->orWhere('user_id', (int)$search);
+                            $q->orWhere('order_id', (int)$search);
+                        }
+
+                        $q->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
+                        $q->orWhereRaw('CAST(user_id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
+                        $q->orWhereRaw('CAST(order_id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
+
+                        $q->orWhereHas('employee', function ($q) use ($likeSearch) {
+                            $q->whereRaw('LOWER(name) LIKE ?', [$likeSearch]);
+                        });
+                    });
+                })
+
+                // Eager load related models
+                ->with([
+                    'items.currency',
+                    'items.item',
+                    'warehouse',
+                    'source',
+                    'destination',
+                    'employee',
+                    'order',
+                    'contragent',
+                    'responsibleUser',
+                ])
+
+                ->latest('updated_at')
+                ->paginate(10);
+
+            return response()->json($outgoing);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Chiqimlarni olishda xatolik yuz berdi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function storeOutgoing(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'warehouse_id' => 'nullable|exists:warehouses,id',
-            'destination_id' => 'nullable|exists:destinations,id',
-            'source_id' => 'nullable|exists:sources,id',
-            'comment' => 'nullable|string',
-            'order_id' => 'nullable|exists:orders,id',
-            'items' => 'required|array|min:1',
-            'items.*.item_id' => 'required|exists:items,id',
-            'items.*.warehouse_id' => 'required|exists:warehouses,id',
-            'items.*.quantity' => 'required|numeric|min:0.01',
-            'items.*.price' => 'nullable|numeric|min:0',
-            'items.*.currency_id' => 'nullable|exists:currencies,id',
+            'warehouse_id'      => 'required|exists:warehouses,id',
+            'destination_id'    => 'nullable|exists:sources,id', // chiqimda destination sifatida yoziladi
+            'destination_name'  => 'nullable|string',
+            'comment'           => 'nullable|string',
+            'order_id'          => 'nullable|exists:orders,id',
+            'contragent_id'     => 'nullable|exists:contragents,id',
+            'responsible_user_id' => 'nullable|exists:users,id',
+            'items'             => 'required|array|min:1',
+            'items.*.item_id'   => 'required|exists:items,id',
+            'items.*.quantity'  => 'required|numeric|min:0.01',
+            'items.*.price'     => 'required|numeric|min:0',
+            'items.*.currency_id' => 'required|exists:currencies,id',
         ]);
 
         DB::beginTransaction();
-        try {
 
-            if (empty($validated['destination_id']) && !empty($validated['destination_name'])) {
-                $destination = Destination::firstOrCreate(['name' => $validated['destination_name']]);
+        try {
+            // Manzil nomi bo‘yicha avtomatik destination yaratish
+            if (!$validated['destination_id'] && $validated['destination_name']) {
+                $destination = Source::firstOrCreate(['name' => $validated['destination_name']]);
                 $validated['destination_id'] = $destination->id;
             }
 
+            // Yangi chiqim yozuvini yaratish
             $entry = StockEntry::create([
-                'type' => 'outgoing',
-                'warehouse_id' => $validated['warehouse_id'] ?? null,
-                'destination_id' => $validated['destination_id'] ?? null,
-                'source_id' => $validated['source_id'] ?? null,
-                'comment' => $validated['comment'] ?? null,
-                'created_by' => auth()->id(),
-                'order_id' => $validated['order_id'] ?? null,
-                'user_id' => auth()->user()->employee->id,
+                'type'          => 'outgoing',
+                'warehouse_id'  => $validated['warehouse_id'],
+                'destination_id'=> $validated['destination_id'] ?? null,
+                'comment'       => $validated['comment'] ?? null,
+                'order_id'      => $validated['order_id'] ?? null,
+                'contragent_id' => $validated['contragent_id'] ?? null,
+                'user_id'       => auth()->user()->employee->id,
+                'responsible_user_id' => $validated['responsible_user_id'] ?? null,
             ]);
 
             foreach ($validated['items'] as $item) {
-                $entry->items()->create([
-                    'item_id' => $item['item_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'] ?? null,
-                    'currency_id' => $item['currency_id'] ?? null,
-                ]);
+                $entryItem = $entry->items()->create($item);
 
+                $itemModel = \App\Models\Item::find($item['item_id']);
+
+                // Zaxiradan ayirish
                 $balance = StockBalance::firstOrCreate(
                     [
-                        'item_id' => $item['item_id'],
-                        'warehouse_id' => $item['warehouse_id'],
-                        'order_id' => $validated['order_id'] ?? null,
+                        'item_id'      => $item['item_id'],
+                        'warehouse_id' => $validated['warehouse_id'],
+                        'order_id'     => $validated['order_id'] ?? null,
                     ],
                     ['quantity' => 0]
                 );
 
                 $oldQty = $balance->quantity;
-                $balance->quantity -= $item['quantity'];
-                $balance->save();
 
+                if ($oldQty < $item['quantity']) {
+                    throw new \Exception("Zaxirada yetarli mahsulot mavjud emas: {$itemModel->name}");
+                }
+
+                $balance->decrement('quantity', $item['quantity']);
+
+                // Log yozish
                 Log::add(
                     auth()->id(),
-                    'Ombordan chiqim amalga oshirildi',
+                    'Ombordan chiqim',
                     'stock_out',
-                    ['item_id' => $item['item_id'], 'quantity' => $oldQty],
-                    ['item_id' => $item['item_id'], 'quantity' => $balance->quantity]
+                    [
+                        'item_name' => $itemModel->name,
+                        'entry_id' => $entry->id,
+                        'old_quantity' => $oldQty,
+                        'removed_quantity' => $item['quantity'],
+                    ],
+                    [
+                        'item_id' => $item['item_id'],
+                        'entry_id' => $entry->id,
+                        'new_quantity' => $balance->quantity,
+                    ]
                 );
             }
 
             DB::commit();
+
             return response()->json([
-                'message' => 'Chiqim muvaffaqiyatli amalga oshirildi',
+                'message' => 'Chiqim muvaffaqiyatli bajarildi.',
                 'entry' => $entry->load('items'),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['message' => 'Xatolik', 'error' => $e->getMessage()], 500);
+
+            return response()->json([
+                'message' => 'Xatolik yuz berdi',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
 
