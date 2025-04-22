@@ -54,7 +54,7 @@ class WarehouseController extends Controller
                 'user',
                 ])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return response()->json($incoming);
     }
@@ -62,7 +62,7 @@ class WarehouseController extends Controller
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'warehouse_id' => 'nullable|exists:warehouses,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
             'source_id' => 'nullable|exists:sources,id',
             'source_name' => 'nullable|string',
             'comment' => 'nullable|string',
@@ -71,8 +71,8 @@ class WarehouseController extends Controller
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric|min:0.01',
-            'items.*.price' => 'nullable|numeric|min:0',
-            'items.*.currency_id' => 'nullable|exists:currencies,id',
+            'items.*.price' => 'required|numeric|min:0',
+            'items.*.currency_id' => 'required|exists:currencies,id',
         ]);
 
         DB::beginTransaction();
