@@ -86,4 +86,9 @@ class Employee extends Model
     {
         return $this->belongsTo(Position::class);
     }
+
+    public function stockEntries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(StockEntry::class, 'user_id');
+    }
 }
