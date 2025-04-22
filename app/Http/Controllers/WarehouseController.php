@@ -51,8 +51,7 @@ class WarehouseController extends Controller
                 'search'
             ]);
 
-            // Handle cases where keys may not be present in the filters
-            $search = $filters['search'] ?? null;
+            $search = trim($filters['search'] ?? '');
             $sourceId = $filters['source_id'] ?? null;
             $warehouseId = $filters['warehouse_id'] ?? null;
 
@@ -67,12 +66,12 @@ class WarehouseController extends Controller
 
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
-                    $lowerSearch = strtolower($search);
+                    $lowerSearch = mb_strtolower($search);
                     $likeSearch = '%' . $lowerSearch . '%';
 
                     return $query->where(function ($q) use ($lowerSearch, $search, $likeSearch) {
                         // Comment bo'yicha qidirish
-                        $q->whereRaw('LOWER(comment) LIKE ?', [$likeSearch]);
+                        $q->orWhere('comment', 'ILIKE', "%$search%");
 
                         // Raqamli qidiruvlar uchun
                         if (is_numeric($search)) {
@@ -94,12 +93,12 @@ class WarehouseController extends Controller
                         });
 
                         // Order bo'yicha qidirish
-                        $q->orWhereHas('order', function ($subQ) use ($search) {
-                            if (is_numeric($search)) {
-                                $subQ->where('id', (int)$search);
-                            }
-                            $subQ->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
+                        $q->orWhereHas('user', function ($userQuery) use ($likeSearch) {
+                            $userQuery->whereHas('employee', function ($employeeQuery) use ($likeSearch) {
+                                $employeeQuery->where('name', 'ILIKE', $likeSearch);
+                            });
                         });
+
                     });
                 })
 
