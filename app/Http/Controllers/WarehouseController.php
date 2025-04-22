@@ -66,14 +66,13 @@ class WarehouseController extends Controller
                 ->when($warehouseId, fn ($q, $v) => $q->where('warehouse_id', $v))
 
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
-// Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
                     $lowerSearch = mb_strtolower($search);
                     $likeSearch = '%' . $lowerSearch . '%';
 
                     return $query->where(function ($q) use ($lowerSearch, $search, $likeSearch) {
                         // Comment bo'yicha qidirish
-                        $q->orWhereRaw('LOWER(comment) LIKE ?', [$likeSearch]);
+                        $q->orWhere('comment', 'ILIKE', $likeSearch); // PostgreSQL bo‘lsa
 
                         // Raqamli qidiruvlar uchun
                         if (is_numeric($search)) {
@@ -103,7 +102,7 @@ class WarehouseController extends Controller
                         });
                     });
                 })
-                
+
                 // Loading necessary relationships
                 ->with([
                     'items.currency',
