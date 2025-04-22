@@ -276,7 +276,7 @@ class WarehouseController extends Controller
             ]);
 
             $search = trim($filters['search'] ?? '');
-            $sourceId = $filters['destionation_id'] ?? null;
+            $sourceId = $filters['destination_id'] ?? null;
             $warehouseId = $filters['warehouse_id'] ?? null;
             $createdFrom = $request->input('start_date');
             $createdTo = $request->input('end_date');
