@@ -156,6 +156,12 @@ class WarehouseController extends Controller
 
         DB::beginTransaction();
         try {
+
+            if (empty($validated['destination_id']) && !empty($validated['destination_name'])) {
+                $destination = Destination::firstOrCreate(['name' => $validated['destination_name']]);
+                $validated['destination_id'] = $destination->id;
+            }
+
             $entry = StockEntry::create([
                 'type' => 'outgoing',
                 'warehouse_id' => $validated['warehouse_id'] ?? null,
