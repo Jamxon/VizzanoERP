@@ -94,15 +94,8 @@ class WarehouseController extends Controller
                         $q->orWhereRaw('CAST(order_id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
 
                         // User va employee bo'yicha qidirish
-                        $q->orWhereHas('user', function($userQuery) use ($likeSearch) {
-                            $userQuery->whereHas('employee', function($employeeQuery) use ($likeSearch) {
-                                $employeeQuery->whereRaw('LOWER(name) LIKE ?', [$likeSearch]);
-                            });
-                        });
-
-                        // Order bo'yicha qidirish
-                        $q->orWhereHas('employee', function($employeeQuery) use ($likeSearch) {
-                            $employeeQuery->whereRaw('LOWER(name) LIKE ?', [$likeSearch]);
+                        $q->orWhereHas('employee', function ($q) use ($lowerSearch, $likeSearch) {
+                            $q->whereRaw('LOWER(name) LIKE ?', [$likeSearch]);
                         });
 
                     });
