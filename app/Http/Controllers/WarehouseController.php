@@ -101,10 +101,8 @@ class WarehouseController extends Controller
                         });
 
                         // Order bo'yicha qidirish
-                        $q->orWhereHas('user', function ($userQuery) use ($likeSearch) {
-                            $userQuery->whereHas('employee', function ($employeeQuery) use ($likeSearch) {
-                                $employeeQuery->where('name', 'ILIKE', $likeSearch);
-                            });
+                        $q->orWhereHas('employee', function($employeeQuery) use ($likeSearch) {
+                            $employeeQuery->whereRaw('LOWER(name) LIKE ?', [$likeSearch]);
                         });
 
                     });
@@ -117,7 +115,7 @@ class WarehouseController extends Controller
                     'warehouse',
                     'source',
                     'destination',
-                    'user.employee',
+                    'employee',
                     'order',
                 ])
 
@@ -142,7 +140,7 @@ class WarehouseController extends Controller
             'warehouse',
             'source',
             'destination',
-            'user.employee',
+            'employee',
             'order',
         ])->findOrFail($id);
 
