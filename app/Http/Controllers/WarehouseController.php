@@ -44,22 +44,26 @@ class WarehouseController extends Controller
     public function getIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
+            // Ensure filters are only set if they exist in the request
             $filters = $request->only([
                 'source_id',
                 'warehouse_id',
                 'search'
             ]);
 
+            // Handle cases where keys may not be present in the filters
             $search = $filters['search'] ?? null;
+            $sourceId = $filters['source_id'] ?? null;
+            $warehouseId = $filters['warehouse_id'] ?? null;
 
             $incoming = StockEntry::query()
                 ->where('type', 'incoming')
 
                 // Filter: manba
-                ->when($filters['source_id'], fn ($q, $v) => $q->where('source_id', $v))
+                ->when($sourceId, fn ($q, $v) => $q->where('source_id', $v))
 
                 // Filter: ombor
-                ->when($filters['warehouse_id'], fn ($q, $v) => $q->where('warehouse_id', $v))
+                ->when($warehouseId, fn ($q, $v) => $q->where('warehouse_id', $v))
 
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
@@ -98,6 +102,7 @@ class WarehouseController extends Controller
 
             return response()->json($incoming);
         } catch (\Throwable $e) {
+            // Handle errors gracefully and return meaningful messages
             return response()->json([
                 'message' => 'Maʼlumotlarni olishda xatolik yuz berdi.',
                 'error' => $e->getMessage()
