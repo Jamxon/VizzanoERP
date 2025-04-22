@@ -39,6 +39,45 @@ class WarehouseController extends Controller
         return response()->json($balance);
     }
 
+    public function showBalance(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $branchId = auth()->user()?->employee?->branch_id;
+        $stockBalanceId = $request->input('stock_balance_id');
+
+        // Asosiy balance ni topamiz
+        $balance = StockBalance::where('id', $stockBalanceId)
+            ->whereHas('warehouse', fn($q) => $q->where('branch_id', $branchId))
+            ->with(['item.unit', 'warehouse', 'order'])
+            ->firstOrFail();
+
+        // Kirim-chiqim entrylarini topamiz (entry darajasida)
+        $entries = StockEntry::where('warehouse_id', $balance->warehouse_id)
+            ->whereHas('items', function ($q) use ($balance) {
+                $q->where('item_id', $balance->item_id);
+            })
+            ->when($balance->order_id, function ($q) use ($balance) {
+                $q->where('order_id', $balance->order_id);
+            }, function ($q) {
+                $q->whereNull('order_id');
+            })
+            ->with([
+                'items.item.unit',
+                'warehouse',
+                'source',
+                'destination',
+                'employee',
+                'responsibleUser.employee',
+                'contragent'
+            ])
+            ->orderByDesc('id')
+            ->get();
+
+        return response()->json([
+            'balance' => $balance,
+            'entries' => $entries,
+        ]);
+    }
+
     public function getUsers(Request $request): \Illuminate\Http\JsonResponse
     {
         $search = trim($request->input('search'));
