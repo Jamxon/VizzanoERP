@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static whereHas(string $string, \Closure $param)
  * @method static create(array $array)
  * @property mixed $currency_id
+ * @property mixed $min_quantity
  */
 class Item extends Model
 {
@@ -23,7 +24,8 @@ class Item extends Model
         'type_id',
         'code',
         'branch_id',
-        'currency_id'
+        'currency_id',
+        'min_quantity',
     ];
 
     protected $hidden = [

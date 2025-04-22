@@ -97,6 +97,7 @@ class ItemController extends Controller
             'type_id' => 'required|exists:item_types,id',
             'code' => 'nullable|unique:items,code',
             'currency_id' => 'nullable|integer',
+            'min_quantity' => 'nullable|numeric',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
@@ -119,6 +120,7 @@ class ItemController extends Controller
             'image' => $imagePath,
             'branch_id' => auth()->user()->employee->branch_id,
             'currency_id' => $validated['currency_id'],
+            'min_quantity' => $validated['min_quantity'] ?? 0,
         ]);
 
         return response()->json([
@@ -137,6 +139,7 @@ class ItemController extends Controller
             'type_id' => 'sometimes|exists:item_types,id',
             'code' => 'sometimes|unique:items,code,' . $item->id,
             'currency_id' => 'sometimes|integer',
+            'min_quantity' => 'sometimes|numeric',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
@@ -163,6 +166,7 @@ class ItemController extends Controller
         $item->code = $validated['code'] ?? $item->code;
         $item->branch_id = auth()->user()->employee->branch_id;
         $item->currency_id = $validated['currency_id'] ?? $item->currency_id;
+        $item->min_quantity = $validated['min_quantity'] ?? $item->min_quantity;
         $item->save();
 
         return response()->json([
