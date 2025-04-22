@@ -23,7 +23,7 @@
     <p><strong>Ombor:</strong> {{ $entry->warehouse->name ?? '-' }}</p>
     <p><strong>Izoh:</strong> {{ $entry->comment }}</p>
     <p><strong>Buyurtma ID:</strong> {{ $entry->order_id }}</p>
-    @if($entry->type === 'income')
+    @if($entry->type === 'incoming')
         <p><strong>Kirim turi:</strong> {{ $entry->source->name ?? '-' }}</p>
     @else
         <p><strong>Chiqim turi:</strong> {{ $entry->destination->name ?? '-' }}</p>
