@@ -100,6 +100,7 @@ class WarehouseController extends Controller
                         });
                     });
                 })
+
                 // Loading necessary relationships
                 ->with([
                     'items.currency',
