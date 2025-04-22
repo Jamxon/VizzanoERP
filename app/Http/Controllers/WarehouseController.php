@@ -70,9 +70,8 @@ class WarehouseController extends Controller
                     $lowerSearch = mb_strtolower($search);
                     return $query->where(function ($q) use ($lowerSearch, $search) {
                         // Comment bo'yicha qidirish
-                        $q->orWhereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]);
+                        dd($q->orWhereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]));
 
-                        dd($lowerSearch);
                         // Raqamli qidiruvlar uchun
                         if (is_numeric($search)) {
                             $q->orWhere('id', (int)$search);
