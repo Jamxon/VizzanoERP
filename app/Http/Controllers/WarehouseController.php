@@ -25,6 +25,7 @@ class WarehouseController extends Controller
         $balance = StockBalance::whereHas('order', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             })
+            ->where('quantity', '>', 0)
             ->when($warehouseId, function ($query) use ($warehouseId) {
                 $query->where('warehouse_id', $warehouseId);
             })
