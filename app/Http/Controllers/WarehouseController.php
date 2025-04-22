@@ -57,7 +57,7 @@ class WarehouseController extends Controller
 
         // Kirim-chiqimlar tarixi
         $history = StockEntryItem::where('item_id', $itemId)
-            ->whereHas('entry', function ($query) use ($warehouseId, $orderId) {
+            ->whereHas('stockEntry', function ($query) use ($warehouseId, $orderId) {
                 $query->where('warehouse_id', $warehouseId);
                 if ($orderId !== null) {
                     $query->where('order_id', $orderId);
