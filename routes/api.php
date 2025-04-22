@@ -38,7 +38,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('/incoming', [WarehouseController::class, 'getIncoming']);
     Route::post('/outcome', [WarehouseController::class, 'storeOutcome']);
     Route::get('/outcome', [WarehouseController::class, 'getOutcome']);
-    Route::get('/balances', [WarehouseController::class, 'getStockBalances']);
+    Route::get('/balances', [WarehouseController::class, 'getBalance']);
     Route::get('items', [ItemController::class, 'index']);
     Route::get('items/search', [ItemController::class, 'search']);
     Route::post('items', [ItemController::class, 'store']);
