@@ -351,7 +351,7 @@ class WarehouseController extends Controller
             'destination_name'  => 'nullable|string',
             'comment'           => 'nullable|string',
             'order_id'          => 'nullable|exists:orders,id',
-            'contragent_id'     => 'nullable|exists:contragents,id',
+            'contragent_id'     => 'nullable|exists:contragent,id',
             'responsible_user_id' => 'nullable|exists:users,id',
             'items'             => 'required|array|min:1',
             'items.*.item_id'   => 'required|exists:items,id',
