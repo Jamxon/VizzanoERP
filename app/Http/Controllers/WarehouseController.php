@@ -49,7 +49,7 @@ class WarehouseController extends Controller
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'warehouse_id' => 'nullable|exists:warehouses,id', // umumiy ombor (ixtiyoriy)
+            'warehouse_id' => 'nullable|exists:warehouses,id',
             'source_id' => 'nullable|exists:sources,id',
             'source_name' => 'nullable|string',
             'comment' => 'nullable|string',
@@ -64,7 +64,6 @@ class WarehouseController extends Controller
         DB::beginTransaction();
         try {
 
-            // Agar source_id berilmagan bo‘lsa, source_name ni saqlash
             if (empty($validated['source_id']) && !empty($validated['source_name'])) {
                 $source = Source::firstOrCreate(['name' => $validated['source_name']]);
                 $validated['source_id'] = $source->id;
@@ -72,7 +71,7 @@ class WarehouseController extends Controller
 
             $entry = StockEntry::create([
                 'type' => 'incoming',
-                'warehouse_id' => $validated['warehouse_id'] ?? null, // umumiy ombor (ixtiyoriy)
+                'warehouse_id' => $validated['warehouse_id'] ?? null,
                 'source_id' => $validated['source_id'] ?? null,
                 'destination_id' => null,
                 'comment' => $validated['comment'] ?? null,
@@ -82,7 +81,6 @@ class WarehouseController extends Controller
             ]);
 
             foreach ($validated['items'] as $item) {
-                // Itemni entryga bog‘lash
                 $entry->items()->create([
                     'item_id' => $item['item_id'],
                     'quantity' => $item['quantity'],
@@ -90,7 +88,6 @@ class WarehouseController extends Controller
                     'currency_id' => $item['currency_id'] ?? null,
                 ]);
 
-                // Zaxirani yangilash
                 $balance = StockBalance::firstOrCreate(
                     [
                         'item_id' => $item['item_id'],
@@ -144,8 +141,8 @@ class WarehouseController extends Controller
     public function storeOutgoing(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'warehouse_id' => 'nullable|exists:warehouses,id', // umumiy ombor (ixtiyoriy)
-            'destination_id' => 'nullable|exists:destinations,id', // destination (maqsad ombori)
+            'warehouse_id' => 'nullable|exists:warehouses,id',
+            'destination_id' => 'nullable|exists:destinations,id',
             'source_id' => 'nullable|exists:sources,id',
             'comment' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
@@ -161,7 +158,7 @@ class WarehouseController extends Controller
         try {
             $entry = StockEntry::create([
                 'type' => 'outgoing',
-                'warehouse_id' => $validated['warehouse_id'] ?? null, // umumiy ombor (ixtiyoriy)
+                'warehouse_id' => $validated['warehouse_id'] ?? null,
                 'destination_id' => $validated['destination_id'] ?? null,
                 'source_id' => $validated['source_id'] ?? null,
                 'comment' => $validated['comment'] ?? null,
@@ -171,7 +168,6 @@ class WarehouseController extends Controller
             ]);
 
             foreach ($validated['items'] as $item) {
-                // Itemni entryga bog‘lash
                 $entry->items()->create([
                     'item_id' => $item['item_id'],
                     'quantity' => $item['quantity'],
@@ -179,7 +175,6 @@ class WarehouseController extends Controller
                     'currency_id' => $item['currency_id'] ?? null,
                 ]);
 
-                // Zaxirani yangilash
                 $balance = StockBalance::firstOrCreate(
                     [
                         'item_id' => $item['item_id'],
@@ -190,7 +185,7 @@ class WarehouseController extends Controller
                 );
 
                 $oldQty = $balance->quantity;
-                $balance->quantity -= $item['quantity']; // Chiqim bo‘lgani uchun quantity minus
+                $balance->quantity -= $item['quantity'];
                 $balance->save();
 
                 Log::add(
