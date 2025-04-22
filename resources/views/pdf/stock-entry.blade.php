@@ -25,7 +25,8 @@
     <p><strong>Buyurtma ID:</strong> {{ $entry->order_id }}</p>
     <p><strong>Manba:</strong> {{ $entry->source->name ?? '-' }}</p>
     <p><strong>Manzil:</strong> {{ $entry->destination->name ?? '-' }}</p>
-    <p><strong>Foydalanuvchi:</strong> {{ $entry->employee->name ?? '-' }}</p>
+    <p><strong>Omborchi:</strong> {{ $entry->employee->name ?? '-' }}</p>
+    {{ $entry->type === 'incoming' ? "<p>Ma'sul: " . ($entry->user->employee->name ?? '-') . '</p>' : '' }}
     <p><strong>Kontragent:</strong> {{ $entry->contragent->name ?? '-' }}</p>
 </div>
 
