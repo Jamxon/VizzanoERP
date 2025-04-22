@@ -28,7 +28,11 @@ class WarehouseController extends Controller
                     $q->where('name', 'ILIKE', '%' . $s . '%');
                 });
         })
-            ->with('employee')
+            ->with(
+                'employee',
+                'employee.department',
+                'employee.position',
+            )
             ->get();
 
         return response()->json($users);
