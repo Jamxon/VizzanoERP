@@ -23,8 +23,11 @@
     <p><strong>Ombor:</strong> {{ $entry->warehouse->name ?? '-' }}</p>
     <p><strong>Izoh:</strong> {{ $entry->comment }}</p>
     <p><strong>Buyurtma ID:</strong> {{ $entry->order_id }}</p>
-    <p><strong>Manba:</strong> {{ $entry->source->name ?? '-' }}</p>
-    <p><strong>Manzil:</strong> {{ $entry->destination->name ?? '-' }}</p>
+    @if($entry->type === 'income')
+        <p><strong>Kirim turi:</strong> {{ $entry->source->name ?? '-' }}</p>
+    @else
+        <p><strong>Chiqim turi:</strong> {{ $entry->destination->name ?? '-' }}</p>
+    @endif
     <p><strong>Omborchi:</strong> {{ $entry->employee->name ?? '-' }}</p>
     @if ($entry->type === 'outcome')
         <p><strong>Ma'sul:</strong> {{ $entry->responsibleUser->employee->name ?? '-' }}</p>
