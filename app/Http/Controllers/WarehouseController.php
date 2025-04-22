@@ -79,7 +79,7 @@ class WarehouseController extends Controller
                             'employee',
                             'responsibleUser.employee',
                             'contragent',
-                            'items.item',
+                            'items.item.unit',
                         ]);
                     }
                 ])
