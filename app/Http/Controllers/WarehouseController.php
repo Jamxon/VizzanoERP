@@ -44,18 +44,21 @@ class WarehouseController extends Controller
 
     public function getIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
-        $filters = $request->only(['source_id', 'warehouse_id', 'order_id', 'user_id', 'search']);
+        $filters = $request->only(['source_id', 'warehouse_id', 'order_id', 'search']);
 
         $incoming = StockEntry::query()
             ->where('type', 'incoming')
             ->when($filters['source_id'] ?? null, fn($q, $v) => $q->where('source_id', $v))
             ->when($filters['warehouse_id'] ?? null, fn($q, $v) => $q->where('warehouse_id', $v))
             ->when($filters['order_id'] ?? null, fn($q, $v) => $q->where('order_id', $v))
-            ->when($filters['user_id'] ?? null, fn($q, $v) => $q->where('user_id', $v))
             ->when($filters['search'] ?? null, function ($q, $search) {
                 $q->where(function ($q) use ($search) {
                     $q->where('comment', 'like', "%{$search}%")
-                        ->orWhere('id', 'like', "%{$search}%");
+                        ->orWhere('id', 'like', "%{$search}%")
+                        ->orWhere('user_id', (int)$search) // faqat raqamli bo‘lsa
+                        ->orWhereHas('user.employee', function ($q) use ($search) {
+                            $q->where('name', 'like', "%{$search}%");
+                        });
                 });
             })
             ->with([
@@ -64,15 +67,14 @@ class WarehouseController extends Controller
                 'warehouse',
                 'source',
                 'destination',
-                'user',
-                'order'
+                'user.employee',
+                'order',
             ])
             ->latest('updated_at')
             ->paginate(10);
 
         return response()->json($incoming);
     }
-
 
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
