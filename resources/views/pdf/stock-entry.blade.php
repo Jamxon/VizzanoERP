@@ -29,6 +29,10 @@
     <p><strong>Kontragent:</strong> {{ $entry->contragent->name ?? '-' }}</p>
 </div>
 
+@php
+    $totals = [];
+@endphp
+
 <div class="section">
     <h3>Kiritilgan Mahsulotlar</h3>
     <table>
@@ -39,20 +43,46 @@
             <th>Miqdor</th>
             <th>Narx</th>
             <th>Valyuta</th>
-            <th>Yaratilgan</th>
-            <th>Yangilangan</th>
+            <th>Summa</th>
         </tr>
         </thead>
         <tbody>
         @foreach ($entry->items as $i => $item)
+            @php
+                $amount = $item->quantity * $item->price;
+                $currencyName = $item->currency->name ?? $item->currency_id;
+                if (!isset($totals[$currencyName])) {
+                    $totals[$currencyName] = 0;
+                }
+                $totals[$currencyName] += $amount;
+            @endphp
             <tr>
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $item->item->name ?? $item->item_id }}</td>
                 <td>{{ $item->quantity }}</td>
                 <td>{{ number_format($item->price, 2) }}</td>
-                <td>{{ $item->currency->name ?? $item->currency_id }}</td>
-                <td>{{ $item->created_at->format('d.m.Y H:i') }}</td>
-                <td>{{ $item->updated_at->format('d.m.Y H:i') }}</td>
+                <td>{{ $currencyName }}</td>
+                <td>{{ number_format($amount, 2) }}</td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+</div>
+
+<div class="section">
+    <h3>Umumiy Summa (valyutalar bo‘yicha)</h3>
+    <table>
+        <thead>
+        <tr>
+            <th>Valyuta</th>
+            <th>Jami</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach ($totals as $currency => $total)
+            <tr>
+                <td>{{ $currency }}</td>
+                <td>{{ number_format($total, 2) }}</td>
             </tr>
         @endforeach
         </tbody>
