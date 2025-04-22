@@ -345,6 +345,7 @@ class WarehouseController extends Controller
 
     public function storeOutcome(Request $request): \Illuminate\Http\JsonResponse
     {
+        dd($request->all());
         $validated = $request->validate([
             'warehouse_id'      => 'required|exists:warehouses,id',
             'destination_id'    => 'nullable|exists:sources,id', // chiqimda destination sifatida yoziladi
