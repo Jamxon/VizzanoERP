@@ -36,8 +36,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
     Route::post('/incoming', [WarehouseController::class, 'storeIncoming']);
     Route::get('/incoming', [WarehouseController::class, 'getIncoming']);
-    Route::post('/outgoing', [WarehouseController::class, 'storeOutgoing']);
-    Route::get('/outgoing', [WarehouseController::class, 'getOutgoing']);
+    Route::post('/outcome', [WarehouseController::class, 'storeOutcome']);
+    Route::get('/outcome', [WarehouseController::class, 'getOutcome']);
     Route::get('/balances', [WarehouseController::class, 'getStockBalances']);
     Route::get('items', [ItemController::class, 'index']);
     Route::get('items/search', [ItemController::class, 'search']);
