@@ -42,9 +42,22 @@ class WarehouseController extends Controller
         return response()->json($contragents);
     }
 
-    public function getIncoming(): \Illuminate\Http\JsonResponse
+    public function getIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
-        $incoming = StockEntry::where('type', 'incoming')
+        $filters = $request->only(['source_id', 'warehouse_id', 'order_id', 'user_id', 'search']);
+
+        $incoming = StockEntry::query()
+            ->where('type', 'incoming')
+            ->when($filters['source_id'] ?? null, fn($q, $v) => $q->where('source_id', $v))
+            ->when($filters['warehouse_id'] ?? null, fn($q, $v) => $q->where('warehouse_id', $v))
+            ->when($filters['order_id'] ?? null, fn($q, $v) => $q->where('order_id', $v))
+            ->when($filters['user_id'] ?? null, fn($q, $v) => $q->where('user_id', $v))
+            ->when($filters['search'] ?? null, function ($q, $search) {
+                $q->where(function ($q) use ($search) {
+                    $q->where('comment', 'like', "%{$search}%")
+                        ->orWhere('id', 'like', "%{$search}%");
+                });
+            })
             ->with([
                 'items.currency',
                 'items.item',
@@ -52,12 +65,13 @@ class WarehouseController extends Controller
                 'source',
                 'destination',
                 'user',
-                ])
-            ->orderBy('updated_at', 'desc')
+            ])
+            ->latest('updated_at')
             ->paginate(10);
 
         return response()->json($incoming);
     }
+
 
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -89,7 +103,6 @@ class WarehouseController extends Controller
                 'source_id' => $validated['source_id'] ?? null,
                 'destination_id' => null,
                 'comment' => $validated['comment'] ?? null,
-                'created_by' => auth()->id(),
                 'order_id' => $validated['order_id'] ?? null,
                 'user_id' => auth()->id(),
                 'contragent_id' => $validated['contragent_id'] ?? null,
