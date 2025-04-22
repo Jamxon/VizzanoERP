@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property mixed $name
  * @method static firstOrCreate(array $array)
+ * @method static where(string $string, mixed $branch_id)
  */
 class Destination extends Model
 {

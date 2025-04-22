@@ -42,6 +42,13 @@ class WarehouseController extends Controller
         return response()->json($contragents);
     }
 
+    public function getDestinations(): \Illuminate\Http\JsonResponse
+    {
+        $destinations = Destination::all();
+
+        return response()->json($destinations);
+    }
+
     public function getIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
@@ -241,13 +248,13 @@ class WarehouseController extends Controller
     {
         try {
             $filters = $request->only([
-                'source_id',
+                'destination_id',
                 'warehouse_id',
                 'search'
             ]);
 
             $search = trim($filters['search'] ?? '');
-            $sourceId = $filters['source_id'] ?? null;
+            $sourceId = $filters['destionation_id'] ?? null;
             $warehouseId = $filters['warehouse_id'] ?? null;
             $createdFrom = $request->input('start_date');
             $createdTo = $request->input('end_date');
@@ -256,7 +263,7 @@ class WarehouseController extends Controller
                 ->where('type', 'outcome')
 
                 // Filter: manba
-                ->when($sourceId, fn ($q, $v) => $q->where('source_id', $v))
+                ->when($sourceId, fn ($q, $v) => $q->where('destination_id', $v))
 
                 // Filter: ombor
                 ->when($warehouseId, fn ($q, $v) => $q->where('warehouse_id', $v))
