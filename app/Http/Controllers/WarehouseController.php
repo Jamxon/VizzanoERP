@@ -43,59 +43,66 @@ class WarehouseController extends Controller
 
     public function getIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
-        $filters = $request->only([
-            'source_id',
-            'warehouse_id',
-            'search'
-        ]);
+        try {
+            $filters = $request->only([
+                'source_id',
+                'warehouse_id',
+                'search'
+            ]);
 
-        $search = $filters['search'] ?? null;
-        $incoming = StockEntry::query()
-            ->where('type', 'incoming')
+            $search = $filters['search'] ?? null;
 
-            // Filter: manba
-            ->when($filters['source_id'], fn ($q, $v) => $q->where('source_id', $v))
+            $incoming = StockEntry::query()
+                ->where('type', 'incoming')
 
-            // Filter: ombor
-            ->when($filters['warehouse_id'], fn ($q, $v) => $q->where('warehouse_id', $v))
+                // Filter: manba
+                ->when($filters['source_id'], fn ($q, $v) => $q->where('source_id', $v))
 
-            // Qidiruv: comment, id, user_id, user->employee->name, order_id
-            ->when($search, function ($query, $search) {
-                $lowerSearch = mb_strtolower($search); // har xil til uchun ham ishlaydi
+                // Filter: ombor
+                ->when($filters['warehouse_id'], fn ($q, $v) => $q->where('warehouse_id', $v))
 
-                $query->where(function ($q) use ($lowerSearch) {
-                    $q->whereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"])
-                        ->orWhereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
+                // Qidiruv: comment, id, user_id, user->employee->name, order_id
+                ->when($search, function ($query, $search) {
+                    $lowerSearch = mb_strtolower($search);
 
-                    if (is_numeric($lowerSearch)) {
-                        $q->orWhere('user_id', (int)$lowerSearch);
-                    }
+                    $query->where(function ($q) use ($lowerSearch) {
+                        $q->whereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"])
+                            ->orWhereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
 
-                    $q->orWhereHas('user.employee', function ($subQ) use ($lowerSearch) {
-                        $subQ->whereRaw('LOWER(name) LIKE ?', ["%{$lowerSearch}%"]);
+                        if (is_numeric($lowerSearch)) {
+                            $q->orWhere('user_id', (int)$lowerSearch);
+                        }
+
+                        $q->orWhereHas('user.employee', function ($subQ) use ($lowerSearch) {
+                            $subQ->whereRaw('LOWER(name) LIKE ?', ["%{$lowerSearch}%"]);
+                        });
+
+                        $q->orWhereHas('order', function ($subQ) use ($lowerSearch) {
+                            $subQ->whereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
+                        });
                     });
+                })
 
-                    $q->orWhereHas('order', function ($subQ) use ($lowerSearch) {
-                        $subQ->whereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
-                    });
-                });
-            })
+                ->with([
+                    'items.currency',
+                    'items.item',
+                    'warehouse',
+                    'source',
+                    'destination',
+                    'user.employee',
+                    'order',
+                ])
 
-            // Aloqador modellarni yuklaymiz
-            ->with([
-                'items.currency',
-                'items.item',
-                'warehouse',
-                'source',
-                'destination',
-                'user.employee',
-                'order',
-            ])
+                ->latest('updated_at')
+                ->paginate(10);
 
-            ->latest('updated_at')
-            ->paginate(10);
-
-        return response()->json($incoming);
+            return response()->json($incoming);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Maʼlumotlarni olishda xatolik yuz berdi.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
