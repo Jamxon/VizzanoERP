@@ -54,8 +54,8 @@ class WarehouseController extends Controller
             $search = trim($filters['search'] ?? '');
             $sourceId = $filters['source_id'] ?? null;
             $warehouseId = $filters['warehouse_id'] ?? null;
-            $createdFrom = $request->input('created_from');
-            $createdTo = $request->input('created_to');
+            $createdFrom = $request->input('start_date');
+            $createdTo = $request->input('end_date');
 
             $incoming = StockEntry::query()
                 ->where('type', 'incoming')
