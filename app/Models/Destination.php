@@ -20,6 +20,11 @@ class Destination extends Model
         'name',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function stockEntries(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(StockEntry::class);
