@@ -66,11 +66,14 @@ class WarehouseController extends Controller
                 ->when($warehouseId, fn ($q, $v) => $q->where('warehouse_id', $v))
 
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
+// Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
                     $lowerSearch = mb_strtolower($search);
-                    return $query->where(function ($q) use ($lowerSearch, $search) {
+                    $likeSearch = '%' . $lowerSearch . '%';
+
+                    return $query->where(function ($q) use ($lowerSearch, $search, $likeSearch) {
                         // Comment bo'yicha qidirish
-                        $q->orWhereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]);
+                        $q->orWhereRaw('LOWER(comment) LIKE ?', [$likeSearch]);
 
                         // Raqamli qidiruvlar uchun
                         if (is_numeric($search)) {
@@ -80,27 +83,27 @@ class WarehouseController extends Controller
                         }
 
                         // ID larni string sifatida qidirish
-                        $q->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ["%{$search}%"]);
-                        $q->orWhereRaw('CAST(user_id AS VARCHAR) LIKE ?', ["%{$search}%"]);
-                        $q->orWhereRaw('CAST(order_id AS VARCHAR) LIKE ?', ["%{$search}%"]);
+                        $q->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
+                        $q->orWhereRaw('CAST(user_id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
+                        $q->orWhereRaw('CAST(order_id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
 
                         // User va employee bo'yicha qidirish
-                        $q->orWhereHas('user', function($userQuery) use ($lowerSearch) {
-                            $userQuery->whereHas('employee', function($employeeQuery) use ($lowerSearch) {
-                                $employeeQuery->whereRaw('LOWER(name) LIKE ?', ["%{$lowerSearch}%"]);
+                        $q->orWhereHas('user', function($userQuery) use ($likeSearch) {
+                            $userQuery->whereHas('employee', function($employeeQuery) use ($likeSearch) {
+                                $employeeQuery->whereRaw('LOWER(name) LIKE ?', [$likeSearch]);
                             });
                         });
 
                         // Order bo'yicha qidirish
-                        $q->orWhereHas('order', function ($subQ) use ($search, $lowerSearch) {
+                        $q->orWhereHas('order', function ($subQ) use ($search) {
                             if (is_numeric($search)) {
                                 $subQ->where('id', (int)$search);
                             }
-                            $subQ->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ["%{$search}%"]);
+                            $subQ->orWhereRaw('CAST(id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
                         });
                     });
                 })
-
+                
                 // Loading necessary relationships
                 ->with([
                     'items.currency',
