@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static findOrFail($id)
  * @method static create(array $validated)
+ * @method static firstOrCreate(array $array)
  */
 class Source extends Model
 {

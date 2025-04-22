@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Destination;
 use App\Models\Order;
+use App\Models\Source;
 use App\Models\StockBalance;
 use App\Models\StockEntry;
 use App\Models\Warehouse;
@@ -65,7 +66,7 @@ class WarehouseController extends Controller
 
             // Agar source_id berilmagan bo‘lsa, source_name ni saqlash
             if (empty($validated['source_id']) && !empty($validated['source_name'])) {
-                $source = Destination::firstOrCreate(['name' => $validated['source_name']]);
+                $source = Source::firstOrCreate(['name' => $validated['source_name']]);
                 $validated['source_id'] = $source->id;
             }
 
