@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static create(array $array)
  * @method static where(string $string, string $string1)
  */
+
 class StockEntry extends Model
 {
     use HasFactory;
@@ -24,6 +25,7 @@ class StockEntry extends Model
         'order_id',
         'user_id',
         'contragent_id',
+        'responsible_user_id',
     ];
 
     protected $hidden = [
@@ -35,6 +37,7 @@ class StockEntry extends Model
         'order_id',
         'user_id',
         'contragent_id',
+        'responsible_user_id',
     ];
 
     public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -70,5 +73,10 @@ class StockEntry extends Model
     public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function responsibleUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'responsible_user_id');
     }
 }
