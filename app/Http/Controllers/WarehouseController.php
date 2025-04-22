@@ -345,22 +345,22 @@ class WarehouseController extends Controller
 
     public function storeOutcome(Request $request): \Illuminate\Http\JsonResponse
     {
-        $validated = $request->validate([
-            'warehouse_id'      => 'required|exists:warehouses,id',
-            'destination_id'    => 'nullable|exists:destinations,id', // chiqimda destination sifatida yoziladi
-            'destination_name'  => 'nullable|string',
-            'comment'           => 'nullable|string',
-            'order_id'          => 'nullable|exists:orders,id',
-            'contragent_id'     => 'nullable|exists:contragent,id',
-            'responsible_user_id' => 'nullable|exists:users,id',
-            'items'             => 'required|array|min:1',
-            'items.*.item_id'   => 'required|exists:items,id',
-            'items.*.quantity'  => 'required|numeric|min:0.01',
-        ]);
-        dd($validated);
         DB::beginTransaction();
-
         try {
+            $validated = $request->validate([
+                'warehouse_id'      => 'required|exists:warehouses,id',
+                'destination_id'    => 'nullable|exists:destinations,id', // chiqimda destination sifatida yoziladi
+                'destination_name'  => 'nullable|string',
+                'comment'           => 'nullable|string',
+                'order_id'          => 'nullable|exists:orders,id',
+                'contragent_id'     => 'nullable|exists:contragent,id',
+                'responsible_user_id' => 'nullable|exists:users,id',
+                'items'             => 'required|array|min:1',
+                'items.*.item_id'   => 'required|exists:items,id',
+                'items.*.quantity'  => 'required|numeric|min:0.01',
+            ]);
+            dd($validated);
+
             // Manzil nomi bo‘yicha avtomatik destination yaratish
             if (!$validated['destination_id'] && $validated['destination_name']) {
                 $destination = Destination::firstOrCreate(['name' => $validated['destination_name']]);
