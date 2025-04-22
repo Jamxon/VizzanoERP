@@ -347,7 +347,7 @@ class WarehouseController extends Controller
     {
         $validated = $request->validate([
             'warehouse_id'      => 'required|exists:warehouses,id',
-            'destination_id'    => 'nullable|exists:sources,id', // chiqimda destination sifatida yoziladi
+            'destination_id'    => 'nullable|exists:destinations,id', // chiqimda destination sifatida yoziladi
             'destination_name'  => 'nullable|string',
             'comment'           => 'nullable|string',
             'order_id'          => 'nullable|exists:orders,id',
