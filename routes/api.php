@@ -55,6 +55,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('contragents', [WarehouseController::class, 'getContragents']);
     Route::get('destinations', [WarehouseController::class, 'getDestinations']);
     Route::get('stockEntry/{id}', [WarehouseController::class, 'downloadPdf']);
+    Route::get('users', [WarehouseController::class, 'getUsers']);
 });
 
 Route::prefix('transport')->middleware('role:transport')->group(function () {
