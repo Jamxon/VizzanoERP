@@ -71,7 +71,7 @@ class WarehouseController extends Controller
                     }
                 })
                 ->with([
-                    'entry' => function ($q) {
+                    'stockEntry' => function ($q) {
                         $q->with([
                             'warehouse',
                             'source',
