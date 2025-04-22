@@ -336,7 +336,7 @@ class WarehouseController extends Controller
         try {
             // Manzil nomi bo‘yicha avtomatik destination yaratish
             if (!$validated['destination_id'] && $validated['destination_name']) {
-                $destination = Source::firstOrCreate(['name' => $validated['destination_name']]);
+                $destination = Destination::firstOrCreate(['name' => $validated['destination_name']]);
                 $validated['destination_id'] = $destination->id;
             }
 
