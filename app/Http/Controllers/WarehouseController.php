@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Source;
 use App\Models\StockBalance;
 use App\Models\StockEntry;
+use App\Models\StockEntryItem;
 use App\Models\Warehouse;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
