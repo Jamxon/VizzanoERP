@@ -65,6 +65,7 @@ class WarehouseController extends Controller
                 'source',
                 'destination',
                 'user',
+                'order'
             ])
             ->latest('updated_at')
             ->paginate(10);
