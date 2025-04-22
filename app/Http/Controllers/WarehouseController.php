@@ -22,12 +22,12 @@ class WarehouseController extends Controller
 
         $warehouseId = $request->input('warehouse_id');
 
-        $balance = StockBalance::whereHas('order', function ($query) use ($branchId) {
-                $query->where('branch_id', $branchId);
-            })
-            ->where('quantity', '>', 0)
+        $balance = StockBalance::where('quantity', '>', 0)
             ->when($warehouseId, function ($query) use ($warehouseId) {
                 $query->where('warehouse_id', $warehouseId);
+            })
+            ->whereHas('warehouse', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
             })
             ->with([
                 'item.unit',
