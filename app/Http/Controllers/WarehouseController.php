@@ -345,7 +345,6 @@ class WarehouseController extends Controller
 
     public function storeOutcome(Request $request): \Illuminate\Http\JsonResponse
     {
-        dd($request->all());
         $validated = $request->validate([
             'warehouse_id'      => 'required|exists:warehouses,id',
             'destination_id'    => 'nullable|exists:sources,id', // chiqimda destination sifatida yoziladi
@@ -358,7 +357,7 @@ class WarehouseController extends Controller
             'items.*.item_id'   => 'required|exists:items,id',
             'items.*.quantity'  => 'required|numeric|min:0.01',
         ]);
-
+        dd($validated);
         DB::beginTransaction();
 
         try {
