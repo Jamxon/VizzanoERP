@@ -71,6 +71,7 @@ class WarehouseController extends Controller
                     }
                 })
                 ->with([
+                    'item.unit', // faqat shu item haqida info kerak bo‘lsa
                     'stockEntry' => function ($q) {
                         $q->with([
                             'warehouse',
@@ -79,7 +80,6 @@ class WarehouseController extends Controller
                             'employee',
                             'responsibleUser.employee',
                             'contragent',
-                            'items.item.unit',
                         ]);
                     }
                 ])
@@ -91,10 +91,10 @@ class WarehouseController extends Controller
                 'history' => $history,
             ]);
         } catch (\Throwable $e) {
-
+            
             return response()->json([
                 'message' => 'Xatolik yuz berdi. Administrator bilan bog‘laning.',
-                'error' => $e->getMessage() // agar faqat dev versiyada ko‘rsatmoqchi bo‘lsang
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
