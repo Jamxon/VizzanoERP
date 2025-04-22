@@ -72,7 +72,7 @@ class WarehouseController extends Controller
 
                     return $query->where(function ($q) use ($lowerSearch, $search, $likeSearch) {
                         // Comment bo'yicha qidirish
-                        $q->orWhere('comment', 'LIKE', $likeSearch); // PostgreSQL bo‘lsa
+                        $q->whereRaw('LOWER(comment) LIKE ?', [$likeSearch]);
 
                         // Raqamli qidiruvlar uchun
                         if (is_numeric($search)) {
