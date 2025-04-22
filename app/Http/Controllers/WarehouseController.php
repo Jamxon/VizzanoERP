@@ -68,9 +68,9 @@ class WarehouseController extends Controller
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
                     $lowerSearch = mb_strtolower($search);
-                    $query->where(function ($q) use ($lowerSearch, $search) {
-                        // Searching in comment
-                        $q->whereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]);
+                    return $query->where(function ($q) use ($lowerSearch, $search) {
+                        // Searching in comment - note that we're using orWhereRaw here instead
+                        $q->orWhereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]);
 
                         // Only try to match IDs if the search is numeric
                         if (is_numeric($search)) {
@@ -100,7 +100,6 @@ class WarehouseController extends Controller
                         });
                     });
                 })
-
                 // Loading necessary relationships
                 ->with([
                     'items.currency',
