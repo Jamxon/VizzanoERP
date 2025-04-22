@@ -68,13 +68,14 @@ class WarehouseController extends Controller
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
                     $lowerSearch = mb_strtolower($search);
-
                     $query->where(function ($q) use ($lowerSearch) {
-                        // Searching in comment and id fields
-                        $q->whereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"])
-                            ->orWhereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
+                        // Searching in comment
+                        $q->whereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"]);
 
-                        // Searching in user_id if the search is numeric
+                        // Searching in id field (numeric)
+                        $q->orWhereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
+
+                        // Searching in user_id if search is numeric
                         if (is_numeric($lowerSearch)) {
                             $q->orWhere('user_id', (int)$lowerSearch);
                         }
@@ -86,7 +87,7 @@ class WarehouseController extends Controller
 
                         // Searching for order_id in the order relationship
                         $q->orWhereHas('order', function ($subQ) use ($lowerSearch) {
-                            // Ensure you're comparing the correct field in the order table
+                            // Search for order_id properly (numeric)
                             $subQ->whereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
                         });
                     });
