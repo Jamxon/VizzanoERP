@@ -346,59 +346,62 @@ class WarehouseController extends Controller
     public function storeOutcome(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'warehouse_id'      => 'required|exists:warehouses,id',
-            'destination_id'    => 'nullable|exists:destinations,id', // chiqimda destination sifatida yoziladi
-            'destination_name'  => 'nullable|string',
-            'comment'           => 'nullable|string',
-            'order_id'          => 'nullable|exists:orders,id',
-            'contragent_id'     => 'nullable|exists:contragent,id',
+            'warehouse_id'        => 'required|exists:warehouses,id',
+            'destination_id'      => 'nullable|exists:destinations,id',
+            'destination_name'    => 'nullable|string',
+            'comment'             => 'nullable|string',
+            'order_id'            => 'nullable|exists:orders,id',
+            'contragent_id'       => 'nullable|exists:contragent,id',
             'responsible_user_id' => 'nullable|exists:users,id',
-            'items'             => 'required|array|min:1',
-            'items.*.item_id'   => 'required|exists:items,id',
-            'items.*.quantity'  => 'required|numeric|min:0.01',
+            'items'               => 'required|array|min:1',
+            'items.*.item_id'     => 'required|exists:items,id',
+            'items.*.quantity'    => 'required|numeric|min:0.01',
         ]);
 
         DB::beginTransaction();
 
         try {
-            // Manzil nomi bo‘yicha avtomatik destination yaratish
+            // Yangi destination yaratish
             if (!$validated['destination_id'] && $validated['destination_name']) {
                 $destination = Destination::firstOrCreate(['name' => $validated['destination_name']]);
                 $validated['destination_id'] = $destination->id;
             }
 
-            // Yangi chiqim yozuvini yaratish
+            // Yangi chiqim yozuvi
             $entry = StockEntry::create([
-                'type'          => 'outcome',
-                'warehouse_id'  => $validated['warehouse_id'],
-                'destination_id'=> $validated['destination_id'] ?? null,
-                'comment'       => $validated['comment'] ?? null,
-                'order_id'      => $validated['order_id'] ?? null,
-                'contragent_id' => $validated['contragent_id'] ?? null,
-                'user_id'       => auth()->user()->employee->id,
-                'responsible_user_id' => $validated['responsible_user_id'] ?? null,
+                'type'               => 'outcome',
+                'warehouse_id'       => $validated['warehouse_id'],
+                'destination_id'     => $validated['destination_id'] ?? null,
+                'comment'            => $validated['comment'] ?? null,
+                'order_id'           => $validated['order_id'] ?? null,
+                'contragent_id'      => $validated['contragent_id'] ?? null,
+                'user_id'            => auth()->user()->employee->id,
+                'responsible_user_id'=> $validated['responsible_user_id'] ?? null,
             ]);
 
             foreach ($validated['items'] as $item) {
-
                 $itemModel = \App\Models\Item::find($item['item_id']);
 
+                // Entry item
                 $entryItem = $entry->items()->create([
-                    'item_id' => $item['item_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $itemModel->price,
+                    'item_id'     => $item['item_id'],
+                    'quantity'    => $item['quantity'],
+                    'price'       => $itemModel->price,
                     'currency_id' => $itemModel->currency_id,
                 ]);
 
+                // Zaxira topish
+                $balance = StockBalance::where('item_id', $item['item_id'])
+                    ->where('warehouse_id', $validated['warehouse_id'])
+                    ->where(function ($query) use ($validated) {
+                        if ($validated['order_id']) {
+                            $query->where('order_id', $validated['order_id']);
+                        } else {
+                            $query->whereNull('order_id');
+                        }
+                    })
+                    ->first();
 
-                // Zaxiradan ayirish
-                $balance = StockBalance::findOrFail([
-                    'item_id'      => $item['item_id'],
-                    'warehouse_id' => $validated['warehouse_id'],
-                    'order_id'     => $validated['order_id'] ?? null,
-                ]);
-
-                // Zaxira mavjudligini tekshirish
                 if (!$balance) {
                     throw new \Exception("Zaxirada mahsulot topilmadi: {$itemModel->name}");
                 }
@@ -406,12 +409,12 @@ class WarehouseController extends Controller
                 $oldQty = $balance->quantity;
 
                 if ($oldQty < $item['quantity']) {
-                    throw new \Exception("Zaxirada yetarli mahsulot mavjud emas: {$itemModel->name}. Max: {$oldQty}, kerak: {$item['quantity']}");
+                    throw new \Exception("Zaxirada yetarli mahsulot yo‘q: {$itemModel->name}. Max: {$oldQty}, kerak: {$item['quantity']}");
                 }
 
                 $balance->decrement('quantity', $item['quantity']);
 
-                // Log yozish
+                // Log
                 Log::add(
                     auth()->id(),
                     'Ombordan chiqim',
@@ -434,14 +437,14 @@ class WarehouseController extends Controller
 
             return response()->json([
                 'message' => 'Chiqim muvaffaqiyatli bajarildi.',
-                'entry' => $entry->load('items'),
+                'entry'   => $entry->load('items'),
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
 
             return response()->json([
-                'message' => 'Xatolik yuz berdi',
-                'error' => $e->getMessage(),
+                'message' => 'Xatolik yuz berdi.',
+                'error'   => $e->getMessage(),
             ], 500);
         }
     }
