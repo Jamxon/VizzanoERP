@@ -398,6 +398,11 @@ class WarehouseController extends Controller
                     'order_id'     => $validated['order_id'] ?? null,
                 ]);
 
+                // Zaxira mavjudligini tekshirish
+                if (!$balance) {
+                    throw new \Exception("Zaxirada mahsulot topilmadi: {$itemModel->name}");
+                }
+
                 $oldQty = $balance->quantity;
 
                 if ($oldQty < $item['quantity']) {
