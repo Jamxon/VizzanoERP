@@ -54,6 +54,7 @@ class WarehouseController extends Controller
             $search = trim($filters['search'] ?? '');
             $sourceId = $filters['source_id'] ?? null;
             $warehouseId = $filters['warehouse_id'] ?? null;
+            $date = $filters['date'] ?? null;
 
             $incoming = StockEntry::query()
                 ->where('type', 'incoming')
@@ -63,6 +64,11 @@ class WarehouseController extends Controller
 
                 // Filter: ombor
                 ->when($warehouseId, fn ($q, $v) => $q->where('warehouse_id', $v))
+
+                // Filter: sana
+                ->when($date, function ($query) use ($date) {
+                    $query->whereDate('created_at', $date);
+                })
 
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
