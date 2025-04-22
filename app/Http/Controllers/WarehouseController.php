@@ -11,7 +11,6 @@ use App\Models\StockEntry;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log as LaravelLog;
 use App\Models\Log;
 
 class WarehouseController extends Controller
@@ -44,21 +43,38 @@ class WarehouseController extends Controller
 
     public function getIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
-        $filters = $request->only(['source_id', 'warehouse_id', 'order_id', 'search']);
+        $filters = $request->only([
+            'source_id',
+            'warehouse_id',
+            'order_id',
+            'search'
+        ]);
 
+        $search = $filters['search'] ?? null;
         $incoming = StockEntry::query()
             ->where('type', 'incoming')
-            ->when($filters['source_id'] ?? null, fn($q, $v) => $q->where('source_id', $v))
-            ->when($filters['warehouse_id'] ?? null, fn($q, $v) => $q->where('warehouse_id', $v))
-            ->when($filters['order_id'] ?? null, fn($q, $v) => $q->where('order_id', $v))
-            ->when($filters['search'] ?? null, function ($q, $search) {
-                $q->where(function ($q) use ($search) {
-                    $q->where('comment', 'like', "%{$search}%")
-                        ->orWhere('id', 'like', "%{$search}%")
-                        ->orWhere('user_id', (int)$search) // faqat raqamli bo‘lsa
-                        ->orWhereHas('user.employee', function ($q) use ($search) {
-                            $q->where('name', 'like', "%{$search}%");
-                        });
+            ->when($filters['source_id'] ?? null, fn ($query, $value) =>
+            $query->where('source_id', $value)
+            )
+            ->when($filters['warehouse_id'] ?? null, fn ($query, $value) =>
+            $query->where('warehouse_id', $value)
+            )
+            ->when($filters['order_id'] ?? null, fn ($query, $value) =>
+            $query->where('order_id', $value)
+            )
+            ->when($search, function ($query, $search) {
+                $lowerSearch = strtolower($search);
+                $query->where(function ($query) use ($lowerSearch) {
+                    $query->where(DB::raw('LOWER(comment)'), 'like', "%{$lowerSearch}%")
+                        ->orWhere('id', 'like', "%{$lowerSearch}%");
+
+                    if (is_numeric($lowerSearch)) {
+                        $query->orWhere('user_id', (int)$lowerSearch);
+                    }
+
+                    $query->orWhereHas('user.employee', function ($subQuery) use ($lowerSearch) {
+                        $subQuery->where(DB::raw('LOWER(name)'), 'like', "%{$lowerSearch}%");
+                    });
                 });
             })
             ->with([
@@ -75,6 +91,7 @@ class WarehouseController extends Controller
 
         return response()->json($incoming);
     }
+
 
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
