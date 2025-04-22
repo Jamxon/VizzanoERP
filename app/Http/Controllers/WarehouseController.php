@@ -143,7 +143,6 @@ class WarehouseController extends Controller
         return $pdf->download("stock-entry-{$entry->id}.pdf");
     }
 
-
     public function storeIncoming(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
