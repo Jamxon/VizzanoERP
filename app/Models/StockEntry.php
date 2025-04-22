@@ -21,7 +21,6 @@ class StockEntry extends Model
         'source_id',
         'destination_id',
         'comment',
-        'created_by',
         'order_id',
         'user_id',
         'contragent_id',
@@ -61,7 +60,7 @@ class StockEntry extends Model
 
     public function  user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $this->belongsTo(User::class);
     }
 
     public function contragent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
