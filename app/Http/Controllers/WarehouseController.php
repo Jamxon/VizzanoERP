@@ -38,7 +38,6 @@ class WarehouseController extends Controller
         return response()->json($users);
     }
 
-
     public function getWarehouses(): \Illuminate\Http\JsonResponse
     {
         $warehouses = Warehouse::where('branch_id', auth()->user()->employee->branch_id)->get();
@@ -357,8 +356,6 @@ class WarehouseController extends Controller
             'items'             => 'required|array|min:1',
             'items.*.item_id'   => 'required|exists:items,id',
             'items.*.quantity'  => 'required|numeric|min:0.01',
-            'items.*.price'     => 'required|numeric|min:0',
-            'items.*.currency_id' => 'required|exists:currencies,id',
         ]);
 
         DB::beginTransaction();
@@ -383,9 +380,16 @@ class WarehouseController extends Controller
             ]);
 
             foreach ($validated['items'] as $item) {
-                $entryItem = $entry->items()->create($item);
 
                 $itemModel = \App\Models\Item::find($item['item_id']);
+
+                $entryItem = $entry->items()->create([
+                    'item_id' => $item['item_id'],
+                    'quantity' => $item['quantity'],
+                    'price' => $itemModel->price,
+                    'currency_id' => $itemModel->currency_id,
+                ]);
+
 
                 // Zaxiradan ayirish
                 $balance = StockBalance::firstOrCreate(
