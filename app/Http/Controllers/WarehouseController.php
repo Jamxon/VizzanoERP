@@ -40,10 +40,6 @@ class WarehouseController extends Controller
         return response()->json($balance);
     }
 
-    use Illuminate\Support\Facades\Log;
-    use Illuminate\Http\JsonResponse;
-    use Illuminate\Http\Request;
-
     public function showBalance(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
