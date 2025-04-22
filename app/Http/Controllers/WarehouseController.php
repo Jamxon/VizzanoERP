@@ -70,23 +70,29 @@ class WarehouseController extends Controller
                     $lowerSearch = mb_strtolower($search);
 
                     $query->where(function ($q) use ($lowerSearch) {
+                        // Searching in comment and id fields
                         $q->whereRaw('LOWER(comment) LIKE ?', ["%{$lowerSearch}%"])
                             ->orWhereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
 
+                        // Searching in user_id if the search is numeric
                         if (is_numeric($lowerSearch)) {
                             $q->orWhere('user_id', (int)$lowerSearch);
                         }
 
+                        // Searching for employee name in the user relationship
                         $q->orWhereHas('user.employee', function ($subQ) use ($lowerSearch) {
                             $subQ->whereRaw('LOWER(name) LIKE ?', ["%{$lowerSearch}%"]);
                         });
 
+                        // Searching for order_id in the order relationship
                         $q->orWhereHas('order', function ($subQ) use ($lowerSearch) {
+                            // Ensure you're comparing the correct field in the order table
                             $subQ->whereRaw('CAST(id AS CHAR) LIKE ?', ["%{$lowerSearch}%"]);
                         });
                     });
                 })
 
+                // Loading necessary relationships
                 ->with([
                     'items.currency',
                     'items.item',
