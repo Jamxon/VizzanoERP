@@ -24,6 +24,19 @@ class StockEntry extends Model
         'created_by',
         'order_id',
         'user_id',
+        'contragent_id',
+    ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'warehouse_id',
+        'source_id',
+        'destination_id',
+        'created_by',
+        'order_id',
+        'user_id',
+        'contragent_id',
     ];
 
     public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
@@ -49,5 +62,10 @@ class StockEntry extends Model
     public function  user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function contragent(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Contragent::class);
     }
 }

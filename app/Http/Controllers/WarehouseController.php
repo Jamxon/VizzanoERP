@@ -67,6 +67,7 @@ class WarehouseController extends Controller
             'source_name' => 'nullable|string',
             'comment' => 'nullable|string',
             'order_id' => 'nullable|exists:orders,id',
+            'contragent_id' => 'nullable|exists:contragents,id',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric|min:0.01',
@@ -91,6 +92,7 @@ class WarehouseController extends Controller
                 'created_by' => auth()->id(),
                 'order_id' => $validated['order_id'] ?? null,
                 'user_id' => auth()->id(),
+                'contragent_id' => $validated['contragent_id'] ?? null,
             ]);
 
             foreach ($validated['items'] as $item) {
