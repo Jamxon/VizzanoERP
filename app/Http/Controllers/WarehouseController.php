@@ -67,7 +67,7 @@ class WarehouseController extends Controller
 
                 // Qidiruv: comment, id, user_id, user->employee->name, order_id
                 ->when($search, function ($query, $search) {
-                    $lowerSearch = mb_strtolower($search);
+                    $lowerSearch = strtolower($search);
                     $likeSearch = '%' . $lowerSearch . '%';
 
                     return $query->where(function ($q) use ($lowerSearch, $search, $likeSearch) {
