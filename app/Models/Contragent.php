@@ -23,6 +23,7 @@ class Contragent extends Model
     protected $hidden = [
         'created_at',
         'updated_at',
-        'is_market'
+        'is_market',
+        'branch_id'
     ];
 }
