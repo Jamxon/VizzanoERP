@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
 use App\Models\Log;
 use App\Models\SupplierOrder;
 use Illuminate\Http\Request;
@@ -17,8 +18,6 @@ class SupplierController extends Controller
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric|min:0.01',
-            'items.*.price' => 'required|numeric|min:0',
-            'items.*.currency_id' => 'required|exists:currencies,id',
         ]);
 
         DB::beginTransaction();
@@ -36,11 +35,13 @@ class SupplierController extends Controller
             ]);
 
             foreach ($request->items as $item) {
+                $items = Item::findOrFail($item['item_id']);
+
                 $order->items()->create([
                     'item_id' => $item['item_id'],
                     'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'currency_id' => $item['currency_id'],
+                    'price' => $items->price,
+                    'currency_id' => $items->currency_id,
                 ]);
             }
 
