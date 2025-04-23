@@ -80,6 +80,7 @@ class ItemController extends Controller
             // Shu itemga tegishli barcha stock_balancelarni branch bo‘yicha olish
             $balances = StockBalance::where('item_id', $item->id)
                 ->whereHas('warehouse', fn($q) => $q->where('branch_id', $branchId))
+                ->with('order', 'warehouse')
                 ->get(['id', 'quantity', 'warehouse_id']);
 
             // Shu itemga tegishli kirim/chiqim tarixini olish
