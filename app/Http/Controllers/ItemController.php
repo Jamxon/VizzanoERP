@@ -76,7 +76,7 @@ class ItemController extends Controller
             'type',
             'currency',
             'stockBalances',
-            'stockEntryItem',
+            'stockEntryItem.stockEntry',
         );
         return response()->json($item);
     }
