@@ -81,7 +81,7 @@ class ItemController extends Controller
             $balances = StockBalance::where('item_id', $item->id)
                 ->whereHas('warehouse', fn($q) => $q->where('branch_id', $branchId))
                 ->with('order', 'warehouse')
-                ->get(['id', 'quantity', 'warehouse_id']);
+                ->get(['id', 'quantity', 'warehouse_id', 'order_id']);
 
             // Shu itemga tegishli kirim/chiqim tarixini olish
             $entryItems = StockEntryItem::where('item_id', $item->id)
