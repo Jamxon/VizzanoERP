@@ -67,7 +67,7 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $item->item->name ?? $item->item_id }}</td>
                 <td>{{ $item->quantity }}</td>
-                <td>{{ $item->unit->name }}</td>
+                <td>{{ $item->item->unit->name }}</td>
                 <td>{{ number_format($item->price, 2) }}</td>
                 <td>{{ $currencyName }}</td>
                 <td>{{ number_format($amount, 2) }}</td>
