@@ -15,7 +15,7 @@ class SupplierController extends Controller
         $request->validate([
             'supplier_id' => 'required|exists:users,id',
             'comment' => 'nullable|string',
-            'deadline' => 'required|date',
+            'deadline' => 'required|datetime',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric|min:0.01',
