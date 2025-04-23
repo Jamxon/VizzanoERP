@@ -40,65 +40,6 @@ class WarehouseController extends Controller
         return response()->json($balance);
     }
 
-    public function showBalance(Request $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $branchId = auth()->user()?->employee?->branch_id;
-            $stockBalanceId = $request->input('stock_balance_id');
-
-            $balance = StockBalance::where('id', $stockBalanceId)
-                ->whereHas('warehouse', fn($q) => $q->where('branch_id', $branchId))
-                ->with(['item.unit', 'warehouse', 'order'])
-                ->first();
-
-            if (!$balance) {
-                return response()->json([
-                    'message' => 'Ombor zaxirasi topilmadi yoki ruxsatingiz yo‘q.'
-                ], 404);
-            }
-
-            $itemId = $balance->item_id;
-            $warehouseId = $balance->warehouse_id;
-            $orderId = $balance->order_id;
-
-            $history = StockEntryItem::where('item_id', $itemId)
-                ->whereHas('stockEntry', function ($query) use ($warehouseId, $orderId) {
-                    $query->where('warehouse_id', $warehouseId);
-                    if ($orderId !== null) {
-                        $query->where('order_id', $orderId);
-                    } else {
-                        $query->whereNull('order_id');
-                    }
-                })
-                ->with([
-                    'item.unit', // faqat shu item haqida info kerak bo‘lsa
-                    'stockEntry' => function ($q) {
-                        $q->with([
-                            'warehouse',
-                            'source',
-                            'destination',
-                            'employee',
-                            'responsibleUser.employee',
-                            'contragent',
-                        ]);
-                    }
-                ])
-                ->orderByDesc('id')
-                ->get();
-
-            return response()->json([
-                'balance' => $balance,
-                'history' => $history,
-            ]);
-        } catch (\Throwable $e) {
-
-            return response()->json([
-                'message' => 'Xatolik yuz berdi. Administrator bilan bog‘laning.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-
     public function getUsers(Request $request): \Illuminate\Http\JsonResponse
     {
         $search = trim($request->input('search'));
