@@ -90,8 +90,7 @@ class ItemController extends Controller
                 ->with([
                     'stockEntry' => function ($q) {
                         $q->with([
-                            'employee:id,user_id,id',
-                            'employee:id,name',
+                            'employee:id,user_id,id,name',
                         ]);
                     }
                 ])
