@@ -68,17 +68,88 @@ class ItemController extends Controller
         ]);
     }
 
-    public function show(Item $item): \Illuminate\Http\JsonResponse
+    public function show(Request $request): \Illuminate\Http\JsonResponse
     {
-        $item->load(
-            'unit',
-            'color',
-            'type',
-            'currency',
-            'stockBalances',
-            'stockEntryItem.stockEntry',
-        );
-        return response()->json($item);
+        try {
+            $branchId = auth()->user()?->employee?->branch_id;
+            $stockBalanceId = $request->input('stock_balance_id');
+
+            $balance = StockBalance::where('id', $stockBalanceId)
+                ->whereHas('warehouse', fn($q) => $q->where('branch_id', $branchId))
+                ->with(['item:id,name', 'warehouse:id,name', 'order'])
+                ->first();
+
+            if (!$balance) {
+                return response()->json([
+                    'message' => 'Ombor zaxirasi topilmadi yoki ruxsatingiz yo‘q.'
+                ], 404);
+            }
+
+            $itemId = $balance->item_id;
+            $warehouseId = $balance->warehouse_id;
+            $orderId = $balance->order_id;
+
+            $entryItems = StockEntryItem::where('item_id', $itemId)
+                ->whereHas('stockEntry', function ($query) use ($warehouseId, $orderId) {
+                    $query->where('warehouse_id', $warehouseId);
+                    if ($orderId !== null) {
+                        $query->where('order_id', $orderId);
+                    } else {
+                        $query->whereNull('order_id');
+                    }
+                })
+                ->with([
+                    'stockEntry' => function ($q) {
+                        $q->with([
+                            'employee:id,user_id,id',
+                            'employee.user:id,name',
+                        ]);
+                    }
+                ])
+                ->orderByDesc('id')
+                ->get();
+
+            // Har bir kirim/chiqim uchun item info joylashtiramiz
+            $history = $entryItems->map(function ($entryItem) {
+                $entry = $entryItem->stockEntry;
+
+                return [
+                    'id' => $entry->id,
+                    'type' => $entry->type,
+                    'created_at' => $entry->created_at,
+                    'comment' => $entry->comment,
+                    'employee' => [
+                        'id' => $entry->employee?->id,
+                        'full_name' => $entry->employee?->user?->name,
+                    ],
+                    'item' => [
+                        'id' => $entryItem->item_id,
+                        'name' => $entryItem->item->name ?? null,
+                        'quantity' => $entryItem->quantity,
+                        'price' => $entryItem->price,
+                    ],
+                ];
+            });
+
+            return response()->json([
+                'balance' => [
+                    'id' => $balance->id,
+                    'quantity' => $balance->quantity,
+                ],
+                'history' => $history,
+            ]);
+
+        } catch (\Throwable $e) {
+            \Log::error('showBalance error', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'message' => 'Xatolik yuz berdi. Administrator bilan bog‘laning.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
