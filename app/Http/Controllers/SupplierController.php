@@ -21,8 +21,6 @@ class SupplierController extends Controller
             'items.*.quantity' => 'required|numeric|min:0.01',
         ]);
 
-        dd($request->all());
-
         DB::beginTransaction();
         try {
             // Kod yaratish: ORD-0001
@@ -35,7 +33,7 @@ class SupplierController extends Controller
                 'comment' => $request->comment,
                 'status' => 'pending',
                 'created_by' => auth()->id(),
-                'deadline' => $request->deadline,
+                'deadline' => $request->deadline->format('Y-m-d H:i:s'),
                 'completed_date' => null
             ]);
 
