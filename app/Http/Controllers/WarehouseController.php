@@ -85,7 +85,7 @@ class WarehouseController extends Controller
     {
         $order->load([
             'stockEntry',
-            'stockEntry.items',
+            'stockEntry.items.item',
             'stockEntry.warehouse',
             'stockEntry.source',
             'stockEntry.destination',
