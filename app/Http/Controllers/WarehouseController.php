@@ -91,7 +91,7 @@ class WarehouseController extends Controller
                 'history' => $history,
             ]);
         } catch (\Throwable $e) {
-            
+
             return response()->json([
                 'message' => 'Xatolik yuz berdi. Administrator bilan bog‘laning.',
                 'error' => $e->getMessage(),
