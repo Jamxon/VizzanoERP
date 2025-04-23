@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static whereHas(string $string, \Closure $param)
  * @method static create(array $array)
+ * @method static findOrFail(mixed $item_id)
  * @property mixed $currency_id
  * @property mixed $min_quantity
  */
