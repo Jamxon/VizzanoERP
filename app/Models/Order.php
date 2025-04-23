@@ -110,4 +110,9 @@ class Order extends Model
     {
         return $this->hasMany(PackageOutcome::class, 'order_id');
     }
+
+    public function stockEntry(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(StockEntry::class, 'order_id');
+    }
 }

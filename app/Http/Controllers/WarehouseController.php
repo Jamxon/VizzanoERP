@@ -17,6 +17,7 @@ use App\Models\Log;
 
 class WarehouseController extends Controller
 {
+
     public function getBalance(Request $request): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()?->employee?->branch_id;
@@ -78,6 +79,22 @@ class WarehouseController extends Controller
             ->get();
 
         return response()->json($orders);
+    }
+
+    public function showOrder(Order $order): \Illuminate\Http\JsonResponse
+    {
+        $order->load([
+            'stockEntry',
+            'stockEntry.items',
+            'stockEntry.warehouse',
+            'stockEntry.source',
+            'stockEntry.destination',
+            'stockEntry.employee',
+            'stockEntry.contragent',
+            'stockEntry.responsibleUser',
+        ]);
+
+        return response()->json($order);
     }
 
     public function getContragents(): \Illuminate\Http\JsonResponse

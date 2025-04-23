@@ -52,6 +52,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('sources',[SourceController::class, 'index']);
     Route::get('warehouses', [WarehouseController::class, 'getWarehouses']);
     Route::get('orders', [WarehouseController::class, 'getOrders']);
+    Route::get('orders/{order}', [WarehouseController::class, 'showOrder']);
     Route::get('contragents', [WarehouseController::class, 'getContragents']);
     Route::get('destinations', [WarehouseController::class, 'getDestinations']);
     Route::get('stockEntry/{id}', [WarehouseController::class, 'downloadPdf']);
