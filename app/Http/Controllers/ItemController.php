@@ -109,7 +109,7 @@ class ItemController extends Controller
                     'comment' => $entry->comment,
                     'employee' => [
                         'id' => $entry->employee?->id,
-                        'full_name' => $entry->employee?->name,
+                        'full_name' => $entry->employee,
                     ],
                     'quantity' => $entryItem->quantity,
                     'price' => $entryItem->price,
