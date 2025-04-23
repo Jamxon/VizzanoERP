@@ -15,6 +15,7 @@ class SupplierController extends Controller
         $request->validate([
             'supplier_id' => 'required|exists:users,id',
             'comment' => 'nullable|string',
+            'deadline' => 'required|date',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric|min:0.01',
@@ -32,6 +33,8 @@ class SupplierController extends Controller
                 'comment' => $request->comment,
                 'status' => 'pending',
                 'created_by' => auth()->id(),
+                'deadline' => $request->deadline,
+                'completed_date' => null
             ]);
 
             foreach ($request->items as $item) {
