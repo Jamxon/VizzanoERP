@@ -21,6 +21,8 @@ class SupplierController extends Controller
             'items.*.quantity' => 'required|numeric|min:0.01',
         ]);
 
+        dd($request->all());
+
         DB::beginTransaction();
         try {
             // Kod yaratish: ORD-0001
