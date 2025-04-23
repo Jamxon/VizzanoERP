@@ -23,6 +23,7 @@ use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\SuperHRController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TechnologController;
 use App\Http\Controllers\TransportAttendanceController;
 use App\Http\Controllers\TransportController;
@@ -57,6 +58,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('destinations', [WarehouseController::class, 'getDestinations']);
     Route::get('stockEntry/{id}', [WarehouseController::class, 'downloadPdf']);
     Route::get('users', [WarehouseController::class, 'getUsers']);
+    Route::post('supplierOrders', [SupplierController::class, 'store']);
 });
 
 Route::prefix('transport')->middleware('role:transport')->group(function () {
