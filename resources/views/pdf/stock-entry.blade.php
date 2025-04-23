@@ -47,6 +47,7 @@
             <th>#</th>
             <th>Mahsulot</th>
             <th>Miqdor</th>
+            <th>Birligi</th>
             <th>Narx</th>
             <th>Valyuta</th>
             <th>Summa</th>
@@ -66,6 +67,7 @@
                 <td>{{ $i + 1 }}</td>
                 <td>{{ $item->item->name ?? $item->item_id }}</td>
                 <td>{{ $item->quantity }}</td>
+                <td>{{ $item->unit->name }}</td>
                 <td>{{ number_format($item->price, 2) }}</td>
                 <td>{{ $currencyName }}</td>
                 <td>{{ number_format($amount, 2) }}</td>
