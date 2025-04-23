@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Jobs\NotifyUserOfCompletedExport;
 use App\Models\Item;
+use App\Models\StockBalance;
+use App\Models\StockEntryItem;
 use Illuminate\Http\Request;
 use App\Exports\ItemsExport;
 use Maatwebsite\Excel\Facades\Excel;
