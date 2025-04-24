@@ -16,7 +16,7 @@ class QualityControllerMasterController extends Controller
     {
         $date = $request->input('date') ?? now();
 
-        $department = Department::where('responsible_user_id', auth()->id())->first();
+        $department = Department::where('id', auth()->user()->employee->department_id)->first();
 
         if (!$department) {
             return response()->json(['error' => 'Department not found'], 404);
