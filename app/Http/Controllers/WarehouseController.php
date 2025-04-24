@@ -84,6 +84,9 @@ class WarehouseController extends Controller
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
         $order->load([
+            'stockBalance',
+            'stockBalance.item',
+            'stockBalance.warehouse',
             'stockEntry',
             'stockEntry.items.item',
             'stockEntry.warehouse',
