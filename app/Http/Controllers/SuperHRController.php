@@ -17,6 +17,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
+
     public function getRegions(): \Illuminate\Http\JsonResponse
     {
         $regions = Region::all();
@@ -186,6 +187,88 @@ class SuperHRController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Xodimni qo‘shishda xatolik: ' . $e->getMessage()], 500);
         }
 
+    }
+
+    public function storeFastEmployee(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'group_id' => 'nullable|integer|exists:groups,id',
+            'department_id' => 'nullable|integer|exists:departments,id',
+            'position_id' => 'nullable|integer|exists:positions,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $branchId = auth()->user()->employee->branch_id;
+
+            // Doimiy ishlatiladigan telefon raqam yoki random
+            $phone = '+998991111111'; // yoki uniq qilish uchun: '+99899' . rand(1000000, 9999999);
+
+            // Username avtomatik
+            $username = $this->generateCodeWithBranch($branchId);
+
+            // Foydalanuvchi yaratish
+            $userId = DB::table('users')->insertGetId([
+                'username' => $username,
+                'password' => $this->hashPassword($phone),
+                'role_id' => null,
+            ]);
+
+            // Xodim yaratish
+            $employee = DB::table('employees')->insert([
+                'name' => $request->name,
+                'phone' => $phone,
+                'group_id' => $request->group_id,
+                'position_id' => $request->position_id, // masalan, default pozitsiya ID
+                'department_id' => $request->department_id,
+                'hiring_date' => now(),
+                'address' => null,
+                'passport_number' => null,
+                'passport_code' => null,
+                'payment_type' => 'piece_work',
+                'comment' => null,
+                'type' => 'simple',
+                'birthday' => null,
+                'branch_id' => $branchId,
+                'user_id' => $userId,
+                'status' => 'working',
+                'img' => null
+            ]);
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Tezkor xodim qo‘shildi',
+                'create',
+                null,
+                $employee
+            );
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Tezkor xodim muvaffaqiyatli qo‘shildi',
+                'employee' => $employee
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            Log::add(
+                auth()->user()->id,
+                'Tezkor xodim qo‘shishda xatolik',
+                'error',
+                null,
+                $e->getMessage()
+            );
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Xatolik: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updateEmployees(Request $request, $id): \Illuminate\Http\JsonResponse

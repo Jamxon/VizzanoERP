@@ -225,6 +225,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('attendances/history', [AttendanceController::class, 'getAttendanceHistory']);
     Route::post('attendances', [AttendanceController::class, 'storeAttendance']);
     Route::patch('attendances/{attendance}', [AttendanceController::class, 'updateAttendance']);
+    Route::post('employees/store', [SuperHRController::class, 'storeFastEmployee']);
 });
 
 Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {
