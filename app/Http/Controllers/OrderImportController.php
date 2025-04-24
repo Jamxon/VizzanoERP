@@ -158,7 +158,7 @@ class OrderImportController extends Controller
         }
 
         if (!$request->hasFile('file')) {
-            return response()->json(['success' => false, 'message' => "Fayl yuklanmadi!"], 400);
+            return response()->json(['success' => false, 'message' => "Fayl emas!"], 400);
         }
 
         if (!$file || !$file->isValid()) {
