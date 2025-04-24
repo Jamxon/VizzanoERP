@@ -151,38 +151,16 @@ class OrderImportController extends Controller
     }
 
     public function import(Request $request): \Illuminate\Http\JsonResponse
-    {
-        ini_set('upload_max_filesize', '20M');
-        ini_set('post_max_size', '25M');
-
+    {ds
         $file = $request->file('file');
 
-        if (!$file) {
-            return response()->json(['success' => false, 'message' => "Fayl yuklanmadi!"], 400);
-        }
-
-        if (!$request->hasFile('file')) {
-            return response()->json(['success' => false, 'message' => "Fayl emas!"], 400);
-        }
-
         if (!$file || !$file->isValid()) {
-            return response()->json(['success' => false, 'message' => "Fayl yuklanmadi yoki fayl xato!"], 400);
-        }
-
-        $fileExtension = $file->getClientOriginalExtension();
-        if (!in_array($fileExtension, ['xls', 'xlsx'])) {
-            return response()->json(['success' => false, 'message' => "Fayl formati noto'g'ri!"], 400);
-        }
-
-        $filePath = $file->getPathname();
-        if (!file_exists($filePath)) {
-            return response()->json(['success' => false, 'message' => "Fayl mavjud emas: {$filePath}"], 400);
+            return response()->json(['success' => false, 'message' => "Fayl noto'g'ri yuklangan!"], 400);
         }
 
         try {
-            $spreadsheet = IOFactory::load($filePath);
+            $spreadsheet = IOFactory::load($file->getPathname());
             $sheet = $spreadsheet->getActiveSheet();
-            // Rest of your code...
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => "Faylni o'qishda xatolik: " . $e->getMessage()], 500);
         }
