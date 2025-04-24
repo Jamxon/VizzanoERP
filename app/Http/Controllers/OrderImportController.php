@@ -183,7 +183,6 @@ class OrderImportController extends Controller
                     $imagePath = "models/$imageName";
 
                     $drawingPath = $drawing->getPath();
-                    if ($drawingPath && file_exists($drawingPath)) {
                         Storage::disk('public')->put($imagePath, file_get_contents($drawingPath));
 
                         preg_match('/\d+/', $coordinates, $matches);
@@ -192,9 +191,7 @@ class OrderImportController extends Controller
                         if ($rowNumber) {
                             $modelImages[$rowNumber][] = url('storage/' . $imagePath);
                         }
-                    } else {
-                        return response()->json(['success' => false, 'message' => "Rasm topilmadi: $drawingPath"], 500);
-                    }
+
                 }
             } catch (\Throwable $e) {
                 return response()->json(['success' => false, 'message' => "Rasmlarni yuklashda xatolik: " . $e->getMessage()], 500);
