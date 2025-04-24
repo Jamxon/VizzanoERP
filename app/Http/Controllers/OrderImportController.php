@@ -152,6 +152,9 @@ class OrderImportController extends Controller
 
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
+        ini_set('memory_limit', '512M');
+
+
         $file = $request->file('file');
 
         if (!$request->hasFile('file')) {
