@@ -153,8 +153,8 @@ class OrderImportController extends Controller
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
         $file = $request->file('file');
-        if (!$file) {
-            return response()->json(['success' => false, 'message' => "Fayl yuklanmadi!"], 400);
+        if (!$file || !$file->isValid()) {
+            return response()->json(['success' => false, 'message' => "Fayl yuklanmadi yoki fayl xatolikli!"], 400);
         }
 
         $fileExtension = $file->getClientOriginalExtension();
@@ -162,9 +162,15 @@ class OrderImportController extends Controller
             return response()->json(['success' => false, 'message' => "Fayl formati noto'g'ri!"], 400);
         }
 
+        $filePath = $file->getPathname();
+        if (!file_exists($filePath)) {
+            return response()->json(['success' => false, 'message' => "Fayl mavjud emas: {$filePath}"], 400);
+        }
+
         try {
-            $spreadsheet = IOFactory::load($file->getPathname());
+            $spreadsheet = IOFactory::load($filePath);
             $sheet = $spreadsheet->getActiveSheet();
+            // Rest of your code...
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => "Faylni o'qishda xatolik: " . $e->getMessage()], 500);
         }
