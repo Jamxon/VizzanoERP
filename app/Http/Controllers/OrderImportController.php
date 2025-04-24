@@ -153,7 +153,7 @@ class OrderImportController extends Controller
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'file' => 'required|file|mimetypes:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel',
+            'file' => 'required|file|mimes:xlsx,xls',
         ]);
 
 
