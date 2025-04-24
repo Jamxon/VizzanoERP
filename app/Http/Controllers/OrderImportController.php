@@ -157,7 +157,6 @@ class OrderImportController extends Controller
 
         $file = $request->file('file');
 
-        dd($file);
         if (!$file) {
             return response()->json(['success' => false, 'message' => "Fayl yuklanmadi!"], 400);
         }
