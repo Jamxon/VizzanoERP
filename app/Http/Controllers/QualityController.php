@@ -125,7 +125,6 @@ class QualityController extends Controller
     public function getQualityDescription(): \Illuminate\Http\JsonResponse
     {
         $qualityDescriptions = QualityDescription::where('user_id', auth()->id())
-            ->whereDate('created_at', now()->toDateString())
             ->get();
 
         return response()->json($qualityDescriptions);
