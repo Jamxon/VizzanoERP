@@ -175,22 +175,32 @@ class OrderImportController extends Controller
 
         // Rasmlarni olish
         foreach ($sheet->getDrawingCollection() as $drawing) {
-            if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
-                $coordinates = $drawing->getCoordinates();
-                $imageExtension = $drawing->getExtension();
-                $imageName = Str::uuid() . '.' . $imageExtension;
-                $imagePath = "models/$imageName";
+            try {
+                if ($drawing instanceof \PhpOffice\PhpSpreadsheet\Worksheet\Drawing) {
+                    $coordinates = $drawing->getCoordinates();
+                    $imageExtension = $drawing->getExtension();
+                    $imageName = Str::uuid() . '.' . $imageExtension;
+                    $imagePath = "models/$imageName";
 
-                Storage::disk('public')->put($imagePath, file_get_contents($drawing->getPath()));
+                    $drawingPath = $drawing->getPath();
+                    if ($drawingPath && file_exists($drawingPath)) {
+                        Storage::disk('public')->put($imagePath, file_get_contents($drawingPath));
 
-                preg_match('/\d+/', $coordinates, $matches);
-                $rowNumber = $matches[0] ?? null;
+                        preg_match('/\d+/', $coordinates, $matches);
+                        $rowNumber = $matches[0] ?? null;
 
-                if ($rowNumber) {
-                    $modelImages[$rowNumber][] = url('storage/' . $imagePath);
+                        if ($rowNumber) {
+                            $modelImages[$rowNumber][] = url('storage/' . $imagePath);
+                        }
+                    } else {
+                        return response()->json(['success' => false, 'message' => "Rasm topilmadi: $drawingPath"], 500);
+                    }
                 }
+            } catch (\Throwable $e) {
+                return response()->json(['success' => false, 'message' => "Rasmlarni yuklashda xatolik: " . $e->getMessage()], 500);
             }
         }
+
 
         for ($row = 2; $row <= $highestRow; $row++) {
             $aValue = trim((string)$sheet->getCell("A$row")->getValue());
