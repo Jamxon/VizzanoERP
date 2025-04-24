@@ -154,9 +154,12 @@ class OrderImportController extends Controller
     {
         ini_set('memory_limit', '512M');
 
-
         $file = $request->file('file');
 
+        // Faylni tekshirish
+        if (!$file) {
+            return response()->json(['success' => false, 'message' => 'Fayl topilmadi'], 400);
+        }
         if (!$request->hasFile('file')) {
             return response()->json(['success' => false, 'message' => 'No file was uploaded'], 400);
         }
