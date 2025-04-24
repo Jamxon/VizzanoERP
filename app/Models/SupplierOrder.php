@@ -21,6 +21,7 @@ class SupplierOrder extends Model
         'comment',
         'status',
         'created_by',
+        'deadline',
     ];
 
     protected $hidden = [
