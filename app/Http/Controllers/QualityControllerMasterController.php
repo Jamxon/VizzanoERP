@@ -161,7 +161,7 @@ class QualityControllerMasterController extends Controller
 
     public function getGroups(): \Illuminate\Http\JsonResponse
     {
-        $department = Department::where('responsible_user_id', auth()->id())->first();
+        $department = Department::where('id', auth()->user()->employee->department_id)->first();
 
         $groups = optional($department)->groups ?? [];
 

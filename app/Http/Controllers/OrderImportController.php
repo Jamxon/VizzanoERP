@@ -152,21 +152,6 @@ class OrderImportController extends Controller
 
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
-        ini_set('memory_limit', '512M');
-
-        $file = $request->file('file');
-
-        // Faylni tekshirish
-        if (!$file) {
-            return response()->json(['success' => false, 'message' => 'Fayl topilmadi'], 400);
-        }
-        if (!$request->hasFile('file')) {
-            return response()->json(['success' => false, 'message' => 'No file was uploaded'], 400);
-        }
-
-        if (!$file || !$file->isValid()) {
-            return response()->json(['success' => false, 'message' => "Fayl noto'g'ri yuklangan!"], 400);
-        }
 
         try {
             $spreadsheet = IOFactory::load($file->getPathname());
