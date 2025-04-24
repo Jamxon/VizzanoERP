@@ -83,6 +83,12 @@ class WarehouseController extends Controller
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
+        if (!$order->stockBalance || $order->stockBalance->quantity <= 0) {
+            return response()->json([
+                'message' => 'Buyurtma uchun ombordagi zaxira yo‘q.'
+            ], 400);
+        }
+
         $order->load([
             'stockBalance',
             'stockBalance.item',
