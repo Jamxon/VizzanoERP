@@ -152,6 +152,10 @@ class OrderImportController extends Controller
 
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
+        ini_set('upload_max_filesize' , '25M');
+        ini_set('post_max_size' , '25M');
+        ini_set('memory_limit', '256M');
+
         $request->validate([
             'file' => 'required|file|mimes:xlsx,xls',
         ]);
