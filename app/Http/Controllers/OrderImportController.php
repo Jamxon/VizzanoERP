@@ -154,6 +154,10 @@ class OrderImportController extends Controller
     {
         $file = $request->file('file');
 
+        if (!$file || !$file->isValid()) {
+            return response()->json(['success' => false, 'message' => "Fayl noto'g'ri yuklangan!"], 400);
+        }
+
         try {
             $spreadsheet = IOFactory::load($file->getPathname());
             $sheet = $spreadsheet->getActiveSheet();
