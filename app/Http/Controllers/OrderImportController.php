@@ -154,6 +154,10 @@ class OrderImportController extends Controller
     {
         $file = $request->file('file');
 
+        if (!$request->hasFile('file')) {
+            return response()->json(['success' => false, 'message' => 'No file was uploaded'], 400);
+        }
+
         if (!$file || !$file->isValid()) {
             return response()->json(['success' => false, 'message' => "Fayl noto'g'ri yuklangan!"], 400);
         }
