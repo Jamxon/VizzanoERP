@@ -152,6 +152,15 @@ class OrderImportController extends Controller
 
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
+        $file = $request->file('file');
+        if (!$file) {
+            return response()->json(['success' => false, 'message' => "Fayl yuklanmadi!"], 400);
+        }
+
+        $fileExtension = $file->getClientOriginalExtension();
+        if (!in_array($fileExtension, ['xls', 'xlsx'])) {
+            return response()->json(['success' => false, 'message' => "Fayl formati noto'g'ri!"], 400);
+        }
 
         try {
             $spreadsheet = IOFactory::load($file->getPathname());
