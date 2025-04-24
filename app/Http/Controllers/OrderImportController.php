@@ -152,6 +152,9 @@ class OrderImportController extends Controller
 
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
+        ini_set('upload_max_filesize', '20M');
+        ini_set('post_max_size', '25M');
+
         $file = $request->file('file');
 
         dd($file);
