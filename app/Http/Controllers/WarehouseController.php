@@ -83,12 +83,6 @@ class WarehouseController extends Controller
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
-        if (!$order->stockBalance || $order->stockBalance->quantity <= 0) {
-            return response()->json([
-                'message' => 'Buyurtma uchun ombordagi zaxira yo‘q.'
-            ], 400);
-        }
-
         $order->load([
             'stockBalance',
             'stockBalance.item',
@@ -102,6 +96,14 @@ class WarehouseController extends Controller
             'stockEntry.contragent',
             'stockEntry.responsibleUser',
         ]);
+
+        // Filtrlash: faqat quantity > 0 bo‘lganlarini qoldirish
+        $filteredBalances = $order->stockBalance->filter(function ($balance) {
+            return $balance->quantity > 0;
+        })->values(); // values() indeksi to'g'ri bo'lishi uchun
+
+        // Javobga yangi filtered stockBalance ni joylaymiz
+        $order->setRelation('stockBalance', $filteredBalances);
 
         return response()->json($order);
     }
