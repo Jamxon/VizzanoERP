@@ -153,6 +153,8 @@ class OrderImportController extends Controller
     public function import(Request $request): \Illuminate\Http\JsonResponse
     {
         $file = $request->file('file');
+
+        dd($file);
         if (!$file) {
             return response()->json(['success' => false, 'message' => "Fayl yuklanmadi!"], 400);
         }
