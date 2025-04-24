@@ -150,7 +150,6 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::patch('orders/change/{order}', [OrderController::class, 'changeOrderStatus']);
     Route::get('/orders/{id}/pdf', [OrderController::class, 'generateOrderPdf']);
 
-    Route::post('/import-orders', [OrderImportController::class, 'import'])->name('orders.import');
     Route::post('orderStore',[OrderImportController::class,'store']);
 
 
