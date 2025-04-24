@@ -12,6 +12,9 @@ class AttendanceController extends Controller
     {
         $date = $request->date ?? now()->toDateString();
         $attendances = Attendance::whereDate('date', $date)
+            ->whereHas('employee', function ($query) {
+                $query->where('branch_id', auth()->user()->branch_id);
+            })
             ->orderBy('updated_at', 'desc')
             ->get();
 
