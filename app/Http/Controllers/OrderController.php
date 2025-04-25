@@ -158,7 +158,9 @@ class OrderController extends Controller
             Log::add($user->id, 'Buyurtma yaratishga urinish', 'attempt', $request->all());
 
             if ($request->contragent_id) {
-                $contragent = Contragent::find($request->contragent_id);
+                $contragent = Contragent::where('id', $request->contragent_id)
+                    ->where('branch_id', $user->employee->branch_id)
+                    ->first();
             } else {
                 $contragent = Contragent::create([
                     'name' => $request->contragent_name ?? null,
