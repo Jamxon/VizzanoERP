@@ -494,6 +494,9 @@ class SuperHRController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'groups' => 'nullable|array',
+            'groups.*.name' => 'required|string|max:255',
+            'groups.*.responsible_user_id' => 'nullable|integer|exists:users,id',
         ]);
 
         try {
@@ -509,20 +512,37 @@ class SuperHRController extends Controller
                 'break_time' => $request->break_time,
             ]);
 
+            if ($request->filled('groups')) {
+                foreach ($request->groups as $groupData) {
+                    $department->groups()->create([
+                        'name' => $groupData['name'],
+                        'department_id' => $department->id,
+                        'responsible_user_id' => $groupData['responsible_user_id'] ?? 1,
+                    ]);
+                }
+            }
+
             DB::commit();
 
             Log::add(
                 auth()->user()->id,
-                'Yangi bo‘lim qo‘shildi',
+                'Yangi bo‘lim va guruhlari qo‘shildi',
                 'create',
                 null,
-                $department->toArray()
+                $department->load('groups')->toArray()
             );
 
-            return response()->json(['status' => 'success', 'message' => 'Bo‘lim muvaffaqiyatli qo‘shildi', 'department' => $department], 201);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Bo‘lim va guruhlari muvaffaqiyatli qo‘shildi',
+                'department' => $department->load('groups')
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Bo‘limni qo‘shishda xatolik: ' . $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bo‘limni qo‘shishda xatolik: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -535,15 +555,20 @@ class SuperHRController extends Controller
             'start_time' => 'sometimes|date_format:H:i',
             'end_time' => 'sometimes|date_format:H:i',
             'break_time' => 'sometimes|integer|min:0',
+            'groups' => 'nullable|array',
+            'groups.*.name' => 'required|string|max:255',
+            'groups.*.id' => 'nullable|integer|exists:groups,id',
+            'groups.*.responsible_user_id' => 'nullable|integer|exists:users,id',
         ]);
 
         try {
             DB::beginTransaction();
 
             $department = Department::findOrFail($id);
-            $oldData = $department->toArray();
+            $oldData = $department->load('groups')->toArray();
+
             $department->update([
-                'name' => $request->name ?? $department->name,
+                'name' => $request->name,
                 'responsible_user_id' => $request->responsible_user_id ?? $department->responsible_user_id,
                 'main_department_id' => $request->main_department_id ?? $department->main_department_id,
                 'start_time' => $request->start_time ?? $department->start_time,
@@ -552,20 +577,48 @@ class SuperHRController extends Controller
                 'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
+            if ($request->filled('groups')) {
+                foreach ($request->groups as $groupData) {
+                    if (!empty($groupData['id'])) {
+                        // Update existing group
+                        $group = $department->groups()->where('id', $groupData['id'])->first();
+                        if ($group) {
+                            $group->update([
+                                'name' => $groupData['name'],
+                                'responsible_user_id' => $groupData['responsible_user_id'] ?? $group->responsible_user_id,
+                            ]);
+                        }
+                    } else {
+                        // Create new group
+                        $department->groups()->create([
+                            'name' => $groupData['name'],
+                            'responsible_user_id' => $groupData['responsible_user_id'] ?? 1,
+                        ]);
+                    }
+                }
+            }
+
             DB::commit();
 
             Log::add(
                 auth()->user()->id,
-                'Bo‘lim yangilandi',
+                'Bo‘lim va guruhlari yangilandi',
                 'edit',
                 $oldData,
-                $department->toArray()
+                $department->load('groups')->toArray()
             );
 
-            return response()->json(['status' => 'success', 'message' => 'Bo‘lim muvaffaqiyatli yangilandi', 'department' => $department], 200);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Bo‘lim muvaffaqiyatli yangilandi',
+                'department' => $department->load('groups')
+            ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['status' => 'error', 'message' => 'Bo‘limni yangilashda xatolik: ' . $e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bo‘limni yangilashda xatolik: ' . $e->getMessage()
+            ], 500);
         }
     }
 
