@@ -228,10 +228,6 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::post('employees/store', [SuperHRController::class, 'storeFastEmployee']);
 });
 
-Route::prefix('omborchi')->middleware('role:omborchi')->group(function () {
-    Route::get('export-items', [ItemController::class, 'export']);
-});
-
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {
     Route::get('export-tarification',[TechnologController::class,'exportTarification']);
     Route::post('import-tarification',[TechnologController::class,'importTarification']);
