@@ -482,6 +482,7 @@ class SuperHRController extends Controller
                 ->with(
                     'departments',
                     'departments.groups',
+                    'departments.groups.responsibleUser',
                 )
                 ->get();
             return response()->json($departments, 200);
