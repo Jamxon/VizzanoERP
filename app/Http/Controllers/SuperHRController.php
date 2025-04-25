@@ -30,33 +30,14 @@ class SuperHRController extends Controller
         return Excel::download(new EmployeeExport($request), 'xodimlar.xlsx');
     }
 
-    public function getWorkingEmployees(Request $request): \Illuminate\Http\JsonResponse
+    public function getWorkingEmployees(): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'search' => 'nullable|string',
-        ]);
-
-        $filters = $request->only(['search']);
         $user = auth()->user();
-
-        $query = Employee::with('user.role', 'position') // role ham kerak bo'ladi endi
-        ->where('branch_id', $user->employee->branch_id);
-
-        if (!empty($filters['search'])) {
-            $search = strtolower($filters['search']);
-            $searchLatin = transliterate_to_latin($search);
-            $searchCyrillic = transliterate_to_cyrillic($search);
-
-            $query->where(function ($q) use ($search, $searchLatin, $searchCyrillic) {
-                foreach ([$search, $searchLatin, $searchCyrillic] as $term) {
-                    $q->orWhereRaw('LOWER(name) LIKE ?', ["%$term%"])
-                        ->orWhereRaw('CAST(id AS TEXT) LIKE ?', ["%$term%"]);
-                }
-            });
-
-        }
-
-        $employees = $query->orderByDesc('updated_at')->paginate(10);
+        $employees = Employee::where('branch_id', $user->employee->branch_id)
+            ->where('status', '!=','kicked')
+            ->with('position')
+            ->orderByDesc('updated_at')
+            ->get();
 
         return response()->json($employees);
     }
