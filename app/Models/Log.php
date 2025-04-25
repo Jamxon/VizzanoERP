@@ -17,7 +17,18 @@ class Log extends Model
 
     protected $table = 'log';
 
-    protected $fillable = ['user_id', 'action', 'type', 'old_data', 'new_data', 'ip_address', 'user_agent', 'created_at'];
+    protected $fillable = [
+        'user_id',
+        'action',
+        'type',
+        'old_data',
+        'new_data',
+        'ip_address',
+        'user_agent',
+        'created_at',
+        'program',
+        'branch_id',
+    ];
 
     protected $with = ['user'];
 
@@ -33,6 +44,7 @@ class Log extends Model
             'user_agent' => Request::header('User-Agent'),
             'program' => auth()->user()->role ?? null,
             'created_at' => now(),
+            'branch_id' => auth()->user()->branch_id ?? null,
         ]);
     }
 
