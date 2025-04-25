@@ -358,22 +358,29 @@ class SuperHRController extends Controller
 
     private function generateCodeWithBranch(int $branchId): string
     {
-        $lastUser = User::where('username', 'like', $branchId . '%')
+        $baseCode = $branchId;
+
+        // Oxirgi kodni topish
+        $lastUser = User::where('username', 'like', $baseCode . '%')
             ->whereHas('employee', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             })
             ->orderByDesc('id')
             ->first();
 
-        if ($lastUser && preg_match('/^' . $branchId . '(\d{4})$/', $lastUser->username, $matches)) {
+        if ($lastUser && preg_match('/^' . $baseCode . '(\d{4})$/', $lastUser->username, $matches)) {
             $lastCode = (int) $matches[1];
         } else {
             $lastCode = 999;
         }
 
-        $newCodePart = $lastCode + 1;
+        // Unique username topilguncha qayta urinish
+        do {
+            $lastCode++;
+            $newUsername = $baseCode . str_pad($lastCode, 4, '0', STR_PAD_LEFT);
+        } while (User::where('username', $newUsername)->exists());
 
-        return $branchId . str_pad($newCodePart, 4, '0', STR_PAD_LEFT); // Masalan: 41001, 41002, ...
+        return $newUsername;
     }
 
     public function getRoles(): \Illuminate\Http\JsonResponse
