@@ -44,7 +44,7 @@ class Log extends Model
             'user_agent' => Request::header('User-Agent'),
             'program' => auth()->user()->role ?? null,
             'created_at' => now(),
-            'branch_id' => auth()->user()->branch_id ?? null,
+            'branch_id' => auth()->user()->employee->branch_id ?? null,
         ]);
     }
 
