@@ -80,7 +80,9 @@ class OrderController extends Controller
 
     public function getContragents(): \Illuminate\Http\JsonResponse
     {
-        $contragents = Contragent::all();
+        $contragents = Contragent::orderBy('id', 'asc')
+            ->where('branch_id', auth()->user()->employee->branch_id)
+            ->get();
         return response()->json($contragents);
     }
 
@@ -91,7 +93,11 @@ class OrderController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $contragent = Contragent::create($request->all());
+        $contragent = Contragent::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'branch_id' => auth()->user()->employee->branch_id,
+        ]);
 
         return response()->json($contragent, 201);
     }
@@ -103,7 +109,10 @@ class OrderController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $contragent->update($request->all());
+        $contragent->update([
+            'name' => $request->name,
+            'description' => $request->description,
+        ])->save();
 
         return response()->json($contragent);
     }
