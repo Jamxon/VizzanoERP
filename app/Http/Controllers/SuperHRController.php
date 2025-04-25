@@ -495,6 +495,11 @@ class SuperHRController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'responsible_user_id' => 'nullable|integer|exists:users,id',
+            'main_department_id' => 'nullable|integer|exists:main_department,id',
+            'start_time' => 'nullable|date_format:H:i',
+            'end_time' => 'nullable|date_format:H:i',
+            'break_time' => 'nullable|integer|min:0',
             'groups' => 'nullable|array',
             'groups.*.name' => 'required|string|max:255',
             'groups.*.responsible_user_id' => 'nullable|integer|exists:users,id',
@@ -508,9 +513,9 @@ class SuperHRController extends Controller
                 'branch_id' => auth()->user()->employee->branch_id,
                 'responsible_user_id' => $request->responsible_user_id ?? null,
                 'main_department_id' => $request->main_department_id ?? null,
-                'start_time' => $request->start_time,
-                'end_time' => $request->end_time,
-                'break_time' => $request->break_time,
+                'start_time' => $request->start_time ?? "07:30:00",
+                'end_time' => $request->end_time ?? "17:30:00",
+                'break_time' => $request->break_time ?? 0,
             ]);
 
             if ($request->filled('groups')) {
