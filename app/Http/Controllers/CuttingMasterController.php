@@ -119,6 +119,7 @@ class CuttingMasterController extends Controller
             'orderModel.material',
             'orderModel.submodels',
             'orderModel.submodels.submodel',
+            'orderModel.submodels.specificationCategories',
         ]);
 
         return response()->json($order);
