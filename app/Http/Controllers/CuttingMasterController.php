@@ -115,13 +115,10 @@ class CuttingMasterController extends Controller
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
         $order->load([
-            'instructions',
             'orderModel.model',
             'orderModel.material',
             'orderModel.submodels',
             'orderModel.submodels.submodel',
-            'orderModel.sizes.size',
-            'orderPrintingTime.user'
         ]);
 
         return response()->json($order);
