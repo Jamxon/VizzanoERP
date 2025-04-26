@@ -114,78 +114,17 @@ class CuttingMasterController extends Controller
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
-        $orderModelIds = OrderModel::where('order_id', $order->id)->pluck('id')->toArray();
+        $order->load([
+            'instructions',
+            'orderModel.model',
+            'orderModel.material',
+            'orderModel.submodels',
+            'orderModel.submodels.submodel',
+            'orderModel.sizes.size',
+            'orderPrintingTime.user'
+        ]);
 
-        $outcomeItemModelDistribution = OutcomeItemModelDistrubition::whereIn('model_id', $orderModelIds)
-            ->whereHas('outcomeItem.outcome', function ($query) {
-                $query->where('outcome_type', 'production')
-                    ->whereHas('productionOutcome', function ($query) {
-                        $query->where('received_by_id', auth()->id());
-                    });
-            })
-            ->with([
-                'outcomeItem.outcome.items.product.color',
-                'orderModel.model',
-                'orderModel.submodels.submodel',
-                'orderModel.sizes.size',
-                'orderModel.model',
-                'orderModel.order.instructions',
-                'orderModel.order.orderRecipes',
-//                'orderModel.order.orderPrintingTime.user'
-            ])
-            ->get();
-
-        $orderRecipes = $order->orderRecipes->map(function ($recipe) {
-            return [
-                'id' => $recipe->id,
-                'quantity' => $recipe->quantity,
-                'item' => $recipe->item->load('color','unit'),
-            ];
-        });
-
-        $outcomes = [];
-        foreach ($outcomeItemModelDistribution as $item) {
-            $outcome = $item->outcomeItem->outcome;
-            $outcomeId = $outcome->id;
-
-            if (!isset($outcomes[$outcomeId])) {
-                $outcomes[$outcomeId] = [
-                    'id' => $outcome->id,
-                    'outcome_type' => $outcome->outcome_type,
-                    'number' => $outcome->number,
-                    'status' => $outcome->status,
-                    'items' => [],
-                ];
-            }
-
-            foreach ($outcome->items as $outcomeItem) {
-                $itemId = $outcomeItem->id;
-                if (!isset($outcomes[$outcomeId]['items'][$itemId])) {
-                    $outcomes[$outcomeId]['items'][$itemId] = [
-                        'id' => $outcomeItem->id,
-                        'name' => $outcomeItem->product->name ?? null,
-                        'code' => $outcomeItem->product->code ?? null,
-                        'quantity' => $outcomeItem->quantity ?? 0,
-                        'unit' => $outcomeItem->product->unit ?? null,
-                        'color' => [
-                            'id' => $outcomeItem->product->color->id ?? null,
-                            'name' => $outcomeItem->product->color->name ?? null,
-                            'hex' => $outcomeItem->product->color->hex ?? null,
-                        ]
-                    ];
-                }
-            }
-        }
-
-        $outcomes = array_map(function ($outcome) {
-            $outcome['items'] = array_values($outcome['items']);
-            return $outcome;
-        }, array_values($outcomes));
-
-        $resource = new showOrderCuttingMasterResource($order);
-        $resource->outcomes = $outcomes;
-
-        return response()->json($resource);
+        return response()->json($order);
     }
 
     public function getSpecificationByOrderId($id): \Illuminate\Http\JsonResponse
