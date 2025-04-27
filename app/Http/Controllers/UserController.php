@@ -26,7 +26,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'username' => 'required|string|max:255|unique:users,username,' . $employee->user_id,
-                'password' => 'sometimes|string|min:6',
+                'password' => 'sometimes|nullable|string|min:6',
             ]);
 
             $user = User::where('id', $employee->user_id)->first();
@@ -34,10 +34,16 @@ class UserController extends Controller
             $oldUserData = $user->only(['username', 'password']);
             $oldEmployeeData = $employee->only(['img']);
 
-            $user->update([
+            $updateData = [
                 'username' => $request->username,
-                'password' => $this->hashPassword($request->password) ?: $oldUserData['password'],
-            ]);
+            ];
+
+            // Password faqat kelsa va bo'sh bo'lmasa hash qilamiz
+            if ($request->filled('password')) {
+                $updateData['password'] = $this->hashPassword($request->password);
+            }
+
+            $user->update($updateData);
 
             if ($request->hasFile('img')) {
                 $file = $request->file('img');
