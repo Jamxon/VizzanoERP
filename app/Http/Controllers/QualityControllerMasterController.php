@@ -112,6 +112,7 @@ class QualityControllerMasterController extends Controller
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('status', $request->status)
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->with([
                 'orderModel.model',
                 'orderModel.submodels.submodel',
