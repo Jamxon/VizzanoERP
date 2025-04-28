@@ -19,15 +19,17 @@ class ConstructorController extends Controller
             ->whereIn('orders.status', ['cutting', 'printing'])
             ->whereIn('order_printing_times.status', ['cutting', 'printing'])
             ->orderBy('order_printing_times.planned_time', 'desc')
+            ->select('orders.*') // faqat orders ustunlari
             ->with(
                 'orderModel',
                 'orderModel.submodels.specificationCategories.specifications',
                 'orderModel.model',
-                'orderModel.material',
-                'orderPrintingTime',
+                'orderModel.material'
             )
-            ->select('orders.*') // faqat orders ustunlarini olamiz
             ->get();
+
+        // bu yerda orderPrintingTime relationshipni keyinchalik yuklaymiz
+        $orders->load('orderPrintingTime');
 
         $resource = OrderPrintingTime::collection($orders);
 
