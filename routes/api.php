@@ -47,6 +47,8 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::patch('items/{item}', [ItemController::class, 'update']);
     Route::get('items-export', [ItemController::class, 'export']);
     Route::get('colors',[ColorController::class, 'index']);
+    Route::post('colors', [ColorController::class, 'store']);
+    Route::patch('colors/{color}', [ColorController::class, 'update']);
     Route::get('types',[ItemTypeController::class, 'index']);
     Route::get('units',[UnitController::class, 'index']);
     Route::get('currencies',[CurrencyController::class, 'index']);
