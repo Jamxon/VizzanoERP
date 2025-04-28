@@ -14,24 +14,29 @@ class ConstructorController extends Controller
 {
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::join('order_printing_times', 'orders.id', '=', 'order_printing_times.order_id')
-            ->where('orders.branch_id', auth()->user()->employee->branch_id)
-            ->whereIn('orders.status', ['cutting', 'printing'])
-            ->whereIn('order_printing_times.status', ['cutting', 'printing'])
-            ->orderBy('order_printing_times.planned_time', 'desc')
-            ->select('orders.*') // faqat orders ustunlari
-            ->with(
+        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
+            ->whereIn('status', ['cutting', 'printing'])
+            ->whereHas('orderPrintingTime', function ($query) {
+                $query->whereIn('status', ['cutting', 'printing']);
+            })
+            ->with([
                 'orderModel',
                 'orderModel.submodels.specificationCategories.specifications',
                 'orderModel.model',
-                'orderModel.material'
+                'orderModel.material',
+                'orderPrintingTime' => function ($query) {
+                    $query->orderBy('planned_time', 'desc');
+                }
+            ])
+            ->orderByDesc(
+                OrderPrintingTime::select('planned_time')
+                    ->whereColumn('order_printing_times.order_id', 'orders.id')
+                    ->orderBy('planned_time', 'desc')
+                    ->limit(1)
             )
             ->get();
 
-        // bu yerda orderPrintingTime relationshipni keyinchalik yuklaymiz
-        $orders->load('orderPrintingTime');
-
-        $resource = OrderPrintingTime::collection($orders);
+        $resource = OrderResource::collection($orders);
 
         return response()->json($resource);
     }
