@@ -26,12 +26,6 @@ class ConstructorController extends Controller
                 'orderModel.material',
                 'orderPrintingTime'
             ])
-            ->orderByDesc(
-                OrderPrintingTimes::select('planned_time')
-                    ->whereColumn('order_printing_times.order_id', 'orders.id')
-                    ->orderBy('planned_time', 'desc')
-                    ->limit(1)
-            )
             ->get();
 
         $resource = OrderPrintingTime::collection($orders);
