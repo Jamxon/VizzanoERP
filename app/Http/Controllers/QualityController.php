@@ -77,8 +77,8 @@ class QualityController extends Controller
                             'name' => $subModel->orderSubModel->submodel->name,
                         ],
                         'group' => [
-                            'id' => $subModel->group->id ?? null,
-                            'name' => $subModel->group->name ?? null,
+                            'id' => $subModel->orderSubModel->group->group->id ?? null,
+                            'name' => $subModel->orderSubModel->group->group->name ?? null,
                         ],
                     ]],
                 ],
