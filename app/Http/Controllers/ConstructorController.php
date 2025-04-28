@@ -16,6 +16,9 @@ class ConstructorController extends Controller
     {
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
             ->where('status', '!=', 'cutting')
+            ->whereHas('orderPrintingTime', function ($query) {
+                $query->where('status', '!=', 'cutting');
+            })
             ->with(
                 'orderModel',
                 'orderModel.submodels.specificationCategories.specifications',
