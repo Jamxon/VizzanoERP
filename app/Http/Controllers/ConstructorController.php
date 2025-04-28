@@ -14,11 +14,10 @@ class ConstructorController extends Controller
 {
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
-            ->whereIn('status', ['cutting', 'printing']) // faqat cutting va printing lar
-            ->whereHas('orderPrintingTime', function ($query) {
-                $query->whereIn('status', ['cutting', 'printing']);
-            })
+        $orders = Order::join('order_printing_times', 'orders.id', '=', 'order_printing_times.order_id')
+            ->where('orders.branch_id', auth()->user()->employee->branch_id)
+            ->whereIn('orders.status', ['cutting', 'printing'])
+            ->whereIn('order_printing_times.status', ['cutting', 'printing'])
             ->orderBy('order_printing_times.planned_time', 'asc')
             ->with(
                 'orderModel',
@@ -27,6 +26,7 @@ class ConstructorController extends Controller
                 'orderModel.material',
                 'orderPrintingTime',
             )
+            ->select('orders.*') // faqat orders ustunlarini olamiz
             ->get();
 
         $resource = OrderPrintingTime::collection($orders);
