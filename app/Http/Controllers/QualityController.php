@@ -77,6 +77,7 @@ class QualityController extends Controller
                         ],
                         'group' => [
                             'id' => $subModel->group->id ?? null,
+                            'name' => $subModel->group->name ?? null,
                             'group' => [
                                 'id' => $subModel->group->group->id ?? null,
                                 'name' => $subModel->group->group->name ?? null,
