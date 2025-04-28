@@ -29,14 +29,14 @@ class ConstructorController extends Controller
                 }
             ])
             ->orderByDesc(
-                OrderPrintingTime::select('planned_time')
+                OrderPrintingTimes::select('planned_time')
                     ->whereColumn('order_printing_times.order_id', 'orders.id')
                     ->orderBy('planned_time', 'desc')
                     ->limit(1)
             )
             ->get();
 
-        $resource = OrderResource::collection($orders);
+        $resource = OrderPrintingTime::collection($orders);
 
         return response()->json($resource);
     }
