@@ -938,7 +938,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function importSpecification(Request $request): \Illuminate\Http\JsonResponse
+    public function importSpecificationsExcel(Request $request)
     {
         $file = $request->file('file');
 
@@ -952,37 +952,40 @@ class TechnologController extends Controller
             return response()->json(['message' => 'submodel_id kerak!'], 400);
         }
 
-        $content = file_get_contents($file->getRealPath());
-        $text = strip_tags($content);
-        $lines = preg_split("/\r\n|\n|\r/", $text);
+        $rows = Excel::toArray([], $file);
+
+        // Bitta fayl, birinchi sheetni olamiz
+        $sheet = $rows[0];
 
         $currentCategory = null;
 
         DB::beginTransaction();
 
         try {
-            foreach ($lines as $line) {
-                $line = trim($line);
+            foreach ($sheet as $row) {
+                $row = array_map('trim', $row);
 
-                if (empty($line)) {
+                if (empty($row) || (count(array_filter($row)) == 0)) {
                     continue;
                 }
 
-                if (preg_match('/^(Верх|Флис|Подкладка|Искусственный|Прокламелин|Утеплитель|Вспомогательные|Лекала)/u', $line)) {
+                // Category qatorini aniqlaymiz
+                if (isset($row[0]) && preg_match('/^(Верх|Флис|Подкладка|Искусственный|Прокламелин|Утеплитель|Вспомогательные|Лекала)/u', $row[0])) {
                     $currentCategory = SpecificationCategory::create([
-                        'name' => $line,
+                        'name' => $row[0],
                         'submodel_id' => $submodelId,
                     ]);
                     continue;
                 }
 
-                if ($currentCategory && preg_match('/^([A-Z0-9]+)\s+(.+?)\s+(\d+)(?:\s+(.*))?$/u', $line, $matches)) {
+                // Agar detal qatori bo'lsa
+                if ($currentCategory && isset($row[0], $row[1], $row[2])) {
                     PartSpecification::create([
                         'specification_category_id' => $currentCategory->id,
-                        'code' => $matches[1],
-                        'name' => $matches[2],
-                        'quantity' => $matches[3],
-                        'comment' => $matches[4] ?? null,
+                        'code' => $row[0],
+                        'name' => $row[1],
+                        'quantity' => is_numeric($row[2]) ? (int) $row[2] : 0,
+                        'comment' => $row[3] ?? null,
                     ]);
                 }
             }
@@ -996,4 +999,5 @@ class TechnologController extends Controller
             return response()->json(['message' => 'Xatolik: ' . $e->getMessage()], 500);
         }
     }
+
 }
