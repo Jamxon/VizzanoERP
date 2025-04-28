@@ -33,6 +33,14 @@ class OrderPrintingTime extends JsonResource
                     'name' => $this->orderModel->material->name ?? null,
                 ],
             ],
+            'order_printing_times' => [
+                "id" => $this->orderPrintingTime->id,
+                "planned_time" => $this->orderPrintingTime->planned_time,
+                "actual_time" => $this->orderPrintingTime->actual_time,
+                "status" => $this->orderPrintingTime->status,
+                "comment" => $this->orderPrintingTime->comment,
+                "user" => $this->orderPrintingTime->user,
+            ],
         ];
     }
 
