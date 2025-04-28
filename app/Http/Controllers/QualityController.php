@@ -23,7 +23,7 @@ class QualityController extends Controller
         }
         $otkOrderGroups = OtkOrderGroup::whereIn('group_id', $groupIds)
             ->whereHas('orderSubModel.orderModel.order', function ($query) {
-                $query->where('status', '!=', 'checked')
+                $query->whereIn('status', ['tailoring', 'tailored', 'checking'])
                     ->where('branch_id', auth()->user()->employee->branch_id);
             })
             ->with([
