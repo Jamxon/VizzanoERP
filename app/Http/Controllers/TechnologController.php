@@ -959,6 +959,8 @@ class TechnologController extends Controller
 
         $currentCategory = null;
 
+        dd($submodelId);
+        
         DB::beginTransaction();
 
         try {
