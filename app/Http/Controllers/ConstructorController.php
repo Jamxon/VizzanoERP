@@ -18,7 +18,7 @@ class ConstructorController extends Controller
             ->where('orders.branch_id', auth()->user()->employee->branch_id)
             ->whereIn('orders.status', ['cutting', 'printing'])
             ->whereIn('order_printing_times.status', ['cutting', 'printing'])
-            ->orderBy('order_printing_times.planned_time', 'asc')
+            ->orderBy('order_printing_times.planned_time', 'desc')
             ->with(
                 'orderModel',
                 'orderModel.submodels.specificationCategories.specifications',
