@@ -6,7 +6,6 @@ use App\Http\Resources\OrderPrintingTime;
 use App\Http\Resources\ShowOrderPrintingTime;
 use App\Models\Log;
 use App\Models\Order;
-use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
 use Illuminate\Http\Request;
 
@@ -16,9 +15,6 @@ class ConstructorController extends Controller
     {
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
             ->whereIn('status', ['cutting', 'printing'])
-            ->whereHas('orderPrintingTime', function ($query) {
-                $query->whereIn('status', ['cutting', 'printing']);
-            })
             ->with([
                 'orderModel',
                 'orderModel.submodels.specificationCategories.specifications',
