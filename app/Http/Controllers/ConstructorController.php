@@ -20,7 +20,7 @@ class ConstructorController extends Controller
                 'orderModel.submodels.specificationCategories.specifications',
                 'orderModel.model',
                 'orderModel.material',
-                'orderPrintingTime'
+                'orderPrintingTime',
             ])
             ->get();
 
