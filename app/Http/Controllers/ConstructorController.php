@@ -24,9 +24,7 @@ class ConstructorController extends Controller
                 'orderModel.submodels.specificationCategories.specifications',
                 'orderModel.model',
                 'orderModel.material',
-                'orderPrintingTime' => function ($query) {
-                    $query->orderBy('planned_time', 'desc');
-                }
+                'orderPrintingTime'
             ])
             ->orderByDesc(
                 OrderPrintingTimes::select('planned_time')
