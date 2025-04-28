@@ -20,6 +20,7 @@ use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use App\Models\TypeWriter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
@@ -910,37 +911,6 @@ class TechnologController extends Controller
         }
     }
 
-    public function importTarification(Request $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $orderSubModelId = $request->get('orderSubmodelId');
-            $file = $request->file('file');
-
-            if (!$orderSubModelId || !$file) {
-                return response()->json(['error' => 'orderSubModelId va fayl majburiy.'], 400);
-            }
-
-            $orderSubmodel = OrderSubModel::findOrFail($orderSubModelId);
-            $orderModel = OrderModel::findOrFail($orderSubmodel->order_model_id);
-            $order = Order::findOrFail($orderModel->order_id);
-
-            Excel::import(new TarificationCategoryImport($orderSubModelId), $file);
-
-            Log::add(auth()->id(), 'Import tarification', 'import', null, [
-                'orderSubModelId' => $orderSubModelId,
-                'order_name' => $order->name,
-                'submodel_name' => $orderSubmodel->submodel->name,
-                'filename' => $file->getClientOriginalName()
-            ]);
-
-            return response()->json(['message' => 'Import muvaffaqiyatli bajarildi.'], 200);
-
-        } catch (\Exception $e) {
-            Log::add(auth()->id(), 'Xatolik: Tarifikatsiyani import qilishda', 'error', $e->getMessage());
-            return response()->json(['error' => 'Import xatoligi: ' . $e->getMessage()], 500);
-        }
-    }
-
     public function exportSpecification(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
     {
         try {
@@ -970,32 +940,60 @@ class TechnologController extends Controller
 
     public function importSpecification(Request $request): \Illuminate\Http\JsonResponse
     {
-        try {
-            $orderSubmodelId = $request->get('orderSubmodelId');
-            $file = $request->file('file');
+        $file = $request->file('file');
 
-            if (!$orderSubmodelId || !$file) {
-                return response()->json(['error' => 'orderSubmodelId va fayl majburiy.'], 400);
+        if (!$file) {
+            return response()->json(['message' => 'Fayl topilmadi!'], 400);
+        }
+
+        $submodelId = $request->input('submodel_id');
+
+        if (!$submodelId) {
+            return response()->json(['message' => 'submodel_id kerak!'], 400);
+        }
+
+        $content = file_get_contents($file->getRealPath());
+        $text = strip_tags($content);
+        $lines = preg_split("/\r\n|\n|\r/", $text);
+
+        $currentCategory = null;
+
+        DB::beginTransaction();
+
+        try {
+            foreach ($lines as $line) {
+                $line = trim($line);
+
+                if (empty($line)) {
+                    continue;
+                }
+
+                if (preg_match('/^(Верх|Флис|Подкладка|Искусственный|Прокламелин|Утеплитель|Вспомогательные|Лекала)/u', $line)) {
+                    $currentCategory = SpecificationCategory::create([
+                        'name' => $line,
+                        'submodel_id' => $submodelId,
+                    ]);
+                    continue;
+                }
+
+                if ($currentCategory && preg_match('/^([A-Z0-9]+)\s+(.+?)\s+(\d+)(?:\s+(.*))?$/u', $line, $matches)) {
+                    PartSpecification::create([
+                        'specification_category_id' => $currentCategory->id,
+                        'code' => $matches[1],
+                        'name' => $matches[2],
+                        'quantity' => $matches[3],
+                        'comment' => $matches[4] ?? null,
+                    ]);
+                }
             }
 
-            $orderSubmodel = OrderSubModel::findOrFail($orderSubmodelId);
-            $orderModel = OrderModel::findOrFail($orderSubmodel->order_model_id);
-            $order = Order::findOrFail($orderModel->order_id);
+            DB::commit();
 
-            Excel::import(new SpecificationCategoryImport($orderSubmodelId), $file);
-
-            Log::add(auth()->id(), 'Import specification', 'import', null, [
-                'orderSubmodelId' => $orderSubmodelId,
-                'order_name' => $order->name,
-                'submodel_name' => $orderSubmodel->submodel->name,
-                'filename' => $file->getClientOriginalName()
-            ]);
-
-            return response()->json(['message' => 'Import muvaffaqiyatli bajarildi.'], 200);
-
+            return response()->json(['message' => 'Import muvaffaqiyatli yakunlandi!']);
         } catch (\Exception $e) {
-            Log::add(auth()->id(), 'Xatolik: Spesifikatsiyani import qilishda', 'error', $e->getMessage());
-            return response()->json(['error' => 'Import xatoligi: ' . $e->getMessage()], 500);
+            DB::rollBack();
+
+            return response()->json(['message' => 'Xatolik: ' . $e->getMessage()], 500);
         }
     }
 }
