@@ -19,7 +19,7 @@ class ConstructorController extends Controller
             ->whereHas('orderPrintingTime', function ($query) {
                 $query->whereIn('status', ['cutting', 'printing']);
             })
-            ->orderBy('orderPrintingTime.planned_time', 'asc')
+            ->orderBy('orderPrintingTimes.planned_time', 'asc')
             ->with(
                 'orderModel',
                 'orderModel.submodels.specificationCategories.specifications',
