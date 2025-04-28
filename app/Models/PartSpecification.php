@@ -30,7 +30,7 @@ class PartSpecification extends Model
         'specification_category_id',
     ];
 
-    public function specification()
+    public function specification(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(SpecificationCategory::class);
     }
