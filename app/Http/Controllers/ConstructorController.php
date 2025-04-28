@@ -15,9 +15,9 @@ class ConstructorController extends Controller
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
-            ->where('status', '!=', 'cutting')
+            ->whereIn('status', ['cutting', 'printing']) // faqat cutting va printing lar
             ->whereHas('orderPrintingTime', function ($query) {
-                $query->where('status', '!=', 'cutting');
+                $query->whereIn('status', ['cutting', 'printing']);
             })
             ->with(
                 'orderModel',
