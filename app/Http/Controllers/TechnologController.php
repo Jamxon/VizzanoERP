@@ -938,7 +938,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function importSpecificationsExcel(Request $request)
+    public function importSpecification(Request $request): \Illuminate\Http\JsonResponse
     {
         $file = $request->file('file');
 
