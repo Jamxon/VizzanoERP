@@ -290,38 +290,46 @@ class GroupMasterController extends Controller
         }
 
         $orderQuantity = $order->quantity;
-
         $totalSewnQuantity = SewingOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
+        $newQuantity = $validatedData['quantity'];
+        $combinedQuantity = $totalSewnQuantity + $newQuantity;
 
-        $remainingQuantity = $orderQuantity - $totalSewnQuantity;
-
-        if ($validatedData['quantity'] > $remainingQuantity) {
+        if ($combinedQuantity > $orderQuantity) {
+            $a = $orderQuantity - $totalSewnQuantity;
             return response()->json([
-                'message' => "Siz faqat {$remainingQuantity} dona qo'shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."
+                'message' => "Siz faqat $a dona qo'shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."
             ], 400);
         }
 
+        // Saqlash
         $sewingOutput = SewingOutputs::create($validatedData);
+
+        // Agar to‘liq tikilgan bo‘lsa — statusni 'tailored' qilamiz
+        if ($combinedQuantity === $orderQuantity) {
+            $order->status = 'tailored';
+            $order->save();
+        }
+
+        // Log yozish
         $time = Time::find($validatedData['time_id']);
-        // Log the action with names instead of IDs
         Log::add(
             auth()->id(),
             'Patok Master natija kiritdi',
             'sewing',
             null,
             [
-                'sewing_output' => $sewingOutput->id, // ID is retained as part of data, but we can include 'name' if it makes sense
+                'sewing_output' => $sewingOutput->id,
                 'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
                 'quantity' => $validatedData['quantity'],
                 'time' => $time,
                 'comment' => $validatedData['comment'] ?? null,
                 'order' => $order->name ?? 'Noma’lum buyurtma',
-                'remaining_quantity' => $remainingQuantity - $validatedData['quantity']
+                'remaining_quantity' => $orderQuantity - $combinedQuantity
             ]
         );
 
         return response()->json([
-            'message' => "Sewing output muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($remainingQuantity - $validatedData['quantity'])
+            'message' => "Sewing output muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
         ]);
     }
 
