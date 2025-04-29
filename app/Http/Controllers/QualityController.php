@@ -170,7 +170,6 @@ class QualityController extends Controller
             });
         })->where('status', true)->count();
 
-        dd($trueChecksCount);
         // Limit tekshiruvi
         if ($trueChecksCount >= $order->quantity) {
             return response()->json([
