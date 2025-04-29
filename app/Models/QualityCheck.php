@@ -32,7 +32,7 @@ class QualityCheck extends Model
     public function getImageAttribute($value)
     {
         if ($value) {
-            return url($value);
+            return url('storage/' . $value);
         }
         return null;
     }
