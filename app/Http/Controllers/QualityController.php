@@ -152,8 +152,10 @@ class QualityController extends Controller
             'comment' => 'nullable|string',
         ]);
 
+        dd($validated);
+
         // Submodel va unga tegishli orderni oldindan olish (1 query)
-        $submodel = OrderSubModel::with('order')->find($validated['order_sub_model_id']);
+        $submodel = OrderSubModel::with('order')->findOrFail($validated['order_sub_model_id']);
         $order = $submodel->order;
 
         if (!$order) {
