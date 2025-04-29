@@ -23,19 +23,15 @@ class PackageMasterController extends Controller
         return response()->json($orders);
     }
 
-    public function showOrder($id): \Illuminate\Http\JsonResponse
+    public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
-
-         $order = Order::find($id)
-            ->where('branch_id', auth()->user()->employee->branch_id)
-            ->with(
+            $order->load(
                 'packageOutcomes',
                 'orderModel.model',
                 'orderModel.material',
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',
-            )
-            ->first();
+            );
 
         return response()->json($order);
     }
