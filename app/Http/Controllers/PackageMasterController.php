@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 class PackageMasterController extends Controller
 {
     public function getOrders(): \Illuminate\Http\JsonResponse
