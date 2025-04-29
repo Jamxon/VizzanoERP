@@ -156,6 +156,8 @@ class QualityController extends Controller
         $submodel = OrderSubModel::where('id', $validated['order_sub_model_id'])->with('orderModel.order')->first();
         $order = $submodel->orderModel->order;
 
+        dd($order);
+
         if (!$order) {
             return response()->json([
                 'status' => 'error',
