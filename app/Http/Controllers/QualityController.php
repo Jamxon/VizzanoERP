@@ -189,8 +189,8 @@ class QualityController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $fileName = time() . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/images', $fileName);
-            $imageName = "/storage/images/" . $fileName;
+            $image->storeAs('/images/', $fileName);
+            $imageName = "images/" . $fileName;
         }
 
         // Bazaga yozish
