@@ -152,43 +152,51 @@ class QualityController extends Controller
             'comment' => 'nullable|string',
         ]);
 
-        // Submodel orqali orderni aniqlaymiz
+        // Submodel va unga tegishli orderni oldindan olish (1 query)
         $submodel = OrderSubModel::with('order')->findOrFail($validated['order_sub_model_id']);
         $order = $submodel->order;
 
-        // Hozirgi 'true' quality_check lar soni
-        $existingTrueChecks = QualityCheck::whereHas('orderSubModel', function ($q) use ($order) {
-            $q->where('order_id', $order->id);
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Buyurtma topilmadi.'
+            ], 404);
+        }
+
+        // Hozirgi true statusdagi tekshiruvlar soni
+        $trueChecksCount = QualityCheck::whereHas('orderSubModel', function ($query) use ($order) {
+            $query->where('order_id', $order->id);
         })->where('status', true)->count();
 
-        // Orderdagi maksimal miqdor
-        if ($existingTrueChecks >= $order->quantity) {
+        // Limit tekshiruvi
+        if ($trueChecksCount >= $order->quantity) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Tekshiruvlar miqdori buyurtma miqdoridan oshmasligi kerak.'
             ], 422);
         }
 
-        // Yangi quality check yozamiz
+        // QualityCheck yoziladi
         $qualityCheck = QualityCheck::create([
-            'order_sub_model_id' => $validated['order_sub_model_id'],
+            'order_sub_model_id' => $submodel->id,
             'status' => true,
             'user_id' => auth()->id(),
             'comment' => $validated['comment'] ?? null,
             'image' => null,
         ]);
 
-        // Agar umumiy son quantity ga teng bo‘lsa → status = 'checked'
-        if (($existingTrueChecks + 1) === $order->quantity) {
+        // Agar yangi yozilganidan so‘ng quantity to‘lsa — order status 'checked' bo'ladi
+        if (($trueChecksCount + 1) === $order->quantity) {
             $order->status = 'checked';
             $order->save();
         }
 
         return response()->json([
-            'message' => 'Muvofaqiyatli holat saqlandi (status = true)',
+            'message' => 'Muvofaqiyatli saqlandi (status = true)',
             'data' => $qualityCheck
         ]);
     }
+
 
     public function qualityCheckFailureStore(Request $request): \Illuminate\Http\JsonResponse
     {
