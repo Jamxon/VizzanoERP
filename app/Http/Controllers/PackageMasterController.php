@@ -10,16 +10,13 @@ class PackageMasterController extends Controller
 {
     public function getOrders(): \Illuminate\Http\JsonResponse
     {
-
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
-            ->orWhere('status', 'tailoring')
-            ->orWhere('status', 'tailored')
-            ->orWhere('status', 'checking')
-            ->orWhere('status', 'checked')
+            ->whereIn('status', ['tailoring', 'tailored', 'checking', 'checked'])
             ->with(
                 'orderModel.model',
+                'orderModel.material',
                 'orderModel.submodels.submodel',
-                'orderModel.sizes.size',
+                'orderModel.sizes.size'
             )
             ->get();
 
