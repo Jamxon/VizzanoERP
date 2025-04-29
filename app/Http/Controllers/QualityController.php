@@ -146,21 +146,27 @@ class QualityController extends Controller
 
     public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
     {
-        if (is_string($request->input('descriptions'))) {
-            $request->merge([
-                'descriptions' => json_decode($request->input('descriptions'), true),
-            ]);
+        // descriptions ni avval to'g'rilab olish
+        $descriptions = $request->input('descriptions');
+
+        // agar u string bo‘lsa (JSON string shaklida), uni arrayga aylantiramiz
+        if (is_string($descriptions)) {
+            $descriptions = json_decode($descriptions, true);
         }
 
-        dd($request->all());
-        $validatedData = $request->validate([
+        // manual qilib requestga qo‘shib qo‘yish (validationga emas!)
+        $requestData = $request->all();
+        $requestData['descriptions'] = $descriptions;
+
+        // Validatsiya faqat kerakli maydonlar uchun
+        $validatedData = validator($requestData, [
             'order_sub_model_id' => 'required|exists:order_sub_models,id',
             'status' => 'required|boolean',
             'comment' => 'nullable|string',
             'descriptions' => 'nullable|array',
             'descriptions.*' => 'exists:quality_descriptions,id',
             'image' => 'nullable|image|max:20480',
-        ]);
+        ])->validate();
 
         // Rasmni saqlash
         $imageName = null;
