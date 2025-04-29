@@ -144,24 +144,40 @@ class QualityController extends Controller
         return response()->json($qualityDescription);
     }
 
-    public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
+    public function qualityCheckSuccessStore(Request $request): \Illuminate\Http\JsonResponse
     {
-        // descriptions ni avval to'g'rilab olish
-        $descriptions = $request->input('descriptions');
+        $validated = $request->validate([
+            'order_sub_model_id' => 'required|exists:order_sub_models,id',
+            'comment' => 'nullable|string',
+        ]);
 
-        // agar u string bo‘lsa (JSON string shaklida), uni arrayga aylantiramiz
+        $qualityCheck = QualityCheck::create([
+            'order_sub_model_id' => $validated['order_sub_model_id'],
+            'status' => true,
+            'user_id' => auth()->id(),
+            'comment' => $validated['comment'] ?? null,
+            'image' => null,
+        ]);
+
+        return response()->json([
+            'message' => 'Muvofaqiyatli holat saqlandi (status = true)',
+            'data' => $qualityCheck
+        ]);
+    }
+
+    public function qualityCheckFailureStore(Request $request): \Illuminate\Http\JsonResponse
+    {
+        // JSON formatda kelsa, descriptionsni arrayga aylantirib qo'yamiz
+        $descriptions = $request->input('descriptions');
         if (is_string($descriptions)) {
             $descriptions = json_decode($descriptions, true);
         }
 
-        // manual qilib requestga qo‘shib qo‘yish (validationga emas!)
         $requestData = $request->all();
         $requestData['descriptions'] = $descriptions;
 
-        // Validatsiya faqat kerakli maydonlar uchun
-        $validatedData = validator($requestData, [
+        $validated = validator($requestData, [
             'order_sub_model_id' => 'required|exists:order_sub_models,id',
-            'status' => 'required|boolean',
             'comment' => 'nullable|string',
             'descriptions' => 'nullable|array',
             'descriptions.*' => 'exists:quality_descriptions,id',
@@ -173,32 +189,34 @@ class QualityController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $fileName = time() . '_' . $image->getClientOriginalName();
-            $image->storeAs('public/images', $fileName); // disk: public
+            $image->storeAs('public/images', $fileName);
             $imageName = "/storage/images/" . $fileName;
         }
 
-        // Ma'lumotni bazaga yozish
+        // Bazaga yozish
         $qualityCheck = QualityCheck::create([
-            'order_sub_model_id' => $validatedData['order_sub_model_id'],
-            'status' => $validatedData['status'],
-            'image' => $imageName,
+            'order_sub_model_id' => $validated['order_sub_model_id'],
+            'status' => false,
             'user_id' => auth()->id(),
-            'comment' => $validatedData['comment'] ?? null,
+            'comment' => $validated['comment'] ?? null,
+            'image' => $imageName,
         ]);
 
-        // Agar xato bo'lsa descriptionlar qo'shiladi
-        if (!$qualityCheck->status && !empty($validatedData['descriptions'])) {
-            foreach ($validatedData['descriptions'] as $description) {
+        // Descriptionlar kiritish
+        if (!empty($validated['descriptions'])) {
+            foreach ($validated['descriptions'] as $descriptionId) {
                 QualityCheckDescription::create([
                     'quality_check_id' => $qualityCheck->id,
-                    'quality_description_id' => $description,
+                    'quality_description_id' => $descriptionId,
                 ]);
             }
         }
 
-        return response()->json(['message' => 'Saqlash muvaffaqiyatli', 'data' => $qualityCheck]);
+        return response()->json([
+            'message' => 'Xatolik holati saqlandi (status = false)',
+            'data' => $qualityCheck
+        ]);
     }
-
 
     public function getQualityChecks(Request $request): \Illuminate\Http\JsonResponse
     {

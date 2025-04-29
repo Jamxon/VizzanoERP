@@ -101,7 +101,8 @@ Route::prefix('qualityController')->middleware('role:qualityController')->group(
     Route::get('qualityDescription',[QualityController::class, 'getQualityDescription']);
     Route::post('qualityDescription',[QualityController::class, 'qualityDescriptionStore']);
     Route::patch('qualityDescription/{qualityDescription}',[QualityController::class, 'updateQualityDescription']);
-    Route::post('qualityCheck',[QualityController::class, 'qualityCheckStore']);
+    Route::post('qualitySuccessCheck',[QualityController::class, 'qualityCheckSuccessStore']);
+    Route::post('qualityFailureCheck',[QualityController::class, 'qualityCheckFailureStore']);
     Route::get('qualityCheck',[QualityController::class, 'getQualityChecks']);
 });
 
