@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static create(array $array)
  * @method static where(string $string, int|string|null $id)
  * @method static whereIn(string $string, $pluck)
+ * @method static whereHas(string $string, \Closure $param)
  */
 class QualityCheck extends Model
 {
