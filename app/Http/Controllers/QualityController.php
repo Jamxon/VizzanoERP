@@ -146,6 +146,11 @@ class QualityController extends Controller
 
     public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
     {
+        if (is_string($request->input('descriptions'))) {
+            $request->merge([
+                'descriptions' => json_decode($request->input('descriptions'), true),
+            ]);
+        }
         $validatedData = $request->validate([
             'order_sub_model_id' => 'required|exists:order_sub_models,id',
             'status' => 'required|boolean',
