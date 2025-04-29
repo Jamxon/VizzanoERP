@@ -164,8 +164,10 @@ class QualityController extends Controller
         }
 
         // Hozirgi true statusdagi tekshiruvlar soni
-        $trueChecksCount = QualityCheck::whereHas('orderSubModel', function ($query) use ($order) {
-            $query->where('order_id', $order->id);
+        $trueChecksCount = QualityCheck::whereHas('order_sub_model', function ($query) use ($order) {
+            $query->whereHas('orderModel', function ($query) use ($order) {
+                $query->where('order_id', $order->id);
+            });
         })->where('status', true)->count();
 
         dd($trueChecksCount);
