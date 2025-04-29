@@ -981,7 +981,9 @@ class TechnologController extends Controller
                 // Agar detal qatori bo'lsa
                 if ($currentCategory && isset($row[0], $row[1], $row[2])) {
                     //итого  larni yozmaslik kerak
-
+                    if (preg_match('/^(итого|Итого:)/u', $row[0])) {
+                        continue;
+                    }
                     PartSpecification::create([
                         'specification_category_id' => $currentCategory->id,
                         'code' => $row[1],
