@@ -987,7 +987,7 @@ class TechnologController extends Controller
                     PartSpecification::create([
                         'specification_category_id' => $currentCategory->id,
                         'code' => $row[1],
-                        'name' => $row[2],
+                        'name' => translateToUzFree($row[2]),
                         'quantity' => is_numeric($row[3]) ? (int) $row[3] : 0,
                         'comment' => $row[4] ?? null,
                     ]);
