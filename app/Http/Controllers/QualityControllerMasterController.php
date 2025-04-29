@@ -60,7 +60,7 @@ class QualityControllerMasterController extends Controller
                     'model' => $orderSubModel->orderModel->model ?? null,
                     'qualityChecksTrue' => $counts[1] ?? 0,
                     'qualityChecksFalse' => $counts[0] ?? 0,
-                    'descriptions' => $descriptionCounts,
+                    'qualityChecks' => $orderSubModel->qualityChecks,
                 ];
             });
 
