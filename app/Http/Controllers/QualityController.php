@@ -129,6 +129,21 @@ class QualityController extends Controller
 
     }
 
+    public function updateQualityDescription(Request $request, QualityDescription $qualityDescription): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'description' => 'required|string',
+        ]);
+
+        $qualityDescription->update(
+            [
+                'description' => $request->description,
+            ]
+        );
+
+        return response()->json($qualityDescription);
+    }
+
     public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $validatedData = $request->validate([

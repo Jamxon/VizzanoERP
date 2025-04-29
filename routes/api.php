@@ -32,6 +32,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VizzanoReportTvController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
+use App\Models\QualityDescription;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
@@ -97,8 +98,9 @@ Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMast
 Route::prefix('qualityController')->middleware('role:qualityController')->group(function () {
     Route::get('orders',[QualityController::class, 'getOrders']);
     Route::get('orders/{id}',[QualityController::class, 'showOrder']);
-    Route::post('qualityDescription',[QualityController::class, 'qualityDescriptionStore']);
     Route::get('qualityDescription',[QualityController::class, 'getQualityDescription']);
+    Route::post('qualityDescription',[QualityController::class, 'qualityDescriptionStore']);
+    Route::patch('qualityDescription{qualityDescription}',[QualityController::class, 'updateQualityDescription']);
     Route::post('qualityCheck',[QualityController::class, 'qualityCheckStore']);
     Route::get('qualityCheck',[QualityController::class, 'getQualityChecks']);
 });
