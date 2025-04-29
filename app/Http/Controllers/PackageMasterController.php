@@ -49,16 +49,39 @@ class PackageMasterController extends Controller
         try {
             $order = Order::findOrFail($request->input('order_id'));
 
-            if ($order->status === 'checked') {
-                $order->status = 'packaging';
-                $order->save();
+            // 1. Jami hozirgacha qadoqlangan mahsulotlar
+            $existingTotal = $order->packageOutcomes()
+                ->selectRaw('SUM(package_size * package_quantity) as total')
+                ->value('total') ?? 0;
+
+            // 2. Yangi kirayotgan paket miqdori
+            $newTotal = $request->input('package_size') * $request->input('package_quantity');
+
+            $combinedTotal = $existingTotal + $newTotal;
+
+            // 3. Tekshir: umumiy miqdordan oshmasligi kerak
+            if ($combinedTotal > $order->quantity) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Umumiy miqdordan oshib ketmasligi kerak.'
+                ], 422);
             }
 
+            // 4. Paketni yozamiz
             $order->packageOutcomes()->create([
                 'order_id' => $request->input('order_id'),
                 'package_size' => $request->input('package_size'),
                 'package_quantity' => $request->input('package_quantity'),
             ]);
+
+            // 5. Order statusini yangilaymiz
+            if ($combinedTotal === $order->quantity) {
+                $order->status = 'completed';
+            } elseif ($order->status === 'checked') {
+                $order->status = 'packaging';
+            }
+
+            $order->save();
 
             DB::commit();
 
