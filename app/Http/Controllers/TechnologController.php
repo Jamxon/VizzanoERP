@@ -980,12 +980,14 @@ class TechnologController extends Controller
 
                 // Agar detal qatori bo'lsa
                 if ($currentCategory && isset($row[0], $row[1], $row[2])) {
+                    //итого  larni yozmaslik kerak
+                    
                     PartSpecification::create([
                         'specification_category_id' => $currentCategory->id,
-                        'code' => $row[0],
-                        'name' => $row[1],
-                        'quantity' => is_numeric($row[2]) ? (int) $row[2] : 0,
-                        'comment' => $row[3] ?? null,
+                        'code' => $row[1],
+                        'name' => $row[2],
+                        'quantity' => is_numeric($row[3]) ? (int) $row[3] : 0,
+                        'comment' => $row[4] ?? null,
                     ]);
                 }
             }
