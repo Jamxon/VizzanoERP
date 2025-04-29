@@ -131,13 +131,12 @@ class QualityController extends Controller
 
     public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
     {
+        dd($request->all());
         $data = json_decode($request->input('data'), true);
 
         if (!$data) {
             return response()->json(['error' => 'Invalid JSON data'], 400);
         }
-
-        dd($data);
 
         $validatedData = $data->validate([
             'order_sub_model_id' => 'required|exists:order_sub_models,id',
