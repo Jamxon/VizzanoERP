@@ -131,39 +131,35 @@ class QualityController extends Controller
 
     public function qualityCheckStore(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = json_decode($request->input('data'), true);
-        dd($data);
-        if (!$data) {
-            return response()->json(['error' => 'Invalid JSON data'], 400);
-        }
-
-        $validatedData = $data->validate([
+        $validatedData = $request->validate([
             'order_sub_model_id' => 'required|exists:order_sub_models,id',
             'status' => 'required|boolean',
             'comment' => 'nullable|string',
             'descriptions' => 'nullable|array',
             'descriptions.*' => 'exists:quality_descriptions,id',
+            'image' => 'nullable|image|max:2048',
         ]);
 
+        // Rasmni saqlash
         $imageName = null;
-        if ($request->hasFile('image') && !empty($request->file('image'))) {
-                $image = $request->file('image');
-                $fileName = time() . '_' . $image->getClientOriginalName();
-                 //full path to image
-                $imageName = "/storage/images/" . $fileName;
-                $image->storeAs("/images/" . $fileName);
-
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            $image->storeAs('public/images', $fileName); // disk: public
+            $imageName = "/storage/images/" . $fileName;
         }
 
+        // Ma'lumotni bazaga yozish
         $qualityCheck = QualityCheck::create([
             'order_sub_model_id' => $validatedData['order_sub_model_id'],
             'status' => $validatedData['status'],
-            'image' => $imageName ?? null,
-            'user_id' => auth()->user()->id,
+            'image' => $imageName,
+            'user_id' => auth()->id(),
             'comment' => $validatedData['comment'] ?? null,
         ]);
 
-        if ($qualityCheck->status === false && !empty($validatedData['descriptions'])) {
+        // Agar xato bo'lsa descriptionlar qo'shiladi
+        if (!$qualityCheck->status && !empty($validatedData['descriptions'])) {
             foreach ($validatedData['descriptions'] as $description) {
                 QualityCheckDescription::create([
                     'quality_check_id' => $qualityCheck->id,
@@ -172,8 +168,9 @@ class QualityController extends Controller
             }
         }
 
-        return response()->json($qualityCheck);
+        return response()->json(['message' => 'Saqlash muvaffaqiyatli', 'data' => $qualityCheck]);
     }
+
 
     public function getQualityChecks(Request $request): \Illuminate\Http\JsonResponse
     {
