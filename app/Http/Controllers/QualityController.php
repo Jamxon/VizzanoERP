@@ -151,6 +151,8 @@ class QualityController extends Controller
                 'descriptions' => json_decode($request->input('descriptions'), true),
             ]);
         }
+
+        dd($request->all());
         $validatedData = $request->validate([
             'order_sub_model_id' => 'required|exists:order_sub_models,id',
             'status' => 'required|boolean',
