@@ -29,6 +29,14 @@ class QualityCheck extends Model
         'updated_at',
     ];
 
+    public function getImageAttribute($value)
+    {
+        if ($value) {
+            return url($value);
+        }
+        return null;
+    }
+
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);
