@@ -153,7 +153,7 @@ class QualityController extends Controller
         ]);
 
         // Submodel va unga tegishli orderni oldindan olish (1 query)
-        $submodel = OrderSubModel::with('orderModel.order')->findOrFail($validated['order_sub_model_id']);
+        $submodel = OrderSubModel::where('id', $validated['order_sub_model_id'])->with('orderModel.order')->first();
         $order = $submodel->orderModel->order;
 
         if (!$order) {
