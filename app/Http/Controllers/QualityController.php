@@ -137,6 +137,8 @@ class QualityController extends Controller
             return response()->json(['error' => 'Invalid JSON data'], 400);
         }
 
+        dd($data);
+
         $validatedData = $data->validate([
             'order_sub_model_id' => 'required|exists:order_sub_models,id',
             'status' => 'required|boolean',
