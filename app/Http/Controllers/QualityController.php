@@ -156,8 +156,6 @@ class QualityController extends Controller
         $submodel = OrderSubModel::where('id', $validated['order_sub_model_id'])->with('orderModel.order')->first();
         $order = $submodel->orderModel->order;
 
-        dd($order);
-
         if (!$order) {
             return response()->json([
                 'status' => 'error',
@@ -170,6 +168,7 @@ class QualityController extends Controller
             $query->where('order_id', $order->id);
         })->where('status', true)->count();
 
+        dd($trueChecksCount);
         // Limit tekshiruvi
         if ($trueChecksCount >= $order->quantity) {
             return response()->json([
