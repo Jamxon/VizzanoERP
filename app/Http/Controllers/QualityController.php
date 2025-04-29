@@ -152,7 +152,7 @@ class QualityController extends Controller
             'comment' => 'nullable|string',
             'descriptions' => 'nullable|array',
             'descriptions.*' => 'exists:quality_descriptions,id',
-            'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:20480',
         ]);
 
         // Rasmni saqlash
