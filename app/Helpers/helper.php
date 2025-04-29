@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Http;
+
 if (!function_exists('transliterate')) {
     /**
      * Transliterate a given text from Cyrillic to Latin or vice versa.
@@ -29,4 +31,20 @@ if (!function_exists('transliterate')) {
             'yu'=>'ю','ya'=>'я','q'=>'қ','g‘'=>'ғ',
         ]);
     }
+
+    function translateToUzFree($text)
+    {
+        $response = Http::get('https://api.mymemory.translated.net/get', [
+            'q' => $text,
+            'langpair' => 'ru|uz'
+        ]);
+
+        if ($response->successful()) {
+            return $response['responseData']['translatedText'] ?? $text;
+        }
+
+        return $text;
+    }
+
+
 }
