@@ -137,12 +137,13 @@ class QualityController extends Controller
             return response()->json(['error' => 'Invalid JSON data'], 400);
         }
 
-        $validatedData = Validator::make($data, [
-            'order_sub_model_id' => 'required|integer|exists:order_sub_models,id',
+        $validatedData = $data->validate([
+            'order_sub_model_id' => 'required|exists:order_sub_models,id',
             'status' => 'required|boolean',
             'comment' => 'nullable|string',
             'descriptions' => 'nullable|array',
-        ])->validate();
+            'descriptions.*' => 'exists:quality_descriptions,id',
+        ]);
 
         $imageName = null;
         if ($request->hasFile('image') && !empty($request->file('image'))) {
