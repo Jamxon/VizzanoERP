@@ -40,12 +40,12 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
     Route::get('employees/working', [SuperHRController::class, 'getWorkingEmployees']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
-    
     Route::get('attendances', [AttendanceController::class, 'getAttendances']);
     Route::get('attendances/history', [AttendanceController::class, 'getAttendanceHistory']);
     Route::post('attendances', [AttendanceController::class, 'storeAttendance']);
     Route::patch('attendances/{attendance}', [AttendanceController::class, 'updateAttendance']);
     Route::get('orders', [InternalAccountantController::class, 'getOrders']);
+    Route::get('tarifications/search', [InternalAccountantController::class, 'searchTarifications']);
 });
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
