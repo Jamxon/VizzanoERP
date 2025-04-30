@@ -112,7 +112,7 @@ class OrderController extends Controller
         $contragent->update([
             'name' => $request->name,
             'description' => $request->description,
-        ])->save();
+        ]);
 
         return response()->json($contragent);
     }

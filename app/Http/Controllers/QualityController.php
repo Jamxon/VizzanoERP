@@ -104,47 +104,6 @@ class QualityController extends Controller
         return response()->json($order);
     }
 
-    public function qualityDescriptionStore(Request $request): \Illuminate\Http\JsonResponse
-    {
-
-        $request->validate([
-            'description' => 'required|string',
-        ]);
-
-        $qualityDescription = QualityDescription::create(
-            [
-                'description' => $request->description,
-                'user_id' => auth()->user()->id
-            ]
-        );
-
-        return response()->json($qualityDescription);
-    }
-
-    public function getQualityDescription(): \Illuminate\Http\JsonResponse
-    {
-        $qualityDescriptions = QualityDescription::where('user_id', auth()->id())
-            ->get();
-
-        return response()->json($qualityDescriptions);
-
-    }
-
-    public function updateQualityDescription(Request $request, QualityDescription $qualityDescription): \Illuminate\Http\JsonResponse
-    {
-        $request->validate([
-            'description' => 'required|string',
-        ]);
-
-        $qualityDescription->update(
-            [
-                'description' => $request->description,
-            ]
-        );
-
-        return response()->json($qualityDescription);
-    }
-
     public function qualityCheckSuccessStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
@@ -198,7 +157,6 @@ class QualityController extends Controller
             'data' => $qualityCheck
         ]);
     }
-
 
     public function qualityCheckFailureStore(Request $request): \Illuminate\Http\JsonResponse
     {
