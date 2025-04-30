@@ -24,8 +24,8 @@ class QualityCheckDescription extends Model
         return $this->belongsTo(QualityCheck::class, 'quality_check_id');
     }
 
-    public function qualityDescription(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function tarification(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(QualityDescription::class, 'quality_description_id');
+        return $this->belongsTo(Tarification::class, 'quality_description_id');
     }
 }
