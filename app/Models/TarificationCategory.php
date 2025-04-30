@@ -27,12 +27,12 @@ class TarificationCategory extends Model
         'updated_at',
     ];
 
-    public function submodel()
+    public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(OrderSubModel::class, 'submodel_id');
     }
 
-    public function tarifications()
+    public function tarifications(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Tarification::class);
     }
