@@ -161,19 +161,19 @@ class QualityController extends Controller
     public function qualityCheckFailureStore(Request $request): \Illuminate\Http\JsonResponse
     {
         // JSON formatda kelsa, descriptionsni arrayga aylantirib qo'yamiz
-        $descriptions = $request->input('descriptions');
-        if (is_string($descriptions)) {
-            $descriptions = json_decode($descriptions, true);
+        $tarifications = $request->input('tarifications');
+        if (is_string($tarifications)) {
+            $tarifications = json_decode($tarifications, true);
         }
 
         $requestData = $request->all();
-        $requestData['descriptions'] = $descriptions;
+        $requestData['tarifications'] = $tarifications;
 
         $validated = validator($requestData, [
             'order_sub_model_id' => 'required|exists:order_sub_models,id',
             'comment' => 'nullable|string',
-            'descriptions' => 'nullable|array',
-            'descriptions.*' => 'exists:quality_descriptions,id',
+            'tarifications' => 'nullable|array',
+            'tarifications.*' => 'exists:tarifications,id',
             'image' => 'nullable|image|max:20480',
         ])->validate();
 
@@ -196,8 +196,8 @@ class QualityController extends Controller
         ]);
 
         // Descriptionlar kiritish
-        if (!empty($validated['descriptions'])) {
-            foreach ($validated['descriptions'] as $descriptionId) {
+        if (!empty($validated['tarifications'])) {
+            foreach ($validated['tarifications'] as $descriptionId) {
                 QualityCheckDescription::create([
                     'quality_check_id' => $qualityCheck->id,
                     'quality_description_id' => $descriptionId,
