@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use Illuminate\Http\Request;
 
@@ -32,12 +33,10 @@ class InternalAccountantController extends Controller
     public function searchTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         $search = $request->input('search');
-        $tarifications = TarificationCategory::whereHas('tarifications', function ($query) use ($search) {
-            $query->where('name', 'like', "%$search%")
+        $tarifications = Tarification::where('name', 'like', "%$search%")
                 ->orWhere('razryad_id', 'like', "%$search%")
                 ->orWhere('typewriter_id', 'like', "%$search%")
-                ->orWhere('code', 'like', "%$search%");
-        })
+                ->orWhere('code', 'like', "%$search%")
             ->with(
                 'tarifications',
                 'tarifications.employee',
