@@ -35,6 +35,15 @@ use App\Http\Controllers\TailorMasterController;
 use App\Models\QualityDescription;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () {
+    Route::get('employees', [SuperHRController::class, 'getEmployees']);
+    Route::get('attendances', [AttendanceController::class, 'getAttendances']);
+    Route::get('attendances/history', [AttendanceController::class, 'getAttendanceHistory']);
+    Route::post('attendances', [AttendanceController::class, 'storeAttendance']);
+    Route::patch('attendances/{attendance}', [AttendanceController::class, 'updateAttendance']);
+
+});
+
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
     Route::post('/incoming', [WarehouseController::class, 'storeIncoming']);
     Route::get('/incoming', [WarehouseController::class, 'getIncoming']);
