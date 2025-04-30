@@ -10,6 +10,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupMasterController;
 use App\Http\Controllers\HikvisionEventController;
+use App\Http\Controllers\InternalAccountantController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
 use App\Http\Controllers\ModelController;
@@ -37,11 +38,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () {
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
+    Route::get('employees/working', [SuperHRController::class, 'getWorkingEmployees']);
+    Route::get('departments', [SuperHRController::class, 'getDepartments']);
+    
     Route::get('attendances', [AttendanceController::class, 'getAttendances']);
     Route::get('attendances/history', [AttendanceController::class, 'getAttendanceHistory']);
     Route::post('attendances', [AttendanceController::class, 'storeAttendance']);
     Route::patch('attendances/{attendance}', [AttendanceController::class, 'updateAttendance']);
-
+    Route::get('orders', [InternalAccountantController::class, 'getOrders']);
 });
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
