@@ -1107,7 +1107,7 @@ class TechnologController extends Controller
                     }
 
                     // Устанавливаем разряд по умолчанию
-                    $razryadName = $row['D'] ?? '1';
+                    $razryadName = $row['C'] ?? '1';
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
 
@@ -1152,5 +1152,5 @@ class TechnologController extends Controller
             ], 500);
         }
     }
-    
+
 }
