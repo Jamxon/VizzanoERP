@@ -364,11 +364,18 @@ class WarehouseController extends Controller
                         $q->orWhereRaw('CAST(user_id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
                         $q->orWhereRaw('CAST(order_id AS VARCHAR) LIKE ?', ['%' . $search . '%']);
 
+                        // Employee name orqali qidiruv
                         $q->orWhereHas('employee', function ($q) use ($likeSearch) {
                             $q->whereRaw('LOWER(name) LIKE ?', [$likeSearch]);
                         });
+
+                        // YANGI: item.code bo‘yicha qidiruv
+                        $q->orWhereHas('items.item', function ($q) use ($likeSearch) {
+                            $q->whereRaw('LOWER(code) LIKE ?', [$likeSearch]);
+                        });
                     });
                 })
+
 
                 // Eager load related models
                 ->with([

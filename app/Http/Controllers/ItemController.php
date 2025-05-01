@@ -155,7 +155,7 @@ class ItemController extends Controller
             'unit_id' => 'required|exists:units,id',
             'color_id' => 'required|exists:colors,id',
             'type_id' => 'required|exists:item_types,id',
-            'code' => 'nullable|unique:items,code',
+            'code' => 'nullable',
             'currency_id' => 'nullable|integer',
             'min_quantity' => 'nullable|numeric',
         ], [
@@ -197,7 +197,7 @@ class ItemController extends Controller
             'unit_id' => 'sometimes|exists:units,id',
             'color_id' => 'sometimes|exists:colors,id',
             'type_id' => 'sometimes|exists:item_types,id',
-            'code' => 'sometimes|unique:items,code,' . $item->id,
+            'code' => 'sometimes',
             'currency_id' => 'sometimes|integer',
             'min_quantity' => 'sometimes|numeric',
         ], [
