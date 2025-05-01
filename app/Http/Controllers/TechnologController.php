@@ -1022,8 +1022,6 @@ class TechnologController extends Controller
                 return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
             }
 
-            dd($file);
-
             try {
                 // Explicitly specify reader based on extension
                 $extension = strtolower($file->getClientOriginalExtension());
@@ -1039,7 +1037,7 @@ class TechnologController extends Controller
 
                 $spreadsheet = $reader->load($file->getPathname());
                 $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-
+                dd($sheet);
             } catch (\Exception $e) {
                 return response()->json(['message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage()], 422);
             }
