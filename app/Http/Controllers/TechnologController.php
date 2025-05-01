@@ -1035,9 +1035,11 @@ class TechnologController extends Controller
                     return response()->json(['message' => 'Noto\'g\'ri fayl formati. XLSX, XLS yoki ODS formatidagi fayl yuklang'], 422);
                 }
 
+                libxml_use_internal_errors(false); // Bu faqat PhpSpreadsheet ichida silent errorni ochib beradi
+
                 $spreadsheet = $reader->load($file->getPathname());
                 $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-                dd($sheet);
+
             } catch (\Exception $e) {
                 return response()->json(['message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage()], 422);
             }
