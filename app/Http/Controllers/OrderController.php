@@ -32,7 +32,7 @@ class OrderController extends Controller
             'orderModel.sizes',
             'orderModel.submodels.submodel.orderRecipes',
             'orderModel.submodels.group',
-            'orderModel.submodels.qualityChecks.qualityCheckDescriptions.qualityDescription',
+            'orderModel.submodels.qualityChecks.qualityCheckDescriptions.tarification',
             'orderModel.submodels.sewingOutputs',
             'orderModel.submodels.otkOrderGroup',
             'instructions',
