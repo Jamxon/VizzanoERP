@@ -1006,6 +1006,8 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
+        dd($request->file('file')->getMimeType());
+
         try {
             if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
                 return response()->json(['message' => 'Fayl topilmadi yoki noto‘g‘ri yuborilgan'], 422);
