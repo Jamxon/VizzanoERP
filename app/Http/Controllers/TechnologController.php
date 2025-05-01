@@ -1007,95 +1007,142 @@ class TechnologController extends Controller
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
-                return response()->json(['message' => "Fayl topilmadi yoki noto'g'ri yuborilgan"], 422);
-        }
+            \Log::info('Starting tarification import');
+
+            if (!$request->hasFile('file')) {
+                \Log::error('No file was uploaded');
+                return response()->json(['message' => 'Fayl yuklashda xatolik: fayl yuklanmagan'], 422);
+            }
+
+            if (!$request->file('file')->isValid()) {
+                \Log::error('Uploaded file is not valid');
+                return response()->json(['message' => 'Fayl yuklashda xatolik: fayl yaroqsiz'], 422);
+            }
 
             $file = $request->file('file');
             $submodelId = $request->input('submodel_id');
 
-            $rows = app(Excel::class)->toArray([], $file, null, Excel::XLSX); // yoki ODS, XLS
-            $sheet = $rows[0];
+            if (empty($submodelId)) {
+                \Log::error('No submodel_id provided');
+                return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
+            }
+
+            \Log::info('File received, processing Excel data');
+
+            try {
+                // Explicitly specify reader based on extension
+                $extension = strtolower($file->getClientOriginalExtension());
+                if ($extension == 'xlsx') {
+                    $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+                } elseif ($extension == 'xls') {
+                    $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+                } elseif ($extension == 'ods') {
+                    $reader = new \PhpOffice\PhpSpreadsheet\Reader\Ods();
+                } else {
+                    \Log::error('Unsupported file extension: ' . $extension);
+                    return response()->json(['message' => 'Noto\'g\'ri fayl formati. XLSX, XLS yoki ODS formatidagi fayl yuklang'], 422);
+                }
+
+                $spreadsheet = $reader->load($file->getPathname());
+                $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+            } catch (\Exception $e) {
+                \Log::error('Failed to parse Excel file: ' . $e->getMessage());
+                return response()->json(['message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage()], 422);
+            }
 
             // Verify we have data
             if (empty($sheet) || count($sheet) < 3) {
+                \Log::error('Not enough data in the file');
                 return response()->json(['message' => 'Faylda ma\'lumot topilmadi yoki format noto\'g\'ri'], 422);
             }
 
+            \Log::info('Starting database transaction');
             DB::beginTransaction();
 
-            // Extract category name from first or second row based on your file structure
-            // In the example file, it appears at the top "730825 и 731225"
-            $categoryName = trim($sheet[0][2] ?? 'Nomaʼlum kategoriya');
+            try {
+                // Get the title from the first row (will be first column's value in the standard Excel reader format)
+                $categoryName = trim($sheet[1]['C'] ?? 'Nomaʼlum kategoriya');
+                \Log::info('Category name: ' . $categoryName);
 
-            $category = TarificationCategory::create([
-                'name' => $categoryName,
-                'submodel_id' => $submodelId,
-            ]);
-
-            // Skip header rows and start processing from data rows
-            // Based on your example, data starts from row 3 (index 2)
-            foreach (array_slice($sheet, 2) as $row) {
-                // Check if this is the "Прокламелин" section heading or empty row
-                if (empty($row[0]) && empty($row[1]) && !empty($row[2]) && empty($row[3])) {
-                    // This is likely a section header, save it to use as a prefix for the next items
-                    $sectionPrefix = trim($row[2]);
-                    continue;
-                }
-
-                // Skip if missing essential data (seconds or description)
-                // Column 0 = seconds, Column 1 = costs, Column 2 = operation description
-                if (empty($row[0]) || empty($row[2])) {
-                    continue;
-                }
-
-                $seconds = (float) $row[0];     // Column "секунды"
-                $costs = (float) $row[1];       // Column "затраты"
-                $description = trim($row[2]);   // Column "описание рабочей операции"
-
-                // The last column seems to be quantity or some other value, usually "1"
-                // We'll store it as a code or identifier if needed
-                $quantityOrCode = trim($row[3] ?? '1');
-
-                // If we're in a section (like "Прокламелин"), prefix the description
-                if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
-                    $description = "$sectionPrefix - $description";
-                }
-
-                // Determine razryad (if your system requires it)
-                // This is a placeholder - you may need to calculate this based on other factors
-                $razryadName = "1"; // Default value based on the table
-                $razryad = Razryad::where('name', $razryadName)->first();
-                $razryadId = $razryad?->id;
-                $razryadSumma = $razryad?->summa ?? 0;
-
-                // Create the tarification record
-                Tarification::create([
-                    'tarification_category_id' => $category->id,
-                    'user_id' => null,
-                    'name' => $description,
-                    'razryad_id' => $razryadId,
-                    'typewriter_id' => null,
-                    'second' => $seconds,
-                    'summa' => $costs, // Use the actual costs from column 1 instead of calculating
-                    'code' => $this->generateSequentialCode(),
+                $category = TarificationCategory::create([
+                    'name' => $categoryName,
+                    'submodel_id' => $submodelId,
                 ]);
+
+                \Log::info('Category created with ID: ' . $category->id);
+
+                $sectionPrefix = null;
+
+                // Start from row 3 (our data rows)
+                foreach (array_slice($sheet, 3, null, true) as $rowNum => $row) {
+                    \Log::debug("Processing row {$rowNum}: " . json_encode($row));
+
+                    // Check if this is a section header (like "Прокламелин")
+                    if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
+                        $sectionPrefix = trim($row['C']);
+                        \Log::info("Found section header: {$sectionPrefix}");
+                        continue;
+                    }
+
+                    // Skip rows without essential data
+                    if (empty($row['A']) || empty($row['C'])) {
+                        \Log::debug("Skipping row {$rowNum}: missing essential data");
+                        continue;
+                    }
+
+                    $seconds = (float) str_replace(',', '.', $row['A']); // Handle both comma and period decimal separators
+                    $costs = (float) str_replace(',', '.', $row['B']);
+                    $description = trim($row['C']);
+
+                    // Process section prefixes if applicable
+                    if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
+                        $description = "{$sectionPrefix} - {$description}";
+                    }
+
+                    // Set default razryad
+                    $razryadName = "1";
+                    $razryad = Razryad::where('name', $razryadName)->first();
+                    $razryadId = $razryad?->id;
+
+                    \Log::debug("Creating tarification: {$seconds}s, {$costs}sum, {$description}");
+
+                    // Create the tarification record
+                    Tarification::create([
+                        'tarification_category_id' => $category->id,
+                        'user_id' => auth()->id(), // Use logged in user if available
+                        'name' => $description,
+                        'razryad_id' => $razryadId,
+                        'typewriter_id' => null,
+                        'second' => $seconds,
+                        'summa' => $costs,
+                        'code' => $this->generateSequentialCode(),
+                    ]);
+                }
+
+                DB::commit();
+                \Log::info('Tarification import completed successfully');
+
+                return response()->json(['message' => 'Tarifikatsiya muvaffaqiyatli import qilindi']);
+
+            } catch (\Exception $e) {
+                \Log::error('Error in database operations: ' . $e->getMessage());
+                DB::rollBack();
+                throw $e; // Re-throw to be caught by the outer try-catch
             }
 
-            DB::commit();
-
-            return response()->json(['message' => 'Tarifikatsiya muvaffaqiyatli import qilindi']);
         } catch (\Throwable $e) {
             DB::rollBack();
+            \Log::error('Exception during import: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
 
             return response()->json([
                 'message' => 'Xatolik yuz berdi!',
                 'error' => $e->getMessage(),
-                'trace' => collect($e->getTrace())->take(5),
+                'trace' => collect($e->getTrace())->take(5)->toArray(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
             ], 500);
         }
     }
-
+    
 }
