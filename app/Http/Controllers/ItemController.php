@@ -218,8 +218,9 @@ class ItemController extends Controller
             }
 
             $item->image = $imagePath;
-        }elseif($request->image == null){
-            // Eski rasmni o'chirish
+        }
+
+        if (!$request->hasFile('image') && $request->filled('image') && $request->input('image') === null) {
             if ($item->image && Storage::exists('public/' . $item->image)) {
                 Storage::delete('public/' . $item->image);
             }
