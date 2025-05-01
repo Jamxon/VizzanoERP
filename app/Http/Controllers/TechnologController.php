@@ -1074,7 +1074,7 @@ class TechnologController extends Controller
 
             try {
                 // Получаем название категории из первой строки
-                $categoryName = trim($sheet[2]['C'] ?? 'Nomaʼlum kategoriya');
+                $categoryName = trim($sheet[2]['B'] ?? 'Nomaʼlum kategoriya');
 
                 $category = TarificationCategory::create([
                     'name' => $categoryName,
