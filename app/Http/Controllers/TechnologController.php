@@ -1006,22 +1006,15 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
-        dd($request->file('file')->getMimeType());
-
         try {
             if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
                 return response()->json(['message' => 'Fayl topilmadi yoki noto‘g‘ri yuborilgan'], 422);
             }
-            // Validatsiyani ham try ichiga olamiz
-            $request->validate([
-                'file' => 'required|file|mimetypes:application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.spreadsheet',
-                'submodel_id' => 'required|exists:order_sub_models,id',
-            ]);
 
             $file = $request->file('file');
             $submodelId = $request->input('submodel_id');
 
-            $rows = Excel::toArray([], $file);
+            $rows = Excel::toArray([], $request->file('file'), null, Excel::XLSX);
             $sheet = $rows[0];
 
             DB::beginTransaction();
