@@ -1029,7 +1029,7 @@ class TechnologController extends Controller
             ]);
 
             // 3-qatordan boshlab tarifflar
-            foreach (array_slice($sheet, 3) as $row) {
+            foreach (array_slice($sheet, 2) as $row) {
                 if (
                     empty($row[1]) ||  // second (затраты)
                     empty($row[2])     // name
