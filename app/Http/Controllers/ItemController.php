@@ -157,7 +157,6 @@ class ItemController extends Controller
             'code' => 'nullable',
             'currency_id' => 'nullable|integer',
             'min_quantity' => 'nullable|numeric',
-            'lot' => 'nullable|numeric',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
@@ -181,7 +180,7 @@ class ItemController extends Controller
             'branch_id' => auth()->user()->employee->branch_id,
             'currency_id' => $validated['currency_id'],
             'min_quantity' => $validated['min_quantity'] ?? 0,
-            'lot' => $validated['lot'] ?? null,
+            'lot' => $validated['lot'] !== '' ? $validated['lot'] : null,
         ]);
 
         return response()->json([
@@ -238,7 +237,7 @@ class ItemController extends Controller
             $item->code = $validated['code'] ?? $item->code;
             $item->currency_id = $validated['currency_id'] ?? $item->currency_id;
             $item->min_quantity = $validated['min_quantity'] ?? $item->min_quantity;
-            $item->lot = $validated['lot'] ?? $item->lot;
+            $item->lot = $validated['lot'] !== '' ? $validated['lot'] : null;
             $item->branch_id = auth()->user()->employee->branch_id;
 
             $item->save();
