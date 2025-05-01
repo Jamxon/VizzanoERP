@@ -376,7 +376,6 @@ class WarehouseController extends Controller
                     });
                 })
 
-
                 // Eager load related models
                 ->with([
                     'items.currency',
