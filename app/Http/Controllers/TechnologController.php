@@ -1074,7 +1074,7 @@ class TechnologController extends Controller
 
             try {
                 // Получаем название категории из первой строки
-                $categoryName = trim($sheet[2]['B'] ?? 'Nomaʼlum kategoriya');
+                $categoryName = trim($sheet[1]['B'] ?? 'Nomaʼlum kategoriya');
 
                 $category = TarificationCategory::create([
                     'name' => $categoryName,
@@ -1084,7 +1084,7 @@ class TechnologController extends Controller
                 $sectionPrefix = null;
 
                 // Начинаем обработку с 3-й строки
-                for ($rowNum = 3; $rowNum <= count($sheet); $rowNum++) {
+                for ($rowNum = 2; $rowNum <= count($sheet); $rowNum++) {
                     $row = $sheet[$rowNum] ?? [];
 
                     // Проверка на наличие заголовка секции (например, "Прокламелин")
