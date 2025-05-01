@@ -17,15 +17,14 @@ class ItemController extends Controller
     {
         $query = strtolower($request->get('search'));
         $type = $request->input('type_id');
+
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($q) use ($query) {
                 $q->orWhereRaw('LOWER(name) LIKE ?', ["%$query%"])
-                    ->orWhere('code', 'like', "%$query%");
+                    ->orWhereRaw('LOWER(code) LIKE ?', ["%$query%"]);
             })
-            ->when($type, function ($q) use ($type) {
-                $q->where('type_id', $type);
-            })
-            ->with('unit', 'color', 'type','currency')
+            ->when($type, fn($q) => $q->where('type_id', $type))
+            ->with('unit', 'color', 'type', 'currency')
             ->orderBy('updated_at', 'desc')
             ->paginate(10);
 
@@ -39,7 +38,7 @@ class ItemController extends Controller
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
             ->where(function ($q) use ($query) {
                 $q->orWhereRaw('LOWER(name) LIKE ?', ["%$query%"])
-                    ->orWhere('code', 'like', "%$query%");
+                    ->orWhereRaw('LOWER(code) LIKE ?', ["%$query%"]);
             })
             ->when($type, function ($q) use ($type) {
                 $q->where('type_id', $type);
