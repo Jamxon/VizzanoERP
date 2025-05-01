@@ -1090,10 +1090,11 @@ class TechnologController extends Controller
                     $row = $sheet[$rowNum] ?? [];
 
                     $seconds = isset($row['B']) ? str_replace(',', '.', (string)$row['B']) : null;
-                    $razryadName = $row['D'] ?? null;
-                    $description = trim((string)($row['C'] ?? ''));
+                    $costsValue = $row['C'] ?? null;
+                    $description = trim((string)($row['D'] ?? ''));
+                    $razryadName = $row['A'] ?? null;
 
-                    // ✅ Yangi kategoriya aniqlash (agar B va D bo‘sh bo‘lsa, C to‘lsa)
+                    // Kategoriya qatori (masalan: "Прокламелин", "Утеплитель")
                     if (empty($row['B']) && empty($razryadName) && !empty($description)) {
                         $currentCategory = TarificationCategory::create([
                             'name' => $description,
@@ -1102,17 +1103,15 @@ class TechnologController extends Controller
                         continue;
                     }
 
-                    // ❌ Category yo'q bo'lsa, bu qatorni o'tkazamiz
+                    // Operatsiya mavjud bo‘lishi uchun description va seconds kerak
                     if (!$currentCategory || empty($seconds) || empty($description)) {
                         continue;
                     }
 
-                    // ✅ Razryadni aniqlash
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
                     $costs = ((float)$seconds) * ($razryad?->salary ?? 0);
 
-                    // ✅ Tarification yaratish
                     Tarification::create([
                         'tarification_category_id' => $currentCategory->id,
                         'user_id' => null,
@@ -1124,6 +1123,7 @@ class TechnologController extends Controller
                         'code' => $this->generateSequentialCode(),
                     ]);
                 }
+
 
                 DB::commit();
 
