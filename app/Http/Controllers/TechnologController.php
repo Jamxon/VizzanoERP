@@ -1006,16 +1006,21 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
-
-        $file = $request->file('file');
-        $submodelId = $request->input('submodel_id');
-
-        $rows = Excel::toArray([], $file);
-        $sheet = $rows[0];
-
-        DB::beginTransaction();
-
         try {
+            // Validatsiyani ham try ichiga olamiz
+            $request->validate([
+                'file' => 'required|file|mimes:xlsx,xls,ods',
+                'submodel_id' => 'required|exists:order_sub_models,id',
+            ]);
+
+            $file = $request->file('file');
+            $submodelId = $request->input('submodel_id');
+
+            $rows = Excel::toArray([], $file);
+            $sheet = $rows[0];
+
+            DB::beginTransaction();
+
             // 2-qator: tarification category nomi
             $categoryName = trim($sheet[1][2] ?? 'Nomaʼlum kategoriya');
 
@@ -1034,7 +1039,7 @@ class TechnologController extends Controller
                 }
 
                 $description = trim($row[2]);
-                $seconds = (float) $row[1]; // B ustun — second sifatida
+                $seconds = (float) $row[1];
                 $razryadName = trim($row[3] ?? '');
 
                 $razryad = Razryad::where('name', $razryadName)->first();
@@ -1060,8 +1065,9 @@ class TechnologController extends Controller
             DB::rollBack();
 
             return response()->json([
-                'message' => 'Xatolik yuz berdi',
+                'message' => 'Xatolik yuz berdi!',
                 'error' => $e->getMessage(),
+                // 'trace' => $e->getTraceAsString(), // xohlasa qo‘shing
             ], 500);
         }
     }
