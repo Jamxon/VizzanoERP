@@ -1037,7 +1037,7 @@ class TechnologController extends Controller
 
                 $spreadsheet = $reader->load($file->getPathname());
                 $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-
+                dd($sheet);
             } catch (\Exception $e) {
                 return response()->json(['message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage()], 422);
             }
