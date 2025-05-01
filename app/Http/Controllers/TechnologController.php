@@ -1010,10 +1010,9 @@ class TechnologController extends Controller
             if (!$request->hasFile('file')) {
                 return response()->json(['message' => 'Fayl topilmadi yoki noto‘g‘ri yuborilgan'], 422);
             }
-
             // Validatsiyani ham try ichiga olamiz
             $request->validate([
-                'file' => 'required|file|mimes:xlsx,xls,ods',
+                'file' => 'required|file',
                 'submodel_id' => 'required|exists:order_sub_models,id',
             ]);
 
