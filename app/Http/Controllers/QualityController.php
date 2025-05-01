@@ -91,21 +91,28 @@ class QualityController extends Controller
 
     public function showOrder($id): \Illuminate\Http\JsonResponse
     {
-        $order = Order::find($id);
-        $order->load(
-            'orderModel',
-            'orderModel.model',
-            'orderModel.sizes.size',
-            'orderModel.material',
-            'orderModel.submodels.submodel',
-            'orderModel.submodels.group.group',
-            'orderModel.submodels.tarificationCategories',
-            'orderModel.submodels.tarificationCategories',
-            'orderModel.submodels.tarificationCategories.tarifications',
-            'orderModel.submodels.tarificationCategories.tarifications.employee',
-            'orderModel.submodels.tarificationCategories.tarifications.razryad',
-            'orderModel.submodels.tarificationCategories.tarifications.typewriter',
-        );
+        $order = Order::where('id', $id)
+            ->whereIn('status', ['tailoring', 'tailored', 'checking'])
+            ->with(
+                'orderModel',
+                'orderModel.model',
+                'orderModel.sizes.size',
+                'orderModel.material',
+                'orderModel.submodels.submodel',
+                'orderModel.submodels.group.group',
+                'orderModel.submodels.tarificationCategories',
+                'orderModel.submodels.tarificationCategories.tarifications',
+                'orderModel.submodels.tarificationCategories.tarifications.employee',
+                'orderModel.submodels.tarificationCategories.tarifications.razryad',
+                'orderModel.submodels.tarificationCategories.tarifications.typewriter',
+            )
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'message' => 'Buyurtma topilmadi yoki ruxsat etilgan statuslarda emas.'
+            ], 404);
+        }
 
         return response()->json($order);
     }
