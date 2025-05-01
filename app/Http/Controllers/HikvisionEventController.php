@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\EmployeeCheckedIn;
 use App\Models\Log;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -49,6 +50,8 @@ class HikvisionEventController extends Controller
                     $attendance->check_in_image = $imagePath;
                     $attendance->status = 'present';
                     $attendance->save();
+
+                    broadcast(new EmployeeCheckedIn($employee, $eventTime, $imagePath));
 
                     Log::add(
                         $employee->user_id ?? null,
