@@ -28,6 +28,7 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEve
                 'items.price as Narxi',
                 'colors.name as Rangi',
                 'item_types.name as Turi',
+                'items.lot as Lot',
             ])
             ->get();
     }
@@ -43,6 +44,7 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEve
             'Narxi ($)',
             'Rangi',
             'Turi',
+            'Lot',
         ];
     }
 
@@ -85,6 +87,7 @@ class ItemsExport implements FromCollection, WithHeadings, WithDrawings, WithEve
                 $sheet->getColumnDimension('F')->setWidth(15);  // Column F
                 $sheet->getColumnDimension('G')->setWidth(15);  // Column G
                 $sheet->getColumnDimension('H')->setWidth(15);  // Column H
+                $sheet->getColumnDimension('I')->setWidth(15);  // Column I
 
                 // Har bir qatorning balandligini sozlash
                 $rowCount = Item::count() + 1; // Barcha qatorlar soni (header + ma'lumotlar)

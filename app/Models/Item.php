@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static findOrFail(mixed $item_id)
  * @property mixed $currency_id
  * @property mixed $min_quantity
+ * @property mixed $lot
  */
 class Item extends Model
 {
@@ -27,6 +28,7 @@ class Item extends Model
         'branch_id',
         'currency_id',
         'min_quantity',
+        'lot'
     ];
 
     protected $hidden = [
