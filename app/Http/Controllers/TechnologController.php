@@ -1008,8 +1008,8 @@ class TechnologController extends Controller
     {
         try {
             if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
-                return response()->json(['message' => 'Fayl topilmadi yoki noto‘g‘ri yuborilgan'], 422);
-            }
+                return response()->json(['message' => "Fayl topilmadi yoki noto'g'ri yuborilgan"], 422);
+        }
 
             $file = $request->file('file');
             $submodelId = $request->input('submodel_id');
@@ -1017,34 +1017,59 @@ class TechnologController extends Controller
             $rows = app(Excel::class)->toArray([], $file, null, Excel::XLSX); // yoki ODS, XLS
             $sheet = $rows[0];
 
+            // Verify we have data
+            if (empty($sheet) || count($sheet) < 3) {
+                return response()->json(['message' => 'Faylda ma\'lumot topilmadi yoki format noto\'g\'ri'], 422);
+            }
 
             DB::beginTransaction();
 
-            // 2-qator: tarification category nomi
-            $categoryName = trim($sheet[1][2] ?? 'Nomaʼlum kategoriya');
+            // Extract category name from first or second row based on your file structure
+            // In the example file, it appears at the top "730825 и 731225"
+            $categoryName = trim($sheet[0][2] ?? 'Nomaʼlum kategoriya');
 
             $category = TarificationCategory::create([
                 'name' => $categoryName,
                 'submodel_id' => $submodelId,
             ]);
 
-            // 3-qatordan boshlab tarifflar
+            // Skip header rows and start processing from data rows
+            // Based on your example, data starts from row 3 (index 2)
             foreach (array_slice($sheet, 2) as $row) {
-                if (
-                    empty($row[1]) ||  // second (затраты)
-                    empty($row[2])     // name
-                ) {
+                // Check if this is the "Прокламелин" section heading or empty row
+                if (empty($row[0]) && empty($row[1]) && !empty($row[2]) && empty($row[3])) {
+                    // This is likely a section header, save it to use as a prefix for the next items
+                    $sectionPrefix = trim($row[2]);
                     continue;
                 }
 
-                $description = trim($row[2]);
-                $seconds = (float) $row[1];
-                $razryadName = trim($row[3] ?? '');
+                // Skip if missing essential data (seconds or description)
+                // Column 0 = seconds, Column 1 = costs, Column 2 = operation description
+                if (empty($row[0]) || empty($row[2])) {
+                    continue;
+                }
 
+                $seconds = (float) $row[0];     // Column "секунды"
+                $costs = (float) $row[1];       // Column "затраты"
+                $description = trim($row[2]);   // Column "описание рабочей операции"
+
+                // The last column seems to be quantity or some other value, usually "1"
+                // We'll store it as a code or identifier if needed
+                $quantityOrCode = trim($row[3] ?? '1');
+
+                // If we're in a section (like "Прокламелин"), prefix the description
+                if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
+                    $description = "$sectionPrefix - $description";
+                }
+
+                // Determine razryad (if your system requires it)
+                // This is a placeholder - you may need to calculate this based on other factors
+                $razryadName = "1"; // Default value based on the table
                 $razryad = Razryad::where('name', $razryadName)->first();
                 $razryadId = $razryad?->id;
                 $razryadSumma = $razryad?->summa ?? 0;
 
+                // Create the tarification record
                 Tarification::create([
                     'tarification_category_id' => $category->id,
                     'user_id' => null,
@@ -1052,7 +1077,7 @@ class TechnologController extends Controller
                     'razryad_id' => $razryadId,
                     'typewriter_id' => null,
                     'second' => $seconds,
-                    'summa' => $razryadSumma * $seconds,
+                    'summa' => $costs, // Use the actual costs from column 1 instead of calculating
                     'code' => $this->generateSequentialCode(),
                 ]);
             }
