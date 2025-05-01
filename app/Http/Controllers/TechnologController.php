@@ -1074,7 +1074,7 @@ class TechnologController extends Controller
 
             try {
                 // Получаем название категории из первой строки
-                $categoryName = trim($sheet[1]['C'] ?? 'Nomaʼlum kategoriya');
+                $categoryName = trim($sheet[2]['C'] ?? 'Nomaʼlum kategoriya');
 
                 $category = TarificationCategory::create([
                     'name' => $categoryName,
@@ -1099,7 +1099,6 @@ class TechnologController extends Controller
                     }
 
                     $seconds = (float) str_replace(',', '.', (string)$row['A']); // Обработка десятичных разделителей
-                    $costs = (float) str_replace(',', '.', (string)$row['B']);
                     $description = trim((string)$row['C']);
 
                     // Обработка префиксов секций
@@ -1108,14 +1107,16 @@ class TechnologController extends Controller
                     }
 
                     // Устанавливаем разряд по умолчанию
-                    $razryadName = "1";
+                    $razryadName = $row['D'] ?? '1';
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
+
+                    $costs = $seconds * ($razryad?->salary ?? 0);
 
                     // Создаем запись тарификации
                     Tarification::create([
                         'tarification_category_id' => $category->id,
-                        'user_id' => auth()->id(), // Используем ID авторизованного пользователя
+                        'user_id' => null, // Используем ID авторизованного пользователя
                         'name' => $description,
                         'razryad_id' => $razryadId,
                         'typewriter_id' => null,
