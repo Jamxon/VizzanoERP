@@ -1006,6 +1006,8 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
+        ini_set('memory_limit', '512M'); // yoki '1G'
+
         try {
             if (!$request->hasFile('file')) {
                 return response()->json(['message' => 'Fayl yuklashda xatolik: fayl yuklanmagan'], 422);
@@ -1147,5 +1149,5 @@ class TechnologController extends Controller
             ], 500);
         }
     }
-    
+
 }
