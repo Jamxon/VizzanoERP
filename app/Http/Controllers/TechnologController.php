@@ -1007,15 +1007,11 @@ class TechnologController extends Controller
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            \Log::info('Starting tarification import');
-
             if (!$request->hasFile('file')) {
-                \Log::error('No file was uploaded');
                 return response()->json(['message' => 'Fayl yuklashda xatolik: fayl yuklanmagan'], 422);
             }
 
             if (!$request->file('file')->isValid()) {
-                \Log::error('Uploaded file is not valid');
                 return response()->json(['message' => 'Fayl yuklashda xatolik: fayl yaroqsiz'], 422);
             }
 
@@ -1023,11 +1019,8 @@ class TechnologController extends Controller
             $submodelId = $request->input('submodel_id');
 
             if (empty($submodelId)) {
-                \Log::error('No submodel_id provided');
                 return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
             }
-
-            \Log::info('File received, processing Excel data');
 
             try {
                 // Explicitly specify reader based on extension
@@ -1039,7 +1032,6 @@ class TechnologController extends Controller
                 } elseif ($extension == 'ods') {
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Ods();
                 } else {
-                    \Log::error('Unsupported file extension: ' . $extension);
                     return response()->json(['message' => 'Noto\'g\'ri fayl formati. XLSX, XLS yoki ODS formatidagi fayl yuklang'], 422);
                 }
 
@@ -1047,47 +1039,38 @@ class TechnologController extends Controller
                 $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 
             } catch (\Exception $e) {
-                \Log::error('Failed to parse Excel file: ' . $e->getMessage());
                 return response()->json(['message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage()], 422);
             }
 
             // Verify we have data
             if (empty($sheet) || count($sheet) < 3) {
-                \Log::error('Not enough data in the file');
                 return response()->json(['message' => 'Faylda ma\'lumot topilmadi yoki format noto\'g\'ri'], 422);
             }
 
-            \Log::info('Starting database transaction');
             DB::beginTransaction();
 
             try {
                 // Get the title from the first row (will be first column's value in the standard Excel reader format)
                 $categoryName = trim($sheet[1]['C'] ?? 'Nomaʼlum kategoriya');
-                \Log::info('Category name: ' . $categoryName);
 
                 $category = TarificationCategory::create([
                     'name' => $categoryName,
                     'submodel_id' => $submodelId,
                 ]);
 
-                \Log::info('Category created with ID: ' . $category->id);
-
                 $sectionPrefix = null;
 
                 // Start from row 3 (our data rows)
                 foreach (array_slice($sheet, 3, null, true) as $rowNum => $row) {
-                    \Log::debug("Processing row {$rowNum}: " . json_encode($row));
 
                     // Check if this is a section header (like "Прокламелин")
                     if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
                         $sectionPrefix = trim($row['C']);
-                        \Log::info("Found section header: {$sectionPrefix}");
                         continue;
                     }
 
                     // Skip rows without essential data
                     if (empty($row['A']) || empty($row['C'])) {
-                        \Log::debug("Skipping row {$rowNum}: missing essential data");
                         continue;
                     }
 
@@ -1105,8 +1088,6 @@ class TechnologController extends Controller
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
 
-                    \Log::debug("Creating tarification: {$seconds}s, {$costs}sum, {$description}");
-
                     // Create the tarification record
                     Tarification::create([
                         'tarification_category_id' => $category->id,
@@ -1121,19 +1102,16 @@ class TechnologController extends Controller
                 }
 
                 DB::commit();
-                \Log::info('Tarification import completed successfully');
 
                 return response()->json(['message' => 'Tarifikatsiya muvaffaqiyatli import qilindi']);
 
             } catch (\Exception $e) {
-                \Log::error('Error in database operations: ' . $e->getMessage());
                 DB::rollBack();
                 throw $e; // Re-throw to be caught by the outer try-catch
             }
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            \Log::error('Exception during import: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
 
             return response()->json([
                 'message' => 'Xatolik yuz berdi!',
@@ -1144,5 +1122,5 @@ class TechnologController extends Controller
             ], 500);
         }
     }
-    
+
 }
