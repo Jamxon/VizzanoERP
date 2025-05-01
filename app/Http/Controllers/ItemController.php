@@ -192,58 +192,67 @@ class ItemController extends Controller
 
     public function update(Request $request, Item $item): \Illuminate\Http\JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|string',
-            'price' => 'sometimes|numeric',
-            'unit_id' => 'sometimes|exists:units,id',
-            'color_id' => 'sometimes|exists:colors,id',
-            'type_id' => 'sometimes|exists:item_types,id',
-            'code' => 'sometimes',
-            'currency_id' => 'sometimes|integer',
-            'min_quantity' => 'sometimes|numeric',
-            'lot' => 'sometimes',
-        ], [
-            'code.unique' => 'Code must be unique',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'sometimes|string',
+                'price' => 'sometimes|numeric',
+                'unit_id' => 'sometimes|exists:units,id',
+                'color_id' => 'sometimes|exists:colors,id',
+                'type_id' => 'sometimes|exists:item_types,id',
+                'code' => 'sometimes',
+                'currency_id' => 'sometimes|integer',
+                'min_quantity' => 'sometimes|numeric',
+                'lot' => 'sometimes',
+            ]);
 
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('/items', $imageName);
-            $imagePath = str_replace('public/', '', $imagePath);
+            // 1. Rasm yangilanishi
+            if ($request->hasFile('image') && $request->file('image')->isValid()) {
+                $image = $request->file('image');
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $imagePath = $image->storeAs('/items', $imageName);
+                $imagePath = str_replace('public/', '', $imagePath);
 
-            // Eski rasmni o'chirish
-            if ($item->image && Storage::exists('public/' . $item->image)) {
-                Storage::delete('public/' . $item->image);
+                // eski rasmni o'chirish
+                if ($item->image && Storage::exists('public/' . $item->image)) {
+                    Storage::delete('public/' . $item->image);
+                }
+
+                $item->image = $imagePath;
             }
 
-            $item->image = $imagePath;
-        }
+            // 2. image = null deb kelsa
+            elseif ($request->has('image') && $request->input('image') === null) {
+                if ($item->image && Storage::exists('public/' . $item->image)) {
+                    Storage::delete('public/' . $item->image);
+                }
 
-        elseif ($request->has('image') && is_null($request->input('image'))) {
-            if ($item->image && Storage::exists('public/' . $item->image)) {
-                Storage::delete('public/' . $item->image);
+                $item->image = null;
             }
 
-            $item->image = null;
+            // 3. Qolgan ma'lumotlar
+            $item->name = $validated['name'] ?? $item->name;
+            $item->price = $validated['price'] ?? $item->price;
+            $item->unit_id = $validated['unit_id'] ?? $item->unit_id;
+            $item->color_id = $validated['color_id'] ?? $item->color_id;
+            $item->type_id = $validated['type_id'] ?? $item->type_id;
+            $item->code = $validated['code'] ?? $item->code;
+            $item->currency_id = $validated['currency_id'] ?? $item->currency_id;
+            $item->min_quantity = $validated['min_quantity'] ?? $item->min_quantity;
+            $item->lot = $validated['lot'] ?? $item->lot;
+            $item->branch_id = auth()->user()->employee->branch_id;
+
+            $item->save();
+
+            return response()->json([
+                'message' => 'Item updated successfully',
+                'item' => $item,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Xatolik yuz berdi!',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $item->name = $validated['name'] ?? $item->name;
-        $item->price = $validated['price'] ?? $item->price;
-        $item->unit_id = $validated['unit_id'] ?? $item->unit_id;
-        $item->color_id = $validated['color_id'] ?? $item->color_id;
-        $item->type_id = $validated['type_id'] ?? $item->type_id;
-        $item->code = $validated['code'] ?? $item->code;
-        $item->branch_id = auth()->user()->employee->branch_id;
-        $item->currency_id = $validated['currency_id'] ?? $item->currency_id;
-        $item->min_quantity = $validated['min_quantity'] ?? $item->min_quantity;
-        $item->lot = $validated['lot'] ?? null;
-        $item->save();
-
-        return response()->json([
-            'message' => 'Item updated successfully',
-            'item' => $item,
-        ]);
     }
 
 }
