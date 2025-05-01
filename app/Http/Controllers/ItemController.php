@@ -218,6 +218,12 @@ class ItemController extends Controller
             }
 
             $item->image = $imagePath;
+        }elseif($request->image == null){
+            // Eski rasmni o'chirish
+            if ($item->image && Storage::exists('public/' . $item->image)) {
+                Storage::delete('public/' . $item->image);
+            }
+            $item->image = null;
         }
 
         $item->name = $validated['name'] ?? $item->name;
