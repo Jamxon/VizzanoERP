@@ -1026,6 +1026,7 @@ class TechnologController extends Controller
                 // Explicitly specify reader based on extension
                 $extension = strtolower($file->getClientOriginalExtension());
                 if ($extension == 'xlsx') {
+                    dd($extension);
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
                 } elseif ($extension == 'xls') {
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
@@ -1037,7 +1038,6 @@ class TechnologController extends Controller
 
                 $spreadsheet = $reader->load($file->getPathname());
                 $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-                dd($sheet);
             } catch (\Exception $e) {
                 return response()->json(['message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage()], 422);
             }
