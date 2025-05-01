@@ -66,7 +66,7 @@ class ConstructorController extends Controller
             auth()->user()->id,
             "Buyurtmani kesishga jo'natildi",
             'constructor',
-            ['old_data' => $orderPrintingTime->status, 'order_id' => $id],
+            ['old_data' => $orderPrintingTime->status, 'order_id' => $order->id],
             ['new_data' => 'cutting']
         );
 
