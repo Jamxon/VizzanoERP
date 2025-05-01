@@ -1007,6 +1007,10 @@ class TechnologController extends Controller
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
+            if (!$request->hasFile('file')) {
+                return response()->json(['message' => 'Fayl topilmadi yoki noto‘g‘ri yuborilgan'], 422);
+            }
+
             // Validatsiyani ham try ichiga olamiz
             $request->validate([
                 'file' => 'required|file|mimes:xlsx,xls,ods',
