@@ -221,7 +221,7 @@ class ItemController extends Controller
             }
 
             // 2. image = null deb kelsa
-            elseif ($request->has('image') && $request->input('image') === null) {
+            elseif ($request->has('image') || $request->input('image') === null) {
                 if ($item->image && Storage::exists('public/' . $item->image)) {
                     Storage::delete('public/' . $item->image);
                 }
