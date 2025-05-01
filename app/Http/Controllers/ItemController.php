@@ -26,7 +26,7 @@ class ItemController extends Controller
             ->when($type, fn($q) => $q->where('type_id', $type))
             ->with('unit', 'color', 'type', 'currency')
             ->orderBy('updated_at', 'desc')
-            ->paginate(10);
+            ->paginate(30);
 
         return response()->json($items);
     }
