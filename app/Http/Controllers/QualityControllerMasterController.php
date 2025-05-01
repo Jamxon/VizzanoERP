@@ -48,7 +48,7 @@ class QualityControllerMasterController extends Controller
                     ->groupBy('quality_description_id')
                     ->map(fn($desc) => [
                         'id' => $desc->first()->id,
-                        'description' => $desc->first()->qualityDescription->description,
+                        'tarification' => $desc->first()->qualityDescription->tarification,
                         'count' => $desc->count(),
                     ])
                     ->values();
