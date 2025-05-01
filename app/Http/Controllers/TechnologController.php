@@ -1066,7 +1066,9 @@ class TechnologController extends Controller
             return response()->json([
                 'message' => 'Xatolik yuz berdi!',
                 'error' => $e->getMessage(),
-                // 'trace' => $e->getTraceAsString(), // xohlasa qo‘shing
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
             ], 500);
         }
     }
