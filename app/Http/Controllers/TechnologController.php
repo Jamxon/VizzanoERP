@@ -1029,6 +1029,8 @@ class TechnologController extends Controller
                 $extension = strtolower($file->getClientOriginalExtension());
                 if ($extension == 'xlsx') {
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+                    $reader->setReadDataOnly(true); // faqat data
+                    $reader->setReadEmptyCells(false);
                 } elseif ($extension == 'xls') {
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
                 } elseif ($extension == 'ods') {
