@@ -220,10 +220,11 @@ class ItemController extends Controller
             $item->image = $imagePath;
         }
 
-        if (!$request->hasFile('image') && $request->filled('image') && $request->input('image') === null) {
+        elseif ($request->has('image') && is_null($request->input('image'))) {
             if ($item->image && Storage::exists('public/' . $item->image)) {
                 Storage::delete('public/' . $item->image);
             }
+
             $item->image = null;
         }
 
