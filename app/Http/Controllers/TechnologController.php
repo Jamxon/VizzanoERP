@@ -1022,8 +1022,8 @@ class TechnologController extends Controller
                 return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
             }
 
+            // Простой подход без использования toArray()
             try {
-                // Explicitly specify reader based on extension
                 $extension = strtolower($file->getClientOriginalExtension());
                 if ($extension == 'xlsx') {
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
@@ -1035,16 +1035,33 @@ class TechnologController extends Controller
                     return response()->json(['message' => 'Noto\'g\'ri fayl formati. XLSX, XLS yoki ODS formatidagi fayl yuklang'], 422);
                 }
 
-                libxml_use_internal_errors(false); // Bu faqat PhpSpreadsheet ichida silent errorni ochib beradi
-
                 $spreadsheet = $reader->load($file->getPathname());
-                $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+                $worksheet = $spreadsheet->getActiveSheet();
+
+                // Считываем данные ячейка за ячейкой, чтобы избежать проблем с toArray()
+                $sheet = [];
+                $highestRow = $worksheet->getHighestRow();
+                $highestColumn = $worksheet->getHighestColumn();
+                $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+
+                for ($row = 1; $row <= $highestRow; $row++) {
+                    $rowData = [];
+                    for ($col = 1; $col <= $highestColumnIndex; $col++) {
+                        $cellValue = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col - 1);
+                        $rowData[$colLetter] = $cellValue;
+                    }
+                    $sheet[$row] = $rowData;
+                }
 
             } catch (\Exception $e) {
-                return response()->json(['message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage()], 422);
+                return response()->json([
+                    'message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage(),
+                    'error_details' => $e->getTraceAsString()
+                ], 422);
             }
 
-            // Verify we have data
+            // Проверка наличия данных
             if (empty($sheet) || count($sheet) < 3) {
                 return response()->json(['message' => 'Faylda ma\'lumot topilmadi yoki format noto\'g\'ri'], 422);
             }
@@ -1052,7 +1069,7 @@ class TechnologController extends Controller
             DB::beginTransaction();
 
             try {
-                // Get the title from the first row (will be first column's value in the standard Excel reader format)
+                // Получаем название категории из первой строки
                 $categoryName = trim($sheet[1]['C'] ?? 'Nomaʼlum kategoriya');
 
                 $category = TarificationCategory::create([
@@ -1062,38 +1079,39 @@ class TechnologController extends Controller
 
                 $sectionPrefix = null;
 
-                // Start from row 3 (our data rows)
-                foreach (array_slice($sheet, 3, null, true) as $rowNum => $row) {
+                // Начинаем обработку с 3-й строки
+                for ($rowNum = 3; $rowNum <= count($sheet); $rowNum++) {
+                    $row = $sheet[$rowNum] ?? [];
 
-                    // Check if this is a section header (like "Прокламелин")
+                    // Проверка на наличие заголовка секции (например, "Прокламелин")
                     if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
                         $sectionPrefix = trim($row['C']);
                         continue;
                     }
 
-                    // Skip rows without essential data
+                    // Пропускаем строки без основных данных
                     if (empty($row['A']) || empty($row['C'])) {
                         continue;
                     }
 
-                    $seconds = (float) str_replace(',', '.', $row['A']); // Handle both comma and period decimal separators
-                    $costs = (float) str_replace(',', '.', $row['B']);
-                    $description = trim($row['C']);
+                    $seconds = (float) str_replace(',', '.', (string)$row['A']); // Обработка десятичных разделителей
+                    $costs = (float) str_replace(',', '.', (string)$row['B']);
+                    $description = trim((string)$row['C']);
 
-                    // Process section prefixes if applicable
+                    // Обработка префиксов секций
                     if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
                         $description = "{$sectionPrefix} - {$description}";
                     }
 
-                    // Set default razryad
+                    // Устанавливаем разряд по умолчанию
                     $razryadName = "1";
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
 
-                    // Create the tarification record
+                    // Создаем запись тарификации
                     Tarification::create([
                         'tarification_category_id' => $category->id,
-                        'user_id' => auth()->id(), // Use logged in user if available
+                        'user_id' => auth()->id(), // Используем ID авторизованного пользователя
                         'name' => $description,
                         'razryad_id' => $razryadId,
                         'typewriter_id' => null,
@@ -1109,7 +1127,12 @@ class TechnologController extends Controller
 
             } catch (\Exception $e) {
                 DB::rollBack();
-                throw $e; // Re-throw to be caught by the outer try-catch
+
+                return response()->json([
+                    'message' => 'Xatolik yuz berdi!',
+                    'error' => $e->getMessage(),
+                    'details' => $e->getTraceAsString()
+                ], 500);
             }
 
         } catch (\Throwable $e) {
@@ -1124,5 +1147,5 @@ class TechnologController extends Controller
             ], 500);
         }
     }
-
+    
 }
