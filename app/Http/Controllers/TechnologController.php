@@ -1089,7 +1089,7 @@ class TechnologController extends Controller
                 for ($rowNum = 3; $rowNum <= count($sheet); $rowNum++) {
                     $row = $sheet[$rowNum] ?? [];
 
-                    $seconds = isset($row['A']) ? str_replace(',', '.', (string)$row['A']) : null;
+                    $seconds = isset($row['B']) ? str_replace(',', '.', (string)$row['B']) : null;
                     $razryadName = $row['D'] ?? null;
                     $description = trim((string)($row['C'] ?? ''));
 
