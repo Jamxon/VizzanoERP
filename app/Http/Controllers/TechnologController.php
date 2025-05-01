@@ -1083,44 +1083,43 @@ class TechnologController extends Controller
 
                 $sectionPrefix = null;
 
-                // Начинаем обработку с 3-й строки
+
+                $currentCategory = null;
+
                 for ($rowNum = 3; $rowNum <= count($sheet); $rowNum++) {
                     $row = $sheet[$rowNum] ?? [];
 
-                    // Проверка на наличие заголовка секции (например, "Прокламелин")
-                    if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
-                        $sectionPrefix = trim($row['C']);
+                    $seconds = isset($row['A']) ? str_replace(',', '.', (string)$row['A']) : null;
+                    $razryadName = $row['D'] ?? null;
+                    $description = trim((string)($row['C'] ?? ''));
+
+                    // ✅ Yangi kategoriya aniqlash (agar B va D bo‘sh bo‘lsa, C to‘lsa)
+                    if (empty($row['B']) && empty($razryadName) && !empty($description)) {
+                        $currentCategory = TarificationCategory::create([
+                            'name' => $description,
+                            'submodel_id' => $submodelId,
+                        ]);
                         continue;
                     }
 
-                    // Пропускаем строки без основных данных
-                    if (empty($row['A']) || empty($row['C'])) {
+                    // ❌ Category yo'q bo'lsa, bu qatorni o'tkazamiz
+                    if (!$currentCategory || empty($seconds) || empty($description)) {
                         continue;
                     }
 
-                    $seconds = (float) str_replace(',', '.', (string)$row['A']); // Обработка десятичных разделителей
-                    $description = trim((string)$row['C']);
-
-                    // Обработка префиксов секций
-                    if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
-                        $description = "{$sectionPrefix} - {$description}";
-                    }
-
-                    // Устанавливаем разряд по умолчанию
-                    $razryadName = $row['D'] ?? '1';
+                    // ✅ Razryadni aniqlash
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
+                    $costs = ((float)$seconds) * ($razryad?->salary ?? 0);
 
-                    $costs = $seconds * ($razryad?->salary ?? 0);
-
-                    // Создаем запись тарификации
+                    // ✅ Tarification yaratish
                     Tarification::create([
-                        'tarification_category_id' => $category->id,
-                        'user_id' => null, // Используем ID авторизованного пользователя
+                        'tarification_category_id' => $currentCategory->id,
+                        'user_id' => null,
                         'name' => $description,
                         'razryad_id' => $razryadId,
                         'typewriter_id' => null,
-                        'second' => $seconds,
+                        'second' => (float)$seconds,
                         'summa' => $costs,
                         'code' => $this->generateSequentialCode(),
                     ]);
