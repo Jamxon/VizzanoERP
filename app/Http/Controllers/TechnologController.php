@@ -1006,10 +1006,6 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'file' => 'required|file|mimes:xlsx,xls,ods',
-            'submodel_id' => 'required|exists:order_sub_models,id',
-        ]);
 
         $file = $request->file('file');
         $submodelId = $request->input('submodel_id');
