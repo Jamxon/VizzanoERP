@@ -1037,8 +1037,8 @@ class TechnologController extends Controller
 
                 $spreadsheet = $reader->load($file->getPathname());
                 $sheet = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-                $sheet = array_map('array_filter', $sheet); // Remove empty rows
                 dd($sheet);
+                $sheet = array_map('array_filter', $sheet); // Remove empty rows
             } catch (\Exception $e) {
                 return response()->json(['message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage()], 422);
             }
