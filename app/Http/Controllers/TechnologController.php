@@ -1099,7 +1099,7 @@ class TechnologController extends Controller
                     }
 
                     $seconds = (float) str_replace(',', '.', (string)$row['A']); // Обработка десятичных разделителей
-                    $description = trim((string)$row['C']);
+                    $description = trim((string)$row['B']);
 
                     // Обработка префиксов секций
                     if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
