@@ -1022,6 +1022,8 @@ class TechnologController extends Controller
                 return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
             }
 
+            dd($file);
+
             try {
                 // Explicitly specify reader based on extension
                 $extension = strtolower($file->getClientOriginalExtension());
