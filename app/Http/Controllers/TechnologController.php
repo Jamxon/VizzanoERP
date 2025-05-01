@@ -1014,8 +1014,9 @@ class TechnologController extends Controller
             $file = $request->file('file');
             $submodelId = $request->input('submodel_id');
 
-            $rows = Excel::toArray([], $request->file('file'), null, Excel::XLSX);
+            $rows = app(Excel::class)->toArray([], $file, null, Excel::XLSX); // yoki ODS, XLS
             $sheet = $rows[0];
+
 
             DB::beginTransaction();
 
