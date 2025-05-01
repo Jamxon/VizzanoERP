@@ -1004,4 +1004,70 @@ class TechnologController extends Controller
         }
     }
 
+    public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,ods',
+            'submodel_id' => 'required|exists:order_sub_models,id',
+        ]);
+
+        $file = $request->file('file');
+        $submodelId = $request->input('submodel_id');
+
+        $rows = Excel::toArray([], $file);
+        $sheet = $rows[0];
+
+        DB::beginTransaction();
+
+        try {
+            // 2-qator: tarification category nomi
+            $categoryName = trim($sheet[1][2] ?? 'Nomaʼlum kategoriya');
+
+            $category = TarificationCategory::create([
+                'name' => $categoryName,
+                'submodel_id' => $submodelId,
+            ]);
+
+            // 3-qatordan boshlab tarifflar
+            foreach (array_slice($sheet, 2) as $row) {
+                if (
+                    empty($row[1]) ||  // second (затраты)
+                    empty($row[2])     // name
+                ) {
+                    continue;
+                }
+
+                $description = trim($row[2]);
+                $seconds = (float) $row[1]; // B ustun — second sifatida
+                $razryadName = trim($row[3] ?? '');
+
+                $razryad = Razryad::where('name', $razryadName)->first();
+                $razryadId = $razryad?->id;
+                $razryadSumma = $razryad?->summa ?? 0;
+
+                Tarification::create([
+                    'tarification_category_id' => $category->id,
+                    'user_id' => null,
+                    'name' => $description,
+                    'razryad_id' => $razryadId,
+                    'typewriter_id' => null,
+                    'second' => $seconds,
+                    'summa' => $razryadSumma * $seconds,
+                    'code' => $this->generateSequentialCode(),
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'Tarifikatsiya muvaffaqiyatli import qilindi']);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return response()->json([
+                'message' => 'Xatolik yuz berdi',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

@@ -248,7 +248,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {
     Route::get('export-tarification',[TechnologController::class,'exportTarification']);
-    Route::post('import-tarification',[TechnologController::class,'importTarification']);
+    Route::post('import-tarification',[TechnologController::class,'importTarifications']);
     Route::get('export-specification',[TechnologController::class,'exportSpecification']);
     Route::post('import-specification',[TechnologController::class,'importSpecification']);
     Route::get('export-items', [ItemController::class, 'export']);
