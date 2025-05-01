@@ -201,7 +201,7 @@ class ItemController extends Controller
             'code' => 'sometimes',
             'currency_id' => 'sometimes|integer',
             'min_quantity' => 'sometimes|numeric',
-            'lot' => 'sometimes|numeric',
+            'lot' => 'sometimes',
         ], [
             'code.unique' => 'Code must be unique',
         ]);
@@ -229,7 +229,7 @@ class ItemController extends Controller
         $item->branch_id = auth()->user()->employee->branch_id;
         $item->currency_id = $validated['currency_id'] ?? $item->currency_id;
         $item->min_quantity = $validated['min_quantity'] ?? $item->min_quantity;
-        $item->lot = $validated['lot'] ?? $item->lot;
+        $item->lot = $validated['lot'] ?? null;
         $item->save();
 
         return response()->json([
