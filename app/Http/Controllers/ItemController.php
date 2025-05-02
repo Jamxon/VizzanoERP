@@ -172,6 +172,12 @@ class ItemController extends Controller
                 'lot' => 'nullable|string',
             ])->validate();
 
+            foreach ($validated as $key => $value) {
+                if ($value === '') {
+                    $validated[$key] = null;
+                }
+            }
+
             // 3. Faylni saqlash
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
