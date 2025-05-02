@@ -1117,12 +1117,20 @@ class TechnologController extends Controller
                     $totalSumma += $costs;
                 }
 
-                // ✅ SubmodelSpend qo‘shildi:
-                SubmodelSpend::create([
-                    'submodel_id' => $submodelId,
-                    'seconds' => $totalSecond,
-                    'summa' => $totalSumma,
-                ]);
+                $submodelSpend = SubmodelSpend::where('submodel_id', $submodelId)->first();
+
+                if ($submodelSpend) {
+                    $submodelSpend->update([
+                        'seconds' => $submodelSpend->seconds + $totalSecond,
+                        'summa' => $submodelSpend->summa + $totalSumma,
+                    ]);
+                } else {
+                    SubmodelSpend::create([
+                        'submodel_id' => $submodelId,
+                        'seconds' => $totalSecond,
+                        'summa' => $totalSumma,
+                    ]);
+                }
 
                 DB::commit();
 
