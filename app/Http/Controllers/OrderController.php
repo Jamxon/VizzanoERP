@@ -57,6 +57,7 @@ class OrderController extends Controller
     {
         $orders = Order::orderBy('created_at', 'asc')
             ->where('branch_id', auth()->user()->employee->branch_id)
+            ->orderBy('updated_at', 'desc')
             ->with(
                 'orderModel',
                 'orderModel.model',
