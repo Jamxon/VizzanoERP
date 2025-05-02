@@ -156,50 +156,41 @@ class ItemController extends Controller
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $validated = $request->validate([
-                'data.name' => 'required|string',
-                'data.price' => 'required|numeric',
-                'data.unit_id' => 'required|exists:units,id',
-                'data.color_id' => 'required|exists:colors,id',
-                'data.type_id' => 'required|exists:item_types,id',
-                'data.code' => 'nullable|string',
-                'data.currency_id' => 'nullable|integer',
-                'data.min_quantity' => 'nullable|numeric',
-                'data.lot' => 'nullable|string',
-            ]);
+            // 1. JSONni arrayga aylantirish
+            $data = json_decode($request->input('data'), true);
 
-            $data = $validated['data'];
+            // 2. Validatsiya
+            $validated = validator($data, [
+                'name' => 'required|string',
+                'price' => 'required|numeric',
+                'unit_id' => 'required|exists:units,id',
+                'color_id' => 'required|exists:colors,id',
+                'type_id' => 'required|exists:item_types,id',
+                'code' => 'nullable|string',
+                'currency_id' => 'nullable|integer',
+                'min_quantity' => 'nullable|numeric',
+                'lot' => 'nullable|string',
+            ])->validate();
 
-            // Faylni saqlash
+            // 3. Faylni saqlash
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $filename = time() . '_' . \Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
-                $data['image'] = $image->storeAs('items', $filename, 'public');
+                $validated['image'] = $image->storeAs('items', $filename, 'public');
             }
 
-            $data['branch_id'] = auth()->user()->employee->branch_id;
-            $data['code'] = $data['code'] ?? \Str::uuid();
-            $data['min_quantity'] = $data['min_quantity'] ?? 0;
+            $validated['branch_id'] = auth()->user()->employee->branch_id;
+            $validated['code'] = $validated['code'] ?? \Str::uuid();
+            $validated['min_quantity'] = $validated['min_quantity'] ?? 0;
 
-            $item = Item::create($data);
+            $item = Item::create($validated);
 
             Log::add(
                 auth()->user()->id,
                 'Yangi material yaratildi',
                 'Material yaratish',
                 null,
-                [
-                    'item_id' => $item->id,
-                    'name' => $item->name,
-                    'price' => $item->price,
-                    'unit_id' => $item->unit_id,
-                    'color_id' => $item->color_id,
-                    'type_id' => $item->type_id,
-                    'code' => $item->code,
-                    'currency_id' => $item->currency_id,
-                    'min_quantity' => $item->min_quantity,
-                    'lot' => $item->lot,
-                ]
+                $validated + ['item_id' => $item->id]
             );
 
             return response()->json([
