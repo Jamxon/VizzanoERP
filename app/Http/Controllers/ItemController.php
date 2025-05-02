@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Jobs\NotifyUserOfCompletedExport;
 use App\Models\Item;
+use App\Models\Log;
 use App\Models\StockBalance;
 use App\Models\StockEntryItem;
 use Illuminate\Http\Request;
 use App\Exports\ItemsExport;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
 
@@ -62,6 +64,17 @@ class ItemController extends Controller
         ]);
 
         $fileUrl = url('storage/materiallar.xlsx');
+
+        // Log yozish
+        Log::add(
+            auth()->user()->id,
+            'Materiallar eksport qilindi',
+            'Materiallar eksporti',
+            null,
+            [
+                'file_url' => $fileUrl,
+            ]
+        );
 
         return response()->json([
             'message' => 'Eksport jarayoni navbatga olindi',
@@ -142,49 +155,72 @@ class ItemController extends Controller
 
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
-        $data = json_decode($request->input('data'), true);
+        try {
+            $data = $request->validate([
+                'name' => 'required|string',
+                'price' => 'required|numeric',
+                'unit_id' => 'required|exists:units,id',
+                'color_id' => 'sometimes|exists:colors,id',
+                'type_id' => 'sometimes|exists:item_types,id',
+                'code' => 'sometimes',
+                'currency_id' => 'sometimes|integer',
+                'min_quantity' => 'sometimes|numeric',
+                'lot' => 'sometimes',
+            ]);
 
-        if (!$data) {
-            return response()->json(['error' => 'Invalid JSON data'], 400);
+            // Rasmni saqlash
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $filename = time() . '_' . Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
+                $data['image'] = $image->storeAs('items', $filename, 'public');
+            }
+
+            $data['branch_id'] = auth()->user()->employee->branch_id;
+            $data['code'] = $data['code'] ?? Str::uuid();
+            $data['min_quantity'] = $data['min_quantity'] ?? 0;
+
+            $item = Item::create($data);
+
+            Log::add(
+                auth()->user()->id,
+                'Yangi material yaratildi',
+                'Material yaratish',
+                null,
+                [
+                    'item_id' => $item->id,
+                    'name' => $item->name,
+                    'price' => $item->price,
+                    'unit_id' => $item->unit_id,
+                    'color_id' => $item->color_id,
+                    'type_id' => $item->type_id,
+                    'code' => $item->code,
+                    'currency_id' => $item->currency_id,
+                    'min_quantity' => $item->min_quantity,
+                    'lot' => $item->lot,
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Item created successfully',
+                'item' => $item,
+            ], 201);
+        } catch (\Exception $e) {
+            Log::add(
+                auth()->user()->id,
+                'Item yaratishda xatolik',
+                'Item yaratish',
+                null,
+                [
+                    'error' => $e->getMessage(),
+                    'request' => $request->all(),
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Item creation failed',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        $validated = $request->merge($data)->validate([
-            'name' => 'required|string',
-            'price' => 'required|numeric',
-            'unit_id' => 'required|exists:units,id',
-            'color_id' => 'required|exists:colors,id',
-            'type_id' => 'required|exists:item_types,id',
-            'code' => 'nullable',
-            'currency_id' => 'nullable|integer',
-            'min_quantity' => 'nullable|numeric',
-        ]);
-
-        $imagePath = null;
-        if ($request->hasFile('image') && $request->file('image')->isValid()) {
-            $image = $request->file('image');
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $imagePath = $image->storeAs('/items', $imageName);
-            $imagePath = str_replace('public/', '', $imagePath);
-        }
-
-        $item = Item::create([
-            'name' => $validated['name'],
-            'price' => $validated['price'],
-            'unit_id' => $validated['unit_id'],
-            'color_id' => $validated['color_id'],
-            'type_id' => $validated['type_id'],
-            'code' => $validated['code'] ?? uniqid(),
-            'image' => $imagePath,
-            'branch_id' => auth()->user()->employee->branch_id,
-            'currency_id' => $validated['currency_id'],
-            'min_quantity' => $validated['min_quantity'] ?? 0,
-            'lot' => $validated['lot'] !== '' ? $validated['lot'] : null,
-        ]);
-
-        return response()->json([
-            'message' => $item ? 'Item created successfully' : 'Item not created',
-            'item' => $item,
-        ], $item ? 201 : 500);
     }
 
     public function update(Request $request, Item $item): \Illuminate\Http\JsonResponse
@@ -240,11 +276,42 @@ class ItemController extends Controller
 
             $item->save();
 
+            Log::add(
+                auth()->user()->id,
+                'Material yangilandi',
+                'Material yangilash',
+                [
+                    'item_id' => $item->id,
+                    'name' => $item->name,
+                    'price' => $item->price,
+                    'unit_id' => $item->unit_id,
+                    'color_id' => $item->color_id,
+                    'type_id' => $item->type_id,
+                    'code' => $item->code,
+                    'currency_id' => $item->currency_id,
+                    'min_quantity' => $item->min_quantity,
+                    'lot' => $item->lot,
+                ],
+                null
+            );
+
             return response()->json([
                 'message' => 'Item updated successfully',
                 'item' => $item,
             ]);
         } catch (\Throwable $e) {
+
+            Log::add(
+                auth()->user()->id,
+                'Item yangilashda xatolik',
+                'Item yangilash',
+                null,
+                [
+                    'error' => $e->getMessage(),
+                    'request' => $request->all(),
+                ]
+            );
+
             return response()->json([
                 'message' => 'Xatolik yuz berdi!',
                 'error' => $e->getMessage(),
