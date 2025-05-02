@@ -21,14 +21,52 @@ if (!function_exists('transliterate')) {
         ]);
     }
 
-    function transliterate_to_cyrillic($text): string
+    function transliterate_to_cyrillic(string $text): string
     {
-        return strtr($text, [
-            'a'=>'а','b'=>'б','v'=>'в','g'=>'г','d'=>'д','e'=>'е','yo'=>'ё',
-            'j'=>'ж','z'=>'з','i'=>'и','y'=>'й','k'=>'к','l'=>'л','m'=>'м',
-            'n'=>'н','o‘'=>'ў','o'=>'о','p'=>'п','r'=>'р','s'=>'с','t'=>'т',
-            'u'=>'у','f'=>'ф','x'=>'х','ts'=>'ц','ch'=>'ч','sh'=>'ш','h'=>'ҳ',
-            'yu'=>'ю','ya'=>'я','q'=>'қ','g‘'=>'ғ',
-        ]);
+        $replacements = [
+            'sh' => 'ш',
+            'ch' => 'ч',
+            'yo' => 'ё',
+            'yu' => 'ю',
+            'ya' => 'я',
+            'g‘' => 'ғ',
+            'o‘' => 'ў',
+            'ts' => 'ц',
+            'a' => 'а',
+            'b' => 'б',
+            'v' => 'в',
+            'g' => 'г',
+            'd' => 'д',
+            'e' => 'е',
+            'j' => 'ж',
+            'z' => 'з',
+            'i' => 'и',
+            'y' => 'й',
+            'k' => 'к',
+            'l' => 'л',
+            'm' => 'м',
+            'n' => 'н',
+            'o' => 'о',
+            'p' => 'п',
+            'r' => 'р',
+            's' => 'с',
+            't' => 'т',
+            'u' => 'у',
+            'f' => 'ф',
+            'x' => 'х',
+            'h' => 'ҳ',
+            'q' => 'қ',
+        ];
+
+        // Avval uzun kombinatsiyalarni almashtiramiz
+        foreach (['sh', 'ch', 'yo', 'yu', 'ya', 'g‘', 'o‘', 'ts'] as $combo) {
+            $text = str_ireplace($combo, $replacements[$combo], $text);
+        }
+
+        // Endi bitta harflarni
+        $text = strtr($text, $replacements);
+
+        return $text;
     }
+
 }
