@@ -157,15 +157,15 @@ class ItemController extends Controller
     {
         try {
             $data = $request->validate([
-                'name' => 'required|string',
-                'price' => 'required|numeric',
-                'unit_id' => 'required|exists:units,id',
-                'color_id' => 'sometimes|exists:colors,id',
-                'type_id' => 'sometimes|exists:item_types,id',
-                'code' => 'sometimes',
-                'currency_id' => 'sometimes|integer',
-                'min_quantity' => 'sometimes|numeric',
-                'lot' => 'sometimes',
+                'data.name' => 'required|string',
+                'data.price' => 'required|numeric',
+                'data.unit_id' => 'required|exists:units,id',
+                'data.color_id' => 'sometimes|exists:colors,id',
+                'data.type_id' => 'sometimes|exists:item_types,id',
+                'data.code' => 'sometimes',
+                'data.currency_id' => 'sometimes|integer',
+                'data.min_quantity' => 'sometimes|numeric',
+                'data.lot' => 'sometimes',
             ]);
 
             // Rasmni saqlash
