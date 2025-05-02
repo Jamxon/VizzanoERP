@@ -156,27 +156,29 @@ class ItemController extends Controller
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $data = $request->validate([
+            $validated = $request->validate([
                 'data.name' => 'required|string',
                 'data.price' => 'required|numeric',
                 'data.unit_id' => 'required|exists:units,id',
-                'data.color_id' => 'sometimes|exists:colors,id',
-                'data.type_id' => 'sometimes|exists:item_types,id',
-                'data.code' => 'sometimes',
-                'data.currency_id' => 'sometimes|integer',
-                'data.min_quantity' => 'sometimes|numeric',
-                'data.lot' => 'sometimes',
+                'data.color_id' => 'required|exists:colors,id',
+                'data.type_id' => 'required|exists:item_types,id',
+                'data.code' => 'nullable|string',
+                'data.currency_id' => 'nullable|integer',
+                'data.min_quantity' => 'nullable|numeric',
+                'data.lot' => 'nullable|string',
             ]);
 
-            // Rasmni saqlash
+            $data = $validated['data'];
+
+            // Faylni saqlash
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $filename = time() . '_' . Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
+                $filename = time() . '_' . \Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
                 $data['image'] = $image->storeAs('items', $filename, 'public');
             }
 
             $data['branch_id'] = auth()->user()->employee->branch_id;
-            $data['code'] = $data['code'] ?? Str::uuid();
+            $data['code'] = $data['code'] ?? \Str::uuid();
             $data['min_quantity'] = $data['min_quantity'] ?? 0;
 
             $item = Item::create($data);
