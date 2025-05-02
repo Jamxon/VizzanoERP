@@ -1089,7 +1089,7 @@ class TechnologController extends Controller
                         continue;
                     }
 
-                    $seconds = (float) str_replace(',', '.', (string)$row['A']);
+                    $seconds = (float) str_replace(',', '.', trim((string)$row['A']));
                     $description = trim((string)$row['C']);
 
                     if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
