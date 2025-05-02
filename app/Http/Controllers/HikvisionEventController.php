@@ -8,11 +8,24 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Employee;
 use App\Models\Attendance;
+use SebastianBergmann\LinesOfCode\LinesOfCode;
 
 class HikvisionEventController extends Controller
 {
     public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
     {
+
+        Log::add(
+            null,
+            'Hikvision event received',
+            'Hikvision',
+            null,
+            [
+                'request' => $request->all(),
+                'headers' => $request->headers->all(),
+            ]
+        );
+
         $contentType = $request->header('Content-Type');
 
         if (str_contains($contentType, 'multipart/form-data')) {
