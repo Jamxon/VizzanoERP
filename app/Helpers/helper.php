@@ -11,14 +11,15 @@ if (!function_exists('transliterate')) {
      */
     function transliterate_to_latin(string $text): string
     {
-        return strtr($text, [
+        $map = [
             'а'=>'a','б'=>'b','в'=>'v','г'=>'g','д'=>'d','е'=>'e','ё'=>'yo',
             'ж'=>'j','з'=>'z','и'=>'i','й'=>'y','к'=>'k','л'=>'l','м'=>'m',
             'н'=>'n','о'=>'o','п'=>'p','р'=>'r','с'=>'s','т'=>'t','у'=>'u',
             'ф'=>'f','х'=>'x','ц'=>'ts','ч'=>'ch','ш'=>'sh','щ'=>'sh','ъ'=>'',
             'ы'=>'i','ь'=>'','э'=>'e','ю'=>'yu','я'=>'ya',
             'қ'=>'q','ў'=>'o‘','ғ'=>'g‘','ҳ'=>'h',
-        ]);
+        ];
+        return strtr(mb_strtolower($text, 'UTF-8'), $map);
     }
 
     function transliterate_to_cyrillic(string $text): string
