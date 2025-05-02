@@ -1099,17 +1099,6 @@ class TechnologController extends Controller
                         $seconds = 0;
                     }
 
-                    Log::add(
-                        auth()->id(),
-                        'Tarifikatsiya import qilindi',
-                        'import',
-                        null,
-                        [
-                            'seconds' => $row['A'],
-                            'description' => $row['C'],
-                            'razryad' => $row['D'] ?? '1'
-                        ]
-                    );
                     $description = trim((string)$row['C']);
 
                     if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
