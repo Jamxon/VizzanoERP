@@ -1104,7 +1104,7 @@ class TechnologController extends Controller
                         'import',
                         null,
                         [
-                            'seconds' => $seconds,
+                            'seconds' => $row['A'],
                             'description' => $row['C'],
                             'razryad' => $row['D'] ?? '1'
                         ]
