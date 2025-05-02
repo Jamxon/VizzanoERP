@@ -157,8 +157,6 @@ class ItemController extends Controller
             'code' => 'nullable',
             'currency_id' => 'nullable|integer',
             'min_quantity' => 'nullable|numeric',
-        ], [
-            'code.unique' => 'Code must be unique',
         ]);
 
         $imagePath = null;
