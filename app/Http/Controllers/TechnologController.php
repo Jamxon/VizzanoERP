@@ -1043,7 +1043,7 @@ class TechnologController extends Controller
                     $worksheet->getHighestColumn()
                 );
 
-                for ($row = 0; $row <= $highestRow; $row++) {
+                for ($row = 1; $row <= $highestRow; $row++) {
                     $rowData = [];
                     for ($col = 1; $col <= $highestColumnIndex; $col++) {
                         $cellValue = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
