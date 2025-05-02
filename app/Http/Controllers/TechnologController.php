@@ -1066,7 +1066,7 @@ class TechnologController extends Controller
             DB::beginTransaction();
 
             try {
-                $categoryName = trim($sheet[1]['B'] ?? 'Nomaʼlum kategoriya');
+                $categoryName = trim($sheet[1]['C'] ?? 'Nomaʼlum kategoriya');
 
                 $category = TarificationCategory::create([
                     'name' => $categoryName,
