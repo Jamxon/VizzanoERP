@@ -20,9 +20,14 @@ class ItemController extends Controller
         $query = strtolower($request->get('search'));
         $type = $request->input('type_id');
 
+        $latin = transliterate_to_latin($query);
+        $cyrillic = transliterate_to_cyrillic($query);
+
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
-            ->where(function ($q) use ($query) {
+            ->where(function ($q) use ($query, $latin, $cyrillic) {
                 $q->orWhereRaw('LOWER(name) LIKE ?', ["%$query%"])
+                    ->orWhereRaw('LOWER(name) LIKE ?', ["%$latin%"])
+                    ->orWhereRaw('LOWER(name) LIKE ?', ["%$cyrillic%"])
                     ->orWhereRaw('LOWER(code) LIKE ?', ["%$query%"]);
             })
             ->when($type, fn($q) => $q->where('type_id', $type))
@@ -37,15 +42,19 @@ class ItemController extends Controller
     {
         $query = strtolower($request->get('search'));
         $type = $request->input('type_id');
+
+        $latin = transliterate_to_latin($query);
+        $cyrillic = transliterate_to_cyrillic($query);
+
         $items = Item::where('branch_id', auth()->user()->employee->branch_id)
-            ->where(function ($q) use ($query) {
+            ->where(function ($q) use ($query, $latin, $cyrillic) {
                 $q->orWhereRaw('LOWER(name) LIKE ?', ["%$query%"])
+                    ->orWhereRaw('LOWER(name) LIKE ?', ["%$latin%"])
+                    ->orWhereRaw('LOWER(name) LIKE ?', ["%$cyrillic%"])
                     ->orWhereRaw('LOWER(code) LIKE ?', ["%$query%"]);
             })
-            ->when($type, function ($q) use ($type) {
-                $q->where('type_id', $type);
-            })
-            ->with('unit', 'color', 'type','currency')
+            ->when($type, fn($q) => $q->where('type_id', $type))
+            ->with('unit', 'color', 'type', 'currency')
             ->orderBy('updated_at', 'desc')
             ->get();
 
