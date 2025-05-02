@@ -1077,7 +1077,8 @@ class TechnologController extends Controller
                 $totalSecond = 0;
                 $totalSumma = 0;
 
-                for ($rowNum = 2; $rowNum <= count($sheet); $rowNum++) {
+                $maxRow = max(array_keys($sheet));
+                for ($rowNum = 2; $rowNum <= $maxRow; $rowNum++) {
                     $row = $sheet[$rowNum] ?? [];
 
                     if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
@@ -1089,7 +1090,14 @@ class TechnologController extends Controller
                         continue;
                     }
 
-                    $seconds = (float) str_replace(',', '.', trim((string)$row['A']));
+                    $rawA = $row['A'] ?? null;
+
+                    if (!is_null($rawA) && is_numeric(str_replace(',', '.', trim((string)$rawA)))) {
+                        $seconds = (float) str_replace(',', '.', trim((string)$rawA));
+                    } else {
+                        $seconds = 0;
+                    }
+
                     Log::add(
                         auth()->id(),
                         'Tarifikatsiya import qilindi',
