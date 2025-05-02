@@ -1006,15 +1006,11 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
-        ini_set('memory_limit', '512M'); // yoki '1G'
+        ini_set('memory_limit', '512M');
 
         try {
-            if (!$request->hasFile('file')) {
-                return response()->json(['message' => 'Fayl yuklashda xatolik: fayl yuklanmagan'], 422);
-            }
-
-            if (!$request->file('file')->isValid()) {
-                return response()->json(['message' => 'Fayl yuklashda xatolik: fayl yaroqsiz'], 422);
+            if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
+                return response()->json(['message' => 'Fayl yuklashda xatolik'], 422);
             }
 
             $file = $request->file('file');
@@ -1024,29 +1020,28 @@ class TechnologController extends Controller
                 return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
             }
 
-            // Простой подход без использования toArray()
             try {
                 $extension = strtolower($file->getClientOriginalExtension());
                 if ($extension == 'xlsx') {
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-                    $reader->setReadDataOnly(true); // faqat data
+                    $reader->setReadDataOnly(true);
                     $reader->setReadEmptyCells(false);
                 } elseif ($extension == 'xls') {
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
                 } elseif ($extension == 'ods') {
                     $reader = new \PhpOffice\PhpSpreadsheet\Reader\Ods();
                 } else {
-                    return response()->json(['message' => 'Noto\'g\'ri fayl formati. XLSX, XLS yoki ODS formatidagi fayl yuklang'], 422);
+                    return response()->json(['message' => 'Yaroqsiz fayl formati'], 422);
                 }
 
                 $spreadsheet = $reader->load($file->getPathname());
                 $worksheet = $spreadsheet->getActiveSheet();
 
-                // Считываем данные ячейка за ячейкой, чтобы избежать проблем с toArray()
                 $sheet = [];
                 $highestRow = $worksheet->getHighestRow();
-                $highestColumn = $worksheet->getHighestColumn();
-                $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+                $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString(
+                    $worksheet->getHighestColumn()
+                );
 
                 for ($row = 1; $row <= $highestRow; $row++) {
                     $rowData = [];
@@ -1057,23 +1052,20 @@ class TechnologController extends Controller
                     }
                     $sheet[$row] = $rowData;
                 }
-
             } catch (\Exception $e) {
                 return response()->json([
-                    'message' => 'Fayl o\'qishda xatolik: ' . $e->getMessage(),
+                    'message' => 'Fayl o‘qishda xatolik: ' . $e->getMessage(),
                     'error_details' => $e->getTraceAsString()
                 ], 422);
             }
 
-            // Проверка наличия данных
             if (empty($sheet) || count($sheet) < 3) {
-                return response()->json(['message' => 'Faylda ma\'lumot topilmadi yoki format noto\'g\'ri'], 422);
+                return response()->json(['message' => 'Faylda maʼlumot yoʻq yoki format noto‘g‘ri'], 422);
             }
 
             DB::beginTransaction();
 
             try {
-                // Получаем название категории из первой строки
                 $categoryName = trim($sheet[1]['B'] ?? 'Nomaʼlum kategoriya');
 
                 $category = TarificationCategory::create([
@@ -1082,41 +1074,37 @@ class TechnologController extends Controller
                 ]);
 
                 $sectionPrefix = null;
+                $totalSecond = 0;
+                $totalSumma = 0;
 
-                // Начинаем обработку с 3-й строки
                 for ($rowNum = 2; $rowNum <= count($sheet); $rowNum++) {
                     $row = $sheet[$rowNum] ?? [];
 
-                    // Проверка на наличие заголовка секции (например, "Прокламелин")
                     if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
                         $sectionPrefix = trim($row['C']);
                         continue;
                     }
 
-                    // Пропускаем строки без основных данных
                     if (empty($row['A']) || empty($row['C'])) {
                         continue;
                     }
 
-                    $seconds = (float) str_replace(',', '.', (string)$row['A']); // Обработка десятичных разделителей
+                    $seconds = (float) str_replace(',', '.', (string)$row['A']);
                     $description = trim((string)$row['B']);
 
-                    // Обработка префиксов секций
                     if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
                         $description = "{$sectionPrefix} - {$description}";
                     }
 
-                    // Устанавливаем разряд по умолчанию
                     $razryadName = $row['C'] ?? '1';
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
 
                     $costs = $seconds * ($razryad?->salary ?? 0);
 
-                    // Создаем запись тарификации
                     Tarification::create([
                         'tarification_category_id' => $category->id,
-                        'user_id' => null, // Используем ID авторизованного пользователя
+                        'user_id' => null,
                         'name' => $description,
                         'razryad_id' => $razryadId,
                         'typewriter_id' => null,
@@ -1124,12 +1112,21 @@ class TechnologController extends Controller
                         'summa' => $costs,
                         'code' => $this->generateSequentialCode(),
                     ]);
+
+                    $totalSecond += $seconds;
+                    $totalSumma += $costs;
                 }
+
+                // ✅ SubmodelSpend qo‘shildi:
+                SubmodelSpend::create([
+                    'submodel_id' => $submodelId,
+                    'seconds' => $totalSecond,
+                    'summa' => $totalSumma,
+                ]);
 
                 DB::commit();
 
                 return response()->json(['message' => 'Tarifikatsiya muvaffaqiyatli import qilindi']);
-
             } catch (\Exception $e) {
                 DB::rollBack();
 
@@ -1152,5 +1149,4 @@ class TechnologController extends Controller
             ], 500);
         }
     }
-
 }
