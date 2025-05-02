@@ -1090,13 +1090,13 @@ class TechnologController extends Controller
                     }
 
                     $seconds = (float) str_replace(',', '.', (string)$row['A']);
-                    $description = trim((string)$row['B']);
+                    $description = trim((string)$row['C']);
 
                     if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
                         $description = "{$sectionPrefix} - {$description}";
                     }
 
-                    $razryadName = $row['C'] ?? '1';
+                    $razryadName = $row['D'] ?? '1';
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
 
