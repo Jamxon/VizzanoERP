@@ -51,8 +51,6 @@ class HikvisionEventController extends Controller
                     $attendance->status = 'present';
                     $attendance->save();
 
-                    broadcast(new EmployeeCheckedIn($employee, $eventTime, $imagePath));
-
                     Log::add(
                         $employee->user_id ?? null,
                         'Hodim ishga keldi',
