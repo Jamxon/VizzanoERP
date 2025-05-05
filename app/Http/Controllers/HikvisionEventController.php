@@ -26,7 +26,7 @@ class HikvisionEventController extends Controller
 
             $employeeNo = $accessData['employeeNoString'] ?? null;
             $deviceId = $eventData['deviceID'] ?? null;
-            $eventTime = $accessData['dateTime'] ?? now()->toDateTimeString();
+            $eventTime = $eventData['dateTime'] ?? now()->toDateTimeString();
 
             $imagePath = null;
             if ($image && $image->isValid()) {
