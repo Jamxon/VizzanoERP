@@ -95,6 +95,7 @@ class HikvisionEventController extends Controller
                             'employee_id' => $employee->id,
                             'device_id' => $deviceId,
                             'time' => $eventTime,
+                            'image_path' => $imagePath,
                         ]
                     );
                 }
