@@ -15,18 +15,6 @@ class HikvisionEventController extends Controller
 {
     public function handleEvent(Request $request): \Illuminate\Http\JsonResponse
     {
-        Log::add(
-            null,
-            'Hikvision event received',
-            'Hikvision',
-            null,
-            [
-                'request' => $request->all(),
-                'headers' => $request->headers->all(),
-                'content_type' => $request->header('Content-Type'),
-            ]
-        );
-
         $contentType = $request->header('Content-Type');
 
         if (str_contains($contentType, 'multipart/form-data')) {
