@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\EmployeeCheckedIn;
 use App\Models\Log;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Employee;
 use App\Models\Attendance;
-use SebastianBergmann\LinesOfCode\LinesOfCode;
-use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 
 class HikvisionEventController extends Controller
 {
