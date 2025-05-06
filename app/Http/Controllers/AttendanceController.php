@@ -20,7 +20,6 @@ class AttendanceController extends Controller
 
         return response()->json($attendances);
     }
-    
 
     public function getAttendanceHistory(Request $request): \Illuminate\Http\JsonResponse
     {
