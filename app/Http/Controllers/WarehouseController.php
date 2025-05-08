@@ -203,7 +203,7 @@ class WarehouseController extends Controller
                 ])
 
                 ->latest('updated_at')
-                ->paginate(10);
+                ->paginate(20);
 
             return response()->json($incoming);
         } catch (\Throwable $e) {
@@ -399,7 +399,7 @@ class WarehouseController extends Controller
                 ])
 
                 ->latest('updated_at')
-                ->paginate(10);
+                ->paginate(20);
 
             return response()->json($outgoing);
         } catch (\Throwable $e) {
