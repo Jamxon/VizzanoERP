@@ -193,6 +193,7 @@ class WarehouseController extends Controller
                 ->with([
                     'items.currency',
                     'items.item',
+                    'items.item.unit',
                     'warehouse',
                     'source',
                     'destination',
@@ -389,6 +390,7 @@ class WarehouseController extends Controller
                 ->with([
                     'items.currency',
                     'items.item',
+                    'items.item.unit',
                     'warehouse',
                     'source',
                     'destination',
