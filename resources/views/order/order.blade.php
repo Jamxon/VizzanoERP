@@ -143,7 +143,7 @@
         <div class="company-info">
             <div>
                 <h1 class="document-title">BUYURTMA HUJJATI</h1>
-                <div class="document-number">Hujjat № {{ $order['id'] }}</div>
+                <div class="document-number">Hujjat № {{ $order['id'] ?? '-' }}</div>
                 <p>Sana: {{ now()->format('d.m.Y') }}</p>
             </div>
         </div>
@@ -154,23 +154,27 @@
         <div class="info-group">
             <div class="info-item">
                 <span class="info-label">Buyurtma №:</span>
-                <span class="info-value">{{ $order['id'] }}</span>
+                <span class="info-value">{{ $order['id'] ?? '-' }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Buyurtma nomi:</span>
-                <span class="info-value">{{ $order['name'] }}</span>
+                <span class="info-value">{{ $order['name'] ?? '-' }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Miqdori:</span>
-                <span class="info-value">{{ $order['quantity'] }}</span>
+                <span class="info-value">{{ $order['quantity'] ?? '-' }}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Boshlangan sana:</span>
-                <span class="info-value">{{ \Carbon\Carbon::parse($order['start_date'])->format('d.m.Y') }}</span>
+                <span class="info-value">
+                    {{ isset($order['start_date']) ? \Carbon\Carbon::parse($order['start_date'])->format('d.m.Y') : '-' }}
+                </span>
             </div>
             <div class="info-item">
                 <span class="info-label">Tugash sanasi:</span>
-                <span class="info-value">{{ \Carbon\Carbon::parse($order['end_date'])->format('d.m.Y') }}</span>
+                <span class="info-value">
+                    {{ isset($order['end_date']) ? \Carbon\Carbon::parse($order['end_date'])->format('d.m.Y') : '-' }}
+                </span>
             </div>
         </div>
     </div>
@@ -180,17 +184,19 @@
         <div class="info-group">
             <div class="info-item">
                 <span class="info-label">Model:</span>
-                <span class="info-value">{{ $order['order_model']['model']->name }}  (</span>
-                @foreach($order['order_model']['submodels'] as $submodel)
-
-                        <span class="info-value">{{ $submodel['submodel']['name'] }}, </span>
-
-                @endforeach
-            <span>)</span>
+                <span class="info-value">
+                    {{ optional(optional($order['order_model'])['model'])->name ?? '-' }} (
+                    @forelse($order['order_model']['submodels'] ?? [] as $submodel)
+                        {{ $submodel['submodel']['name'] ?? '-' }}{{ !$loop->last ? ', ' : '' }}
+                    @empty
+                        -
+                    @endforelse
+                    )
+                </span>
             </div>
             <div class="info-item">
                 <span class="info-label">Material:</span>
-                <span class="info-value">{{ $order['order_model']['material']->name }}</span>
+                <span class="info-value">{{ optional(optional($order['order_model'])['material'])->name ?? '-' }}</span>
             </div>
         </div>
 
@@ -204,15 +210,17 @@
             </tr>
             </thead>
             <tbody>
-            <!-- {For each size in order.order_model.sizes} -->
-            @foreach($order['order_model']['sizes'] as $size)
+            @forelse($order['order_model']['sizes'] ?? [] as $size)
                 <tr>
-                    <td>{{ $size['id'] }}</td>
-                    <td>{{ $size['size']['name'] }}</td>
-                    <td>{{ $size['quantity'] }}</td>
+                    <td>{{ $size['id'] ?? '-' }}</td>
+                    <td>{{ $size['size']['name'] ?? '-' }}</td>
+                    <td>{{ $size['quantity'] ?? '-' }}</td>
                 </tr>
-            @endforeach
-            <!-- {End for} -->
+            @empty
+                <tr>
+                    <td colspan="3">O'lchamlar mavjud emas</td>
+                </tr>
+            @endforelse
             </tbody>
         </table>
     </div>
@@ -228,22 +236,24 @@
             </tr>
             </thead>
             <tbody>
-            <!-- {For each instruction in order.instructions} -->
-            @foreach($order['instructions'] as $instruction)
+            @forelse($order['instructions'] ?? [] as $instruction)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $instruction['title'] }}</td>
-                    <td>{{ $instruction['description'] }}</td>
+                    <td>{{ $instruction['title'] ?? '-' }}</td>
+                    <td>{{ $instruction['description'] ?? '-' }}</td>
                 </tr>
-            @endforeach
-            <!-- {End for} -->
+            @empty
+                <tr>
+                    <td colspan="3">Ko'rsatmalar mavjud emas</td>
+                </tr>
+            @endforelse
             </tbody>
         </table>
     </div>
 
     <div class="section">
         <h2 class="section-title">Buyurtma bo'yicha izoh</h2>
-        <p>{{ $order['comment'] }}</p>
+        <p>{{ $order['comment'] ?? 'Izoh mavjud emas' }}</p>
     </div>
 </div>
 </body>
