@@ -64,6 +64,7 @@ class ModelController extends Controller
             ->get();
         return response()->json($materials);
     }
+    
 
     public function show(Models $model): \Illuminate\Http\JsonResponse
     {
