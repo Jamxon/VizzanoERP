@@ -241,6 +241,10 @@ class CuttingMasterController extends Controller
                 'status' => 'pending'
             ]);
 
+            $order->orderPrintingTime->update([
+                'status' => 'completed'
+            ]);
+
             // Add log entry
             Log::add(
                 auth()->user()->id,
