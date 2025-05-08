@@ -59,7 +59,9 @@ class ModelController extends Controller
     {
         $materials = Item::whereHas('type', function ($query) {
             $query->where('name', 'Mato');
-        })->get();
+        })
+            ->with(['color'])
+            ->get();
         return response()->json($materials);
     }
 
