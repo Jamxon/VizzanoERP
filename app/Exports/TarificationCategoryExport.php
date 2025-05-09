@@ -7,12 +7,14 @@ use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 class TarificationCategoryExport implements FromCollection, WithEvents
 {
     protected $orderSubModelId;
     protected $mergeRows = [];
     protected $formulaCells = [];
+    protected $debugInfo = [];
 
     public function __construct($orderSubModelId)
     {
@@ -30,6 +32,10 @@ class TarificationCategoryExport implements FromCollection, WithEvents
         $rows = new Collection();
         $currentRow = 1;
 
+        // Debug row to verify where we start counting rows
+        $rows->push(['DEBUG: START', 'Row 1']);
+        $currentRow++;
+
         foreach ($orderSubModel->tarificationCategories as $category) {
             // 1. Category name (merged across A–G)
             $rows->push([$category->name]);
@@ -42,12 +48,20 @@ class TarificationCategoryExport implements FromCollection, WithEvents
 
             // 3. Tarification data rows
             foreach ($category->tarifications as $tarification) {
-                $bcolumn = $tarification->second / 0.6;
+                // Calculate and validate B column value
+                $bValue = $tarification->second > 0 ? $tarification->second / 0.6 : 0;
 
-                // Store the actual value for A column, we'll set the formula later
+                // Save debug info for this row
+                $this->debugInfo[] = [
+                    'row' => $currentRow,
+                    'second' => $tarification->second,
+                    'bValue' => $bValue
+                ];
+
+                // Store the actual calculated value temporarily in A column
                 $rows->push([
-                    $tarification->second, // Initially put the actual value
-                    $bcolumn,
+                    $tarification->second, // Real value for second
+                    $bValue,               // B column value
                     $tarification->name ?? null,
                     optional($tarification->razryad)->name ?? null,
                     null,
@@ -56,10 +70,18 @@ class TarificationCategoryExport implements FromCollection, WithEvents
                 ]);
 
                 // Save the cell address for later formula application
-                $this->formulaCells[] = 'A' . $currentRow;
+                $this->formulaCells[] = [
+                    'cell' => 'A' . $currentRow,
+                    'bValue' => $bValue,
+                    'second' => $tarification->second
+                ];
+
                 $currentRow++;
             }
         }
+
+        // Add debug row at the end
+        $rows->push(['DEBUG: END', 'Row ' . $currentRow]);
 
         return $rows;
     }
@@ -82,16 +104,44 @@ class TarificationCategoryExport implements FromCollection, WithEvents
                     ]);
                 }
 
-                // Set formulas for A column cells
-                foreach ($this->formulaCells as $cell) {
+                // Add debug information
+                $debugRow = $sheet->getHighestRow() + 2;
+                $sheet->setCellValue("A{$debugRow}", "DEBUG INFO");
+                $sheet->getStyle("A{$debugRow}")->getFont()->setBold(true);
+                $debugRow++;
+
+                // Write all debug info
+                foreach ($this->debugInfo as $info) {
+                    $sheet->setCellValue("A{$debugRow}", "Row: " . $info['row']);
+                    $sheet->setCellValue("B{$debugRow}", "Second: " . $info['second']);
+                    $sheet->setCellValue("C{$debugRow}", "B Value: " . $info['bValue']);
+                    $debugRow++;
+                }
+
+                // Set formulas for A column cells - explicitly ensure they are formulas
+                foreach ($this->formulaCells as $info) {
+                    $cell = $info['cell'];
                     $rowNumber = substr($cell, 1);
-                    $formula = "=B{$rowNumber}*0.6";
-                    $sheet->setCellValue($cell, $formula);
+                    $bValue = $info['bValue'];
+                    $second = $info['second'];
+
+                    if ($bValue > 0) {
+                        // Set as formula if B value exists
+                        $formula = "=B{$rowNumber}*0.6";
+                        $sheet->setCellValueExplicit(
+                            $cell,
+                            $formula,
+                            DataType::TYPE_FORMULA
+                        );
+                    } else {
+                        // Ensure we at least keep the original value
+                        $sheet->setCellValue($cell, $second);
+                    }
                 }
 
                 // Ustun kengliklari
-                $sheet->getColumnDimension('A')->setWidth(10); // second
-                $sheet->getColumnDimension('B')->setWidth(5);  // blank
+                $sheet->getColumnDimension('A')->setWidth(15); // second
+                $sheet->getColumnDimension('B')->setWidth(10); // B column value
                 $sheet->getColumnDimension('C')->setWidth(40); // name/category
                 $sheet->getColumnDimension('D')->setWidth(12); // razryad
                 $sheet->getColumnDimension('E')->setWidth(5);  // blank
