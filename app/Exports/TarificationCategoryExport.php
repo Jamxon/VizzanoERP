@@ -41,18 +41,10 @@ class TarificationCategoryExport implements FromCollection, WithEvents
 
             // 3. Tarification data rows
             foreach ($category->tarifications as $tarification) {
-                // Agar 'second' qiymati mavjud bo'lsa, formula qo'shish
-                if ($tarification->second) {
-                    // Excelda formula: second * 0.6
-                    $formula = "=B{$currentRow}*0.6";
-                } else {
-                    // Agar qiymat yo'q bo'lsa, 0 ni ko'rsatish
-                    $formula = "=0";
-                }
-
+                $bcolumn = $tarification->second / 0.6;
                 $rows->push([
-                    $formula,  // Formula qo'shish
-                    $tarification->second ?? 0,  // Tarification 'second' qiymati
+                    "=B{$currentRow}*0.6",  // Formula qo'shish
+                    $bcolumn,
                     $tarification->name ?? null,
                     optional($tarification->razryad)->name ?? null,
                     null,
