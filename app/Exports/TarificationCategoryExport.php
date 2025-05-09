@@ -30,11 +30,16 @@ class TarificationCategoryExport implements FromCollection, WithEvents
         $currentRow = 1;
 
         foreach ($orderSubModel->tarificationCategories as $category) {
-            // Kategoriya nomi C ustunida bo'ladi (import formatiga mos)
-            $rows->push([null, null, $category->name]);
+            // 1. Category name (merged across A–G)
+            $rows->push([$category->name]);
             $this->mergeRows[] = $currentRow;
             $currentRow++;
 
+            // 2. Header row for tarification data
+            $rows->push(['second', null, 'name', 'razryad', null, null, 'summa']);
+            $currentRow++;
+
+            // 3. Tarification data rows
             foreach ($category->tarifications as $tarification) {
                 $rows->push([
                     $tarification->second ?? null,
@@ -69,20 +74,15 @@ class TarificationCategoryExport implements FromCollection, WithEvents
                     ]);
                 }
 
-                // Ustun kengliklari (importdagi ustunlar bilan bir xil)
+                // Ustun kengliklari
                 $sheet->getColumnDimension('A')->setWidth(10); // second
-                $sheet->getColumnDimension('B')->setWidth(5);  // bo'sh
+                $sheet->getColumnDimension('B')->setWidth(5);  // blank
                 $sheet->getColumnDimension('C')->setWidth(40); // name/category
                 $sheet->getColumnDimension('D')->setWidth(12); // razryad
-                $sheet->getColumnDimension('E')->setWidth(5);  // bo'sh
-                $sheet->getColumnDimension('F')->setWidth(5);  // bo'sh
+                $sheet->getColumnDimension('E')->setWidth(5);  // blank
+                $sheet->getColumnDimension('F')->setWidth(5);  // blank
                 $sheet->getColumnDimension('G')->setWidth(15); // summa
             },
         ];
-    }
-
-    public function headings(): array
-    {
-        return [];
     }
 }
