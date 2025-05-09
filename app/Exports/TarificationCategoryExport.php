@@ -16,6 +16,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
     public function __construct($orderSubModelId)
     {
         $this->orderSubModelId = $orderSubModelId;
+        dd($orderSubModelId);
     }
 
     public function collection(): Collection
@@ -25,8 +26,6 @@ class TarificationCategoryExport implements FromCollection, WithEvents
         if (!$orderSubModel) {
             return collect([]);
         }
-
-        dd($orderSubModel);
 
         $rows = new Collection();
         $currentRow = 1;
