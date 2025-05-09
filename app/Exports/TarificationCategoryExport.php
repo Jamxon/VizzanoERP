@@ -35,11 +35,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
             $rows->push([$category->name]);
             $this->mergeRows[] = $currentRow;
             $currentRow++;
-
-            // 2. Header row for tarification data
-            $rows->push(['second', null, 'name', 'razryad', null, null, 'summa']);
-            $currentRow++;
-
+            
             // 3. Tarification data rows
             foreach ($category->tarifications as $tarification) {
                 $bcolumn = $tarification->second / 0.6;
