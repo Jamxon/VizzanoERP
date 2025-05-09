@@ -903,6 +903,8 @@ class TechnologController extends Controller
                 'submodel_name' => $orderSubmodel->submodel->name
             ]);
 
+            dd($order);
+
             return Excel::download(new TarificationCategoryExport($orderSubModelId),  $order->id . ' ' . $orderSubmodel->submodel->name .  '.xlsx');
 
         } catch (\Exception $e) {
