@@ -78,7 +78,7 @@ class ItemController extends Controller
         Log::add(
             auth()->user()->id,
             'Materiallar eksport qilindi',
-            'Materiallar eksporti',
+            'export',
             null,
             [
                 'file_url' => $fileUrl,
@@ -203,7 +203,7 @@ class ItemController extends Controller
             Log::add(
                 auth()->user()->id,
                 'Yangi material yaratildi',
-                'Material yaratish',
+                'create',
                 null,
                 $validated + ['item_id' => $item->id]
             );
@@ -287,7 +287,7 @@ class ItemController extends Controller
             Log::add(
                 auth()->user()->id,
                 'Material yangilandi',
-                'Material yangilash',
+                'edit',
                 [
                     'item_id' => $item->id,
                     'name' => $item->name,
