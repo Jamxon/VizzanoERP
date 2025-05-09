@@ -1045,7 +1045,7 @@ class TechnologController extends Controller
                     $rowData = [];
                     for ($col = 1; $col <= $highestColumnIndex; $col++) {
                         $cell = $worksheet->getCellByColumnAndRow($col, $row);
-                        $cellValue = $cell->getCalculatedValue();
+                        $cellValue = $cell->getValue(); // Formulasi yo'q bo'lgan joylar uchun ham ishlaydi
                         $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
                         $rowData[$colLetter] = $cellValue;
                     }
