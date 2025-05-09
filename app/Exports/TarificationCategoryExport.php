@@ -26,6 +26,8 @@ class TarificationCategoryExport implements FromCollection, WithEvents
             return collect([]);
         }
 
+        dd($orderSubModel);
+
         $rows = new Collection();
         $currentRow = 1;
 
