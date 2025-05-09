@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Exports\SpecificationCategoryExport;
 use App\Exports\TarificationCategoryExport;
-use App\Imports\SpecificationCategoryImport;
-use App\Imports\TarificationCategoryImport;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\Order;
@@ -21,7 +19,7 @@ use App\Models\TarificationCategory;
 use App\Models\TypeWriter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Excel;
+use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
