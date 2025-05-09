@@ -41,9 +41,9 @@ class TarificationCategoryExport implements FromCollection, WithEvents
 
             // 3. Tarification data rows
             foreach ($category->tarifications as $tarification) {
-                $bcolumn = $tarification->second ?? null;
+                $bcolumn = $tarification->second / 0.6;
                 $rows->push([
-                    "=A{$currentRow}*0.6",  // Formula qo'shish
+                    "=B{$currentRow}*0.6",  // Formula qo'shish
                     $bcolumn,
                     $tarification->name ?? null,
                     optional($tarification->razryad)->name ?? null,
