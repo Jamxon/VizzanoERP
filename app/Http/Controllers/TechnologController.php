@@ -1004,169 +1004,67 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
-        ini_set('memory_limit', '512M');
+        $maxRow = max(array_keys($sheet));
+        $currentCategory = null;
+        $sectionPrefix = null;
+        $totalSecond = 0;
+        $totalSumma = 0;
 
-        try {
-            if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
-                return response()->json(['message' => 'Fayl yuklashda xatolik'], 422);
-            }
+        for ($rowNum = 1; $rowNum <= $maxRow; $rowNum++) {
+            $row = $sheet[$rowNum] ?? [];
 
-            $file = $request->file('file');
-            $submodelId = $request->input('submodel_id');
-
-            if (empty($submodelId)) {
-                return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
-            }
-
-            try {
-                $extension = strtolower($file->getClientOriginalExtension());
-                if ($extension == 'xlsx') {
-                    $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
-                    $reader->setReadDataOnly(true);
-                    $reader->setReadEmptyCells(false);
-                } elseif ($extension == 'xls') {
-                    $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
-                } elseif ($extension == 'ods') {
-                    $reader = new \PhpOffice\PhpSpreadsheet\Reader\Ods();
-                } else {
-                    return response()->json(['message' => 'Yaroqsiz fayl formati'], 422);
-                }
-
-                $spreadsheet = $reader->load($file->getPathname());
-                $worksheet = $spreadsheet->getActiveSheet();
-
-                $sheet = [];
-                $highestRow = $worksheet->getHighestRow();
-                $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString(
-                    $worksheet->getHighestColumn()
-                );
-
-                for ($row = 1; $row <= $highestRow; $row++) {
-                    $rowData = [];
-                    for ($col = 1; $col <= $highestColumnIndex; $col++) {
-                        $cell = $worksheet->getCellByColumnAndRow($col, $row);
-                        $cellValue = $cell->getCalculatedValue();
-
-                        if ($cellValue === null) {
-                            $cellValue = $cell->getValue();
-                        }
-
-                        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
-                        $rowData[$colLetter] = $cellValue;
-                    }
-                    $sheet[$row] = $rowData;
-                }
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Fayl o‘qishda xatolik: ' . $e->getMessage(),
-                    'error_details' => $e->getTraceAsString()
-                ], 422);
-            }
-
-            if (empty($sheet) || count($sheet) < 3) {
-                return response()->json(['message' => 'Faylda maʼlumot yoʻq yoki format noto‘g‘ri'], 422);
-            }
-
-            DB::beginTransaction();
-
-            try {
-                $categoryName = trim($sheet[1]['C'] ?? 'Nomaʼlum kategoriya');
-
-                $category = TarificationCategory::create([
+            // Kategoriya sarlavhasini aniqlash (merge qilingan satrda C ustunda nom bo'ladi)
+            if (!empty($row['C']) && empty($row['A']) && empty($row['B']) && empty($row['D'])) {
+                $categoryName = trim($row['C']);
+                $currentCategory = TarificationCategory::create([
                     'name' => $categoryName,
                     'submodel_id' => $submodelId,
                 ]);
-
-                $sectionPrefix = null;
-                $totalSecond = 0;
-                $totalSumma = 0;
-
-                $maxRow = max(array_keys($sheet));
-                for ($rowNum = 2; $rowNum <= $maxRow; $rowNum++) {
-                    $row = $sheet[$rowNum] ?? [];
-
-                    if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
-                        $sectionPrefix = trim($row['C']);
-                        continue;
-                    }
-
-                    if (empty($row['A']) || empty($row['C'])) {
-                        continue;
-                    }
-
-                    $rawA = $row['A'] ?? null;
-
-                    if (!is_null($rawA) && is_numeric(str_replace(',', '.', trim((string)$rawA)))) {
-                        $seconds = (float) str_replace(',', '.', trim((string)$rawA));
-                    } else {
-                        $seconds = 0;
-                    }
-
-                    $description = trim((string)$row['C']);
-
-                    if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
-                        $description = "{$sectionPrefix} - {$description}";
-                    }
-
-                    $razryadName = $row['D'] ?? '1';
-                    $razryad = Razryad::where('name', $razryadName)->first();
-                    $razryadId = $razryad?->id;
-
-                    $costs = $seconds * ($razryad?->salary ?? 0);
-
-                    Tarification::create([
-                        'tarification_category_id' => $category->id,
-                        'user_id' => null,
-                        'name' => $description,
-                        'razryad_id' => $razryadId,
-                        'typewriter_id' => null,
-                        'second' => $seconds,
-                        'summa' => $costs,
-                        'code' => $this->generateSequentialCode(),
-                    ]);
-
-                    $totalSecond += $seconds;
-                    $totalSumma += $costs;
-                }
-
-                $submodelSpend = SubmodelSpend::where('submodel_id', $submodelId)->first();
-
-                if ($submodelSpend) {
-                    $submodelSpend->update([
-                        'seconds' => $submodelSpend->seconds + $totalSecond,
-                        'summa' => $submodelSpend->summa + $totalSumma,
-                    ]);
-                } else {
-                    SubmodelSpend::create([
-                        'submodel_id' => $submodelId,
-                        'seconds' => $totalSecond,
-                        'summa' => $totalSumma,
-                    ]);
-                }
-
-                DB::commit();
-
-                return response()->json(['message' => 'Tarifikatsiya muvaffaqiyatli import qilindi']);
-            } catch (\Exception $e) {
-                DB::rollBack();
-
-                return response()->json([
-                    'message' => 'Xatolik yuz berdi!',
-                    'error' => $e->getMessage(),
-                    'details' => $e->getTraceAsString()
-                ], 500);
+                continue;
             }
 
-        } catch (\Throwable $e) {
-            DB::rollBack();
+            // Section prefixni aniqlash
+            if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
+                $sectionPrefix = trim($row['C']);
+                continue;
+            }
 
-            return response()->json([
-                'message' => 'Xatolik yuz berdi!',
-                'error' => $e->getMessage(),
-                'trace' => collect($e->getTrace())->take(5)->toArray(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ], 500);
+            // Malumot satrlarini o'qish
+            if (!empty($row['C']) && $currentCategory) {
+                $rawA = $row['A'] ?? null;
+
+                if (!is_null($rawA) && is_numeric(str_replace(',', '.', trim((string)$rawA)))) {
+                    $seconds = (float) str_replace(',', '.', trim((string)$rawA));
+                } else {
+                    $seconds = 0;
+                }
+
+                $description = trim((string)$row['C']);
+
+                if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
+                    $description = "{$sectionPrefix} - {$description}";
+                }
+
+                $razryadName = $row['D'] ?? '1';
+                $razryad = Razryad::where('name', $razryadName)->first();
+                $razryadId = $razryad?->id;
+
+                $costs = $seconds * ($razryad?->salary ?? 0);
+
+                Tarification::create([
+                    'tarification_category_id' => $currentCategory->id,
+                    'user_id' => null,
+                    'name' => $description,
+                    'razryad_id' => $razryadId,
+                    'typewriter_id' => null,
+                    'second' => $seconds,
+                    'summa' => $costs,
+                    'code' => $this->generateSequentialCode(),
+                ]);
+
+                $totalSecond += $seconds;
+                $totalSumma += $costs;
+            }
         }
     }
 
