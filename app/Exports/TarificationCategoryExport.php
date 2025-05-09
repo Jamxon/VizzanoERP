@@ -20,7 +20,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
 
     public function collection(): Collection
     {
-        $orderSubModel = OrderSubModel::with(['tarificationCategories.tarifications.razryad', 'tarificationCategories.tarifications.typewriter'])->find($this->orderSubModelId);
+        $orderSubModel = OrderSubModel::with(['tarificationCategories.tarifications.razryad'])->find($this->orderSubModelId);
 
         if (!$orderSubModel) {
             return collect([]);
@@ -29,23 +29,21 @@ class TarificationCategoryExport implements FromCollection, WithEvents
         $rows = new Collection();
         $currentRow = 1;
 
-        foreach ($orderSubModel->tarificationCategories ?? [] as $category) {
-            $rows->push([$category->name ?? '']);
+        foreach ($orderSubModel->tarificationCategories as $category) {
+            // Kategoriya nomi C ustunida bo'ladi (import formatiga mos)
+            $rows->push([null, null, $category->name]);
             $this->mergeRows[] = $currentRow;
             $currentRow++;
 
-            $header = ['code', 'name', 'razryad', 'typewriter', 'second', 'summa'];
-            $rows->push($header);
-            $currentRow++;
-
-            foreach ($category->tarifications ?? [] as $tarification) {
+            foreach ($category->tarifications as $tarification) {
                 $rows->push([
-                    $tarification->code ?? '',
-                    $tarification->name ?? '',
-                    optional($tarification->razryad)->name ?? '',
-                    optional($tarification->typewriter)->name ?? '',
-                    $tarification->second ?? '',
-                    $tarification->summa ?? '',
+                    $tarification->second ?? null,
+                    null,
+                    $tarification->name ?? null,
+                    optional($tarification->razryad)->name ?? null,
+                    null,
+                    null,
+                    $tarification->summa ?? null,
                 ]);
                 $currentRow++;
             }
@@ -61,7 +59,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
                 $sheet = $event->sheet->getDelegate();
 
                 foreach ($this->mergeRows as $row) {
-                    $cellRange = "A{$row}:H{$row}";
+                    $cellRange = "A{$row}:G{$row}";
                     $sheet->mergeCells($cellRange);
                     $sheet->getStyle($cellRange)->applyFromArray([
                         'font' => ['bold' => true],
@@ -71,14 +69,14 @@ class TarificationCategoryExport implements FromCollection, WithEvents
                     ]);
                 }
 
-                $sheet->getColumnDimension('A')->setWidth(15);
-                $sheet->getColumnDimension('B')->setWidth(12);
-                $sheet->getColumnDimension('C')->setWidth(20);
-                $sheet->getColumnDimension('D')->setWidth(30);
-                $sheet->getColumnDimension('E')->setWidth(15);
-                $sheet->getColumnDimension('F')->setWidth(20);
-                $sheet->getColumnDimension('G')->setWidth(10);
-                $sheet->getColumnDimension('H')->setWidth(15);
+                // Ustun kengliklari (importdagi ustunlar bilan bir xil)
+                $sheet->getColumnDimension('A')->setWidth(10); // second
+                $sheet->getColumnDimension('B')->setWidth(5);  // bo'sh
+                $sheet->getColumnDimension('C')->setWidth(40); // name/category
+                $sheet->getColumnDimension('D')->setWidth(12); // razryad
+                $sheet->getColumnDimension('E')->setWidth(5);  // bo'sh
+                $sheet->getColumnDimension('F')->setWidth(5);  // bo'sh
+                $sheet->getColumnDimension('G')->setWidth(15); // summa
             },
         ];
     }
