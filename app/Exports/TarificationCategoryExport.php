@@ -6,16 +6,12 @@ use App\Models\OrderSubModel;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 use Maatwebsite\Excel\Events\AfterSheet;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
-class TarificationCategoryExport implements FromCollection, WithEvents, WithStrictNullComparison
+class TarificationCategoryExport implements FromCollection, WithEvents
 {
     protected $orderSubModelId;
     protected $mergeRows = [];
-    protected $formulaData = [];
 
     public function __construct($orderSubModelId)
     {
@@ -40,33 +36,21 @@ class TarificationCategoryExport implements FromCollection, WithEvents, WithStri
             $currentRow++;
 
             // 2. Header row for tarification data
-            $rows->push(['second', 'B column', 'name', 'razryad', null, null, 'summa']);
+            $rows->push(['second', null, 'name', 'razryad', null, null, 'summa']);
             $currentRow++;
 
             // 3. Tarification data rows
             foreach ($category->tarifications as $tarification) {
-                // Use a placeholder for column A, will be replaced with formula
-                $second = $tarification->second ?? 0;
-                $bValue = $second > 0 ? $second / 0.6 : 0;
-
-                // Store row with actual values - A column will get formula later
+                $bcolumn = $tarification->second / 0.6;
                 $rows->push([
-                    "FORMULA_PLACEHOLDER_{$currentRow}", // Formula placeholder
-                    $bValue, // B column value
+                    "=B{$currentRow}*0.6",  
+                    $bcolumn,
                     $tarification->name ?? null,
                     optional($tarification->razryad)->name ?? null,
                     null,
                     null,
                     $tarification->summa ?? null,
                 ]);
-
-                // Save formula data for later
-                $this->formulaData[] = [
-                    'row' => $currentRow,
-                    'bValue' => $bValue,
-                    'second' => $second
-                ];
-
                 $currentRow++;
             }
         }
@@ -79,7 +63,6 @@ class TarificationCategoryExport implements FromCollection, WithEvents, WithStri
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $spreadsheet = $sheet->getParent();
 
                 // Merge category name cells
                 foreach ($this->mergeRows as $row) {
@@ -93,33 +76,9 @@ class TarificationCategoryExport implements FromCollection, WithEvents, WithStri
                     ]);
                 }
 
-                // Explicitly apply formulas to cells (replacing placeholders)
-                foreach ($this->formulaData as $data) {
-                    $row = $data['row'];
-                    $bValue = $data['bValue'];
-                    $cell = "A{$row}";
-
-                    // Replace placeholder with formula
-                    $formula = "=B{$row}*0.6";
-
-                    // First ensure B column has the correct value
-                    $sheet->getCell("B{$row}")->setValue($bValue);
-
-                    // Then set the formula
-                    $sheet->getCell($cell)->setValue($formula);
-
-                    // Format the cell to display decimal numbers
-                    $sheet->getStyle($cell)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
-                    $sheet->getStyle("B{$row}")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_00);
-                }
-
-                // Force recalculation
-                $spreadsheet->getCalculationEngine()->disableCalculationCache();
-                $spreadsheet->getCalculationEngine()->calculateFormulas();
-
-                // Column widths
-                $sheet->getColumnDimension('A')->setWidth(15); // second with formula
-                $sheet->getColumnDimension('B')->setWidth(10); // B column
+                // Ustun kengliklari
+                $sheet->getColumnDimension('A')->setWidth(10); // second
+                $sheet->getColumnDimension('B')->setWidth(5);  // blank
                 $sheet->getColumnDimension('C')->setWidth(40); // name/category
                 $sheet->getColumnDimension('D')->setWidth(12); // razryad
                 $sheet->getColumnDimension('E')->setWidth(5);  // blank
