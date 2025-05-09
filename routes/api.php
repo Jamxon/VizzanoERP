@@ -33,7 +33,6 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VizzanoReportTvController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
-use App\Models\QualityDescription;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () {
