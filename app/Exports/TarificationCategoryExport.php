@@ -12,6 +12,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
 {
     protected $orderSubModelId;
     protected $mergeRows = [];
+    protected $formulaCells = [];
 
     public function __construct($orderSubModelId)
     {
@@ -42,8 +43,10 @@ class TarificationCategoryExport implements FromCollection, WithEvents
             // 3. Tarification data rows
             foreach ($category->tarifications as $tarification) {
                 $bcolumn = $tarification->second / 0.6;
+
+                // Store the actual value for A column, we'll set the formula later
                 $rows->push([
-                    "=B{$currentRow}*0.6",  // Formula qo'shish
+                    $tarification->second, // Initially put the actual value
                     $bcolumn,
                     $tarification->name ?? null,
                     optional($tarification->razryad)->name ?? null,
@@ -51,6 +54,9 @@ class TarificationCategoryExport implements FromCollection, WithEvents
                     null,
                     $tarification->summa ?? null,
                 ]);
+
+                // Save the cell address for later formula application
+                $this->formulaCells[] = 'A' . $currentRow;
                 $currentRow++;
             }
         }
@@ -74,6 +80,13 @@ class TarificationCategoryExport implements FromCollection, WithEvents
                             'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
                         ],
                     ]);
+                }
+
+                // Set formulas for A column cells
+                foreach ($this->formulaCells as $cell) {
+                    $rowNumber = substr($cell, 1);
+                    $formula = "=B{$rowNumber}*0.6";
+                    $sheet->setCellValue($cell, $formula);
                 }
 
                 // Ustun kengliklari
