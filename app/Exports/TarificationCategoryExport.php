@@ -41,9 +41,10 @@ class TarificationCategoryExport implements FromCollection, WithEvents
 
             // 3. Tarification data rows
             foreach ($category->tarifications as $tarification) {
+                $bcolumn = $tarification->second ?? null;
                 $rows->push([
-                    $tarification->second ?? null,
-                    null,
+                    "=A{$currentRow}*0.6",  // Formula qo'shish
+                    $bcolumn,
                     $tarification->name ?? null,
                     optional($tarification->razryad)->name ?? null,
                     null,
@@ -63,6 +64,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
+                // Merge category name cells
                 foreach ($this->mergeRows as $row) {
                     $cellRange = "A{$row}:G{$row}";
                     $sheet->mergeCells($cellRange);
