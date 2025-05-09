@@ -1004,67 +1004,154 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
-        $maxRow = max(array_keys($sheet));
-        $currentCategory = null;
-        $sectionPrefix = null;
-        $totalSecond = 0;
-        $totalSumma = 0;
+        ini_set('memory_limit', '512M');
 
-        for ($rowNum = 1; $rowNum <= $maxRow; $rowNum++) {
-            $row = $sheet[$rowNum] ?? [];
+        if (!$request->hasFile('file') || !$request->file('file')->isValid()) {
+            return response()->json(['message' => 'Fayl yuklashda xatolik'], 422);
+        }
 
-            // Kategoriya sarlavhasini aniqlash (merge qilingan satrda C ustunda nom bo'ladi)
-            if (!empty($row['C']) && empty($row['A']) && empty($row['B']) && empty($row['D'])) {
-                $categoryName = trim($row['C']);
-                $currentCategory = TarificationCategory::create([
-                    'name' => $categoryName,
+        $file = $request->file('file');
+        $submodelId = $request->input('submodel_id');
+
+        if (empty($submodelId)) {
+            return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
+        }
+
+        try {
+            $extension = strtolower($file->getClientOriginalExtension());
+            if ($extension === 'xlsx') {
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xlsx();
+                $reader->setReadDataOnly(true);
+                $reader->setReadEmptyCells(false);
+            } elseif ($extension === 'xls') {
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Xls();
+            } elseif ($extension === 'ods') {
+                $reader = new \PhpOffice\PhpSpreadsheet\Reader\Ods();
+            } else {
+                return response()->json(['message' => 'Yaroqsiz fayl formati'], 422);
+            }
+
+            $spreadsheet = $reader->load($file->getPathname());
+            $worksheet = $spreadsheet->getActiveSheet();
+
+            $sheet = [];
+            $highestRow = $worksheet->getHighestRow();
+            $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString(
+                $worksheet->getHighestColumn()
+            );
+
+            for ($row = 1; $row <= $highestRow; $row++) {
+                $rowData = [];
+                for ($col = 1; $col <= $highestColumnIndex; $col++) {
+                    $cell = $worksheet->getCellByColumnAndRow($col, $row);
+                    $cellValue = $cell->getCalculatedValue();
+                    if ($cellValue === null) {
+                        $cellValue = $cell->getValue();
+                    }
+
+                    $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col);
+                    $rowData[$colLetter] = $cellValue;
+                }
+                $sheet[$row] = $rowData;
+            }
+
+            if (empty($sheet) || count($sheet) < 3) {
+                return response()->json(['message' => 'Faylda maʼlumot yoʻq yoki format noto‘g‘ri'], 422);
+            }
+
+            DB::beginTransaction();
+
+            $maxRow = max(array_keys($sheet));
+            $currentCategory = null;
+            $sectionPrefix = null;
+            $totalSecond = 0;
+            $totalSumma = 0;
+
+            for ($rowNum = 1; $rowNum <= $maxRow; $rowNum++) {
+                $row = $sheet[$rowNum] ?? [];
+
+                // Kategoriya nomi: C ustunda yozilgan va boshqa ustunlar bo‘sh
+                if (!empty($row['C']) && empty($row['A']) && empty($row['B']) && empty($row['D'])) {
+                    $categoryName = trim($row['C']);
+                    $currentCategory = TarificationCategory::create([
+                        'name' => $categoryName,
+                        'submodel_id' => $submodelId,
+                    ]);
+                    $sectionPrefix = null;
+                    continue;
+                }
+
+                // Section prefix: C ustunda nom bor, lekin bu tarif emas
+                if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
+                    $sectionPrefix = trim($row['C']);
+                    continue;
+                }
+
+                // Tarif qatorlari
+                if (!empty($row['C']) && $currentCategory) {
+                    $rawA = $row['A'] ?? null;
+                    if (!is_null($rawA) && is_numeric(str_replace(',', '.', trim((string)$rawA)))) {
+                        $seconds = (float) str_replace(',', '.', trim((string)$rawA));
+                    } else {
+                        $seconds = 0;
+                    }
+
+                    $description = trim((string)$row['C']);
+                    if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
+                        $description = "{$sectionPrefix} - {$description}";
+                    }
+
+                    $razryadName = $row['D'] ?? '1';
+                    $razryad = Razryad::where('name', $razryadName)->first();
+                    $razryadId = $razryad?->id;
+
+                    $costs = $seconds * ($razryad?->salary ?? 0);
+
+                    Tarification::create([
+                        'tarification_category_id' => $currentCategory->id,
+                        'user_id' => null,
+                        'name' => $description,
+                        'razryad_id' => $razryadId,
+                        'typewriter_id' => null,
+                        'second' => $seconds,
+                        'summa' => $costs,
+                        'code' => $this->generateSequentialCode(),
+                    ]);
+
+                    $totalSecond += $seconds;
+                    $totalSumma += $costs;
+                }
+            }
+
+            // SubmodelSpend ni yangilash
+            $submodelSpend = SubmodelSpend::where('submodel_id', $submodelId)->first();
+            if ($submodelSpend) {
+                $submodelSpend->update([
+                    'seconds' => $submodelSpend->seconds + $totalSecond,
+                    'summa' => $submodelSpend->summa + $totalSumma,
+                ]);
+            } else {
+                SubmodelSpend::create([
                     'submodel_id' => $submodelId,
+                    'seconds' => $totalSecond,
+                    'summa' => $totalSumma,
                 ]);
-                continue;
             }
 
-            // Section prefixni aniqlash
-            if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
-                $sectionPrefix = trim($row['C']);
-                continue;
-            }
+            DB::commit();
 
-            // Malumot satrlarini o'qish
-            if (!empty($row['C']) && $currentCategory) {
-                $rawA = $row['A'] ?? null;
+            return response()->json(['message' => 'Tarifikatsiyalar muvaffaqiyatli import qilindi.']);
 
-                if (!is_null($rawA) && is_numeric(str_replace(',', '.', trim((string)$rawA)))) {
-                    $seconds = (float) str_replace(',', '.', trim((string)$rawA));
-                } else {
-                    $seconds = 0;
-                }
+        } catch (\Throwable $e) {
+            DB::rollBack();
 
-                $description = trim((string)$row['C']);
-
-                if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
-                    $description = "{$sectionPrefix} - {$description}";
-                }
-
-                $razryadName = $row['D'] ?? '1';
-                $razryad = Razryad::where('name', $razryadName)->first();
-                $razryadId = $razryad?->id;
-
-                $costs = $seconds * ($razryad?->salary ?? 0);
-
-                Tarification::create([
-                    'tarification_category_id' => $currentCategory->id,
-                    'user_id' => null,
-                    'name' => $description,
-                    'razryad_id' => $razryadId,
-                    'typewriter_id' => null,
-                    'second' => $seconds,
-                    'summa' => $costs,
-                    'code' => $this->generateSequentialCode(),
-                ]);
-
-                $totalSecond += $seconds;
-                $totalSumma += $costs;
-            }
+            return response()->json([
+                'message' => 'Xatolik yuz berdi!',
+                'error' => $e->getMessage(),
+                'trace' => collect($e->getTrace())->take(5)->toArray(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ], 500);
         }
     }
 
