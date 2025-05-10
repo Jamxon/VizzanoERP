@@ -182,7 +182,8 @@ class WarehouseController extends Controller
                         // YANGI: item.code bo‘yicha qidiruv
                         $q->orWhereHas('items', function ($q) use ($likeSearch) {
                             $q->whereHas('item', function ($sub) use ($likeSearch) {
-                                $sub->whereRaw('LOWER(code) LIKE ?', [$likeSearch]);
+                                $sub->whereRaw('LOWER(code) LIKE ?', [$likeSearch])
+                                    ->orWhereRaw('LOWER(name) LIKE ?', [$likeSearch]);
                             });
                         });
 
