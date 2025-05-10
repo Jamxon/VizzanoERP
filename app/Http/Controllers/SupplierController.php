@@ -100,6 +100,8 @@ class SupplierController extends Controller
     public function getSupplierOrder(Request $request): \Illuminate\Http\JsonResponse
     {
         $supplierOrders = SupplierOrder::where('branch_id', auth()->user()->employee->branch_id)
+            ->where('status', $request->input('status'))
+            ->where('deadline', $request->input('deadline'))
             ->with([
                 'items.item',
                 'items.item.unit',
