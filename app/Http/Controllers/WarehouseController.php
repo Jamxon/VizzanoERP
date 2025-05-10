@@ -37,7 +37,7 @@ class WarehouseController extends Controller
         if ($search) {
             $latin = transliterate_to_latin($search);
             $cyrillic = transliterate_to_cyrillic($search);
-            $original = mb_strtolower($search);
+            $original = mb_strtolower($search, 'UTF-8');
 
             $query->where(function ($q) use ($original, $latin, $cyrillic) {
                 $q->whereRaw('LOWER(items.name) LIKE ?', ["%{$original}%"])
