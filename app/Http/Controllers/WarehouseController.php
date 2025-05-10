@@ -43,7 +43,7 @@ class WarehouseController extends Controller
                     ->orWhere('items.name', 'like', "%$cyrillic%");
             });
 
-            dd($query->toSql().
+            dd(
                 $query->getBindings());
         }
 
