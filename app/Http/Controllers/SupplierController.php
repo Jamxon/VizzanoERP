@@ -77,17 +77,23 @@ class SupplierController extends Controller
 
     public function getSupplier(): \Illuminate\Http\JsonResponse
     {
+        $branchId = auth()->user()?->employee?->branch_id;
+
+        if (!$branchId) {
+            return response()->json(['message' => 'Branch ID topilmadi.'], 400);
+        }
+
         $suppliers = User::whereHas('roles', function ($query) {
             $query->where('name', 'supplier');
         })
-            ->whereHas('employee', function ($query) {
+            ->whereHas('employee', function ($query) use ($branchId) {
                 $query->where('status', '!=', 'kicked')
-                    ->where('branch_id', auth()->user()->employee->branch_id);
+                    ->where('branch_id', $branchId);
             })
             ->with('employee')
             ->get();
 
         return response()->json($suppliers);
-
     }
+
 }
