@@ -137,11 +137,34 @@ class SupplierController extends Controller
         return response()->json($supplierOrders);
     }
 
-    public function getOrders(): \Illuminate\Http\JsonResponse
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
-        $supplierOrders = SupplierOrder::where('branch_id', auth()->user()->employee->branch_id)
+        $branchId = auth()->user()?->employee?->branch_id;
+
+        if (!$branchId) {
+            return response()->json(['message' => 'Branch aniqlanmadi'], 400);
+        }
+
+        $search = $request->input('search');
+
+        $orders = SupplierOrder::where('branch_id', $branchId)
             ->where('supplier_id', auth()->id())
             ->where('status', '!=', 'inactive')
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('status', $request->input('status'));
+            })
+            ->when($request->filled('deadline'), function ($query) use ($request) {
+                $query->whereDate('deadline', $request->input('deadline'));
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereRaw('LOWER(code) LIKE ?', ['%' . mb_strtolower($search) . '%'])
+                        ->orWhereRaw('LOWER(comment) LIKE ?', ['%' . mb_strtolower($search) . '%'])
+                        ->orWhereHas('supplier.employee', function ($q) use ($search) {
+                            $q->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($search) . '%']);
+                        });
+                });
+            })
             ->with([
                 'items.item',
                 'items.item.unit',
@@ -151,9 +174,9 @@ class SupplierController extends Controller
                 'supplier.employee'
             ])
             ->orderBy('deadline', 'desc')
-            ->get();
+            ->paginate(20);
 
-        return response()->json($supplierOrders);
+        return response()->json($orders);
     }
 
     public function destroySupplierOrder($id): \Illuminate\Http\JsonResponse
