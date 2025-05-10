@@ -42,6 +42,11 @@ class SupplierOrder extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function createdBy(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
     public function items(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SupplierOrderItem::class);
