@@ -83,7 +83,7 @@ class SupplierController extends Controller
             return response()->json(['message' => 'Branch ID topilmadi.'], 400);
         }
 
-        $suppliers = User::whereHas('roles', function ($query) {
+        $suppliers = User::whereHas('role', function ($query) {
             $query->where('name', 'supplier');
         })
             ->whereHas('employee', function ($query) use ($branchId) {
