@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
     Route::get('orders', [SupplierController::class, 'getOrders']);
+    Route::get('receive/{id}', [SupplierController::class, 'receiveSupplierOrder']);
 });
 
 Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () {

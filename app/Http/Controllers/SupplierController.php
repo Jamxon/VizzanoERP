@@ -163,7 +163,7 @@ class SupplierController extends Controller
             return response()->json(['message' => 'Faqat yangi buyurtmalarni o\'chirish mumkin.'], 400);
         }
 
-        if ($order->supplier_id !== auth()->id()) {
+        if ($order->created_by !== auth()->id()) {
             return response()->json(['message' => 'Siz faqat o\'zingizning buyurtmalaringizni o\'chira olasiz.'], 403);
         }
 
@@ -180,5 +180,33 @@ class SupplierController extends Controller
         );
 
         return response()->json(['message' => 'Buyurtma muvaffaqiyatli o\'chirildi.'], 200);
+    }
+
+    public function receiveSupplierOrder($id): \Illuminate\Http\JsonResponse
+    {
+        $order = SupplierOrder::findOrFail($id);
+
+        if ($order->status !== 'new') {
+            return response()->json(['message' => 'Faqat yangi buyurtmalarni qabul qilish mumkin.'], 400);
+        }
+
+        if ($order->supplier_id !== auth()->id()) {
+            return response()->json(['message' => 'Siz faqat o\'zingizning buyurtmalaringizni qabul qilishingiz mumkin.'], 403);
+        }
+
+        $order->update([
+            'status' => 'active',
+            'received_date' => now(),
+        ]);
+
+        Log::add(
+            auth()->user()->id,
+            "Ta'minotchiga buyurtma qabul qilindi (ID: $id)",
+            'update',
+            null,
+            $order
+        );
+
+        return response()->json(['message' => 'Buyurtma muvaffaqiyatli qabul qilindi.'], 200);
     }
 }
