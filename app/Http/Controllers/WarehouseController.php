@@ -37,11 +37,12 @@ class WarehouseController extends Controller
         if ($search) {
             $latin = transliterate_to_latin($search);
             $cyrillic = transliterate_to_cyrillic($search);
+            $original = mb_strtolower($search);
 
-            dd($cyrillic);
-            $query->where(function ($q) use ($latin, $cyrillic) {
-                $q->whereRaw('LOWER(items.name) LIKE ?', ['%' . mb_strtolower($latin) . '%'])
-                    ->orWhereRaw('LOWER(items.name) LIKE ?', ['%' . mb_strtolower($cyrillic) . '%']);
+            $query->where(function ($q) use ($original, $latin, $cyrillic) {
+                $q->whereRaw('LOWER(items.name) LIKE ?', ["%{$original}%"])
+                    ->orWhereRaw('LOWER(items.name) LIKE ?', ["%{$latin}%"])
+                    ->orWhereRaw('LOWER(items.name) LIKE ?', ["%{$cyrillic}%"]);
             });
         }
 
