@@ -39,12 +39,9 @@ class WarehouseController extends Controller
             $cyrillic = transliterate_to_cyrillic($search);
 
             $query->where(function ($q) use ($latin, $cyrillic) {
-                $q->where('items.name', 'like', "%$latin%")
-                    ->orWhere('items.name', 'like', "%$cyrillic%");
+                $q->whereRaw('LOWER(items.name) LIKE ?', ['%' . mb_strtolower($latin) . '%'])
+                    ->orWhereRaw('LOWER(items.name) LIKE ?', ['%' . mb_strtolower($cyrillic) . '%']);
             });
-
-            dd(
-                $query->getBindings());
         }
 
         // Klonlangan query orqali total quantity hisoblash
