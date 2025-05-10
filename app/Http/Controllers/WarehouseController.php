@@ -21,7 +21,6 @@ class WarehouseController extends Controller
     public function getBalance(Request $request): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()?->employee?->branch_id;
-
         $warehouseId = $request->input('warehouse_id');
 
         $balance = StockBalance::where('quantity', '>', 0)
@@ -31,12 +30,12 @@ class WarehouseController extends Controller
             ->whereHas('warehouse', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             })
-            ->with([
-                'item.unit',
-                'warehouse',
-                'order'
-            ])
-            ->paginate();
+            ->join('items', 'items.id', '=', 'stock_balances.item_id')
+            ->with(['item.unit', 'warehouse', 'order'])
+            ->select('stock_balances.*')
+            ->orderByRaw('stock_balances.quantity <= items.min_quantity DESC')
+            ->orderBy('items.name')
+            ->paginate(20);
 
         return response()->json($balance);
     }
