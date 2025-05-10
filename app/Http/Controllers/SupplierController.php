@@ -37,7 +37,6 @@ class SupplierController extends Controller
                 'deadline' => $request->deadline,
                 'completed_date' => null,
                 'received_date' => null,
-                'received_by' => null,
             ]);
 
             foreach ($request->items as $item) {
