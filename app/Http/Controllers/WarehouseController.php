@@ -22,22 +22,43 @@ class WarehouseController extends Controller
     {
         $branchId = auth()->user()?->employee?->branch_id;
         $warehouseId = $request->input('warehouse_id');
+        $search = $request->input('search');
 
-        $balance = StockBalance::where('quantity', '>', 0)
+        $query = StockBalance::where('quantity', '>', 0)
             ->when($warehouseId, function ($query) use ($warehouseId) {
                 $query->where('warehouse_id', $warehouseId);
             })
             ->whereHas('warehouse', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             })
-            ->join('items', 'items.id', '=', 'stock_balances.item_id')
+            ->join('items', 'items.id', '=', 'stock_balances.item_id');
+
+        // Search (kiril va lotin)
+        if ($search) {
+            $latin = transliterate_to_latin($search);
+            $cyrillic = transliterate_to_cyrillic($search);
+
+            $query->where(function ($q) use ($latin, $cyrillic) {
+                $q->where('items.name', 'like', "%$latin%")
+                    ->orWhere('items.name', 'like', "%$cyrillic%");
+            });
+        }
+
+        // Klonlangan query orqali total quantity hisoblash
+        $totalQuantity = (clone $query)->sum('stock_balances.quantity');
+
+        // Asosiy query davom ettiriladi
+        $balances = $query
             ->with(['item.unit', 'warehouse', 'order'])
             ->select('stock_balances.*')
             ->orderByRaw('stock_balances.quantity <= items.min_quantity DESC')
             ->orderBy('items.name')
             ->paginate(20);
 
-        return response()->json($balance);
+        return response()->json([
+            'data' => $balances,
+            'total_quantity' => $totalQuantity,
+        ]);
     }
 
     public function getUsers(Request $request): \Illuminate\Http\JsonResponse
