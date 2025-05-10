@@ -37,6 +37,9 @@
     <setting file="file://$PROJECT_DIR$/routes/api.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="mock:///a.sql" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="PackageJsonUpdateNotifier">
+    <dismissed value="$PROJECT_DIR$/package.json" />
+  </component>
   <component name="PhpDebugGeneral" listening_started="true" />
   <component name="PhpWorkspaceProjectConfiguration" interpreter_name="php">
     <include_path>
@@ -328,7 +331,7 @@
       <workItem from="1745222297650" duration="26560000" />
       <workItem from="1745303207118" duration="44297000" />
       <workItem from="1745485070343" duration="75179000" />
-      <workItem from="1745916228550" duration="77161000" />
+      <workItem from="1745916228550" duration="117733000" />
     </task>
     <task id="LOCAL-00001" summary="huhuh">
       <option name="closed" value="true" />
