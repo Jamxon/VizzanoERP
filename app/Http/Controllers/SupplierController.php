@@ -117,7 +117,10 @@ class SupplierController extends Controller
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->whereRaw('LOWER(code) LIKE ?', ['%' . mb_strtolower($search) . '%'])
-                        ->orWhereRaw('LOWER(comment) LIKE ?', ['%' . mb_strtolower($search) . '%']);
+                        ->orWhereRaw('LOWER(comment) LIKE ?', ['%' . mb_strtolower($search) . '%'])
+                        ->orWhereHas('supplier', function ($q) use ($search) {
+                            $q->whereRaw('LOWER(employee.name) LIKE ?', ['%' . mb_strtolower($search) . '%']);
+                        });
                 });
             })
             ->with([
@@ -164,11 +167,9 @@ class SupplierController extends Controller
             return response()->json(['message' => 'Siz faqat o\'zingizning buyurtmalaringizni o\'chira olasiz.'], 403);
         }
 
-        foreach ($order->items as $item) {
-            $item->delete();
-        }
-
-        $order->delete();
+        $order->update([
+            'status' => 'inactive',
+        ]);
 
         Log::add(
             auth()->user()->id,
