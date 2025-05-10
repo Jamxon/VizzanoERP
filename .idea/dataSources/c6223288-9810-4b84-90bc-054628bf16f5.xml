@@ -9912,19 +9912,13 @@ tokenable_id</ColNames>
       <StoredType>timestamp|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="966" parent="399" name="received_by">
-      <Position>11</Position>
-      <StateNumber>221396</StateNumber>
-      <StoredType>bigint|0s</StoredType>
-      <TypeId>20</TypeId>
-    </column>
-    <column id="967" parent="399" name="received_date">
+    <column id="966" parent="399" name="received_date">
       <Position>12</Position>
       <StateNumber>221397</StateNumber>
       <StoredType>timestamp|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <foreign-key id="968" parent="399" name="supplier_orders_supplier_id_fkey">
+    <foreign-key id="967" parent="399" name="supplier_orders_supplier_id_fkey">
       <ColNames>supplier_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>22859</ObjectId>
@@ -9932,7 +9926,7 @@ tokenable_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>18244</RefTableId>
     </foreign-key>
-    <foreign-key id="969" parent="399" name="supplier_orders_created_by_fkey">
+    <foreign-key id="968" parent="399" name="supplier_orders_created_by_fkey">
       <ColNames>created_by</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>22864</ObjectId>
@@ -9940,7 +9934,7 @@ tokenable_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>18244</RefTableId>
     </foreign-key>
-    <index id="970" parent="399" name="supplier_orders_pkey">
+    <index id="969" parent="399" name="supplier_orders_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>22855</ObjectId>
@@ -9949,7 +9943,7 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="971" parent="399" name="supplier_orders_code_key">
+    <index id="970" parent="399" name="supplier_orders_code_key">
       <ColNames>code</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>22857</ObjectId>
@@ -9960,20 +9954,20 @@ tokenable_id</ColNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="972" parent="399" name="supplier_orders_pkey">
+    <key id="971" parent="399" name="supplier_orders_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>22856</ObjectId>
       <Primary>1</Primary>
       <StateNumber>194102</StateNumber>
       <UnderlyingIndexId>22855</UnderlyingIndexId>
     </key>
-    <key id="973" parent="399" name="supplier_orders_code_key">
+    <key id="972" parent="399" name="supplier_orders_code_key">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>22858</ObjectId>
       <StateNumber>194102</StateNumber>
       <UnderlyingIndexId>22857</UnderlyingIndexId>
     </key>
-    <column id="974" parent="400" name="id">
+    <column id="973" parent="400" name="id">
       <DefaultExpression>nextval(&apos;tarification_categories_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -9982,33 +9976,33 @@ tokenable_id</ColNames>
       <SequenceId>18995</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="975" parent="400" name="name">
+    <column id="974" parent="400" name="name">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>4270</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="976" parent="400" name="submodel_id">
+    <column id="975" parent="400" name="submodel_id">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>4270</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="977" parent="400" name="created_at">
+    <column id="976" parent="400" name="created_at">
       <Position>4</Position>
       <StateNumber>4270</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="978" parent="400" name="updated_at">
+    <column id="977" parent="400" name="updated_at">
       <Position>5</Position>
       <StateNumber>4270</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <index id="979" parent="400" name="tarification_categories_pkey">
+    <index id="978" parent="400" name="tarification_categories_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>19000</ObjectId>
@@ -10017,14 +10011,14 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="980" parent="400" name="tarification_categories_pkey">
+    <key id="979" parent="400" name="tarification_categories_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>19001</ObjectId>
       <Primary>1</Primary>
       <StateNumber>4270</StateNumber>
       <UnderlyingIndexId>19000</UnderlyingIndexId>
     </key>
-    <column id="981" parent="401" name="id">
+    <column id="980" parent="401" name="id">
       <DefaultExpression>nextval(&apos;tarifications_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10033,72 +10027,72 @@ tokenable_id</ColNames>
       <SequenceId>19002</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="982" parent="401" name="tarification_category_id">
+    <column id="981" parent="401" name="tarification_category_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>4272</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="983" parent="401" name="user_id">
+    <column id="982" parent="401" name="user_id">
       <Position>3</Position>
       <StateNumber>4831</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="984" parent="401" name="name">
+    <column id="983" parent="401" name="name">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>4272</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="985" parent="401" name="razryad_id">
+    <column id="984" parent="401" name="razryad_id">
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>4272</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="986" parent="401" name="typewriter_id">
+    <column id="985" parent="401" name="typewriter_id">
       <Position>6</Position>
       <StateNumber>206486</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="987" parent="401" name="second">
+    <column id="986" parent="401" name="second">
       <NotNull>1</NotNull>
       <Position>7</Position>
       <StateNumber>4272</StateNumber>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="988" parent="401" name="summa">
+    <column id="987" parent="401" name="summa">
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StateNumber>4272</StateNumber>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="989" parent="401" name="created_at">
+    <column id="988" parent="401" name="created_at">
       <Position>9</Position>
       <StateNumber>4272</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="990" parent="401" name="updated_at">
+    <column id="989" parent="401" name="updated_at">
       <Position>10</Position>
       <StateNumber>4272</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="991" parent="401" name="code">
+    <column id="990" parent="401" name="code">
       <Position>11</Position>
       <StateNumber>4887</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <index id="992" parent="401" name="tarifications_pkey">
+    <index id="991" parent="401" name="tarifications_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>19007</ObjectId>
@@ -10107,14 +10101,14 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="993" parent="401" name="tarifications_pkey">
+    <key id="992" parent="401" name="tarifications_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>19008</ObjectId>
       <Primary>1</Primary>
       <StateNumber>4272</StateNumber>
       <UnderlyingIndexId>19007</UnderlyingIndexId>
     </key>
-    <column id="994" parent="402" name="id">
+    <column id="993" parent="402" name="id">
       <DefaultExpression>nextval(&apos;times_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10123,7 +10117,7 @@ tokenable_id</ColNames>
       <SequenceId>20208</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="995" parent="402" name="time">
+    <column id="994" parent="402" name="time">
       <DefaultExpression>&apos;00:00:00&apos;::time without time zone</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>2</Position>
@@ -10131,19 +10125,19 @@ tokenable_id</ColNames>
       <StoredType>time(0)|0s</StoredType>
       <TypeId>1083</TypeId>
     </column>
-    <column id="996" parent="402" name="created_at">
+    <column id="995" parent="402" name="created_at">
       <Position>3</Position>
       <StateNumber>8822</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="997" parent="402" name="updated_at">
+    <column id="996" parent="402" name="updated_at">
       <Position>4</Position>
       <StateNumber>8822</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <index id="998" parent="402" name="times_pkey">
+    <index id="997" parent="402" name="times_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>20214</ObjectId>
@@ -10152,14 +10146,14 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="999" parent="402" name="times_pkey">
+    <key id="998" parent="402" name="times_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>20215</ObjectId>
       <Primary>1</Primary>
       <StateNumber>8822</StateNumber>
       <UnderlyingIndexId>20214</UnderlyingIndexId>
     </key>
-    <column id="1000" parent="403" name="id">
+    <column id="999" parent="403" name="id">
       <DefaultExpression>nextval(&apos;transport_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10168,7 +10162,7 @@ tokenable_id</ColNames>
       <SequenceId>20817</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="1001" parent="403" name="name">
+    <column id="1000" parent="403" name="name">
       <Comment>Transport nomi yoki rusumi</Comment>
       <NotNull>1</NotNull>
       <Position>2</Position>
@@ -10176,7 +10170,7 @@ tokenable_id</ColNames>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1002" parent="403" name="state_number">
+    <column id="1001" parent="403" name="state_number">
       <Comment>Avtoraqam (masalan: 50 000 AAA)</Comment>
       <NotNull>1</NotNull>
       <Position>3</Position>
@@ -10184,20 +10178,20 @@ tokenable_id</ColNames>
       <StoredType>varchar(20)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1003" parent="403" name="driver_full_name">
+    <column id="1002" parent="403" name="driver_full_name">
       <NotNull>1</NotNull>
       <Position>4</Position>
       <StateNumber>173113</StateNumber>
       <StoredType>varchar(200)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1004" parent="403" name="phone">
+    <column id="1003" parent="403" name="phone">
       <Position>5</Position>
       <StateNumber>13838</StateNumber>
       <StoredType>varchar(100)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1005" parent="403" name="capacity">
+    <column id="1004" parent="403" name="capacity">
       <DefaultExpression>0</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>7</Position>
@@ -10205,147 +10199,147 @@ tokenable_id</ColNames>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1006" parent="403" name="branch_id">
+    <column id="1005" parent="403" name="branch_id">
       <NotNull>1</NotNull>
       <Position>8</Position>
       <StateNumber>13838</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1007" parent="403" name="is_active">
+    <column id="1006" parent="403" name="is_active">
       <DefaultExpression>true</DefaultExpression>
       <Position>9</Position>
       <StateNumber>13838</StateNumber>
       <StoredType>boolean|0s</StoredType>
       <TypeId>16</TypeId>
     </column>
-    <column id="1008" parent="403" name="created_at">
+    <column id="1007" parent="403" name="created_at">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <Position>10</Position>
       <StateNumber>13838</StateNumber>
       <StoredType>timestamp with time zone|0s</StoredType>
       <TypeId>1184</TypeId>
     </column>
-    <column id="1009" parent="403" name="updated_at">
+    <column id="1008" parent="403" name="updated_at">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <Position>11</Position>
       <StateNumber>13838</StateNumber>
       <StoredType>timestamp with time zone|0s</StoredType>
       <TypeId>1184</TypeId>
     </column>
-    <column id="1010" parent="403" name="region_id">
+    <column id="1009" parent="403" name="region_id">
       <Position>12</Position>
       <StateNumber>173137</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1011" parent="403" name="vin_number">
+    <column id="1010" parent="403" name="vin_number">
       <Position>13</Position>
       <StateNumber>174536</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1012" parent="403" name="tech_passport_number">
+    <column id="1011" parent="403" name="tech_passport_number">
       <Position>14</Position>
       <StateNumber>174537</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1013" parent="403" name="engine_number">
+    <column id="1012" parent="403" name="engine_number">
       <Position>15</Position>
       <StateNumber>174538</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1014" parent="403" name="year">
+    <column id="1013" parent="403" name="year">
       <Position>16</Position>
       <StateNumber>174539</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1015" parent="403" name="color">
+    <column id="1014" parent="403" name="color">
       <Position>17</Position>
       <StateNumber>174540</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1016" parent="403" name="registration_date">
+    <column id="1015" parent="403" name="registration_date">
       <Position>18</Position>
       <StateNumber>174541</StateNumber>
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="1017" parent="403" name="insurance_expiry">
+    <column id="1016" parent="403" name="insurance_expiry">
       <Position>19</Position>
       <StateNumber>174542</StateNumber>
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="1018" parent="403" name="inspection_expiry">
+    <column id="1017" parent="403" name="inspection_expiry">
       <Position>20</Position>
       <StateNumber>174543</StateNumber>
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="1019" parent="403" name="column_name">
+    <column id="1018" parent="403" name="column_name">
       <Position>21</Position>
       <StateNumber>174544</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1020" parent="403" name="driver_passport_number">
+    <column id="1019" parent="403" name="driver_passport_number">
       <Position>22</Position>
       <StateNumber>174545</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1021" parent="403" name="driver_license_number">
+    <column id="1020" parent="403" name="driver_license_number">
       <Position>23</Position>
       <StateNumber>174546</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1022" parent="403" name="driver_experience_years">
+    <column id="1021" parent="403" name="driver_experience_years">
       <Position>24</Position>
       <StateNumber>174547</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1023" parent="403" name="phone_2">
+    <column id="1022" parent="403" name="phone_2">
       <Position>25</Position>
       <StateNumber>174548</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1024" parent="403" name="salary">
+    <column id="1023" parent="403" name="salary">
       <DefaultExpression>0</DefaultExpression>
       <Position>26</Position>
       <StateNumber>174569</StateNumber>
       <StoredType>numeric|0s</StoredType>
       <TypeId>1700</TypeId>
     </column>
-    <column id="1025" parent="403" name="fuel_bonus">
+    <column id="1024" parent="403" name="fuel_bonus">
       <DefaultExpression>0</DefaultExpression>
       <Position>27</Position>
       <StateNumber>174570</StateNumber>
       <StoredType>numeric|0s</StoredType>
       <TypeId>1700</TypeId>
     </column>
-    <column id="1026" parent="403" name="balance">
+    <column id="1025" parent="403" name="balance">
       <DefaultExpression>0</DefaultExpression>
       <Position>28</Position>
       <StateNumber>174685</StateNumber>
       <StoredType>numeric|0s</StoredType>
       <TypeId>1700</TypeId>
     </column>
-    <column id="1027" parent="403" name="distance">
+    <column id="1026" parent="403" name="distance">
       <DefaultExpression>0</DefaultExpression>
       <Position>29</Position>
       <StateNumber>174729</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <foreign-key id="1028" parent="403" name="transport_branch_id_fkey">
+    <foreign-key id="1027" parent="403" name="transport_branch_id_fkey">
       <ColNames>branch_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>20830</ObjectId>
@@ -10354,7 +10348,7 @@ tokenable_id</ColNames>
       <RefKeyColPositions>1</RefKeyColPositions>
       <RefTableId>17947</RefTableId>
     </foreign-key>
-    <index id="1029" parent="403" name="transport_pkey">
+    <index id="1028" parent="403" name="transport_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>20828</ObjectId>
@@ -10363,33 +10357,33 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="1030" parent="403" name="transport_branch_id_idx">
+    <index id="1029" parent="403" name="transport_branch_id_idx">
       <ColNames>branch_id</ColNames>
       <ObjectId>20835</ObjectId>
       <StateNumber>13840</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="1031" parent="403" name="transport_is_active_idx">
+    <index id="1030" parent="403" name="transport_is_active_idx">
       <ColNames>is_active</ColNames>
       <ObjectId>20836</ObjectId>
       <StateNumber>13841</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="1032" parent="403" name="transport_pkey">
+    <key id="1031" parent="403" name="transport_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>20829</ObjectId>
       <Primary>1</Primary>
       <StateNumber>13838</StateNumber>
       <UnderlyingIndexId>20828</UnderlyingIndexId>
     </key>
-    <trigger id="1033" parent="403" name="update_transport_timestamp">
+    <trigger id="1032" parent="403" name="update_transport_timestamp">
       <Events>U</Events>
       <ObjectId>20931</ObjectId>
       <StateNumber>13875</StateNumber>
       <Turn>before-row</Turn>
       <CallRoutineId>20929</CallRoutineId>
     </trigger>
-    <column id="1034" parent="404" name="id">
+    <column id="1033" parent="404" name="id">
       <DefaultExpression>nextval(&apos;transport_attendance_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10398,54 +10392,54 @@ tokenable_id</ColNames>
       <SequenceId>20873</SequenceId>
       <TypeId>23</TypeId>
     </column>
-    <column id="1035" parent="404" name="date">
+    <column id="1034" parent="404" name="date">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>13852</StateNumber>
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="1036" parent="404" name="created_at">
+    <column id="1035" parent="404" name="created_at">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <Position>8</Position>
       <StateNumber>13852</StateNumber>
       <StoredType>timestamp with time zone|0s</StoredType>
       <TypeId>1184</TypeId>
     </column>
-    <column id="1037" parent="404" name="updated_at">
+    <column id="1036" parent="404" name="updated_at">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <Position>9</Position>
       <StateNumber>13852</StateNumber>
       <StoredType>timestamp with time zone|0s</StoredType>
       <TypeId>1184</TypeId>
     </column>
-    <column id="1038" parent="404" name="transport_id">
+    <column id="1037" parent="404" name="transport_id">
       <Position>10</Position>
       <StateNumber>174700</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1039" parent="404" name="attendance_type">
+    <column id="1038" parent="404" name="attendance_type">
       <Position>11</Position>
       <StateNumber>174701</StateNumber>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="1040" parent="404" name="salary">
+    <column id="1039" parent="404" name="salary">
       <DefaultExpression>0</DefaultExpression>
       <Position>12</Position>
       <StateNumber>174702</StateNumber>
       <StoredType>numeric|0s</StoredType>
       <TypeId>1700</TypeId>
     </column>
-    <column id="1041" parent="404" name="fuel_bonus">
+    <column id="1040" parent="404" name="fuel_bonus">
       <DefaultExpression>0</DefaultExpression>
       <Position>13</Position>
       <StateNumber>174703</StateNumber>
       <StoredType>numeric|0s</StoredType>
       <TypeId>1700</TypeId>
     </column>
-    <index id="1042" parent="404" name="transport_attendance_pkey">
+    <index id="1041" parent="404" name="transport_attendance_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>20884</ObjectId>
@@ -10454,20 +10448,20 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="1043" parent="404" name="transport_attendance_date_idx">
+    <index id="1042" parent="404" name="transport_attendance_date_idx">
       <ColNames>date</ColNames>
       <ObjectId>20898</ObjectId>
       <StateNumber>174714</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="1044" parent="404" name="transport_attendance_pkey">
+    <key id="1043" parent="404" name="transport_attendance_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>20885</ObjectId>
       <Primary>1</Primary>
       <StateNumber>13852</StateNumber>
       <UnderlyingIndexId>20884</UnderlyingIndexId>
     </key>
-    <column id="1045" parent="405" name="id">
+    <column id="1044" parent="405" name="id">
       <DefaultExpression>nextval(&apos;transport_attendance_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10475,45 +10469,45 @@ tokenable_id</ColNames>
       <StoredType>bigint|0s</StoredType>
       <TypeId>20</TypeId>
     </column>
-    <column id="1046" parent="405" name="transport_id">
+    <column id="1045" parent="405" name="transport_id">
       <Position>2</Position>
       <StateNumber>176895</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1047" parent="405" name="date">
+    <column id="1046" parent="405" name="date">
       <Position>3</Position>
       <StateNumber>176896</StateNumber>
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="1048" parent="405" name="type">
+    <column id="1047" parent="405" name="type">
       <Position>4</Position>
       <StateNumber>176897</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1049" parent="405" name="amount">
+    <column id="1048" parent="405" name="amount">
       <Position>5</Position>
       <StateNumber>176898</StateNumber>
       <StoredType>numeric|0s</StoredType>
       <TypeId>1700</TypeId>
     </column>
-    <column id="1050" parent="405" name="created_at">
+    <column id="1049" parent="405" name="created_at">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <Position>6</Position>
       <StateNumber>176899</StateNumber>
       <StoredType>timestamp|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1051" parent="405" name="updated_at">
+    <column id="1050" parent="405" name="updated_at">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <Position>7</Position>
       <StateNumber>176900</StateNumber>
       <StoredType>timestamp|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1052" parent="406" name="id">
+    <column id="1051" parent="406" name="id">
       <DefaultExpression>nextval(&apos;type_writers_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10522,33 +10516,33 @@ tokenable_id</ColNames>
       <SequenceId>18969</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="1053" parent="406" name="name">
+    <column id="1052" parent="406" name="name">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>4264</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1054" parent="406" name="comment">
+    <column id="1053" parent="406" name="comment">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>4264</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1055" parent="406" name="created_at">
+    <column id="1054" parent="406" name="created_at">
       <Position>4</Position>
       <StateNumber>4264</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1056" parent="406" name="updated_at">
+    <column id="1055" parent="406" name="updated_at">
       <Position>5</Position>
       <StateNumber>4264</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <index id="1057" parent="406" name="type_writers_pkey">
+    <index id="1056" parent="406" name="type_writers_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18976</ObjectId>
@@ -10557,14 +10551,14 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="1058" parent="406" name="type_writers_pkey">
+    <key id="1057" parent="406" name="type_writers_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18977</ObjectId>
       <Primary>1</Primary>
       <StateNumber>4264</StateNumber>
       <UnderlyingIndexId>18976</UnderlyingIndexId>
     </key>
-    <column id="1059" parent="407" name="id">
+    <column id="1058" parent="407" name="id">
       <DefaultExpression>nextval(&apos;units_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10573,26 +10567,26 @@ tokenable_id</ColNames>
       <SequenceId>18243</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="1060" parent="407" name="name">
+    <column id="1059" parent="407" name="name">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>3441</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1061" parent="407" name="created_at">
+    <column id="1060" parent="407" name="created_at">
       <Position>3</Position>
       <StateNumber>3441</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1062" parent="407" name="updated_at">
+    <column id="1061" parent="407" name="updated_at">
       <Position>4</Position>
       <StateNumber>3441</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <index id="1063" parent="407" name="units_pkey">
+    <index id="1062" parent="407" name="units_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18480</ObjectId>
@@ -10601,14 +10595,14 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="1064" parent="407" name="units_pkey">
+    <key id="1063" parent="407" name="units_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18481</ObjectId>
       <Primary>1</Primary>
       <StateNumber>3716</StateNumber>
       <UnderlyingIndexId>18480</UnderlyingIndexId>
     </key>
-    <column id="1065" parent="408" name="id">
+    <column id="1064" parent="408" name="id">
       <DefaultExpression>nextval(&apos;users_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10617,39 +10611,39 @@ tokenable_id</ColNames>
       <SequenceId>18249</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="1066" parent="408" name="username">
+    <column id="1065" parent="408" name="username">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>3446</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1067" parent="408" name="password">
+    <column id="1066" parent="408" name="password">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>3446</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1068" parent="408" name="role_id">
+    <column id="1067" parent="408" name="role_id">
       <Position>4</Position>
       <StateNumber>174633</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1069" parent="408" name="created_at">
+    <column id="1068" parent="408" name="created_at">
       <Position>5</Position>
       <StateNumber>3446</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1070" parent="408" name="updated_at">
+    <column id="1069" parent="408" name="updated_at">
       <Position>6</Position>
       <StateNumber>3446</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <index id="1071" parent="408" name="users_pkey">
+    <index id="1070" parent="408" name="users_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18482</ObjectId>
@@ -10658,7 +10652,7 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <index id="1072" parent="408" name="users_username_unique">
+    <index id="1071" parent="408" name="users_username_unique">
       <ColNames>username</ColNames>
       <ObjectId>18484</ObjectId>
       <StateNumber>9531</StateNumber>
@@ -10668,19 +10662,19 @@ tokenable_id</ColNames>
       <CollationIds>100</CollationIds>
       <CollationParentNames>pg_catalog</CollationParentNames>
     </index>
-    <key id="1073" parent="408" name="users_pkey">
+    <key id="1072" parent="408" name="users_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18483</ObjectId>
       <Primary>1</Primary>
       <StateNumber>3717</StateNumber>
       <UnderlyingIndexId>18482</UnderlyingIndexId>
     </key>
-    <key id="1074" parent="408" name="users_username_unique">
+    <key id="1073" parent="408" name="users_username_unique">
       <ObjectId>18485</ObjectId>
       <StateNumber>3718</StateNumber>
       <UnderlyingIndexId>18484</UnderlyingIndexId>
     </key>
-    <column id="1075" parent="409" name="id">
+    <column id="1074" parent="409" name="id">
       <DefaultExpression>nextval(&apos;warehouses_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10689,7 +10683,7 @@ tokenable_id</ColNames>
       <SequenceId>18264</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="1076" parent="409" name="name">
+    <column id="1075" parent="409" name="name">
       <Comment>Ombor nomi</Comment>
       <NotNull>1</NotNull>
       <Position>2</Position>
@@ -10697,7 +10691,7 @@ tokenable_id</ColNames>
       <StoredType>varchar(200)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1077" parent="409" name="location">
+    <column id="1076" parent="409" name="location">
       <Comment>Manzil</Comment>
       <NotNull>1</NotNull>
       <Position>3</Position>
@@ -10705,26 +10699,26 @@ tokenable_id</ColNames>
       <StoredType>varchar(300)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1078" parent="409" name="created_at">
+    <column id="1077" parent="409" name="created_at">
       <Position>4</Position>
       <StateNumber>3461</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1079" parent="409" name="updated_at">
+    <column id="1078" parent="409" name="updated_at">
       <Position>5</Position>
       <StateNumber>3461</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1080" parent="409" name="branch_id">
+    <column id="1079" parent="409" name="branch_id">
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>3461</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <index id="1081" parent="409" name="warehouses_pkey">
+    <index id="1080" parent="409" name="warehouses_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18492</ObjectId>
@@ -10733,7 +10727,7 @@ tokenable_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="1082" parent="409" name="warehouses_pkey">
+    <key id="1081" parent="409" name="warehouses_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18493</ObjectId>
       <Primary>1</Primary>
