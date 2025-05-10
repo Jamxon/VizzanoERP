@@ -105,12 +105,24 @@ class SupplierController extends Controller
             return response()->json(['message' => 'Branch aniqlanmadi'], 400);
         }
 
+        $search = $request->input('search');
+        $latin = transliterate_to_latin($search);
+        $cyrillic = transliterate_to_cyrillic($search);
+
         $supplierOrders = SupplierOrder::where('branch_id', $branchId)
             ->when($request->filled('status'), function ($query) use ($request) {
                 $query->where('status', $request->input('status'));
             })
             ->when($request->filled('deadline'), function ($query) use ($request) {
                 $query->whereDate('deadline', $request->input('deadline'));
+            })
+            ->when($search, function ($query) use ($latin, $cyrillic) {
+                $query->where(function ($q) use ($latin, $cyrillic) {
+                    $q->whereRaw('LOWER(code) LIKE ?', ['%' . mb_strtolower($latin) . '%'])
+                        ->orWhereRaw('LOWER(code) LIKE ?', ['%' . mb_strtolower($cyrillic) . '%'])
+                        ->orWhereRaw('LOWER(comment) LIKE ?', ['%' . mb_strtolower($latin) . '%'])
+                        ->orWhereRaw('LOWER(comment) LIKE ?', ['%' . mb_strtolower($cyrillic) . '%']);
+                });
             })
             ->with([
                 'items.item',
