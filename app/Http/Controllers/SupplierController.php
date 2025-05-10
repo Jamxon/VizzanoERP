@@ -172,7 +172,8 @@ class SupplierController extends Controller
                 'items.item.color',
                 'items.item.type',
                 'items.item.currency',
-                'supplier.employee'
+                'supplier.employee',
+                'createdBy.employee',
             ])
             ->orderBy('deadline', 'desc')
             ->paginate(20);
