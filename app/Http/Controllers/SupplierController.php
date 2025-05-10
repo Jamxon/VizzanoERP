@@ -141,6 +141,7 @@ class SupplierController extends Controller
     {
         $supplierOrders = SupplierOrder::where('branch_id', auth()->user()->employee->branch_id)
             ->where('supplier_id', auth()->id())
+            ->where('status', '!=', 'inactive')
             ->with([
                 'items.item',
                 'items.item.unit',
