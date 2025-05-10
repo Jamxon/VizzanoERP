@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Item;
 use App\Models\Log;
 use App\Models\SupplierOrder;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -75,4 +76,19 @@ class SupplierController extends Controller
         }
     }
 
+    public function getSupplier(): \Illuminate\Http\JsonResponse
+    {
+        $suppliers = User::whereHas('roles', function ($query) {
+            $query->where('name', 'supplier');
+        })
+            ->whereHas('employee', function ($query) {
+                $query->where('status', '!=', 'kicked')
+                    ->where('branch_id', auth()->user()->employee->branch_id);
+            })
+            ->with('employee')
+            ->get();
+
+        return response()->json($suppliers);
+
+    }
 }
