@@ -42,6 +42,8 @@ class WarehouseController extends Controller
                 $q->where('items.name', 'like', "%$latin%")
                     ->orWhere('items.name', 'like', "%$cyrillic%");
             });
+
+            dd($query->toSql());
         }
 
         // Klonlangan query orqali total quantity hisoblash
