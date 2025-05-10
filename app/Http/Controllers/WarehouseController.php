@@ -36,7 +36,7 @@ class WarehouseController extends Controller
                 'warehouse',
                 'order'
             ])
-            ->get();
+            ->paginate(50);
 
         return response()->json($balance);
     }
