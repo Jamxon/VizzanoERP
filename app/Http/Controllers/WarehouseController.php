@@ -38,6 +38,7 @@ class WarehouseController extends Controller
             $latin = transliterate_to_latin($search);
             $cyrillic = transliterate_to_cyrillic($search);
 
+            dd($cyrillic);
             $query->where(function ($q) use ($latin, $cyrillic) {
                 $q->whereRaw('LOWER(items.name) LIKE ?', ['%' . mb_strtolower($latin) . '%'])
                     ->orWhereRaw('LOWER(items.name) LIKE ?', ['%' . mb_strtolower($cyrillic) . '%']);
