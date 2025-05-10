@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static max(string $string)
  * @method static create(array $array)
  * @method static where(string $string, mixed $supplier_id)
+ * @method static findOrFail($id)
  */
 class SupplierOrder extends Model
 {

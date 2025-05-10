@@ -151,4 +151,33 @@ class SupplierController extends Controller
 
         return response()->json($supplierOrders);
     }
+
+    public function destroySupplierOrder($id): \Illuminate\Http\JsonResponse
+    {
+        $order = SupplierOrder::findOrFail($id);
+
+        if ($order->status !== 'new') {
+            return response()->json(['message' => 'Faqat yangi buyurtmalarni o\'chirish mumkin.'], 400);
+        }
+
+        if ($order->supplier_id !== auth()->id()) {
+            return response()->json(['message' => 'Siz faqat o\'zingizning buyurtmalaringizni o\'chira olasiz.'], 403);
+        }
+
+        foreach ($order->items as $item) {
+            $item->delete();
+        }
+
+        $order->delete();
+
+        Log::add(
+            auth()->user()->id,
+            "Ta'minotchiga buyurtma o'chirildi (ID: $id)",
+            'delete',
+            null,
+            $order
+        );
+
+        return response()->json(['message' => 'Buyurtma muvaffaqiyatli o\'chirildi.'], 200);
+    }
 }
