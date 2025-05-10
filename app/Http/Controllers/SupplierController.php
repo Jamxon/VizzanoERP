@@ -118,8 +118,8 @@ class SupplierController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->whereRaw('LOWER(code) LIKE ?', ['%' . mb_strtolower($search) . '%'])
                         ->orWhereRaw('LOWER(comment) LIKE ?', ['%' . mb_strtolower($search) . '%'])
-                        ->orWhereHas('supplier', function ($q) use ($search) {
-                            $q->whereRaw('LOWER(employee.name) LIKE ?', ['%' . mb_strtolower($search) . '%']);
+                        ->orWhereHas('supplier.employee', function ($q) use ($search) {
+                            $q->whereRaw('LOWER(name) LIKE ?', ['%' . mb_strtolower($search) . '%']);
                         });
                 });
             })
