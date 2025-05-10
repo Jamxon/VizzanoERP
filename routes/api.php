@@ -35,6 +35,10 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('supplier')->middleware('role:supplier')->group(function () {
+
+});
+
 Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () {
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
     Route::get('employees/working', [SuperHRController::class, 'getWorkingEmployees']);
