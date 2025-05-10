@@ -37,6 +37,7 @@ class SupplierController extends Controller
                 'deadline' => $request->deadline,
                 'completed_date' => null,
                 'received_date' => null,
+                'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
             foreach ($request->items as $item) {
@@ -94,6 +95,23 @@ class SupplierController extends Controller
             ->get();
 
         return response()->json($suppliers);
+    }
+
+    public function getSupplierOrder(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $supplierOrders = SupplierOrder::where('branch_id', auth()->user()->employee->branch_id)
+            ->with([
+                'items.item',
+                'items.item.unit',
+                'items.item.color',
+                'items.item.type',
+                'items.item.currency',
+                'supplier.employee'
+            ])
+            ->orderBy('deadline', 'desc')
+            ->get();
+
+        return response()->json($supplierOrders);
     }
 
 }
