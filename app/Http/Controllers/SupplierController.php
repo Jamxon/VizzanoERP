@@ -32,7 +32,7 @@ class SupplierController extends Controller
                 'supplier_id' => $request->supplier_id,
                 'code' => $code,
                 'comment' => $request->comment,
-                'status' => 'pending',
+                'status' => 'new',
                 'created_by' => auth()->id(),
                 'deadline' => $request->deadline,
                 'completed_date' => null,
@@ -109,7 +109,7 @@ class SupplierController extends Controller
                 'supplier.employee'
             ])
             ->orderBy('deadline', 'desc')
-            ->get();
+            ->paginate(20);
 
         return response()->json($supplierOrders);
     }
