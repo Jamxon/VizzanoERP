@@ -37,7 +37,7 @@ class WarehouseController extends Controller
         if ($search) {
             $latin = transliterate_to_latin($search);
             $cyrillic = transliterate_to_cyrillic($search);
-dd($latin);
+
             $query->where(function ($q) use ($latin, $cyrillic) {
                 $q->where('items.name', 'like', "%$latin%")
                     ->orWhere('items.name', 'like', "%$cyrillic%");
