@@ -34,7 +34,9 @@ class SupplierController extends Controller
                 'status' => 'pending',
                 'created_by' => auth()->id(),
                 'deadline' => $request->deadline,
-                'completed_date' => null
+                'completed_date' => null,
+                'received_date' => null,
+                'received_by' => null,
             ]);
 
             foreach ($request->items as $item) {
