@@ -114,4 +114,21 @@ class SupplierController extends Controller
         return response()->json($supplierOrders);
     }
 
+    public function getOrders(): \Illuminate\Http\JsonResponse
+    {
+        $supplierOrders = SupplierOrder::where('branch_id', auth()->user()->employee->branch_id)
+            ->where('supplier_id', auth()->id())
+            ->with([
+                'items.item',
+                'items.item.unit',
+                'items.item.color',
+                'items.item.type',
+                'items.item.currency',
+                'supplier.employee'
+            ])
+            ->orderBy('deadline', 'desc')
+            ->get();
+
+        return response()->json($supplierOrders);
+    }
 }

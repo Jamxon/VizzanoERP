@@ -36,7 +36,7 @@ use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
-
+    Route::get('orders', [SupplierController::class, 'getOrders']);
 });
 
 Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () {
