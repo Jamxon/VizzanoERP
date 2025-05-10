@@ -78,7 +78,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('stockEntry/{id}', [WarehouseController::class, 'downloadPdf']);
     Route::get('users', [WarehouseController::class, 'getUsers']);
     Route::post('supplierOrders', [SupplierController::class, 'store']);
-    Route::get('supplierOrders', [SupplierController::class, 'getOrders']);
+    Route::get('supplierOrders', [SupplierController::class, 'getSupplierOrder']);
     Route::get('suppliers', [SupplierController::class, 'getSupplier']);
 });
 
