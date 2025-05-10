@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static max(string $string)
  * @method static create(array $array)
+ * @method static where(string $string, mixed $supplier_id)
  */
 class SupplierOrder extends Model
 {
@@ -24,6 +25,7 @@ class SupplierOrder extends Model
         'deadline',
         'completed_date',
         'received_date',
+        'branch_id'
     ];
 
     protected $hidden = [
@@ -31,6 +33,7 @@ class SupplierOrder extends Model
         'deleted_at',
         'supplier_id',
         'created_by',
+        'branch_id',
     ];
 
     public function supplier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
