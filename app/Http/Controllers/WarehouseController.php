@@ -18,6 +18,27 @@ use App\Models\Log;
 class WarehouseController extends Controller
 {
 
+    public function exportStockBalancesPdf(): \Illuminate\Http\Response
+    {
+        $branchId = auth()->user()?->employee?->branch_id;
+
+        $stockBalances = StockBalance::with([
+            'item.unit',
+            'item.color',
+            'item.type',
+            'item.currency',
+            'warehouse',
+            'order'
+        ])
+            ->whereHas('item', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+            })
+            ->get();
+
+        $pdf = Pdf::loadView('pdf.stock-balances', compact('stockBalances'));
+        return $pdf->download('stock_balances.pdf');
+    }
+
     public function getBalance(Request $request): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()?->employee?->branch_id;
