@@ -11,7 +11,7 @@
     </style>
 </head>
 <body>
-<h2>Ombor Holati ({{ now()->format('Y-m-d H:i') }})</h2>
+<h2>Ombor Holati ({{ now()->format('Y-m-d') }})</h2>
 <table>
     <thead>
     <tr>
