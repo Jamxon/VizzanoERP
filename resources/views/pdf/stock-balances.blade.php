@@ -19,6 +19,7 @@
         <th>Mahsulot</th>
         <th>Tur</th>
         <th>Rang</th>
+        <th>Lot</th>
         <th>Birlik</th>
         <th>Valyuta</th>
         <th>Ombor</th>
@@ -32,6 +33,7 @@
             <td>{{ $stock->item->name }}</td>
             <td>{{ $stock->item->type->name ?? '-' }}</td>
             <td>{{ $stock->item->color->name ?? '-' }}</td>
+            <td>{{ $stock->item->lot ?? '-' }}</td>
             <td>{{ $stock->item->unit->name ?? '-' }}</td>
             <td>{{ $stock->item->currency->code ?? '-' }}</td>
             <td>{{ $stock->warehouse->name ?? '-' }}</td>
