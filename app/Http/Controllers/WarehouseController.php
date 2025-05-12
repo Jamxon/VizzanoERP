@@ -35,8 +35,9 @@ class WarehouseController extends Controller
             })
             ->get();
 
+        $today = now()->format('d.m.Y');
         $pdf = Pdf::loadView('pdf.stock-balances', compact('stockBalances'));
-        return $pdf->download('stock_balances.pdf');
+        return $pdf->download("$today-stock.pdf");
     }
 
     public function getBalance(Request $request): \Illuminate\Http\JsonResponse
