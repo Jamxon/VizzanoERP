@@ -73,7 +73,12 @@ class WarehouseController extends Controller
 
         // Asosiy query davom ettiriladi
         $balances = $query
-            ->with(['item.unit', 'warehouse', 'order'])
+            ->with([
+                'item.unit',
+                'item.color',
+                'warehouse',
+                'order'
+            ])
             ->select('stock_balances.*')
             ->orderByRaw('stock_balances.quantity <= items.min_quantity DESC')
             ->orderBy('items.name')
