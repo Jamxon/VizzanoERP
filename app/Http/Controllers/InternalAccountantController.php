@@ -78,7 +78,7 @@ class InternalAccountantController extends Controller
                 'tarificationCategories.tarifications' => function ($q) use ($request) {
                     $q->select('id', 'name', 'second', 'tarification_category_id')
                         ->where('second', '>', 0)
-                        ->with(['employees' => function($query) use ($request) {
+                        ->with(['employee' => function($query) use ($request) {
                             $query->select('employees.id', 'employees.name')
                                 ->where('employees.group_id', $request->group_id);
                         }]);
