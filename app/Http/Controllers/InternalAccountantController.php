@@ -67,7 +67,7 @@ class InternalAccountantController extends Controller
         return response()->json($tarifications);
     }
 
-    public function generateDailyPlan(Request $request)
+    public function generateDailyPlan(Request $request): \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
@@ -168,7 +168,7 @@ class InternalAccountantController extends Controller
             ];
         }
 
-        $pdf = Pdf::loadView('pdf.daily_plan', [
+        $pdf = Pdf::loadView('pdf.daily-plan', [
             'plans' => $employeePlans
         ])->setPaper([0, 0, 226.77, 141.73], 'portrait'); // 80mm x 50mm in points
 
