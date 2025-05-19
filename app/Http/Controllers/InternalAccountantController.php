@@ -88,15 +88,13 @@ class InternalAccountantController extends Controller
             foreach ($category->tarifications as $tarification) {
                 $minutes = floatval($tarification->second) / 60;
                 if ($minutes > 0) {
-                    // Faqat shu tarifikatsiyaga bog'langan xodimni olish
-                    $assignedEmployee = $tarification->employee;
 
                     $tarifications->push([
                         'id' => $tarification->id,
                         'name' => $tarification->name,
                         'seconds' => floatval($tarification->second),
                         'minutes' => $minutes,
-                        'assigned_employee' => $assignedEmployee
+                        'assigned_employee' => $tarification->employee,
                     ]);
                 }
             }
