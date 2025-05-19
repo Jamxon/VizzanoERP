@@ -96,15 +96,14 @@ class InternalAccountantController extends Controller
                     // Faqat shu tarifikatsiyaga bog'langan va ko'rsatilgan guruhga tegishli xodimlarni olish
                     $assignedEmployees = $tarification->employee;
 
-                    if ($assignedEmployees->isNotEmpty()) {
                         $tarifications->push([
                             'id' => $tarification->id,
                             'name' => $tarification->name,
                             'seconds' => floatval($tarification->second),
                             'minutes' => $minutes,
-                            'assigned_employees' => $assignedEmployees
+                            'assigned_employees' => $assignedEmployees ?? 'Xodim biriktirilmagan',
                         ]);
-                    }
+
                 }
             }
         }
