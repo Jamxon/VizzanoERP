@@ -67,7 +67,6 @@ class InternalAccountantController extends Controller
     public function generateDailyPlan(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'group_id' => 'required|exists:groups,id',
             'submodel_id' => 'required|exists:order_sub_models,id',
         ]);
 
@@ -75,14 +74,10 @@ class InternalAccountantController extends Controller
         $submodel = OrderSubmodel::select('id')
             ->with([
                 'tarificationCategories:id,submodel_id',
-                'tarificationCategories.tarifications' => function ($q) use ($request) {
+                'tarificationCategories.tarifications' => function ($q) {
                     $q->select('id', 'name', 'second', 'tarification_category_id')
                         ->where('second', '>', 0)
-                        ->with(
-                            'employee:id,name',
-                            'razryad:id,name',
-                            'typewriter:id,name'
-                        );
+                        ->with('employee:id,name');
                 }
             ])
             ->findOrFail($request->submodel_id);
@@ -93,23 +88,22 @@ class InternalAccountantController extends Controller
             foreach ($category->tarifications as $tarification) {
                 $minutes = floatval($tarification->second) / 60;
                 if ($minutes > 0) {
-                    // Faqat shu tarifikatsiyaga bog'langan va ko'rsatilgan guruhga tegishli xodimlarni olish
-                    $assignedEmployees = $tarification->employee;
+                    // Faqat shu tarifikatsiyaga bog'langan xodimni olish
+                    $assignedEmployee = $tarification->employee;
 
-                        $tarifications->push([
-                            'id' => $tarification->id,
-                            'name' => $tarification->name,
-                            'seconds' => floatval($tarification->second),
-                            'minutes' => $minutes,
-                            'assigned_employees' => $assignedEmployees ?? 'Xodim biriktirilmagan',
-                        ]);
-
+                    $tarifications->push([
+                        'id' => $tarification->id,
+                        'name' => $tarification->name,
+                        'seconds' => floatval($tarification->second),
+                        'minutes' => $minutes,
+                        'assigned_employee' => $assignedEmployee
+                    ]);
                 }
             }
         }
 
         if ($tarifications->isEmpty()) {
-            return response()->json(['message' => 'Tarifikatsiyalar yoki ularga bog\'langan xodimlar topilmadi'], 400);
+            return response()->json(['message' => 'Tarifikatsiyalar topilmadi'], 400);
         }
 
         // Xodimlar holatini kuzatish uchun tayyorlash
