@@ -48,4 +48,6 @@ class InternalAccountantController extends Controller
 
         return response()->json($tarifications);
     }
+
+
 }
