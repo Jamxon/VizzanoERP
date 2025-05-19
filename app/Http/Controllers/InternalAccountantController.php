@@ -82,7 +82,7 @@ class InternalAccountantController extends Controller
         }
 
         $submodel = OrderSubmodel::with('tarificationCategories.tarifications')->findOrFail($submodelId);
-        return response()->json($submodel);
+
         // Tarificationlarni yig‘amiz
         $tarifications = collect();
         foreach ($submodel->tarificationCategories as $category) {
@@ -97,6 +97,8 @@ class InternalAccountantController extends Controller
                 }
             }
         }
+
+        return response()->json($tarifications);
 
         if ($tarifications->isEmpty()) {
             return response()->json(['message' => 'Tarificationlar topilmadi'], 400);
