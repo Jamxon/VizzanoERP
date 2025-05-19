@@ -91,8 +91,8 @@ class InternalAccountantController extends Controller
                     $tarifications->push([
                         'id' => $tarification->id,
                         'name' => $tarification->name,
-                        'seconds' => $tarification->seconds,
-                        'minutes' => $tarification->seconds / 60,
+                        'seconds' => $tarification->second,
+                        'minutes' => $tarification->second / 60,
                     ]);
 
             }
