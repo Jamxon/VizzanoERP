@@ -83,21 +83,23 @@ class InternalAccountantController extends Controller
 
         $submodel = OrderSubmodel::with('tarificationCategories.tarifications')->findOrFail($submodelId);
 
-        // Tarificationlarni yig‘amiz
+
         $tarifications = collect();
+
         foreach ($submodel->tarificationCategories as $category) {
-            return response()->json($category);
             foreach ($category->tarifications as $tarification) {
-                if ($tarification->seconds > 0) {
+                $seconds = floatval($tarification->seconds);
+                if ($seconds > 0.00001) {
                     $tarifications->push([
                         'id' => $tarification->id,
                         'name' => $tarification->name,
-                        'seconds' => $tarification->seconds,
-                        'minutes' => $tarification->seconds / 60,
+                        'seconds' => $seconds,
+                        'minutes' => $seconds / 60,
                     ]);
                 }
             }
         }
+
 
         if ($tarifications->isEmpty()) {
             return response()->json(['message' => 'Tarificationlar topilmadi'], 400);
