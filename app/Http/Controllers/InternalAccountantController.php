@@ -76,7 +76,7 @@ class InternalAccountantController extends Controller
             'tarificationCategories.tarifications.employee' => fn($q) => $q->select('id', 'name'),
         ])->findOrFail($request->submodel_id);
 
-        // Barcha tarifikatsiyalarni to‘playmiz
+        // 1. Tarifikatsiyalarni yig‘ish (faqat employee biriktirilganlari)
         $tarifications = collect();
 
         foreach ($submodel->tarificationCategories as $category) {
@@ -86,7 +86,7 @@ class InternalAccountantController extends Controller
                         'id' => $tarification->id,
                         'name' => $tarification->name,
                         'seconds' => $tarification->second,
-                        'minutes_per_unit' => round($tarification->second / 60, 4),
+                        'minutes' => round($tarification->second / 60, 4),
                         'assigned_employee_id' => $tarification->employee->id,
                         'assigned_employee_name' => $tarification->employee->name,
                     ]);
@@ -98,67 +98,72 @@ class InternalAccountantController extends Controller
             return response()->json(['message' => 'Tarifikatsiyalar yoki ularning xodimlari topilmadi'], 400);
         }
 
-        // Har bir xodim uchun tarifikatsiyalarni alohida ajratamiz
+        // 2. Xodimlar bo‘yicha guruhlash
         $grouped = $tarifications->groupBy('assigned_employee_id');
 
-        $finalPlan = [];
+        $employeePlans = [];
 
-        foreach ($grouped as $employeeId => $employeeTarifs) {
+        foreach ($grouped as $employeeId => $tasks) {
+            $employeeName = $tasks->first()['assigned_employee_name'];
             $remainingMinutes = 500;
             $usedMinutes = 0;
-            $resultTarifs = [];
 
-            // 1-bosqich: har bir tarifga 1 dona beramiz
-            foreach ($employeeTarifs as $tarif) {
-                if ($remainingMinutes >= $tarif['minutes_per_unit']) {
-                    $resultTarifs[] = [
-                        'tarification_id' => $tarif['id'],
-                        'tarification_name' => $tarif['name'],
+            // 1-qadam: tayyorlanadigan array
+            $assigned = [];
+
+            // Tartiblash: eng kam vaqt talab qiladigan ishlar birinchi
+            $sortedTasks = $tasks->sortBy('minutes')->values();
+
+            // 1-bosqich: har bir ishga kamida 1 dona berish
+            foreach ($sortedTasks as $task) {
+                if ($task['minutes'] > 0 && $remainingMinutes >= $task['minutes']) {
+                    $assigned[] = [
+                        'tarification_id' => $task['id'],
+                        'tarification_name' => $task['name'],
                         'count' => 1,
-                        'total_minutes' => round($tarif['minutes_per_unit'], 2),
-                        'minutes_per_unit' => $tarif['minutes_per_unit'],
+                        'total_minutes' => round($task['minutes'], 2),
+                        'minutes_per_unit' => $task['minutes'],
                     ];
-                    $usedMinutes += $tarif['minutes_per_unit'];
-                    $remainingMinutes -= $tarif['minutes_per_unit'];
+                    $usedMinutes += $task['minutes'];
+                    $remainingMinutes -= $task['minutes'];
                 }
             }
 
-            // 2-bosqich: qolgan vaqtni navbat bilan to‘ldirish
+            // 2-bosqich: qolgan vaqtni teng ravishda to‘ldirish
             $i = 0;
-            while ($remainingMinutes > 0 && count($resultTarifs) > 0) {
-                $index = $i % count($resultTarifs);
-                $tarif = &$resultTarifs[$index];
-                $unitTime = $tarif['minutes_per_unit'];
+            while ($remainingMinutes > 0 && count($assigned) > 0) {
+                $index = $i % count($assigned);
+                $unit = $assigned[$index];
+                $minutes = $unit['minutes_per_unit'];
 
-                if ($remainingMinutes >= $unitTime) {
-                    $tarif['count'] += 1;
-                    $tarif['total_minutes'] = round($tarif['count'] * $unitTime, 2);
-                    $usedMinutes += $unitTime;
-                    $remainingMinutes -= $unitTime;
+                if ($remainingMinutes >= $minutes) {
+                    $assigned[$index]['count'] += 1;
+                    $assigned[$index]['total_minutes'] = round($assigned[$index]['count'] * $minutes, 2);
+                    $usedMinutes += $minutes;
+                    $remainingMinutes -= $minutes;
                 } else {
                     break;
                 }
+
                 $i++;
             }
 
-            // So'nggi tozalash
-            foreach ($resultTarifs as &$t) {
-                unset($t['minutes_per_unit']);
+            // Yakuniy arraydan texnik maydonlarni olib tashlash
+            foreach ($assigned as &$item) {
+                unset($item['minutes_per_unit']);
             }
 
-            if (count($resultTarifs)) {
-                $finalPlan[] = [
-                    'employee_id' => $employeeId,
-                    'employee_name' => $employeeTarifs->first()['assigned_employee_name'],
-                    'used_minutes' => round($usedMinutes, 2),
-                    'tarifications' => $resultTarifs,
-                ];
-            }
+            $employeePlans[] = [
+                'employee_id' => $employeeId,
+                'employee_name' => $employeeName,
+                'used_minutes' => round($usedMinutes, 2),
+                'tarifications' => $assigned,
+            ];
         }
 
         return response()->json([
             'message' => 'Kunlik plan yaratildi',
-            'data' => $finalPlan,
+            'data' => $employeePlans,
         ]);
     }
 
