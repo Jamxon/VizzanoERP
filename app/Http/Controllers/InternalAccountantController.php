@@ -71,32 +71,31 @@ class InternalAccountantController extends Controller
             'submodel_id' => 'required|exists:order_sub_models,id',
         ]);
 
-        $groupId = $request->input('group_id');
-        $submodelId = $request->input('submodel_id');
-
-        $group = Group::with('employees')->findOrFail($groupId);
+        $group = Group::with('employees')->findOrFail($request->group_id);
         $employees = $group->employees;
 
         if ($employees->isEmpty()) {
             return response()->json(['message' => 'Guruhda hodimlar mavjud emas'], 400);
         }
 
-        $submodel = OrderSubmodel::with('tarificationCategories.tarifications')->findOrFail($submodelId);
+        $submodel = OrderSubmodel::with(['tarificationCategories.tarifications' => function ($q) {
+            $q->where('second', '>', 0);
+        }])->findOrFail($request->submodel_id);
 
-
-        $tarifications = collect();
-
-        foreach ($submodel->tarificationCategories as $category) {
-            foreach ($category->tarifications as $tarification) {
-                    $tarifications->push([
-                        'id' => $tarification->id,
-                        'name' => $tarification->name,
-                        'seconds' => $tarification->second,
-                        'minutes' => $tarification->second / 60,
-                    ]);
-
-            }
-        }
+        // ✅ Efficiently collect tarifications
+        $tarifications = $submodel->tarificationCategories
+            ->pluck('tarifications')
+            ->flatten()
+            ->map(function ($t) {
+                return [
+                    'id' => $t->id,
+                    'name' => $t->name,
+                    'seconds' => floatval($t->second),
+                    'minutes' => floatval($t->second) / 60,
+                ];
+            })->filter(function ($t) {
+                return $t['minutes'] > 0;
+            })->values();
 
         if ($tarifications->isEmpty()) {
             return response()->json(['message' => 'Tarificationlar topilmadi'], 400);
@@ -104,19 +103,15 @@ class InternalAccountantController extends Controller
 
         $plans = [];
         $employeeCount = $employees->count();
-        $employeeStates = [];
-
-        // Har bir employee uchun ishlatilgan minutni 0 qilib boshlaymiz
-        foreach ($employees as $employee) {
-            $employeeStates[$employee->id] = [
-                'used_minutes' => 0,
-                'name' => $employee->name ?? 'No name',
-            ];
-        }
+        $employeeStates = $employees->mapWithKeys(function ($e) {
+            return [$e->id => ['used_minutes' => 0, 'name' => $e->name ?? 'No name']];
+        })->toArray();
 
         $currentEmployeeIndex = 0;
+
         foreach ($tarifications as $tarification) {
-            $tarificationLeft = 999999; // shunchaki katta son — sizda bo‘lishi mumkin bo‘lgan maksimal birlik soni
+            $tarificationLeft = 999999; // bu yerda kerakli sonni hisoblab kelishingiz mumkin
+
             while ($tarificationLeft > 0) {
                 $employee = $employees[$currentEmployeeIndex];
                 $employeeId = $employee->id;
@@ -125,13 +120,11 @@ class InternalAccountantController extends Controller
                 $available = 500 - $used;
 
                 if ($available <= 0) {
-                    // Keyingi employee
                     $currentEmployeeIndex = ($currentEmployeeIndex + 1) % $employeeCount;
                     continue;
                 }
 
                 $maxCount = floor($available / $tarification['minutes']);
-
                 if ($maxCount <= 0) {
                     $currentEmployeeIndex = ($currentEmployeeIndex + 1) % $employeeCount;
                     continue;
@@ -146,19 +139,18 @@ class InternalAccountantController extends Controller
                     'tarification_id' => $tarification['id'],
                     'tarification_name' => $tarification['name'],
                     'count' => $assignCount,
-                    'total_minutes' => $assignMinutes,
+                    'total_minutes' => round($assignMinutes, 2),
                 ];
 
-                // Yangilash
                 $employeeStates[$employeeId]['used_minutes'] += $assignMinutes;
                 $tarificationLeft -= $assignCount;
 
-                // Keyingi employee ga o‘tish
                 $currentEmployeeIndex = ($currentEmployeeIndex + 1) % $employeeCount;
 
-                // Agar hamma hodimning limiti to‘lgan bo‘lsa — break
-                $allFull = collect($employeeStates)->every(fn($e) => $e['used_minutes'] >= 500);
-                if ($allFull) break 2;
+                // ✅ break if all employees are full
+                if (collect($employeeStates)->every(fn ($e) => $e['used_minutes'] >= 500)) {
+                    break 2;
+                }
             }
         }
 
