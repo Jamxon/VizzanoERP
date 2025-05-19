@@ -288,6 +288,8 @@ class SuperHRController extends Controller
             'type' => 'nullable|string',
             'birthday' => 'nullable|date',
             'role_id' => 'nullable',
+            'status' => 'nullable|string|in:working,kicked,reserv',
+            'salary' => 'nullable|numeric',
         ]);
 
         try {
@@ -309,22 +311,48 @@ class SuperHRController extends Controller
             $user->update([
                 'role_id' => $request->role_id === 'null' ? null : $request->role_id,
             ]);
-            $employee->update([
-                'name' => $request->name,
-                'phone' => $request->phone,
-                'group_id' => $request->group_id,
-                'position_id' => $request->position_id,
-                'department_id' => $request->department_id,
-                'hiring_date' => $request->hiring_date,
-                'address' => $request->address,
-                'passport_number' => $request->passport_number,
-                'passport_code' => $request->passport_code,
-                'payment_type' => $request->payment_type,
-                'comment' => $request->comment,
-                'type' => $request->type,
-                'birthday' => $request->birthday,
-                'img' => $img ?? $employee->img,
-            ]);
+
+            if ($request->status === 'kicked') {
+                $employee->update([
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'group_id' => $request->group_id,
+                    'position_id' => $request->position_id,
+                    'department_id' => $request->department_id,
+                    'hiring_date' => $request->hiring_date,
+                    'address' => $request->address,
+                    'passport_number' => $request->passport_number,
+                    'passport_code' => $request->passport_code,
+                    'payment_type' => $request->payment_type,
+                    'comment' => $request->comment,
+                    'type' => $request->type,
+                    'birthday' => $request->birthday,
+                    'img' => $img ?? $employee->img,
+                    'status' => $request->status,
+                    'kicked_date' => now(),
+                    'salary' => $request->salary ?? null,
+                ]);
+            } else {
+                $employee->update([
+                    'name' => $request->name,
+                    'phone' => $request->phone,
+                    'group_id' => $request->group_id,
+                    'position_id' => $request->position_id,
+                    'department_id' => $request->department_id,
+                    'hiring_date' => $request->hiring_date,
+                    'address' => $request->address,
+                    'passport_number' => $request->passport_number,
+                    'passport_code' => $request->passport_code,
+                    'payment_type' => $request->payment_type,
+                    'comment' => $request->comment,
+                    'type' => $request->type,
+                    'birthday' => $request->birthday,
+                    'img' => $img ?? $employee->img,
+                    'salary' => $request->salary ?? null,
+                ]);
+            }
+
+
 
             DB::commit();
 
