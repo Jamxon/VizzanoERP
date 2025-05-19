@@ -112,7 +112,8 @@ class InternalAccountantController extends Controller
         // Barcha xodimlarni (tarifikatsiyalarga bog'langan) ro'yxatini yaratish
         $allEmployeesInTarifications = collect();
         foreach ($tarifications as $tarification) {
-            foreach ($tarification['assigned_employees'] as $employee) {
+            if (!empty($tarification['assigned_employee'])) {
+                $employee = $tarification['assigned_employee'];
                 if (!$allEmployeesInTarifications->contains('id', $employee->id)) {
                     $allEmployeesInTarifications->push($employee);
                 }
@@ -138,12 +139,13 @@ class InternalAccountantController extends Controller
 
         // Har bir tarifikatsiya uchun ish taqsimlash
         foreach ($tarifications as $tarification) {
-            // Faqat shu tarifikatsiyaga bog'langan xodimlar bilan ishlash
-            $assignedEmployeeIds = $tarification['assigned_employees']->pluck('id')->toArray();
-
-            if (empty($assignedEmployeeIds)) {
-                continue; // Agar bu tarifikatsiyaga xodimlar bog'lanmagan bo'lsa, o'tkazib yuborish
+            // Faqat shu tarifikatsiyaga bog'langan xodimni olish
+            if (empty($tarification['assigned_employee'])) {
+                continue; // Agar bu tarifikatsiyaga xodim bog'lanmagan bo'lsa, o'tkazib yuborish
             }
+
+            $employeeId = $tarification['assigned_employee']->id;
+            $assignedEmployeeIds = [$employeeId]; // Single employee in array format
 
             // Har bir xodim uchun mavjud bo'lgan umumiy vaqt
             $totalMinutesAvailable = count($assignedEmployeeIds) * 500;
