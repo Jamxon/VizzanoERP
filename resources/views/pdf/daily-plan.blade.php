@@ -4,55 +4,67 @@
     <meta charset="UTF-8">
     <style>
         @page {
-            size: 50mm 80mm portrait;
+            size: 80mm auto;
             margin: 0;
         }
 
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 9px;
+            font-size: 8.5px;
             margin: 0;
-            padding: 2px 4px;
-            width: 100%;
+            padding: 0;
+            width: 80mm;
         }
 
         .page {
             page-break-after: always;
-            padding-bottom: 5px;
+            padding: 3mm 3mm 5mm 3mm;
         }
 
         .header {
             text-align: center;
             font-weight: bold;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-size: 10px;
         }
 
-        .info {
-            margin-bottom: 5px;
-            font-size: 9px;
+        .employee-info {
+            margin-bottom: 2mm;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-bottom: 3mm;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 4px;
+            font-size: 8px;
         }
 
-        table th, table td {
+        th, td {
             border: 1px solid #000;
-            padding: 2px;
+            padding: 1mm;
             text-align: left;
+            word-break: break-word;
         }
 
-        table th {
-            background-color: #f0f0f0;
+        th {
+            background-color: #efefef;
         }
 
-        .summary {
-            margin-top: 5px;
+        .total-row {
             font-weight: bold;
-            font-size: 9px;
+            background-color: #e0e0e0;
+        }
+
+        .footer {
+            margin-top: 3mm;
+            font-size: 8px;
+            text-align: center;
         }
     </style>
 </head>
@@ -62,10 +74,13 @@
     <div class="page">
         <div class="header">👷 Kunlik Ish Rejasi</div>
 
-        <div class="info">
-            <strong>Xodim:</strong> {{ $plan['employee_name'] }}<br>
-            <strong>Rejalashtirilgan daqiqa:</strong> {{ $plan['used_minutes'] }}<br>
-            <strong>Umumiy summa:</strong> {{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm
+        <div class="employee-info">
+            <strong>Xodim:</strong> {{ $plan['employee_name'] }}
+        </div>
+
+        <div class="summary">
+            <div>⏱ {{ $plan['used_minutes'] }} daqiqa</div>
+            <div>💰 {{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm</div>
         </div>
 
         <table>
@@ -73,31 +88,48 @@
             <tr>
                 <th>#</th>
                 <th>Ish nomi</th>
-                <th>Ish kodi</th>
-                <th>Dona narxi</th>
-                <th>Reja</th>
-                <th>Jami so'm</th>
-                <th>Bajarildi</th>
+                <th>Kodi</th>
+                <th>Narx</th>
+                <th>Soni</th>
+                <th>Jami</th>
+                <th>✔</th>
             </tr>
             </thead>
             <tbody>
+            @php
+                $totalCount = 0;
+                $totalSum = 0;
+                $totalMinutes = 0;
+            @endphp
             @foreach($plan['tarifications'] as $index => $tar)
+                @php
+                    $totalCount += $tar['count'];
+                    $totalSum += $tar['amount_earned'];
+                    $totalMinutes += $tar['total_minutes'];
+                @endphp
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $tar['tarification_name'] }}</td>
-                    <td>{{ $tar['code'] }}</td>
+                    <td>{{ $tar['code'] ?? '-' }}</td>
                     <td>{{ number_format($tar['sum'], 0, ',', ' ') }}</td>
                     <td>{{ $tar['count'] }}</td>
                     <td>{{ number_format($tar['amount_earned'], 0, ',', ' ') }}</td>
                     <td></td>
                 </tr>
             @endforeach
+            <tr class="total-row">
+                <td colspan="2">JAMI</td>
+                <td>-</td>
+                <td>-</td>
+                <td>{{ $totalCount }}</td>
+                <td>{{ number_format($totalSum, 0, ',', ' ') }}</td>
+                <td></td>
+            </tr>
             </tbody>
         </table>
 
-        <div class="summary">
-            ✅ Ushbu rejani to‘liq bajarsa: <br>
-            {{ $plan['used_minutes'] }} daqiqa ishlaysiz va <strong>{{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm</strong> topasiz.
+        <div class="footer">
+            Sana: {{ now()->format('d.m.Y') }} | Imzo: ____________________
         </div>
     </div>
 @endforeach
