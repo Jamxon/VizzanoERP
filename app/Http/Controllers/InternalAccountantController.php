@@ -131,14 +131,19 @@ class InternalAccountantController extends Controller
             while ($remainingMinutes > 0 && count($employeeTarifications) > 0) {
                 $tarif = &$employeeTarifications[$i % count($employeeTarifications)];
                 $minutesPerUnit = $tarif['minutes_per_unit'];
+
                 if ($remainingMinutes >= $minutesPerUnit) {
                     $tarif['count'] += 1;
                     $tarif['total_minutes'] = round($tarif['count'] * $minutesPerUnit, 2);
                     $usedMinutes += $minutesPerUnit;
                     $remainingMinutes -= $minutesPerUnit;
+                } else {
+                    break; // loopdan chiqib ketish
                 }
+
                 $i++;
             }
+
 
             // Yakuniy tozalash
             foreach ($employeeTarifications as &$tarif) {
