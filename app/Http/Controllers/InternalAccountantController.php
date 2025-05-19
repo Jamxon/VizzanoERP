@@ -76,7 +76,7 @@ class InternalAccountantController extends Controller
                 $q->select('id', 'submodel_id');
             },
             'tarificationCategories.tarifications' => function ($q) {
-                $q->select('id', 'name', 'second', 'tarification_category_id', 'employee_id')
+                $q->select('id', 'name', 'second', 'tarification_category_id', 'user_id')
                     ->where('second', '>', 0);
             },
             'tarificationCategories.tarifications.employee' => function ($q) {
