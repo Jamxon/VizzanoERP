@@ -88,18 +88,15 @@ class InternalAccountantController extends Controller
 
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
-                $seconds = floatval($tarification->seconds);
-                if ($seconds > 0.00001) {
                     $tarifications->push([
                         'id' => $tarification->id,
                         'name' => $tarification->name,
-                        'seconds' => $seconds,
-                        'minutes' => $seconds / 60,
+                        'seconds' => $tarification->seconds,
+                        'minutes' => $tarification->seconds / 60,
                     ]);
-                }
+
             }
         }
-
 
         if ($tarifications->isEmpty()) {
             return response()->json(['message' => 'Tarificationlar topilmadi'], 400);
