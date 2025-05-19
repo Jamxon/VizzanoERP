@@ -117,7 +117,11 @@ class SuperHRController extends Controller
             'payment_type' => 'nullable|string',
             'comment' => 'nullable|string',
             'type' => 'nullable|string',
-            'birthday' => 'nullable|date'
+            'birthday' => 'nullable|date',
+            'role_id' => 'nullable|integer|exists:roles,id',
+            'status' => 'nullable|string|in:working,kicked,reserv',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'salary' => 'nullable|numeric',
         ]);
 
         try {
@@ -158,7 +162,8 @@ class SuperHRController extends Controller
                 'branch_id' => auth()->user()->employee->branch_id,
                 'user_id' => $userId, // <-- endi bu joyda xatolik bo‘lmaydi
                 'status' => $request->status,
-                'img' => $img
+                'img' => $img,
+                'salary' => $request->salary ?? null,
             ]);
 
 
@@ -234,8 +239,7 @@ class SuperHRController extends Controller
                 'branch_id' => $branchId,
                 'user_id' => $userId,
                 'status' => 'working',
-                'img' => null,
-                'salary' => $request->salary ?? null,
+                'img' => null
             ]);
 
             DB::commit();
