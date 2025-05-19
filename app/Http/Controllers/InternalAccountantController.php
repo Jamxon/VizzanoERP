@@ -84,7 +84,7 @@ class InternalAccountantController extends Controller
 
         // Optimize submodel loading by selecting only needed columns
         $submodel = OrderSubmodel::select('id')
-            ->with(['tarificationCategories:id,order_sub_model_id',
+            ->with(['tarificationCategories:id,submodel_id',
                 'tarificationCategories.tarifications' => function ($q) {
                     $q->select('id', 'name', 'second', 'tarification_category_id')
                         ->where('second', '>', 0);
@@ -214,5 +214,5 @@ class InternalAccountantController extends Controller
             'data' => $flattenedPlans,
         ]);
     }
-    
+
 }
