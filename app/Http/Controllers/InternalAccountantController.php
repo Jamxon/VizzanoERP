@@ -72,7 +72,7 @@ class InternalAccountantController extends Controller
 
         $submodel = OrderSubmodel::with([
             'tarificationCategories' => fn($q) => $q->select('id', 'submodel_id'),
-            'tarificationCategories.tarifications' => fn($q) => $q->select('id', 'name', 'second', 'sum', 'tarification_category_id', 'user_id')->where('second', '>', 0),
+            'tarificationCategories.tarifications' => fn($q) => $q->select('id', 'name', 'second', 'summa', 'tarification_category_id', 'user_id')->where('second', '>', 0),
             'tarificationCategories.tarifications.employee' => fn($q) => $q->select('id', 'name'),
         ])->findOrFail($request->submodel_id);
 
@@ -85,7 +85,7 @@ class InternalAccountantController extends Controller
                         'id' => $tarification->id,
                         'name' => $tarification->name,
                         'seconds' => $tarification->second,
-                        'sum' => $tarification->sum,
+                        'sum' => $tarification->summa,
                         'minutes' => round($tarification->second / 60, 4),
                         'assigned_employee_id' => $tarification->employee->id,
                         'assigned_employee_name' => $tarification->employee->name,
