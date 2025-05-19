@@ -234,7 +234,8 @@ class SuperHRController extends Controller
                 'branch_id' => $branchId,
                 'user_id' => $userId,
                 'status' => 'working',
-                'img' => null
+                'img' => null,
+                'salary' => $request->salary ?? null,
             ]);
 
             DB::commit();
