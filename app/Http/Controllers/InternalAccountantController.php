@@ -9,6 +9,7 @@ use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\View;
 
 
 class InternalAccountantController extends Controller
@@ -66,15 +67,13 @@ class InternalAccountantController extends Controller
         return response()->json($tarifications);
     }
 
-    public function generateDailyPlan(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+    public function generateDailyPlan(Request $request)
     {
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
         ]);
 
         $submodel = OrderSubmodel::with([
-            'tarificationCategories' => fn($q) => $q->select('id', 'submodel_id'),
-            'tarificationCategories.tarifications' => fn($q) => $q->select('id', 'name', 'second', 'summa', 'tarification_category_id', 'user_id')->where('second', '>', 0),
             'tarificationCategories.tarifications.employee' => fn($q) => $q->select('id', 'name'),
         ])->findOrFail($request->submodel_id);
 
@@ -97,10 +96,11 @@ class InternalAccountantController extends Controller
         }
 
         if ($tarifications->isEmpty()) {
-            return response()->json(['message' => 'Tarifikatsiyalar yoki ularning xodimlari topilmadi'], 400);
+            return back()->with('error', 'Tarifikatsiyalar yoki ularning xodimlari topilmadi');
         }
 
         $grouped = $tarifications->groupBy('assigned_employee_id');
+
         $employeePlans = [];
 
         foreach ($grouped as $employeeId => $tasks) {
@@ -108,7 +108,6 @@ class InternalAccountantController extends Controller
             $remainingMinutes = 500;
             $usedMinutes = 0;
             $totalEarned = 0;
-
             $assigned = [];
             $sortedTasks = $tasks->sortBy('minutes')->values();
 
@@ -169,9 +168,9 @@ class InternalAccountantController extends Controller
             ];
         }
 
-        // PDFni generate qilish
-        $pdf = Pdf::loadView('pdf.daily-plan', ['plans' => $employeePlans]);
-        $pdf->setPaper([0, 0, 165, 1000]); // 58mm width = 165pt
+        $pdf = Pdf::loadView('pdf.daily_plan', [
+            'plans' => $employeePlans
+        ])->setPaper([0, 0, 226.77, 141.73], 'portrait'); // 80mm x 50mm in points
 
         return $pdf->download('daily_plan.pdf');
     }

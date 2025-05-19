@@ -33,18 +33,20 @@
 <body>
 <div class="header">👷 Kunlik Ish Rejasi</div>
 @foreach($plans as $plan)
-    <div class="employee">
-        👤 <strong>{{ $plan['employee_name'] }}</strong><br>
-        🕒: {{ $plan['used_minutes'] }} daqiqa<br>
-        💰: {{ number_format($plan['total_earned'], 2, '.', '') }} so'm
+    <div style="page-break-after: always; font-size: 10px;">
+        <strong>Xodim:</strong> {{ $plan['employee_name'] }}<br>
+        <strong>Umumiy daqiqa:</strong> {{ $plan['used_minutes'] }}<br>
+        <strong>Umumiy summa:</strong> {{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm<br><br>
 
-        @foreach($plan['tarifications'] as $t)
-            <div class="task">
-                - {{ \Illuminate\Support\Str::limit($t['tarification_name'], 40) }}<br>
-                💼 {{ $t['count'] }} dona | ⏱ {{ $t['total_minutes'] }} daq | 💵 {{ number_format($t['amount_earned'], 2) }} so'm
+        @foreach($plan['tarifications'] as $tar)
+            <div>
+                {{ $tar['tarification_name'] }}<br>
+                {{ $tar['count'] }} dona ({{ $tar['total_minutes'] }} daq) -
+                {{ number_format($tar['amount_earned'], 0, ',', ' ') }} so'm
             </div>
         @endforeach
     </div>
 @endforeach
+
 </body>
 </html>
