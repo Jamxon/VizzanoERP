@@ -8,6 +8,8 @@ use App\Models\OrderSubModel;
 use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class InternalAccountantController extends Controller
 {
@@ -64,7 +66,7 @@ class InternalAccountantController extends Controller
         return response()->json($tarifications);
     }
 
-    public function generateDailyPlan(Request $request): \Illuminate\Http\JsonResponse
+    public function generateDailyPlan(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
@@ -99,7 +101,6 @@ class InternalAccountantController extends Controller
         }
 
         $grouped = $tarifications->groupBy('assigned_employee_id');
-
         $employeePlans = [];
 
         foreach ($grouped as $employeeId => $tasks) {
@@ -155,7 +156,6 @@ class InternalAccountantController extends Controller
                 $i++;
             }
 
-            // remove temporary fields
             foreach ($assigned as &$item) {
                 unset($item['minutes_per_unit']);
             }
@@ -169,10 +169,11 @@ class InternalAccountantController extends Controller
             ];
         }
 
-        return response()->json([
-            'message' => 'Kunlik plan yaratildi',
-            'data' => $employeePlans,
-        ]);
+        // PDFni generate qilish
+        $pdf = Pdf::loadView('pdf.daily-plan', ['plans' => $employeePlans]);
+        $pdf->setPaper([0, 0, 165, 1000]); // 58mm width = 165pt
+
+        return $pdf->download('daily_plan.pdf');
     }
 
 }
