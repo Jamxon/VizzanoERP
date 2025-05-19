@@ -108,34 +108,41 @@ class InternalAccountantController extends Controller
             $usedMinutes = 0;
             $employeeTarifications = [];
 
-            // Eng kam vaqt talab qiladigan ishlarni oldinga qo‘y
             $sortedTarifs = $tarifs->sortBy('minutes');
 
+            // 1-bosqich: har bir ishga 1 dona beramiz (agar vaqt yetarli bo‘lsa)
             foreach ($sortedTarifs as $tarif) {
                 $minutesPerUnit = $tarif['minutes'];
-
-                if ($minutesPerUnit <= 0 || $remainingMinutes < $minutesPerUnit) {
-                    continue;
-                }
-
-                $maxCount = floor($remainingMinutes / $minutesPerUnit);
-                $totalMinutes = round($maxCount * $minutesPerUnit, 2);
-
-                if ($maxCount > 0) {
+                if ($minutesPerUnit > 0 && $remainingMinutes >= $minutesPerUnit) {
                     $employeeTarifications[] = [
                         'tarification_id' => $tarif['id'],
                         'tarification_name' => $tarif['name'],
-                        'count' => $maxCount,
-                        'total_minutes' => $totalMinutes,
+                        'count' => 1,
+                        'total_minutes' => round($minutesPerUnit, 2),
+                        'minutes_per_unit' => $minutesPerUnit, // keyinchalik kerak bo‘ladi
                     ];
-
-                    $usedMinutes += $totalMinutes;
-                    $remainingMinutes -= $totalMinutes;
+                    $usedMinutes += $minutesPerUnit;
+                    $remainingMinutes -= $minutesPerUnit;
                 }
+            }
 
-                if ($remainingMinutes <= 0) {
-                    break;
+            // 2-bosqich: qolgan vaqtni boricha navbatma-navbat bo‘lish
+            $i = 0;
+            while ($remainingMinutes > 0 && count($employeeTarifications) > 0) {
+                $tarif = &$employeeTarifications[$i % count($employeeTarifications)];
+                $minutesPerUnit = $tarif['minutes_per_unit'];
+                if ($remainingMinutes >= $minutesPerUnit) {
+                    $tarif['count'] += 1;
+                    $tarif['total_minutes'] = round($tarif['count'] * $minutesPerUnit, 2);
+                    $usedMinutes += $minutesPerUnit;
+                    $remainingMinutes -= $minutesPerUnit;
                 }
+                $i++;
+            }
+
+            // Yakuniy tozalash
+            foreach ($employeeTarifications as &$tarif) {
+                unset($tarif['minutes_per_unit']);
             }
 
             if (count($employeeTarifications)) {
