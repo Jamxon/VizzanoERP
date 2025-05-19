@@ -71,93 +71,148 @@ class InternalAccountantController extends Controller
             'submodel_id' => 'required|exists:order_sub_models,id',
         ]);
 
-        $group = Group::with('employees')->findOrFail($request->group_id);
+        // Load only necessary data with eager loading
+        $group = Group::select('id')->with(['employees' => function($q) {
+            $q->select('id', 'name', 'group_id');
+        }])->findOrFail($request->group_id);
+
         $employees = $group->employees;
 
         if ($employees->isEmpty()) {
             return response()->json(['message' => 'Guruhda hodimlar mavjud emas'], 400);
         }
 
-        $submodel = OrderSubmodel::with(['tarificationCategories.tarifications' => function ($q) {
-            $q->where('second', '>', 0);
-        }])->findOrFail($request->submodel_id);
+        // Optimize submodel loading by selecting only needed columns
+        $submodel = OrderSubmodel::select('id')
+            ->with(['tarificationCategories:id,order_sub_model_id',
+                'tarificationCategories.tarifications' => function ($q) {
+                    $q->select('id', 'name', 'second', 'tarification_category_id')
+                        ->where('second', '>', 0);
+                }])
+            ->findOrFail($request->submodel_id);
 
-        // ✅ Efficiently collect tarifications
-        $tarifications = $submodel->tarificationCategories
-            ->pluck('tarifications')
-            ->flatten()
-            ->map(function ($t) {
-                return [
-                    'id' => $t->id,
-                    'name' => $t->name,
-                    'seconds' => floatval($t->second),
-                    'minutes' => floatval($t->second) / 60,
-                ];
-            })->filter(function ($t) {
-                return $t['minutes'] > 0;
-            })->values();
+        // Collect tarifications efficiently
+        $tarifications = collect();
+        foreach ($submodel->tarificationCategories as $category) {
+            foreach ($category->tarifications as $tarification) {
+                $minutes = floatval($tarification->second) / 60;
+                if ($minutes > 0) {
+                    $tarifications->push([
+                        'id' => $tarification->id,
+                        'name' => $tarification->name,
+                        'seconds' => floatval($tarification->second),
+                        'minutes' => $minutes,
+                    ]);
+                }
+            }
+        }
 
         if ($tarifications->isEmpty()) {
             return response()->json(['message' => 'Tarificationlar topilmadi'], 400);
         }
 
-        $plans = [];
-        $employeeCount = $employees->count();
-        $employeeStates = $employees->mapWithKeys(function ($e) {
-            return [$e->id => ['used_minutes' => 0, 'name' => $e->name ?? 'No name']];
-        })->toArray();
+        // Calculate total work needed
+        $totalTarificationMinutes = $tarifications->sum(function($t) {
+            return $t['minutes'] * 1000; // Arbitrary large number to ensure all work is covered
+        });
 
+        // Calculate how many employees we need to handle this work
+        $requiredEmployeeCapacity = ceil($totalTarificationMinutes / 500);
+
+        // Prepare employee state tracking
+        $employeeStates = [];
+        foreach ($employees as $employee) {
+            $employeeStates[$employee->id] = [
+                'id' => $employee->id,
+                'name' => $employee->name ?? 'No name',
+                'used_minutes' => 0,
+                'plans' => []
+            ];
+        }
+
+        // Allocate work efficiently
+        $plans = [];
         $currentEmployeeIndex = 0;
+        $employeeCount = $employees->count();
+
+        // Sort tarifications by time (descending) to optimize allocation
+        $tarifications = $tarifications->sortByDesc('minutes')->values();
 
         foreach ($tarifications as $tarification) {
-            $tarificationLeft = 999999; // bu yerda kerakli sonni hisoblab kelishingiz mumkin
+            // Set a reasonable limit based on total required capacity
+            $tarificationLeft = ceil(500 * $requiredEmployeeCapacity / $tarifications->count());
 
             while ($tarificationLeft > 0) {
-                $employee = $employees[$currentEmployeeIndex];
-                $employeeId = $employee->id;
+                // Find employee with minimum used minutes
+                $minUsedMinutes = 500;
+                $minEmployeeId = null;
 
-                $used = $employeeStates[$employeeId]['used_minutes'];
-                $available = 500 - $used;
+                foreach ($employeeStates as $id => $state) {
+                    if ($state['used_minutes'] < $minUsedMinutes) {
+                        $minUsedMinutes = $state['used_minutes'];
+                        $minEmployeeId = $id;
+                    }
+                }
+
+                // If all employees are full, break
+                if ($minUsedMinutes >= 500) {
+                    break;
+                }
+
+                $employeeId = $minEmployeeId;
+                $available = 500 - $employeeStates[$employeeId]['used_minutes'];
 
                 if ($available <= 0) {
-                    $currentEmployeeIndex = ($currentEmployeeIndex + 1) % $employeeCount;
-                    continue;
+                    break; // All employees are full
                 }
 
                 $maxCount = floor($available / $tarification['minutes']);
                 if ($maxCount <= 0) {
-                    $currentEmployeeIndex = ($currentEmployeeIndex + 1) % $employeeCount;
-                    continue;
+                    break; // No more work can be assigned
                 }
 
                 $assignCount = min($tarificationLeft, $maxCount);
                 $assignMinutes = $assignCount * $tarification['minutes'];
 
-                $plans[] = [
-                    'employee_id' => $employeeId,
-                    'employee_name' => $employeeStates[$employeeId]['name'],
-                    'tarification_id' => $tarification['id'],
-                    'tarification_name' => $tarification['name'],
-                    'count' => $assignCount,
-                    'total_minutes' => round($assignMinutes, 2),
-                ];
+                // Add to employee's plan
+                if (!isset($employeeStates[$employeeId]['plans'][$tarification['id']])) {
+                    $employeeStates[$employeeId]['plans'][$tarification['id']] = [
+                        'employee_id' => $employeeId,
+                        'employee_name' => $employeeStates[$employeeId]['name'],
+                        'tarification_id' => $tarification['id'],
+                        'tarification_name' => $tarification['name'],
+                        'count' => 0,
+                        'total_minutes' => 0,
+                    ];
+                }
+
+                $employeeStates[$employeeId]['plans'][$tarification['id']]['count'] += $assignCount;
+                $employeeStates[$employeeId]['plans'][$tarification['id']]['total_minutes'] += round($assignMinutes, 2);
 
                 $employeeStates[$employeeId]['used_minutes'] += $assignMinutes;
                 $tarificationLeft -= $assignCount;
 
-                $currentEmployeeIndex = ($currentEmployeeIndex + 1) % $employeeCount;
+                // Break if tarification is exhausted or all employees are full
+                if ($tarificationLeft <= 0 || collect($employeeStates)->every(fn ($e) => $e['used_minutes'] >= 500)) {
+                    break;
+                }
+            }
+        }
 
-                // ✅ break if all employees are full
-                if (collect($employeeStates)->every(fn ($e) => $e['used_minutes'] >= 500)) {
-                    break 2;
+        // Flatten plans for response
+        $flattenedPlans = [];
+        foreach ($employeeStates as $employeeId => $state) {
+            foreach ($state['plans'] as $tarificationId => $plan) {
+                if ($plan['count'] > 0) {
+                    $flattenedPlans[] = $plan;
                 }
             }
         }
 
         return response()->json([
             'message' => 'Kunlik plan yaratildi',
-            'data' => $plans,
+            'data' => $flattenedPlans,
         ]);
     }
-
+    
 }
