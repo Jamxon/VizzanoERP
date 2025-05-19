@@ -86,6 +86,7 @@ class InternalAccountantController extends Controller
         // Tarificationlarni yig‘amiz
         $tarifications = collect();
         foreach ($submodel->tarificationCategories as $category) {
+            return response()->json($category);
             foreach ($category->tarifications as $tarification) {
                 if ($tarification->seconds > 0) {
                     $tarifications->push([
@@ -97,8 +98,6 @@ class InternalAccountantController extends Controller
                 }
             }
         }
-
-        return response()->json($tarifications);
 
         if ($tarifications->isEmpty()) {
             return response()->json(['message' => 'Tarificationlar topilmadi'], 400);
