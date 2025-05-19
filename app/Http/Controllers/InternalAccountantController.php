@@ -70,14 +70,12 @@ class InternalAccountantController extends Controller
             'submodel_id' => 'required|exists:order_sub_models,id',
         ]);
 
-        // Submodel bilan tarifikatsiya va xodimlarini olish
         $submodel = OrderSubmodel::with([
             'tarificationCategories' => fn($q) => $q->select('id', 'submodel_id'),
             'tarificationCategories.tarifications' => fn($q) => $q->select('id', 'name', 'second', 'tarification_category_id', 'user_id')->where('second', '>', 0),
             'tarificationCategories.tarifications.employee' => fn($q) => $q->select('id', 'name'),
         ])->findOrFail($request->submodel_id);
 
-        // Tarifikatsiyalarni yig‘ish
         $tarifications = collect();
 
         foreach ($submodel->tarificationCategories as $category) {
@@ -98,69 +96,61 @@ class InternalAccountantController extends Controller
             return response()->json(['message' => 'Tarifikatsiyalar yoki ularning xodimlari topilmadi'], 400);
         }
 
-        // Ishchilar holatini tayyorlash
-        $employeeStates = [];
-        $groupedTarifications = $tarifications->groupBy(fn($t) => $t['assigned_employee']->id);
+        // Har bir ishchi uchun tarifikatsiyalarni ajratib olish
+        $groupedTarifications = $tarifications->groupBy(fn($item) => $item['assigned_employee']->id);
 
-        foreach ($groupedTarifications as $employeeId => $employeeTarifs) {
-            $employee = $employeeTarifs->first()['assigned_employee'];
-            $employeeStates[$employeeId] = [
-                'id' => $employeeId,
-                'name' => $employee->name ?? 'No name',
-                'used_minutes' => 0,
-                'plans' => []
-            ];
-        }
+        $employeePlans = [];
 
-        // Har bir ishchi uchun tarifikatsiyalarni 1 dona ishlashga ketadigan daqiqalar bo‘yicha o‘sish tartibida saralab, optimal taqsimlash
         foreach ($groupedTarifications as $employeeId => $tarifs) {
-            $state = &$employeeStates[$employeeId];
-            $remainingMinutes = 500;
+            $employee = $tarifs->first()['assigned_employee'];
 
-            // Eng kam vaqt talab qiladigandan boshlaymiz
+            $remainingMinutes = 500;
+            $usedMinutes = 0;
+            $employeeTarifications = [];
+
+            // Eng kam vaqt talab qiladigan ishlarni oldinga qo‘y
             $sortedTarifs = $tarifs->sortBy('minutes');
 
             foreach ($sortedTarifs as $tarif) {
                 $minutesPerUnit = $tarif['minutes'];
+
                 if ($minutesPerUnit <= 0 || $remainingMinutes < $minutesPerUnit) {
                     continue;
                 }
 
-                // Nechta dona ish bu turdagi ishni qilish mumkin
                 $maxCount = floor($remainingMinutes / $minutesPerUnit);
-                $totalMinutes = $maxCount * $minutesPerUnit;
+                $totalMinutes = round($maxCount * $minutesPerUnit, 2);
 
-                $state['plans'][$tarif['id']] = [
-                    'employee_id' => $employeeId,
-                    'employee_name' => $state['name'],
-                    'tarification_id' => $tarif['id'],
-                    'tarification_name' => $tarif['name'],
-                    'count' => $maxCount,
-                    'total_minutes' => round($totalMinutes, 2),
-                ];
+                if ($maxCount > 0) {
+                    $employeeTarifications[] = [
+                        'tarification_id' => $tarif['id'],
+                        'tarification_name' => $tarif['name'],
+                        'count' => $maxCount,
+                        'total_minutes' => $totalMinutes,
+                    ];
 
-                $state['used_minutes'] += $totalMinutes;
-                $remainingMinutes -= $totalMinutes;
+                    $usedMinutes += $totalMinutes;
+                    $remainingMinutes -= $totalMinutes;
+                }
 
                 if ($remainingMinutes <= 0) {
                     break;
                 }
             }
-        }
 
-        // Natijani tekis formatga o‘tkazish
-        $flattenedPlans = [];
-        foreach ($employeeStates as $state) {
-            foreach ($state['plans'] as $plan) {
-                if ($plan['count'] > 0) {
-                    $flattenedPlans[] = $plan;
-                }
+            if (count($employeeTarifications)) {
+                $employeePlans[] = [
+                    'employee_id' => $employeeId,
+                    'employee_name' => $employee->name ?? 'No name',
+                    'used_minutes' => round($usedMinutes, 2),
+                    'tarifications' => $employeeTarifications,
+                ];
             }
         }
 
         return response()->json([
             'message' => 'Kunlik plan yaratildi',
-            'data' => $flattenedPlans,
+            'data' => $employeePlans,
         ]);
     }
 
