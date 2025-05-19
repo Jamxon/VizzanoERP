@@ -170,7 +170,7 @@ class InternalAccountantController extends Controller
 
         $pdf = Pdf::loadView('pdf.daily-plan', [
             'plans' => $employeePlans
-        ])->setPaper([0, 0, 226.77, 141.73], 'portrait'); // 80mm x 50mm in points
+        ])->setPaper([0, 0, 141.73, 226.77], 'portrait'); // 80mm x 50mm in points
 
         return $pdf->download('daily_plan.pdf');
     }
