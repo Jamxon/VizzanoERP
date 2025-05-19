@@ -84,20 +84,21 @@ class InternalAccountantController extends Controller
 
         // Tarifikatsiyalarni yig'ish va ularning xodimlarini belgilash
         $tarifications = collect();
-
-        return response()->json($submodel->tarificationCategories);
-
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
+                $minutes = floatval($tarification->second) / 60;
+                if ($minutes > 0) {
+                    // Faqat shu tarifikatsiyaga bog'langan xodimni olish
+                    $assignedEmployee = $tarification->employee;
 
                     $tarifications->push([
                         'id' => $tarification->id,
                         'name' => $tarification->name,
-                        'seconds' => $tarification->second,
-                        'minutes' => round($tarification->second / 60, 2),
-                        'assigned_employee' => $tarification->employee,
+                        'seconds' => floatval($tarification->second),
+                        'minutes' => $minutes,
+                        'assigned_employee' => $assignedEmployee
                     ]);
-
+                }
             }
         }
 
