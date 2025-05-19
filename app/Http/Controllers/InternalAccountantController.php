@@ -87,6 +87,7 @@ class InternalAccountantController extends Controller
                         'name' => $tarification->name,
                         'seconds' => $tarification->second,
                         'sum' => $tarification->summa,
+                        'code' => $tarification->code,
                         'minutes' => round($tarification->second / 60, 4),
                         'assigned_employee_id' => $tarification->employee->id,
                         'assigned_employee_name' => $tarification->employee->name,
@@ -120,6 +121,7 @@ class InternalAccountantController extends Controller
                     $assigned[] = [
                         'tarification_id' => $task['id'],
                         'tarification_name' => $task['name'],
+                        'code' => $task['code'],
                         'count' => $count,
                         'total_minutes' => $total_minutes,
                         'minutes_per_unit' => $task['minutes'],

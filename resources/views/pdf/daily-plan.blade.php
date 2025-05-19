@@ -15,7 +15,7 @@
             padding: 2px 4px;
             width: 100%;
         }
-        
+
         .page {
             page-break-after: always;
             padding-bottom: 5px;
@@ -73,9 +73,11 @@
             <tr>
                 <th>#</th>
                 <th>Ish nomi</th>
+                <th>Ish kodi</th>
                 <th>Dona narxi</th>
-                <th>Dona</th>
+                <th>Reja</th>
                 <th>Jami so'm</th>
+                <th>Bajarildi</th>
             </tr>
             </thead>
             <tbody>
@@ -83,9 +85,11 @@
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $tar['tarification_name'] }}</td>
+                    <td>{{ $tar['code'] }}</td>
                     <td>{{ number_format($tar['sum'], 0, ',', ' ') }}</td>
                     <td>{{ $tar['count'] }}</td>
                     <td>{{ number_format($tar['amount_earned'], 0, ',', ' ') }}</td>
+                    <td></td>
                 </tr>
             @endforeach
             </tbody>
@@ -93,7 +97,7 @@
 
         <div class="summary">
             ✅ Ushbu rejani to‘liq bajarsa: <br>
-            {{ $plan['used_minutes'] }} daqiqa ishlaydi va <strong>{{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm</strong> topadi.
+            {{ $plan['used_minutes'] }} daqiqa ishlaysiz va <strong>{{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm</strong> topasiz.
         </div>
     </div>
 @endforeach
