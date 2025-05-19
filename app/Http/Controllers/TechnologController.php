@@ -1067,12 +1067,14 @@ class TechnologController extends Controller
             $totalSecond = 0;
             $totalSumma = 0;
 
+// Iterate through all rows
             for ($rowNum = 1; $rowNum <= $maxRow; $rowNum++) {
                 $row = $sheet[$rowNum] ?? [];
 
-                // Kategoriya nomi: C ustunda yozilgan va boshqa ustunlar bo‘sh
+                // Check for new category
                 if (!empty($row['C']) && empty($row['A']) && empty($row['B']) && empty($row['D'])) {
                     $categoryName = trim($row['C']);
+
                     $currentCategory = TarificationCategory::create([
                         'name' => $categoryName,
                         'submodel_id' => $submodelId,
@@ -1081,20 +1083,17 @@ class TechnologController extends Controller
                     continue;
                 }
 
-                // Section prefix: C ustunda nom bor, lekin bu tarif emas
+                // If new section prefix
                 if (empty($row['A']) && empty($row['B']) && !empty($row['C']) && empty($row['D'])) {
                     $sectionPrefix = trim($row['C']);
                     continue;
                 }
 
-                // Tarif qatorlari
+                // Tarification row
                 if (!empty($row['C']) && $currentCategory) {
                     $rawA = $row['A'] ?? null;
-                    if (!is_null($rawA) && is_numeric(str_replace(',', '.', trim((string)$rawA)))) {
-                        $seconds = (float) str_replace(',', '.', trim((string)$rawA));
-                    } else {
-                        $seconds = 0;
-                    }
+                    $seconds = is_numeric(str_replace(',', '.', (string)$rawA)) ?
+                        (float) str_replace(',', '.', (string)$rawA) : 0;
 
                     $description = trim((string)$row['C']);
                     if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
@@ -1122,6 +1121,7 @@ class TechnologController extends Controller
                     $totalSumma += $costs;
                 }
             }
+
 
             // SubmodelSpend ni yangilash
             $submodelSpend = SubmodelSpend::where('submodel_id', $submodelId)->first();
