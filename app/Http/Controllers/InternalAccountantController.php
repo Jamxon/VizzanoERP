@@ -18,11 +18,6 @@ class InternalAccountantController extends Controller
                 'orderModel.model',
                 'orderModel.material',
                 'orderModel.submodels.submodel',
-                'orderModel.submodels.tarificationCategories',
-                'orderModel.submodels.tarificationCategories.tarifications',
-                'orderModel.submodels.tarificationCategories.tarifications.employee',
-                'orderModel.submodels.tarificationCategories.tarifications.razryad',
-                'orderModel.submodels.tarificationCategories.tarifications.typewriter',
             )
             ->orderBy('id', 'desc')
             ->get();
