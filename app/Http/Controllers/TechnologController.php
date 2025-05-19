@@ -1005,7 +1005,7 @@ class TechnologController extends Controller
             return response()->json(['message' => 'Xatolik: ' . $e->getMessage()], 500);
         }
     }
-    
+
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         ini_set('memory_limit', '512M');
