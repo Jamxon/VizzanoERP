@@ -84,6 +84,9 @@ class InternalAccountantController extends Controller
 
         // Tarifikatsiyalarni yig'ish va ularning xodimlarini belgilash
         $tarifications = collect();
+
+        return response()->json($submodel->tarificationCategories);
+
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
 
@@ -101,8 +104,6 @@ class InternalAccountantController extends Controller
         if ($tarifications->isEmpty()) {
             return response()->json(['message' => 'Tarifikatsiyalar topilmadi'], 400);
         }
-
-        return response()->json($tarifications);
 
         // Xodimlar holatini kuzatish uchun tayyorlash
         $employeeStates = [];
