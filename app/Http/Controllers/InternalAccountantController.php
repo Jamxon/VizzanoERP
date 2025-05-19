@@ -71,53 +71,67 @@ class InternalAccountantController extends Controller
             'submodel_id' => 'required|exists:order_sub_models,id',
         ]);
 
-        // Load only necessary data with eager loading
-        $group = Group::select('id')->with(['employees' => function($q) {
-            $q->select('id', 'name', 'group_id');
-        }])->findOrFail($request->group_id);
-
-        $employees = $group->employees;
-
-        if ($employees->isEmpty()) {
-            return response()->json(['message' => 'Guruhda hodimlar mavjud emas'], 400);
-        }
-
-        // Optimize submodel loading by selecting only needed columns
+        // Tarifikatsiyalarga bog'langan xodimlarni olish
         $submodel = OrderSubmodel::select('id')
-            ->with(['tarificationCategories:id,submodel_id',
+            ->with([
+                'tarificationCategories:id,submodel_id',
                 'tarificationCategories.tarifications' => function ($q) {
                     $q->select('id', 'name', 'second', 'tarification_category_id')
-                        ->where('second', '>', 0);
-                }])
+                        ->where('second', '>', 0)
+                        ->with(['employees' => function($query) use ($request) {
+                            $query->select('employees.id', 'employees.name')
+                                ->where('employees.group_id', $request->group_id);
+                        }]);
+                }
+            ])
             ->findOrFail($request->submodel_id);
 
-        // Collect tarifications efficiently
+        // Tarifikatsiyalarni yig'ish va ularning xodimlarini belgilash
         $tarifications = collect();
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
                 $minutes = floatval($tarification->second) / 60;
                 if ($minutes > 0) {
-                    $tarifications->push([
-                        'id' => $tarification->id,
-                        'name' => $tarification->name,
-                        'seconds' => floatval($tarification->second),
-                        'minutes' => $minutes,
-                    ]);
+                    // Faqat shu tarifikatsiyaga bog'langan va ko'rsatilgan guruhga tegishli xodimlarni olish
+                    $assignedEmployees = $tarification->employees
+                        ->where('group_id', $request->group_id);
+
+                    if ($assignedEmployees->isNotEmpty()) {
+                        $tarifications->push([
+                            'id' => $tarification->id,
+                            'name' => $tarification->name,
+                            'seconds' => floatval($tarification->second),
+                            'minutes' => $minutes,
+                            'assigned_employees' => $assignedEmployees
+                        ]);
+                    }
                 }
             }
         }
 
         if ($tarifications->isEmpty()) {
-            return response()->json(['message' => 'Tarificationlar topilmadi'], 400);
+            return response()->json(['message' => 'Tarifikatsiyalar yoki ularga bog\'langan xodimlar topilmadi'], 400);
         }
 
-        // Calculate total work needed
-        $totalMinutesAvailable = $employees->count() * 500;
-        $totalTarificationCount = $tarifications->count();
-
-        // Prepare employee state tracking
+        // Xodimlar holatini kuzatish uchun tayyorlash
         $employeeStates = [];
-        foreach ($employees as $employee) {
+
+        // Barcha xodimlarni (tarifikatsiyalarga bog'langan) ro'yxatini yaratish
+        $allEmployeesInTarifications = collect();
+        foreach ($tarifications as $tarification) {
+            foreach ($tarification['assigned_employees'] as $employee) {
+                if (!$allEmployeesInTarifications->contains('id', $employee->id)) {
+                    $allEmployeesInTarifications->push($employee);
+                }
+            }
+        }
+
+        if ($allEmployeesInTarifications->isEmpty()) {
+            return response()->json(['message' => 'Tarifikatsiyalarga bog\'langan xodimlar topilmadi'], 400);
+        }
+
+        // Xodimlar uchun boshlang'ich holatni o'rnatish
+        foreach ($allEmployeesInTarifications as $employee) {
             $employeeStates[$employee->id] = [
                 'id' => $employee->id,
                 'name' => $employee->name ?? 'No name',
@@ -126,37 +140,31 @@ class InternalAccountantController extends Controller
             ];
         }
 
-        // Allocate work efficiently
-        $plans = [];
-        $employeeCount = $employees->count();
-
-        // Sort tarifications by time (descending) to optimize allocation
+        // Tarifikatsiyalarni vaqtga ko'ra saralash (kamayish tartibida)
         $tarifications = $tarifications->sortByDesc('minutes')->values();
 
-        // Track tarification distribution for better balancing
-        $tarificationDistribution = [];
-        foreach ($employees as $employee) {
-            $tarificationDistribution[$employee->id] = [];
-            foreach ($tarifications as $tarification) {
-                $tarificationDistribution[$employee->id][$tarification['id']] = 0;
+        // Har bir tarifikatsiya uchun ish taqsimlash
+        foreach ($tarifications as $tarification) {
+            // Faqat shu tarifikatsiyaga bog'langan xodimlar bilan ishlash
+            $assignedEmployeeIds = $tarification['assigned_employees']->pluck('id')->toArray();
+
+            if (empty($assignedEmployeeIds)) {
+                continue; // Agar bu tarifikatsiyaga xodimlar bog'lanmagan bo'lsa, o'tkazib yuborish
             }
-        }
 
-        // Calculate total workload per tarification
-        $totalWorkPerTarification = [];
-        foreach ($tarifications as $tarification) {
-            // Each tarification gets roughly equal share of total capacity
-            $totalWorkPerTarification[$tarification['id']] = ceil(500 * $employeeCount * 0.8 / $tarifications->count());
-        }
+            // Har bir xodim uchun mavjud bo'lgan umumiy vaqt
+            $totalMinutesAvailable = count($assignedEmployeeIds) * 500;
 
-        // First pass: distribute each tarification among all employees
-        foreach ($tarifications as $tarification) {
-            $tarificationLeft = $totalWorkPerTarification[$tarification['id']];
+            // Har bir tarifikatsiya uchun taxminiy ish hajmi
+            $totalWorkNeeded = ceil($totalMinutesAvailable * 0.8 / $tarifications->count());
+            $tarificationLeft = $totalWorkNeeded;
 
-            // Initial distribution - give each employee some work of each type
-            $baseAllocation = floor($tarificationLeft / $employeeCount);
+            // Har bir xodimga asosiy taqsimlash
+            $baseAllocation = floor($tarificationLeft / count($assignedEmployeeIds));
+
             if ($baseAllocation > 0) {
-                foreach ($employeeStates as $employeeId => &$state) {
+                foreach ($assignedEmployeeIds as $employeeId) {
+                    $state = &$employeeStates[$employeeId];
                     $available = 500 - $state['used_minutes'];
                     $maxCount = floor($available / $tarification['minutes']);
                     $assignCount = min($baseAllocation, $maxCount);
@@ -164,7 +172,7 @@ class InternalAccountantController extends Controller
                     if ($assignCount > 0) {
                         $assignMinutes = $assignCount * $tarification['minutes'];
 
-                        // Add to employee's plan
+                        // Xodimning rejasiga qo'shish
                         if (!isset($state['plans'][$tarification['id']])) {
                             $state['plans'][$tarification['id']] = [
                                 'employee_id' => $employeeId,
@@ -181,26 +189,25 @@ class InternalAccountantController extends Controller
 
                         $state['used_minutes'] += $assignMinutes;
                         $tarificationLeft -= $assignCount;
-                        $tarificationDistribution[$employeeId][$tarification['id']] += $assignCount;
                     }
                 }
             }
 
-            // Second pass: distribute remaining work
+            // Qolgan ishni tarqatish
             while ($tarificationLeft > 0) {
-                // Find the employee with the lowest count of this tarification who still has available minutes
-                $minCount = PHP_INT_MAX;
+                // Eng kam yuklangan xodimni topish
+                $minUsed = PHP_INT_MAX;
                 $selectedEmployeeId = null;
 
-                foreach ($employeeStates as $employeeId => $state) {
-                    if ($state['used_minutes'] < 500 &&
-                        ($tarificationDistribution[$employeeId][$tarification['id']] < $minCount)) {
-                        $minCount = $tarificationDistribution[$employeeId][$tarification['id']];
+                foreach ($assignedEmployeeIds as $employeeId) {
+                    $state = $employeeStates[$employeeId];
+                    if ($state['used_minutes'] < 500 && $state['used_minutes'] < $minUsed) {
+                        $minUsed = $state['used_minutes'];
                         $selectedEmployeeId = $employeeId;
                     }
                 }
 
-                // If no employee has capacity, break
+                // Agar bo'sh xodim bo'lmasa, to'xtatish
                 if ($selectedEmployeeId === null) {
                     break;
                 }
@@ -208,17 +215,17 @@ class InternalAccountantController extends Controller
                 $available = 500 - $employeeStates[$selectedEmployeeId]['used_minutes'];
                 $maxCount = floor($available / $tarification['minutes']);
 
-                // Limit how much we assign at once for better distribution
-                $maxAssignAtOnce = ceil($tarificationLeft / max(1, $employeeCount / 2));
+                // Bir vaqtda taqsimlanadigan maksimal miqdorni cheklash
+                $maxAssignAtOnce = ceil($tarificationLeft / max(1, count($assignedEmployeeIds) / 2));
                 $assignCount = min($maxAssignAtOnce, $maxCount, $tarificationLeft);
 
                 if ($assignCount <= 0) {
-                    break; // No more work can be assigned
+                    break; // Ko'proq ish taqsimlab bo'lmaydi
                 }
 
                 $assignMinutes = $assignCount * $tarification['minutes'];
 
-                // Add to employee's plan
+                // Xodimning rejasiga qo'shish
                 if (!isset($employeeStates[$selectedEmployeeId]['plans'][$tarification['id']])) {
                     $employeeStates[$selectedEmployeeId]['plans'][$tarification['id']] = [
                         'employee_id' => $selectedEmployeeId,
@@ -235,16 +242,23 @@ class InternalAccountantController extends Controller
 
                 $employeeStates[$selectedEmployeeId]['used_minutes'] += $assignMinutes;
                 $tarificationLeft -= $assignCount;
-                $tarificationDistribution[$selectedEmployeeId][$tarification['id']] += $assignCount;
 
-                // Break if all employees are full
-                if (collect($employeeStates)->every(fn ($e) => $e['used_minutes'] >= 500)) {
+                // Agar barcha xodimlar to'la bo'lsa, to'xtatish
+                $allFull = true;
+                foreach ($assignedEmployeeIds as $employeeId) {
+                    if ($employeeStates[$employeeId]['used_minutes'] < 500) {
+                        $allFull = false;
+                        break;
+                    }
+                }
+
+                if ($allFull) {
                     break;
                 }
             }
         }
 
-        // Flatten plans for response
+        // Rejalarni javob uchun tekislash
         $flattenedPlans = [];
         foreach ($employeeStates as $employeeId => $state) {
             foreach ($state['plans'] as $tarificationId => $plan) {
