@@ -103,7 +103,6 @@ class InternalAccountantController extends Controller
 
         foreach ($groupedTarifications as $employeeId => $tarifs) {
             $employee = $tarifs->first()['assigned_employee'];
-
             $remainingMinutes = 500;
             $usedMinutes = 0;
             $employeeTarifications = [];
@@ -119,17 +118,18 @@ class InternalAccountantController extends Controller
                         'tarification_name' => $tarif['name'],
                         'count' => 1,
                         'total_minutes' => round($minutesPerUnit, 2),
-                        'minutes_per_unit' => $minutesPerUnit, // keyinchalik kerak bo‘ladi
+                        'minutes_per_unit' => $minutesPerUnit,
                     ];
                     $usedMinutes += $minutesPerUnit;
                     $remainingMinutes -= $minutesPerUnit;
                 }
             }
 
-            // 2-bosqich: qolgan vaqtni boricha navbatma-navbat bo‘lish
+            // 2-bosqich: qolgan vaqtni navbatma-navbat to‘ldirish
             $i = 0;
             while ($remainingMinutes > 0 && count($employeeTarifications) > 0) {
-                $tarif = &$employeeTarifications[$i % count($employeeTarifications)];
+                $index = $i % count($employeeTarifications);
+                $tarif = &$employeeTarifications[$index];
                 $minutesPerUnit = $tarif['minutes_per_unit'];
 
                 if ($remainingMinutes >= $minutesPerUnit) {
@@ -138,14 +138,12 @@ class InternalAccountantController extends Controller
                     $usedMinutes += $minutesPerUnit;
                     $remainingMinutes -= $minutesPerUnit;
                 } else {
-                    break; // loopdan chiqib ketish
+                    break;
                 }
-
                 $i++;
             }
 
-
-            // Yakuniy tozalash
+            // Tozalash
             foreach ($employeeTarifications as &$tarif) {
                 unset($tarif['minutes_per_unit']);
             }
@@ -155,10 +153,11 @@ class InternalAccountantController extends Controller
                     'employee_id' => $employeeId,
                     'employee_name' => $employee->name ?? 'No name',
                     'used_minutes' => round($usedMinutes, 2),
-                    'tarifications' => $employeeTarifications,
+                    'tarifications' => $employeeTarifications, // Bu yerda faqat tozalangan array
                 ];
             }
         }
+
 
         return response()->json([
             'message' => 'Kunlik plan yaratildi',
