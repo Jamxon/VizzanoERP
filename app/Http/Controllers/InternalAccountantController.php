@@ -12,7 +12,7 @@ class InternalAccountantController extends Controller
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
-            ->whereIn('status', ['tailoring', 'tailored', 'checking', 'checked', 'packaging', 'completed'])
+            ->whereIn('status', ['cutting','pending','tailoring', 'tailored', 'checking', 'checked', 'packaging', 'completed'])
             ->with(
                 'orderModel',
                 'orderModel.model',
