@@ -123,7 +123,7 @@ class InternalAccountantController extends Controller
                         'count' => $count,
                         'total_minutes' => $total_minutes,
                         'minutes_per_unit' => $task['minutes'],
-                        'sum' => $task['sum'],
+                        'sum' => $task['sum'] * $count,
                         'amount_earned' => $amount_earned,
                     ];
 
