@@ -1,50 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
     <style>
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 10px;
+            font-size: 9px;
             margin: 0;
-            padding: 0 2px;
-            width: 58mm;
+            padding: 2px 4px;
+            width: 80mm;
         }
+
+        .page {
+            page-break-after: always;
+            padding-bottom: 5px;
+        }
+
         .header {
             text-align: center;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            font-size: 10px;
         }
-        .employee {
-            margin-top: 5px;
-            border-top: 1px dashed #000;
-            padding-top: 3px;
+
+        .info {
+            margin-bottom: 5px;
+            font-size: 9px;
         }
-        .task {
-            margin-left: 5px;
-            margin-bottom: 2px;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
         }
+
+        table th, table td {
+            border: 1px solid #000;
+            padding: 2px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f0f0f0;
+        }
+
         .summary {
-            margin-top: 3px;
+            margin-top: 5px;
             font-weight: bold;
+            font-size: 9px;
         }
     </style>
 </head>
 <body>
-<div class="header">👷 Kunlik Ish Rejasi</div>
-@foreach($plans as $plan)
-    <div style="page-break-after: always; font-size: 10px;">
-        <strong>Xodim:</strong> {{ $plan['employee_name'] }}<br>
-        <strong>Umumiy daqiqa:</strong> {{ $plan['used_minutes'] }}<br>
-        <strong>Umumiy summa:</strong> {{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm<br><br>
 
-        @foreach($plan['tarifications'] as $tar)
-            <div>
-                {{ $tar['tarification_name'] }}<br>
-                {{ $tar['count'] }} dona ({{ $tar['total_minutes'] }} daq) -
-                {{ number_format($tar['amount_earned'], 0, ',', ' ') }} so'm
-            </div>
-        @endforeach
+@foreach($plans as $plan)
+    <div class="page">
+        <div class="header">👷 Kunlik Ish Rejasi</div>
+
+        <div class="info">
+            <strong>Xodim:</strong> {{ $plan['employee_name'] }}<br>
+            <strong>Rejalashtirilgan daqiqa:</strong> {{ $plan['used_minutes'] }}<br>
+            <strong>Umumiy summa:</strong> {{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Ish nomi</th>
+                <th>Dona narxi</th>
+                <th>Dona</th>
+                <th>Jami so'm</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($plan['tarifications'] as $index => $tar)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $tar['tarification_name'] }}</td>
+                    <td>{{ number_format($tar['sum'], 0, ',', ' ') }}</td>
+                    <td>{{ $tar['count'] }}</td>
+                    <td>{{ number_format($tar['amount_earned'], 0, ',', ' ') }}</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+
+        <div class="summary">
+            ✅ Ushbu rejani to‘liq bajarsa: <br>
+            {{ $plan['used_minutes'] }} daqiqa ishlaydi va <strong>{{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm</strong> topadi.
+        </div>
     </div>
 @endforeach
 
