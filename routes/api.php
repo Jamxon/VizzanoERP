@@ -49,6 +49,7 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::post('attendances', [AttendanceController::class, 'storeAttendance']);
     Route::patch('attendances/{attendance}', [AttendanceController::class, 'updateAttendance']);
     Route::get('orders', [InternalAccountantController::class, 'getOrders']);
+    Route::get('orders/{order}', [InternalAccountantController::class, 'showOrder']);
     Route::get('tarifications/search', [InternalAccountantController::class, 'searchTarifications']);
 });
 

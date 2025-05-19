@@ -30,6 +30,23 @@ class InternalAccountantController extends Controller
         return response()->json($orders);
     }
 
+    public function showOrder(Order $order): \Illuminate\Http\JsonResponse
+    {
+        $order->load(
+            'orderModel',
+            'orderModel.model',
+            'orderModel.material',
+            'orderModel.submodels.submodel',
+            'orderModel.submodels.tarificationCategories',
+            'orderModel.submodels.tarificationCategories.tarifications',
+            'orderModel.submodels.tarificationCategories.tarifications.employee',
+            'orderModel.submodels.tarificationCategories.tarifications.razryad',
+            'orderModel.submodels.tarificationCategories.tarifications.typewriter',
+        );
+
+        return response()->json($order);
+    }
+
     public function searchTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         $search = $request->input('search');
