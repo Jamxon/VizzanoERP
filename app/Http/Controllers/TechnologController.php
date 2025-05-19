@@ -486,7 +486,7 @@ class TechnologController extends Controller
 
             if (!empty($data['tarifications'])) {
                 foreach ($data['tarifications'] as $tarification) {
-                    if (!isset($tarification['name'], $tarification['razryad_id'], $tarification['typewriter_id'], $tarification['second'])) {
+                    if (!isset($tarification['name'], $tarification['razryad_id'], $tarification['second'])) {
                         continue;
                     }
 
