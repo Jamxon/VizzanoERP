@@ -82,7 +82,7 @@ class InternalAccountantController extends Controller
         }
 
         $submodel = OrderSubmodel::with('tarificationCategories.tarifications')->findOrFail($submodelId);
-
+        dd($submodel);
         // Tarificationlarni yig‘amiz
         $tarifications = collect();
         foreach ($submodel->tarificationCategories as $category) {
