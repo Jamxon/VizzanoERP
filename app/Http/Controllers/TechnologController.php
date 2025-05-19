@@ -601,7 +601,7 @@ class TechnologController extends Controller
 
         $number++;
 
-        if ($number > 99) {
+        if ($number > 999) {
             $number = 1;
             $letter = $this->incrementLetter($letter);
         }
