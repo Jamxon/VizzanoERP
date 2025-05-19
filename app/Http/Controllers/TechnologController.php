@@ -951,24 +951,22 @@ class TechnologController extends Controller
         }
 
         $rows = Excel::toArray([], $file);
-
-        // Bitta fayl, birinchi sheetni olamiz
-        $sheet = $rows[0];
-
-        $currentCategory = null;
+        $sheet = $rows[0]; // faqat birinchi sheetni olamiz
 
         DB::beginTransaction();
 
         try {
+            $currentCategory = null;
+
             foreach ($sheet as $row) {
                 $row = array_map('trim', $row);
 
-                if (empty($row) || (count(array_filter($row)) == 0)) {
-                    continue;
+                if (empty($row) || count(array_filter($row)) == 0) {
+                    continue; // bo'sh qator
                 }
 
-                // Category qatorini aniqlaymiz
-                if (isset($row[0]) && preg_match('/^(Верх|Флис|Подкладка|Искусственный|Прокламелин|Утеплитель|Вспомогательные|Лекала)/u', $row[0])) {
+                // Yangi kategoriya boshlanganini aniqlash
+                if (!empty($row[0]) && preg_match('/^(Верх|Флис|Подкладка|Искусственный|Прокламелин|Утеплитель|Вспомогательные|Лекала)/u', $row[0])) {
                     $currentCategory = SpecificationCategory::create([
                         'name' => $row[0],
                         'submodel_id' => $submodelId,
@@ -976,28 +974,27 @@ class TechnologController extends Controller
                     continue;
                 }
 
-                // Agar detal qatori bo'lsa
-                if ($currentCategory && isset($row[0], $row[1], $row[2])) {
-                    //итого  larni yozmaslik kerak
-                    if (preg_match('/^(итого|Итого:)/u', $row[0])) {
-                        continue;
-                    }
+                // "итого" qatorlarini tashlab o'tamiz
+                if (!empty($row[0]) && preg_match('/^(итого|Итого:)/ui', $row[0])) {
+                    continue;
+                }
+
+                // Detal yozuvlari
+                if ($currentCategory && isset($row[1], $row[2])) {
                     PartSpecification::create([
                         'specification_category_id' => $currentCategory->id,
                         'code' => $row[1],
                         'name' => $row[2],
-                        'quantity' => is_numeric($row[3]) ? (int) $row[3] : 0,
+                        'quantity' => isset($row[3]) && is_numeric($row[3]) ? (float)$row[3] : 0,
                         'comment' => $row[4] ?? null,
                     ]);
                 }
             }
 
             DB::commit();
-
             return response()->json(['message' => 'Import muvaffaqiyatli yakunlandi!']);
         } catch (\Exception $e) {
             DB::rollBack();
-
             return response()->json(['message' => 'Xatolik: ' . $e->getMessage()], 500);
         }
     }
