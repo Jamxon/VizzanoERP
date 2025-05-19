@@ -65,7 +65,7 @@ class WarehouseController extends Controller
                 $q->whereRaw('LOWER(items.name) LIKE ?', ["%{$original}%"])
                     ->orWhereRaw('LOWER(items.name) LIKE ?', ["%{$latin}%"])
                     ->orWhereRaw('LOWER(items.name) LIKE ?', ["%{$cyrillic}%"])
-                    ->orWareRaw('LOWER(items.code) LIKE ?', ["%{$original}%"]);
+                    ->orWhereRaw('LOWER(items.code) LIKE ?', ["%{$original}%"]);
             });
         }
 
