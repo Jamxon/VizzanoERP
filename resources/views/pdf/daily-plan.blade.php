@@ -3,14 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <style>
+        @page {
+            size: 50mm 80mm portrait;
+            margin: 0;
+        }
+
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 9px;
             margin: 0;
             padding: 2px 4px;
-            width: 80mm;
+            width: 100%;
         }
-
+        
         .page {
             page-break-after: always;
             padding-bottom: 5px;
