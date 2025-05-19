@@ -107,7 +107,7 @@ class TarificationCategoryImport implements ToCollection
         $number = (int)($matches[2] ?? 0);
         $number++;
 
-        if ($number > 99) {
+        if ($number > 999) {
             $number = 1;
             $letter = $this->incrementLetter($letter);
         }
