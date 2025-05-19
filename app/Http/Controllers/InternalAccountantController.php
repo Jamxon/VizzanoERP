@@ -94,8 +94,7 @@ class InternalAccountantController extends Controller
                 $minutes = floatval($tarification->second) / 60;
                 if ($minutes > 0) {
                     // Faqat shu tarifikatsiyaga bog'langan va ko'rsatilgan guruhga tegishli xodimlarni olish
-                    $assignedEmployees = $tarification->employees
-                        ->where('group_id', $request->group_id);
+                    $assignedEmployees = $tarification->employees;
 
                     if ($assignedEmployees->isNotEmpty()) {
                         $tarifications->push([
