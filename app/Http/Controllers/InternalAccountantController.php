@@ -16,7 +16,7 @@ class InternalAccountantController extends Controller
             ->with(
                 'orderModel',
                 'orderModel.model',
-                'orderModel.materials',
+                'orderModel.material',
                 'orderModel.submodels.submodel',
                 'orderModel.submodels.tarificationCategories',
                 'orderModel.submodels.tarificationCategories.tarifications',
