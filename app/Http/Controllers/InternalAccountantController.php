@@ -75,7 +75,7 @@ class InternalAccountantController extends Controller
         $submodel = OrderSubmodel::select('id')
             ->with([
                 'tarificationCategories:id,submodel_id',
-                'tarificationCategories.tarifications' => function ($q) {
+                'tarificationCategories.tarifications' => function ($q) use ($request) {
                     $q->select('id', 'name', 'second', 'tarification_category_id')
                         ->where('second', '>', 0)
                         ->with(['employees' => function($query) use ($request) {
