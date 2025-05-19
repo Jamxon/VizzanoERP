@@ -84,7 +84,7 @@ class InternalAccountantController extends Controller
 
         // Optimize submodel loading by selecting only needed columns
         $submodel = OrderSubmodel::select('id')
-            ->with(['tarificationCategories:id,submodel_id',
+            ->with(['tarificationCategories:id,order_sub_model_id',
                 'tarificationCategories.tarifications' => function ($q) {
                     $q->select('id', 'name', 'second', 'tarification_category_id')
                         ->where('second', '>', 0);
@@ -112,12 +112,8 @@ class InternalAccountantController extends Controller
         }
 
         // Calculate total work needed
-        $totalTarificationMinutes = $tarifications->sum(function($t) {
-            return $t['minutes'] * 1000; // Arbitrary large number to ensure all work is covered
-        });
-
-        // Calculate how many employees we need to handle this work
-        $requiredEmployeeCapacity = ceil($totalTarificationMinutes / 500);
+        $totalMinutesAvailable = $employees->count() * 500;
+        $totalTarificationCount = $tarifications->count();
 
         // Prepare employee state tracking
         $employeeStates = [];
@@ -132,53 +128,101 @@ class InternalAccountantController extends Controller
 
         // Allocate work efficiently
         $plans = [];
-        $currentEmployeeIndex = 0;
         $employeeCount = $employees->count();
 
         // Sort tarifications by time (descending) to optimize allocation
         $tarifications = $tarifications->sortByDesc('minutes')->values();
 
+        // Track tarification distribution for better balancing
+        $tarificationDistribution = [];
+        foreach ($employees as $employee) {
+            $tarificationDistribution[$employee->id] = [];
+            foreach ($tarifications as $tarification) {
+                $tarificationDistribution[$employee->id][$tarification['id']] = 0;
+            }
+        }
+
+        // Calculate total workload per tarification
+        $totalWorkPerTarification = [];
         foreach ($tarifications as $tarification) {
-            // Set a reasonable limit based on total required capacity
-            $tarificationLeft = ceil(500 * $requiredEmployeeCapacity / $tarifications->count());
+            // Each tarification gets roughly equal share of total capacity
+            $totalWorkPerTarification[$tarification['id']] = ceil(500 * $employeeCount * 0.8 / $tarifications->count());
+        }
 
+        // First pass: distribute each tarification among all employees
+        foreach ($tarifications as $tarification) {
+            $tarificationLeft = $totalWorkPerTarification[$tarification['id']];
+
+            // Initial distribution - give each employee some work of each type
+            $baseAllocation = floor($tarificationLeft / $employeeCount);
+            if ($baseAllocation > 0) {
+                foreach ($employeeStates as $employeeId => &$state) {
+                    $available = 500 - $state['used_minutes'];
+                    $maxCount = floor($available / $tarification['minutes']);
+                    $assignCount = min($baseAllocation, $maxCount);
+
+                    if ($assignCount > 0) {
+                        $assignMinutes = $assignCount * $tarification['minutes'];
+
+                        // Add to employee's plan
+                        if (!isset($state['plans'][$tarification['id']])) {
+                            $state['plans'][$tarification['id']] = [
+                                'employee_id' => $employeeId,
+                                'employee_name' => $state['name'],
+                                'tarification_id' => $tarification['id'],
+                                'tarification_name' => $tarification['name'],
+                                'count' => 0,
+                                'total_minutes' => 0,
+                            ];
+                        }
+
+                        $state['plans'][$tarification['id']]['count'] += $assignCount;
+                        $state['plans'][$tarification['id']]['total_minutes'] += round($assignMinutes, 2);
+
+                        $state['used_minutes'] += $assignMinutes;
+                        $tarificationLeft -= $assignCount;
+                        $tarificationDistribution[$employeeId][$tarification['id']] += $assignCount;
+                    }
+                }
+            }
+
+            // Second pass: distribute remaining work
             while ($tarificationLeft > 0) {
-                // Find employee with minimum used minutes
-                $minUsedMinutes = 500;
-                $minEmployeeId = null;
+                // Find the employee with the lowest count of this tarification who still has available minutes
+                $minCount = PHP_INT_MAX;
+                $selectedEmployeeId = null;
 
-                foreach ($employeeStates as $id => $state) {
-                    if ($state['used_minutes'] < $minUsedMinutes) {
-                        $minUsedMinutes = $state['used_minutes'];
-                        $minEmployeeId = $id;
+                foreach ($employeeStates as $employeeId => $state) {
+                    if ($state['used_minutes'] < 500 &&
+                        ($tarificationDistribution[$employeeId][$tarification['id']] < $minCount)) {
+                        $minCount = $tarificationDistribution[$employeeId][$tarification['id']];
+                        $selectedEmployeeId = $employeeId;
                     }
                 }
 
-                // If all employees are full, break
-                if ($minUsedMinutes >= 500) {
+                // If no employee has capacity, break
+                if ($selectedEmployeeId === null) {
                     break;
                 }
 
-                $employeeId = $minEmployeeId;
-                $available = 500 - $employeeStates[$employeeId]['used_minutes'];
-
-                if ($available <= 0) {
-                    break; // All employees are full
-                }
-
+                $available = 500 - $employeeStates[$selectedEmployeeId]['used_minutes'];
                 $maxCount = floor($available / $tarification['minutes']);
-                if ($maxCount <= 0) {
+
+                // Limit how much we assign at once for better distribution
+                $maxAssignAtOnce = ceil($tarificationLeft / max(1, $employeeCount / 2));
+                $assignCount = min($maxAssignAtOnce, $maxCount, $tarificationLeft);
+
+                if ($assignCount <= 0) {
                     break; // No more work can be assigned
                 }
 
-                $assignCount = min($tarificationLeft, $maxCount);
                 $assignMinutes = $assignCount * $tarification['minutes'];
 
                 // Add to employee's plan
-                if (!isset($employeeStates[$employeeId]['plans'][$tarification['id']])) {
-                    $employeeStates[$employeeId]['plans'][$tarification['id']] = [
-                        'employee_id' => $employeeId,
-                        'employee_name' => $employeeStates[$employeeId]['name'],
+                if (!isset($employeeStates[$selectedEmployeeId]['plans'][$tarification['id']])) {
+                    $employeeStates[$selectedEmployeeId]['plans'][$tarification['id']] = [
+                        'employee_id' => $selectedEmployeeId,
+                        'employee_name' => $employeeStates[$selectedEmployeeId]['name'],
                         'tarification_id' => $tarification['id'],
                         'tarification_name' => $tarification['name'],
                         'count' => 0,
@@ -186,14 +230,15 @@ class InternalAccountantController extends Controller
                     ];
                 }
 
-                $employeeStates[$employeeId]['plans'][$tarification['id']]['count'] += $assignCount;
-                $employeeStates[$employeeId]['plans'][$tarification['id']]['total_minutes'] += round($assignMinutes, 2);
+                $employeeStates[$selectedEmployeeId]['plans'][$tarification['id']]['count'] += $assignCount;
+                $employeeStates[$selectedEmployeeId]['plans'][$tarification['id']]['total_minutes'] += round($assignMinutes, 2);
 
-                $employeeStates[$employeeId]['used_minutes'] += $assignMinutes;
+                $employeeStates[$selectedEmployeeId]['used_minutes'] += $assignMinutes;
                 $tarificationLeft -= $assignCount;
+                $tarificationDistribution[$selectedEmployeeId][$tarification['id']] += $assignCount;
 
-                // Break if tarification is exhausted or all employees are full
-                if ($tarificationLeft <= 0 || collect($employeeStates)->every(fn ($e) => $e['used_minutes'] >= 500)) {
+                // Break if all employees are full
+                if (collect($employeeStates)->every(fn ($e) => $e['used_minutes'] >= 500)) {
                     break;
                 }
             }
@@ -214,5 +259,4 @@ class InternalAccountantController extends Controller
             'data' => $flattenedPlans,
         ]);
     }
-
 }
