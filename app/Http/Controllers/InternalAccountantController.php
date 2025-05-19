@@ -86,17 +86,15 @@ class InternalAccountantController extends Controller
         $tarifications = collect();
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
-                $minutes = floatval($tarification->second) / 60;
-                if ($minutes > 0) {
 
                     $tarifications->push([
                         'id' => $tarification->id,
                         'name' => $tarification->name,
-                        'seconds' => floatval($tarification->second),
-                        'minutes' => $minutes,
+                        'seconds' => $tarification->second,
+                        'minutes' => round($tarification->second / 60, 2),
                         'assigned_employee' => $tarification->employee,
                     ]);
-                }
+
             }
         }
 
