@@ -106,6 +106,8 @@ class InternalAccountantController extends Controller
             return response()->json(['message' => 'Tarifikatsiyalar topilmadi'], 400);
         }
 
+        return response()->json($tarifications);
+
         // Xodimlar holatini kuzatish uchun tayyorlash
         $employeeStates = [];
 
