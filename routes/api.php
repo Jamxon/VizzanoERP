@@ -52,6 +52,7 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('orders/{order}', [InternalAccountantController::class, 'showOrder']);
     Route::get('tarifications/search', [InternalAccountantController::class, 'searchTarifications']);
     Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
+    Route::get('users', [TechnologController::class, 'getEmployerByDepartment']);
 });
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
