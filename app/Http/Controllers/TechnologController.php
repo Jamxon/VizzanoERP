@@ -950,43 +950,50 @@ class TechnologController extends Controller
             return response()->json(['message' => 'submodel_id kerak!'], 400);
         }
 
-        $rows = Excel::toArray([], $file);
-        $sheet = $rows[0]; // faqat birinchi sheetni olamiz
+        $rows = \Excel::toArray([], $file);
+        $sheet = $rows[0];
 
         DB::beginTransaction();
 
         try {
             $currentCategory = null;
+            $skipNext = false;
 
             foreach ($sheet as $row) {
                 $row = array_map('trim', $row);
 
-                if (empty($row) || count(array_filter($row)) == 0) {
-                    continue; // bo'sh qator
+                if (empty($row) || count(array_filter($row)) === 0) {
+                    continue;
                 }
 
-                // Yangi kategoriya boshlanganini aniqlash
-                if (!empty($row[0]) && preg_match('/^(Верх|Флис|Подкладка|Искусственный|Прокламелин|Утеплитель|Вспомогательные|Лекала)/u', $row[0])) {
-                    $currentCategory = SpecificationCategory::create([
+                // Agar 1-ustun bo‘sh emas va boshqa ustunlar bo‘sh bo‘lsa => bu category nomi
+                if (!empty($row[0]) && empty($row[1]) && empty($row[2]) && empty($row[3])) {
+                    $currentCategory = \App\Models\SpecificationCategory::create([
                         'name' => $row[0],
                         'submodel_id' => $submodelId,
                     ]);
+                    $skipNext = true; // keyingi qatorda ustun nomlari bor, uni tashlab ketamiz
                     continue;
                 }
 
-                // "итого" qatorlarini tashlab o'tamiz
-                if (!empty($row[0]) && preg_match('/^(итого|Итого:)/ui', $row[0])) {
+                if ($skipNext) {
+                    $skipNext = false;
+                    continue; // ustun nomlari qatori
+                }
+
+                // "Итого" kabi yozuvlarni tashlab ketamiz
+                if (isset($row[0]) && preg_match('/итого/ui', $row[0])) {
                     continue;
                 }
 
-                // Detal yozuvlari
-                if ($currentCategory && isset($row[1], $row[2])) {
-                    PartSpecification::create([
+                // Ma'lumotni saqlash
+                if ($currentCategory && isset($row[0], $row[1], $row[2])) {
+                    \App\Models\PartSpecification::create([
                         'specification_category_id' => $currentCategory->id,
-                        'code' => $row[1],
-                        'name' => $row[2],
-                        'quantity' => isset($row[3]) && is_numeric($row[3]) ? (float)$row[3] : 0,
-                        'comment' => $row[4] ?? null,
+                        'code' => $row[0],
+                        'name' => $row[1],
+                        'quantity' => isset($row[2]) && is_numeric($row[2]) ? (float) $row[2] : 0,
+                        'comment' => $row[3] ?? null,
                     ]);
                 }
             }
@@ -998,7 +1005,7 @@ class TechnologController extends Controller
             return response()->json(['message' => 'Xatolik: ' . $e->getMessage()], 500);
         }
     }
-
+    
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         ini_set('memory_limit', '512M');
