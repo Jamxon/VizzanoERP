@@ -118,7 +118,7 @@ class InternalAccountantController extends Controller
                 }
             }
         }
-        dd($employeeTarifications);
+
         // Har bir xodim uchun plan tuzish
         foreach ($employeeTarifications as $employeeId => $employeeData) {
             $employeeName = $employeeData['name'];
@@ -221,6 +221,8 @@ class InternalAccountantController extends Controller
                 'date' => $date,
             ];
         }
+
+        dd($plans);
 
         // PDF yaratish va yuklash
         $pdf = Pdf::loadView('pdf.daily-plan-styled', [
