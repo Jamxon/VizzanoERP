@@ -298,7 +298,7 @@ class InternalAccountantController extends Controller
             $tarificationId = $tarificationData['id'];
             $quantity = $tarificationData['quantity'];
 
-            $tarification = \App\Models\Tarification::with('tarificationCategory.orderSubmodel')->findOrFail($tarificationId);
+            $tarification = \App\Models\Tarification::with('tarificationCategory.submodel')->findOrFail($tarificationId);
             $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity;
 
             // Hozirgacha shu tarification bo‘yicha jami bajarilgan soni
