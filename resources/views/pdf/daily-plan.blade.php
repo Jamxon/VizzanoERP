@@ -21,7 +21,10 @@
             margin-bottom: 12px; /* pastdan ko'proq joy qoldirildi */
             font-size: 6pt;
             border-top: 1px solid black;
-            text-align: center;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             padding-top: 4mm;
         }
 
@@ -55,6 +58,20 @@
             word-break: break-word;
             padding-top: 15px;
             padding-bottom: 15px;
+        }
+        .double-cell {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2mm;
+            height: 100%;
+        }
+        .double-cell hr {
+            width: 100%;
+            text-align: center;
+            border: 0;
+            border-top: 1px solid black;
         }
     </style>
 </head>
