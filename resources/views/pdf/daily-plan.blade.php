@@ -144,10 +144,10 @@
 
         <table style="width: 100%; font-size: 6pt; margin-top: 10px;">
             <tr>
-                <td style="text-align: left; padding-top: 5px; padding-bottom: 10px">
+                <td style="text-align: left; padding-top: 15px; padding-bottom: 5px">
                     Sana: {{ $plan['date'] }}
                 </td>
-                <td style="text-align: right; padding-top: 5px; padding-bottom: 10px">
+                <td style="text-align: right; padding-top: 15px; padding-bottom: 5px">
                     Imzo: ______________________
                 </td>
             </tr>
