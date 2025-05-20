@@ -43,7 +43,6 @@
         td.task-name {
             width: 30mm;
             word-break: break-word;
-            min-height: 20mm;
         }
         .footer {
             margin-top: 8px;
@@ -90,7 +89,7 @@
                     <td>{{ number_format($task['sum'], 0, ',', ' ') }}</td>
                     <td>{{ $task['count'] }}</td>
                     <td>{{ number_format($task['amount_earned'], 0, ',', ' ') }}</td>
-                    <td></td> {{-- Natija uchun bo'sh joy --}}
+                    <td style="min-height: 30px"></td> {{-- Natija uchun bo'sh joy --}}
                 </tr>
             @endforeach
             </tbody>
