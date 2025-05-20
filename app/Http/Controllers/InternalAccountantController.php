@@ -284,14 +284,17 @@ class InternalAccountantController extends Controller
             'tarifications' => 'required|array',
             'tarifications.*.id' => 'required|exists:tarifications,id',
             'tarifications.*.quantity' => 'required|numeric|min:1',
+            'daily_plan_id' => 'required|exists:daily_plans,id',
         ]);
 
         $employeeId = $request->input('employee_id');
         $tarifications = $request->input('tarifications');
+        $dailyPlanId = $request->input('daily_plan_id');
+
         $employee = Employee::findOrFail($employeeId);
         $oldBalance = $employee->balance;
 
-        // ❌ Agar xodim "kicked" bo‘lsa, qaytaramiz
+        // ❌ Tekshiruv: ishdan bo‘shatilganmi
         if ($employee->status === 'kicked') {
             return response()->json([
                 'message' => "❌ Xodim ishdan bo‘shatilgan (status: kicked). Hisob-kitob amalga oshirilmaydi."
@@ -306,13 +309,10 @@ class InternalAccountantController extends Controller
             $tarificationId = $tarificationData['id'];
             $quantity = $tarificationData['quantity'];
 
-            $tarification = \App\Models\Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
-
+            $tarification = Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
             $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
 
-            // Jami bajarilgan miqdorni hisoblash
-            $totalDone = \App\Models\EmployeeTarificationLog::where('tarification_id', $tarificationId)->sum('quantity');
-
+            $totalDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)->sum('quantity');
             if (($totalDone + $quantity) > $orderQuantity) {
                 return response()->json([
                     'message' => "❌ Tarification [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat etilgan: $orderQuantity, bajarilgan: $totalDone, qo‘shilmoqchi: $quantity"
@@ -322,8 +322,8 @@ class InternalAccountantController extends Controller
             $amount = $tarification->summa * $quantity;
             $isOwn = in_array($tarificationId, $employeeTarificationIds);
 
-            // Log yozish
-            \App\Models\EmployeeTarificationLog::create([
+            // Logga yozish
+            EmployeeTarificationLog::create([
                 'employee_id' => $employee->id,
                 'tarification_id' => $tarificationId,
                 'date' => $today,
@@ -332,16 +332,25 @@ class InternalAccountantController extends Controller
                 'amount_earned' => $amount,
             ]);
 
+            // Plan item actual qiymatini yangilash
+            DailyPlanItem::where('daily_plan_id', $dailyPlanId)
+                ->where('tarification_id', $tarificationId)
+                ->increment('actual', $quantity);
+
             $totalEarned += $amount;
         }
 
-        $balanceUpdated = false;
+        // Daily plan statusini to'g'rilash
+        DailyPlan::where('id', $dailyPlanId)->update(['status' => true]);
 
+        // Balansga qo‘shish (agar piece_work bo‘lsa)
+        $balanceUpdated = false;
         if ($employee->payment_type === 'piece_work') {
             $employee->increment('balance', $totalEarned);
             $balanceUpdated = true;
         }
 
+        // Log yozish
         Log::add(
             auth()->id(),
             "Hisob-kitob amalga oshirildi",
@@ -363,14 +372,12 @@ class InternalAccountantController extends Controller
         return response()->json([
             'message' => $balanceUpdated
                 ? '✅ Hisob-kitob muvaffaqiyatli yakunlandi va balans yangilandi.'
-                : 'ℹ️ Hisob-kitob bajarildi, lekin xodim ishbay : [' . $employee->payment_type . '] bo‘lmagani sababli balansga qo‘shilmadi.',
+                : 'ℹ️ Hisob-kitob bajarildi, lekin xodimning payment_type `piece_work` bo‘lmagani sababli balansga qo‘shilmadi.',
             'employee' => $employee->name,
             'payment_type' => $employee->payment_type,
             'total_earned' => round($totalEarned, 2),
             'balance_updated' => $balanceUpdated
         ]);
     }
-
-
 
 }
