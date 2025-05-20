@@ -102,7 +102,7 @@
 
         <div class="summary">
             <div>Ishga ketadigan vaqt: {{ $plan['used_minutes'] }} daq</div>
-            <div>Qo'shimcha vaqt: {{ $plan['total_minutes'] - $plan['used_minutes'] }} daq</div>
+            <div>Qo'shimcha vaqt: {{ number_format($plan['total_minutes'] - $plan['used_minutes'], 0, ',', ' ') }} daq</div>
         </div>
 
         <table>
