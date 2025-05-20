@@ -216,6 +216,7 @@ class InternalAccountantController extends Controller
                 'employee_id' => $employeeId,
                 'employee_name' => $employeeName,
                 'used_minutes' => round($usedMinutes, 2),
+                'total_minutes' => $totalWorkMinutes,
                 'total_earned' => round($totalEarned, 2),
                 'tarifications' => $assigned,
                 'date' => $date,
