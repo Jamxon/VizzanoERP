@@ -96,7 +96,7 @@ class InternalAccountantController extends Controller
 
         $plans = [];
         $employeeTarifications = [];
-        $date = now()->format('Y-m-d');
+        $date = now()->format('d-m-Y');
 
         // Tarifikatsiya ma'lumotlarini bitta tsiklda to'plash
         foreach ($submodel->tarificationCategories as $category) {
