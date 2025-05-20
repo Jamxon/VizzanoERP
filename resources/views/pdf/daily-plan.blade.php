@@ -83,7 +83,7 @@
 
         .barcode {
             text-align: center;
-            padding-bottom: 25px;
+            padding-bottom: 15px;
             padding-top:  25px;
         }
     </style>
@@ -156,7 +156,7 @@
 
         <div class="barcode">
             <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
-            <hr>
+            <hr style="padding-top: 10px">
         </div>
     </div>
 @endforeach
