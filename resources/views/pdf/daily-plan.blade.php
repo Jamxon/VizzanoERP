@@ -65,7 +65,6 @@
             justify-content: space-between;
             align-items: center;
             gap: 2mm;
-            height: 100%;
         }
         .double-cell hr {
             width: 100%;
