@@ -93,7 +93,7 @@ class InternalAccountantController extends Controller
         $plans = [];
         $employeeTarifications = [];
         $date = now()->format('Y-m-d');
-        dd($date);
+
         // Tarifikatsiya ma'lumotlarini bitta tsiklda to'plash
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
@@ -118,7 +118,7 @@ class InternalAccountantController extends Controller
                 }
             }
         }
-
+        dd($employeeTarifications);
         // Har bir xodim uchun plan tuzish
         foreach ($employeeTarifications as $employeeId => $employeeData) {
             $employeeName = $employeeData['name'];
