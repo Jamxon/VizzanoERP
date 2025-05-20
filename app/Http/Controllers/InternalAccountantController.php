@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DailyPlan;
 use App\Models\DailyPlanItem;
 use App\Models\Group;
+use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderSubModel;
 use App\Models\Tarification;
@@ -231,6 +232,18 @@ class InternalAccountantController extends Controller
         $pdf = Pdf::loadView('pdf.daily-plan', [
             'plans' => $plans
         ])->setPaper([0, 0, 226.77, 566.93], 'portrait'); // 80mm x ~200mm
+
+        Log::add(
+            auth()->id(),
+            "Plan chiqarildi",
+            'print',
+            null,
+            [
+                'submodel_name' => $submodel->submodel->name,
+                'group_name' => $group->name,
+                'date' => $date,
+            ]
+        );
 
         return $pdf->download('daily_plan.pdf');
     }
