@@ -7,7 +7,14 @@
         body { font-family: DejaVu Sans, sans-serif; font-size: 8pt; margin: 0; padding: 0; width: 80mm; }
         .page { page-break-after: always; padding: 5px 5px 10px 5px; }
         .employee-info { border-bottom: 1px solid black; margin-bottom: 5px; font-weight: bold; }
-        .summary { margin-bottom: 4px; display: flex; justify-content: space-between; font-size: 7pt; }
+        .summary {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid black;
+            padding: 1mm 0;
+            margin-bottom: 2mm;
+            font-size: 7pt;
+        }
         table { width: 100%; border-collapse: collapse; font-size: 7pt; }
         th, td { border: 1px solid #000; padding: 2px; }
         th { background-color: #eee; }
