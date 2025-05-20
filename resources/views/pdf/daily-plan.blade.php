@@ -119,7 +119,7 @@
             @foreach($plan['tarifications'] as $task)
                 <tr>
                     <td class="task-name">
-                        {{ ($task['code'] ?? '') . ' - ' . \Illuminate\Support\Str::limit($task['tarification_name'], 50) }}
+                        {{ ($task['code'] ?? '') . ' - ' . $task['tarification_name'] }}
                     </td>
                     <td>
                         <div class="double-cell">
