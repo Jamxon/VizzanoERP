@@ -19,6 +19,7 @@ class DailyPlan extends Model
         'date',
         'used_minutes',
         'total_earned',
+        'status',
     ];
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo

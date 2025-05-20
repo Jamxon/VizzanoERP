@@ -19,6 +19,7 @@ class DailyPlanItem extends Model
         'count',
         'total_minutes',
         'amount_earned',
+        'actual'
     ];
 
     public function dailyPlan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
