@@ -83,7 +83,7 @@ class InternalAccountantController extends Controller
         ])->findOrFail($request->submodel_id);
 
         $group = Group::with('department')->findOrFail($request->group_id);
-        dd($group);
+
         // Ish vaqtini hisoblash
         $workStart = Carbon::parse($group->department->start_time);
         $workEnd = Carbon::parse($group->department->end_time);
@@ -93,7 +93,7 @@ class InternalAccountantController extends Controller
         $plans = [];
         $employeeTarifications = [];
         $date = now()->format('Y-m-d');
-
+        dd($date);
         // Tarifikatsiya ma'lumotlarini bitta tsiklda to'plash
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
