@@ -81,7 +81,7 @@ class InternalAccountantController extends Controller
         $submodel = OrderSubmodel::with([
             'tarificationCategories.tarifications.employee:id,name'
         ])->findOrFail($request->submodel_id);
-
+        dd($submodel);
         $group = Group::with('department')->findOrFail($request->group_id);
 
         // Ish vaqtini hisoblash
