@@ -223,7 +223,7 @@ class InternalAccountantController extends Controller
         }
 
         // PDF yaratish va yuklash
-        $pdf = Pdf::loadView('pdf.daily-plan-styled', [
+        $pdf = Pdf::loadView('pdf.daily-plan', [
             'plans' => $plans
         ])->setPaper([0, 0, 226.77, 566.93], 'portrait'); // 80mm x ~200mm
 
