@@ -289,8 +289,16 @@ class InternalAccountantController extends Controller
         $employeeId = $request->input('employee_id');
         $tarifications = $request->input('tarifications');
         $employee = Employee::findOrFail($employeeId);
-        $employeeTarificationIds = $employee->tarifications()->pluck('id')->toArray();
+        $oldBalance = $employee->balance;
 
+        // ❌ Agar xodim "kicked" bo‘lsa, qaytaramiz
+        if ($employee->status === 'kicked') {
+            return response()->json([
+                'message' => "❌ Xodim ishdan bo‘shatilgan (status: kicked). Hisob-kitob amalga oshirilmaydi."
+            ], 403);
+        }
+
+        $employeeTarificationIds = $employee->tarifications()->pluck('id')->toArray();
         $totalEarned = 0;
         $today = now()->toDateString();
 
@@ -298,16 +306,16 @@ class InternalAccountantController extends Controller
             $tarificationId = $tarificationData['id'];
             $quantity = $tarificationData['quantity'];
 
-            $tarification = \App\Models\Tarification::with('tarificationCategory.submodel')->findOrFail($tarificationId);
-            $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity;
+            $tarification = \App\Models\Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
 
-            // Hozirgacha shu tarification bo‘yicha jami bajarilgan soni
+            $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
+
+            // Jami bajarilgan miqdorni hisoblash
             $totalDone = \App\Models\EmployeeTarificationLog::where('tarification_id', $tarificationId)->sum('quantity');
 
-            // Limit tekshiruvi
             if (($totalDone + $quantity) > $orderQuantity) {
                 return response()->json([
-                    'message' => "❌ Tarification [{$tarification->name}] uchun limitdan oshib ketdi. Jami ruxsat etilgan: $orderQuantity, bajarilgan: $totalDone, qo‘shilmoqchi: $quantity"
+                    'message' => "❌ Tarification [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat etilgan: $orderQuantity, bajarilgan: $totalDone, qo‘shilmoqchi: $quantity"
                 ], 422);
             }
 
@@ -327,12 +335,39 @@ class InternalAccountantController extends Controller
             $totalEarned += $amount;
         }
 
-        // Foydalanuvchi balansini yangilash
-        $employee->increment('balance', $totalEarned);
+        $balanceUpdated = false;
+
+        if ($employee->payment_type === 'piece_work') {
+            $employee->increment('balance', $totalEarned);
+            $balanceUpdated = true;
+        }
+
+        Log::add(
+            auth()->id(),
+            "Hisob-kitob amalga oshirildi",
+            'accounting',
+            [
+                'employee_id' => $employee->id,
+                'employee_name' => $employee->name,
+                'old_balance' => $oldBalance,
+                'total_earned' => $totalEarned,
+            ],
+            [
+                'employee_id' => $employee->id,
+                'employee_name' => $employee->name,
+                'total_earned' => $totalEarned,
+                'balance_updated' => $balanceUpdated,
+            ]
+        );
 
         return response()->json([
-            'message' => '✅ Ishchi balansi muvaffaqiyatli yangilandi',
-            'total_earned' => $totalEarned,
+            'message' => $balanceUpdated
+                ? '✅ Hisob-kitob muvaffaqiyatli yakunlandi va balans yangilandi.'
+                : 'ℹ️ Hisob-kitob bajarildi, lekin xodim ishbay : [' . $employee->payment_type . '] bo‘lmagani sababli balansga qo‘shilmadi.',
+            'employee' => $employee->name,
+            'payment_type' => $employee->payment_type,
+            'total_earned' => round($totalEarned, 2),
+            'balance_updated' => $balanceUpdated
         ]);
     }
 
