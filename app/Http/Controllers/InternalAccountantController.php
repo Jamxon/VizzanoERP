@@ -248,7 +248,7 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan.pdf');
     }
 
-    public function showDailyPlan(DailyPlan $dailyPlan): \Illuminate\Http\Response
+    public function showDailyPlan(DailyPlan $dailyPlan): \Illuminate\Http\JsonResponse
     {
         $dailyPlan->load(
             'employee',
@@ -259,10 +259,6 @@ class InternalAccountantController extends Controller
             'items.tarification.razryad',
             'items.tarification.typewriter'
         );
-
-        $pdf = Pdf::loadView('pdf.daily-plan-show', [
-            'dailyPlan' => $dailyPlan
-        ])->setPaper([0, 0, 226.77, 566.93], 'portrait'); // 80mm x ~200mm
 
         Log::add(
             auth()->id(),
@@ -276,6 +272,8 @@ class InternalAccountantController extends Controller
             ]
         );
 
-        return $pdf->download('daily_plan.pdf');
+        return response()->json($dailyPlan);
     }
+
+
 }
