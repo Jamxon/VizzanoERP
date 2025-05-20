@@ -141,12 +141,12 @@
             </tbody>
         </table>
 
-        <table style="width: 100%; font-size: 6pt; margin-top: 10px; border-top: 1px solid #000;">
+        <table style="width: 100%; font-size: 6pt; margin-top: 10px;">
             <tr>
-                <td style="text-align: left; padding-top: 5px;">
+                <td style="text-align: left; padding-top: 5px; padding-bottom: 10px">
                     Sana: {{ $plan['date'] }}
                 </td>
-                <td style="text-align: right; padding-top: 5px;">
+                <td style="text-align: right; padding-top: 5px; padding-bottom: 10px">
                     Imzo: ______________________
                 </td>
             </tr>
