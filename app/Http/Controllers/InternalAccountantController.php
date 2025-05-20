@@ -26,6 +26,7 @@ class InternalAccountantController extends Controller
                 'orderModel.model',
                 'orderModel.material',
                 'orderModel.submodels.submodel',
+                'orderModel.submodels.group.group',
             )
             ->orderBy('id', 'desc')
             ->get();
