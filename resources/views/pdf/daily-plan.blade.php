@@ -15,8 +15,8 @@
     </style>
 </head>
 <body>
-{!! DNS1D::getBarcodeHTML((string) $plan['plan_id'], 'C128') !!}
 @foreach($plans as $plan)
+    {!! DNS1D::getBarcodeHTML((string) $plan['plan_id'], 'C128') !!}
     <div class="page">
         <div class="employee-info">
             👷 <strong>Xodim:</strong> {{ $plan['employee_name'] }} <br>
