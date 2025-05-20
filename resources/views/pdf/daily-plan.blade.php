@@ -15,6 +15,9 @@
             margin-bottom: 2mm;
             font-size: 7pt;
         }
+        .container {
+            padding: 2mm;
+        }
         table { width: 100%; border-collapse: collapse; font-size: 7pt; }
         th, td { border: 1px solid #000; padding: 2px; }
         th { background-color: #eee; }
@@ -24,7 +27,7 @@
 <body>
 @foreach($plans as $plan)
 {{--    {!! DNS1D::getBarcodeHTML((string) $plan['plan_id'], 'C128') !!}--}}
-    <div class="page">
+    <div class="container">
         <div class="employee-info">
             <strong>Xodim:</strong> {{ $plan['employee_name'] }} <br>
         </div>
