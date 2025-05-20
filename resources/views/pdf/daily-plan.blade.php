@@ -43,6 +43,8 @@
         td.task-name {
             width: 30mm;
             word-break: break-word;
+            padding-top: 15px;
+            padding-bottom: 15px;
         }
         .footer {
             margin-top: 8px;
@@ -50,9 +52,6 @@
             border-top: 1px solid black;
             text-align: center;
             padding-top: 4mm;
-        }
-        tr {
-            min-height: 30px;
         }
     </style>
 </head>
