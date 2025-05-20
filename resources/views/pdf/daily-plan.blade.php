@@ -17,8 +17,8 @@
         }
 
         .footer {
-            margin-top: 8px;
-            margin-bottom: 12px; /* pastdan ko'proq joy qoldirildi */
+            margin-top: 30px;
+            margin-bottom: 30px; /* pastdan ko'proq joy qoldirildi */
             font-size: 6pt;
             border-top: 1px solid black;
             width: max-content;
@@ -133,17 +133,16 @@
         </table>
 
         <div class="footer">
-            <br>
-            <br>
-            Sana: {{ $plan['date'] }} | Imzo: ______________________<br><br>
-            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
+            <div>
+                Sana: {{ $plan['date'] }}
+            </div>
+            <div>
+                Imzo: ______________________
+            </div>
             <hr>
+        </div>
+        <div style="text-align: center; padding-bottom: 20px">
+            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
         </div>
     </div>
 @endforeach
