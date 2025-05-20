@@ -143,6 +143,7 @@ class InternalAccountantController extends Controller
                         'tarification_id' => $task['id'],
                         'tarification_name' => $task['name'],
                         'code' => $task['code'],
+                        'seconds' => $task['seconds'],
                         'count' => $count,
                         'minutes_per_unit' => $task['minutes'],
                         'total_minutes' => $total_minutes,
