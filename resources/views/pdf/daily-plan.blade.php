@@ -84,6 +84,7 @@
         .barcode {
             text-align: center;
             padding-bottom: 15px;
+            padding-top:  15px;
         }
     </style>
 </head>
