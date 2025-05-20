@@ -52,7 +52,6 @@
 
         <div class="footer">
             Sana: {{ $plan['date'] }} | Imzo: ______________________<br>
-            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128') }}" height="25">
         </div>
     </div>
 @endforeach
