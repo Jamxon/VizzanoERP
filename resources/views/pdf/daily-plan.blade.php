@@ -141,10 +141,17 @@
             </tbody>
         </table>
 
-        <div class="footer">
-            <div>Sana: {{ $plan['date'] }}</div>
-            <div>Imzo: ______________________</div>
-        </div>
+        <table style="width: 100%; font-size: 6pt; margin-top: 10px; border-top: 1px solid #000;">
+            <tr>
+                <td style="text-align: left; padding-top: 5px;">
+                    Sana: {{ $plan['date'] }}
+                </td>
+                <td style="text-align: right; padding-top: 5px;">
+                    Imzo: ______________________
+                </td>
+            </tr>
+        </table>
+
 
         <div class="barcode">
             <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
