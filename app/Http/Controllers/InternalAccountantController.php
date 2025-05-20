@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DailyPlan;
 use App\Models\DailyPlanItem;
+use App\Models\EmployeeTarificationLog;
 use App\Models\Group;
 use App\Models\Log;
 use App\Models\Order;
