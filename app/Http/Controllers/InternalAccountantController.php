@@ -14,6 +14,8 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\View;
+use App\Models\Employee;
+use Illuminate\Support\Facades\DB;
 
 
 class InternalAccountantController extends Controller
@@ -274,6 +276,66 @@ class InternalAccountantController extends Controller
 
         return response()->json($dailyPlan);
     }
+
+    public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'tarifications' => 'required|array',
+            'tarifications.*.id' => 'required|exists:tarifications,id',
+            'tarifications.*.quantity' => 'required|numeric|min:1',
+        ]);
+
+        $employeeId = $request->input('employee_id');
+        $tarifications = $request->input('tarifications');
+        $employee = Employee::findOrFail($employeeId);
+        $employeeTarificationIds = $employee->tarifications()->pluck('id')->toArray();
+
+        $totalEarned = 0;
+        $today = now()->toDateString();
+
+        foreach ($tarifications as $tarificationData) {
+            $tarificationId = $tarificationData['id'];
+            $quantity = $tarificationData['quantity'];
+
+            $tarification = \App\Models\Tarification::with('tarificationCategory.orderSubmodel')->findOrFail($tarificationId);
+            $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity;
+
+            // Hozirgacha shu tarification bo‘yicha jami bajarilgan soni
+            $totalDone = \App\Models\EmployeeTarificationLog::where('tarification_id', $tarificationId)->sum('quantity');
+
+            // Limit tekshiruvi
+            if (($totalDone + $quantity) > $orderQuantity) {
+                return response()->json([
+                    'message' => "❌ Tarification [{$tarification->name}] uchun limitdan oshib ketdi. Jami ruxsat etilgan: $orderQuantity, bajarilgan: $totalDone, qo‘shilmoqchi: $quantity"
+                ], 422);
+            }
+
+            $amount = $tarification->summa * $quantity;
+            $isOwn = in_array($tarificationId, $employeeTarificationIds);
+
+            // Log yozish
+            \App\Models\EmployeeTarificationLog::create([
+                'employee_id' => $employee->id,
+                'tarification_id' => $tarificationId,
+                'date' => $today,
+                'quantity' => $quantity,
+                'is_own' => $isOwn,
+                'amount_earned' => $amount,
+            ]);
+
+            $totalEarned += $amount;
+        }
+
+        // Foydalanuvchi balansini yangilash
+        $employee->increment('balance', $totalEarned);
+
+        return response()->json([
+            'message' => '✅ Ishchi balansi muvaffaqiyatli yangilandi',
+            'total_earned' => $totalEarned,
+        ]);
+    }
+
 
 
 }
