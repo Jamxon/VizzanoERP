@@ -81,9 +81,9 @@ class InternalAccountantController extends Controller
         $submodel = OrderSubmodel::with([
             'tarificationCategories.tarifications.employee:id,name'
         ])->findOrFail($request->submodel_id);
-        dd($submodel);
-        $group = Group::with('department')->findOrFail($request->group_id);
 
+        $group = Group::with('department')->findOrFail($request->group_id);
+        dd($group);
         // Ish vaqtini hisoblash
         $workStart = Carbon::parse($group->department->start_time);
         $workEnd = Carbon::parse($group->department->end_time);
