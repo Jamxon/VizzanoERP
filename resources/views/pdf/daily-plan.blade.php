@@ -101,6 +101,8 @@
         </table>
 
         <div class="footer">
+            <br>
+            <br>
             Sana: {{ $plan['date'] }} | Imzo: ______________________<br><br>
             <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
             <br>
