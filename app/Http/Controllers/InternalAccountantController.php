@@ -41,6 +41,7 @@ class InternalAccountantController extends Controller
             'orderModel.model',
             'orderModel.material',
             'orderModel.submodels.submodel',
+            'orderModel.submodels.group.group',
             'orderModel.submodels.submodelSpend',
             'orderModel.submodels.tarificationCategories',
             'orderModel.submodels.tarificationCategories.tarifications',
