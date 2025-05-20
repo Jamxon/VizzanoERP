@@ -156,7 +156,7 @@
 
         <div class="barcode">
             <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
-            <hr style="margin-top: 10px">
+            <hr style="margin-top: 40px">
         </div>
     </div>
 @endforeach
