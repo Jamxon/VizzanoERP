@@ -13,19 +13,18 @@
         }
         .page {
             page-break-after: always;
-            padding: 2px 5px 10px 5px; /* tepadan 5px emas, 2px */
+            padding: 2px 5px 10px 5px;
         }
 
         .footer {
-            margin-top: 30px;
-            margin-bottom: 30px; /* pastdan ko'proq joy qoldirildi */
+            margin-top: 20px;
+            margin-bottom: 30px;
             font-size: 6pt;
             border-top: 1px solid black;
             width: 100%;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding-top: 4mm;
+            padding-top: 3mm;
         }
 
         .employee-info {
@@ -33,6 +32,7 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
+
         .summary {
             display: flex;
             justify-content: space-between;
@@ -41,24 +41,31 @@
             margin-bottom: 2mm;
             font-size: 7pt;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             font-size: 7pt;
         }
+
         th, td {
             border: 1px solid #000;
             padding: 2px;
+            text-align: center;
         }
+
         th {
             background-color: #eee;
         }
+
         td.task-name {
             width: 30mm;
+            text-align: left;
             word-break: break-word;
             padding-top: 15px;
             padding-bottom: 15px;
         }
+
         .double-cell {
             display: flex;
             flex-direction: column;
@@ -66,11 +73,17 @@
             align-items: center;
             gap: 2mm;
         }
+
         .double-cell hr {
             width: 100%;
             text-align: center;
             border: 0;
             border-top: 1px solid black;
+        }
+
+        .barcode {
+            text-align: center;
+            padding-bottom: 15px;
         }
     </style>
 </head>
@@ -104,43 +117,36 @@
             <tbody>
             @foreach($plan['tarifications'] as $task)
                 <tr>
-                    <td class="task-name">{{ $task['code'] ?? ' ' . \Illuminate\Support\Str::limit($task['tarification_name'], 50) }}</td>
-                    <td><div class="double-cell">
-                            <div>
-                                {{ number_format($task['seconds'], 0, ',', ' ') }}
-                            </div>
+                    <td class="task-name">
+                        {{ ($task['code'] ?? '') . ' - ' . \Illuminate\Support\Str::limit($task['tarification_name'], 50) }}
+                    </td>
+                    <td>
+                        <div class="double-cell">
+                            <div>{{ number_format($task['seconds'], 0, ',', ' ') }}</div>
                             <hr />
-                            <div>
-                                {{ number_format($task['seconds'] * $task['count'], 0, ',', ' ') }}
-                            </div>
+                            <div>{{ number_format($task['seconds'] * $task['count'], 0, ',', ' ') }}</div>
                         </div>
                     </td>
-                    <td><div class="double-cell">
-                            <div>
-                                {{ number_format($task['sum'], 0, ',', ' ') }}
-                            </div>
+                    <td>
+                        <div class="double-cell">
+                            <div>{{ number_format($task['sum'], 0, ',', ' ') }}</div>
                             <hr />
-                            <div>
-                                {{ number_format($task['amount_earned'], 0, ',', ' ') }}
-                            </div>
+                            <div>{{ number_format($task['amount_earned'], 0, ',', ' ') }}</div>
                         </div>
                     </td>
                     <td>{{ $task['count'] }}</td>
-                    <td style="min-height: 30px"></td> {{-- Natija uchun bo'sh joy --}}
+                    <td></td> {{-- Natija uchun bo‘sh joy --}}
                 </tr>
             @endforeach
             </tbody>
         </table>
 
         <div class="footer">
-            <div>
-                Sana: {{ $plan['date'] }}
-            </div>
-            <div>
-                Imzo: ______________________
-            </div>
+            <div>Sana: {{ $plan['date'] }}</div>
+            <div>Imzo: ______________________</div>
         </div>
-        <div style="text-align: center; padding-bottom: 20px">
+
+        <div class="barcode">
             <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
             <hr>
         </div>
