@@ -77,48 +77,60 @@ class InternalAccountantController extends Controller
             'group_id' => 'required|exists:groups,id',
         ]);
 
+        // Kerakli ma'lumotlarni bir so'rov bilan olish
         $submodel = OrderSubmodel::with([
             'tarificationCategories.tarifications.employee:id,name'
         ])->findOrFail($request->submodel_id);
 
         $group = Group::with('department')->findOrFail($request->group_id);
+
+        // Ish vaqtini hisoblash
         $workStart = Carbon::parse($group->department->start_time);
         $workEnd = Carbon::parse($group->department->end_time);
         $breakTime = $group->department->break_time ?? 0;
-
         $totalWorkMinutes = $workEnd->diffInMinutes($workStart) - $breakTime;
 
         $plans = [];
-        $tarifications = collect();
+        $employeeTarifications = [];
+        $date = now()->format('Y-m-d');
 
+        // Tarifikatsiya ma'lumotlarini bitta tsiklda to'plash
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
                 if ($tarification->employee) {
-                    $tarifications->push([
+                    $employeeId = $tarification->employee->id;
+
+                    if (!isset($employeeTarifications[$employeeId])) {
+                        $employeeTarifications[$employeeId] = [
+                            'name' => $tarification->employee->name,
+                            'tasks' => []
+                        ];
+                    }
+
+                    $employeeTarifications[$employeeId]['tasks'][] = [
                         'id' => $tarification->id,
                         'code' => $tarification->code,
                         'name' => $tarification->name,
                         'seconds' => $tarification->second,
                         'sum' => $tarification->summa,
                         'minutes' => round($tarification->second / 60, 4),
-                        'employee_id' => $tarification->employee->id,
-                        'employee_name' => $tarification->employee->name,
-                    ]);
+                    ];
                 }
             }
         }
 
-        $grouped = $tarifications->groupBy('employee_id');
-        $date = now()->format('Y-m-d');
+        // Har bir xodim uchun plan tuzish
+        foreach ($employeeTarifications as $employeeId => $employeeData) {
+            $employeeName = $employeeData['name'];
+            $tasks = collect($employeeData['tasks'])->sortBy('minutes');
 
-        foreach ($grouped as $employeeId => $tasks) {
-            $employeeName = $tasks->first()['employee_name'];
             $remainingMinutes = $totalWorkMinutes;
             $usedMinutes = 0;
             $totalEarned = 0;
             $assigned = [];
 
-            foreach ($tasks->sortBy('minutes') as $task) {
+            // Dastlabki vazifalarni belgilash (har bir vazifadan kamida bitta)
+            foreach ($tasks as $task) {
                 if ($remainingMinutes >= $task['minutes']) {
                     $count = 1;
                     $total_minutes = round($task['minutes'], 2);
@@ -141,50 +153,64 @@ class InternalAccountantController extends Controller
                 }
             }
 
-            $i = 0;
-            while ($remainingMinutes > 0 && count($assigned)) {
-                $index = $i % count($assigned);
-                $item = &$assigned[$index];
-                $minutes = $item['minutes_per_unit'];
+            // Qolgan vaqtni to'ldirish
+            $tasksCount = count($assigned);
+            if ($tasksCount > 0) {
+                $i = 0;
+                while ($remainingMinutes > 0) {
+                    $index = $i % $tasksCount;
+                    $item = &$assigned[$index];
+                    $minutes = $item['minutes_per_unit'];
 
-                if ($remainingMinutes >= $minutes) {
-                    $item['count'] += 1;
-                    $item['total_minutes'] = round($item['count'] * $minutes, 2);
-                    $item['amount_earned'] = round($item['count'] * $item['sum'], 2);
+                    if ($remainingMinutes >= $minutes) {
+                        $item['count'] += 1;
+                        $item['total_minutes'] = round($item['count'] * $minutes, 2);
+                        $item['amount_earned'] = round($item['count'] * $item['sum'], 2);
 
-                    $usedMinutes += $minutes;
-                    $remainingMinutes -= $minutes;
-                    $totalEarned += $item['sum'];
-                } else break;
+                        $usedMinutes += $minutes;
+                        $remainingMinutes -= $minutes;
+                        $totalEarned += $item['sum'];
+                    } else {
+                        break;
+                    }
 
-                $i++;
+                    $i++;
+                }
             }
 
+            // Plan DB ga saqlash va uning elementlarini tayyorlash
+            $planItems = [];
             foreach ($assigned as &$item) {
+                $planItems[] = [
+                    'tarification_id' => $item['tarification_id'],
+                    'count' => $item['count'],
+                    'total_minutes' => $item['total_minutes'],
+                    'amount_earned' => $item['amount_earned'],
+                ];
+
+                // UI uchun keraksiz maydonni olib tashlash
                 unset($item['minutes_per_unit']);
             }
 
-            // 📌 Save plan to DB
+            // Yangi plan yaratish
             $plan = DailyPlan::create([
                 'employee_id' => $employeeId,
                 'submodel_id' => $submodel->id,
                 'group_id' => $group->id,
                 'date' => $date,
-                'used_minutes' => $usedMinutes,
-                'total_earned' => $totalEarned,
+                'used_minutes' => round($usedMinutes, 2),
+                'total_earned' => round($totalEarned, 2),
             ]);
 
-            unset($item);
-            foreach ($assigned as $item) {
-                DailyPlanItem::create([
-                    'daily_plan_id' => $plan->id,
-                    'tarification_id' => $item['tarification_id'],
-                    'count' => $item['count'],
-                    'total_minutes' => $item['total_minutes'],
-                    'amount_earned' => $item['amount_earned'],
-                ]);
+            // Plan elementlarini bir so'rov bilan saqlash
+            if (!empty($planItems)) {
+                foreach ($planItems as &$item) {
+                    $item['daily_plan_id'] = $plan->id;
+                }
+                DailyPlanItem::insert($planItems);
             }
 
+            // Yakuniy plan ma'lumotlarini yig'ish
             $plans[] = [
                 'plan_id' => $plan->id,
                 'employee_id' => $employeeId,
@@ -196,11 +222,11 @@ class InternalAccountantController extends Controller
             ];
         }
 
+        // PDF yaratish va yuklash
         $pdf = Pdf::loadView('pdf.daily-plan-styled', [
             'plans' => $plans
         ])->setPaper([0, 0, 226.77, 566.93], 'portrait'); // 80mm x ~200mm
 
         return $pdf->download('daily_plan.pdf');
     }
-
 }
