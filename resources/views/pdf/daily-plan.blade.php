@@ -20,11 +20,12 @@
     <div class="page">
         <div class="employee-info">
             👷 <strong>Xodim:</strong> {{ $plan['employee_name'] }} <br>
-            🆔 Reja ID: {{ $plan['plan_id'] }}
         </div>
 
         <div class="summary">
-            <div>🕒 Reja vaqti: {{ $plan['used_minutes'] }} daq</div>
+            <div>🕒 Umumiy vaqt: {{ $plan['total_minutes'] }} daq</div>
+            <div>🕒 Ishga ketadigan vaqt: {{ $plan['used_minutes'] }} daq</div>
+            <div>🕒 Qo'shimcha vaqt: {{ $plan['total_minutes'] - $plan['used_minutes'] }} daq</div>
             <div>💰 Umumiy summa: {{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm</div>
         </div>
 
