@@ -16,7 +16,7 @@
 </head>
 <body>
 @foreach($plans as $plan)
-    {!! DNS1D::getBarcodeHTML((string) $plan['plan_id'], 'C128') !!}
+{{--    {!! DNS1D::getBarcodeHTML((string) $plan['plan_id'], 'C128') !!}--}}
     <div class="page">
         <div class="employee-info">
             👷 <strong>Xodim:</strong> {{ $plan['employee_name'] }} <br>
@@ -52,7 +52,7 @@
         </table>
 
         <div class="footer">
-            Sana: {{ $plan['date'] }} | Imzo: ______________________<br>
+            Sana: {{ $plan['date'] }} | Imzo: ______________________<br><br>
             <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
         </div>
     </div>
