@@ -89,6 +89,7 @@ class InternalAccountantController extends Controller
         $workEnd = Carbon::parse($group->department->end_time);
         $breakTime = $group->department->break_time ?? 0;
         $totalWorkMinutes = $workEnd->diffInMinutes($workStart) - $breakTime;
+        $totalMinutes = $workEnd->diffInMinutes($workStart);
 
         $plans = [];
         $employeeTarifications = [];
@@ -216,7 +217,7 @@ class InternalAccountantController extends Controller
                 'employee_id' => $employeeId,
                 'employee_name' => $employeeName,
                 'used_minutes' => round($usedMinutes, 2),
-                'total_minutes' => $totalWorkMinutes,
+                'total_minutes' => $totalMinutes,
                 'total_earned' => round($totalEarned, 2),
                 'tarifications' => $assigned,
                 'date' => $date,
