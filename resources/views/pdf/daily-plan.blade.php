@@ -43,7 +43,7 @@
         td.task-name {
             width: 30mm;
             word-break: break-word;
-            min-height: 10mm;
+            min-height: 20mm;
         }
         .footer {
             margin-top: 8px;
