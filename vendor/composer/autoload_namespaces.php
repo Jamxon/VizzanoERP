@@ -8,5 +8,6 @@ $baseDir = dirname($vendorDir);
 return array(
     'Parsedown' => array($vendorDir . '/erusev/parsedown'),
     'Mpociot' => array($vendorDir . '/mpociot/reflection-docblock/src'),
+    'Milon\\Barcode' => array($vendorDir . '/milon/barcode/src'),
     'HTMLPurifier' => array($vendorDir . '/ezyang/htmlpurifier/library'),
 );

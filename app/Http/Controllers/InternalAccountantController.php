@@ -229,4 +229,5 @@ class InternalAccountantController extends Controller
 
         return $pdf->download('daily_plan.pdf');
     }
+
 }
