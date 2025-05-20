@@ -13,8 +13,18 @@
         }
         .page {
             page-break-after: always;
-            padding: 5px 5px 10px 5px;
+            padding: 2px 5px 10px 5px; /* tepadan 5px emas, 2px */
         }
+
+        .footer {
+            margin-top: 8px;
+            margin-bottom: 12px; /* pastdan ko'proq joy qoldirildi */
+            font-size: 6pt;
+            border-top: 1px solid black;
+            text-align: center;
+            padding-top: 4mm;
+        }
+
         .employee-info {
             border-bottom: 1px solid black;
             margin-bottom: 5px;
@@ -45,13 +55,6 @@
             word-break: break-word;
             padding-top: 15px;
             padding-bottom: 15px;
-        }
-        .footer {
-            margin-top: 8px;
-            font-size: 6pt;
-            border-top: 1px solid black;
-            text-align: center;
-            padding-top: 4mm;
         }
     </style>
 </head>
