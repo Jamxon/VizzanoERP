@@ -51,7 +51,7 @@
             text-align: center;
             padding-top: 4mm;
         }
-        .tr{
+        tr {
             min-height: 30px;
         }
     </style>
