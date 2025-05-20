@@ -15,6 +15,7 @@
     </style>
 </head>
 <body>
+{!! DNS1D::getBarcodeHTML((string) $plan['plan_id'], 'C128') !!}
 @foreach($plans as $plan)
     <div class="page">
         <div class="employee-info">
@@ -41,7 +42,7 @@
             @foreach($plan['tarifications'] as $task)
                 <tr>
                     <td>{{ $task['tarification_name'] }}</td>
-                    <td>{{ $task['code'] }}</td>
+                    <td>{{ $task['code'] ?? '-' }}</td>
                     <td>{{ number_format($task['sum'], 0, ',', ' ') }}</td>
                     <td>{{ $task['count'] }}</td>
                     <td>{{ number_format($task['amount_earned'], 0, ',', ' ') }}</td>
@@ -52,6 +53,7 @@
 
         <div class="footer">
             Sana: {{ $plan['date'] }} | Imzo: ______________________<br>
+            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
         </div>
     </div>
 @endforeach
