@@ -221,7 +221,7 @@ class InternalAccountantController extends Controller
                 'date' => $date,
             ];
         }
-
+        dd($plans);
         // PDF yaratish va yuklash
         $pdf = Pdf::loadView('pdf.daily-plan', [
             'plan' => $plans
