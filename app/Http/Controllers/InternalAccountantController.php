@@ -202,7 +202,7 @@ class InternalAccountantController extends Controller
                 'employee_id' => $employeeId,
                 'submodel_id' => $submodel->id,
                 'group_id' => $group->id,
-                'date' => $date,
+                'date' =>  Carbon::createFromFormat('d-m-Y', $date)->format('Y-m-d'),
                 'used_minutes' => round($usedMinutes, 2),
                 'total_earned' => round($totalEarned, 2),
             ]);
