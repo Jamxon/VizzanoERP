@@ -79,21 +79,37 @@
             <thead>
             <tr>
                 <th>Ish</th>
-                <th>Kod</th>
+                <th>Vaqt</th>
                 <th>Narx</th>
                 <th>Reja</th>
-                <th>Jami</th>
                 <th>Natija</th>
             </tr>
             </thead>
             <tbody>
             @foreach($plan['tarifications'] as $task)
                 <tr>
-                    <td class="task-name">{{ \Illuminate\Support\Str::limit($task['tarification_name'], 50) }}</td>
-                    <td>{{ $task['code'] ?? '-' }}</td>
-                    <td>{{ number_format($task['sum'], 0, ',', ' ') }}</td>
+                    <td class="task-name">{{ $task['code'] ?? ' ' . \Illuminate\Support\Str::limit($task['tarification_name'], 50) }}</td>
+                    <td><div class="double-cell">
+                            <div>
+                                {{ number_format($task['seconds'], 0, ',', ' ') }}
+                            </div>
+                            <hr />
+                            <div>
+                                {{ number_format($task['seconds'] * $task['count'], 0, ',', ' ') }}
+                            </div>
+                        </div>
+                    </td>
+                    <td><div class="double-cell">
+                            <div>
+                                {{ number_format($task['sum'], 0, ',', ' ') }}
+                            </div>
+                            <hr />
+                            <div>
+                                {{ number_format($task['amount_earned'], 0, ',', ' ') }}
+                            </div>
+                        </div>
+                    </td>
                     <td>{{ $task['count'] }}</td>
-                    <td>{{ number_format($task['amount_earned'], 0, ',', ' ') }}</td>
                     <td style="min-height: 30px"></td> {{-- Natija uchun bo'sh joy --}}
                 </tr>
             @endforeach
