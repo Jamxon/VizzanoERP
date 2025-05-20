@@ -21,7 +21,7 @@
             margin-bottom: 30px; /* pastdan ko'proq joy qoldirildi */
             font-size: 6pt;
             border-top: 1px solid black;
-            width: max-content;
+            width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -139,10 +139,10 @@
             <div>
                 Imzo: ______________________
             </div>
-            <hr>
         </div>
         <div style="text-align: center; padding-bottom: 20px">
             <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $plan['plan_id'], 'C128', 1.5, 40) }}">
+            <hr>
         </div>
     </div>
 @endforeach
