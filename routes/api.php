@@ -55,6 +55,7 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('users', [TechnologController::class, 'getEmployerByDepartment']);
     Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
     Route::get('dailyPlan', [InternalAccountantController::class, 'generateDailyPlan']);
+    Route::get('dailyPlan/{dailyPlan}', [InternalAccountantController::class, 'showDailyPlan']);
 });
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {

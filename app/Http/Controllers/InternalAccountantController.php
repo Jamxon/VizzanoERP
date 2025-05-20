@@ -248,4 +248,34 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan.pdf');
     }
 
+    public function showDailyPlan(DailyPlan $dailyPlan): \Illuminate\Http\Response
+    {
+        $dailyPlan->load(
+            'employee',
+            'submodel.submodel',
+            'group',
+            'items.tarification',
+            'items.tarification.employee',
+            'items.tarification.razryad',
+            'items.tarification.typewriter'
+        );
+
+        $pdf = Pdf::loadView('pdf.daily-plan-show', [
+            'dailyPlan' => $dailyPlan
+        ])->setPaper([0, 0, 226.77, 566.93], 'portrait'); // 80mm x ~200mm
+
+        Log::add(
+            auth()->id(),
+            "Plan chiqarildi",
+            'print',
+            null,
+            [
+                'submodel_name' => $dailyPlan->submodel->name,
+                'group_name' => $dailyPlan->group->name,
+                'date' => $dailyPlan->date,
+            ]
+        );
+
+        return $pdf->download('daily_plan.pdf');
+    }
 }
