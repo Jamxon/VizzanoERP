@@ -21,7 +21,7 @@
             margin-bottom: 12px; /* pastdan ko'proq joy qoldirildi */
             font-size: 6pt;
             border-top: 1px solid black;
-            width: 100%;
+            width: max-content;
             display: flex;
             align-items: center;
             justify-content: space-between;
