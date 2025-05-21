@@ -497,6 +497,10 @@ class InternalAccountantController extends Controller
         $planAlreadySubmitted = (bool) $dailyPlan->status;
         $day = Carbon::parse($dailyPlan->date);
 
+        $dailyPlan->update([
+            'status' => true,
+        ]);
+
         $employeeTarificationIds = $employee->tarifications()->pluck('id')->toArray();
         $totalEarned = 0;
         $totalDeducted = 0;
