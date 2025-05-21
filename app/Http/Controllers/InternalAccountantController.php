@@ -620,4 +620,24 @@ class InternalAccountantController extends Controller
         return response()->json($tarification);
     }
 
+    public function getEmployeeByOrderSubModelId(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'submodel_id' => 'required|exists:order_sub_models,id',
+        ]);
+
+        $submodel = OrderSubModel::with('tarificationCategories.tarifications.employee:id,name')
+            ->findOrFail($request->submodel_id);
+
+        $employees = [];
+        foreach ($submodel->tarificationCategories as $category) {
+            foreach ($category->tarifications as $tarification) {
+                if ($tarification->employee) {
+                    $employees[$tarification->employee->id] = $tarification->employee;
+                }
+            }
+        }
+
+        return response()->json(array_values($employees));
+    }
 }
