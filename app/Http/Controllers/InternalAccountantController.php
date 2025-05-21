@@ -417,6 +417,15 @@ class InternalAccountantController extends Controller
             'items.tarification.typewriter'
         );
 
+        $department = $dailyPlan->group->department;
+
+        $workStart = Carbon::parse($department->start_time);
+        $workEnd = Carbon::parse($department->end_time);
+        $breakTime = $department->break_time ?? 0;
+        $totalWorkMinutes = $workEnd->diffInMinutes($workStart) - $breakTime;
+
+        $dailyPlan->total_work_minutes = $totalWorkMinutes;
+
         Log::add(
             auth()->id(),
             "Plan chiqarildi",
