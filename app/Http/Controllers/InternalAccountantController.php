@@ -405,30 +405,30 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan_' . $employee->id . '.pdf');
     }
 
-    public function showDailyPlan(DailyPlan $dailyPlan): \Illuminate\Http\JsonResponse
+    public function showDailyPlan($id): \Illuminate\Http\JsonResponse
     {
-        $dailyPlan->load([
+        // DailyPlan ni find qilish
+        $dailyPlan = DailyPlan::with([
             'employee',
             'submodel.submodel',
             'group.department',
             'items.tarification.employee:id,name',
             'items.tarification.razryad:id,name',
             'items.tarification.typewriter:id,name',
-        ]);
+        ])->findOrFail($id);
 
-        // Collectiondan arrayga o'tkazmasdan to'g'ridan-to'g'ri sort qilish
-        // Kodni to'g'ri saralash uchun quyidagi funksiyani ishlating
+        // Collectionni to'g'ri saralash
         $sortedItems = $dailyPlan->items->sortBy(function($item) {
             $code = $item->tarification->code ?? '';
 
-            // Natural sorting (A1, A2, A10... to'g'ri tartiblash uchun)
+            // Natural sorting (A1, A2, A10...)
             return [
-                preg_replace('/[^A-Za-z]/', '', $code),  // Faqat harflarni oladi (A, B, C...)
-                (int)preg_replace('/[^0-9]/', '', $code)   // Faqat raqamlarni oladi (1, 2, 10...)
+                preg_replace('/[^A-Za-z]/', '', $code),  // Harflar
+                (int)preg_replace('/[^0-9]/', '', $code) // Raqamlar
             ];
         });
 
-        // Saralangan ma'lumotlarni qayta indekslash va Collectionga qaytarish
+        // Saralangan ma'lumotlarni qayta indekslash
         $dailyPlan->items = $sortedItems->values();
 
         // Ish vaqti hisoblash
@@ -439,7 +439,7 @@ class InternalAccountantController extends Controller
         $totalWorkMinutes = $workEnd->diffInMinutes($workStart) - $breakTime;
         $dailyPlan->total_work_minutes = $totalWorkMinutes;
 
-        // Log
+        // Log yozish
         Log::add(
             auth()->id(),
             "Plan ko'rsatildi",
@@ -461,7 +461,7 @@ class InternalAccountantController extends Controller
             'employee_id' => 'required|exists:employees,id',
             'tarifications' => 'required|array',
             'tarifications.*.id' => 'required|exists:tarifications,id',
-            'tarifications.*.quantity' => 'required|numeric|min:1',
+            'tarifications.*.quantity' => 'required|numeric',
             'daily_plan_id' => 'required|exists:daily_plans,id',
         ]);
 

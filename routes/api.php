@@ -56,7 +56,7 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
     Route::get('dailyPlan', [InternalAccountantController::class, 'generateDailyPlan']);
     Route::get('dailyPlan/employee', [InternalAccountantController::class, 'generateDailyPlanForOneEmployee']);
-    Route::get('dailyPlan/{dailyPlan}', [InternalAccountantController::class, 'showDailyPlan']);
+    Route::get('dailyPlan/{id}', [InternalAccountantController::class, 'showDailyPlan']);
     Route::post('employeeSalaryCalculation', [InternalAccountantController::class, 'employeeSalaryCalculation']);
 });
 
