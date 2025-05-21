@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static insert(array $planItems)
  * @method static updateOrInsert(array $array, array $array1)
  * @method static updateOrCreate(array $array, array $array1)
+ * @method static where(string $string, mixed $dailyPlanId)
  */
 class DailyPlanItem extends Model
 {
