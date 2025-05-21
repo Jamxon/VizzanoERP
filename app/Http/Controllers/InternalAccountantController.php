@@ -501,7 +501,7 @@ class InternalAccountantController extends Controller
                 [
                     'employee_id' => $employee->id,
                     'tarification_id' => $tarificationId,
-                    'date' => $day->toDateString(),
+                    'date' => $day,
                 ],
                 [
                     'quantity' => $quantity,
@@ -510,7 +510,6 @@ class InternalAccountantController extends Controller
                 ]
             );
 
-            // 🔄 DailyPlanItem update or create
             DailyPlanItem::updateOrCreate(
                 [
                     'daily_plan_id' => $dailyPlanId,
