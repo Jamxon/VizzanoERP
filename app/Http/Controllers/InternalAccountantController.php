@@ -413,15 +413,22 @@ class InternalAccountantController extends Controller
             'employee',
             'submodel.submodel',
             'group.department',
+            'items.tarification.employee:id,name',
+            'items.tarification.razryad:id,name',
+            'items.tarification.typewriter:id,name',
             'items.tarification' => function ($q) use ($codeFilter) {
                 if ($codeFilter) {
                     $q->where('code', $codeFilter);
                 }
             },
-            'items.tarification.employee:id,name',
-            'items.tarification.razryad:id,name',
-            'items.tarification.typewriter:id,name',
         ]);
+
+        // PHP tarafda code bo‘yicha natural tartibda sortlash
+        $dailyPlan->items = $dailyPlan->items->sort(function ($a, $b) {
+            $codeA = $a->tarification->code ?? '';
+            $codeB = $b->tarification->code ?? '';
+            return strnatcasecmp($codeA, $codeB); // natural case-insensitive sort
+        })->values(); // reindex qilish kerak bo‘ladi
 
         // Ish vaqti hisoblash
         $department = $dailyPlan->group->department;
