@@ -427,8 +427,8 @@ class InternalAccountantController extends Controller
         $dailyPlan->items = $dailyPlan->items->sort(function ($a, $b) {
             $codeA = $a->tarification->code ?? '';
             $codeB = $b->tarification->code ?? '';
-            return strnatcasecmp($codeA, $codeB); // natural case-insensitive sort
-        })->values(); // reindex qilish kerak bo‘ladi
+            return strnatcasecmp($codeA, $codeB); // Natural alphanumeric sort
+        })->values();
 
         // Ish vaqti hisoblash
         $department = $dailyPlan->group->department;
