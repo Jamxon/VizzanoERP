@@ -416,40 +416,22 @@ class InternalAccountantController extends Controller
             'items.tarification.typewriter:id,name',
         ]);
 
-        // Ma'lumotlarni collectioin arrayga olish
-        $items = $dailyPlan->items->toArray();
-
-        // tarification.code bo'yicha usort() bilan saralash (PHP native sort)
-        usort($items, function ($a, $b) {
-            if (!isset($a['tarification']['code']) || !isset($b['tarification']['code'])) {
-                // Agar code mavjud bo'lmasa, default taqqoslash
-                return 0;
-            }
-
-            $codeA = $a['tarification']['code'];
-            $codeB = $b['tarification']['code'];
+        // Collectiondan arrayga o'tkazmasdan to'g'ridan-to'g'ri sort qilish
+        $sortedItems = $dailyPlan->items->sortBy(function ($item) {
+            $code = $item->tarification->code ?? '';
 
             // Kodni harf va raqam qismlariga ajratish
-            preg_match('/^([A-Za-z]+)(\d+)$/', $codeA, $matchesA);
-            preg_match('/^([A-Za-z]+)(\d+)$/', $codeB, $matchesB);
+            preg_match('/^([A-Za-z]+)(\d+)$/', $code, $matches);
 
-            if (!empty($matchesA) && !empty($matchesB)) {
-                // Harf qismini taqqoslash
-                $letterCompare = strcmp(strtoupper($matchesA[1]), strtoupper($matchesB[1]));
-                if ($letterCompare !== 0) {
-                    return $letterCompare;
-                }
-
-                // Harf qismi bir xil bo'lsa, raqam qismini taqqoslash
-                return (int)$matchesA[2] - (int)$matchesB[2];
+            if (!empty($matches)) {
+                return [strtoupper($matches[1]), (int)$matches[2]];
             }
 
-            // Agar standart formatda bo'lmasa, oddiy string sifatida taqqoslash
-            return strcmp($codeA, $codeB);
+            return [$code, 0];
         });
 
-        // Saralangan ma'lumotlarni Collection formatiga qaytarish
-        $dailyPlan->items = collect($items);
+        // Saralangan ma'lumotlarni qayta indekslash va Collectionga qaytarish
+        $dailyPlan->items = $sortedItems->values();
 
         // Ish vaqti hisoblash
         $department = $dailyPlan->group->department;
@@ -474,7 +456,7 @@ class InternalAccountantController extends Controller
 
         return response()->json($dailyPlan);
     }
-
+    
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
