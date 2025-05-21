@@ -405,10 +405,8 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan_' . $employee->id . '.pdf');
     }
 
-    public function showDailyPlan(DailyPlan $dailyPlan, Request $request): \Illuminate\Http\JsonResponse
+    public function showDailyPlan(DailyPlan $dailyPlan): \Illuminate\Http\JsonResponse
     {
-        $codeFilter = $request->query('code');
-
         $dailyPlan->load([
             'employee',
             'submodel.submodel',
@@ -416,18 +414,13 @@ class InternalAccountantController extends Controller
             'items.tarification.employee:id,name',
             'items.tarification.razryad:id,name',
             'items.tarification.typewriter:id,name',
-            'items.tarification' => function ($q) use ($codeFilter) {
-                if ($codeFilter) {
-                    $q->where('code', $codeFilter);
-                }
-            },
         ]);
 
         // Tarification.code bo'yicha to'g'ri alphanumeric saralash
         $dailyPlan->items = $dailyPlan->items
             ->filter(function ($item) {
                 // Null tarification yoki code bo'lgan elementlarni filtrlash
-                return !is_null($item->tarification) && !is_null($item->tarification->code);
+                return isset($item->tarification) && isset($item->tarification->code);
             })
             ->sort(function ($a, $b) {
                 $codeA = $a->tarification->code;
@@ -471,13 +464,12 @@ class InternalAccountantController extends Controller
                 'submodel_name' => $dailyPlan->submodel->name,
                 'group_name' => $dailyPlan->group->name,
                 'date' => $dailyPlan->date,
-                'code_filter' => $codeFilter,
             ]
         );
 
         return response()->json($dailyPlan);
     }
-
+    
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
