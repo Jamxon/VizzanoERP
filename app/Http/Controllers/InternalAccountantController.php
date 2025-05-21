@@ -418,7 +418,7 @@ class InternalAccountantController extends Controller
 
         // Tarification.code bo'yicha to'g'ri alphanumeric saralash
         $dailyPlan->items = $dailyPlan->items
-            ->orderBy('items.tarification.code')
+//            ->orderBy('items.tarification.code')
             ->values();
 
         // Ish vaqti hisoblash
