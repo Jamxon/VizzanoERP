@@ -334,9 +334,17 @@ class InternalAccountantController extends Controller
             ]);
 
             // Plan item actual qiymatini yangilash
-            DailyPlanItem::where('daily_plan_id', $dailyPlanId)
-                ->where('tarification_id', $tarificationId)
-                ->increment('actual', $quantity);
+            DailyPlanItem::updateOrInsert(
+                [
+                    'daily_plan_id' => $dailyPlanId,
+                    'tarification_id' => $tarificationId,
+                ],
+                [
+                    'actual' => DB::raw("COALESCE(actual, 0) + $quantity"),
+                    'updated_at' => now(),
+                ]
+            );
+
 
             $totalEarned += $amount;
         }
