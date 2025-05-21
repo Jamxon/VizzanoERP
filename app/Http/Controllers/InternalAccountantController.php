@@ -418,10 +418,7 @@ class InternalAccountantController extends Controller
 
         // Tarification.code bo'yicha to'g'ri alphanumeric saralash
         $dailyPlan->items = $dailyPlan->items
-            ->orderBy(function ($query) {
-                $query->selectRaw('CAST(items.tarification.code AS UNSIGNED)')
-                    ->orderByRaw('CAST(items.tarification.code AS UNSIGNED) ASC');
-            })
+            ->orderBy('items.tarification.code')
             ->values();
 
         // Ish vaqti hisoblash
