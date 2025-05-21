@@ -5638,7 +5638,7 @@ gas</Labels>
     </table>
     <table id="356" parent="263" name="employees">
       <ObjectId>18013</ObjectId>
-      <StateNumber>240380</StateNumber>
+      <StateNumber>242362</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -7111,16 +7111,16 @@ gas</Labels>
     <column id="574" parent="356" name="balance">
       <DefaultExpression>0</DefaultExpression>
       <Position>25</Position>
-      <StateNumber>240380</StateNumber>
-      <StoredType>bigint|0s</StoredType>
-      <TypeId>20</TypeId>
+      <StateNumber>242362</StateNumber>
+      <StoredType>real|0s</StoredType>
+      <TypeId>700</TypeId>
     </column>
     <index id="575" parent="356" name="employees_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18380</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>9531</StateNumber>
+      <StateNumber>242362</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>

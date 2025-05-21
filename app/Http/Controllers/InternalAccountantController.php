@@ -405,36 +405,43 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan_' . $employee->id . '.pdf');
     }
 
-    public function showDailyPlan(DailyPlan $dailyPlan): \Illuminate\Http\JsonResponse
+    public function showDailyPlan(DailyPlan $dailyPlan, Request $request): \Illuminate\Http\JsonResponse
     {
-        $dailyPlan->load(
+        $codeFilter = $request->query('code');
+
+        $dailyPlan->load([
             'employee',
             'submodel.submodel',
-            'group',
-            'items.tarification',
-            'items.tarification.employee',
-            'items.tarification.razryad',
-            'items.tarification.typewriter'
-        );
+            'group.department',
+            'items.tarification' => function ($q) use ($codeFilter) {
+                if ($codeFilter) {
+                    $q->where('code', $codeFilter);
+                }
+            },
+            'items.tarification.employee:id,name',
+            'items.tarification.razryad:id,name',
+            'items.tarification.typewriter:id,name',
+        ]);
 
+        // Ish vaqti hisoblash
         $department = $dailyPlan->group->department;
-
         $workStart = Carbon::parse($department->start_time);
         $workEnd = Carbon::parse($department->end_time);
         $breakTime = $department->break_time ?? 0;
         $totalWorkMinutes = $workEnd->diffInMinutes($workStart) - $breakTime;
-
         $dailyPlan->total_work_minutes = $totalWorkMinutes;
 
+        // Log
         Log::add(
             auth()->id(),
-            "Plan chiqarildi",
+            "Plan ko'rsatildi",
             'print',
             null,
             [
                 'submodel_name' => $dailyPlan->submodel->name,
                 'group_name' => $dailyPlan->group->name,
                 'date' => $dailyPlan->date,
+                'code_filter' => $codeFilter,
             ]
         );
 
