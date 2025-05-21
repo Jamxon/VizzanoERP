@@ -251,6 +251,156 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan.pdf');
     }
 
+    public function generateDailyPlanForOneEmployee(Request $request): \Illuminate\Http\Response
+    {
+        $request->validate([
+            'submodel_id' => 'required|exists:order_sub_models,id',
+            'group_id' => 'required|exists:groups,id',
+            'employee_id' => 'required|exists:employees,id',
+        ]);
+
+        $submodel = OrderSubmodel::with([
+            'tarificationCategories.tarifications' => function ($q) use ($request) {
+                $q->whereHas('employee', function ($q2) use ($request) {
+                    $q2->where('id', $request->employee_id);
+                })->with('employee:id,name');
+            }
+        ])->findOrFail($request->submodel_id);
+
+        $group = Group::with('department')->findOrFail($request->group_id);
+        $employee = Employee::findOrFail($request->employee_id);
+
+        $workStart = Carbon::parse($group->department->start_time);
+        $workEnd = Carbon::parse($group->department->end_time);
+        $breakTime = $group->department->break_time ?? 0;
+        $totalWorkMinutes = $workEnd->diffInMinutes($workStart) - $breakTime;
+        $date = now()->format('d-m-Y');
+
+        $tasks = collect();
+        foreach ($submodel->tarificationCategories as $category) {
+            foreach ($category->tarifications as $tarification) {
+                $tasks->push([
+                    'id' => $tarification->id,
+                    'code' => $tarification->code,
+                    'name' => $tarification->name,
+                    'seconds' => $tarification->second,
+                    'sum' => $tarification->summa,
+                    'minutes' => round($tarification->second / 60, 4),
+                ]);
+            }
+        }
+
+        $tasks = $tasks->sortBy('minutes')->values();
+        $remainingMinutes = $totalWorkMinutes;
+        $usedMinutes = 0;
+        $totalEarned = 0;
+        $assigned = [];
+
+        foreach ($tasks as $task) {
+            if ($remainingMinutes >= $task['minutes']) {
+                $count = 1;
+                $total_minutes = round($task['minutes'], 2);
+                $amount_earned = round($task['sum'], 2);
+
+                $assigned[] = [
+                    'tarification_id' => $task['id'],
+                    'tarification_name' => $task['name'],
+                    'code' => $task['code'],
+                    'seconds' => $task['seconds'],
+                    'count' => $count,
+                    'minutes_per_unit' => $task['minutes'],
+                    'total_minutes' => $total_minutes,
+                    'sum' => $task['sum'],
+                    'amount_earned' => $amount_earned,
+                ];
+
+                $usedMinutes += $task['minutes'];
+                $remainingMinutes -= $task['minutes'];
+                $totalEarned += $amount_earned;
+            }
+        }
+
+        $tasksCount = count($assigned);
+        if ($tasksCount > 0) {
+            $i = 0;
+            while ($remainingMinutes > 0) {
+                $index = $i % $tasksCount;
+                $item = &$assigned[$index];
+                $minutes = $item['minutes_per_unit'];
+
+                if ($remainingMinutes >= $minutes) {
+                    $item['count'] += 1;
+                    $item['total_minutes'] = round($item['count'] * $minutes, 2);
+                    $item['amount_earned'] = round($item['count'] * $item['sum'], 2);
+
+                    $usedMinutes += $minutes;
+                    $remainingMinutes -= $minutes;
+                    $totalEarned += $item['sum'];
+                } else {
+                    break;
+                }
+
+                $i++;
+            }
+        }
+
+        foreach ($assigned as &$item) {
+            unset($item['minutes_per_unit']);
+        }
+
+        $plan = DailyPlan::create([
+            'employee_id' => $employee->id,
+            'submodel_id' => $submodel->id,
+            'group_id' => $group->id,
+            'date' => Carbon::createFromFormat('d-m-Y', $date)->format('Y-m-d'),
+            'used_minutes' => round($usedMinutes, 2),
+            'total_earned' => round($totalEarned, 2),
+        ]);
+
+        $planItems = [];
+        foreach ($assigned as $item) {
+            $planItems[] = [
+                'daily_plan_id' => $plan->id,
+                'tarification_id' => $item['tarification_id'],
+                'count' => $item['count'],
+                'total_minutes' => $item['total_minutes'],
+                'amount_earned' => $item['amount_earned'],
+            ];
+        }
+
+        DailyPlanItem::insert($planItems);
+
+        $plans = [[
+            'plan_id' => $plan->id,
+            'employee_id' => $employee->id,
+            'employee_name' => $employee->name,
+            'used_minutes' => round($usedMinutes, 2),
+            'total_minutes' => $totalWorkMinutes,
+            'total_earned' => round($totalEarned, 2),
+            'tarifications' => $assigned,
+            'date' => $date,
+        ]];
+
+        $pdf = Pdf::loadView('pdf.daily-plan', ['plans' => $plans])
+            ->setPaper([0, 0, 226.77, 566.93], 'portrait');
+
+        Log::add(
+            auth()->id(),
+            "1 kishilik plan chiqarildi",
+            'print',
+            null,
+            [
+                'employee_id' => $employee->id,
+                'employee_name' => $employee->name,
+                'submodel_name' => $submodel->submodel->name,
+                'group_name' => $group->name,
+                'date' => $date,
+            ]
+        );
+
+        return $pdf->download('daily_plan_' . $employee->id . '.pdf');
+    }
+
     public function showDailyPlan(DailyPlan $dailyPlan): \Illuminate\Http\JsonResponse
     {
         $dailyPlan->load(
