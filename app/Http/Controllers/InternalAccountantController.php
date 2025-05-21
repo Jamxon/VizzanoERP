@@ -417,17 +417,15 @@ class InternalAccountantController extends Controller
         ]);
 
         // Collectiondan arrayga o'tkazmasdan to'g'ridan-to'g'ri sort qilish
-        $sortedItems = $dailyPlan->items->sortBy(function ($item) {
+        // Kodni to'g'ri saralash uchun quyidagi funksiyani ishlating
+        $sortedItems = $dailyPlan->items->sortBy(function($item) {
             $code = $item->tarification->code ?? '';
 
-            // Kodni harf va raqam qismlariga ajratish
-            preg_match('/^([A-Za-z]+)(\d+)$/', $code, $matches);
-
-            if (!empty($matches)) {
-                return [strtoupper($matches[1]), (int)$matches[2]];
-            }
-
-            return [$code, 0];
+            // Natural sorting (A1, A2, A10... to'g'ri tartiblash uchun)
+            return [
+                preg_replace('/[^A-Za-z]/', '', $code),  // Faqat harflarni oladi (A, B, C...)
+                (int)preg_replace('/[^0-9]/', '', $code)   // Faqat raqamlarni oladi (1, 2, 10...)
+            ];
         });
 
         // Saralangan ma'lumotlarni qayta indekslash va Collectionga qaytarish
@@ -456,7 +454,7 @@ class InternalAccountantController extends Controller
 
         return response()->json($dailyPlan);
     }
-    
+
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
