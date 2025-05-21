@@ -416,27 +416,40 @@ class InternalAccountantController extends Controller
             'items.tarification.typewriter:id,name',
         ]);
 
-        // Tarification.code bo'yicha to'g'ri alphanumeric saralash
-        $dailyPlan->items = $dailyPlan->items
-            ->filter(function ($item) {
-                return isset($item->tarification) && isset($item->tarification->code);
-            })
-            ->sortBy(function ($item) {
-                $code = $item->tarification->code;
+        // Ma'lumotlarni collectioin arrayga olish
+        $items = $dailyPlan->items->toArray();
 
-                // "A20" formatidagi kodlarni saralash uchun maxsus logika
-                if (preg_match('/^([A-Za-z]+)(\d+)$/', $code, $matches)) {
-                    $letterPart = strtoupper($matches[1]); // Harflarni katta harfga o'tkazish
-                    $numberPart = (int)$matches[2];        // Son qismini integerga o'tkazish
+        // tarification.code bo'yicha usort() bilan saralash (PHP native sort)
+        usort($items, function ($a, $b) {
+            if (!isset($a['tarification']['code']) || !isset($b['tarification']['code'])) {
+                // Agar code mavjud bo'lmasa, default taqqoslash
+                return 0;
+            }
 
-                    // Masalan: A -> 65 (ASCII kod), 1 -> 000001 (son qismi)
-                    // A1 -> 65000001, A2 -> 65000002, B1 -> 66000001
-                    return ord($letterPart[0]) * 1000000 + $numberPart;
+            $codeA = $a['tarification']['code'];
+            $codeB = $b['tarification']['code'];
+
+            // Kodni harf va raqam qismlariga ajratish
+            preg_match('/^([A-Za-z]+)(\d+)$/', $codeA, $matchesA);
+            preg_match('/^([A-Za-z]+)(\d+)$/', $codeB, $matchesB);
+
+            if (!empty($matchesA) && !empty($matchesB)) {
+                // Harf qismini taqqoslash
+                $letterCompare = strcmp(strtoupper($matchesA[1]), strtoupper($matchesB[1]));
+                if ($letterCompare !== 0) {
+                    return $letterCompare;
                 }
 
-                return $code; // Agar standart formatda bo'lmasa
-            })
-            ->values();
+                // Harf qismi bir xil bo'lsa, raqam qismini taqqoslash
+                return (int)$matchesA[2] - (int)$matchesB[2];
+            }
+
+            // Agar standart formatda bo'lmasa, oddiy string sifatida taqqoslash
+            return strcmp($codeA, $codeB);
+        });
+
+        // Saralangan ma'lumotlarni Collection formatiga qaytarish
+        $dailyPlan->items = collect($items);
 
         // Ish vaqti hisoblash
         $department = $dailyPlan->group->department;
