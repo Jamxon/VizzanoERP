@@ -418,31 +418,9 @@ class InternalAccountantController extends Controller
 
         // Tarification.code bo'yicha to'g'ri alphanumeric saralash
         $dailyPlan->items = $dailyPlan->items
-            ->filter(function ($item) {
-                // Null tarification yoki code bo'lgan elementlarni filtrlash
-                return isset($item->tarification) && isset($item->tarification->code);
-            })
+            ->filter(fn ($item) => isset($item->tarification) && isset($item->tarification->code))
             ->sort(function ($a, $b) {
-                $codeA = $a->tarification->code;
-                $codeB = $b->tarification->code;
-
-                // Kodni harf va raqam qismlariga ajratish
-                preg_match('/^([A-Za-z]+)(\d+)$/', $codeA, $matchesA);
-                preg_match('/^([A-Za-z]+)(\d+)$/', $codeB, $matchesB);
-
-                if (!empty($matchesA) && !empty($matchesB)) {
-                    // Harf qismini taqqoslash
-                    $letterCompare = strcmp(strtoupper($matchesA[1]), strtoupper($matchesB[1]));
-                    if ($letterCompare !== 0) {
-                        return $letterCompare;
-                    }
-
-                    // Harf qismi bir xil bo'lsa, raqam qismini taqqoslash
-                    return (int)$matchesA[2] - (int)$matchesB[2];
-                }
-
-                // Agar standart formatda bo'lmasa, oddiy string sifatida taqqoslash
-                return strcmp($codeA, $codeB);
+                return strnatcasecmp($a->tarification->code, $b->tarification->code);
             })
             ->values();
 
@@ -469,7 +447,7 @@ class InternalAccountantController extends Controller
 
         return response()->json($dailyPlan);
     }
-    
+
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
