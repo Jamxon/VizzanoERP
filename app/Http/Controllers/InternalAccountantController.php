@@ -418,9 +418,9 @@ class InternalAccountantController extends Controller
 
         // Tarification.code bo'yicha to'g'ri alphanumeric saralash
         $dailyPlan->items = $dailyPlan->items
-            ->filter(fn ($item) => isset($item->tarification) && isset($item->tarification->code))
-            ->sort(function ($a, $b) {
-                return strnatcasecmp($a->tarification->code, $b->tarification->code);
+            ->orderBy(function ($query) {)
+                $query->selectRaw('CAST(code AS UNSIGNED)')
+                    ->orderByRaw('CAST(code AS UNSIGNED) ASC');
             })
             ->values();
 
