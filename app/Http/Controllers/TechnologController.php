@@ -17,6 +17,7 @@ use App\Models\SubmodelSpend;
 use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use App\Models\TypeWriter;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1157,6 +1158,25 @@ class TechnologController extends Controller
                 'line' => $e->getLine(),
             ], 500);
         }
+    }
+
+    public function exportTarificationsPdf(Request $request): \Illuminate\Http\Response
+    {
+        $request->validate([
+            'submodel_id' => 'required|exists:order_sub_models,id',
+        ]);
+
+        $submodel = OrderSubmodel::with([
+            'tarificationCategories.tarifications.razryad',
+            'tarificationCategories.tarifications.typewriter',
+            'tarificationCategories.tarifications.employee:id,name'
+        ])->findOrFail($request->submodel_id);
+
+        $pdf = Pdf::loadView('pdf.tarifications', [
+            'submodel' => $submodel
+        ])->setPaper('A4', 'portrait');
+
+        return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
 
 }
