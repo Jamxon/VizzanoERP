@@ -610,5 +610,21 @@ class InternalAccountantController extends Controller
         ]);
     }
 
+    public function showTarifications(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $tarification = Tarification::where('code', $request->code)
+            ->with(
+                'employee:id,name',
+                'razryad:id,name',
+                'typewriter:id,name'
+            )
+            ->first();
+
+        if (!$tarification) {
+            return response()->json(['message' => 'Tarifikatsiya topilmadi'], 404);
+        }
+
+        return response()->json($tarification);
+    }
 
 }
