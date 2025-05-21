@@ -424,19 +424,34 @@ class InternalAccountantController extends Controller
         ]);
 
         // Tarification.code bo'yicha to'g'ri alphanumeric saralash
-        $dailyPlan->items = $dailyPlan->items->sortBy(function ($item) {
-            $code = $item->tarification->code ?? '';
-            // "A20" formatidagi kodlarni saralash uchun maxsus logika
-            if (preg_match('/^([A-Za-z]+)(\d+)$/', $code, $matches)) {
-                // Avval harf qismi, keyin son qismini olish
-                $letterPart = $matches[1];
-                $numberPart = $matches[2];
-                // Son qismini boshlang'ich nollar bilan to'ldirish (masalan, 1 -> 001)
-                $paddedNumber = str_pad($numberPart, 10, '0', STR_PAD_LEFT);
-                return strtoupper($letterPart) . $paddedNumber;
-            }
-            return $code;
-        })->values();
+        $dailyPlan->items = $dailyPlan->items
+            ->filter(function ($item) {
+                // Null tarification yoki code bo'lgan elementlarni filtrlash
+                return !is_null($item->tarification) && !is_null($item->tarification->code);
+            })
+            ->sort(function ($a, $b) {
+                $codeA = $a->tarification->code;
+                $codeB = $b->tarification->code;
+
+                // Kodni harf va raqam qismlariga ajratish
+                preg_match('/^([A-Za-z]+)(\d+)$/', $codeA, $matchesA);
+                preg_match('/^([A-Za-z]+)(\d+)$/', $codeB, $matchesB);
+
+                if (!empty($matchesA) && !empty($matchesB)) {
+                    // Harf qismini taqqoslash
+                    $letterCompare = strcmp(strtoupper($matchesA[1]), strtoupper($matchesB[1]));
+                    if ($letterCompare !== 0) {
+                        return $letterCompare;
+                    }
+
+                    // Harf qismi bir xil bo'lsa, raqam qismini taqqoslash
+                    return (int)$matchesA[2] - (int)$matchesB[2];
+                }
+
+                // Agar standart formatda bo'lmasa, oddiy string sifatida taqqoslash
+                return strcmp($codeA, $codeB);
+            })
+            ->values();
 
         // Ish vaqti hisoblash
         $department = $dailyPlan->group->department;
@@ -462,7 +477,7 @@ class InternalAccountantController extends Controller
 
         return response()->json($dailyPlan);
     }
-    
+
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
