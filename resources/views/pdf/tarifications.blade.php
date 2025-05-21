@@ -43,7 +43,11 @@
     </thead>
 
 @foreach($submodel->tarificationCategories as $category)
-    <tr class="category-title">{{ $category->name }}</tr>
+    <tr class="category-title">
+        <td colspan="8">
+            {{ $category->name }}
+        </td>
+    </tr>
 
         <tbody>
         @foreach($category->tarifications as $index => $tar)
