@@ -407,7 +407,6 @@ class InternalAccountantController extends Controller
 
     public function showDailyPlan($id): \Illuminate\Http\JsonResponse
     {
-        // DailyPlan ni find qilish
         $dailyPlan = DailyPlan::with([
             'employee',
             'submodel.submodel',
@@ -417,42 +416,22 @@ class InternalAccountantController extends Controller
             'items.tarification.typewriter:id,name',
         ])->findOrFail($id);
 
-        // items ni JSON array sifatida olish, lekin reference bo'yicha
-        // bu endi eloquent collection emas, oddiy array bo'ladi
+        // Tarificationlarni kod bo‘yicha sortlash
         $itemsArray = json_decode(json_encode($dailyPlan->items), true);
-
-        // PHP native usort bilan saralash
         usort($itemsArray, function ($a, $b) {
-            // Tarification code olish, agar bo'lmasa bo'sh string
-            $codeA = isset($a['tarification']['code']) ? $a['tarification']['code'] : '';
-            $codeB = isset($b['tarification']['code']) ? $b['tarification']['code'] : '';
+            $codeA = $a['tarification']['code'] ?? '';
+            $codeB = $b['tarification']['code'] ?? '';
 
-            // A43 formatidagi stringni ajratib olish
             preg_match('/^([A-Za-z]+)(\d+)$/', $codeA, $matchesA);
             preg_match('/^([A-Za-z]+)(\d+)$/', $codeB, $matchesB);
 
-            // Agar ikkala kod ham to'g'ri formatda bo'lsa
             if (!empty($matchesA) && !empty($matchesB)) {
-                // Harf qismini taqqoslash (katta harflarga o'tkazib)
-                $letterA = strtoupper($matchesA[1]);
-                $letterB = strtoupper($matchesB[1]);
-
-                if ($letterA !== $letterB) {
-                    return strcmp($letterA, $letterB);
-                }
-
-                // Harf qismi bir xil bo'lsa, raqam qismini int ga o'tkazib taqqoslash
-                $numA = (int)$matchesA[2];
-                $numB = (int)$matchesB[2];
-
-                return $numA - $numB;
+                $letterCompare = strcmp(strtoupper($matchesA[1]), strtoupper($matchesB[1]));
+                return $letterCompare !== 0 ? $letterCompare : ((int)$matchesA[2] - (int)$matchesB[2]);
             }
 
-            // Agar to'g'ri formatda bo'lmasa, shunchaki string sifatida taqqoslash
             return strcmp($codeA, $codeB);
         });
-
-        // Saralangan arrayni qayta modelga berish
         $dailyPlan->setRelation('items', collect($itemsArray));
 
         // Ish vaqti hisoblash
@@ -460,8 +439,19 @@ class InternalAccountantController extends Controller
         $workStart = Carbon::parse($department->start_time);
         $workEnd = Carbon::parse($department->end_time);
         $breakTime = $department->break_time ?? 0;
-        $totalWorkMinutes = $workEnd->diffInMinutes($workStart) - $breakTime;
-        $dailyPlan->total_work_minutes = $totalWorkMinutes;
+        $dailyPlan->total_work_minutes = $workEnd->diffInMinutes($workStart) - $breakTime;
+
+        // 🔁 Qo‘shimcha ishlar (rejadagi bo‘lmagan)
+        $planTarificationIds = $dailyPlan->items->pluck('tarification_id')->toArray();
+        $extraLogs = \App\Models\EmployeeTarificationLog::with([
+            'tarification.employee:id,name',
+            'tarification.razryad:id,name',
+            'tarification.typewriter:id,name',
+        ])
+            ->where('employee_id', $dailyPlan->employee_id)
+            ->whereDate('date', $dailyPlan->date)
+            ->whereNotIn('tarification_id', $planTarificationIds)
+            ->get();
 
         // Log
         Log::add(
@@ -476,7 +466,10 @@ class InternalAccountantController extends Controller
             ]
         );
 
-        return response()->json($dailyPlan);
+        return response()->json([
+            'plan' => $dailyPlan,
+            'extra_logs' => $extraLogs,
+        ]);
     }
 
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
