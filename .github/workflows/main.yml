@@ -19,5 +19,5 @@ jobs:
           password: 'hS+mN_w4+@SaWm'
           script: |
             cd /home/jamkhan/VizzanoERP/
-            git pull
+            git pull --no-rebase
             php artisan optimize
