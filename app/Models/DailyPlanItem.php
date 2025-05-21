@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static create(array $array)
  * @method static insert(array $planItems)
+ * @method static updateOrInsert(array $array, array $array1)
  */
 class DailyPlanItem extends Model
 {
