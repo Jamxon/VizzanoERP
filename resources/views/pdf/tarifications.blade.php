@@ -25,24 +25,26 @@
 </head>
 <body>
 
-<h2>📋 Tarifikatsiyalar Ro'yxati</h2>
-<h4>Submodel: {{ $submodel->submodel->name ?? '-' }}</h4>
+<h2>📋 Operatsiyalar Ro'yxati</h2>
+<h4>{{ $submodel->submodel->name ?? '-' }}</h4>
+
+<table>
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>Kod</th>
+        <th>Ish nomi</th>
+        <th>Razryad</th>
+        <th>Tikuv mashinasi</th>
+        <th>1 dona vaqti (sekund)</th>
+        <th>1 dona narxi (so'm)</th>
+        <th>Xodim</th>
+    </tr>
+    </thead>
 
 @foreach($submodel->tarificationCategories as $category)
-    <div class="category-title">{{ $category->name }}</div>
-    <table>
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Kod</th>
-            <th>Ish nomi</th>
-            <th>Razryad</th>
-            <th>Tikuv mashinasi</th>
-            <th>1 dona vaqti (sekund)</th>
-            <th>1 dona narxi (so'm)</th>
-            <th>Xodim</th>
-        </tr>
-        </thead>
+    <tr class="category-title">{{ $category->name }}</tr>
+
         <tbody>
         @foreach($category->tarifications as $index => $tar)
             <tr>
@@ -57,8 +59,10 @@
             </tr>
         @endforeach
         </tbody>
-    </table>
 @endforeach
+
+</table>
+
 
 </body>
 </html>
