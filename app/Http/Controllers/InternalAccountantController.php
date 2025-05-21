@@ -478,7 +478,7 @@ class InternalAccountantController extends Controller
 
         return response()->json($dailyPlan);
     }
-    
+
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
@@ -592,14 +592,21 @@ class InternalAccountantController extends Controller
             ]
         );
 
+        $message = '';
+
+        if ($employee->status === 'kicked') {
+            $message = "❌ Xodim: {$employee->name} ishdan bo‘shatilgan.\nHisob-kitob amalga oshirilmaydi.";
+        } elseif ($employee->payment_type !== 'piece_work') {
+            $message = "ℹ️ Xodim: {$employee->name} uchun hisob-kitob bajarildi, ammo to‘lov turi: `{$employee->payment_type}`.\nBalansga qo‘shilmadi.";
+        } elseif ($planAlreadySubmitted) {
+            $diff = round($totalEarned - $totalDeducted, 2);
+            $message = "♻️ Reja yangilandi (qayta yuborildi).\nXodim: {$employee->name}\nOldin hisoblangan: " . number_format($totalDeducted, 0, ',', ' ') . " so'm\nYangi hisob: " . number_format($totalEarned, 0, ',', ' ') . " so'm\nBalans farqi: " . number_format($diff, 0, ',', ' ') . " so'm qo‘shildi.";
+        } else {
+            $message = "✅ Reja muvaffaqiyatli yuborildi.\nXodim: {$employee->name}\nUmumiy hisoblangan: " . number_format($totalEarned, 0, ',', ' ') . " so'm\nBalans yangilandi.";
+        }
+
         return response()->json([
-            'message' => $balanceUpdated
-                ? ($planAlreadySubmitted ? '♻️ Reja yangilandi va balans farqi hisoblandi' : '✅ Reja birinchi marta yuborildi va balansga qo‘shildi')
-                : 'ℹ️ Balansga qo‘shilmadi (payment_type mos emas)',
-            'total_earned' => round($totalEarned, 2),
-            'balance_diff' => round($totalEarned - ($planAlreadySubmitted ? $totalDeducted : 0), 2),
-            'employee' => $employee->name,
-            'balance_updated' => $balanceUpdated
+            'message' => $message
         ]);
     }
 
