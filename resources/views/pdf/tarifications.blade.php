@@ -12,15 +12,12 @@
             padding: 6px;
             text-align: left;
         }
-        th {
-            background-color: #f0f0f0;
-        }
+        th { background-color: #f0f0f0; }
         .category-title {
-            margin-top: 25px;
-            font-size: 12pt;
             font-weight: bold;
-            border-bottom: 2px solid #000;
             text-align: center;
+            font-size: 12pt;
+            margin: 15px 0 5px 0;
         }
     </style>
 </head>
@@ -29,27 +26,24 @@
 <h2>📋 Operatsiyalar Ro'yxati</h2>
 <h4>{{ $submodel->submodel->name ?? '-' }}</h4>
 
-<table>
-    <thead>
-    <tr>
-        <th>#</th>
-        <th>Kod</th>
-        <th>Ish nomi</th>
-        <th>Razryad</th>
-        <th>Tikuv mashinasi</th>
-        <th>1 dona vaqti (sekund)</th>
-        <th>1 dona narxi (so'm)</th>
-        <th>Xodim</th>
-    </tr>
-    </thead>
-
 @foreach($submodel->tarificationCategories as $category)
-    <tr class="category-title">
-        <td colspan="8">
-            {{ $category->name }}
-        </td>
-    </tr>
-
+    <div class="category-title">{{ $category->name }}</div>
+    <table>
+        {{-- faqat birinchi jadval uchun thead ko‘rsatiladi --}}
+        @if($loop->first)
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Kod</th>
+                <th>Ish nomi</th>
+                <th>Razryad</th>
+                <th>Tikuv mashinasi</th>
+                <th>1 dona vaqti (sekund)</th>
+                <th>1 dona narxi (so'm)</th>
+                <th>Xodim</th>
+            </tr>
+            </thead>
+        @endif
         <tbody>
         @foreach($category->tarifications as $index => $tar)
             <tr>
@@ -64,10 +58,8 @@
             </tr>
         @endforeach
         </tbody>
+    </table>
 @endforeach
-
-</table>
-
 
 </body>
 </html>
