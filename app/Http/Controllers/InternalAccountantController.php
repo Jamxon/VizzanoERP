@@ -548,16 +548,16 @@ class InternalAccountantController extends Controller
                 ]
             );
 
-            DailyPlanItem::updateOrCreate(
-                [
-                    'daily_plan_id' => $dailyPlanId,
-                    'tarification_id' => $tarificationId
-                ],
-                [
+            $existingItem = DailyPlanItem::where('daily_plan_id', $dailyPlanId)
+                ->where('tarification_id', $tarificationId)
+                ->first();
+
+            if ($existingItem) {
+                $existingItem->update([
                     'actual' => $quantity,
                     'updated_at' => now()
-                ]
-            );
+                ]);
+            }
 
             $totalEarned += $amount;
             $totalDeducted += $oldAmount;
