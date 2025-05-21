@@ -255,7 +255,6 @@ class InternalAccountantController extends Controller
     {
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
-            'group_id' => 'required|exists:groups,id',
             'employee_id' => 'required|exists:employees,id',
         ]);
 
@@ -267,8 +266,12 @@ class InternalAccountantController extends Controller
             }
         ])->findOrFail($request->submodel_id);
 
-        $group = Group::with('department')->findOrFail($request->group_id);
         $employee = Employee::findOrFail($request->employee_id);
+        $group = Group::with('department')->findOrFail($employee->group_id);
+
+        if (!$group) {
+            return response()->json(['message' => 'Hodimning guruhi topilmadi, avval uni guruhga biriktirish kerak!'], 404);
+        }
 
         $workStart = Carbon::parse($group->department->start_time);
         $workEnd = Carbon::parse($group->department->end_time);
@@ -358,6 +361,7 @@ class InternalAccountantController extends Controller
         ]);
 
         $planItems = [];
+        unset($item);
         foreach ($assigned as $item) {
             $planItems[] = [
                 'daily_plan_id' => $plan->id,
