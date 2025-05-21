@@ -417,19 +417,43 @@ class InternalAccountantController extends Controller
             'items.tarification.typewriter:id,name',
         ])->findOrFail($id);
 
-        // Collectionni to'g'ri saralash
-        $sortedItems = $dailyPlan->items->sortBy(function($item) {
-            $code = $item->tarification->code ?? '';
+        // items ni JSON array sifatida olish, lekin reference bo'yicha
+        // bu endi eloquent collection emas, oddiy array bo'ladi
+        $itemsArray = json_decode(json_encode($dailyPlan->items), true);
 
-            // Natural sorting (A1, A2, A10...)
-            return [
-                preg_replace('/[^A-Za-z]/', '', $code),  // Harflar
-                (int)preg_replace('/[^0-9]/', '', $code) // Raqamlar
-            ];
+        // PHP native usort bilan saralash
+        usort($itemsArray, function ($a, $b) {
+            // Tarification code olish, agar bo'lmasa bo'sh string
+            $codeA = isset($a['tarification']['code']) ? $a['tarification']['code'] : '';
+            $codeB = isset($b['tarification']['code']) ? $b['tarification']['code'] : '';
+
+            // A43 formatidagi stringni ajratib olish
+            preg_match('/^([A-Za-z]+)(\d+)$/', $codeA, $matchesA);
+            preg_match('/^([A-Za-z]+)(\d+)$/', $codeB, $matchesB);
+
+            // Agar ikkala kod ham to'g'ri formatda bo'lsa
+            if (!empty($matchesA) && !empty($matchesB)) {
+                // Harf qismini taqqoslash (katta harflarga o'tkazib)
+                $letterA = strtoupper($matchesA[1]);
+                $letterB = strtoupper($matchesB[1]);
+
+                if ($letterA !== $letterB) {
+                    return strcmp($letterA, $letterB);
+                }
+
+                // Harf qismi bir xil bo'lsa, raqam qismini int ga o'tkazib taqqoslash
+                $numA = (int)$matchesA[2];
+                $numB = (int)$matchesB[2];
+
+                return $numA - $numB;
+            }
+
+            // Agar to'g'ri formatda bo'lmasa, shunchaki string sifatida taqqoslash
+            return strcmp($codeA, $codeB);
         });
 
-        // Saralangan ma'lumotlarni qayta indekslash
-        $dailyPlan->items = $sortedItems->values();
+        // Saralangan arrayni qayta modelga berish
+        $dailyPlan->setRelation('items', collect($itemsArray));
 
         // Ish vaqti hisoblash
         $department = $dailyPlan->group->department;
@@ -439,7 +463,7 @@ class InternalAccountantController extends Controller
         $totalWorkMinutes = $workEnd->diffInMinutes($workStart) - $breakTime;
         $dailyPlan->total_work_minutes = $totalWorkMinutes;
 
-        // Log yozish
+        // Log
         Log::add(
             auth()->id(),
             "Plan ko'rsatildi",
@@ -454,7 +478,7 @@ class InternalAccountantController extends Controller
 
         return response()->json($dailyPlan);
     }
-
+    
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
