@@ -423,11 +423,19 @@ class InternalAccountantController extends Controller
             },
         ]);
 
-        // PHP tarafda code bo‘yicha natural tartibda sortlash
-        $dailyPlan->items = $dailyPlan->items->sort(function ($a, $b) {
-            $codeA = $a->tarification->code ?? '';
-            $codeB = $b->tarification->code ?? '';
-            return strnatcasecmp($codeA, $codeB); // Natural alphanumeric sort
+        // Tarification.code bo'yicha to'g'ri alphanumeric saralash
+        $dailyPlan->items = $dailyPlan->items->sortBy(function ($item) {
+            $code = $item->tarification->code ?? '';
+            // "A20" formatidagi kodlarni saralash uchun maxsus logika
+            if (preg_match('/^([A-Za-z]+)(\d+)$/', $code, $matches)) {
+                // Avval harf qismi, keyin son qismini olish
+                $letterPart = $matches[1];
+                $numberPart = $matches[2];
+                // Son qismini boshlang'ich nollar bilan to'ldirish (masalan, 1 -> 001)
+                $paddedNumber = str_pad($numberPart, 10, '0', STR_PAD_LEFT);
+                return strtoupper($letterPart) . $paddedNumber;
+            }
+            return $code;
         })->values();
 
         // Ish vaqti hisoblash
@@ -454,7 +462,7 @@ class InternalAccountantController extends Controller
 
         return response()->json($dailyPlan);
     }
-
+    
     public function employeeSalaryCalculation(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
