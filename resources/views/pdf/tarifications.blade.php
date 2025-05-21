@@ -20,6 +20,7 @@
             font-size: 12pt;
             font-weight: bold;
             border-bottom: 2px solid #000;
+            text-align: center;
         }
     </style>
 </head>
