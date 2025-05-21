@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static create(array $array)
  * @method static where(string $string, mixed $tarificationId)
+ * @method static updateOrCreate(array $array, array $array1)
  */
 class EmployeeTarificationLog extends Model
 {

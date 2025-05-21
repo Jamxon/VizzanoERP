@@ -451,23 +451,24 @@ class InternalAccountantController extends Controller
             'daily_plan_id' => 'required|exists:daily_plans,id',
         ]);
 
-        $employeeId = $request->input('employee_id');
-        $tarifications = $request->input('tarifications');
+        $employee = Employee::findOrFail($request->employee_id);
         $dailyPlanId = $request->input('daily_plan_id');
-
-        $employee = Employee::findOrFail($employeeId);
+        $tarifications = $request->input('tarifications');
         $oldBalance = $employee->balance;
+        $today = now()->toDateString();
 
-        // ❌ Tekshiruv: ishdan bo‘shatilganmi
+        // ✅ Check kicked
         if ($employee->status === 'kicked') {
-            return response()->json([
-                'message' => "❌ Xodim ishdan bo‘shatilgan (status: kicked). Hisob-kitob amalga oshirilmaydi."
-            ], 403);
+            return response()->json(['message' => '❌ Xodim ishdan bo‘shatilgan.'], 403);
         }
+
+        $dailyPlan = DailyPlan::findOrFail($dailyPlanId);
+        $planAlreadySubmitted = (bool) $dailyPlan->status;
+        $day = Carbon::parse($dailyPlan->date);
 
         $employeeTarificationIds = $employee->tarifications()->pluck('id')->toArray();
         $totalEarned = 0;
-        $today = now()->toDateString();
+        $totalDeducted = 0;
 
         foreach ($tarifications as $tarificationData) {
             $tarificationId = $tarificationData['id'];
@@ -476,80 +477,94 @@ class InternalAccountantController extends Controller
             $tarification = Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
             $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
 
-            $totalDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)->sum('quantity');
-            if (($totalDone + $quantity) > $orderQuantity) {
+            // Avvalgi actual qiymat (agar status true bo‘lsa)
+            $existingItem = DailyPlanItem::where('daily_plan_id', $dailyPlanId)
+                ->where('tarification_id', $tarificationId)
+                ->first();
+
+            $previousActual = ($planAlreadySubmitted && $existingItem) ? $existingItem->actual ?? 0 : 0;
+
+            // Limit tekshirish
+            $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)->sum('quantity') - $previousActual;
+            if (($alreadyDone + $quantity) > $orderQuantity) {
                 return response()->json([
-                    'message' => "❌ Tarification [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat etilgan: $orderQuantity, bajarilgan: $totalDone, qo‘shilmoqchi: $quantity"
+                    'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: $quantity"
                 ], 422);
             }
 
-            $amount = $tarification->summa * $quantity;
             $isOwn = in_array($tarificationId, $employeeTarificationIds);
+            $amount = $tarification->summa * $quantity;
+            $oldAmount = $tarification->summa * $previousActual;
 
-            // Logga yozish
-            EmployeeTarificationLog::create([
-                'employee_id' => $employee->id,
-                'tarification_id' => $tarificationId,
-                'date' => $today,
-                'quantity' => $quantity,
-                'is_own' => $isOwn,
-                'amount_earned' => $amount,
-            ]);
-
-            // Plan item actual qiymatini yangilash
-            DailyPlanItem::updateOrInsert(
+            // 🔄 Log update or create
+            EmployeeTarificationLog::updateOrCreate(
                 [
-                    'daily_plan_id' => $dailyPlanId,
+                    'employee_id' => $employee->id,
                     'tarification_id' => $tarificationId,
+                    'date' => $day->toDateString(),
                 ],
                 [
-                    'actual' => DB::raw("COALESCE(actual, 0) + $quantity"),
-                    'updated_at' => now(),
+                    'quantity' => $quantity,
+                    'is_own' => $isOwn,
+                    'amount_earned' => $amount
                 ]
             );
 
+            // 🔄 DailyPlanItem update or create
+            DailyPlanItem::updateOrCreate(
+                [
+                    'daily_plan_id' => $dailyPlanId,
+                    'tarification_id' => $tarificationId
+                ],
+                [
+                    'actual' => $quantity,
+                    'updated_at' => now()
+                ]
+            );
 
             $totalEarned += $amount;
+            $totalDeducted += $oldAmount;
         }
 
-        // Daily plan statusini to'g'rilash
-        DailyPlan::where('id', $dailyPlanId)->update(['status' => true]);
-
-        // Balansga qo‘shish (agar piece_work bo‘lsa)
+        // ✅ Balansni yangilash
         $balanceUpdated = false;
         if ($employee->payment_type === 'piece_work') {
-            $employee->increment('balance', $totalEarned);
+            $diff = $totalEarned - ($planAlreadySubmitted ? $totalDeducted : 0);
+            $employee->increment('balance', $diff);
             $balanceUpdated = true;
         }
 
-        // Log yozish
+        // ✅ Plan statusini yangilash (agar hali false bo‘lsa)
+        if (!$planAlreadySubmitted) {
+            $dailyPlan->update(['status' => true]);
+        }
+
+        // 🔐 Log
         Log::add(
             auth()->id(),
-            "Hisob-kitob amalga oshirildi",
+            "Hisob-kitob " . ($planAlreadySubmitted ? 'yangilandi' : 'yaratildi'),
             'accounting',
+            null,
             [
                 'employee_id' => $employee->id,
                 'employee_name' => $employee->name,
                 'old_balance' => $oldBalance,
+                'new_balance' => $employee->balance,
                 'total_earned' => $totalEarned,
-            ],
-            [
-                'employee_id' => $employee->id,
-                'employee_name' => $employee->name,
-                'total_earned' => $totalEarned,
-                'balance_updated' => $balanceUpdated,
+                'total_deducted' => $planAlreadySubmitted ? $totalDeducted : 0,
             ]
         );
 
         return response()->json([
             'message' => $balanceUpdated
-                ? '✅ Hisob-kitob muvaffaqiyatli yakunlandi va balans yangilandi.'
-                : 'ℹ️ Hisob-kitob bajarildi, lekin xodimning payment_type `piece_work` bo‘lmagani sababli balansga qo‘shilmadi.',
-            'employee' => $employee->name,
-            'payment_type' => $employee->payment_type,
+                ? ($planAlreadySubmitted ? '♻️ Reja yangilandi va balans farqi hisoblandi' : '✅ Reja birinchi marta yuborildi va balansga qo‘shildi')
+                : 'ℹ️ Balansga qo‘shilmadi (payment_type mos emas)',
             'total_earned' => round($totalEarned, 2),
+            'balance_diff' => round($totalEarned - ($planAlreadySubmitted ? $totalDeducted : 0), 2),
+            'employee' => $employee->name,
             'balance_updated' => $balanceUpdated
         ]);
     }
+
 
 }
