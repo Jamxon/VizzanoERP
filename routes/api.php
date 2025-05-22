@@ -151,6 +151,11 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::post('orderCuts/{id}',[\App\Http\Controllers\GroupMasterController::class, 'receiveOrderCut']);
        Route::get('plans',[GroupMasterController::class, 'getPlans']);
        Route::post('receiveOrder',[GroupMasterController::class, 'receiveOrder']);
+       Route::get('orders2/{id}',[InternalAccountantController::class, 'showOrder']);
+       Route::get('users2', [TechnologController::class, 'getEmployerByDepartment']);
+       Route::get('dailyPlan', [InternalAccountantController::class, 'generateDailyPlan']);
+       Route::get('dailyPlan/employee', [InternalAccountantController::class, 'generateDailyPlanForOneEmployee']);
+
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
