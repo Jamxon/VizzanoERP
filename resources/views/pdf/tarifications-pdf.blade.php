@@ -51,7 +51,7 @@
     <tr>
         <td><strong>Buyurtma:</strong> {{ $submodel->orderModel->order->id ?? '-' }}</td>
         <td><strong>Model:</strong> {{ $submodel->orderModel->model->name ?? '-' }}</td>
-        <td><strong></strong> {{ $submodel->submodel->name ?? '-' }}</td>
+        <td><strong></strong> {{ $submodel->submodel->name ?? '-' }} 2</td>
     </tr>
 </table>
 
