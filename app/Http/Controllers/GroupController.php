@@ -32,6 +32,11 @@ class GroupController extends Controller
         return response()->json($group);
     }
 
+    public function show(Group $group): \Illuminate\Http\JsonResponse
+    {
+        return response()->json($group, 200);
+    }
+
     public function update(Request $request, Group $group): \Illuminate\Http\JsonResponse
     {
         try {
