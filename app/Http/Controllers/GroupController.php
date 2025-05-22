@@ -34,16 +34,20 @@ class GroupController extends Controller
 
     public function update(Request $request, Group $group): \Illuminate\Http\JsonResponse
     {
-        dd($group);
-        $group->update([
+        try {
+            $group->update([
                 'name' => $request->name ?? $group->name,
                 'department_id' => $request->department_id ?? $group->department_id,
                 'responsible_user_id' => $request->responsible_user_id ?? $group->responsible_user_id,
-        ]);
-
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Xatolik: ' . $e->getMessage()
+            ], 500);
+        }
         return response()->json([
             'message' => 'Group updated successfully',
-            'group' => $group,
+            'group' => $group
         ], 200);
     }
 
