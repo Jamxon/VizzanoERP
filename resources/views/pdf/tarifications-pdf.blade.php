@@ -5,7 +5,12 @@
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 10pt; }
         h2 { text-align: center; margin-bottom: 10px; }
-        .header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .header {
+            width:  100%;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
         .header div { font-size: 10pt; }
         table {
             width: 100%;
@@ -27,9 +32,6 @@
     </style>
 </head>
 <body>
-
-<h2>Tarifikatsiya Ro'yxati</h2>
-
 <div class="header">
     <div>Buyurtma: {{ $submodel->orderModel->order->id ?? '-' }}</div>
     <div>Model: {{ $submodel->orderModel->model->name ?? '-' }}</div>
