@@ -278,6 +278,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::get('export-specification',[TechnologController::class,'exportSpecification']);
     Route::post('import-specification',[TechnologController::class,'importSpecification']);
     Route::get('tarifications/pdf', [TechnologController::class, 'exportTarificationsPdf']);
+    Route::get('tarification/pdf', [TechnologController::class, 'exportPdf']);
     Route::get('export-items', [ItemController::class, 'export']);
     Route::get('models', [ModelController::class, 'index']);
     Route::get('models/{model}', [ModelController::class, 'show']);

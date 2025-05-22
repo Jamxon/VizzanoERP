@@ -1179,4 +1179,24 @@ class TechnologController extends Controller
         return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
 
+    public function exportPdf(Request $request)
+    {
+        $request->validate([
+            'submodel_id' => 'required|exists:order_sub_models,id',
+            'size' => 'required',
+            'quantity' => 'required',
+        ]);
+
+        $submodel = OrderSubmodel::with([
+            'tarificationCategories.tarifications.razryad',
+            'tarificationCategories.tarifications.typewriter',
+            'tarificationCategories.tarifications.employee:id,name'
+        ])->findOrFail($request->submodel_id);
+
+        $pdf = Pdf::loadView('pdf.tarifications-pdf', [
+            'submodel' => $submodel
+        ])->setPaper('A4', 'portrait');
+
+        return $pdf->download("tarifikatsiya_ro'yxati.pdf");
+    }
 }
