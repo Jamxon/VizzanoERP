@@ -299,6 +299,12 @@ class InternalAccountantController extends Controller
         $totalEarned = 0;
         $assigned = [];
 
+        if ($tasks->isEmpty()) {
+            return response()->json([
+                'message' => "❌ Xodim [{$employee->name}] uchun bironta ham tarifikatsiya topilmadi. Avval unga ish biriktiring!"
+            ], 422);
+        }
+
         foreach ($tasks as $task) {
             if ($remainingMinutes >= $task['minutes']) {
                 $count = 1;
