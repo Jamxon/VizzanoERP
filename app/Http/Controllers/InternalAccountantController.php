@@ -40,6 +40,15 @@ class InternalAccountantController extends Controller
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
+        if (auth()->user()->role->name === 'groupMaster'){
+            $orderGroup = $order->orderModel->submodels->group->group_id;
+            $userGroup = auth()->user()->group->id;
+
+            if ($orderGroup !== $userGroup) {
+                return response()->json(['message' => 'Sizga tegishli buyurtma emas!'], 403);
+            }
+        }
+
         $order->load(
             'orderModel',
             'orderModel.model',
