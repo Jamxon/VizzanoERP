@@ -155,6 +155,8 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::get('users2', [TechnologController::class, 'getEmployerByDepartment']);
        Route::get('dailyPlan', [InternalAccountantController::class, 'generateDailyPlan']);
        Route::get('dailyPlan/employee', [InternalAccountantController::class, 'generateDailyPlanForOneEmployee']);
+       Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
+       Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
 
 });
 
