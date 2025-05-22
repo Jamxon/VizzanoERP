@@ -36,7 +36,11 @@ class GroupController extends Controller
     {
         $groups = Group::find($group->id);
 
-        $groups->update($request->all());
+        $groups->update([
+                'name' => $request->name ?? $groups->name,
+                'department_id' => $request->department_id ?? $groups->department_id,
+                'responsible_user_id' => $request->responsible_user_id ?? $groups->responsible_user_id,
+        ]);
 
         return response()->json([
             'message' => 'Group updated successfully',
