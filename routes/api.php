@@ -268,6 +268,8 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::post('attendances', [AttendanceController::class, 'storeAttendance']);
     Route::patch('attendances/{attendance}', [AttendanceController::class, 'updateAttendance']);
     Route::post('employees/store', [SuperHRController::class, 'storeFastEmployee']);
+    Route::post('groups', [GroupController::class, 'store']);
+    Route::patch('groups/{group}', [GroupController::class, 'update']);
 });
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {
