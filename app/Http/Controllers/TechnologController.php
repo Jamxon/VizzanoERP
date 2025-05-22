@@ -1179,7 +1179,7 @@ class TechnologController extends Controller
         return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
 
-    public function exportPdf(Request $request)
+    public function exportPdf(Request $request): \Illuminate\Http\Response
     {
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
