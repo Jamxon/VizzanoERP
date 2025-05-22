@@ -51,7 +51,6 @@ class GroupController extends Controller
         ], 200);
     }
 
-
     public function delete(Group $group): \Illuminate\Http\JsonResponse
     {
        if ($group->delete()){
