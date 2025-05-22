@@ -28,7 +28,7 @@
 </head>
 <body>
 
-<h2>📋 Tarifikatsiya Ro'yxati</h2>
+<h2>Tarifikatsiya Ro'yxati</h2>
 
 <div class="header">
     <div>Buyurtma: {{ $submodel->orderModel->order->id ?? '-' }}</div>
