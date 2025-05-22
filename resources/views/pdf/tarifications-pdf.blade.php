@@ -31,11 +31,13 @@
     </style>
 </head>
 <body>
-<div class="header">
-    <div>Buyurtma: {{ $submodel->orderModel->order->id ?? '-' }}</div>
-    <div>Model: {{ $submodel->orderModel->model->name ?? '-' }}</div>
-    <div>{{ $submodel->submodel->name }}</div>
-</div>
+<table style="width: 100%; margin-bottom: 10px; font-size: 10pt;">
+    <tr>
+        <td><strong>Buyurtma:</strong> {{ $submodel->orderModel->order->id ?? '-' }}</td>
+        <td><strong>Model:</strong> {{ $submodel->orderModel->model->name ?? '-' }}</td>
+        <td><strong>Submodel:</strong> {{ $submodel->submodel->name ?? '-' }}</td>
+    </tr>
+</table>
 
 <table>
     <thead>
