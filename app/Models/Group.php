@@ -18,6 +18,8 @@ class Group extends Model
 {
     use HasFactory;
 
+    protected $table = 'groups';
+
     protected $fillable = [
         'name',
         'department_id',
@@ -27,7 +29,6 @@ class Group extends Model
     protected $hidden = [
         'created_at',
         'updated_at',
-        'responsible_user_id',
     ];
 
     public function responsibleUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
