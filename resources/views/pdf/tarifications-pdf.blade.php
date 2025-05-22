@@ -3,27 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { font-family: DejaVu Sans, sans-serif; font-size: 10pt; }
-        h2 { text-align: center; margin-bottom: 10px; }
-        .header {
-            width:  100%;
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+        body {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 10pt;
+            margin: 0;
+            padding: 0;
         }
-        .header div { font-size: 10pt; }
-        table {
+        h2 {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .order-info {
+            width: 100%;
+            font-size: 10pt;
+            margin: 0 0 5px 0;
+            border: none;
+            border-collapse: collapse;
+        }
+        .order-info td {
+            border: none;
+            padding: 2px 4px;
+        }
+
+        table.main-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin: 0;
         }
-        th, td {
+        table.main-table td {
             border: 1px solid #000;
             text-align: center;
             vertical-align: middle;
+            padding: 4px;
         }
-        th {
+        .th-style {
             background-color: #f2f2f2;
+            font-weight: bold;
         }
         .barcode {
             margin-top: 3px;
@@ -31,31 +47,31 @@
     </style>
 </head>
 <body>
-<table style="width: 100%; margin-bottom: 10px; font-size: 10pt;">
+<table class="order-info">
     <tr>
         <td><strong>Buyurtma:</strong> {{ $submodel->orderModel->order->id ?? '-' }}</td>
         <td><strong>Model:</strong> {{ $submodel->orderModel->model->name ?? '-' }}</td>
-        <td><strong>Submodel:</strong> {{ $submodel->submodel->name ?? '-' }}</td>
+        <td><strong></strong> {{ $submodel->submodel->name ?? '-' }}</td>
     </tr>
 </table>
 
-<table>
-    <thead>
-    <tr>
-        <th>No</th>
-        <th>Razmer</th>
-        <th>Operatsiya nomi</th>
-        <th>Soni</th>
-        <th>Sekund</th>
-        <th>Narxi</th>
-        <th>Operatsiya kodi</th>
-        <th>Shtrix kod</th>
-    </tr>
-    </thead>
+<table class="main-table">
     <tbody>
     @php $i = 1; @endphp
     @foreach($submodel->tarificationCategories as $category)
         @foreach($category->tarifications as $tarification)
+            @if($i === 1)
+                <tr class="th-style">
+                    <td>No</td>
+                    <td>Razmer</td>
+                    <td>Operatsiya nomi</td>
+                    <td>Soni</td>
+                    <td>Sekund</td>
+                    <td>Narxi</td>
+                    <td>Operatsiya kodi</td>
+                    <td>Shtrix kod</td>
+                </tr>
+            @endif
             <tr>
                 <td>{{ $i++ }}</td>
                 <td>{{ request()->input('size') }}</td>
@@ -72,6 +88,5 @@
     @endforeach
     </tbody>
 </table>
-
 </body>
 </html>
