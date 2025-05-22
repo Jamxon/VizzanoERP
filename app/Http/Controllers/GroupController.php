@@ -34,6 +34,7 @@ class GroupController extends Controller
 
     public function update(Request $request, Group $group): \Illuminate\Http\JsonResponse
     {
+        dd($group);
         $group->update([
                 'name' => $request->name ?? $group->name,
                 'department_id' => $request->department_id ?? $group->department_id,
