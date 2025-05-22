@@ -319,7 +319,7 @@ class InternalAccountantController extends Controller
         if ($tasks->isEmpty()) {
             return response()->json([
                 'message' => "❌ Xodim [{$employee->name}] uchun bironta ham tarifikatsiya topilmadi. Avval unga ish biriktiring!"
-            ], 422);
+            ], 500);
         }
 
         foreach ($tasks as $task) {
