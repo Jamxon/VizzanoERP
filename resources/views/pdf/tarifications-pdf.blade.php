@@ -31,8 +31,8 @@
 <h2>📋 Tarifikatsiya Ro'yxati</h2>
 
 <div class="header">
-    <div>📦 Buyurtma: {{ $submodel->orderModel->order->id ?? '-' }}</div>
-    <div>🧵 Model: {{ $submodel->orderModel->model->name ?? '-' }}</div>
+    <div>Buyurtma: {{ $submodel->orderModel->order->id ?? '-' }}</div>
+    <div>Model: {{ $submodel->orderModel->model->name ?? '-' }}</div>
     <div>{{ $submodel->submodel->name }}</div>
 </div>
 
