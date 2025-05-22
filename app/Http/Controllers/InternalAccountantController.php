@@ -268,7 +268,7 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan.pdf');
     }
 
-    public function generateDailyPlanForOneEmployee(Request $request): \Illuminate\Http\Response
+    public function generateDailyPlanForOneEmployee(Request $request)
     {
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
