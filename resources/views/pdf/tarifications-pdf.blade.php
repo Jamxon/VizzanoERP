@@ -43,8 +43,8 @@
         <th>Razmer</th>
         <th>Operatsiya nomi</th>
         <th>Soni</th>
-        <th>Narxi</th>
         <th>Sekund</th>
+        <th>Narxi</th>
         <th>Operatsiya kodi</th>
         <th>Shtrix kod</th>
     </tr>
@@ -58,8 +58,8 @@
                 <td>{{ request()->input('size') }}</td>
                 <td>{{ $tarification->name }}</td>
                 <td>{{ request()->input('quantity') }}</td>
-                <td>{{ number_format($tarification->summa, 0, ',', ' ') }}</td>
                 <td>{{ $tarification->second }}</td>
+                <td>{{ number_format($tarification->summa, 0, ',', ' ') }}</td>
                 <td>{{ $tarification->code }}</td>
                 <td class="barcode">
                     <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $tarification->code, 'C128', 1.2, 30) }}" alt="barcode">
