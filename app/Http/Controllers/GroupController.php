@@ -34,12 +34,10 @@ class GroupController extends Controller
 
     public function update(Request $request, Group $group): \Illuminate\Http\JsonResponse
     {
-        $groups = Group::find($group->id);
-
-        $groups->update([
-                'name' => $request->name ?? $groups->name,
-                'department_id' => $request->department_id ?? $groups->department_id,
-                'responsible_user_id' => $request->responsible_user_id ?? $groups->responsible_user_id,
+        $group->update([
+                'name' => $request->name ?? $group->name,
+                'department_id' => $request->department_id ?? $group->department_id,
+                'responsible_user_id' => $request->responsible_user_id ?? $group->responsible_user_id,
         ]);
 
         return response()->json([
