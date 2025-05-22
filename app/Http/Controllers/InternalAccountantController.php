@@ -40,6 +40,8 @@ class InternalAccountantController extends Controller
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
+        dd($order);
+
         $order->load(
             'orderModel',
             'orderModel.model',
