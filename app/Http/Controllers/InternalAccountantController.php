@@ -40,15 +40,23 @@ class InternalAccountantController extends Controller
 
     public function showOrder(Order $order): \Illuminate\Http\JsonResponse
     {
-        if (auth()->user()->role->name === 'groupMaster'){
-            $orderGroup = $order->orderModel->submodels->group->group_id;
-            $userGroup = auth()->user()->group->id;
+        $user = auth()->user();
 
-            if ($orderGroup !== $userGroup) {
-                return response()->json(['message' => 'Sizga tegishli buyurtma emas!'], 403);
+        // Faqat 'groupMaster' bo‘lsa va guruh tekshiruvi kerak bo‘lsa
+        if ($user->role->name === 'groupMaster') {
+            $userGroupId = $user->group->id ?? null;
+
+            // Buyurtmaga tegishli submodellardan birortasi foydalanuvchining guruhiga tegishlimi?
+            $matched = $order->orderModel->submodels->contains(function ($submodel) use ($userGroupId) {
+                return optional($submodel->group)->group_id === $userGroupId;
+            });
+
+            if (!$matched) {
+                return response()->json(['message' => '❌ Bu buyurtma sizning guruhingizga tegishli emas.'], 403);
             }
         }
 
+        // Kerakli ma’lumotlarni yuklash
         $order->load(
             'orderModel',
             'orderModel.model',
