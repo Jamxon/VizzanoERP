@@ -646,7 +646,6 @@ class InternalAccountantController extends Controller
                 'tarification.razryad:id,name',
                 'tarification.typewriter:id,name',
                 'tarification.employee:id,name',
-
             ]);
 
             if ($boxTarification->status === 'completed') {
@@ -693,7 +692,7 @@ class InternalAccountantController extends Controller
                     ]
                 );
 
-                $boxTarification->employee = $employee;
+                $boxTarification->setRelation('employee', $employee);
 
                 return response()->json($boxTarification);
             }
