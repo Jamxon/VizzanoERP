@@ -144,7 +144,6 @@ class CuttingMasterController extends Controller
     {
         $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
-            'cut_at' => 'required|date',
             'quantity' => 'required|integer',
             'submodel_id' => 'required|integer|exists:order_sub_models,id',
             'size_id' => 'required|integer|exists:order_sizes,id',
@@ -155,7 +154,7 @@ class CuttingMasterController extends Controller
             $orderCut = OrderCut::create([
                 'order_id' => $data['order_id'],
                 'user_id' => auth()->user()->id,
-                'cut_at' => Carbon::parse($data['cut_at']),
+                'cut_at' => Carbon::parse(now())->format('Y-m-d H:i:s'),
                 'quantity' => $data['quantity'],
                 'status' => 'pending',
                 'submodel_id' => $data['submodel_id'],
