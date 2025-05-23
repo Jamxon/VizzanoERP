@@ -78,4 +78,17 @@ class UserController extends Controller
         $options = ['cost' => 12];
         return password_hash($password, PASSWORD_BCRYPT, $options);
     }
+
+    public function show(User $user): \Illuminate\Http\JsonResponse
+    {
+        $employee = Employee::where('user_id', $user->id)->first();
+
+        if (!$employee) {
+            return response()->json(['error' => 'Employee not found'], 404);
+        }
+
+        $resource = new GetUserResource($employee);
+
+        return response()->json($resource);
+    }
 }

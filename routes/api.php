@@ -271,6 +271,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::post('groups', [GroupController::class, 'store']);
     Route::patch('groups/{group}', [GroupController::class, 'update']);
     Route::get('groups/{group}', [GroupController::class, 'show']);
+    Route::get('users/{user}', [UserController::class, 'show']);
 });
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {
