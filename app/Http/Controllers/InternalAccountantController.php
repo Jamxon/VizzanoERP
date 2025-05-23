@@ -659,6 +659,12 @@ class InternalAccountantController extends Controller
             'tarification.employee:id,name'
         ]);
 
+        if ($boxTarification->status === 'completed') {
+            return response()->json(['message' => '❌ Bu operatsiya allaqachon bajarilgan!'], 403);
+        }elseif ($boxTarification->status === 'inactive') {
+            return response()->json(['message' => '❌ Bu operatsiya bekor qilingan!'], 403);
+        }
+
         $isOwn = Tarification::where('user_id', $request->employee_id)
             ->where('id', $boxTarification->tarification_id)
             ->exists();
