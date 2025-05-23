@@ -309,6 +309,9 @@ class CuttingMasterController extends Controller
             'status' => 'inactive'
         ]);
 
+        $data['submodel'] = $boxTarification->submodel;
+        $data['size'] = $boxTarification->size->size->name ?? '-';
+
         $pdf = Pdf::loadView('pdf.tarifications-pdf', [
             'boxes' => [$data],
             'totalQuantity' => $data['quantity'],
