@@ -44,6 +44,8 @@
 </head>
 <body>
 
+$sizeName = $size;
+
 @foreach($boxes as $index => $box)
     @if($index > 0)
         <div class="page-break"></div>
@@ -80,7 +82,7 @@
             @foreach($category->tarifications as $tarification)
                 <tr>
                     <td>{{ $i++ }}</td>
-                    <td>{{ $boxes['size'] }}</td>
+                    <td>{{ $sizeName }}</td>
                     <td style="text-align: left;">{{ $tarification->name }}</td>
                     <td>{{ $box['quantity'] }}</td>
                     <td>{{ $tarification->second }}</td>
