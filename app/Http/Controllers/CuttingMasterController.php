@@ -211,7 +211,7 @@ class CuttingMasterController extends Controller
             'user_id' => auth()->user()->id,
             'cut_at' => now()->format('Y-m-d H:i:s'),
             'quantity' => $data['quantity'],
-            'status' => 'active',
+            'status' => false,
             'submodel_id' => $data['submodel_id'],
             'size_id' => $data['size_id'],
         ]);
