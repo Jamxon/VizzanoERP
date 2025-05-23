@@ -151,13 +151,23 @@ class GroupMasterController extends Controller
 
             if ($order && $order->orderModel) {
                 $linkedSubmodelIds = $orderGroups->pluck('submodel_id')->unique();
+
                 $order->orderModel->submodels = $order->orderModel->submodels
                     ->whereIn('id', $linkedSubmodelIds)
                     ->values();
+
+                // Tikilgan umumiy sonni hisoblash
+                $totalSewn = $order->orderModel->submodels->flatMap(function ($submodel) {
+                    return $submodel->sewingOutputs;
+                })->sum('quantity');
+
+                // Dinamik property qo‘shish yoki resource ichida ishlatish
+                $order->total_sewn_quantity = $totalSewn;
             }
 
             return $firstOrderGroup;
         })->values();
+
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
