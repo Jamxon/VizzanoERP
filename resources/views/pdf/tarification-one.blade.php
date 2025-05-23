@@ -74,7 +74,7 @@
         <td>{{ number_format($box->tarification->summa, 0, ',', ' ') }}</td>
         <td>{{ $box->tarification->code ?? '-' }}</td>
         <td class="barcode">
-            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $box->id, 'C128', 1.0, 30) }}" alt="barcode">
+            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG('A' . (string) $box->id, 'C128', 1.0, 30) }}" alt="barcode">
         </td>
     </tr>
     </tbody>
