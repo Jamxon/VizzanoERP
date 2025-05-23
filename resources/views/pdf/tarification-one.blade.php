@@ -68,7 +68,7 @@
     <tr>
         <td>{{ $boxes[0]['id'] }}</td>
         <td>{{ $size }}</td>
-        <td style="text-align: left;">{{ $boxes[0]['tarification']->name ?? '-' }}</td>
+        <td style="text-align: left;">{{ $boxes[0]->tarification->name ?? '-' }}</td>
         <td>{{ $boxes[0]['quantity'] }}</td>
         <td>{{ $boxes[0]['tarification']->second ?? '-' }}</td>
         <td>{{ number_format($boxes[0]['price'], 0, ',', ' ') }}</td>
