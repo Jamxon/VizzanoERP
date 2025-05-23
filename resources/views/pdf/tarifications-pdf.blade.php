@@ -80,7 +80,7 @@
             @foreach($category->tarifications as $tarification)
                 <tr>
                     <td>{{ $i++ }}</td>
-                    <td>{{ $box['size'] }}</td>
+                    <td>{{ $box['size_id'] }}</td>
                     <td style="text-align: left;">{{ $tarification->name }}</td>
                     <td>{{ $box['quantity'] }}</td>
                     <td>{{ $tarification->second }}</td>
