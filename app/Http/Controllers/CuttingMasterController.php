@@ -312,7 +312,7 @@ class CuttingMasterController extends Controller
         $data['submodel'] = $boxTarification->submodel;
         $data['size'] = $boxTarification->size->size->name ?? '-';
 
-        $pdf = Pdf::loadView('pdf.tarifications-one', [
+        $pdf = Pdf::loadView('pdf.tarification-one', [
             'boxes' => [$data],
             'totalQuantity' => $data['quantity'],
             'totalBoxes' => 1,
