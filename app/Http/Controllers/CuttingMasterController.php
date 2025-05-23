@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BoxTarification;
 use App\Http\Resources\GetOrderCutResource;
 use App\Http\Resources\GetSpecificationResource;
 use App\Http\Resources\showOrderCuttingMasterResource;
@@ -143,82 +144,6 @@ class CuttingMasterController extends Controller
         return response()->json($resource);
     }
 
-    public function markAsCutAndExportMultiplePdfs(Request $request): \Illuminate\Http\Response
-    {
-        $data = $request->validate([
-            'order_id' => 'required|integer|exists:orders,id',
-            'quantity' => 'required|integer|min:1',
-            'submodel_id' => 'required|integer|exists:order_sub_models,id',
-            'size_id' => 'required|integer|exists:order_sizes,id',
-            'box_capacity' => 'required|integer|min:1',
-        ]);
-
-        // Memory va time limitlarini sozlash
-        ini_set('memory_limit', '2G');
-        set_time_limit(0);
-
-        // Ma'lumotlarni olish
-        $submodel = OrderSubmodel::with([
-            'orderModel.order:id,name',
-            'orderModel.model:id,name',
-            'submodel:id,name',
-            'tarificationCategories.tarifications.razryad:id,name',
-            'tarificationCategories.tarifications.typewriter:id,name',
-            'tarificationCategories.tarifications.employee:id,name'
-        ])->findOrFail($data['submodel_id']);
-
-        $sizeName = OrderSize::find($data['size_id'])->name ?? '-';
-        $totalQuantity = $data['quantity'];
-        $capacity = $data['box_capacity'];
-        $boxes = intdiv($totalQuantity, $capacity);
-        $remainder = $totalQuantity % $capacity;
-
-        // Barcha quti ma'lumotlarini tayyorlash
-        $pdfBoxes = [];
-
-        // To'liq qutilar
-        for ($i = 0; $i < $boxes; $i++) {
-            $pdfBoxes[] = [
-                'box_number' => $i + 1,
-                'quantity' => $capacity,
-                'submodel' => $submodel,
-                'size' => $sizeName,
-            ];
-        }
-
-        // Qolgan quantity
-        if ($remainder > 0) {
-            $pdfBoxes[] = [
-                'box_number' => $boxes + 1,
-                'quantity' => $remainder,
-                'submodel' => $submodel,
-                'size' => $sizeName,
-            ];
-        }
-
-        // Bitta PDF yaratish
-        $fileName = 'kesish_tarifikatsiyasi_' . now()->format('Ymd_His') . '.pdf';
-
-        $pdf = Pdf::loadView('pdf.tarifications-pdf', [
-            'boxes' => $pdfBoxes,
-            'totalQuantity' => $totalQuantity,
-            'totalBoxes' => count($pdfBoxes),
-            'submodel' => $submodel,
-            'size' => $sizeName,
-            'order_id' => $data['order_id'],
-        ])
-            ->setPaper('A4', 'portrait')
-            ->setOptions([
-                'isHtml5ParserEnabled' => true,
-                'isRemoteEnabled' => true,
-                'defaultFont' => 'sans-serif',
-                'dpi' => 96,
-                'enable_php' => false
-            ]);
-
-        return $pdf->download($fileName);
-    }
-
     public function getCuts($id): \Illuminate\Http\JsonResponse
     {
         $cuts = OrderCut::where('order_id', $id)
@@ -266,5 +191,102 @@ class CuttingMasterController extends Controller
                 'error' => $e->getMessage()
             ], 400);
         }
+    }
+
+    public function markAsCutAndExportMultiplePdfs(Request $request): \Illuminate\Http\Response
+    {
+        $data = $request->validate([
+            'order_id' => 'required|integer|exists:orders,id',
+            'quantity' => 'required|integer|min:1',
+            'submodel_id' => 'required|integer|exists:order_sub_models,id',
+            'size_id' => 'required|integer|exists:order_sizes,id',
+            'box_capacity' => 'required|integer|min:1',
+        ]);
+
+        ini_set('memory_limit', '2G');
+        set_time_limit(0);
+
+        OrderCut::create([
+            'order_id' => $data['order_id'],
+            'user_id' => auth()->user()->id,
+            'cut_at' => now()->format('Y-m-d H:i:s'),
+            'quantity' => $data['quantity'],
+            'status' => 'active',
+            'submodel_id' => $data['submodel_id'],
+            'size_id' => $data['size_id'],
+        ]);
+
+        $submodel = OrderSubmodel::with([
+            'orderModel.order:id,name',
+            'orderModel.model:id,name',
+            'submodel:id,name',
+            'tarificationCategories.tarifications.razryad:id,name',
+            'tarificationCategories.tarifications.typewriter:id,name',
+            'tarificationCategories.tarifications.employee:id,name'
+        ])->findOrFail($data['submodel_id']);
+
+        $sizeName = OrderSize::find($data['size_id'])->name ?? '-';
+        $totalQuantity = $data['quantity'];
+        $capacity = $data['box_capacity'];
+        $boxes = intdiv($totalQuantity, $capacity);
+        $remainder = $totalQuantity % $capacity;
+
+        $pdfBoxes = [];
+        $boxNumber = 1;
+
+        for ($i = 0; $i < $boxes; $i++) {
+            $pdfBoxes[] = $this->storeBoxTarifications(
+                $boxNumber++, $capacity, $data, $submodel, $sizeName
+            );
+        }
+
+        if ($remainder > 0) {
+            $pdfBoxes[] = $this->storeBoxTarifications(
+                $boxNumber, $remainder, $data, $submodel, $sizeName
+            );
+        }
+
+        $pdf = Pdf::loadView('pdf.tarifications-pdf', [
+            'boxes' => $pdfBoxes,
+            'totalQuantity' => $totalQuantity,
+            'totalBoxes' => count($pdfBoxes),
+            'submodel' => $submodel,
+            'size' => $sizeName,
+            'order_id' => $data['order_id'],
+        ])->setPaper('A4', 'portrait');
+
+        return $pdf->download('kesish_tarifikatsiyasi_' . now()->format('Ymd_His') . '.pdf');
+    }
+
+    private function storeBoxTarifications($boxNumber, $quantity, $data, $submodel, $sizeName): array
+    {
+        $records = [];
+        foreach ($submodel->tarificationCategories as $category) {
+            foreach ($category->tarifications as $tarification) {
+                $total = $tarification->summa * $quantity;
+
+                $record = BoxTarification::create([
+                    'order_id' => $data['order_id'],
+                    'submodel_id' => $data['submodel_id'],
+                    'tarification_id' => $tarification->id,
+                    'size_id' => $data['size_id'],
+                    'quantity' => $quantity,
+                    'price' => $tarification->summa,
+                    'total' => $total,
+                    'status' => 'active',
+                ]);
+
+                $tarification->box_tarification_id = $record->id; // PDF uchun
+                $records[] = $tarification;
+            }
+        }
+
+        return [
+            'box_number' => $boxNumber,
+            'quantity' => $quantity,
+            'submodel' => $submodel,
+            'size' => $sizeName,
+            'tarifications' => $records
+        ];
     }
 }
