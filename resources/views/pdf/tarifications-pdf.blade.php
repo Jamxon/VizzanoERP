@@ -44,6 +44,8 @@
 </head>
 <body>
 
+{{ dd($boxes) }}
+
 @foreach($boxes as $index => $box)
     @if($index > 0)
         <div class="page-break"></div>
