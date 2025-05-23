@@ -289,4 +289,35 @@ class CuttingMasterController extends Controller
             'tarifications' => $records
         ];
     }
+
+    public function updateBoxTarification(BoxTarification $boxTarification): \Illuminate\Http\Response
+    {
+        $data = $boxTarification->toArray();
+
+        BoxTarification::create([
+            'order_id' => $data['order_id'],
+            'submodel_id' => $data['submodel_id'],
+            'tarification_id' => $data['tarification_id'],
+            'size_id' => $data['size_id'],
+            'quantity' => $data['quantity'],
+            'price' => $data['price'],
+            'total' => $data['total'],
+            'status' => 'active',
+        ]);
+
+        $boxTarification->update([
+            'status' => 'inactive'
+        ]);
+
+        $pdf = Pdf::loadView('pdf.tarifications-pdf', [
+            'boxes' => [$data],
+            'totalQuantity' => $data['quantity'],
+            'totalBoxes' => 1,
+            'submodel' => $data['submodel'],
+            'size' => $data['size'],
+            'order_id' => $data['order_id'],
+        ])->setPaper('A4', 'portrait');
+
+        return $pdf->download('kesish_tarifikatsiyasi_' . now()->format('Ymd_His') . '.pdf');
+    }
 }
