@@ -725,5 +725,4 @@ class InternalAccountantController extends Controller
         }
     }
 
-
 }
