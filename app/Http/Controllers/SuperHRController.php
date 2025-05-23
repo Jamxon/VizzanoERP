@@ -355,6 +355,7 @@ class SuperHRController extends Controller
                     'img' => $img ?? $employee->img ?? null,
                     'salary' => $request->salary ?? null,
                     'kicked_date' => null,
+                    'status' => $request->status ?? 'working',
                 ]);
             }
 

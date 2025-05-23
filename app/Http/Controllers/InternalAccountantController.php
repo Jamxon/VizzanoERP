@@ -648,7 +648,7 @@ class InternalAccountantController extends Controller
         return response()->json($tarification);
     }
 
-    public function boxTarificationShow(BoxTarification $boxTarification): \Illuminate\Http\JsonResponse
+    public function boxTarificationShow(BoxTarification $boxTarification, Request $request): \Illuminate\Http\JsonResponse
     {
         $boxTarification->load([
             'submodel.orderModel.order:id,name',
@@ -657,6 +657,11 @@ class InternalAccountantController extends Controller
             'tarification.razryad:id,name',
             'tarification.typewriter:id,name',
             'tarification.employee:id,name'
+        ]);
+
+        $employeeTarificationLog = EmployeeTarificationLog::create([
+            'employee_id' => $request->employee_id,
+            'tarification_id' => $boxTarification->tarification_id,
         ]);
 
         return response()->json($boxTarification);
