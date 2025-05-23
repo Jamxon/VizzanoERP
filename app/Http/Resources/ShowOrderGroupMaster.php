@@ -14,11 +14,14 @@ class ShowOrderGroupMaster extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $remainAmount = 0;
+        $orderQuantity = $this->orderModel->order->quantity ?? 0;
 
-        $this->orderModel->submodels->each(function ($submodel) use (&$remainAmount) {
-            $remainAmount += $submodel->quantity - $submodel->sewingOutputs->sum('quantity');
+        $totalSewn = $this->orderModel->submodels->sum(function ($submodel) {
+            return $submodel->sewingOutputs->sum('quantity');
         });
+
+        $remainAmount = $orderQuantity - $totalSewn;
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -28,6 +31,7 @@ class ShowOrderGroupMaster extends JsonResource
             'rasxod' => $this->rasxod,
             'status' => $this->status,
             'comment' => $this->comment,
+            'remainAmount' => $remainAmount,
             'orderModel' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
                 'model' => [
@@ -65,8 +69,7 @@ class ShowOrderGroupMaster extends JsonResource
                                 ->values()
                                 ->toArray() ?? [],
                         'total_quantity' => $submodel->sewingOutputs
-                                ->sum('quantity') ?? 0,
-                        'remain_quantity' => $remainAmount
+                                ->sum('quantity') ?? 0
 
                     ]) ?? [],
             ] : null,
