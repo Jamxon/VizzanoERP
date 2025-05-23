@@ -294,7 +294,7 @@ class CuttingMasterController extends Controller
     {
         $data = $boxTarification->toArray();
 
-        BoxTarification::create([
+        $box =  BoxTarification::create([
             'order_id' => $data['order_id'],
             'submodel_id' => $data['submodel_id'],
             'tarification_id' => $data['tarification_id'],
@@ -309,17 +309,7 @@ class CuttingMasterController extends Controller
             'status' => 'inactive'
         ]);
 
-        $data['submodel'] = $boxTarification->submodel;
-        $data['size'] = $boxTarification->size->size->name ?? '-';
-
-        $pdf = Pdf::loadView('pdf.tarification-one', [
-            'boxes' => [$data],
-            'totalQuantity' => $data['quantity'],
-            'totalBoxes' => 1,
-            'submodel' => $data['submodel'],
-            'size' => $data['size'],
-            'order_id' => $data['order_id'],
-        ])->setPaper('A4', 'portrait');
+        $pdf = Pdf::loadView('pdf.tarification-one', ['box' => $box])->setPaper('A4', 'portrait');
 
         return $pdf->download('kesish_tarifikatsiyasi_' . now()->format('Ymd_His') . '.pdf');
     }
