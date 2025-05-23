@@ -55,7 +55,7 @@
             <td><strong>Buyurtma:</strong> {{ $box['submodel']->orderModel->order->name ?? '-' }}</td>
             <td><strong>Model:</strong> {{ $box['submodel']->orderModel->model->name ?? '-' }}</td>
             <td><strong></strong> {{ $box['submodel']->submodel->name ?? '-' }}</td>
-            <td><strong>Quti:</strong> #{{ $box['box_number'] }}</td>
+            <td><strong>Quti:</strong> #{{ $box['box_number'] ?? 0}}</td>
             <td><strong>Sana:</strong> {{ now()->format('d.m.Y') }}</td>
         </tr>
     </table>
