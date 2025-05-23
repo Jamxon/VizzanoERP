@@ -10,9 +10,12 @@ use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderModel;
 use App\Models\OrderPrintingTimes;
+use App\Models\OrderSize;
+use App\Models\OrderSubModel;
 use App\Models\Outcome;
 use App\Models\OutcomeItemModelDistrubition;
 use App\Models\Stok;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -140,35 +143,80 @@ class CuttingMasterController extends Controller
         return response()->json($resource);
     }
 
-    public function markAsCut(Request $request): \Illuminate\Http\JsonResponse
+    public function markAsCutAndExportMultiplePdfs(Request $request): \Illuminate\Http\Response
     {
         $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
-            'quantity' => 'required|integer',
+            'quantity' => 'required|integer|min:1',
             'submodel_id' => 'required|integer|exists:order_sub_models,id',
             'size_id' => 'required|integer|exists:order_sizes,id',
+            'box_capacity' => 'required|integer|min:1',
         ]);
 
-        DB::beginTransaction();
-        try {
-            $orderCut = OrderCut::create([
-                'order_id' => $data['order_id'],
-                'user_id' => auth()->user()->id,
-                'cut_at' => Carbon::parse(now())->format('Y-m-d H:i:s'),
-                'quantity' => $data['quantity'],
-                'status' => 'pending',
-                'submodel_id' => $data['submodel_id'],
-                'size_id' => $data['size_id'],
+        // Memory va time limitlarini sozlash
+        ini_set('memory_limit', '2G');
+        set_time_limit(0);
+
+        // Ma'lumotlarni olish
+        $submodel = OrderSubmodel::with([
+            'orderModel.order:id,name',
+            'orderModel.model:id,name',
+            'submodel:id,name',
+            'tarificationCategories.tarifications.razryad:id,name',
+            'tarificationCategories.tarifications.typewriter:id,name',
+            'tarificationCategories.tarifications.employee:id,name'
+        ])->findOrFail($data['submodel_id']);
+
+        $sizeName = OrderSize::find($data['size_id'])->name ?? '-';
+        $totalQuantity = $data['quantity'];
+        $capacity = $data['box_capacity'];
+        $boxes = intdiv($totalQuantity, $capacity);
+        $remainder = $totalQuantity % $capacity;
+
+        // Barcha quti ma'lumotlarini tayyorlash
+        $pdfBoxes = [];
+
+        // To'liq qutilar
+        for ($i = 0; $i < $boxes; $i++) {
+            $pdfBoxes[] = [
+                'box_number' => $i + 1,
+                'quantity' => $capacity,
+                'submodel' => $submodel,
+                'size' => $sizeName,
+            ];
+        }
+
+        // Qolgan quantity
+        if ($remainder > 0) {
+            $pdfBoxes[] = [
+                'box_number' => $boxes + 1,
+                'quantity' => $remainder,
+                'submodel' => $submodel,
+                'size' => $sizeName,
+            ];
+        }
+
+        // Bitta PDF yaratish
+        $fileName = 'kesish_tarifikatsiyasi_' . now()->format('Ymd_His') . '.pdf';
+
+        $pdf = Pdf::loadView('pdf.tarifications-pdf', [
+            'boxes' => $pdfBoxes,
+            'totalQuantity' => $totalQuantity,
+            'totalBoxes' => count($pdfBoxes),
+            'submodel' => $submodel,
+            'size' => $sizeName,
+            'order_id' => $data['order_id'],
+        ])
+            ->setPaper('A4', 'portrait')
+            ->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isRemoteEnabled' => true,
+                'defaultFont' => 'sans-serif',
+                'dpi' => 96,
+                'enable_php' => false
             ]);
 
-            DB::commit();
-            return response()->json($orderCut);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 400);
-        }
+        return $pdf->download($fileName);
     }
 
     public function getCuts($id): \Illuminate\Http\JsonResponse
