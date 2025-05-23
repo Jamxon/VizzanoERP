@@ -225,7 +225,7 @@ class CuttingMasterController extends Controller
             'tarificationCategories.tarifications.employee:id,name'
         ])->findOrFail($data['submodel_id']);
 
-        $sizeName = OrderSize::find($data['size_id'])->name ?? '-';
+        $sizeName = OrderSize::find($data['size_id'])->size->name ?? '-';
         $totalQuantity = $data['quantity'];
         $capacity = $data['box_capacity'];
         $boxes = intdiv($totalQuantity, $capacity);

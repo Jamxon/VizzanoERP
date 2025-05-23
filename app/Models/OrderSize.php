@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static create(array $array)
  * @method static updateOrCreate(array $array, array $array1)
  * @method static where(string $string, mixed $id)
+ * @method static find(mixed $size_id)
  */
 class OrderSize extends Model
 {
