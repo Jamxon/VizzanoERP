@@ -73,11 +73,14 @@ class VizzanoReportTvController extends Controller
             ->pluck('employee_count', 'employees.group_id');
 
         // ✅ 5. Work time hisoblash
-        $workTimeByGroup = \App\Models\Group::whereIn('id', $groupIds)
+        $workTimeByGroup = \App\Models\Group::whereIn('groups.id', $groupIds)
             ->join('departments', 'groups.department_id', '=', 'departments.id')
-            ->selectRaw('groups.id as group_id, 
-            EXTRACT(EPOCH FROM (departments.end_time - departments.start_time - (departments.break_time * INTERVAL \'1 second\'))) as work_seconds')
+            ->selectRaw('
+        groups.id as group_id, 
+        EXTRACT(EPOCH FROM (departments.end_time - departments.start_time - (departments.break_time * INTERVAL \'1 second\'))) as work_seconds
+    ')
             ->pluck('work_seconds', 'group_id');
+
 
         // ✅ 6. Motivatsiyalar
         $motivations = \App\Models\Motivation::all()->map(fn($m) => ['title' => $m->title]);
