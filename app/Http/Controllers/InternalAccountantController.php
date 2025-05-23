@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BoxTarification;
 use App\Models\DailyPlan;
 use App\Models\DailyPlanItem;
 use App\Models\EmployeeTarificationLog;
@@ -647,4 +648,17 @@ class InternalAccountantController extends Controller
         return response()->json($tarification);
     }
 
+    public function boxTarificationShow(BoxTarification $boxTarification): \Illuminate\Http\JsonResponse
+    {
+        $boxTarification->load([
+            'submodel.orderModel.order:id,name',
+            'submodel.orderModel.model:id,name',
+            'submodel.submodel:id,name',
+            'tarificationCategories.tarifications.razryad:id,name',
+            'tarificationCategories.tarifications.typewriter:id,name',
+            'tarificationCategories.tarifications.employee:id,name'
+        ]);
+
+        return response()->json($boxTarification);
+    }
 }
