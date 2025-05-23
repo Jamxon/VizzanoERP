@@ -142,93 +142,47 @@ class CuttingMasterController extends Controller
 
     public function markAsCut(Request $request): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
+        $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
-            'category_id' => 'required|integer|exists:specification_categories,id',
-            'quantity' => 'required|numeric|min:1',
+            'cut_at' => 'required|date',
+            'quantity' => 'required|integer',
+            'submodel_id' => 'required|integer|exists:order_sub_models,id',
+            'size_id' => 'required|integer|exists:order_sizes,id',
         ]);
 
-        $orderId = $request->order_id;
-        $categoryId = $request->category_id;
-        $quantity = $request->quantity;
-        $user = auth()->user();
-
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-
-            $oldData = DB::table('order_cuts')
-                ->where('order_id', $orderId)
-                ->where('specification_category_id', $categoryId)
-                ->sum('quantity') ?? 0;
-
-            $newData = $oldData + $quantity;
-
-            OrderCut::create([
-                'order_id' => $orderId,
-                'specification_category_id' => $categoryId,
-                'user_id' => $user->id,
-                'cut_at' => now(),
-                'quantity' => $quantity,
+            $orderCut = OrderCut::create([
+                'order_id' => $data['order_id'],
+                'user_id' => auth()->user()->id,
+                'cut_at' => Carbon::parse($data['cut_at']),
+                'quantity' => $data['quantity'],
+                'status' => 'pending',
+                'submodel_id' => $data['submodel_id'],
+                'size_id' => $data['size_id'],
             ]);
 
-            Log::add(
-                $user->id,
-                "Buyurtma kesildi (Order ID: $orderId, Category ID: $categoryId, Kesilgan miqdor: $quantity, Jami: $newData)",
-                'cut',
-                ['old_total_quantity' => $oldData],
-                ['new_total_quantity' => $newData]
-            );
-
             DB::commit();
-
-            return response()->json(["message" => "Kesish muvaffaqiyatli belgilandi"], 200);
+            return response()->json($orderCut);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
-                "message" => "Kesish belgilanmadi: " . $e->getMessage()
-            ], 500);
+                'error' => $e->getMessage()
+            ], 400);
         }
     }
 
     public function getCuts($id): \Illuminate\Http\JsonResponse
     {
-        $cuts = OrderCut::with('category.submodel.submodel')
-            ->where('order_id', $id)
+        $cuts = OrderCut::where('order_id', $id)
+            ->with([
+                'user:id,name',
+                'submodel.submodel',
+                'size.size'
+            ])
             ->get();
 
-        if ($cuts->isEmpty()) {
-            return response()->json([
-                'message' => 'Kesish ma\'lumotlari topilmadi'
-            ], 404);
-        }
-
-        $groupedCuts = $cuts->groupBy(function ($cut) {
-            return optional(optional($cut->category)->submodel)->id ?? 0;
-        });
-
-        $resource = $groupedCuts->map(function ($group, $submodelId) {
-            $submodel = optional(optional($group->first()->category)->submodel);
-
-            return [
-                'submodel' => [
-                    'id' => optional($submodel->submodel)->id,
-                    'name' => optional($submodel->submodel)->name,
-                ],
-                'cuts' => $group->map(function ($cut) {
-                    return [
-                        'id' => $cut->id,
-                        'cut_at' => $cut->cut_at,
-                        'quantity' => $cut->quantity,
-                        'category' => [
-                            'id' => optional($cut->category)->id,
-                            'name' => optional($cut->category)->name,
-                        ],
-                    ];
-                })->values()->all(),
-            ];
-        })->values()->all();
-
-        return response()->json($resource);
+        return response()->json($cuts);
     }
 
     public function finishCutting($id): \Illuminate\Http\JsonResponse
