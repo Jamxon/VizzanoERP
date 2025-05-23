@@ -647,16 +647,18 @@ class InternalAccountantController extends Controller
                 'tarification.typewriter:id,name',
                 'tarification.employee:id,name',
             ]);
-            $employee = Employee::findOrFail($request->employee_id);
 
             if ($boxTarification->status === 'completed') {
+                $completedEmployee = EmployeeTarificationLog::where('box_tarification_id', $boxTarification->id)
+                    ->first();
+
                 return response()->json([
                     'box_tarification' => $boxTarification,
                     'employee' => [
-                        'id' => $employee->id,
-                        'name' => $employee->name,
-                        'balance' => $employee->balance,
-                        'payment_type' => $employee->payment_type,
+                        'id' => $completedEmployee->employee->id,
+                        'name' => $completedEmployee->employee->name,
+                        'balance' => $completedEmployee->employee->balance,
+                        'payment_type' => $completedEmployee->employee->payment_type,
                 ],]);
             } elseif ($boxTarification->status === 'inactive') {
                 return response()->json(['message' => '❌ Bu operatsiya bekor qilingan!'], 422);
@@ -675,6 +677,7 @@ class InternalAccountantController extends Controller
                 'quantity' => $boxTarification->quantity,
                 'is_own' => $isOwn ? 1 : 0,
                 'amount_earned' => $boxTarification->total,
+                'box_tarification_id' => $boxTarification->id,
             ]);
 
             $employee = Employee::findOrFail($request->employee_id);
