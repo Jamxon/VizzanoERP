@@ -718,8 +718,6 @@ class InternalAccountantController extends Controller
                 'message' => "ℹ️ Xodim: {$employee->name} uchun hisob-kitob bajarildi, ammo to‘lov turi: `{$employee->payment_type}`.\nBalansga qo‘shilmadi.",
             ]);
         } catch (\Exception $e) {
-            Log::error("boxTarificationShow xatoligi: " . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-
             return response()->json([
                 'message' => '❌ Ichki xatolik yuz berdi. Iltimos, tizim adminiga murojaat qiling.',
                 'error' => env('APP_DEBUG') ? $e->getMessage() : null,
