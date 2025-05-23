@@ -80,11 +80,11 @@
             @foreach($category->tarifications as $tarification)
                 <tr>
                     <td>{{ $i++ }}</td>
-                    <td>{{ $size }}</td>
+                    <td>{{ $boxes['size'] }}</td>
                     <td style="text-align: left;">{{ $tarification->name }}</td>
                     <td>{{ $box['quantity'] }}</td>
                     <td>{{ $tarification->second }}</td>
-                    <td>{{ number_format($tarification->price, 0, ',', ' ') }}</td>
+                    <td>{{ number_format($tarification->summa, 0, ',', ' ') }}</td>
                     <td>{{ $tarification->code }}</td>
                     <td class="barcode">
                         <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $tarification->box_tarification_id, 'C128', 1.0, 30) }}" alt="barcode">
