@@ -327,6 +327,7 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::get('markAsCut', [CuttingMasterController::class, 'markAsCutAndExportMultiplePdfs']);
     Route::get('cuts/{id}', [CuttingMasterController::class, 'getCuts']);
     Route::get('finishCutting/{id}', [CuttingMasterController::class, 'finishCutting']);
+    Route::get('markAsCut/{boxTarification}', [CuttingMasterController::class, 'updateBoxTarification']);
 });
 
 Route::prefix('tv')->middleware('role:tv')->group(function () {
