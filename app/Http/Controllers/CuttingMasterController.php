@@ -118,6 +118,7 @@ class CuttingMasterController extends Controller
             'orderModel.model',
             'orderModel.material',
             'orderModel.submodels',
+            'orderModel.sizes.size',
             'orderModel.submodels.submodel',
             'orderModel.submodels.specificationCategories',
         ]);
