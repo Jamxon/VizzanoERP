@@ -654,9 +654,9 @@ class InternalAccountantController extends Controller
             'submodel.orderModel.order:id,name',
             'submodel.orderModel.model:id,name',
             'submodel.submodel:id,name',
-            'tarificationCategories.tarifications.razryad:id,name',
-            'tarificationCategories.tarifications.typewriter:id,name',
-            'tarificationCategories.tarifications.employee:id,name'
+            'tarification.razryad:id,name',
+            'tarification.typewriter:id,name',
+            'tarification.employee:id,name'
         ]);
 
         return response()->json($boxTarification);
