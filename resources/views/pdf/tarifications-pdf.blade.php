@@ -79,7 +79,7 @@
         @foreach($box['submodel']->tarificationCategories as $category)
             @foreach($category->tarifications as $tarification)
                 <tr>
-                    <td>{{ $i++ }}</td>
+                    <td>{{ $tarification->box_tarification_id }}</td>
                     <td>{{ $size }}</td>
                     <td style="text-align: left;">{{ $tarification->name }}</td>
                     <td>{{ $box['quantity'] }}</td>
