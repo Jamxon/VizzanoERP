@@ -40,6 +40,7 @@ class GetEmployeeResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name ?? null,
+            'user_id' => $this->user_id ?? null,
             'user' => [
                 'username' => $this->user->username ?? null,
                 'role' => $this->user->role ?? null,
