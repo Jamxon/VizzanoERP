@@ -18,6 +18,7 @@ class EmployeeTarificationLog extends Model
         'quantity',
         'is_own',
         'amount_earned',
+        'box_tarification_id',
     ];
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
