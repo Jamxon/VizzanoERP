@@ -14,6 +14,11 @@ class ShowOrderGroupMaster extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $remainAmount = 0;
+
+        $this->orderModel->submodels->each(function ($submodel) use (&$remainAmount) {
+            $remainAmount += $submodel->quantity - $submodel->sewingOutputs->sum('quantity');
+        });
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -61,6 +66,7 @@ class ShowOrderGroupMaster extends JsonResource
                                 ->toArray() ?? [],
                         'total_quantity' => $submodel->sewingOutputs
                                 ->sum('quantity') ?? 0,
+                        'remain_quantity' => $remainAmount
 
                     ]) ?? [],
             ] : null,
