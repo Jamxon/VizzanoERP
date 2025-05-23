@@ -23,6 +23,7 @@ class GetOrderGroupMasterResource extends JsonResource
             'rasxod' => $this->order->rasxod,
             'status' => $this->order->status,
             'comment' => $this->order->comment,
+            'remainAmount' => $this->order->total_sewn_quantity ?? 0,
             'orderModel' => [
                 'id' => $this->order->orderModel->id,
                 'model' => [
