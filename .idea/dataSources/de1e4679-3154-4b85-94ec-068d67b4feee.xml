@@ -5582,7 +5582,7 @@ gas</Labels>
     </table>
     <table id="345" parent="263" name="box_tarifications">
       <ObjectId>23138</ObjectId>
-      <StateNumber>246783</StateNumber>
+      <StateNumber>249620</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -6146,10 +6146,10 @@ gas</Labels>
       <DefaultExpression>nextval(&apos;box_tarifications_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
-      <StateNumber>246783</StateNumber>
-      <StoredType>integer|0s</StoredType>
+      <StateNumber>249620</StateNumber>
+      <StoredType>bigint|0s</StoredType>
       <SequenceId>23137</SequenceId>
-      <TypeId>23</TypeId>
+      <TypeId>20</TypeId>
     </column>
     <column id="439" parent="345" name="order_id">
       <NotNull>1</NotNull>
@@ -6261,18 +6261,18 @@ gas</Labels>
     <index id="453" parent="345" name="box_tarifications_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>23145</ObjectId>
+      <ObjectId>23168</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>246783</StateNumber>
+      <StateNumber>249620</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <key id="454" parent="345" name="box_tarifications_pkey">
       <NameSurrogate>1</NameSurrogate>
-      <ObjectId>23146</ObjectId>
+      <ObjectId>23169</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>246783</StateNumber>
-      <UnderlyingIndexId>23145</UnderlyingIndexId>
+      <StateNumber>249620</StateNumber>
+      <UnderlyingIndexId>23168</UnderlyingIndexId>
     </key>
     <column id="455" parent="346" name="id">
       <DefaultExpression>nextval(&apos;branches_id_seq&apos;::regclass)</DefaultExpression>

@@ -230,20 +230,19 @@ class CuttingMasterController extends Controller
         $capacity = $data['box_capacity'];
         $boxes = intdiv($totalQuantity, $capacity);
         $remainder = $totalQuantity % $capacity;
-        $sizeId = $data['size_id'];
 
         $pdfBoxes = [];
         $boxNumber = 1;
 
         for ($i = 0; $i < $boxes; $i++) {
             $pdfBoxes[] = $this->storeBoxTarifications(
-                $boxNumber++, $capacity, $data, $submodel, $sizeName, $sizeId
+                $boxNumber++, $capacity, $data, $submodel, $sizeName
             );
         }
 
         if ($remainder > 0) {
             $pdfBoxes[] = $this->storeBoxTarifications(
-                $boxNumber, $remainder, $data, $submodel, $sizeName, $sizeId
+                $boxNumber, $remainder, $data, $submodel, $sizeName
             );
         }
 
@@ -253,7 +252,6 @@ class CuttingMasterController extends Controller
             'totalBoxes' => count($pdfBoxes),
             'submodel' => $submodel,
             'size' => $sizeName,
-            'size_id' => $data['size_id'],
             'order_id' => $data['order_id'],
         ])->setPaper('A4', 'portrait');
 
@@ -288,7 +286,6 @@ class CuttingMasterController extends Controller
             'quantity' => $quantity,
             'submodel' => $submodel,
             'size' => $sizeName,
-            'size_id' => $data['size_id'],
             'tarifications' => $records
         ];
     }
