@@ -660,9 +660,9 @@ class InternalAccountantController extends Controller
         ]);
 
         if ($boxTarification->status === 'completed') {
-            return response()->json(['message' => '❌ Bu operatsiya allaqachon bajarilgan!'], 403);
+            return response()->json(['message' => '❌ Bu operatsiya allaqachon bajarilgan!'], 422);
         }elseif ($boxTarification->status === 'inactive') {
-            return response()->json(['message' => '❌ Bu operatsiya bekor qilingan!'], 403);
+            return response()->json(['message' => '❌ Bu operatsiya bekor qilingan!'], 422);
         }
 
         $boxTarification->update(['status' => 'completed']);
