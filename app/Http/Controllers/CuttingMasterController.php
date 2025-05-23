@@ -312,7 +312,7 @@ class CuttingMasterController extends Controller
         $data['submodel'] = $boxTarification->submodel;
         $data['size'] = $boxTarification->size->size->name ?? '-';
 
-        $pdf = Pdf::loadView('pdf.tarifications-pdf', [
+        $pdf = Pdf::loadView('pdf.tarifications-one', [
             'boxes' => [$data],
             'totalQuantity' => $data['quantity'],
             'totalBoxes' => 1,
@@ -323,4 +323,5 @@ class CuttingMasterController extends Controller
 
         return $pdf->download('kesish_tarifikatsiyasi_' . now()->format('Ymd_His') . '.pdf');
     }
+
 }
