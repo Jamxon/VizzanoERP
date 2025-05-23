@@ -665,6 +665,8 @@ class InternalAccountantController extends Controller
             return response()->json(['message' => '❌ Bu operatsiya bekor qilingan!'], 403);
         }
 
+        $boxTarification->update(['status' => 'completed']);
+
         $isOwn = Tarification::where('user_id', $request->employee_id)
             ->where('id', $boxTarification->tarification_id)
             ->exists();
