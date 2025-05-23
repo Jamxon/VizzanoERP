@@ -659,12 +659,50 @@ class InternalAccountantController extends Controller
             'tarification.employee:id,name'
         ]);
 
-        $employeeTarificationLog = EmployeeTarificationLog::create([
+        $isOwn = Tarification::where('user_id', $request->employee_id)
+            ->where('id', $boxTarification->tarification_id)
+            ->exists();
+
+        EmployeeTarificationLog::create([
             'employee_id' => $request->employee_id,
             'tarification_id' => $boxTarification->tarification_id,
+            'date' => now()->format('Y-m-d'),
+            'quantity' => $boxTarification->quantity,
+            'is_own' => $isOwn ? 1 : 0,
+            'amount_earned' => $boxTarification->total,
         ]);
 
-        return response()->json($boxTarification);
+        $employee = Employee::find($request->employee_id);
+        $balance = $employee->balance;
+
+        if ($employee->payment_type === 'piece_work') {
+
+            $employee->increment('balance', $boxTarification->total);
+
+            // Log
+            Log::add(
+                auth()->id(),
+                "Kunlik maosh qo'shildi!",
+                'accounting',
+                null,
+                [
+                    'employee_id' => $request->employee_id,
+                    'employee_name' => $employee->name,
+                    'tarification_id' => $boxTarification->tarification_id,
+                    'tarification_name' => $boxTarification->tarification->name,
+                    'old_balance' => $balance,
+                    'new_balance' => $employee->balance,
+                    'total_earned' => $boxTarification->total,
+                ]
+            );
+            return response()->json($boxTarification);
+        }
+
+
+        return response()->json([
+            'message' => 'Xodimning to\'lov turi: Oylik maosh. Balans yangilanmadi.',
+        ]);
+
     }
 
 
