@@ -22,4 +22,14 @@ class BoxTarification extends Model
         return $this->belongsTo(Tarification::class);
     }
 
+    public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(OrderSubModel::class);
+    }
+
+    public function size(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(OrderSize::class);
+    }
+
 }
