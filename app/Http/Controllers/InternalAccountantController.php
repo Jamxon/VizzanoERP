@@ -661,4 +661,6 @@ class InternalAccountantController extends Controller
 
         return response()->json($boxTarification);
     }
+
+
 }
