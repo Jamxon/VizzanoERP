@@ -43,9 +43,9 @@
 {{-- Header satr --}}
 <table class="header-table">
     <tr>
-        <td><strong>Buyurtma:</strong> {{ $submodel->orderModel->order->name ?? '-' }}</td>
-        <td><strong>Model:</strong> {{ $submodel->orderModel->model->name ?? '-' }}</td>
-        <td><strong>Submodel:</strong> {{ $submodel->submodel->name ?? '-' }}</td>
+        <td><strong>Buyurtma:</strong> {{ $box->submodel->orderModel->order->name ?? '-' }}</td>
+        <td><strong>Model:</strong> {{ $box->submodel->orderModel->model->name ?? '-' }}</td>
+        <td><strong></strong> {{ $box->submodel->submodel->name ?? '-' }}</td>
         <td><strong>Sana:</strong> {{ now()->format('d.m.Y') }}</td>
     </tr>
 </table>
@@ -66,15 +66,15 @@
     </thead>
     <tbody>
     <tr>
-        <td>{{ $boxes[0]['id'] }}</td>
-        <td>{{ $size }}</td>
-        <td style="text-align: left;">{{ $boxes[0]->tarification->name ?? '-' }}</td>
-        <td>{{ $boxes[0]['quantity'] }}</td>
-        <td>{{ $boxes[0]['tarification']->second ?? '-' }}</td>
-        <td>{{ number_format($boxes[0]['price'], 0, ',', ' ') }}</td>
-        <td>{{ $boxes[0]['tarification']->code ?? '-' }}</td>
+        <td>{{ $box->id }}</td>
+        <td>{{ $box->size->size->name }}</td>
+        <td style="text-align: left;">{{ $box->tarification->name ?? '-' }}</td>
+        <td>{{ $box->quantity }}</td>
+        <td>{{ $box->tarification->second ?? '-' }}</td>
+        <td>{{ number_format($box->tarification->summa, 0, ',', ' ') }}</td>
+        <td>{{ $box->tarification->code ?? '-' }}</td>
         <td class="barcode">
-            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $boxes[0]['id'], 'C128', 1.0, 30) }}" alt="barcode">
+            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG((string) $box->id, 'C128', 1.0, 30) }}" alt="barcode">
         </td>
     </tr>
     </tbody>
