@@ -105,7 +105,8 @@ class CasherController extends Controller
             'cashbox_id' => 'required|exists:cashboxes,id',
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
-            'destination' => 'nullable|string|max:255',
+            'destination_id' => 'required|exists:income_destinations,id',
+            'destination_name' => 'nullable|string|max:255',
             'via_id' => 'nullable|exists:income_via,id',
             'via_name' => 'nullable|string|max:255',
             'purpose' => 'nullable|string|max:1000',
@@ -126,6 +127,21 @@ class CasherController extends Controller
             ]);
 
             $data['via_id'] = $via->id;
+        }
+
+        // Agar destination_id bo'lmasa, destination_name kelishi kerak
+        if (empty($data['destination_id'])) {
+            if (empty($data['destination_name'])) {
+                return response()->json([
+                    'message' => '❌ destination_id ham destination_name ham kiritilmadi. Biri bo‘lishi shart.'
+                ], 422);
+            }
+
+            $destination = \App\Models\IncomeDestination::firstOrCreate([
+                'name' => $data['destination_name']
+            ]);
+
+            $data['destination_id'] = $destination->id;
         }
 
         $data['type'] = 'expense';
@@ -230,7 +246,9 @@ class CasherController extends Controller
                     ->orWhereHas('via', function ($q3) use ($search) {
                         $q3->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
                     })
-                    ->orWhereRaw('LOWER(destination) LIKE ?', ["%{$search}%"])
+                    ->orWhereHas('destination', function ($q4) use ($search) {
+                        $q4->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
+                    })
                     ->orWhereRaw('LOWER(purpose) LIKE ?', ["%{$search}%"])
                     ->orWhereRaw('LOWER(comment) LIKE ?', ["%{$search}%"]);
             });
