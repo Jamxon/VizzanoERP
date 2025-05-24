@@ -236,10 +236,8 @@ class CasherController extends Controller
     {
         try {
             $data = $request->validate([
-                'from_cashbox_id' => 'required|exists:cashboxes,id',
-                'to_cashbox_id' => 'required|exists:cashboxes,id|different:from_cashbox_id',
                 'from_currency_id' => 'required|exists:currencies,id',
-                'to_currency_id' => 'required|exists:currencies,id',
+                'to_currency_id' => 'required|exists:currencies,id|different:from_currency_id',
                 'from_amount' => 'required|numeric|min:0.01',
                 'to_amount' => 'required|numeric|min:0.01',
                 'exchange_rate' => 'required|numeric|min:0.0001',
@@ -249,64 +247,74 @@ class CasherController extends Controller
 
             $data['date'] = $data['date'] ?? now()->toDateString();
 
-            // Balance tekshirish
-            $balance = CashboxBalance::where('cashbox_id', $data['from_cashbox_id'])
+            $branchId = auth()->user()->employee->branch_id;
+
+            // Har ikkala kassani bir xil filialdan olish
+            $cashbox = Cashbox::where('branch_id', $branchId)->firstOrFail();
+
+            // Balansni tekshirish
+            $fromBalance = CashboxBalance::where('cashbox_id', $cashbox->id)
                 ->where('currency_id', $data['from_currency_id'])
                 ->value('amount');
 
-            if ($balance === null || $balance < $data['from_amount']) {
+            if ($fromBalance === null || $fromBalance < $data['from_amount']) {
                 return response()->json([
-                    'message' => '❌ Jo‘natilayotgan kassada yetarli mablag‘ yo‘q.'
+                    'message' => '❌ Kassada yetarli mablag‘ mavjud emas.'
                 ], 422);
             }
 
-            DB::transaction(function () use ($data) {
-                // 1. Chiqim yozish
+            DB::transaction(function () use ($data, $cashbox) {
+                // Chiqim
                 CashboxTransaction::create([
-                    'cashbox_id' => $data['from_cashbox_id'],
+                    'cashbox_id' => $cashbox->id,
                     'type' => 'expense',
                     'currency_id' => $data['from_currency_id'],
                     'amount' => $data['from_amount'],
-                    'comment' => $data['comment'],
-                    'target_cashbox_id' => $data['to_cashbox_id'],
+                    'target_cashbox_id' => $cashbox->id,
                     'exchange_rate' => $data['exchange_rate'],
                     'target_amount' => $data['to_amount'],
                     'date' => $data['date'],
+                    'comment' => $data['comment'],
+                    'branch_id' => $cashbox->branch_id,
                 ]);
 
-                // 2. Kirim yozish
+                // Kirim
                 CashboxTransaction::create([
-                    'cashbox_id' => $data['to_cashbox_id'],
+                    'cashbox_id' => $cashbox->id,
                     'type' => 'income',
                     'currency_id' => $data['to_currency_id'],
                     'amount' => $data['to_amount'],
-                    'comment' => '🔁 O‘tkazma: kassa ID ' . $data['from_cashbox_id'],
-                    'target_cashbox_id' => $data['from_cashbox_id'],
+                    'target_cashbox_id' => $cashbox->id,
                     'exchange_rate' => $data['exchange_rate'],
                     'target_amount' => $data['from_amount'],
                     'date' => $data['date'],
+                    'comment' => '🔁 Valyuta ayirboshlash',
+                    'branch_id' => $cashbox->branch_id,
                 ]);
 
-                // 3. From kassani kamaytirish
-                CashboxBalance::where('cashbox_id', $data['from_cashbox_id'])
+                // From balans kamayadi
+                CashboxBalance::where('cashbox_id', $cashbox->id)
                     ->where('currency_id', $data['from_currency_id'])
                     ->decrement('amount', $data['from_amount']);
 
-                // 4. To kassani oshirish
-                $toBalance = CashboxBalance::firstOrNew([
-                    'cashbox_id' => $data['to_cashbox_id'],
-                    'currency_id' => $data['to_currency_id'],
-                ]);
-                $toBalance->amount = ($toBalance->amount ?? 0) + $data['to_amount'];
-                $toBalance->save();
+                // To balans oshadi
+                CashboxBalance::updateOrCreate(
+                    [
+                        'cashbox_id' => $cashbox->id,
+                        'currency_id' => $data['to_currency_id'],
+                    ],
+                    [
+                        'amount' => DB::raw("amount + {$data['to_amount']}")
+                    ]
+                );
             });
 
             return response()->json([
-                'message' => "✅ Pul muvoffaqiyatli o‘tkazildi:\n{$data['from_amount']} → {$data['to_amount']}"
+                'message' => "✅ Pul muvaffaqiyatli ayirboshlanib saqlandi:\n{$data['from_amount']} → {$data['to_amount']}"
             ]);
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => '❌ Xatolik yuz berdi:',
+                'message' => '❌ Xatolik yuz berdi.',
                 'error' => $e->getMessage()
             ], 500);
         }
