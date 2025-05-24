@@ -26,6 +26,7 @@ class RequestForm extends Model
         'created_by',
         'created_at',
         'branch_id',
+        'deadline',
     ];
 
     protected $casts = [

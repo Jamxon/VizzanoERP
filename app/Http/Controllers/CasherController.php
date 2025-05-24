@@ -333,7 +333,7 @@ class CasherController extends Controller
                 'status' => 'pending',
                 'created_by' => auth()->id(),
                 'branch_id' => auth()->user()->employee->branch_id,
-                'deadline' => $validated['deadline']->format('Y-m-d H:i:s'),
+                'deadline' => $validated['deadline'],
             ]);
 
             return response()->json([
