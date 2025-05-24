@@ -38,6 +38,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::post('storeIncome', [\App\Http\Controllers\CasherController::class, 'storeIncome']);
     Route::post('storeExpense', [\App\Http\Controllers\CasherController::class, 'storeExpense']);
+    Route::get('balances', [\App\Http\Controllers\CasherController::class, 'getBalances']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
