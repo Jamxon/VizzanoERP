@@ -31,6 +31,7 @@ class CasherController extends Controller
             'source_id' => 'nullable|exists:income_sources,id',
             'source_name' => 'nullable|string|max:255',
             'via_id' => 'nullable|exists:income_via,id',
+            'via_name' => 'nullable|string|max:255',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
         ]);
