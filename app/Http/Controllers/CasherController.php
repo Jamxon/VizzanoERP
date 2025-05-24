@@ -174,6 +174,8 @@ class CasherController extends Controller
             $query->where('purpose', 'ilike', '%' . $request->purpose . '%');
         }
 
+        $query->where('branch_id', auth()->user()->employee->branch_id);
+
         $transactions = $query->orderBy('date', 'desc')->get();
 
         return response()->json([
