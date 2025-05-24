@@ -369,7 +369,7 @@ class CasherController extends Controller
                     'created_by' => $form->creator->employee->name ?? 'N/A',
                     'approved_by' => $form->approver->employee->name ?? 'N/A',
                     'approved_at' => $form->approved_at ? $form->approved_at->format('Y-m-d H:i:s') : null,
-                    'deadline' => $form->deadline ? $form->deadline->format('Y-m-d') : null,
+                    'deadline' => $form->deadline ?? null,
                 ];
             })
         ]);
