@@ -203,37 +203,37 @@ class CasherController extends Controller
                 'to_cashbox_id' => 'required|exists:cashboxes,id|different:from_cashbox_id',
                 'from_currency_id' => 'required|exists:currencies,id',
                 'to_currency_id' => 'required|exists:currencies,id',
-                'amount' => 'required|numeric|min:0.01',
+                'from_amount' => 'required|numeric|min:0.01',
+                'to_amount' => 'required|numeric|min:0.01',
                 'exchange_rate' => 'required|numeric|min:0.0001',
                 'date' => 'nullable|date',
                 'comment' => 'nullable|string|max:1000',
             ]);
 
             $data['date'] = $data['date'] ?? now()->toDateString();
-            $targetAmount = round($data['amount'] / $data['exchange_rate'], 2);
 
             // Balance tekshirish
             $balance = CashboxBalance::where('cashbox_id', $data['from_cashbox_id'])
                 ->where('currency_id', $data['from_currency_id'])
                 ->value('amount');
 
-            if ($balance === null || $balance < $data['amount']) {
+            if ($balance === null || $balance < $data['from_amount']) {
                 return response()->json([
                     'message' => '❌ Jo‘natilayotgan kassada yetarli mablag‘ yo‘q.'
                 ], 422);
             }
 
-            DB::transaction(function () use ($data, $targetAmount) {
+            DB::transaction(function () use ($data) {
                 // 1. Chiqim yozish
                 CashboxTransaction::create([
                     'cashbox_id' => $data['from_cashbox_id'],
                     'type' => 'expense',
                     'currency_id' => $data['from_currency_id'],
-                    'amount' => $data['amount'],
+                    'amount' => $data['from_amount'],
                     'comment' => $data['comment'],
                     'target_cashbox_id' => $data['to_cashbox_id'],
                     'exchange_rate' => $data['exchange_rate'],
-                    'target_amount' => $targetAmount,
+                    'target_amount' => $data['to_amount'],
                     'date' => $data['date'],
                 ]);
 
@@ -242,34 +242,34 @@ class CasherController extends Controller
                     'cashbox_id' => $data['to_cashbox_id'],
                     'type' => 'income',
                     'currency_id' => $data['to_currency_id'],
-                    'amount' => $targetAmount,
+                    'amount' => $data['to_amount'],
                     'comment' => '🔁 O‘tkazma: kassa ID ' . $data['from_cashbox_id'],
                     'target_cashbox_id' => $data['from_cashbox_id'],
                     'exchange_rate' => $data['exchange_rate'],
-                    'target_amount' => $data['amount'],
+                    'target_amount' => $data['from_amount'],
                     'date' => $data['date'],
                 ]);
 
-                // 3. Balanslarni yangilash
+                // 3. From kassani kamaytirish
                 CashboxBalance::where('cashbox_id', $data['from_cashbox_id'])
                     ->where('currency_id', $data['from_currency_id'])
-                    ->decrement('amount', $data['amount']);
+                    ->decrement('amount', $data['from_amount']);
 
-                // 4. To kassaga qo‘shish
+                // 4. To kassani oshirish
                 $toBalance = CashboxBalance::firstOrNew([
                     'cashbox_id' => $data['to_cashbox_id'],
                     'currency_id' => $data['to_currency_id'],
                 ]);
-                $toBalance->amount = ($toBalance->amount ?? 0) + $targetAmount;
+                $toBalance->amount = ($toBalance->amount ?? 0) + $data['to_amount'];
                 $toBalance->save();
             });
 
             return response()->json([
-                'message' => "✅ Pul muvoffaqiyatli o‘tkazildi:\n{$data['amount']} → {$targetAmount}"
+                'message' => "✅ Pul muvoffaqiyatli o‘tkazildi:\n{$data['from_amount']} → {$data['to_amount']}"
             ]);
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => '❌ Xatolik yuz berdi: ',
+                'message' => '❌ Xatolik yuz berdi:',
                 'error' => $e->getMessage()
             ], 500);
         }
