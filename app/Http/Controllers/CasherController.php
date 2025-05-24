@@ -30,16 +30,19 @@ class CasherController extends Controller
             DB::transaction(function () use ($data) {
                 CashboxTransaction::create($data);
 
-                CashboxBalance::updateOrCreate(
+                $balance = CashboxBalance::firstOrCreate(
                     [
                         'cashbox_id' => $data['cashbox_id'],
                         'currency_id' => $data['currency_id'],
                     ],
                     [
-                        'amount' => DB::raw("amount + {$data['amount']}")
+                        'amount' => 0
                     ]
                 );
+
+                $balance->increment('amount', $data['amount']);
             });
+
         }
         catch (\Exception $e) {
             return response()->json([
