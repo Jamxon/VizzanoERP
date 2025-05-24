@@ -92,16 +92,36 @@ class CasherController extends Controller
         return response()->json(['message' => '✅ Chiqim muvaffaqiyatli yozildi.']);
     }
 
-    public function getBalances($cashboxId): \Illuminate\Http\JsonResponse
+    public function getBalances(): \Illuminate\Http\JsonResponse
     {
-        $cashbox = Cashbox::with('balances.currency')->findOrFail($cashboxId);
+        $cashboxes = Cashbox::with(['balances.currency'])
+            ->where('branch_id', auth()->user()->employee->branch_id)
+            ->get();
 
         return response()->json([
-            'cashbox' => $cashbox->name,
-            'balances' => $cashbox->balances->map(function ($balance) {
+            'cashboxes' => $cashboxes->map(function ($cashbox) {
                 return [
-                    'currency' => $balance->currency->code,
-                    'amount' => number_format($balance->amount, 2, '.', ' ')
+                    'id' => $cashbox->id,
+                    'name' => $cashbox->name,
+                    'balances' => $cashbox->balances->map(function ($balance) {
+                        return [
+                            'currency' => $balance->currency->code,
+                            'amount' => number_format($balance->amount, 2, '.', ' ')
+                        ];
+                    }),
+                    'transactions' => $cashbox->transactions->map(function ($transaction) {
+                        return [
+                            'type' => $transaction->type,
+                            'amount' => number_format($transaction->amount, 2, '.', ' '),
+                            'currency' => $transaction->currency->code,
+                            'date' => $transaction->date,
+                            'source' => $transaction->source,
+                            'destination' => $transaction->destination,
+                            'via' => $transaction->via,
+                            'purpose' => $transaction->purpose,
+                            'comment' => $transaction->comment,
+                        ];
+                    })
                 ];
             })
         ]);
