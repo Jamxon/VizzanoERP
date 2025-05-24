@@ -250,7 +250,7 @@ class CasherController extends Controller
                     'via' => $tx->via,
                     'purpose' => $tx->purpose,
                     'comment' => $tx->comment,
-
+                    'created_at' => $tx->created_at->format('Y-m-d H:i:s'),
                 ];
             })
         ]);
