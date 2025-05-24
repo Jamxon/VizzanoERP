@@ -140,14 +140,20 @@ class CasherController extends Controller
 
     public function getTransactions(Request $request): \Illuminate\Http\JsonResponse
     {
-        $query = CashboxTransaction::with('currency');
+        $query = CashboxTransaction::with('currency', 'cashbox')
+            ->where('branch_id', auth()->user()->employee->branch_id);
 
+        // Asosiy filterlar
         if ($request->filled('cashbox_id')) {
             $query->where('cashbox_id', $request->cashbox_id);
         }
 
         if ($request->filled('type')) {
             $query->where('type', $request->type);
+        }
+
+        if ($request->filled('currency_id')) {
+            $query->where('currency_id', $request->currency_id);
         }
 
         if ($request->filled('date')) {
@@ -158,27 +164,17 @@ class CasherController extends Controller
             $query->whereBetween('date', [$request->start_date, $request->end_date]);
         }
 
-        if ($request->filled('source')) {
-            $query->where('source', 'ilike', '%' . $request->source . '%');
+        // Qidiruv (search)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('source', 'ilike', "%$search%")
+                    ->orWhere('destination', 'ilike', "%$search%")
+                    ->orWhere('via', 'ilike', "%$search%")
+                    ->orWhere('purpose', 'ilike', "%$search%")
+                    ->orWhere('comment', 'ilike', "%$search%");
+            });
         }
-
-        if ($request->filled('destination')) {
-            $query->where('destination', 'ilike', '%' . $request->destination . '%');
-        }
-
-        if ($request->filled('via')) {
-            $query->where('via', 'ilike', '%' . $request->via . '%');
-        }
-
-        if ($request->filled('purpose')) {
-            $query->where('purpose', 'ilike', '%' . $request->purpose . '%');
-        }
-
-        if ($request->filled('currency_id')) {
-            $query->where('currency_id', $request->currency_id);
-        }
-
-        $query->where('branch_id', auth()->user()->employee->branch_id);
 
         $transactions = $query->orderBy('date', 'desc')->get();
 
@@ -195,6 +191,7 @@ class CasherController extends Controller
                     'via' => $tx->via,
                     'purpose' => $tx->purpose,
                     'comment' => $tx->comment,
+
                 ];
             })
         ]);
