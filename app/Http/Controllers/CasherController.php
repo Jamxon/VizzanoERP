@@ -174,6 +174,10 @@ class CasherController extends Controller
             $query->where('purpose', 'ilike', '%' . $request->purpose . '%');
         }
 
+        if ($request->filled('currency_id')) {
+            $query->where('currency_id', $request->currency_id);
+        }
+
         $query->where('branch_id', auth()->user()->employee->branch_id);
 
         $transactions = $query->orderBy('date', 'desc')->get();
@@ -184,7 +188,7 @@ class CasherController extends Controller
                     'cashbox' => $tx->cashbox,
                     'type' => $tx->type,
                     'amount' => number_format($tx->amount, 2, '.', ' '),
-                    'currency' => $tx->currency->name,
+                    'currency' => $tx->currency,
                     'date' => $tx->date,
                     'source' => $tx->source,
                     'destination' => $tx->destination,
