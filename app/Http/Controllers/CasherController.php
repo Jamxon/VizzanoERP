@@ -34,9 +34,7 @@ class CasherController extends Controller
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
             'source_id' => 'nullable|exists:income_sources,id',
-            'source_name' => 'nullable|string|max:255',
-            'via_id' => 'nullable|exists:income_via,id',
-            'via_name' => 'nullable|string|max:255',
+            'via_id' => 'required|exists:employees,id',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
             'purpose' => 'nullable|string|max:1000',
@@ -53,19 +51,6 @@ class CasherController extends Controller
                 'name' => $data['source_name']
             ]);
             $data['source_id'] = $source->id;
-        }
-
-        if (empty($data['via_id'])) {
-            if (empty($data['via_name'])) {
-                return response()->json([
-                    'message' => '❌ via_id ham via_name ham kiritilmadi.'
-                ], 422);
-            }
-
-            $via = \App\Models\IncomeVia::firstOrCreate([
-                'name' => $data['via_name']
-            ]);
-            $data['via_id'] = $via->id;
         }
 
         try {
@@ -112,38 +97,12 @@ class CasherController extends Controller
         $data = $request->validate([
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
-            'destination_id' => 'nullable|exists:income_destinations,id',
-            'destination_name' => 'nullable|string|max:255',
-            'via_id' => 'nullable|exists:income_via,id',
-            'via_name' => 'nullable|string|max:255',
+            'destination_id' => 'required|exists:employees,id',
+            'via_id' => 'required|exists:employees,id',
             'purpose' => 'nullable|string|max:1000',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
         ]);
-
-        // via_id yoki via_name
-        if (empty($data['via_id'])) {
-            if (empty($data['via_name'])) {
-                return response()->json([
-                    'message' => '❌ via_id ham via_name ham kiritilmadi.'
-                ], 422);
-            }
-
-            $via = \App\Models\IncomeVia::firstOrCreate(['name' => $data['via_name']]);
-            $data['via_id'] = $via->id;
-        }
-
-        // destination_id yoki destination_name
-        if (empty($data['destination_id'])) {
-            if (empty($data['destination_name'])) {
-                return response()->json([
-                    'message' => '❌ destination_id ham destination_name ham kiritilmadi.'
-                ], 422);
-            }
-
-            $destination = \App\Models\IncomeDestination::firstOrCreate(['name' => $data['destination_name']]);
-            $data['destination_id'] = $destination->id;
-        }
 
         $data['type'] = 'expense';
         $data['date'] = $data['date'] ?? now()->toDateString();

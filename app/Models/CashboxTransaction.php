@@ -43,11 +43,11 @@ class CashboxTransaction extends Model
 
     public function via(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(IncomeVia::class, 'via_id');
+        return $this->belongsTo(Employee::class, 'via_id');
     }
 
     public function destination(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(IncomeDestination::class, 'destination_id');
+        return $this->belongsTo(Employee::class, 'destination_id');
     }
 }
