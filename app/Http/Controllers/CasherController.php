@@ -10,14 +10,26 @@ use Illuminate\Support\Facades\DB;
 
 class CasherController extends Controller
 {
+    public function getSource(): \Illuminate\Http\JsonResponse
+    {
+        $sources = \App\Models\IncomeSource::all();
+        return response()->json($sources);
+    }
+
+    public function getVia(): \Illuminate\Http\JsonResponse
+    {
+        $via = \App\Models\IncomeVia::all();
+        return response()->json($via);
+    }
+
     public function storeIncome(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'cashbox_id' => 'required|exists:cashboxes,id',
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
-            'source' => 'nullable|string|max:255',
-            'via' => 'nullable|string|max:255',
+            'source_id' => 'nullable|exists:income_sources,id',
+            'via_id' => 'nullable|exists:income_via,id',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
         ]);
@@ -61,7 +73,7 @@ class CasherController extends Controller
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
             'destination' => 'nullable|string|max:255',
-            'via' => 'nullable|string|max:255',
+            'via_id' => 'nullable|exists:income_via,id',
             'purpose' => 'nullable|string|max:1000',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
@@ -95,7 +107,6 @@ class CasherController extends Controller
             return response()->json(['message' => '✅ Chiqim muvaffaqiyatli yozildi.']);
 
         } catch (\Exception $e) {
-            \Log::error("Chiqim saqlashda xatolik: " . $e->getMessage(), ['data' => $data]);
 
             return response()->json([
                 'message' => '❌ Xatolik yuz berdi. Iltimos, keyinroq urinib ko‘ring.'
