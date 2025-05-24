@@ -143,7 +143,6 @@ class CasherController extends Controller
         $query = CashboxTransaction::with('currency', 'cashbox')
             ->where('branch_id', auth()->user()->employee->branch_id);
 
-        // Asosiy filterlar
         if ($request->filled('cashbox_id')) {
             $query->where('cashbox_id', $request->cashbox_id);
         }
@@ -164,7 +163,6 @@ class CasherController extends Controller
             $query->whereBetween('date', [$request->start_date, $request->end_date]);
         }
 
-        // Qidiruv (search)
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
