@@ -331,6 +331,7 @@ class CasherController extends Controller
                 'comment' => $validated['comment'] ?? null,
                 'status' => 'pending',
                 'created_by' => auth()->id(),
+                'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
             return response()->json([
@@ -348,7 +349,7 @@ class CasherController extends Controller
     public function getRequestForm(): \Illuminate\Http\JsonResponse
     {
         $requestForms = \App\Models\RequestForm::with('employee', 'currency', 'creator', 'approver')
-            ->where('employee_id', auth()->user()->employee->id)
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->orderBy('created_at', 'desc')
             ->get();
 
