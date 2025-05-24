@@ -69,27 +69,38 @@ class CasherController extends Controller
 
         $data['type'] = 'expense';
         $data['date'] = $data['date'] ?? now()->toDateString();
+        $data['branch_id'] = auth()->user()->employee->branch_id ?? null;
 
-        // Balance tekshirish
-        $balance = CashboxBalance::where('cashbox_id', $data['cashbox_id'])
-            ->where('currency_id', $data['currency_id'])
-            ->value('amount');
-
-        if ($balance === null || $balance < $data['amount']) {
-            return response()->json([
-                'message' => '❌ Yetarli mablag‘ mavjud emas.'
-            ], 422);
-        }
-
-        DB::transaction(function () use ($data) {
-            CashboxTransaction::create($data);
-
-            CashboxBalance::where('cashbox_id', $data['cashbox_id'])
+        try {
+            // 1. Balance tekshiruv
+            $balance = CashboxBalance::where('cashbox_id', $data['cashbox_id'])
                 ->where('currency_id', $data['currency_id'])
-                ->decrement('amount', $data['amount']);
-        });
+                ->value('amount');
 
-        return response()->json(['message' => '✅ Chiqim muvaffaqiyatli yozildi.']);
+            if ($balance === null || $balance < $data['amount']) {
+                return response()->json([
+                    'message' => '❌ Kassada yetarli mablag‘ mavjud emas.'
+                ], 422);
+            }
+
+            // 2. Saqlash
+            DB::transaction(function () use ($data) {
+                CashboxTransaction::create($data);
+
+                CashboxBalance::where('cashbox_id', $data['cashbox_id'])
+                    ->where('currency_id', $data['currency_id'])
+                    ->decrement('amount', $data['amount']);
+            });
+
+            return response()->json(['message' => '✅ Chiqim muvaffaqiyatli yozildi.']);
+
+        } catch (\Exception $e) {
+            \Log::error("Chiqim saqlashda xatolik: " . $e->getMessage(), ['data' => $data]);
+
+            return response()->json([
+                'message' => '❌ Xatolik yuz berdi. Iltimos, keyinroq urinib ko‘ring.'
+            ], 500);
+        }
     }
 
     public function getBalances(): \Illuminate\Http\JsonResponse
