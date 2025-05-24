@@ -22,6 +22,11 @@ class CasherController extends Controller
         return response()->json($via);
     }
 
+    public function getDestination(): \Illuminate\Http\JsonResponse
+    {
+        $destinations = \App\Models\IncomeDestination::all();
+        return response()->json($destinations);
+    }
     public function storeIncome(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
