@@ -255,15 +255,13 @@ class CasherController extends Controller
                     ->where('currency_id', $data['from_currency_id'])
                     ->decrement('amount', $data['amount']);
 
-                CashboxBalance::updateOrCreate(
-                    [
-                        'cashbox_id' => $data['to_cashbox_id'],
-                        'currency_id' => $data['to_currency_id'],
-                    ],
-                    [
-                        'amount' => DB::raw("amount + {$targetAmount}")
-                    ]
-                );
+                // 4. To kassaga qo‘shish
+                $toBalance = CashboxBalance::firstOrNew([
+                    'cashbox_id' => $data['to_cashbox_id'],
+                    'currency_id' => $data['to_currency_id'],
+                ]);
+                $toBalance->amount = ($toBalance->amount ?? 0) + $targetAmount;
+                $toBalance->save();
             });
 
             return response()->json([
