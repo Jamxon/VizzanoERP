@@ -372,11 +372,10 @@ class CasherController extends Controller
             $query->whereDate('deadline', '<=', $request->end_date);
         }
 
-        $requestForms = $query->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $requestForms = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return response()->json([
-            'request_forms' => $requestForms->map(function ($form) {
+            'data' => $requestForms->getCollection()->transform(function ($form) {
                 return [
                     'id' => $form->id,
                     'employee' => $form->employee->name,
@@ -391,7 +390,13 @@ class CasherController extends Controller
                     'approved_at' => $form->approved_at ? $form->approved_at->format('Y-m-d H:i:s') : null,
                     'deadline' => $form->deadline,
                 ];
-            })
+            }),
+            'current_page' => $requestForms->currentPage(),
+            'last_page' => $requestForms->lastPage(),
+            'per_page' => $requestForms->perPage(),
+            'total' => $requestForms->total(),
+            'from' => $requestForms->firstItem(),
+            'to' => $requestForms->lastItem(),
         ]);
     }
 }
