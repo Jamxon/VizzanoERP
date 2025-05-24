@@ -124,5 +124,79 @@ class CasherController extends Controller
         ]);
     }
 
+    public function transferBetweenCashboxes(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'from_cashbox_id' => 'required|exists:cashboxes,id',
+            'to_cashbox_id' => 'required|exists:cashboxes,id|different:from_cashbox_id',
+            'from_currency_id' => 'required|exists:currencies,id',
+            'to_currency_id' => 'required|exists:currencies,id',
+            'amount' => 'required|numeric|min:0.01',
+            'exchange_rate' => 'required|numeric|min:0.0001',
+            'date' => 'nullable|date',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        $data['date'] = $data['date'] ?? now()->toDateString();
+        $targetAmount = round($data['amount'] * $data['exchange_rate'], 2);
+
+        // Balance tekshirish
+        $balance = CashboxBalance::where('cashbox_id', $data['from_cashbox_id'])
+            ->where('currency_id', $data['from_currency_id'])
+            ->value('amount');
+
+        if ($balance === null || $balance < $data['amount']) {
+            return response()->json([
+                'message' => '❌ Jo‘natilayotgan kassada yetarli mablag‘ yo‘q.'
+            ], 422);
+        }
+
+        DB::transaction(function () use ($data, $targetAmount) {
+            // 1. Chiqim yoziladi
+            CashboxTransaction::create([
+                'cashbox_id' => $data['from_cashbox_id'],
+                'type' => 'expense',
+                'currency_id' => $data['from_currency_id'],
+                'amount' => $data['amount'],
+                'comment' => $data['comment'],
+                'target_cashbox_id' => $data['to_cashbox_id'],
+                'exchange_rate' => $data['exchange_rate'],
+                'target_amount' => $targetAmount,
+                'date' => $data['date'],
+            ]);
+
+            // 2. Kirim yoziladi
+            CashboxTransaction::create([
+                'cashbox_id' => $data['to_cashbox_id'],
+                'type' => 'income',
+                'currency_id' => $data['to_currency_id'],
+                'amount' => $targetAmount,
+                'comment' => '🔁 O‘tkazma: kassa ID ' . $data['from_cashbox_id'],
+                'target_cashbox_id' => $data['from_cashbox_id'],
+                'exchange_rate' => $data['exchange_rate'],
+                'target_amount' => $data['amount'],
+                'date' => $data['date'],
+            ]);
+
+            // 3. Balansni yangilash
+            CashboxBalance::where('cashbox_id', $data['from_cashbox_id'])
+                ->where('currency_id', $data['from_currency_id'])
+                ->decrement('amount', $data['amount']);
+
+            CashboxBalance::updateOrCreate(
+                [
+                    'cashbox_id' => $data['to_cashbox_id'],
+                    'currency_id' => $data['to_currency_id'],
+                ],
+                [
+                    'amount' => DB::raw("amount + {$targetAmount}")
+                ]
+            );
+        });
+
+        return response()->json([
+            'message' => "✅ Pul muvoffaqiyatli o‘tkazildi.\n{$data['amount']} → {$targetAmount}"
+        ]);
+    }
 
 }
