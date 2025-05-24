@@ -13,7 +13,11 @@ class CashboxBalance extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['cashbox_id', 'currency_id', 'amount'];
+    protected $fillable = [
+        'cashbox_id',
+        'currency_id',
+        'amount'
+    ];
 
     public function cashbox(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
