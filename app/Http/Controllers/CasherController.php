@@ -163,19 +163,6 @@ class CasherController extends Controller
                             'currency' => $balance->currency->code,
                             'amount' => number_format($balance->amount, 2, '.', ' '),
                         ];
-                    }),
-                    'transactions' => $cashbox->transactions->map(function ($transaction) {
-                        return [
-                            'type' => $transaction->type,
-                            'amount' => number_format($transaction->amount, 2, '.', ' '),
-                            'currency' => $transaction->currency->code,
-                            'date' => $transaction->date,
-                            'source' => $transaction->source,
-                            'destination' => $transaction->destination,
-                            'via' => $transaction->via,
-                            'purpose' => $transaction->purpose,
-                            'comment' => $transaction->comment,
-                        ];
                     })
                 ];
             })
