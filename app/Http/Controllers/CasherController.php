@@ -221,13 +221,17 @@ class CasherController extends Controller
         }
 
         if ($request->filled('search')) {
-            $search = $request->search;
+            $search = mb_strtolower($request->search); // PHP tomonda lowercase qilish
             $query->where(function ($q) use ($search) {
-                $q->where('source', 'ilike', "%$search%")
-                    ->orWhere('destination', 'ilike', "%$search%")
-                    ->orWhere('via', 'ilike', "%$search%")
-                    ->orWhere('purpose', 'ilike', "%$search%")
-                    ->orWhere('comment', 'ilike', "%$search%");
+                $q->whereHas('source', function ($q2) use ($search) {
+                    $q2->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
+                })
+                    ->orWhereHas('via', function ($q3) use ($search) {
+                        $q3->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
+                    })
+                    ->orWhereRaw('LOWER(destination) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(purpose) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(comment) LIKE ?', ["%{$search}%"]);
             });
         }
 
