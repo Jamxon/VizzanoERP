@@ -375,6 +375,7 @@ Route::get('/validate', function () {
 Route::middleware('auth:api')->group(function () {
     Route::get('profile', [UserController::class, 'getProfile']);
     Route::patch('profile/{employee}', [UserController::class, 'updateProfile']);
+    Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
 });
 
 Route::post('register', [AuthController::class, 'register']);
