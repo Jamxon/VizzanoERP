@@ -34,6 +34,7 @@ class CasherController extends Controller
             'via_name' => 'nullable|string|max:255',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
+            'purpose' => 'nullable|string|max:1000',
         ]);
 
         // source_id yo‘q bo‘lsa, source_name kelsin, yo‘qsa error
