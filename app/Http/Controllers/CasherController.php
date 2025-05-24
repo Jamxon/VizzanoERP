@@ -34,6 +34,7 @@ class CasherController extends Controller
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
             'source_id' => 'nullable|exists:income_sources,id',
+            'source_name' => 'nullable|string|max:255',
             'via_id' => 'required|exists:employees,id',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
