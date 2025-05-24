@@ -372,7 +372,8 @@ class CasherController extends Controller
             $query->whereDate('deadline', '<=', $request->end_date);
         }
 
-        $requestForms = $query->orderBy('created_at', 'desc')->get();
+        $requestForms = $query->orderBy('created_at', 'desc')
+            ->paginate(10);
 
         return response()->json([
             'request_forms' => $requestForms->map(function ($form) {
