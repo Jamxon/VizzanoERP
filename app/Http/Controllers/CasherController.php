@@ -181,9 +181,10 @@ class CasherController extends Controller
         return response()->json([
             'transactions' => $transactions->map(function ($tx) {
                 return [
+                    'cashbox' => $tx->cashbox,
                     'type' => $tx->type,
                     'amount' => number_format($tx->amount, 2, '.', ' '),
-                    'currency' => $tx->currency->code,
+                    'currency' => $tx->currency->name,
                     'date' => $tx->date,
                     'source' => $tx->source,
                     'destination' => $tx->destination,
