@@ -35,6 +35,10 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('casher')->middleware('role:casher')->group(function () {
+
+});
+
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
     Route::get('orders', [SupplierController::class, 'getOrders']);
     Route::get('receive/{id}', [SupplierController::class, 'receiveSupplierOrder']);
