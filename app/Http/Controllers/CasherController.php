@@ -25,6 +25,7 @@ class CasherController extends Controller
         try {
             $data['type'] = 'income';
             $data['date'] = $data['date'] ?? now()->toDateString();
+            $data['branch_id'] = auth()->user()->employee->branch_id;
 
             DB::transaction(function () use ($data) {
                 CashboxTransaction::create($data);
@@ -41,7 +42,10 @@ class CasherController extends Controller
             });
         }
         catch (\Exception $e) {
-            return response()->json(['message' => '❌ Kirim muvaffaqiyatsiz.'], 500);
+            return response()->json([
+                'message' => '❌ Kirim muvaffaqiyatsiz.',
+                'error' => $e->getMessage()
+            ], 500);
         }
 
         return response()->json(['message' => '✅ Kirim muvaffaqiyatli qo‘shildi.']);
