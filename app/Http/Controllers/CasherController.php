@@ -141,8 +141,7 @@ class CasherController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => '❌ Chiqim muvaffaqiyatsiz.',
-                'error' => $e->getMessage()
+                'message' => '❌ Chiqim muvaffaqiyatsiz.' . $e->getMessage(),
             ], 500);
         }
 
