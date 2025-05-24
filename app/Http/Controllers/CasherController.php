@@ -138,10 +138,10 @@ class CasherController extends Controller
         ]);
     }
 
-    public function getTransactions(Request $request, $cashboxId): \Illuminate\Http\JsonResponse
+    public function getTransactions(Request $request): \Illuminate\Http\JsonResponse
     {
         $transactions = CashboxTransaction::with('currency')
-            ->where('cashbox_id', $cashboxId)
+            ->where('cashbox_id', $request->cashbox_id)
             ->orderBy('date', 'desc')
             ->get();
 
