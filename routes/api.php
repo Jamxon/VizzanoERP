@@ -43,6 +43,8 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::post('transfers', [\App\Http\Controllers\CasherController::class, 'transferBetweenCashboxes']);
     Route::get('currencies', [CurrencyController::class, 'index']);
     Route::post('requestForm', [\App\Http\Controllers\CasherController::class, 'storeRequestForm']);
+    Route::get('via', [\App\Http\Controllers\CasherController::class, 'getVia']);
+    Route::get('sources', [\App\Http\Controllers\CasherController::class, 'getSource']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
