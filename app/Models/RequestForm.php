@@ -12,6 +12,8 @@ class RequestForm extends Model
 {
     use HasFactory;
 
+    protected $table = 'request_forms';
+
     protected $fillable = [
         'employee_id',
         'currency_id',
@@ -22,6 +24,8 @@ class RequestForm extends Model
         'approved_by',
         'approved_at',
         'created_by',
+        'created_at',
+        'branch_id',
     ];
 
     protected $casts = [
