@@ -364,7 +364,7 @@ class CasherController extends Controller
                     'comment' => $form->comment,
                     'status' => $form->status,
                     'created_at' => $form->created_at->format('Y-m-d H:i:s'),
-                    'created_by' => $form->creator->name ?? 'N/A',
+                    'created_by' => $form->creator->employee->name ?? 'N/A',
                     'approved_by' => $form->approver->name ?? 'N/A',
                     'approved_at' => $form->approved_at ? $form->approved_at->format('Y-m-d H:i:s') : null,
                 ];
