@@ -27,10 +27,10 @@ class CasherController extends Controller
         $destinations = \App\Models\IncomeDestination::all();
         return response()->json($destinations);
     }
+
     public function storeIncome(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
-            'cashbox_id' => 'required|exists:cashboxes,id',
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
             'source_id' => 'nullable|exists:income_sources,id',
@@ -42,34 +42,29 @@ class CasherController extends Controller
             'purpose' => 'nullable|string|max:1000',
         ]);
 
-        // source_id yo‘q bo‘lsa, source_name kelsin, yo‘qsa error
         if (empty($data['source_id'])) {
             if (empty($data['source_name'])) {
                 return response()->json([
-                    'message' => '❌ source_id ham source_name ham kiritilmadi. Biri bo‘lishi shart.'
+                    'message' => '❌ source_id ham source_name ham kiritilmadi.'
                 ], 422);
             }
 
-            // Agar mavjud bo‘lmasa, yangi IncomeSource yaratamiz
             $source = \App\Models\IncomeSource::firstOrCreate([
                 'name' => $data['source_name']
             ]);
-
             $data['source_id'] = $source->id;
         }
 
         if (empty($data['via_id'])) {
             if (empty($data['via_name'])) {
                 return response()->json([
-                    'message' => '❌ via_id ham via_name ham kiritilmadi. Biri bo‘lishi shart.'
+                    'message' => '❌ via_id ham via_name ham kiritilmadi.'
                 ], 422);
             }
 
-            // Agar mavjud bo‘lmasa, yangi IncomeVia yaratamiz
             $via = \App\Models\IncomeVia::firstOrCreate([
                 'name' => $data['via_name']
             ]);
-
             $data['via_id'] = $via->id;
         }
 
@@ -78,17 +73,25 @@ class CasherController extends Controller
             $data['date'] = $data['date'] ?? now()->toDateString();
             $data['branch_id'] = auth()->user()->employee->branch_id;
 
-            DB::transaction(function () use ($data) {
-                CashboxTransaction::create($data);
+            DB::transaction(function () use (&$data) {
+                // ✅ 1. Branch bo‘yicha bitta Cashbox topamiz yoki yaratamiz
+                $cashbox = \App\Models\Cashbox::firstOrCreate(
+                    ['branch_id' => $data['branch_id']],
+                    ['name' => 'Avto Cashbox: ' . now()->format('Y-m-d H:i:s')]
+                );
 
-                $balance = CashboxBalance::firstOrCreate(
+                $data['cashbox_id'] = $cashbox->id;
+
+                // ✅ 2. Transaction yozamiz
+                \App\Models\CashboxTransaction::create($data);
+
+                // ✅ 3. Cashbox balanceni yangilaymiz (currency_id bo‘yicha)
+                $balance = \App\Models\CashboxBalance::firstOrCreate(
                     [
-                        'cashbox_id' => $data['cashbox_id'],
+                        'cashbox_id' => $cashbox->id,
                         'currency_id' => $data['currency_id'],
                     ],
-                    [
-                        'amount' => 0
-                    ]
+                    ['amount' => 0]
                 );
 
                 $balance->increment('amount', $data['amount']);
