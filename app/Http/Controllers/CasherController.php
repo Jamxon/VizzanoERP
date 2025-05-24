@@ -210,7 +210,7 @@ class CasherController extends Controller
             ]);
 
             $data['date'] = $data['date'] ?? now()->toDateString();
-            $targetAmount = round($data['amount'] * $data['exchange_rate'], 2);
+            $targetAmount = round($data['amount'] / $data['exchange_rate'], 2);
 
             // Balance tekshirish
             $balance = CashboxBalance::where('cashbox_id', $data['from_cashbox_id'])
