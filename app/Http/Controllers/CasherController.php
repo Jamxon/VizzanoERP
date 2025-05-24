@@ -372,6 +372,11 @@ class CasherController extends Controller
             $query->whereDate('deadline', '<=', $request->end_date);
         }
 
+        // 📋 Status bo‘yicha filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         $requestForms = $query->orderBy('created_at', 'desc')->paginate(10);
 
         return response()->json([
