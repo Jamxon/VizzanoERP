@@ -348,12 +348,31 @@ class CasherController extends Controller
         }
     }
 
-    public function getRequestForm(): \Illuminate\Http\JsonResponse
+    public function getRequestForm(Request $request): \Illuminate\Http\JsonResponse
     {
-        $requestForms = \App\Models\RequestForm::with('employee', 'currency', 'creator', 'approver')
-            ->where('branch_id', auth()->user()->employee->branch_id)
-            ->orderBy('created_at', 'desc')
-            ->get();
+        $query = \App\Models\RequestForm::with('employee', 'currency', 'creator', 'approver')
+            ->where('branch_id', auth()->user()->employee->branch_id);
+
+        // 🔍 Search
+        if ($request->filled('search')) {
+            $search = mb_strtolower($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('employee', fn($q2) => $q2->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]))
+                    ->orWhereRaw('LOWER(purpose) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(comment) LIKE ?', ["%{$search}%"]);
+            });
+        }
+
+        // 📅 Deadline sanasi bo‘yicha filter
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('deadline', [$request->start_date, $request->end_date]);
+        } elseif ($request->filled('start_date')) {
+            $query->whereDate('deadline', '>=', $request->start_date);
+        } elseif ($request->filled('end_date')) {
+            $query->whereDate('deadline', '<=', $request->end_date);
+        }
+
+        $requestForms = $query->orderBy('created_at', 'desc')->get();
 
         return response()->json([
             'request_forms' => $requestForms->map(function ($form) {
@@ -369,7 +388,7 @@ class CasherController extends Controller
                     'created_by' => $form->creator->employee->name ?? 'N/A',
                     'approved_by' => $form->approver->employee->name ?? 'N/A',
                     'approved_at' => $form->approved_at ? $form->approved_at->format('Y-m-d H:i:s') : null,
-                    'deadline' => $form->deadline ?? null,
+                    'deadline' => $form->deadline,
                 ];
             })
         ]);
