@@ -173,9 +173,9 @@ class CasherController extends Controller
                 return [
                     'id' => $cashbox->id,
                     'name' => $cashbox->name,
-                    'balance' => $cashbox->balance ? [
-                        'currency' => $cashbox->balance->currency,
-                        'amount' => number_format($cashbox->balance->amount, 2, '.', ' ')
+                    'balance' => $cashbox->balances ? [
+                        'currency' => $cashbox->balances->currency,
+                        'amount' => number_format($cashbox->balances->amount, 2, '.', ' ')
                     ] : null,
                     'transactions' => $cashbox->transactions->map(function ($transaction) {
                         return [
