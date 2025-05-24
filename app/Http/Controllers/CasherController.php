@@ -369,4 +369,5 @@ class CasherController extends Controller
             ], 500);
         }
     }
+
 }
