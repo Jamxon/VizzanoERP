@@ -11,7 +11,7 @@
 16384||-9223372036854775808|T|G
 16384||10|T|G
 16384||16385|T|G</Grants>
-      <IntrospectionStateNumber>257621</IntrospectionStateNumber>
+      <IntrospectionStateNumber>257710</IntrospectionStateNumber>
       <ServerVersion>14.18</ServerVersion>
       <StartupTime>1747877928</StartupTime>
       <TimeZones>true ACDT
@@ -1415,7 +1415,7 @@ true posixrules
 13395||10|C|G
 13395||-9223372036854775808|U|G
 13395||10|U|G</Grants>
-      <IntrospectionStateNumber>257621</IntrospectionStateNumber>
+      <IntrospectionStateNumber>257710</IntrospectionStateNumber>
       <ObjectId>16384</ObjectId>
       <OwnerName>postgres</OwnerName>
     </database>
@@ -4844,8 +4844,8 @@ true posixrules
     <schema id="263" parent="3" name="public">
       <Comment>standard public schema</Comment>
       <Current>1</Current>
-      <IntrospectionStateNumber>257621</IntrospectionStateNumber>
-      <LastIntrospectionLocalTimestamp>2025-05-24.09:25:47</LastIntrospectionLocalTimestamp>
+      <IntrospectionStateNumber>257710</IntrospectionStateNumber>
+      <LastIntrospectionLocalTimestamp>2025-05-24.09:41:15</LastIntrospectionLocalTimestamp>
       <ObjectId>2200</ObjectId>
       <StateNumber>526</StateNumber>
       <OwnerName>postgres</OwnerName>
@@ -5640,7 +5640,7 @@ gas</Labels>
     </table>
     <table id="354" parent="263" name="cashbox_transactions">
       <ObjectId>23210</ObjectId>
-      <StateNumber>257224</StateNumber>
+      <StateNumber>257709</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -6565,12 +6565,11 @@ currency_id</ColNames>
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="496" parent="354" name="source">
-      <DefaultExpression>NULL::character varying</DefaultExpression>
+    <column id="496" parent="354" name="source_id">
       <Position>7</Position>
-      <StateNumber>257207</StateNumber>
-      <StoredType>varchar(255)|0s</StoredType>
-      <TypeId>1043</TypeId>
+      <StateNumber>257709</StateNumber>
+      <StoredType>integer|0s</StoredType>
+      <TypeId>23</TypeId>
     </column>
     <column id="497" parent="354" name="destination">
       <DefaultExpression>NULL::character varying</DefaultExpression>
@@ -6579,12 +6578,11 @@ currency_id</ColNames>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="498" parent="354" name="via">
-      <DefaultExpression>NULL::character varying</DefaultExpression>
+    <column id="498" parent="354" name="via_id">
       <Position>9</Position>
-      <StateNumber>257209</StateNumber>
-      <StoredType>varchar(255)|0s</StoredType>
-      <TypeId>1043</TypeId>
+      <StateNumber>257708</StateNumber>
+      <StoredType>integer|0s</StoredType>
+      <TypeId>23</TypeId>
     </column>
     <column id="499" parent="354" name="purpose">
       <Position>10</Position>
@@ -6632,7 +6630,7 @@ currency_id</ColNames>
     <column id="506" parent="354" name="updated_at">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <Position>17</Position>
-      <StateNumber>257224</StateNumber>
+      <StateNumber>257708</StateNumber>
       <StoredType>timestamp|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
@@ -6659,7 +6657,7 @@ currency_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>23220</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>257052</StateNumber>
+      <StateNumber>257709</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>

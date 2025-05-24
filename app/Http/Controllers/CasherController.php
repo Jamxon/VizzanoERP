@@ -29,10 +29,42 @@ class CasherController extends Controller
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
             'source_id' => 'nullable|exists:income_sources,id',
+            'source_name' => 'nullable|string|max:255',
             'via_id' => 'nullable|exists:income_via,id',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
         ]);
+
+        // source_id yo‘q bo‘lsa, source_name kelsin, yo‘qsa error
+        if (empty($data['source_id'])) {
+            if (empty($data['source_name'])) {
+                return response()->json([
+                    'message' => '❌ source_id ham source_name ham kiritilmadi. Biri bo‘lishi shart.'
+                ], 422);
+            }
+
+            // Agar mavjud bo‘lmasa, yangi IncomeSource yaratamiz
+            $source = \App\Models\IncomeSource::firstOrCreate([
+                'name' => $data['source_name']
+            ]);
+
+            $data['source_id'] = $source->id;
+        }
+
+        if (empty($data['via_id'])) {
+            if (empty($data['via_name'])) {
+                return response()->json([
+                    'message' => '❌ via_id ham via_name ham kiritilmadi. Biri bo‘lishi shart.'
+                ], 422);
+            }
+
+            // Agar mavjud bo‘lmasa, yangi IncomeVia yaratamiz
+            $via = \App\Models\IncomeVia::firstOrCreate([
+                'name' => $data['via_name']
+            ]);
+
+            $data['via_id'] = $via->id;
+        }
 
         try {
             $data['type'] = 'income';
@@ -55,8 +87,7 @@ class CasherController extends Controller
                 $balance->increment('amount', $data['amount']);
             });
 
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'message' => '❌ Kirim muvaffaqiyatsiz.',
                 'error' => $e->getMessage()
@@ -74,10 +105,26 @@ class CasherController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'destination' => 'nullable|string|max:255',
             'via_id' => 'nullable|exists:income_via,id',
+            'via_name' => 'nullable|string|max:255',
             'purpose' => 'nullable|string|max:1000',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
         ]);
+
+        // Agar via_id bo'lmasa, via_name kelishi kerak
+        if (empty($data['via_id'])) {
+            if (empty($data['via_name'])) {
+                return response()->json([
+                    'message' => '❌ via_id ham via_name ham kiritilmadi. Biri bo‘lishi shart.'
+                ], 422);
+            }
+
+            $via = \App\Models\IncomeVia::firstOrCreate([
+                'name' => $data['via_name']
+            ]);
+
+            $data['via_id'] = $via->id;
+        }
 
         $data['type'] = 'expense';
         $data['date'] = $data['date'] ?? now()->toDateString();
@@ -107,9 +154,9 @@ class CasherController extends Controller
             return response()->json(['message' => '✅ Chiqim muvaffaqiyatli yozildi.']);
 
         } catch (\Exception $e) {
-
             return response()->json([
-                'message' => '❌ Xatolik yuz berdi. Iltimos, keyinroq urinib ko‘ring.'
+                'message' => '❌ Xatolik yuz berdi. Iltimos, keyinroq urinib ko‘ring.',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
