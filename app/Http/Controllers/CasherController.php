@@ -320,6 +320,7 @@ class CasherController extends Controller
             'amount' => 'required|numeric|min:0.01',
             'purpose' => 'nullable|string|max:1000',
             'comment' => 'nullable|string|max:1000',
+            'deadline' => 'required|date|after_or_equal:today',
         ]);
 
         try {
@@ -332,6 +333,7 @@ class CasherController extends Controller
                 'status' => 'pending',
                 'created_by' => auth()->id(),
                 'branch_id' => auth()->user()->employee->branch_id,
+                'deadline' => $validated['deadline'],
             ]);
 
             return response()->json([
@@ -365,8 +367,9 @@ class CasherController extends Controller
                     'status' => $form->status,
                     'created_at' => $form->created_at->format('Y-m-d H:i:s'),
                     'created_by' => $form->creator->employee->name ?? 'N/A',
-                    'approved_by' => $form->approver->name ?? 'N/A',
+                    'approved_by' => $form->approver->employee->name ?? 'N/A',
                     'approved_at' => $form->approved_at ? $form->approved_at->format('Y-m-d H:i:s') : null,
+                    'deadline' => $form->deadline ? $form->deadline->format('Y-m-d') : null,
                 ];
             })
         ]);
