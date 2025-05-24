@@ -11,9 +11,9 @@ class Cashbox extends Model
 
     protected $fillable = ['name'];
 
-    public function balances(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function balances(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
-        return $this->hasMany(CashboxBalance::class);
+        return $this->hasOne(CashboxBalance::class);
     }
 
     public function transactions(): \Illuminate\Database\Eloquent\Relations\HasMany
