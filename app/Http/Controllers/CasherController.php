@@ -377,7 +377,7 @@ class CasherController extends Controller
             $query->where('status', $request->status);
         }
 
-        $requestForms = $query->orderBy('created_at', 'desc')->paginate(10);
+        $requestForms = $query->orderBy('deadline', 'desc')->paginate(10);
 
         return response()->json([
             'data' => $requestForms->getCollection()->transform(function ($form) {
