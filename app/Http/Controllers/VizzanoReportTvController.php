@@ -99,6 +99,7 @@ class VizzanoReportTvController extends Controller
 
                 return [
                     'model' => optional($output->orderSubmodel->orderModel)->model,
+                    'order_id' => optional($output->orderSubmodel->orderModel->order)->id,
                     'submodel' => $output->orderSubmodel->submodel,
                     'group' => optional($output->orderSubmodel->group)->group,
                     'total_quantity' => $output->total_quantity,
