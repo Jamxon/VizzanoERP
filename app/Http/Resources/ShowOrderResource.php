@@ -68,14 +68,19 @@ class ShowOrderResource extends JsonResource
                             'id' => $submodel->group->id,
                             'group' => $submodel->group->group,
                         ] : null,
-                        'sewingOutputs' => $submodel->sewingOutputs->map(function ($output) {
-                            return [
-                                'id' => $output->id,
-                                'quantity' => $output->quantity,
-                                'time' => $output->time,
-                                'comment' => $output->comment,
-                            ];
-                        }),
+                        'sewingOutputs' => $submodel->sewingOutputs
+                                ?->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+                                ->map(fn($sewingOutput) => [
+                                    'id' => $sewingOutput->id,
+                                    'quantity' => $sewingOutput->quantity,
+                                    'comment' => $sewingOutput->comment,
+                                    'time' => [
+                                        'id' => $sewingOutput->time?->id,
+                                        'time' => $sewingOutput->time->time,
+                                    ],
+                                ])
+                                ->values()
+                                ->toArray() ?? [],
                         'otkOrderGroup' => $submodel->otkOrderGroup ? [
                             'id' => $submodel->otkOrderGroup->id,
                             'group' => $submodel->otkOrderGroup->group,
