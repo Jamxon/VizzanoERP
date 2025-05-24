@@ -160,7 +160,7 @@ class CasherController extends Controller
                     'name' => $cashbox->name,
                     'balance' => $cashbox->balances->map(function ($balance) {
                         return [
-                            'currency' => $balance->currency->code,
+                            'currency' => $balance->currency->name,
                             'amount' => number_format($balance->amount, 2, '.', ' '),
                         ];
                     })
