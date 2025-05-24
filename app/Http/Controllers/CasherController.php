@@ -110,10 +110,9 @@ class CasherController extends Controller
     public function storeExpense(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
-            'cashbox_id' => 'required|exists:cashboxes,id',
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
-            'destination_id' => 'required|exists:income_destinations,id',
+            'destination_id' => 'nullable|exists:income_destinations,id',
             'destination_name' => 'nullable|string|max:255',
             'via_id' => 'nullable|exists:income_via,id',
             'via_name' => 'nullable|string|max:255',
@@ -122,69 +121,72 @@ class CasherController extends Controller
             'date' => 'nullable|date',
         ]);
 
-        // Agar via_id bo'lmasa, via_name kelishi kerak
+        // via_id yoki via_name
         if (empty($data['via_id'])) {
             if (empty($data['via_name'])) {
                 return response()->json([
-                    'message' => '❌ via_id ham via_name ham kiritilmadi. Biri bo‘lishi shart.'
+                    'message' => '❌ via_id ham via_name ham kiritilmadi.'
                 ], 422);
             }
 
-            $via = \App\Models\IncomeVia::firstOrCreate([
-                'name' => $data['via_name']
-            ]);
-
+            $via = \App\Models\IncomeVia::firstOrCreate(['name' => $data['via_name']]);
             $data['via_id'] = $via->id;
         }
 
-        // Agar destination_id bo'lmasa, destination_name kelishi kerak
+        // destination_id yoki destination_name
         if (empty($data['destination_id'])) {
             if (empty($data['destination_name'])) {
                 return response()->json([
-                    'message' => '❌ destination_id ham destination_name ham kiritilmadi. Biri bo‘lishi shart.'
+                    'message' => '❌ destination_id ham destination_name ham kiritilmadi.'
                 ], 422);
             }
 
-            $destination = \App\Models\IncomeDestination::firstOrCreate([
-                'name' => $data['destination_name']
-            ]);
-
+            $destination = \App\Models\IncomeDestination::firstOrCreate(['name' => $data['destination_name']]);
             $data['destination_id'] = $destination->id;
         }
 
         $data['type'] = 'expense';
         $data['date'] = $data['date'] ?? now()->toDateString();
-        $data['branch_id'] = auth()->user()->employee->branch_id ?? null;
+        $data['branch_id'] = auth()->user()->employee->branch_id;
 
         try {
-            // 1. Balance tekshiruv
-            $balance = CashboxBalance::where('cashbox_id', $data['cashbox_id'])
-                ->where('currency_id', $data['currency_id'])
-                ->value('amount');
+            DB::transaction(function () use (&$data) {
+                // ✅ Branch bo‘yicha bitta Cashbox topamiz yoki yaratamiz
+                $cashbox = \App\Models\Cashbox::firstOrCreate(
+                    ['branch_id' => $data['branch_id']],
+                    ['name' => 'Avto Cashbox: ' . now()->format('Y-m-d H:i:s')]
+                );
 
-            if ($balance === null || $balance < $data['amount']) {
-                return response()->json([
-                    'message' => '❌ Kassada yetarli mablag‘ mavjud emas.'
-                ], 422);
-            }
+                $data['cashbox_id'] = $cashbox->id;
 
-            // 2. Saqlash
-            DB::transaction(function () use ($data) {
-                CashboxTransaction::create($data);
+                // ✅ Balansni tekshiramiz
+                $balance = \App\Models\CashboxBalance::firstOrCreate(
+                    [
+                        'cashbox_id' => $cashbox->id,
+                        'currency_id' => $data['currency_id'],
+                    ],
+                    ['amount' => 0]
+                );
 
-                CashboxBalance::where('cashbox_id', $data['cashbox_id'])
-                    ->where('currency_id', $data['currency_id'])
-                    ->decrement('amount', $data['amount']);
+                if ($balance->amount < $data['amount']) {
+                    throw new \Exception('❌ Kassada yetarli mablag‘ mavjud emas.');
+                }
+
+                // ✅ Transaction yozamiz
+                \App\Models\CashboxTransaction::create($data);
+
+                // ✅ Balansni kamaytiramiz
+                $balance->decrement('amount', $data['amount']);
             });
-
-            return response()->json(['message' => '✅ Chiqim muvaffaqiyatli yozildi.']);
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => '❌ Xatolik yuz berdi. Iltimos, keyinroq urinib ko‘ring.',
+                'message' => '❌ Chiqim muvaffaqiyatsiz.',
                 'error' => $e->getMessage()
             ], 500);
         }
+
+        return response()->json(['message' => '✅ Chiqim muvaffaqiyatli yozildi.']);
     }
 
     public function getBalances(): \Illuminate\Http\JsonResponse
