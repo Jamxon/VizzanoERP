@@ -345,4 +345,29 @@ class CasherController extends Controller
         }
     }
 
+    public function getRequestForm(): \Illuminate\Http\JsonResponse
+    {
+        $requestForms = \App\Models\RequestForm::with('employee', 'currency', 'creator', 'approver')
+            ->where('employee_id', auth()->user()->employee->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'request_forms' => $requestForms->map(function ($form) {
+                return [
+                    'id' => $form->id,
+                    'employee' => $form->employee->name,
+                    'currency' => $form->currency->name,
+                    'amount' => number_format($form->amount, 2, '.', ' '),
+                    'purpose' => $form->purpose,
+                    'comment' => $form->comment,
+                    'status' => $form->status,
+                    'created_at' => $form->created_at->format('Y-m-d H:i:s'),
+                    'created_by' => $form->creator->name ?? 'N/A',
+                    'approved_by' => $form->approver->name ?? 'N/A',
+                    'approved_at' => $form->approved_at ? $form->approved_at->format('Y-m-d H:i:s') : null,
+                ];
+            })
+        ]);
+    }
 }

@@ -47,6 +47,7 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('sources', [\App\Http\Controllers\CasherController::class, 'getSource']);
     Route::get('destinations', [\App\Http\Controllers\CasherController::class, 'getDestination']);
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
+    Route::get('requests', [\App\Http\Controllers\CasherController::class, 'getRequestForm']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
