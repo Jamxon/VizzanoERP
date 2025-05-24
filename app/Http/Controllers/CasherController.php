@@ -140,10 +140,41 @@ class CasherController extends Controller
 
     public function getTransactions(Request $request): \Illuminate\Http\JsonResponse
     {
-        $transactions = CashboxTransaction::with('currency')
-            ->where('cashbox_id', $request->cashbox_id)
-            ->orderBy('date', 'desc')
-            ->get();
+        $query = CashboxTransaction::with('currency');
+
+        if ($request->filled('cashbox_id')) {
+            $query->where('cashbox_id', $request->cashbox_id);
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('date', $request->date);
+        }
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('date', [$request->start_date, $request->end_date]);
+        }
+
+        if ($request->filled('source')) {
+            $query->where('source', 'ilike', '%' . $request->source . '%');
+        }
+
+        if ($request->filled('destination')) {
+            $query->where('destination', 'ilike', '%' . $request->destination . '%');
+        }
+
+        if ($request->filled('via')) {
+            $query->where('via', 'ilike', '%' . $request->via . '%');
+        }
+
+        if ($request->filled('purpose')) {
+            $query->where('purpose', 'ilike', '%' . $request->purpose . '%');
+        }
+
+        $transactions = $query->orderBy('date', 'desc')->get();
 
         return response()->json([
             'transactions' => $transactions->map(function ($tx) {
