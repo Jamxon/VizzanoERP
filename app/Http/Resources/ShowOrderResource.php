@@ -81,6 +81,8 @@ class ShowOrderResource extends JsonResource
                                 ])
                                 ->values()
                                 ->toArray() ?? [],
+                        'total_quantity' => $submodel->sewingOutputs
+                                ->sum('quantity') ?? 0,
                         'otkOrderGroup' => $submodel->otkOrderGroup ? [
                             'id' => $submodel->otkOrderGroup->id,
                             'group' => $submodel->otkOrderGroup->group,
