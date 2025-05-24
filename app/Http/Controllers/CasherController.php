@@ -275,4 +275,36 @@ class CasherController extends Controller
         }
     }
 
+    public function storeRequestForm(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'currency_id' => 'required|exists:currencies,id',
+            'amount' => 'required|numeric|min:0.01',
+            'purpose' => 'nullable|string|max:1000',
+            'comment' => 'nullable|string|max:1000',
+        ]);
+
+        try {
+            $requestForm = \App\Models\RequestForm::create([
+                'employee_id' => $validated['employee_id'],
+                'currency_id' => $validated['currency_id'],
+                'amount' => $validated['amount'],
+                'purpose' => $validated['purpose'] ?? null,
+                'comment' => $validated['comment'] ?? null,
+                'status' => 'pending',
+                'created_by' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'message' => '✅ Talabnoma muvaffaqiyatli yaratildi.',
+                'request_id' => $requestForm->id
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => '❌ Talabnoma yaratishda xatolik yuz berdi.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
