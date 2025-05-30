@@ -53,41 +53,43 @@ if (!function_exists('transliterate')) {
     }
 
     function sendMessage($chatId, $text)
-    {
-        $token = config('services.telegram.bot_token');
-        $url = "https://api.telegram.org/bot{$token}/sendMessage";
+{
+    $token = config('services.telegram.bot_token');
+    $url = "https://api.telegram.org/bot{$token}/sendMessage";
 
-        try {
-            $response = Http::post($url, [
+    try {
+        $response = Http::post($url, [
+            'chat_id' => $chatId,
+            'text' => $text,
+            'parse_mode' => 'HTML',
+        ]);
+
+        Log::add(
+            auth()->id(),
+            'Ishladi',
+            'success',
+            null,
+            [
+                'chat_id' => $chatId,
+                'text' => $text
+            ]
+        ); // <-- BU YERDA ; BOR
+
+    } catch (\Exception $e) {
+        Log::add(
+            auth()->id(),
+            'Ishlamadi',
+            'error',
+            null,
+            [
                 'chat_id' => $chatId,
                 'text' => $text,
-                'parse_mode' => 'HTML',
-            ]);
-
-            Log::add(
-                auth()->id(),
-                'Ishladi',
-                'success',
-                null,
-                [
-                    'chat_id' => $chatId,
-                    'text' => $text
-                ]
-            )
-            } catch (\Exception $e) {
-                
-            Log::add(
-                auth()->id(),
-                'Ishlamadi',
-                'error',
-                null,
-                [
-                    'chat_id' => $chatId,
-                    'text' => $text
-                ]
-            )
-        }
+                'error' => $e->getMessage(),
+            ]
+        ); // <-- BU YERDA HAM ;
     }
+}
+
 
 
 }
