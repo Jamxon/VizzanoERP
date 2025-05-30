@@ -92,6 +92,9 @@ class UserController extends Controller
 
         return response()->json($resource);
     }
+   
+    use App\Services\TelegramService;
+
     public function storeIssue(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
@@ -99,21 +102,20 @@ class UserController extends Controller
                 'description' => 'required|string|max:255',
                 'image' => 'sometimes|nullable|image|max:20480',
             ]);
-            
+
+            $filename = null;
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
                 $file->storeAs('/issues/', $filename);
             }
 
-            // Create a new issue
-            Issue::create([
+            $issue = Issue::create([
                 'user_id' => auth()->id(),
                 'description' => $request->description,
-                'image' => 'issues/' . ($request->hasFile('image') ? $filename : null),
+                'image' => 'issues/' . ($filename ?? null),
             ]);
 
-            // Log the issue
             Log::add(
                 auth()->id(),
                 "Yangi muammo qo'shildi",
@@ -121,14 +123,28 @@ class UserController extends Controller
                 [],
                 [
                     'description' => $request->description,
-                    'image' => $request->hasFile('image') ? 'issues/' . $filename : null,
+                    'image' => $filename ? 'issues/' . $filename : null,
                 ]
             );
 
-            return response()->json(['message' => 'Fikringiz uchun rahmat! Muammo muvaffaqiyatli yuborildi. Tez orada bu muammoga yechim beriladi!'], 201);
+            // Telegramga yuborish
+            $user = auth()->user();
+            $message = "<b>🛠 Yangi muammo bildirildi!</b>\n\n"
+                    . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role->name})\n"
+                    . "📝 Tavsif: {$request->description}\n"
+                    . ($filename ? "🖼 Rasm: [storage/issues/{$filename}]" : "");
+
+            TelegramService::sendMessage(config('services.telegram.chat_id_1'), $message);
+            TelegramService::sendMessage(config('services.telegram.chat_id_2'), $message);
+
+            return response()->json([
+                'message' => 'Fikringiz uchun rahmat! Muammo yuborildi.',
+            ], 201);
         } catch (\Exception $exception) {
-            return response()->json(['error' => 'Failed to report issue: ' . $exception->getMessage()], 500);
+            return response()->json([
+                'error' => 'Failed to report issue: ' . $exception->getMessage()
+            ], 500);
         }
-        
     }
+
 }
