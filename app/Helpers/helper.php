@@ -1,5 +1,5 @@
 <?php
-
+use App\Models\Log;
 use Illuminate\Support\Facades\Http;
 
 if (!function_exists('transliterate')) {
@@ -51,7 +51,7 @@ if (!function_exists('transliterate')) {
 
         return strtr($text, $single);
     }
-use App\Models\Log;
+    
     function sendMessage($chatId, $text)
     {
         $token = config('services.telegram.bot_token');
