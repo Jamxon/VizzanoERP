@@ -64,9 +64,28 @@ if (!function_exists('transliterate')) {
                 'parse_mode' => 'HTML',
             ]);
 
-            \Log::info('Telegram response: ' . $response->body());
-        } catch (\Exception $e) {
-            \Log::error('Telegram error: ' . $e->getMessage());
+            Log::add(
+                auth()->id(),
+                'Ishladi',
+                'success',
+                null,
+                [
+                    'chat_id' => $chatId,
+                    'text' => $text
+                ]
+            )
+            } catch (\Exception $e) {
+                
+            Log::add(
+                auth()->id(),
+                'Ishlamadi',
+                'error',
+                null,
+                [
+                    'chat_id' => $chatId,
+                    'text' => $text
+                ]
+            )
         }
     }
 
