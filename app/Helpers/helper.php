@@ -57,11 +57,18 @@ if (!function_exists('transliterate')) {
         $token = config('services.telegram.bot_token');
         $url = "https://api.telegram.org/bot{$token}/sendMessage";
 
-        Http::post($url, [
-            'chat_id' => $chatId,
-            'text' => $text,
-            'parse_mode' => 'HTML',
-        ]);
+        try {
+            $response = Http::post($url, [
+                'chat_id' => $chatId,
+                'text' => $text,
+                'parse_mode' => 'HTML',
+            ]);
+
+            \Log::info('Telegram response: ' . $response->body());
+        } catch (\Exception $e) {
+            \Log::error('Telegram error: ' . $e->getMessage());
+        }
     }
+
 
 }

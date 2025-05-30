@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Models\Issue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+
 
 class UserController extends Controller
 {
