@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Issue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+
 class UserController extends Controller
 {
     public function getProfile(): \Illuminate\Http\JsonResponse
@@ -92,8 +93,6 @@ class UserController extends Controller
 
         return response()->json($resource);
     }
-   
-    use App\Services\TelegramService;
 
     public function storeIssue(Request $request): \Illuminate\Http\JsonResponse
     {
