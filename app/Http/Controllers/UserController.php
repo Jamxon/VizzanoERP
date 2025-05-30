@@ -91,4 +91,43 @@ class UserController extends Controller
 
         return response()->json($resource);
     }
+    public function storeIssue(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $request->validate([
+                'description' => 'required|string|max:255',
+                'image' => 'sometimes|nullable|image|max:20480',
+            ]);
+            
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('/issues/', $filename);
+            }
+
+            // Create a new issue
+            Issue::create([
+                'user_id' => auth()->id(),
+                'description' => $request->description,
+                'image' => 'issues/' . ($request->hasFile('image') ? $filename : null),
+            ]);
+
+            // Log the issue
+            Log::add(
+                auth()->id(),
+                "Yangi muammo qo'shildi",
+                'create',
+                [],
+                [
+                    'description' => $request->description,
+                    'image' => $request->hasFile('image') ? 'issues/' . $filename : null,
+                ]
+            );
+
+            return response()->json(['message' => 'Fikringiz uchun rahmat! Muammo muvaffaqiyatli yuborildi. Tez orada bu muammoga yechim beriladi!'], 201);
+        } catch (\Exception $exception) {
+            return response()->json(['error' => 'Failed to report issue: ' . $exception->getMessage()], 500);
+        }
+        
+    }
 }
