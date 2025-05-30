@@ -135,8 +135,7 @@ class UserController extends Controller
                     . "📝 Tavsif: {$request->description}\n"
                     . ($filename ? "🖼 Rasm: [storage/issues/{$filename}]" : "");
 
-            sendMessage(config('services.telegram.chat_id_1'), $message);
-            sendMessage(config('services.telegram.chat_id_2'), $message);
+            sendMessage(TELEGRAM_GROUP_CHAT_ID, $message);
 
             return response()->json([
                 'message' => 'Fikringiz uchun rahmat! Muammo yuborildi.',
