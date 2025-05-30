@@ -39,7 +39,7 @@ class AuthController extends Controller
     protected function hashPassword($password): string
     {
         $options = [
-            'cost' => 12, // Django'dagi `bcrypt.gensalt(rounds=12)` parametri bilan mos.
+            'cost' => 12, // Django'dagi `bcrypt.gensalt(rounds=12)` parametri bilan mos
         ];
         return password_hash($password, PASSWORD_BCRYPT, $options);
     }
