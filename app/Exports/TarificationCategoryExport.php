@@ -13,6 +13,7 @@ class TarificationCategoryExport implements FromCollection, WithEvents
     protected $orderSubModelId;
     protected $mergeRows = [];
     protected $formulaRows = [];
+    protected $region;
 
     public function __construct($orderSubModelId, $region)
     {
