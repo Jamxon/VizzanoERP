@@ -277,6 +277,7 @@ class CasherController extends Controller
                     'comment' => '🔁 Valyuta ayirboshlash',
                     'branch_id' => $cashbox->branch_id,
                     'via_id' => auth()->user()->employee->id, // Hozirgi foydalanuvchi
+                    'purpose' => $data['comment'] ?? null,
                 ]);
 
                 // Kirim
@@ -292,6 +293,7 @@ class CasherController extends Controller
                     'comment' => '🔁 Valyuta ayirboshlash',
                     'branch_id' => $cashbox->branch_id,
                     'via_id' => auth()->user()->employee->id, // Hozirgi foydalanuvchi
+                    'purpose' => $data['comment'] ?? null,
                 ]);
 
                 // From balans kamayadi
