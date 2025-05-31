@@ -130,7 +130,7 @@ class UserController extends Controller
 
         // Telegramga yuborish
         $user = auth()->user();
-        $message = "<b>🛠 Yangi muammo bildirildi!</b>\n\n"
+        $message = "#muammo<b>🛠 Yangi muammo bildirildi!</b>\n\n"
             . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role->name})\n"
             . "📝 Tavsif: {$request->description}";
 
@@ -140,13 +140,13 @@ class UserController extends Controller
         if ($filename) {
             $photoPath = storage_path("app/public/issues/" . $filename);
 
-$response = Http::attach(
-    'photo', file_get_contents($photoPath), $filename
-)->post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
-    'chat_id' => $chatId,
-    'caption' => $message,
-    'parse_mode' => 'HTML',
-]);
+            $response = Http::attach(
+                'photo', file_get_contents($photoPath), $filename
+            )->post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                'chat_id' => $chatId,
+                'caption' => $message,
+                'parse_mode' => 'HTML',
+            ]);
 
         } else {
             // Agar rasm bo‘lmasa — oddiy xabar yuborish
