@@ -91,14 +91,15 @@ class InternalAccountantController extends Controller
         return response()->json($tarifications);
     }
 
-    public function getTarifications(Request $request)
+   public function getTarifications(Request $request)
     {
         $region = $request->input('region');
         $submodelId = $request->input('submodel_id');
 
         $orderSubmodel = OrderSubModel::with([
+            'orderModel.order', // <-- limit uchun kerak
             'tarificationCategories.tarifications' => function ($query) use ($region) {
-                $query->with('tarificationLogs'); // <-- TarificationLog larni yuklaymiz
+                $query->with('tarificationLogs');
                 $query->whereHas('employee', function ($q) use ($region) {
                     if ($region) {
                         $q->where('region', $region);
@@ -108,7 +109,8 @@ class InternalAccountantController extends Controller
             'tarificationCategories.tarifications.employee:id,name,region'
         ])->findOrFail($submodelId);
 
-        $limit = $orderSubmodel->orderModel->order->quantity ?? 0;
+        // Bu yerda limit aniqlanadi
+        $limit = $orderSubmodel->orderModel?->order?->quantity ?? 0;
 
         $tarifications = $orderSubmodel->tarificationCategories->flatMap(function ($category) use ($limit) {
             return $category->tarifications->map(function ($tarification) use ($limit) {
@@ -122,8 +124,8 @@ class InternalAccountantController extends Controller
                     'summa' => $tarification->summa,
                     'employee_id' => $tarification->employee_id,
                     'employee_name' => $tarification->employee?->name,
-                    'total_quantity' => $totalQuantity, // <-- Qilingan mahsulotlar soni
-                    'limit' => $limit - $totalQuantity, // <-- Buyurtma limit
+                    'total_quantity' => $totalQuantity,
+                    'limit' => $limit - $totalQuantity,
                 ];
             });
         });
@@ -132,6 +134,7 @@ class InternalAccountantController extends Controller
             'tarifications' => $tarifications
         ]);
     }
+
 
 
     public function generateDailyPlan(Request $request): \Illuminate\Http\Response
