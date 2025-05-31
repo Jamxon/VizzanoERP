@@ -135,7 +135,7 @@ class UserController extends Controller
                     . "📝 Tavsif: {$request->description}\n"
                     . ($filename ? "🖼 Rasm: [storage/issues/{$filename}]" : "");
 
-            $botToken = "8120915071:AAGVvrYzWBfhABMJWtlDzdFgUELUUKTj5Q";
+            $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
             $chatId = "-4723241667";
 
 
