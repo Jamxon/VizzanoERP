@@ -69,6 +69,7 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('tarifications/search', [InternalAccountantController::class, 'searchTarifications']);
     Route::get('tarifications/show', [InternalAccountantController::class, 'showTarifications']);
     Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
+    Route::get('tarifications', [InternalAccountantController::class, 'getTarifications']);
     Route::get('users', [TechnologController::class, 'getEmployerByDepartment']);
     Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
     Route::get('dailyPlan', [InternalAccountantController::class, 'generateDailyPlan']);

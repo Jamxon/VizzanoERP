@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use App\Models\Employee;
-
+use Svg\Tag\Rect;
 
 class InternalAccountantController extends Controller
 {
@@ -90,6 +90,49 @@ class InternalAccountantController extends Controller
 
         return response()->json($tarifications);
     }
+
+    public function getTarifications(Request $request)
+    {
+        $region = $request->input('region');
+        $submodelId = $request->input('submodel_id');
+
+        $orderSubmodel = OrderSubModel::with([
+            'tarificationCategories.tarifications' => function ($query) use ($region) {
+                $query->with('tarificationLogs'); // <-- TarificationLog larni yuklaymiz
+                $query->whereHas('employee', function ($q) use ($region) {
+                    if ($region) {
+                        $q->where('region', $region);
+                    }
+                });
+            },
+            'tarificationCategories.tarifications.employee:id,name,region'
+        ])->findOrFail($submodelId);
+
+        $limit = $orderSubmodel->orderModel->order->quantity ?? 0;
+
+        $tarifications = $orderSubmodel->tarificationCategories->flatMap(function ($category) use ($limit) {
+            return $category->tarifications->map(function ($tarification) use ($limit) {
+                $totalQuantity = $tarification->tarificationLogs->sum('quantity');
+
+                return [
+                    'id' => $tarification->id,
+                    'name' => $tarification->name,
+                    'code' => $tarification->code,
+                    'second' => $tarification->second,
+                    'summa' => $tarification->summa,
+                    'employee_id' => $tarification->employee_id,
+                    'employee_name' => $tarification->employee?->name,
+                    'total_quantity' => $totalQuantity, // <-- Qilingan mahsulotlar soni
+                    'limit' => $limit - $totalQuantity, // <-- Buyurtma limit
+                ];
+            });
+        });
+
+        return response()->json([
+            'tarifications' => $tarifications
+        ]);
+    }
+
 
     public function generateDailyPlan(Request $request): \Illuminate\Http\Response
     {
