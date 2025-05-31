@@ -91,7 +91,7 @@ class InternalAccountantController extends Controller
         return response()->json($tarifications);
     }
 
-   public function getTarifications(Request $request)
+    public function getTarifications(Request $request)
         {
             $region = $request->input('region');
             $submodelId = $request->input('submodel_id');
@@ -133,10 +133,7 @@ class InternalAccountantController extends Controller
             return response()->json([
                 'tarifications' => $tarifications
             ]);
-        }
-
-
-
+    }
 
     public function generateDailyPlan(Request $request): \Illuminate\Http\Response
     {
@@ -790,4 +787,59 @@ class InternalAccountantController extends Controller
         return response()->json($employees);
     }
 
+    public function salaryCalculation(Request $request){
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'tarifications' => 'required|array',
+            'tarifications.*.id' => 'required|exists:tarifications,id',
+            'tarifications.*.quantity' => 'required|numeric',
+        ]);
+
+        $employee = Employee::findOrFail($request->employee_id);
+
+        if ($employee->status === 'kicked') {
+            return response()->json(['message' => '❌ Xodim ishdan bo‘shatilgan.'], 403);
+        }
+
+        foreach ($request->tarifications as $tarificationData) {
+            $tarification = Tarification::findOrFail($tarificationData['id']);
+            $quantity = $tarificationData['quantity'];
+
+            // Hisob-kitob logini yaratish
+            EmployeeTarificationLog::updateOrCreate(
+                [
+                    'employee_id' => $employee->id,
+                    'tarification_id' => $tarification->id,
+                    'date' => now()->toDateString(),
+                ],
+                [
+                    'quantity' => $quantity,
+                    'is_own' => in_array($tarification->id, $employee->tarifications->pluck('id')->toArray()),
+                    'amount_earned' => $tarification->summa * $quantity,
+                ]
+            );
+
+            // Agar xodimning to'lov turi "piece_work" bo'lsa, balansni yangilash
+
+            if ($employee->payment_type === 'piece_work') {
+                $amountEarned = $tarification->summa * $quantity;
+                $employee->increment('balance', $amountEarned);
+            }
+            // Log yozish
+            Log::add(
+                auth()->id(),
+                "Hisob-kitob amalga oshirildi",
+                'accounting',
+                null,
+                [
+                    'employee_id' => $employee->id,
+                    'employee_name' => $employee->name,
+                    'tarification_id' => $tarification->id,
+                    'tarification_name' => $tarification->name,
+                    'quantity' => $quantity,
+                    'amount_earned' => $tarification->summa * $quantity,
+                ]
+            );
+        }
+    }
 }
