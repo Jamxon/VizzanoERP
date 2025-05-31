@@ -1175,13 +1175,23 @@ class TechnologController extends Controller
     {
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
+            'region' => 'nullable|string|max:255',
         ]);
+        $submodel = OrderSubmodel::findOrFail($request->submodel_id);
 
-        $submodel = OrderSubmodel::with([
-            'tarificationCategories.tarifications.razryad',
-            'tarificationCategories.tarifications.typewriter',
-            'tarificationCategories.tarifications.employee:id,name'
-        ])->findOrFail($request->submodel_id);
+        // region bo'yicha tarificationCategories ni olish
+        $filteredCategories = $submodel->tarificationCategories()
+            ->when($request->filled('region'), function ($query) use ($request) {
+                $query->where('region', $request->region);
+            })
+            ->with([
+                'tarifications.razryad',
+                'tarifications.typewriter',
+                'tarifications.employee:id,name'
+            ])
+            ->get();
+
+        $submodel->tarificationCategories = $filteredCategories;
 
         $pdf = Pdf::loadView('pdf.tarifications', [
             'submodel' => $submodel
