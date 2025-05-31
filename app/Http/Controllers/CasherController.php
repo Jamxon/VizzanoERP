@@ -274,8 +274,9 @@ class CasherController extends Controller
                     'exchange_rate' => $data['exchange_rate'],
                     'target_amount' => $data['to_amount'],
                     'date' => $data['date'],
-                    'comment' => $data['comment'],
+                    'comment' => '🔁 Valyuta ayirboshlash',
                     'branch_id' => $cashbox->branch_id,
+                    'via_id' => auth()->id(), // Hozirgi foydalanuvchi
                 ]);
 
                 // Kirim
@@ -290,6 +291,7 @@ class CasherController extends Controller
                     'date' => $data['date'],
                     'comment' => '🔁 Valyuta ayirboshlash',
                     'branch_id' => $cashbox->branch_id,
+                    'via_id' => auth()->id(), // Hozirgi foydalanuvchi
                 ]);
 
                 // From balans kamayadi
