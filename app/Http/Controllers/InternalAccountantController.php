@@ -92,48 +92,49 @@ class InternalAccountantController extends Controller
     }
 
    public function getTarifications(Request $request)
-    {
-        $region = $request->input('region');
-        $submodelId = $request->input('submodel_id');
+{
+    $region = $request->input('region');
+    $submodelId = $request->input('submodel_id');
 
-        $orderSubmodel = OrderSubModel::with([
-            'orderModel.order', // <-- limit uchun kerak
-            'tarificationCategories.tarifications' => function ($query) use ($region) {
-                $query->with('tarificationLogs');
-                $query->whereHas('employee', function ($q) use ($region) {
-                    if ($region) {
-                        $q->where('region', $region);
-                    }
-                });
-            },
-            'tarificationCategories.tarifications.employee:id,name,region'
-        ])->findOrFail($submodelId);
+    // Region filterini TarificationCategory darajasida qo‘llaymiz
+    $orderSubmodel = OrderSubModel::with([
+        'orderModel.order',
+        'tarificationCategories' => function ($query) use ($region) {
+            if ($region) {
+                $query->where('region', $region);
+            }
+        },
+        'tarificationCategories.tarifications' => function ($query) {
+            $query->with('tarificationLogs');
+        },
+        'tarificationCategories.tarifications.employee:id,name,region'
+    ])->findOrFail($submodelId);
 
-        // Bu yerda limit aniqlanadi
-        $limit = $orderSubmodel->orderModel?->order?->quantity ?? 0;
+    $limit = $orderSubmodel->orderModel?->order?->quantity ?? 0;
 
-        $tarifications = $orderSubmodel->tarificationCategories->flatMap(function ($category) use ($limit) {
-            return $category->tarifications->map(function ($tarification) use ($limit) {
-                $totalQuantity = $tarification->tarificationLogs->sum('quantity');
+    $tarifications = $orderSubmodel->tarificationCategories->flatMap(function ($category) use ($limit) {
+        return $category->tarifications->map(function ($tarification) use ($limit) {
+            $totalQuantity = $tarification->tarificationLogs->sum('quantity');
 
-                return [
-                    'id' => $tarification->id,
-                    'name' => $tarification->name,
-                    'code' => $tarification->code,
-                    'second' => $tarification->second,
-                    'summa' => $tarification->summa,
-                    'employee_id' => $tarification->employee_id,
-                    'employee_name' => $tarification->employee?->name,
-                    'total_quantity' => $totalQuantity,
-                    'limit' => $limit - $totalQuantity,
-                ];
-            });
+            return [
+                'id' => $tarification->id,
+                'name' => $tarification->name,
+                'code' => $tarification->code,
+                'second' => $tarification->second,
+                'summa' => $tarification->summa,
+                'employee_id' => $tarification->employee_id,
+                'employee_name' => $tarification->employee?->name,
+                'total_quantity' => $totalQuantity,
+                'limit' => $limit - $totalQuantity,
+            ];
         });
+    });
 
-        return response()->json([
-            'tarifications' => $tarifications
-        ]);
-    }
+    return response()->json([
+        'tarifications' => $tarifications
+    ]);
+}
+
 
 
 
