@@ -29,7 +29,7 @@ class ShowOrderGroupMaster extends JsonResource
         $todayEarned = $todaySewn * ($this->orderModel->rasxod ?? 0);
 
         // ✅ Bugungi attendances soni
-        $attendanceCount = $this->group
+        $attendanceCount = $this->orderModel->submodels->group->group
             ?->employees()
             ->whereHas('attendances', function ($query) {
                 $query->whereDate('date', now()->toDateString());
