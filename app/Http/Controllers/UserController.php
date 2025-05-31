@@ -130,7 +130,8 @@ class UserController extends Controller
 
         // Telegramga yuborish
         $user = auth()->user();
-        $message = "#muammo<br><b>🛠 Yangi muammo bildirildi!</b>\n\n"
+        $message = "#muammo
+        <b>🛠 Yangi muammo bildirildi!</b>\n\n"
             . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role->name})\n"
             . "📝 Tavsif: {$request->description}";
 
