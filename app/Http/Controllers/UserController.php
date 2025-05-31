@@ -135,11 +135,26 @@ class UserController extends Controller
                     . "📝 Tavsif: {$request->description}\n"
                     . ($filename ? "🖼 Rasm: [storage/issues/{$filename}]" : "");
 
-            sendMessage(env('TELEGRAM_GROUP_CHAT_ID'), $message);
+            $botToken = "8120915071:AAGVvrYz*WBfhABMJWtlDzdFgUELUUKTj5Q";
+            $chatId = "-4723241667";
 
+
+        $response = Http::post("https://api.telegram.org/bot{$botToken}/sendDocument", [
+                'chat_id' => $chatId,
+                'caption' => $message,
+                'parse_mode' => 'HTML',
+            ]);
+
+        if ($response->successful()) {
             return response()->json([
                 'message' => 'Fikringiz uchun rahmat! Muammo yuborildi.',
             ], 201);
+        } else {
+            return response()->json([
+                'error' => 'Failed to send issue to Telegram: ' . $response->body()
+            ], 500);
+        }
+
         } catch (\Exception $exception) {
             return response()->json([
                 'error' => 'Failed to report issue: ' . $exception->getMessage()
