@@ -181,7 +181,7 @@ class GroupMasterController extends Controller
                 'orderModel.material',
                 'orderModel.sizes.size',
                 'orderModel.submodels.submodel',
-                'orderModel.submodels.group',
+                'orderModel.submodels.group.group',
                 'instructions',
                 'orderModel.submodels.sewingOutputs'
             ])
