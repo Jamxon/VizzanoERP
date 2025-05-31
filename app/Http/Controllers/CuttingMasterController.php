@@ -201,6 +201,7 @@ class CuttingMasterController extends Controller
             'submodel_id' => 'required|integer|exists:order_sub_models,id',
             'size_id' => 'required|integer|exists:order_sizes,id',
             'box_capacity' => 'required|integer|min:1',
+            'region' => 'required|string|max:255',
         ]);
 
         ini_set('memory_limit', '2G');
@@ -220,10 +221,20 @@ class CuttingMasterController extends Controller
             'orderModel.order:id,name',
             'orderModel.model:id,name',
             'submodel:id,name',
-            'tarificationCategories.tarifications.razryad:id,name',
-            'tarificationCategories.tarifications.typewriter:id,name',
-            'tarificationCategories.tarifications.employee:id,name'
         ])->findOrFail($data['submodel_id']);
+
+        // Tanlangan regionga mos tarificationCategories olish:
+        $filteredCategories = $submodel->tarificationCategories()
+            ->where('region', $data['region'])
+            ->with([
+                'tarifications.razryad:id,name',
+                'tarifications.typewriter:id,name',
+                'tarifications.employee:id,name'
+            ])
+            ->get();
+
+        $submodel->tarificationCategories = $filteredCategories;
+
 
         $sizeName = OrderSize::find($data['size_id'])->size->name ?? '-';
         $totalQuantity = $data['quantity'];
