@@ -362,6 +362,7 @@ class TechnologController extends Controller
         $validator = validator($data, [
             '*.name' => 'required|string|max:255',
             '*.submodel_id' => 'required|integer|exists:order_sub_models,id',
+            '*.region' => 'nullable|string|max:255',
             '*.tarifications' => 'required|array',
             '*.tarifications.*.employee_id' => 'nullable|integer|exists:employees,id',
             '*.tarifications.*.name' => 'required|string|max:255',
@@ -391,6 +392,7 @@ class TechnologController extends Controller
             $tarificationCategory = TarificationCategory::create([
                 'name' => $datum['name'],
                 'submodel_id' => $submodelId,
+                'region' => $datum['region'] ?? null,
             ]);
 
             $tarifications = [];
@@ -428,6 +430,7 @@ class TechnologController extends Controller
                 'submodel_id' => $submodelId,
                 'seconds' => $totalSecond,
                 'summa' => $totalSumma,
+                'region' => $datum['region'] ?? null,
             ]);
 
             $createdData[] = [
@@ -451,6 +454,7 @@ class TechnologController extends Controller
             $request->validate([
                 'name' => 'required|string|max:255',
                 'submodel_id' => 'required|integer|exists:order_sub_models,id',
+                'region' => 'nullable|string|max:255',
             ]);
 
             $data = $request->all();
@@ -463,13 +467,16 @@ class TechnologController extends Controller
             if ($tarificationCategory) {
                 $oldCategory = $tarificationCategory->getOriginal();
                 $oldTarifications = $tarificationCategory->tarifications()->get()->keyBy('id');
-                $oldSubmodelSpend = SubmodelSpend::where('submodel_id', $tarificationCategory->submodel_id)->first();
+                $oldSubmodelSpend = SubmodelSpend::where('submodel_id', $tarificationCategory->submodel_id)
+                ->where('region', $data['region'] ?? null)
+                ->first();
             }
 
             if (!$tarificationCategory) {
                 $tarificationCategory = TarificationCategory::create([
                     'name' => $data['name'],
                     'submodel_id' => $data['submodel_id'],
+                    'region' => $data['region'] ?? null,
                 ]);
 
                 Log::add(auth()->id(), 'Yangi tarifikatsiya kategoriyasi yaratildi', 'create', null, $tarificationCategory->toArray());
@@ -548,7 +555,8 @@ class TechnologController extends Controller
             }
 
             $submodelSpend = SubmodelSpend::updateOrCreate(
-                ['submodel_id' => $tarificationCategory->submodel_id],
+                ['submodel_id' => $tarificationCategory->submodel_id
+                    , 'region' => $data['region'] ?? null],
                 ['seconds' => $totalSecond, 'summa' => $totalSumma]
             );
 
@@ -1018,6 +1026,8 @@ class TechnologController extends Controller
         $file = $request->file('file');
         $submodelId = $request->input('submodel_id');
 
+        $region = $request->input('region');
+
         if (empty($submodelId)) {
             return response()->json(['message' => 'submodel_id ko\'rsatilmagan'], 422);
         }
@@ -1083,6 +1093,7 @@ class TechnologController extends Controller
                     $currentCategory = TarificationCategory::create([
                         'name' => $categoryName,
                         'submodel_id' => $submodelId,
+                        'region' => $region,
                     ]);
                     $sectionPrefix = null;
                     continue;
