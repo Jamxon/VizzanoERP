@@ -139,7 +139,7 @@ class UserController extends Controller
 
         if ($filename) {
             // Agar rasm bo‘lsa — rasmni yuborish
-            $photoPath = storage_path("app/public/issues/" . $filename);
+            $photoPath = storage_path("/app/public/issues/" . $filename);
 
             $response = Http::attach(
                 'photo', file_get_contents($photoPath), $filename
