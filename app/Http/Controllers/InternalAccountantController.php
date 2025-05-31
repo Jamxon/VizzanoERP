@@ -735,4 +735,12 @@ class InternalAccountantController extends Controller
         }
     }
 
+    public function getEmployeeByGroupID(){
+        $groupId = request()->input('group_id');
+        $employees = Employee::where('group_id', $groupId)
+            ->get();
+
+        return response()->json($employees);
+    }
+
 }
