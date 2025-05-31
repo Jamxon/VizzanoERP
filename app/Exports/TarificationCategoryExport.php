@@ -14,18 +14,33 @@ class TarificationCategoryExport implements FromCollection, WithEvents
     protected $mergeRows = [];
     protected $formulaRows = [];
 
-    public function __construct($orderSubModelId)
+    public function __construct($orderSubModelId, $region)
     {
         $this->orderSubModelId = $orderSubModelId;
+        $this->region = $region;
     }
 
     public function collection(): Collection
     {
-        $orderSubModel = OrderSubModel::with(['tarificationCategories.tarifications.razryad'])->find($this->orderSubModelId);
+        
+        $orderSubModel = OrderSubModel::find($this->orderSubModelId);
 
         if (!$orderSubModel) {
             return collect([]);
         }
+
+        $tarificationCategories = $orderSubModel->tarificationCategories()
+            ->when($this->region, function ($query) {
+                $query->where('region', $this->region);
+            })
+            ->with('tarifications.razryad')
+            ->get();
+
+        if ($tarificationCategories->isEmpty()) {
+            return collect([]);
+        }
+
+        $orderSubModel->tarificationCategories = $tarificationCategories;
 
         $rows = new Collection();
         $currentRow = 1;
