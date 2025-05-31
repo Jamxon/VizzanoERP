@@ -97,54 +97,65 @@ class UserController extends Controller
     }
 
     public function storeIssue(Request $request): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $request->validate([
-                'description' => 'required|string|max:255',
-                'image' => 'sometimes|nullable|image|max:20480',
-            ]);
+{
+    try {
+        $request->validate([
+            'description' => 'required|string|max:255',
+            'image' => 'sometimes|nullable|image|max:20480',
+        ]);
 
-            $filename = null;
-            if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/issues/', $filename);
-            }
+        $filename = null;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('issues', $filename);
+        }
 
-            $issue = Issue::create([
-                'user_id' => auth()->id(),
+        $issue = Issue::create([
+            'user_id' => auth()->id(),
+            'description' => $request->description,
+            'image' => 'issues/' . ($filename ?? null),
+        ]);
+
+        Log::add(
+            auth()->id(),
+            "Yangi muammo qo'shildi",
+            'create',
+            [],
+            [
                 'description' => $request->description,
-                'image' => 'issues/' . ($filename ?? null),
+                'image' => $filename ? 'issues/' . $filename : null,
+            ]
+        );
+
+        // Telegramga yuborish
+        $user = auth()->user();
+        $message = "<b>🛠 Yangi muammo bildirildi!</b>\n\n"
+            . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role->name})\n"
+            . "📝 Tavsif: {$request->description}";
+
+        $botToken = env('ISSUE_BOT_TOKEN');
+        $chatId = env('TELEGRAM_GROUP_CHAT_ID');
+
+        if ($filename) {
+            // Agar rasm bo‘lsa — rasmni yuborish
+            $photoPath = storage_path("app/issues/" . $filename);
+
+            $response = Http::attach(
+                'photo', file_get_contents($photoPath), $filename
+            )->post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                'chat_id' => $chatId,
+                'caption' => $message,
+                'parse_mode' => 'HTML',
             ]);
-
-            Log::add(
-                auth()->id(),
-                "Yangi muammo qo'shildi",
-                'create',
-                [],
-                [
-                    'description' => $request->description,
-                    'image' => $filename ? 'issues/' . $filename : null,
-                ]
-            );
-
-            // Telegramga yuborish
-            $user = auth()->user();
-            $message = "<b>🛠 Yangi muammo bildirildi!</b>\n\n"
-                    . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role->name})\n"
-                    . "📝 Tavsif: {$request->description}\n"
-                    . ($filename ? "🖼 Rasm: [storage/issues/{$filename}]" : "");
-
-            $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
-            $chatId = "-1002523704322";
-
-
-        $response = Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-    'chat_id' => $chatId,
-    'text' => strip_tags($message), // agar HTML bo‘lmasa
-    'parse_mode' => 'HTML',
-]);
-
+        } else {
+            // Agar rasm bo‘lmasa — oddiy xabar yuborish
+            $response = Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                'chat_id' => $chatId,
+                'text' => $message,
+                'parse_mode' => 'HTML',
+            ]);
+        }
 
         if ($response->successful()) {
             return response()->json([
@@ -156,11 +167,12 @@ class UserController extends Controller
             ], 500);
         }
 
-        } catch (\Exception $exception) {
-            return response()->json([
-                'error' => 'Failed to report issue: ' . $exception->getMessage()
-            ], 500);
-        }
+    } catch (\Exception $exception) {
+        return response()->json([
+            'error' => 'Failed to report issue: ' . $exception->getMessage()
+        ], 500);
     }
+}
+
 
 }
