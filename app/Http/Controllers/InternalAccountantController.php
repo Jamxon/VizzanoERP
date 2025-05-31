@@ -96,12 +96,22 @@ class InternalAccountantController extends Controller
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
             'group_id' => 'required|exists:groups,id',
+            'region' => 'nullable|string',
         ]);
 
-        // Kerakli ma'lumotlarni bir so'rov bilan olish
+        $region = $request->region;
+
         $submodel = OrderSubmodel::with([
-            'tarificationCategories.tarifications.employee:id,name'
+            'tarificationCategories.tarifications' => function ($query) use ($region) {
+                $query->whereHas('employee', function ($q) use ($region) {
+                    if ($region) {
+                        $q->where('region', $region);
+                    }
+                });
+            },
+            'tarificationCategories.tarifications.employee:id,name,region'
         ])->findOrFail($request->submodel_id);
+
 
         $group = Group::with('department')->findOrFail($request->group_id);
 
