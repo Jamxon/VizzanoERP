@@ -257,7 +257,7 @@ class CuttingMasterController extends Controller
             );
         }
 
-        $pdf = Pdf::loadView('pdf.tarifications-pdf', [
+        $pdf = Pdf::loadView('pdf.tarifications-pdf', [ 
             'boxes' => $pdfBoxes,
             'totalQuantity' => $totalQuantity,
             'totalBoxes' => count($pdfBoxes),
