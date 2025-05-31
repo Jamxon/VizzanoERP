@@ -18,7 +18,8 @@ class SubmodelSpend extends Model
     protected $fillable = [
         'submodel_id',
         'seconds',
-        'summa'
+        'summa',
+        'region',
     ];
 
     protected $hidden = [
