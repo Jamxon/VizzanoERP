@@ -240,7 +240,7 @@ class CasherController extends Controller
                 'to_currency_id' => 'required|exists:currencies,id|different:from_currency_id',
                 'from_amount' => 'required|numeric|min:0.01',
                 'to_amount' => 'required|numeric|min:0.01',
-                'exchange_rate' => 'required|numeric|min:0.0001',
+                'exchange_rate' => 'required|numeric|min:0.0000001',
                 'date' => 'nullable|date',
                 'comment' => 'nullable|string|max:1000',
             ]);
