@@ -136,7 +136,7 @@ class UserController extends Controller
                     . ($filename ? "🖼 Rasm: [storage/issues/{$filename}]" : "");
 
             $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
-            $chatId = "-1004723241667";
+            $chatId = "-1002523704322";
 
 
         $response = Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
