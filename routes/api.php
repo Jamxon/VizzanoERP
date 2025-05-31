@@ -77,6 +77,7 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('dailyPlan/{id}', [InternalAccountantController::class, 'showDailyPlan']);
     Route::post('employeeSalaryCalculation', [InternalAccountantController::class, 'employeeSalaryCalculation']);
     Route::get('boxTarifications/{boxTarification}', [InternalAccountantController::class, 'boxTarificationShow']);
+    Route::post('salaryCalculate', [InternalAccountantController::class, 'salaryCalculation']);
 });
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
