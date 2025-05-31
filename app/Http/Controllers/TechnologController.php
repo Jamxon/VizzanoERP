@@ -895,6 +895,7 @@ class TechnologController extends Controller
     {
         try {
             $orderSubModelId = $request->get('orderSubModelId');
+            $region = $request->get('region');
 
             if (!$orderSubModelId) {
                 return response()->json(['error' => 'orderSubModelId talab qilinadi.'], 400);
@@ -910,7 +911,7 @@ class TechnologController extends Controller
                 'submodel_name' => $orderSubmodel->submodel->name
             ]);
 
-            return Excel::download(new TarificationCategoryExport($orderSubModelId),  $order->id . ' ' . $orderSubmodel->submodel->name .  '.xlsx');
+            return Excel::download(new TarificationCategoryExport($orderSubModelId, $region),  $order->id . ' ' . $orderSubmodel->submodel->name .  '.xlsx');
 
         } catch (\Exception $e) {
             Log::add(auth()->id(), 'Xatolik: Tarifikatsiyani eksport qilishda', 'error', $e->getMessage());
