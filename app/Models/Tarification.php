@@ -61,4 +61,11 @@ class Tarification extends Model
     {
         return $this->belongsTo(TypeWriter::class,'typewriter_id');
     }
+
+    // Tarification.php
+public function tarificationLogs()
+{
+    return $this->hasMany(EmployeeTarificationLog::class);
+}
+
 }
