@@ -92,48 +92,48 @@ class InternalAccountantController extends Controller
     }
 
    public function getTarifications(Request $request)
-{
-    $region = $request->input('region');
-    $submodelId = $request->input('submodel_id');
+        {
+            $region = $request->input('region');
+            $submodelId = $request->input('submodel_id');
 
-    // Region filterini TarificationCategory darajasida qo‘llaymiz
-    $orderSubmodel = OrderSubModel::with([
-        'orderModel.order',
-        'tarificationCategories' => function ($query) use ($region) {
-            if ($region) {
-                $query->where('region', $region);
-            }
-        },
-        'tarificationCategories.tarifications' => function ($query) {
-            $query->with('tarificationLogs');
-        },
-        'tarificationCategories.tarifications.employee:id,name,region'
-    ])->findOrFail($submodelId);
+            // Region filterini TarificationCategory darajasida qo‘llaymiz
+            $orderSubmodel = OrderSubModel::with([
+                'orderModel.order',
+                'tarificationCategories' => function ($query) use ($region) {
+                    if ($region) {
+                        $query->where('region', $region);
+                    }
+                },
+                'tarificationCategories.tarifications' => function ($query) {
+                    $query->with('tarificationLogs');
+                },
+                'tarificationCategories.tarifications.employee:id,name,region'
+            ])->findOrFail($submodelId);
 
-    $limit = $orderSubmodel->orderModel?->order?->quantity ?? 0;
+            $limit = $orderSubmodel->orderModel?->order?->quantity ?? 0;
 
-    $tarifications = $orderSubmodel->tarificationCategories->flatMap(function ($category) use ($limit) {
-        return $category->tarifications->map(function ($tarification) use ($limit) {
-            $totalQuantity = $tarification->tarificationLogs->sum('quantity');
+            $tarifications = $orderSubmodel->tarificationCategories->flatMap(function ($category) use ($limit) {
+                return $category->tarifications->map(function ($tarification) use ($limit) {
+                    $totalQuantity = $tarification->tarificationLogs->sum('quantity');
 
-            return [
-                'id' => $tarification->id,
-                'name' => $tarification->name,
-                'code' => $tarification->code,
-                'second' => $tarification->second,
-                'summa' => $tarification->summa,
-                'employee_id' => $tarification->employee_id,
-                'employee_name' => $tarification->employee?->name,
-                'total_quantity' => $totalQuantity,
-                'limit' => $limit - $totalQuantity,
-            ];
-        });
-    });
+                    return [
+                        'id' => $tarification->id,
+                        'name' => $tarification->name,
+                        'code' => $tarification->code,
+                        'second' => $tarification->second,
+                        'summa' => $tarification->summa,
+                        'employee_id' => $tarification->employee_id,
+                        'employee_name' => $tarification->employee?->name,
+                        'total_quantity' => $totalQuantity,
+                        'limit' => $limit - $totalQuantity,
+                    ];
+                });
+            });
 
-    return response()->json([
-        'tarifications' => $tarifications
-    ]);
-}
+            return response()->json([
+                'tarifications' => $tarifications
+            ]);
+        }
 
 
 
