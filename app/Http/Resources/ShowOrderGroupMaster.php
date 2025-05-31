@@ -28,13 +28,15 @@ class ShowOrderGroupMaster extends JsonResource
         // ✅ Rasxod asosida bugun ishlab topilgan pul
         $todayEarned = $todaySewn * ($this->orderModel->rasxod ?? 0);
 
-        // ✅ Bugungi attendances soni
-        $attendanceCount = $this->orderModel->submodels->group->group
+        $group = $this->orderModel->submodels->first()?->group?->group;
+
+        $attendanceCount = $group
             ?->employees()
             ->whereHas('attendances', function ($query) {
                 $query->whereDate('date', now()->toDateString());
             })
             ->count();
+
 
         // ✅ Har bir xodimga to‘g‘ri keladigan pul
         $perEmployeeEarning = $attendanceCount > 0
