@@ -20,6 +20,7 @@ class TarificationCategory extends Model
         'id',
         'name',
         'submodel_id',
+        'region',
     ];
 
     protected $hidden = [
