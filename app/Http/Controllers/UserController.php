@@ -134,8 +134,8 @@ class UserController extends Controller
             . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role->name})\n"
             . "📝 Tavsif: {$request->description}";
 
-        $botToken = env('ISSUE_BOT_TOKEN');
-        $chatId = env('TELEGRAM_GROUP_CHAT_ID');
+        $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
+        $chatId = "-1002523704322";
 
         if ($filename) {
             $photoPath = storage_path("app/public/issues/" . $filename);
