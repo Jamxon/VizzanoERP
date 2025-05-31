@@ -1140,7 +1140,9 @@ class TechnologController extends Controller
 
 
             // SubmodelSpend ni yangilash
-            $submodelSpend = SubmodelSpend::where('submodel_id', $submodelId)->first();
+            $submodelSpend = SubmodelSpend::where('submodel_id', $submodelId)
+            ->where('region', $region)
+            ->first();
             if ($submodelSpend) {
                 $submodelSpend->update([
                     'seconds' => $submodelSpend->seconds + $totalSecond,
@@ -1151,6 +1153,7 @@ class TechnologController extends Controller
                     'submodel_id' => $submodelId,
                     'seconds' => $totalSecond,
                     'summa' => $totalSumma,
+                    'region' => $region,
                 ]);
             }
 
