@@ -11,81 +11,80 @@ use Illuminate\Support\Facades\DB;
 class CasherController extends Controller
 {
     public function getGroupsByDepartmentId(Request $request)
-{
-    $departmentId = $request->input('department_id');
-    $startDate = $request->input('start_date');
-    $endDate = $request->input('end_date');
-    $orderIds = $request->input('order_ids');
+    {
+        $departmentId = $request->input('department_id');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $orderIds = $request->input('order_ids');
 
-    if (!$departmentId) {
-        return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
-    }
+        if (!$departmentId) {
+            return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
+        }
 
-    // Tarification ID larini aniqlaymiz agar order_ids berilgan bo‘lsa
-    $filteredTarificationIds = [];
+        // Tarification ID larini aniqlaymiz agar order_ids berilgan bo‘lsa
+        $filteredTarificationIds = [];
 
-    if (!empty($orderIds)) {
-        $orderIds = is_array($orderIds) ? $orderIds : explode(',', $orderIds);
+        if (!empty($orderIds)) {
+            $orderIds = is_array($orderIds) ? $orderIds : explode(',', $orderIds);
 
-        $orders = \App\Models\Order::with('orderModel.submodels.tarificationCategories.tarifications')
-            ->whereIn('id', $orderIds)
+            $orders = \App\Models\Order::with('orderModel.submodels.tarificationCategories.tarifications')
+                ->whereIn('id', $orderIds)
+                ->get();
+
+            $filteredTarificationIds = $orders
+                ->flatMap(fn($order) => $order->orderModel?->submodels ?? [])
+                ->flatMap(fn($submodel) => $submodel->tarificationCategories ?? [])
+                ->flatMap(fn($category) => $category->tarifications->pluck('id'))
+                ->unique()
+                ->values()
+                ->toArray();
+        }
+
+        // GROUPLARGA TEGISHLILAR
+        $groups = \App\Models\Group::where('department_id', $departmentId)
+            ->with(['employees' => function ($query) {
+                $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type');
+            }])
             ->get();
 
-        $filteredTarificationIds = $orders
-            ->flatMap(fn($order) => $order->orderModel?->submodels ?? [])
-            ->flatMap(fn($submodel) => $submodel->tarificationCategories ?? [])
-            ->flatMap(fn($category) => $category->tarifications->pluck('id'))
-            ->unique()
-            ->values()
-            ->toArray();
+        $result = $groups->map(function ($group) use ($startDate, $endDate, $filteredTarificationIds) {
+            $employees = $group->employees->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
+                return $this->getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds);
+            });
+
+            // ❗ Hodimlar balance'ini yig‘ib chiqamiz:
+            $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
+
+            return [
+                'id' => $group->id,
+                'name' => $group->name,
+                'total_balance' => $groupTotal,
+                'employees' => $employees,
+            ];
+        })->values()->toArray();
+
+        // GROUPSIZ EMPLOYEELAR
+        $ungroupedEmployees = \App\Models\Employee::where('department_id', $departmentId)
+            ->whereNull('group_id')
+            ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type')
+            ->get()
+            ->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
+                return $this->getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds);
+            });
+
+        if ($ungroupedEmployees->isNotEmpty()) {
+            $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
+
+            $result[] = [
+                'id' => null,
+                'name' => 'Guruhsiz',
+                'total_balance' => $ungroupedTotal,
+                'employees' => $ungroupedEmployees,
+            ];
+        }
+
+        return response()->json($result);
     }
-
-    // GROUPLARGA TEGISHLILAR
-    $groups = \App\Models\Group::where('department_id', $departmentId)
-        ->with(['employees' => function ($query) {
-            $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type');
-        }])
-        ->get();
-
-    $result = $groups->map(function ($group) use ($startDate, $endDate, $filteredTarificationIds) {
-        $employees = $group->employees->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
-            return $this->getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds);
-        });
-
-        // ❗ Hodimlar balance'ini yig‘ib chiqamiz:
-        $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
-
-        return [
-            'id' => $group->id,
-            'name' => $group->name,
-            'total_balance' => $groupTotal,
-            'employees' => $employees,
-        ];
-    })->values()->toArray();
-
-    // GROUPSIZ EMPLOYEELAR
-    $ungroupedEmployees = \App\Models\Employee::where('department_id', $departmentId)
-        ->whereNull('group_id')
-        ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type')
-        ->get()
-        ->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
-            return $this->getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds);
-        });
-
-    if ($ungroupedEmployees->isNotEmpty()) {
-        $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
-
-        $result[] = [
-            'id' => null,
-            'name' => 'Guruhsiz',
-            'total_balance' => $ungroupedTotal,
-            'employees' => $ungroupedEmployees,
-        ];
-    }
-
-    return response()->json($result);
-}
-
 
     private function getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds)
     {
@@ -165,7 +164,6 @@ class CasherController extends Controller
         ];
     }
 
-
     public function getDepartments()
     {
         $user = auth()->user();
@@ -186,7 +184,6 @@ class CasherController extends Controller
 
         return response()->json($result);
     }
-
 
     public function getSource(): \Illuminate\Http\JsonResponse
     {
