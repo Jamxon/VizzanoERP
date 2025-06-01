@@ -868,25 +868,33 @@ class InternalAccountantController extends Controller
             ], 404);
         }
 
-        return $tarifications->map(function ($tarification) {
-            return [
-                'logs' => $tarification->tarificationLogs->map(function ($log) {
-                    return [
-                        'id' => $log->id,
-                        'employee' => $log->employee,
-                        'date' => $log->date,
-                        'quantity' => $log->quantity,
-                        'is_own' => $log->is_own,
-                        'amount_earned' => $log->amount_earned,
-                        'box_tarification' => $log->box_tarification_id ? [
-                            'id' => $log->box_tarification_id,
-                            'quantity' => $log->box_tarification_quantity,
-                            'total' => $log->box_tarification_total,
-                        ] : null,
-                    ];
-                })
-            ];
+        $logs = $tarifications->flatMap(function ($tarification) {
+            return $tarification->tarificationLogs->map(function ($log) use ($tarification) {
+                return [
+                    'id' => $log->id,
+                    'employee' => $log->employee,
+                    'tarification_id' => $tarification->id,
+                    'tarification_name' => $tarification->name,
+                    'code' => $tarification->code,
+                    'second' => $tarification->second,
+                    'summa' => $tarification->summa,
+                    'date' => $log->date,
+                    'quantity' => $log->quantity,
+                    'is_own' => $log->is_own,
+                    'amount_earned' => $log->amount_earned,
+                    'box_tarification' => $log->box_tarification_id ? [
+                        'id' => $log->box_tarification_id,
+                        'quantity' => $log->box_tarification_quantity,
+                        'total' => $log->box_tarification_total,
+                    ] : null,
+                ];
+            });
         });
+
+        return response()->json([
+            'logs' => $logs->values(),
+        ]);
+
 
     }
 }
