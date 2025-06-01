@@ -42,6 +42,7 @@ class CasherController extends Controller
                     })->unique()->values()->toArray();
             }
         }
+        dd($filteredTarificationIds);
 
         $result = $groups->map(function ($group) use ($startDate, $endDate, $filteredTarificationIds) {
             $employees = $group->employees->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
@@ -58,7 +59,7 @@ class CasherController extends Controller
                     $salaries = $query->get();
 
                     $total = $salaries->sum('amount');
-                        dd($salaries);
+                    
                     $earningDetails = [
                         'type' => 'attendance',
                         'total_earned' => $total,
