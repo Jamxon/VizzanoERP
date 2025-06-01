@@ -10,6 +10,33 @@ use Illuminate\Support\Facades\DB;
 
 class CasherController extends Controller
 {
+    public function getGroupsByDepartmentId(Request $request)
+    {
+        $departmentId = $request->input('department_id');
+
+        if (!$departmentId) {
+            return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
+        }
+
+        $groups = \App\Models\Group::where('department_id', $departmentId)
+            ->with(['employees' => function ($query) {
+                $query->select('id', 'group_id', 'balance');
+            }])
+            ->get();
+
+        $result = $groups->map(function ($group) {
+            $totalBalance = $group->employees->sum('balance');
+            return [
+                'id' => $group->id,
+                'name' => $group->name,
+                'total_balance' => $totalBalance,
+
+            ];
+        });
+
+        return response()->json($result);
+    }
+
     public function getDepartments()
     {
         $user = auth()->user();
@@ -18,6 +45,7 @@ class CasherController extends Controller
                 $query->select('id', 'department_id', 'balance');
             }])
             ->get();
+            dd($departments);
 
         $result = $departments->map(function ($department) {
             $totalBalance = $department->employees->sum('balance');
