@@ -45,7 +45,6 @@ class CasherController extends Controller
                 $query->select('id', 'department_id', 'balance');
             }])
             ->get();
-            dd($departments);
 
         $result = $departments->map(function ($department) {
             $totalBalance = $department->employees->sum('balance');
