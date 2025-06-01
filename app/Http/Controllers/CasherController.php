@@ -65,7 +65,7 @@ class CasherController extends Controller
         // GROUPSIZ EMPLOYEELAR
         $ungroupedEmployees = \App\Models\Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
-            ->select('id', 'group_id', 'balance', 'payment_type')
+            ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type')
             ->get()
             ->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
                 return $this->getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds);
