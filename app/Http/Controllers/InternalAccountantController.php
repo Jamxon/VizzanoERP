@@ -868,29 +868,25 @@ class InternalAccountantController extends Controller
             ], 404);
         }
 
-        return response()->json([
-            'tarificationsLogs' => $tarifications->map(function ($tarification) {
-                return [
-                    'id' => $tarification->tarificationLogs->id,
-                    'employee' => $tarification->employee,
-                    'tarification' => [
-                        'id' => $tarification->id,
-                        'name' => $tarification->name,
-                        'code' => $tarification->code,
-                        'second' => $tarification->second,
-                        'summa' => $tarification->summa,
-                    ],
-                    'date'=> $tarification->date,
-                    'quantity' => $tarification->tarificationLogs->quantity,
-                    'is_own' => $tarification->tarificationLogs->is_own,
-                    'amount_earned' => $tarification->tarificationLogs->amount_earned,
-                    'box_tarification' => $tarification->tarificationLogs->box_tarification_id ? [
-                        'id' => $tarification->tarificationLogs->box_tarification_id,
-                        'quantity' => $tarification->tarificationLogs->box_tarification_quantity,
-                        'total' => $tarification->tarificationLogs->box_tarification_total,
-                    ] : null,
-                ];
-            })
-        ]);
+        return $tarifications->map(function ($tarification) {
+            return [
+                'logs' => $tarification->tarificationLogs->map(function ($log) {
+                    return [
+                        'id' => $log->id,
+                        'employee' => $log->employee,
+                        'date' => $log->date,
+                        'quantity' => $log->quantity,
+                        'is_own' => $log->is_own,
+                        'amount_earned' => $log->amount_earned,
+                        'box_tarification' => $log->box_tarification_id ? [
+                            'id' => $log->box_tarification_id,
+                            'quantity' => $log->box_tarification_quantity,
+                            'total' => $log->box_tarification_total,
+                        ] : null,
+                    ];
+                })
+            ];
+        });
+
     }
 }
