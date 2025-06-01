@@ -873,11 +873,13 @@ class InternalAccountantController extends Controller
                 return [
                     'id' => $log->id,
                     'employee' => $log->employee,
-                    'tarification_id' => $tarification->id,
-                    'tarification_name' => $tarification->name,
-                    'code' => $tarification->code,
-                    'second' => $tarification->second,
-                    'summa' => $tarification->summa,
+                    'tarification' => [
+                        'id' => $tarification->id,
+                        'name' => $tarification->name,
+                        'code' => $tarification->code,
+                        'second' => $tarification->second,
+                        'summa' => $tarification->summa,
+                    ],
                     'date' => $log->date,
                     'quantity' => $log->quantity,
                     'is_own' => $log->is_own,
