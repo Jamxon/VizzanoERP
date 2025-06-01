@@ -141,8 +141,8 @@ class CasherController extends Controller
         return [
             'id' => $employee->id,
             'name' => $employee->name,
-            'position' => $employee->position->name,
-            'group' => optional($employee->group)->name,
+            'position' => $employee->position->name ?? 'N/A',
+            'group' => optional($employee->group)->name ?? 'N/A',
             'balance' => (float) $employee->balance,
             'payment_type' => $employee->payment_type,
             'earning' => $earningDetails,
