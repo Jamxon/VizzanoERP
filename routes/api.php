@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CasherController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ConstructorController;
 use App\Http\Controllers\CurrencyController;
@@ -36,18 +37,19 @@ use App\Http\Controllers\TailorMasterController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('casher')->middleware('role:casher')->group(function () {
-    Route::post('incomes', [\App\Http\Controllers\CasherController::class, 'storeIncome']);
-    Route::post('expenses', [\App\Http\Controllers\CasherController::class, 'storeExpense']);
-    Route::get('balances', [\App\Http\Controllers\CasherController::class, 'getBalances']);
-    Route::get('transactions', [\App\Http\Controllers\CasherController::class, 'getTransactions']);
-    Route::post('transfers', [\App\Http\Controllers\CasherController::class, 'transferBetweenCashboxes']);
+    Route::post('incomes', [CasherController::class, 'storeIncome']);
+    Route::post('expenses', [CasherController::class, 'storeExpense']);
+    Route::get('balances', [CasherController::class, 'getBalances']);
+    Route::get('transactions', [CasherController::class, 'getTransactions']);
+    Route::post('transfers', [CasherController::class, 'transferBetweenCashboxes']);
     Route::get('currencies', [CurrencyController::class, 'index']);
-    Route::post('requestForm', [\App\Http\Controllers\CasherController::class, 'storeRequestForm']);
-    Route::get('via', [\App\Http\Controllers\CasherController::class, 'getVia']);
-    Route::get('sources', [\App\Http\Controllers\CasherController::class, 'getSource']);
-    Route::get('destinations', [\App\Http\Controllers\CasherController::class, 'getDestination']);
+    Route::post('requestForm', [CasherController::class, 'storeRequestForm']);
+    Route::get('via', [CasherController::class, 'getVia']);
+    Route::get('sources', [CasherController::class, 'getSource']);
+    Route::get('destinations', [CasherController::class, 'getDestination']);
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
-    Route::get('requests', [\App\Http\Controllers\CasherController::class, 'getRequestForm']);
+    Route::get('requests', [CasherController::class, 'getRequestForm']);
+    Route::get('departments', [CasherController::class, 'getDepartments']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {

@@ -239,7 +239,8 @@ class SuperHRController extends Controller
                 'branch_id' => $branchId,
                 'user_id' => $userId,
                 'status' => 'working',
-                'img' => null
+                'img' => null,
+                'gender' => $request->gender ?? null
             ]);
 
             DB::commit();
@@ -336,6 +337,7 @@ class SuperHRController extends Controller
                     'status' => $request->status ?? 'kicked',
                     'kicked_date' => now(),
                     'salary' => $request->salary ?? $employee->salary,
+'gender' => $request->gender ?? $employee->gender,
                 ]);
             } else {
                 $employee->update([
@@ -355,6 +357,8 @@ class SuperHRController extends Controller
                     'img' => $img ?? $employee->img ?? null,
                     'salary' => $request->salary ?? null,
                     'kicked_date' => null,
+'gender' => $request->gender ?? $employee->gender,
+
                     'status' => $request->status ?? 'working',
                 ]);
             }

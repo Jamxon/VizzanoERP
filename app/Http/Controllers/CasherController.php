@@ -10,6 +10,28 @@ use Illuminate\Support\Facades\DB;
 
 class CasherController extends Controller
 {
+    public function getDepartments()
+    {
+        $user = auth()->user();
+        $departments = $user->employee->branch->departments()
+            ->with(['employees' => function ($query) {
+                $query->select('id', 'department_id', 'balance');
+            }])
+            ->get();
+
+        $result = $departments->map(function ($department) {
+            $totalBalance = $department->employees->sum('balance');
+            return [
+                'id' => $department->id,
+                'name' => $department->name,
+                'total_balance' => $totalBalance,
+            ];
+        });
+
+        return response()->json($result);
+    }
+
+
     public function getSource(): \Illuminate\Http\JsonResponse
     {
         $sources = \App\Models\IncomeSource::all();
