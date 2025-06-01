@@ -43,7 +43,7 @@ class CasherController extends Controller
         // GROUPLARGA TEGISHLILAR
         $groups = \App\Models\Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) {
-                $query->select('id', 'group_id', 'balance', 'payment_type');
+                $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type');
             }])
             ->get();
 
@@ -75,7 +75,7 @@ class CasherController extends Controller
             $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['earning']['total_earned'] ?? 0);
             $result[] = [
                 'id' => null,
-                'name' => 'Ungrouped',
+                'name' => 'Guruhsiz',
                 'total_balance' => $ungroupedTotal,
                 'employees' => $ungroupedEmployees,
             ];
