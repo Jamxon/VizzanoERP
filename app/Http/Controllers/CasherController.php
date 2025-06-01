@@ -47,6 +47,8 @@ class CasherController extends Controller
             $employees = $group->employees->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
                 $earningDetails = [];
 
+                dd($employee->payment_type);
+
                 if ($employee->payment_type !== 'piece_work') {
                     // attendance_salaries dan olish
                     $query = $employee->attendanceSalaries();
@@ -102,8 +104,6 @@ class CasherController extends Controller
                         }),
                     ];
                 }
-
-                dd($earningDetails);
 
                 return [
                     'id' => $employee->id,
