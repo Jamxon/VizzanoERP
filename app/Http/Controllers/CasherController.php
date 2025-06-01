@@ -15,24 +15,29 @@ class CasherController extends Controller
         $departmentId = $request->input('department_id');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        $orderId = $request->input('order_id');
+        $orderIds = $request->input('order_ids');
 
         if (!$departmentId) {
             return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
         }
 
-        // Tarification ID larini aniqlaymiz agar order_id berilgan bo‘lsa
+        // Tarification ID larini aniqlaymiz agar order_ids berilgan bo‘lsa
         $filteredTarificationIds = [];
-        if ($orderId) {
-            $order = \App\Models\Order::with('orderModel.submodels.tarificationCategories.tarifications')
-                ->find($orderId);
 
-            if ($order) {
-                $filteredTarificationIds = $order->orderModel->submodels
-                    ->flatMap(fn($submodel) => $submodel->tarificationCategories)
-                    ->flatMap(fn($category) => $category->tarifications->pluck('id'))
-                    ->unique()->values()->toArray();
-            }
+        if (!empty($orderIds)) {
+            $orderIds = is_array($orderIds) ? $orderIds : explode(',', $orderIds);
+
+            $orders = \App\Models\Order::with('orderModel.submodels.tarificationCategories.tarifications')
+                ->whereIn('id', $orderIds)
+                ->get();
+
+            $filteredTarificationIds = $orders
+                ->flatMap(fn($order) => $order->orderModel?->submodels ?? [])
+                ->flatMap(fn($submodel) => $submodel->tarificationCategories ?? [])
+                ->flatMap(fn($category) => $category->tarifications->pluck('id'))
+                ->unique()
+                ->values()
+                ->toArray();
         }
 
         // GROUPLARGA TEGISHLILAR
@@ -81,7 +86,6 @@ class CasherController extends Controller
 
     private function getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds)
     {
-        // Avval employee bilan bog‘liq munosabatlarni oldindan chaqiramiz
         $employee->loadMissing(['position', 'branch', 'group']);
 
         $earningDetails = [];
@@ -147,7 +151,6 @@ class CasherController extends Controller
             'earning' => $earningDetails,
         ];
     }
-
 
     public function getDepartments()
     {
