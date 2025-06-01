@@ -79,7 +79,6 @@ class CasherController extends Controller
         return response()->json($result);
     }
 
-// 👇 Helper method (shu controller ichiga qo‘ying)
     private function getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds)
     {
         $earningDetails = [];
@@ -101,6 +100,7 @@ class CasherController extends Controller
                     'date' => $s->date,
                     'amount' => $s->amount,
                 ]),
+                'source' => 'attendance_salaries', // 👈 Shu yerda qo‘shiladi
             ];
         } else {
             $query = $employee->employeeTarificationLogs()->with('tarification');
@@ -129,6 +129,7 @@ class CasherController extends Controller
                     'quantity' => $log->quantity,
                     'amount_earned' => $log->amount_earned,
                 ]),
+                'source' => 'employee_tarification_logs', // 👈 Shu yerda qo‘shiladi
             ];
         }
 
@@ -139,6 +140,7 @@ class CasherController extends Controller
             'earning' => $earningDetails,
         ];
     }
+
 
 
 
