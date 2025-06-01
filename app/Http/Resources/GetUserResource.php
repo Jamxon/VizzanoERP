@@ -53,6 +53,7 @@ class GetUserResource extends JsonResource
             'birthday' => $this->birthday,
             'position' => $this->position->name ?? null,
             'user_id' => $this->user_id,
+            'gender' => $this->gender,
         ];
     }
 }
