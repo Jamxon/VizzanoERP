@@ -73,7 +73,6 @@ class CasherController extends Controller
                     // piece_work → employee_tarification_logs
                     $query = $employee->employeeTarificationLogs()
                         ->with('tarification');
-                    dd($filteredTarificationIds);
                     if (!empty($filteredTarificationIds)) {
                         $query->whereIn('tarification_id', $filteredTarificationIds);
                     }
@@ -103,6 +102,8 @@ class CasherController extends Controller
                         }),
                     ];
                 }
+
+                dd($earningDetails);
 
                 return [
                     'id' => $employee->id,
