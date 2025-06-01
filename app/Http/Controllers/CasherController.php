@@ -140,12 +140,9 @@ class CasherController extends Controller
 
         return [
             'id' => $employee->id,
-            'full_name' => $employee->full_name,
-            'position' => optional($employee->position)->name,
-            'branch' => optional($employee->branch)->name,
+            'name' => $employee->name,
+            'position' => $employee->position->name,
             'group' => optional($employee->group)->name,
-            'phone' => $employee->phone,
-            'image' => $employee->image ? asset('storage/' . $employee->image) : null,
             'balance' => (float) $employee->balance,
             'payment_type' => $employee->payment_type,
             'earning' => $earningDetails,
