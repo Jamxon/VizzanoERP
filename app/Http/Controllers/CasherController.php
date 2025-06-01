@@ -42,7 +42,6 @@ class CasherController extends Controller
                     })->unique()->values()->toArray();
             }
         }
-        dd($filteredTarificationIds);
 
         $result = $groups->map(function ($group) use ($startDate, $endDate, $filteredTarificationIds) {
             $employees = $group->employees->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
@@ -74,7 +73,7 @@ class CasherController extends Controller
                     // piece_work → employee_tarification_logs
                     $query = $employee->employeeTarificationLogs()
                         ->with('tarification');
-
+                    dd($filteredTarificationIds);
                     if (!empty($filteredTarificationIds)) {
                         $query->whereIn('tarification_id', $filteredTarificationIds);
                     }
