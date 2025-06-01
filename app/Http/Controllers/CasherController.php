@@ -81,6 +81,9 @@ class CasherController extends Controller
 
     private function getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds)
     {
+        // Avval employee bilan bog‘liq munosabatlarni oldindan chaqiramiz
+        $employee->loadMissing(['position', 'branch', 'group']);
+
         $earningDetails = [];
 
         if ($employee->payment_type !== 'piece_work') {
@@ -100,7 +103,6 @@ class CasherController extends Controller
                     'date' => $s->date,
                     'amount' => $s->amount,
                 ]),
-                'source' => 'attendance_salaries', // 👈 Shu yerda qo‘shiladi
             ];
         } else {
             $query = $employee->employeeTarificationLogs()->with('tarification');
@@ -129,19 +131,22 @@ class CasherController extends Controller
                     'quantity' => $log->quantity,
                     'amount_earned' => $log->amount_earned,
                 ]),
-                'source' => 'employee_tarification_logs', // 👈 Shu yerda qo‘shiladi
             ];
         }
 
         return [
             'id' => $employee->id,
-            'balance' => $employee->balance,
+            'full_name' => $employee->full_name,
+            'position' => optional($employee->position)->name,
+            'branch' => optional($employee->branch)->name,
+            'group' => optional($employee->group)->name,
+            'phone' => $employee->phone,
+            'image' => $employee->image ? asset('storage/' . $employee->image) : null,
+            'balance' => (float) $employee->balance,
             'payment_type' => $employee->payment_type,
             'earning' => $earningDetails,
         ];
     }
-
-
 
 
     public function getDepartments()
