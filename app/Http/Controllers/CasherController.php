@@ -58,7 +58,7 @@ class CasherController extends Controller
                     $salaries = $query->get();
 
                     $total = $salaries->sum('amount');
-
+                        dd($salaries);
                     $earningDetails = [
                         'type' => 'attendance',
                         'total_earned' => $total,
