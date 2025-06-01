@@ -891,9 +891,7 @@ class InternalAccountantController extends Controller
             });
         });
 
-        return response()->json([
-            'logs' => $logs->values(),
-        ]);
+        return response()->json($logs->values() ?? [],200);
 
 
     }
