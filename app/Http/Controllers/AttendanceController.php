@@ -138,6 +138,6 @@ class AttendanceController extends Controller
                 'attendance' => $attendance,
                 'added_balance' => $salaryToAdd,
             ]);
-        }
+    }
 
 }
