@@ -92,4 +92,14 @@ class Employee extends Model
     {
         return $this->hasMany(StockEntry::class, 'user_id');
     }
+
+    public function attendanceSalaries(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AttendanceSalary::class, 'employee_id');
+    }
+
+    public function employeeTarificationLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(EmployeeTarificationLog::class, 'employee_id');
+    }
 }

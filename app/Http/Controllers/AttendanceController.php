@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\AttendanceSalary;
 use App\Models\Log;
 use Illuminate\Http\Request;
 
@@ -119,6 +120,13 @@ class AttendanceController extends Controller
 
             // Endi balansga qo‘shamiz
             $employee->increment('balance', $salaryToAdd);
+
+            AttendanceSalary::create([
+                'employee_id' => $attendance->employee_id,
+                'attendance_id' => $attendance->id,
+                'amount' => $salaryToAdd,
+                'date' => now()->toDateString(),
+            ]);
 
             Log::add(
                 auth()->id(),
