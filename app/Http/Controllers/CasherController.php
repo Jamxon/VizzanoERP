@@ -27,6 +27,8 @@ class CasherController extends Controller
             }])
             ->get();
 
+            dd($groups);
+
         // Agar order_id kiritilgan bo‘lsa, tegishli tarification_id larni topamiz
         $filteredTarificationIds = [];
         if ($orderId) {
@@ -46,8 +48,6 @@ class CasherController extends Controller
         $result = $groups->map(function ($group) use ($startDate, $endDate, $filteredTarificationIds) {
             $employees = $group->employees->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
                 $earningDetails = [];
-
-                dd($employee->payment_type);
 
                 if ($employee->payment_type !== 'piece_work') {
                     // attendance_salaries dan olish
