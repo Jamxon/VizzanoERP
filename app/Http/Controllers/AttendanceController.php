@@ -83,28 +83,61 @@ class AttendanceController extends Controller
         return response()->json($attendance);
     }
 
-    public function updateAttendance(Request $request, Attendance $attendance): \Illuminate\Http\JsonResponse
-    {
-        $request->validate([
-            'check_out' => 'required|date',
-        ]);
+    public function updateAttendance(Request $request, Attendance $attendance)
+        {
+            $request->validate([
+                'check_out' => 'required|date',
+            ]);
 
-        $attendance->update([
-            'check_out' => $request->check_out,
-        ]);
+            $attendance->update([
+                'check_out' => $request->check_out,
+            ]);
 
-        Log::add(
-            auth()->user()->id,
-            'Hodim ishdan ketdi',
-            'Check Out',
-            null,
-            [
-                'employee_id' => $attendance->employee_id,
-                'check_in' => $attendance->check_in,
-                'check_out' => $attendance->check_out,
-            ]
-        );
+            // check_out bo'lsa, statusni 'present' qilish mantiqan to‘g‘ri
+            if ($attendance->check_out) {
+                $attendance->status = 'present';
+                $attendance->save();
+            }
 
-        return response()->json($attendance);
-    }
+            $employee = $attendance->employee; // faqat 1 marta DB dan olinadi
+            $salaryToAdd = 0;
+
+            if ($employee->payment_type === 'monthly') {
+                $salaryToAdd = $employee->salary / 26;
+            } elseif ($employee->payment_type === 'daily') {
+                $salaryToAdd = $employee->salary;
+            } elseif ($employee->payment_type === 'hourly') {
+                try {
+                    $checkIn = \Carbon\Carbon::parse($attendance->check_in);
+                    $checkOut = \Carbon\Carbon::parse($attendance->check_out);
+                    $workedHours = $checkOut->diffInHours($checkIn);
+                    $salaryToAdd = $employee->salary * $workedHours;
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Check-in yoki check-out noto‘g‘ri formatda.'], 422);
+                }
+            }
+
+            // Endi balansga qo‘shamiz
+            $employee->increment('balance', $salaryToAdd);
+
+            Log::add(
+                auth()->id(),
+                'Hodim ishdan chiqdi',
+                'Check Out',
+                null,
+                [
+                    'employee_id' => $attendance->employee_id,
+                    'check_in' => $attendance->check_in,
+                    'check_out' => $attendance->check_out,
+                    'added_salary' => $salaryToAdd,
+                ]
+            );
+
+            return response()->json([
+                'message' => 'Check-out va balans hisoblash muvaffaqiyatli amalga oshirildi.',
+                'attendance' => $attendance,
+                'added_balance' => $salaryToAdd,
+            ]);
+        }
+
 }
