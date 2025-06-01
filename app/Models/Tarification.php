@@ -63,9 +63,9 @@ class Tarification extends Model
     }
 
     // Tarification.php
-public function tarificationLogs()
-{
-    return $this->hasMany(EmployeeTarificationLog::class);
-}
+    public function tarificationLogs()
+    {
+        return $this->hasMany(EmployeeTarificationLog::class);
+    }
 
 }

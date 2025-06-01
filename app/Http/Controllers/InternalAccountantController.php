@@ -842,4 +842,55 @@ class InternalAccountantController extends Controller
             );
         }
     }
+
+    public function getEmployeeTarificationLog(Request $request)
+    {
+        $orderSubmodel = OrderSubModel::where('id', $request->submodel_id)
+        ->whereHas('tarificationCategories', function ($query) use ($request) {
+            $query->where('region', $request->region);
+        })->first();
+        
+        if (!$orderSubmodel) {
+            return response()->json([
+                'error'=> 'Order submodel not found or does not match the region.',
+                ],404);
+
+        }
+
+        $tarifications = Tarification::whereHas('tarificationCategory', function ($query) use ($orderSubmodel) {
+            $query->where('submodel_id', $orderSubmodel->id);
+        })->with('tarificationLogs')->get();
+
+
+        if ($tarifications->isEmpty()) {
+            return response()->json([
+                'message' => '❌ Tarifikatsiyalar topilmadi.',
+            ], 404);
+        }
+
+        return response()->json([
+            'tarificationsLogs' => $tarifications->map(function ($tarification) {
+                return [
+                    'id' => $tarification->tarificationLogs->id,
+                    'employee' => $tarification->employee,
+                    'tarification' => [
+                        'id' => $tarification->id,
+                        'name' => $tarification->name,
+                        'code' => $tarification->code,
+                        'second' => $tarification->second,
+                        'summa' => $tarification->summa,
+                    ],
+                    'date'=> $tarification->date,
+                    'quantity' => $tarification->tarificationLogs->quantity,
+                    'is_own' => $tarification->tarificationLogs->is_own,
+                    'amount_earned' => $tarification->tarificationLogs->amount_earned,
+                    'box_tarification' => $tarification->tarificationLogs->box_tarification_id ? [
+                        'id' => $tarification->tarificationLogs->box_tarification_id,
+                        'quantity' => $tarification->tarificationLogs->box_tarification_quantity,
+                        'total' => $tarification->tarificationLogs->box_tarification_total,
+                    ] : null,
+                ];
+            })
+        ]);
+    }
 }
