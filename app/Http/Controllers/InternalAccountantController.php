@@ -859,6 +859,8 @@ class InternalAccountantController extends Controller
 
         $tarifications = Tarification::whereHas('tarificationCategory', function ($query) use ($orderSubmodel) {
             $query->where('submodel_id', $orderSubmodel->id);
+        })->whereHas('tarificationCategories', function ($query) use ($request) {
+            $query->where('region', $request->region);
         })->with('tarificationLogs')->get();
 
 
