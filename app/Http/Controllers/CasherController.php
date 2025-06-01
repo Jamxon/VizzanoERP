@@ -94,7 +94,7 @@ class CasherController extends Controller
         $earningDetails = [];
 
         if ($employee->payment_type !== 'piece_work') {
-            $query = $employee->attendanceSalaries();
+            $query = $employee->attendanceSalaries()->with('attendance');
 
             if ($startDate && $endDate) {
                 $query->whereBetween('date', [$startDate, $endDate]);
@@ -106,10 +106,23 @@ class CasherController extends Controller
             $earningDetails = [
                 'type' => 'attendance',
                 'total_earned' => $total,
-                'salaries' => $salaries->map(fn($s) => [
-                    'date' => $s->date,
-                    'amount' => $s->amount,
-                ]),
+                'salaries' => $salaries->map(function ($s) {
+                    // Soat hisoblash
+                    $workedHours = null;
+                    if ($s->attendance && $s->attendance->check_in && $s->attendance->check_out) {
+                        $checkIn = \Carbon\Carbon::parse($s->attendance->check_in);
+                        $checkOut = \Carbon\Carbon::parse($s->attendance->check_out);
+                        $workedHours = round($checkOut->floatDiffInHours($checkIn), 2); // 2 xonali
+                    }
+
+                    return [
+                        'date' => $s->date,
+                        'amount' => $s->amount,
+                        'worked_hours' => $workedHours,
+                        'check_in' => $s->attendance->check_in ?? null,
+                        'check_out' => $s->attendance->check_out ?? null,
+                    ];
+                }),
             ];
         } else {
             $query = $employee->employeeTarificationLogs()->with('tarification');
@@ -151,6 +164,7 @@ class CasherController extends Controller
             'earning' => $earningDetails,
         ];
     }
+
 
     public function getDepartments()
     {
