@@ -10,6 +10,8 @@ class AttendanceSalary extends Authenticatable
 {
     use SoftDeletes;
 
+    protected $table = "attendance_salary";
+
     protected $fillable = [
         'employee_id',
         'attendance_id',
