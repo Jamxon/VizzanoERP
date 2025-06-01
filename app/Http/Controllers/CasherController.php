@@ -13,6 +13,9 @@ class CasherController extends Controller
     public function getGroupsByDepartmentId(Request $request)
     {
         $departmentId = $request->input('department_id');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $orderId = $request->input('order_id');
 
         if (!$departmentId) {
             return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
@@ -20,22 +23,110 @@ class CasherController extends Controller
 
         $groups = \App\Models\Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) {
-                $query->select('id', 'group_id', 'balance');
+                $query->select('id', 'group_id', 'balance', 'payment_type');
             }])
             ->get();
 
-        $result = $groups->map(function ($group) {
-            $totalBalance = $group->employees->sum('balance');
+        // Agar order_id kiritilgan bo‘lsa, tegishli tarification_id larni topamiz
+        $filteredTarificationIds = [];
+        if ($orderId) {
+            $order = \App\Models\Order::with('orderModel.submodels.tarificationCategories.tarifications')
+                ->find($orderId);
+
+            if ($order) {
+                $filteredTarificationIds = $order->orderModel->submodels
+                    ->flatMap(function ($submodel) {
+                        return $submodel->tarificationCategories;
+                    })->flatMap(function ($category) {
+                        return $category->tarifications->pluck('id');
+                    })->unique()->values()->toArray();
+            }
+        }
+
+        $result = $groups->map(function ($group) use ($startDate, $endDate, $filteredTarificationIds) {
+            $employees = $group->employees->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
+                $earningDetails = [];
+
+                if ($employee->payment_type !== 'piece_work') {
+                    // attendance_salaries dan olish
+                    $query = $employee->attendanceSalaries();
+
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('date', [$startDate, $endDate]);
+                    }
+
+                    $salaries = $query->get();
+
+                    $total = $salaries->sum('amount');
+
+                    $earningDetails = [
+                        'type' => 'attendance',
+                        'total_earned' => $total,
+                        'salaries' => $salaries->map(function ($s) {
+                            return [
+                                'date' => $s->date,
+                                'amount' => $s->amount,
+                            ];
+                        }),
+                    ];
+                } else {
+                    // piece_work → employee_tarification_logs
+                    $query = $employee->employeeTarificationLogs()
+                        ->with('tarification');
+
+                    if (!empty($filteredTarificationIds)) {
+                        $query->whereIn('tarification_id', $filteredTarificationIds);
+                    }
+
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('date', [$startDate, $endDate]);
+                    }
+
+                    $logs = $query->get();
+
+                    $total = $logs->sum('amount_earned');
+
+                    $earningDetails = [
+                        'type' => 'piece_work',
+                        'total_earned' => $total,
+                        'operations' => $logs->map(function ($log) {
+                            return [
+                                'date' => $log->date,
+                                'tarification' => [
+                                    'id' => $log->tarification->id,
+                                    'name' => $log->tarification->name,
+                                    'code' => $log->tarification->code,
+                                ],
+                                'quantity' => $log->quantity,
+                                'amount_earned' => $log->amount_earned,
+                            ];
+                        }),
+                    ];
+                }
+
+                return [
+                    'id' => $employee->id,
+                    'balance' => $employee->balance,
+                    'payment_type' => $employee->payment_type,
+                    'earning' => $earningDetails,
+                ];
+            });
+
+            $groupTotal = $employees->sum(function ($e) {
+                return $e['earning']['total_earned'] ?? 0;
+            });
+
             return [
                 'id' => $group->id,
                 'name' => $group->name,
-                'total_balance' => $totalBalance,
-
+                'total_balance' => $groupTotal,
+                'employees' => $employees,
             ];
         });
 
         return response()->json($result);
     }
+
 
     public function getDepartments()
     {
