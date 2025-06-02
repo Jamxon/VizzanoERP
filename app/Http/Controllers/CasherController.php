@@ -8,6 +8,8 @@ use App\Models\CashboxTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use function Laravel\Prompts\search;
+
 class CasherController extends Controller
 {
     public function getOrders(Request $request)
@@ -19,7 +21,8 @@ class CasherController extends Controller
             $search = mb_strtolower($request->search);
             $query->orWhereHas('orderModel', function ($q2) use ($search) {
                     $q2->whereHas('model', function ($q3) use ($search) {
-                    $q3->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
+                    //like kerak emas
+                    $q3->where('name', $search);
                 });
             });
         }
