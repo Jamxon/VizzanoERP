@@ -79,47 +79,47 @@ class GroupController extends Controller
 
 
     public function getGroupsWithPlan(Request $request)
-{
-    $departments = Department::where("id", $request->department_id)
-        ->with([
-            "groups.orders.order",
-            "groups.orders.orderSubmodel.submodel",
-            "groups.orders.orderSubmodel.submodel.model",
-            "groups.orders.orderSubmodel.sewingOutputs:id,order_submodel_id,quantity",
-            "groups.responsibleUser.employee"
-        ])
-        ->first();
+    {
+        $departments = Department::where("id", $request->department_id)
+            ->with([
+                "groups.orders.order",
+                "groups.orders.orderSubmodel.submodel",
+                "groups.orders.orderSubmodel.submodel.model",
+                "groups.orders.orderSubmodel.sewingOutputs:id,order_submodel_id,quantity",
+                "groups.responsibleUser.employee"
+            ])
+            ->first();
 
-    if (!$departments) {
-        return response()->json(['message' => 'Department topilmadi.'], 404);
-    }
-
-    $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
-
-    $departments->groups->each(function ($group) use ($excludedStatuses) {
-    $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {
-        return $orderGroupItem->order && !in_array($orderGroupItem->order->status, $excludedStatuses);
-    })->values();
-
-    // setRelation bilan qayta yozamiz
-    $group->setRelation('orders', $filteredOrders);
-
-    $group->orders->each(function ($orderGroupItem) {
-        if ($orderGroupItem->orderSubmodel) {
-            $sewingQuantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
-            unset($orderGroupItem->orderSubmodel->sewingOutputs);
-            $orderGroupItem->orderSubmodel->sewing_quantity = $sewingQuantity;
-        } else {
-            $orderGroupItem->orderSubmodel = (object)[
-                'sewing_quantity' => 0
-            ];
+        if (!$departments) {
+            return response()->json(['message' => 'Department topilmadi.'], 404);
         }
+
+        $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
+
+        $departments->groups->each(function ($group) use ($excludedStatuses) {
+        $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {
+            return $orderGroupItem->order && !in_array($orderGroupItem->order->status, $excludedStatuses);
+        })->values();
+
+        // setRelation bilan qayta yozamiz
+        $group->setRelation('orders', $filteredOrders);
+
+        $group->orders->each(function ($orderGroupItem) {
+            if ($orderGroupItem->orderSubmodel) {
+                $sewingQuantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
+                unset($orderGroupItem->orderSubmodel->sewingOutputs);
+                $orderGroupItem->orderSubmodel->sewing_quantity = $sewingQuantity;
+            } else {
+                $orderGroupItem->orderSubmodel = (object)[
+                    'sewing_quantity' => 0
+                ];
+            }
+        });
     });
-});
 
 
-    return response()->json($departments, 200);
-}
+        return response()->json($departments, 200);
+    }
 
 
     public function index(): \Illuminate\Http\JsonResponse
