@@ -13,6 +13,7 @@ class GroupController extends Controller
 {
     public function getGroupsWithPlan(Request $request)
     {
+        dd($request->all());
         $departments = Department::where("id", $request->department_id)
         ->with(
          "groups.orders.order",
