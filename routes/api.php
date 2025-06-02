@@ -403,6 +403,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
     Route::post('issue', [UserController::class, 'storeIssue']);
     Route::get('/test-eskiz-report', [EskizTestController::class, 'reportByRange']);
+    Route::post('sendSMS', [EskizTestController::class, 'sendSms']);
 });
 
 Route::post('register', [AuthController::class, 'register']);
