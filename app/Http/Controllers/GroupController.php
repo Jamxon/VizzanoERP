@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Group;
 use App\Models\OrderGroup;
 use App\Models\Department;
+use App\Models\OrderSubModel;
+use App\Models\Order;
+use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -13,23 +16,67 @@ class GroupController extends Controller
 {
     public function orderGroupStore(Request $request)
     {
-        $orderId = $request->order_id;
-        $submodelId = $request->submodel_id;
-        $groupId = $request->group_id;
-        $number = $request->number;
+        try {
+            $submodelId = $request->submodel_id;
+            $orderId = $request->order_id;
+            $groupId = $request->group_id;
+            $number = $request->number;
 
-            OrderGroup::create([
-            "order_id"=> $orderId,
-            "group_id"=> $groupId,
-            "submodel_id"=> $submodelId,
-            "number"=> $number
-            ]);
-        
+            // Mavjudligini submodel_id orqali tekshiramiz
+            $existing = OrderGroup::where('submodel_id', $submodelId)->first();
 
-        return response()->json([
-                'message' => 'Success'
+            if ($existing) {
+                // Yangilaymiz
+                $existing->update([
+                    'order_id' => $orderId,
+                    'group_id' => $groupId,
+                    'number' => $number
                 ]);
+
+                Log::add(
+                auth()->user()->id,
+                "Guruh plani o'zgartirildi!",
+                "edit",
+                null,
+                [
+                    "Group" => Group::where("id", $groupId)->first()->name,
+                    "Submodel" => OrderSubModel::where("id", $submodelId)->first()->submodel?->name,
+                    "Order" => Order::where("id", $orderId)->first()->name
+                ]    
+                );
+            } else {
+                // Yangi yozuv yaratamiz
+                OrderGroup::create([
+                    'order_id' => $orderId,
+                    'group_id' => $groupId,
+                    'submodel_id' => $submodelId,
+                    'number' => $number
+                ]);
+
+                Log::add(
+                auth()->user()->id,
+                'Guruh plani shakllantirildi!',
+                "create",
+                null,
+                [
+                    "Group" => Group::where("id", $groupId)->first()->name,
+                    "Submodel" => OrderSubModel::where("id", $submodelId)->first()->submodel?->name,
+                    "Order" => Order::where("id", $orderId)->first()->name
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Success'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Xatolik yuz berdi!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
 
     public function getGroupsWithPlan(Request $request)
     {
