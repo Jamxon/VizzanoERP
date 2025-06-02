@@ -17,7 +17,6 @@ class CasherController extends Controller
         $query = \App\Models\Order::with(['orderModel.submodels.tarificationCategories.tarifications'])
             ->where('branch_id', auth()->user()->employee->branch_id);
 
-        if ($request->filled('search')) {
             $search = mb_strtolower($request->search);
             $query->orWhereHas('orderModel', function ($q2) use ($search) {
                     $q2->whereHas('model', function ($q3) use ($search) {
@@ -25,7 +24,7 @@ class CasherController extends Controller
                     $q3->where('name', $search);
                 });
             });
-        }
+        
 
         $orders = $query->get();
 
