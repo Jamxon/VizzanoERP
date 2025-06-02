@@ -24,6 +24,30 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
+    public function confirmOrder(Request $request)
+    {
+        $orderId = $request->input('order_id');
+
+        if (!$orderId) {
+            return response()->json(['message' => 'Order ID is required'], 400);
+        }
+
+        $orderModel = OrderModel::where('order_id', $orderId)->first();
+        $orderModel->status = true;
+        $orderModel->rasxod = $request->rasxod ?? $orderModel->rasxod;
+        $orderModel->save();
+
+        Log::add(
+            auth()->id(),
+            'Buyurtma narxi tasdiqlandi',
+            'update',
+            null,
+            ['order_id' => $orderId]
+        );
+
+        return response()->json(['message' => 'Order confirmed successfully'], 200);
+    }
+
     public function showSpecificationCategory($id): \Illuminate\Http\JsonResponse
     {
        $specificationCategory = SpecificationCategory::where('id', $id)
