@@ -51,6 +51,7 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('requests', [CasherController::class, 'getRequestForm']);
     Route::get('departments', [CasherController::class, 'getDepartments']);
     Route::get('groups', [CasherController::class, 'getGroupsByDepartmentId']);
+    Route::get('orders', [CasherController::class, 'getOrders']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
