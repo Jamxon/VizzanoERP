@@ -11,14 +11,15 @@ use Illuminate\Validation\ValidationException;
 
 class GroupController extends Controller
 {
-    public function getGroupsWithPlan(Request $request)
+   public function getGroupsWithPlan(Request $request)
 {
     $departments = Department::where("id", $request->department_id)
         ->with([
             "groups.orders.order",
             "groups.orders.orderSubmodel.submodel",
             "groups.orders.orderSubmodel.submodel.model",
-            "groups.responsibleUser.employee" // bu yerda sewingOutputs ni ham chaqiramiz
+            "groups.orders.orderSubmodel.sewingOutputs", // sewingOutputs ni qo'shdik
+            "groups.responsibleUser.employee"
         ])
         ->first();
 
@@ -30,10 +31,11 @@ class GroupController extends Controller
     $departments->groups->each(function ($group) {
         $group->orders->each(function ($orderGroupItem) {
             if ($orderGroupItem->orderSubmodel) {
-                $orderGroupItem->orderSubmodel->total_quantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
+                // sewingOutputs dagi bajarilgan sonlarni hisoblab, alohida sewing_quantity nomi bilan jo‘natamiz
+                $orderGroupItem->orderSubmodel->sewing_quantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
             } else {
                 $orderGroupItem->orderSubmodel = (object)[
-                    'total_quantity' => 0
+                    'sewing_quantity' => 0
                 ];
             }
         });
@@ -41,6 +43,7 @@ class GroupController extends Controller
 
     return response()->json($departments, 200);
 }
+
    
 
     public function index(): \Illuminate\Http\JsonResponse
