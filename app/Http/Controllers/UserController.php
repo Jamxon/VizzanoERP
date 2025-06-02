@@ -131,7 +131,7 @@ class UserController extends Controller
         // Telegramga yuborish
         $user = auth()->user();
         $message = "#muammo<b>🛠 Yangi muammo bildirildi!</b>\n\n"
-            . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role->name})\n"
+            . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role?->name})\n"
             . "📝 Tavsif: {$request->description}";
 
         $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
