@@ -14,22 +14,18 @@ class CasherController extends Controller
 {
     public function getOrders(Request $request)
     {
-        $query = \App\Models\Order::with(['orderModel.submodels.tarificationCategories.tarifications'])
-            ->where('branch_id', auth()->user()->employee->branch_id);
+        $search = mb_strtolower($request->search);
 
-            $search = mb_strtolower($request->search);
-            $query->orWhereHas('orderModel', function ($q2) use ($search) {
-                    $q2->whereHas('model', function ($q3) use ($search) {
-                    //like kerak emas
-                    $q3->where('name', $search);
-                });
-            });
-        
-
-        $orders = $query->get();
+        $orders = \App\Models\Order::with(['orderModel.submodels.tarificationCategories.tarifications'])
+            ->where('branch_id', auth()->user()->employee->branch_id)
+            ->whereHas('orderModel.model', function ($q) use ($search) {
+                $q->whereRaw('LOWER(name) = ?', [$search]); // aniq tenglik, katta-kichik harfsiz
+            })
+            ->get();
 
         return response()->json($orders);
     }
+
 
     public function getGroupsByDepartmentId(Request $request)
     {
