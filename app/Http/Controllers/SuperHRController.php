@@ -298,6 +298,7 @@ class SuperHRController extends Controller
             'role_id' => 'nullable',
             'status' => 'nullable|string|in:working,kicked,reserv',
             'salary' => 'nullable|numeric',
+            'gender'=> 'nullable|string',
         ]);
 
         try {
@@ -339,7 +340,7 @@ class SuperHRController extends Controller
                     'status' => $request->status ?? 'kicked',
                     'kicked_date' => now(),
                     'salary' => $request->salary ?? $employee->salary,
-'gender' => $request->gender ?? $employee->gender,
+                    'gender' => $request->gender ?? $employee->gender,
                 ]);
             } else {
                 $employee->update([
@@ -359,8 +360,7 @@ class SuperHRController extends Controller
                     'img' => $img ?? $employee->img ?? null,
                     'salary' => $request->salary ?? null,
                     'kicked_date' => null,
-'gender' => $request->gender ?? $employee->gender,
-
+                    'gender' => $request->gender ?? $employee->gender,
                     'status' => $request->status ?? 'working',
                 ]);
             }
