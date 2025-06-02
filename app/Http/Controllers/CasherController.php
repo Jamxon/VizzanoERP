@@ -16,7 +16,7 @@ class CasherController extends Controller
     {
         $search = mb_strtolower($request->search);
 
-        $orders = \App\Models\Order::with(['orderModel.submodels.tarificationCategories.tarifications'])
+        $orders = \App\Models\Order::with(['orderModel.submodels.submodel', 'orderModel.model'])
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->whereHas('orderModel.model', function ($q) use ($search) {
                 $q->whereRaw('LOWER(name) = ?', [$search]); // aniq tenglik, katta-kichik harfsiz
