@@ -203,6 +203,7 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::delete('groups/{group}', [GroupController::class, 'delete']);
 
     Route::get('plans', [GroupController::class, 'getGroupsWithPlan']);
+    Route::get('orders/groups', [OrderController::class, 'getOrdersWithoutOrderGroups']);
 
     Route::get('users/master', [UserController::class, 'getUsersMaster']);
     Route::get('users/submaster', [UserController::class, 'getUsersSubMaster']);
