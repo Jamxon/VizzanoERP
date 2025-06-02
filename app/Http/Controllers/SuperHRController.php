@@ -122,6 +122,7 @@ class SuperHRController extends Controller
             'status' => 'nullable|string|in:working,kicked,reserv',
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'salary' => 'nullable|numeric',
+            'gender'=> 'required|string',
         ]);
 
         try {
@@ -164,6 +165,7 @@ class SuperHRController extends Controller
                 'status' => $request->status,
                 'img' => $img,
                 'salary' => $request->salary ?? null,
+                'gender' => $request->gender,
             ]);
 
 
