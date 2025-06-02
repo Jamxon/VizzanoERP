@@ -11,6 +11,26 @@ use Illuminate\Validation\ValidationException;
 
 class GroupController extends Controller
 {
+    public function orderGroupStore(Request $request)
+    {
+        $orderId = $request->order_id;
+        $submodelId = $request->submodel_id;
+        $groupId = $request->group_id;
+        $number = $request->number;
+
+            OrderGroup::create([
+            "order_id"=> $orderId,
+            "group_id"=> $groupId,
+            "submodel_id"=> $submodelId,
+            "number"=> $number
+            ]);
+        
+
+        return response()->json([
+                'message' => 'Success'
+                ]);
+    }
+
     public function getGroupsWithPlan(Request $request)
     {
         $departments = Department::where("id", $request->department_id)
