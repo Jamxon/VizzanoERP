@@ -34,6 +34,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VizzanoReportTvController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
+use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('casher')->middleware('role:casher')->group(function () {
@@ -401,6 +402,7 @@ Route::middleware('auth:api')->group(function () {
     Route::patch('profile/{employee}', [UserController::class, 'updateProfile']);
     Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
     Route::post('issue', [UserController::class, 'storeIssue']);
+    Route::get('/test-eskiz-report', [EskizTestController::class, 'reportByRange']);
 });
 
 Route::post('register', [AuthController::class, 'register']);
