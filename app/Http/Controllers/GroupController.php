@@ -13,14 +13,14 @@ class GroupController extends Controller
 {
     public function getGroupsWithPlan(Request $request)
     {
-        $departments = Department::findOrFail( $request->department_id)
+        $departments = Department::where("id", $request->department_id)
         ->with(
          "groups.orders.order",
          "groups.orders.orderSubmodel.submodel",
           "groups.orders.orderSubmodel.submodel.model",
           "groups.responsibleUser.employee",
           )
-          ->get();
+          ->first();
 
           return response()->json($departments, 200);
     }    
