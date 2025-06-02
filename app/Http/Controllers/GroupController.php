@@ -4,11 +4,27 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\OrderGroup;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
+
 class GroupController extends Controller
 {
+    public function getGroupsWithPlan(Request $request)
+    {
+        $departments = Department::where("id", $request->department_id)
+        ->with(
+         "groups.orders.order",
+         "groups.orders.orderSubmodel.submodel",
+          "groups.orders.orderSubmodel.submodel.model",
+          "groups.responsibleUser.employee",
+          )
+          ->get();
+
+          return response()->json($departments, 200);
+    }    
+
     public function index(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
