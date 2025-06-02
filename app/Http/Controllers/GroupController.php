@@ -18,7 +18,6 @@ class GroupController extends Controller
             "groups.orders.order",
             "groups.orders.orderSubmodel.submodel",
             "groups.orders.orderSubmodel.submodel.model",
-            "groups.orders.orderSubmodel.sewingOutputs", // sewingOutputs ni qo'shdik
             "groups.responsibleUser.employee"
         ])
         ->first();
