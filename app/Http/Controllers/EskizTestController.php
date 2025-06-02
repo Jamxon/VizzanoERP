@@ -7,6 +7,34 @@ use Illuminate\Support\Facades\Http;
 
 class EskizTestController extends Controller
 {
+    public function sendSms(Request $request)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+            'message' => 'required|string',
+        ]);
+
+        $token = $this->getEskizToken();
+        if (!$token) {
+            return response()->json(['error' => 'Token olishda xatolik'], 500);
+        }
+
+        $response = Http::withToken($token)
+            ->asForm()
+            ->post('https://notify.eskiz.uz/api/message/sms/send', [
+                'mobile_phone' => $request->phone, // masalan: 998901234567
+                'message' => $request->message,
+                'from' => '4546', // Eskizda ulangan sender ID (odatda 4546 bo'ladi)
+                'callback_url' => '', // ixtiyoriy: sms status qaytish url
+            ]);
+
+        return response()->json([
+            'status' => $response->status(),
+            'data' => $response->json(),
+        ]);
+    }
+
+
     public function reportByRange()
     {
         $token = $this->getEskizToken();
