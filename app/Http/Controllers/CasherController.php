@@ -26,7 +26,6 @@ class CasherController extends Controller
         return response()->json($orders);
     }
 
-
     public function getGroupsByDepartmentId(Request $request)
     {
         $departmentId = $request->input('department_id');

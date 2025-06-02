@@ -330,6 +330,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::delete('tarification/category/{id}', [TechnologController::class, 'destroyTarificationCategory']);
     Route::delete('tarification/{id}', [TechnologController::class, 'deleteTarification']);
     Route::post('tarification/fastening', [TechnologController::class, 'fasteningToEmployee']);
+    Route::get('confirmOrder', [TechnologController::class, 'confirmOrder']);
 });
 
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
