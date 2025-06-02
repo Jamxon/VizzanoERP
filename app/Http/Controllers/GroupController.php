@@ -11,42 +11,39 @@ use Illuminate\Validation\ValidationException;
 
 class GroupController extends Controller
 {
-public function getGroupsWithPlan(Request $request)
-{
-    $departments = Department::where("id", $request->department_id)
-        ->with([
-            "groups.orders.order",
-            "groups.orders.orderSubmodel.submodel",
-            "groups.orders.orderSubmodel.submodel.model",
-            "groups.orders.orderSubmodel.sewingOutputs:id,order_submodel_id,quantity", // faqat kerakli maydonlar
-            "groups.responsibleUser.employee"
-        ])
-        ->first();
+    public function getGroupsWithPlan(Request $request)
+    {
+        $departments = Department::where("id", $request->department_id)
+            ->with([
+                "groups.orders.order",
+                "groups.orders.orderSubmodel.submodel",
+                "groups.orders.orderSubmodel.submodel.model",
+                "groups.orders.orderSubmodel.sewingOutputs:id,order_submodel_id,quantity", // faqat kerakli maydonlar
+                "groups.responsibleUser.employee"
+            ])
+            ->first();
 
-    if (!$departments) {
-        return response()->json(['message' => 'Department topilmadi.'], 404);
-    }
+        if (!$departments) {
+            return response()->json(['message' => 'Department topilmadi.'], 404);
+        }
 
-    // Har bir group ichidagi orders ni map qilib chiqamiz
-    $departments->groups->each(function ($group) {
-        $group->orders->each(function ($orderGroupItem) {
-            if ($orderGroupItem->orderSubmodel) {
-                $sewingQuantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
-                unset($orderGroupItem->orderSubmodel->sewingOutputs); // sewing_outputs ni olib tashlaymiz
-                $orderGroupItem->orderSubmodel->sewing_quantity = $sewingQuantity;
-            } else {
-                $orderGroupItem->orderSubmodel = (object)[
-                    'sewing_quantity' => 0
-                ];
-            }
+        // Har bir group ichidagi orders ni map qilib chiqamiz
+        $departments->groups->each(function ($group) {
+            $group->orders->each(function ($orderGroupItem) {
+                if ($orderGroupItem->orderSubmodel) {
+                    $sewingQuantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
+                    unset($orderGroupItem->orderSubmodel->sewingOutputs); // sewing_outputs ni olib tashlaymiz
+                    $orderGroupItem->orderSubmodel->sewing_quantity = $sewingQuantity;
+                } else {
+                    $orderGroupItem->orderSubmodel = (object)[
+                        'sewing_quantity' => 0
+                    ];
+                }
+            });
         });
-    });
 
-    return response()->json($departments, 200);
-}
-
-
-   
+        return response()->json($departments, 200);
+    }
 
     public function index(): \Illuminate\Http\JsonResponse
     {
