@@ -984,7 +984,7 @@ class TechnologController extends Controller
             return response()->json(['message' => 'submodel_id kerak!'], 400);
         }
 
-        $rows = \Excel::toArray([], $file);
+        $rows = Excel::toArray([], $file);
         $sheet = $rows[0];
 
         DB::beginTransaction();
