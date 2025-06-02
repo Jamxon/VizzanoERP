@@ -96,27 +96,27 @@ class GroupController extends Controller
 
     $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
 
-    // Guruhlar ichidagi orderGroup larni filtrlash
     $departments->groups->each(function ($group) use ($excludedStatuses) {
-        // orders kolleksiyasini qayta yozamiz
-        $group->orders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {
-            // Order statusni tekshiramiz
-            return $orderGroupItem->order && !in_array($orderGroupItem->order->status, $excludedStatuses);
-        })->values(); // indexlarni qayta tartiblaymiz
+    $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {
+        return $orderGroupItem->order && !in_array($orderGroupItem->order->status, $excludedStatuses);
+    })->values();
 
-        // qolgan orderGroup lar uchun sewing_quantity ni hisoblaymiz
-        $group->orders->each(function ($orderGroupItem) {
-            if ($orderGroupItem->orderSubmodel) {
-                $sewingQuantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
-                unset($orderGroupItem->orderSubmodel->sewingOutputs);
-                $orderGroupItem->orderSubmodel->sewing_quantity = $sewingQuantity;
-            } else {
-                $orderGroupItem->orderSubmodel = (object)[
-                    'sewing_quantity' => 0
-                ];
-            }
-        });
+    // setRelation bilan qayta yozamiz
+    $group->setRelation('orders', $filteredOrders);
+
+    $group->orders->each(function ($orderGroupItem) {
+        if ($orderGroupItem->orderSubmodel) {
+            $sewingQuantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
+            unset($orderGroupItem->orderSubmodel->sewingOutputs);
+            $orderGroupItem->orderSubmodel->sewing_quantity = $sewingQuantity;
+        } else {
+            $orderGroupItem->orderSubmodel = (object)[
+                'sewing_quantity' => 0
+            ];
+        }
     });
+});
+
 
     return response()->json($departments, 200);
 }
