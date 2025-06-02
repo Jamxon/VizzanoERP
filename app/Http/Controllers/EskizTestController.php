@@ -18,6 +18,7 @@ class EskizTestController extends Controller
             ->asForm()
             ->post('https://notify.eskiz.uz/api/report/total-by-range?status=null', [
                 'start_date' => '2023-11-01 00:00',
+                'end_date'=> '2025-11-01 00:00',
                 'to_date' => '2023-11-02 23:59',
                 'is_ad' => '',
             ]);
