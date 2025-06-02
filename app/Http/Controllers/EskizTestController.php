@@ -7,32 +7,53 @@ use Illuminate\Support\Facades\Http;
 
 class EskizTestController extends Controller
 {
-    public function sendSms(Request $request)
-    {
-        $request->validate([
-            'phone' => 'required|string',
-            'message' => 'required|string',
-        ]);
+    public function sendSmsAndCheckStatus(Request $request)
+{
+    $token = $this->getEskizToken();
 
-        $token = $this->getEskizToken();
-        if (!$token) {
-            return response()->json(['error' => 'Token olishda xatolik'], 500);
+    // SMS yuborish
+    $sendResponse = Http::withToken($token)->asForm()->post('https://notify.eskiz.uz/api/message/sms/send', [
+        'mobile_phone' => $request->phone, // format: 998901234567
+        'message' => $request->message,
+        'from' => '4546',
+        'callback_url' => '',
+    ]);
+
+    if (!$sendResponse->successful()) {
+        return response()->json(['error' => 'SMS yuborishda xatolik'], 500);
+    }
+
+    $smsId = $sendResponse->json('data.id');
+
+    // 10 martagacha statusni tekshirishga harakat qilamiz (har 2 sek.)
+    for ($i = 0; $i < 10; $i++) {
+        sleep(2); // 2 sekund kutish
+
+        $statusResponse = Http::withToken($token)
+            ->get("https://notify.eskiz.uz/api/message/sms/status_by_id/{$smsId}");
+
+        if (!$statusResponse->successful()) {
+            continue;
         }
 
-        $response = Http::withToken($token)
-            ->asForm()
-            ->post('https://notify.eskiz.uz/api/message/sms/send', [
-                'mobile_phone' => $request->phone, // masalan: 998901234567
-                'message' => $request->message,
-                'from' => '4546', // Eskizda ulangan sender ID (odatda 4546 bo'ladi)
-                'callback_url' => '', // ixtiyoriy: sms status qaytish url
-            ]);
+        $status = $statusResponse->json('data.status');
 
-        return response()->json([
-            'status' => $response->status(),
-            'data' => $response->json(),
-        ]);
+        if (in_array($status, ['delivered', 'undelivered', 'failed'])) {
+            return response()->json([
+                'sms_id' => $smsId,
+                'final_status' => $status,
+                'message' => $statusResponse->json('data.message') ?? null
+            ]);
+        }
     }
+
+    return response()->json([
+        'sms_id' => $smsId,
+        'final_status' => 'waiting',
+        'message' => 'SMS holati hali aniqlanmadi'
+    ]);
+}
+
 
 
     public function reportByRange()
