@@ -20,19 +20,23 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends Controller
 {
     public function getOrdersWithoutOrderGroups(Request $request)
-    {
-        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
-            ->whereDoesntHave('orderGroups')
-            ->with([
-                'orderModel',
-                'orderModel.model',
-                'orderModel.material',
-                'orderModel.submodels.submodel',
-            ])
-            ->get();
+{
+    $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
 
-        return response()->json($orders);
-    }
+    $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
+        ->whereNotIn('status', $excludedStatuses) // 🔍 bu yerda status filtr qo‘shildi
+        ->whereDoesntHave('orderGroups')
+        ->with([
+            'orderModel',
+            'orderModel.model',
+            'orderModel.material',
+            'orderModel.submodels.submodel',
+        ])
+        ->get();
+
+    return response()->json($orders);
+}
+
 
     public function getLogs(): \Illuminate\Http\JsonResponse
     {
