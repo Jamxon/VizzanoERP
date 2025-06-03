@@ -87,7 +87,7 @@ class GroupController extends Controller
                 "groups.orders.orderSubmodel.submodel",
                 "groups.orders.orderSubmodel.submodel.model",
                 "groups.orders.orderSubmodel.sewingOutputs:id,order_submodel_id,quantity",
-                "groups.orders.orderSubmodel.spends",
+                "groups.orders.orderSubmodel.submodelSpend",
                 "groups.responsibleUser.employee.attendances"
             ])
             ->first();
