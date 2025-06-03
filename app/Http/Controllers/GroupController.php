@@ -127,7 +127,7 @@ class GroupController extends Controller
 
             $group->setRelation('orders', $filteredOrders);
 
-            $group->orders->each(function ($orderGroupItem) use ($totalWorkSeconds) {
+            $group->orders->each(function ($orderGroupItem) use ($totalWorkSeconds, $avgAttendance) {
                 if ($orderGroupItem->orderSubmodel) {
                     $submodel = $orderGroupItem->orderSubmodel;
                     $sewingQuantity = $submodel->sewingOutputs->sum('quantity');
@@ -146,6 +146,8 @@ class GroupController extends Controller
                         $finalPlan = $averagePlan * $remaining;
                         $submodel->{"plan_$region"} = $finalPlan;
                     });
+
+                    $submodel->avgAttendance = $avgAttendance;
                 } else {
                     $orderGroupItem->orderSubmodel = (object)[
                         'sewing_quantity' => 0,
