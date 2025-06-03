@@ -193,7 +193,7 @@ class CuttingMasterController extends Controller
         }
     }
 
-    public function markAsCutAndExportMultiplePdfs(Request $request): \Illuminate\Http\Response
+    public function markAsCutAndExportMultiplePdfs(Request $request)
     {
         $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
@@ -207,6 +207,20 @@ class CuttingMasterController extends Controller
         ini_set('memory_limit', '2G');
         set_time_limit(0);
 
+        $order = Order::with('submodels')->findOrFail($data['order_id']);
+
+        $existingCutForSubmodel = OrderCut::where('order_id', $data['order_id'])
+            ->where('submodel_id', $data['submodel_id'])
+            ->sum('quantity');
+
+        $remainingForSubmodel = $order->quantity - $existingCutForSubmodel;
+
+        if ($data['quantity'] > $remainingForSubmodel) {
+            return response()->json([
+                'message' => 'Submodel uchun kesish miqdori ortiqcha. Qolgan: ' . $remainingForSubmodel
+            ], 422);
+        }
+
         OrderCut::create([
             'order_id' => $data['order_id'],
             'user_id' => auth()->user()->id,
@@ -216,6 +230,14 @@ class CuttingMasterController extends Controller
             'submodel_id' => $data['submodel_id'],
             'size_id' => $data['size_id'],
         ]);
+
+        $totalCut = OrderCut::where('order_id', $order->id)->sum('quantity');
+
+        if ($totalCut >= $order->quantity) {
+            $order->status = 'pending';
+            $order->save();
+        }
+
 
         $submodel = OrderSubmodel::with([
             'orderModel.order:id,name',
