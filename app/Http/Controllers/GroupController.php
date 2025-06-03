@@ -87,7 +87,7 @@ class GroupController extends Controller
                 "groups.orders.orderSubmodel.submodel",
                 "groups.orders.orderSubmodel.submodel.model",
                 "groups.orders.orderSubmodel.submodelSpend",
-                "groups.employees.attendances", // Eslatma: group->employees bo‘lishi kerak
+                "groups.employees.attendances:id,employee_id,date",
             ])
             ->first();
 
@@ -105,11 +105,19 @@ class GroupController extends Controller
                 $weeklyAttendances = $employee->attendances
                     ->where('date', '>=', $pastWeek)
                     ->filter(fn($a) => Carbon::parse($a->date)->dayOfWeek !== Carbon::SUNDAY);
+
                 $attendances = $attendances->merge($weeklyAttendances);
             }
 
+            // Har bir employee_id + date bo‘yicha noyob davomatlar
+            $uniqueAttendances = $attendances->unique(fn($item) => $item->employee_id . '_' . $item->date);
+            $days = $uniqueAttendances->pluck('date')->unique()->count();
             $employeeCount = $group->employees->count();
-            $avgAttendance = $employeeCount > 0 ? $attendances->count() / $employeeCount : 0;
+
+            // Yangi, aniq o‘rtacha hisoblash
+            $avgAttendance = ($days > 0 && $employeeCount > 0)
+                ? $uniqueAttendances->count() / $days
+                : 0;
 
             // Ish vaqtini hisoblash
             $start = Carbon::parse($group->department->start_time);
@@ -120,13 +128,14 @@ class GroupController extends Controller
 
             $totalWorkSeconds = $workSeconds * $avgAttendance;
 
-            // Keraksiz statusdagi orderlarni chiqarib tashlash
+            // Order statuslar bo‘yicha filtr
             $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {
                 return $orderGroupItem->order && !in_array($orderGroupItem->order->status, $excludedStatuses);
             })->values();
 
             $group->setRelation('orders', $filteredOrders);
 
+            // Har bir orderSubmodel bo‘yicha plan hisoblash
             $group->orders->each(function ($orderGroupItem) use ($totalWorkSeconds, $avgAttendance) {
                 if ($orderGroupItem->orderSubmodel) {
                     $submodel = $orderGroupItem->orderSubmodel;
@@ -147,7 +156,7 @@ class GroupController extends Controller
                         $submodel->{"plan_$region"} = $finalPlan;
                     });
 
-                    $submodel->avgAttendance = $avgAttendance;
+                    $submodel->avgAttendance = round($avgAttendance, 2);
                 } else {
                     $orderGroupItem->orderSubmodel = (object)[
                         'sewing_quantity' => 0,
@@ -157,6 +166,10 @@ class GroupController extends Controller
                     ];
                 }
             });
+
+            // 🔴 Eslatma: employees va department ni chiqarmaslik
+            unset($group->employees);
+            unset($group->department);
         });
 
         return response()->json($departments, 200);
