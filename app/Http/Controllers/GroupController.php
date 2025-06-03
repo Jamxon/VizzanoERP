@@ -21,7 +21,6 @@ class GroupController extends Controller
             $submodelId = $request->submodel_id;
             $orderId = $request->order_id;
             $groupId = $request->group_id;
-            $number = $request->number;
 
             // Mavjudligini submodel_id orqali tekshiramiz
             $existing = OrderGroup::where('submodel_id', $submodelId)->first();
@@ -30,8 +29,7 @@ class GroupController extends Controller
                 // Yangilaymiz
                 $existing->update([
                     'order_id' => $orderId,
-                    'group_id' => $groupId,
-                    'number' => $number
+                    'group_id' => $groupId
                 ]);
 
                 Log::add(
@@ -51,7 +49,6 @@ class GroupController extends Controller
                     'order_id' => $orderId,
                     'group_id' => $groupId,
                     'submodel_id' => $submodelId,
-                    'number' => $number
                 ]);
 
                 Log::add(
