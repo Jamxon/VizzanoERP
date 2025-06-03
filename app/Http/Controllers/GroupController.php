@@ -9,6 +9,7 @@ use App\Models\OrderSubModel;
 use App\Models\Order;
 use App\Models\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\ValidationException;
 
 
@@ -86,7 +87,8 @@ class GroupController extends Controller
                 "groups.orders.orderSubmodel.submodel",
                 "groups.orders.orderSubmodel.submodel.model",
                 "groups.orders.orderSubmodel.sewingOutputs:id,order_submodel_id,quantity",
-                "groups.responsibleUser.employee"
+                "groups.orders.orderSubmodel.spends",
+                "groups.responsibleUser.employee.attendances"
             ])
             ->first();
 
@@ -97,30 +99,70 @@ class GroupController extends Controller
         $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
 
         $departments->groups->each(function ($group) use ($excludedStatuses) {
-        $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {
-            return $orderGroupItem->order && !in_array($orderGroupItem->order->status, $excludedStatuses);
-        })->values();
+            // So'nggi 7 kunlik (yakshanbadan tashqari) ish kunlarida davomat o'rtachasi
+            $pastWeek = now()->subDays(7);
+            $attendances = collect();
 
-        // setRelation bilan qayta yozamiz
-        $group->setRelation('orders', $filteredOrders);
+            foreach ($group->responsibleUser as $user) {
+                $employee = $user->employee;
+                if (!$employee) continue;
 
-        $group->orders->each(function ($orderGroupItem) {
-            if ($orderGroupItem->orderSubmodel) {
-                $sewingQuantity = $orderGroupItem->orderSubmodel->sewingOutputs->sum('quantity');
-                unset($orderGroupItem->orderSubmodel->sewingOutputs);
-                $orderGroupItem->orderSubmodel->sewing_quantity = $sewingQuantity;
-            } else {
-                $orderGroupItem->orderSubmodel = (object)[
-                    'sewing_quantity' => 0
-                ];
+                $weeklyAttendances = $employee->attendances
+                    ->where('date', '>=', $pastWeek)
+                    ->filter(fn($a) => Carbon::parse($a->date)->dayOfWeek !== Carbon::SUNDAY);
+
+                $attendances = $attendances->merge($weeklyAttendances);
             }
-        });
-    });
 
+            $avgAttendance = $attendances->count() > 0 ? $attendances->count() / $group->responsibleUser->count() : 0;
+
+            // Ish vaqtini departmentdan olish
+            $start = Carbon::parse($group->department->start_time);
+            $end = Carbon::parse($group->department->end_time);
+            $break = $group->department->break_time ?? 0;
+            $workMinutes = $end->diffInMinutes($start) - $break;
+            $workSeconds = $workMinutes * 60;
+
+            $totalWorkSeconds = $workSeconds * $avgAttendance;
+
+            // Faqat kerakli statusdagi orderlar
+            $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {
+                return $orderGroupItem->order && !in_array($orderGroupItem->order->status, $excludedStatuses);
+            })->values();
+
+            $group->setRelation('orders', $filteredOrders);
+
+            $group->orders->each(function ($orderGroupItem) use ($totalWorkSeconds) {
+                if ($orderGroupItem->orderSubmodel) {
+                    $submodel = $orderGroupItem->orderSubmodel;
+                    $sewingQuantity = $submodel->sewingOutputs->sum('quantity');
+                    $quantity = $submodel->quantity ?? 0;
+                    $remaining = max(0, $quantity - $sewingQuantity);
+
+                    $submodel->sewing_quantity = $sewingQuantity;
+                    $submodel->remaining_quantity = $remaining;
+
+                    $spends = $submodel->spends;
+
+                    $spends->groupBy('region')->each(function ($spendGroup, $region) use ($submodel, $totalWorkSeconds, $remaining) {
+                        $spendSeconds = $spendGroup->sum('second');
+                        $averagePlan = $spendSeconds > 0 ? floor($totalWorkSeconds / $spendSeconds) : 0;
+                        $finalPlan = $averagePlan * $remaining;
+                        $submodel->{"plan_$region"} = $finalPlan;
+                    });
+                } else {
+                    $orderGroupItem->orderSubmodel = (object)[
+                        'sewing_quantity' => 0,
+                        'remaining_quantity' => 0,
+                        'plan_uz' => 0,
+                        'plan_ru' => 0,
+                    ];
+                }
+            });
+        });
 
         return response()->json($departments, 200);
     }
-
 
     public function index(): \Illuminate\Http\JsonResponse
     {
