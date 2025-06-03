@@ -14,14 +14,6 @@ class HikvisionEventController extends Controller
     {
         $contentType = $request->header('Content-Type');
 
-        Log::add(
-            null,
-            "ishlayatiyu",
-            'hikvision event',
-            null,
-            $contentType
-        );
-
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
             $image = $request->file('Picture');
