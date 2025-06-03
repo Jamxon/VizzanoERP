@@ -47,7 +47,6 @@ class OrderController extends Controller
         return response()->json($result);
     }
 
-
     public function getOrdersWithoutOrderGroups(Request $request)
 {
     $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
@@ -65,6 +64,7 @@ class OrderController extends Controller
 
     return response()->json($orders);
     }
+    
     public function getLogs(): \Illuminate\Http\JsonResponse
     {
         $logs = Log::orderBy('created_at', 'desc')->get();
