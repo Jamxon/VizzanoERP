@@ -154,7 +154,7 @@ class GroupController extends Controller
                     $spends->groupBy('region')->each(function ($spendGroup, $region) use ($submodel, $totalWorkSeconds, $remaining) {
                         $spendSeconds = $spendGroup->sum('seconds');
                         $averagePlan = $spendSeconds > 0 ? floor($totalWorkSeconds / $spendSeconds) : 0;
-                        $finalPlan = $averagePlan * $remaining;
+                        $finalPlan = $remaining / $averagePlan;
                         $submodel->{"plan_$region"} = $finalPlan;
                     });
 
