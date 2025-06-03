@@ -157,6 +157,7 @@ class GroupController extends Controller
                         $finalPlan = $remaining / $averagePlan;
                         $submodel->{"plan_$region"} = $finalPlan;
                         $submodel->avaragePlan = $averagePlan;
+                        $submodel->perEmployee = $averagePlan / $totalWorkSeconds;
                     });
 
                     $submodel->avgAttendance = round($avgAttendance, 2);
