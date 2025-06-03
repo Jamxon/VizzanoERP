@@ -19,6 +19,33 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
+    public function getOrdersWithQuantity(){
+
+    $statuses = [
+        'inactive', 'active', 'printing', 'cutting', 'pending',
+        'tailoring', 'tailored', 'checking', 'checked', 'packaging', 'completed'
+    ];
+
+    $data = DB::table('orders')
+        ->select('status', DB::raw('COUNT(*) as order_count'), DB::raw('SUM(quantity) as total_quantity'))
+        ->whereIn('status', $statuses)
+        ->groupBy('status')
+        ->get();
+
+        $result = collect($statuses)->map(function ($status) use ($data) {
+        $row = $data->firstWhere('status', $status);
+            return [
+                'status' => $status,
+                'order_count' => $row->order_count ?? 0,
+                'total_quantity' => $row->total_quantity ?? 0,
+            ];
+        });
+
+        return response()->json($result);
+
+
+    }
+
     public function getOrdersWithoutOrderGroups(Request $request)
 {
     $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
@@ -35,9 +62,7 @@ class OrderController extends Controller
         ->get();
 
     return response()->json($orders);
-}
-
-
+    }
     public function getLogs(): \Illuminate\Http\JsonResponse
     {
         $logs = Log::orderBy('created_at', 'desc')->get();
