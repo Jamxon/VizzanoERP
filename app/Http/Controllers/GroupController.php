@@ -86,7 +86,6 @@ class GroupController extends Controller
                 "groups.orders.order",
                 "groups.orders.orderSubmodel.submodel",
                 "groups.orders.orderSubmodel.submodel.model",
-                "groups.orders.orderSubmodel.sewingOutputs:id,order_submodel_id,quantity",
                 "groups.orders.orderSubmodel.submodelSpend",
                 "groups.employees.attendances", // Eslatma: group->employees bo‘lishi kerak
             ])
