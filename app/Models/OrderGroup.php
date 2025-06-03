@@ -19,7 +19,6 @@ class OrderGroup extends Model
         'order_id',
         'submodel_id',
         'group_id',
-        'number',
     ];
 
     protected $hidden = [
