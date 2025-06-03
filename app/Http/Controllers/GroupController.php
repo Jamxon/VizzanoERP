@@ -88,7 +88,7 @@ class GroupController extends Controller
                 "groups.orders.orderSubmodel.submodel.model",
                 "groups.orders.orderSubmodel.sewingOutputs:id,order_submodel_id,quantity",
                 "groups.orders.orderSubmodel.submodelSpend",
-                "groups.responsibleUser.employee.attendances"
+                "groups.employees.attendances", // Eslatma: group->employees bo‘lishi kerak
             ])
             ->first();
 
@@ -99,24 +99,20 @@ class GroupController extends Controller
         $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
 
         $departments->groups->each(function ($group) use ($excludedStatuses) {
-            // So'nggi 7 kunlik (yakshanbadan tashqari) ish kunlarida davomat o'rtachasi
             $pastWeek = now()->subDays(7);
             $attendances = collect();
 
-            foreach ($group->responsibleUser as $user) {
-                $employee = $user->employee;
-                if (!$employee) continue;
-
+            foreach ($group->employees as $employee) {
                 $weeklyAttendances = $employee->attendances
                     ->where('date', '>=', $pastWeek)
                     ->filter(fn($a) => Carbon::parse($a->date)->dayOfWeek !== Carbon::SUNDAY);
-
                 $attendances = $attendances->merge($weeklyAttendances);
             }
 
-            $avgAttendance = $attendances->count() > 0 ? $attendances->count() / $group->responsibleUser->count() : 0;
+            $employeeCount = $group->employees->count();
+            $avgAttendance = $employeeCount > 0 ? $attendances->count() / $employeeCount : 0;
 
-            // Ish vaqtini departmentdan olish
+            // Ish vaqtini hisoblash
             $start = Carbon::parse($group->department->start_time);
             $end = Carbon::parse($group->department->end_time);
             $break = $group->department->break_time ?? 0;
@@ -125,7 +121,7 @@ class GroupController extends Controller
 
             $totalWorkSeconds = $workSeconds * $avgAttendance;
 
-            // Faqat kerakli statusdagi orderlar
+            // Keraksiz statusdagi orderlarni chiqarib tashlash
             $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {
                 return $orderGroupItem->order && !in_array($orderGroupItem->order->status, $excludedStatuses);
             })->values();
@@ -142,7 +138,7 @@ class GroupController extends Controller
                     $submodel->sewing_quantity = $sewingQuantity;
                     $submodel->remaining_quantity = $remaining;
 
-                    $spends = $submodel->submodelSpend;
+                    $spends = $submodel->submodelSpend ?? collect();
 
                     $spends->groupBy('region')->each(function ($spendGroup, $region) use ($submodel, $totalWorkSeconds, $remaining) {
                         $spendSeconds = $spendGroup->sum('second');
