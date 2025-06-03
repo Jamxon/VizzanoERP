@@ -19,21 +19,24 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function getOrdersWithQuantity(){
+    public function getOrdersWithQuantity()
+    {
+        $branchId = auth()->user()->employee->branch_id;
 
-    $statuses = [
-        'inactive', 'active', 'printing', 'cutting', 'pending',
-        'tailoring', 'tailored', 'checking', 'checked', 'packaging', 'completed'
-    ];
+        $statuses = [
+            'inactive', 'active', 'printing', 'cutting', 'pending',
+            'tailoring', 'tailored', 'checking', 'checked', 'packaging', 'completed'
+        ];
 
-    $data = DB::table('orders')
-        ->select('status', DB::raw('COUNT(*) as order_count'), DB::raw('SUM(quantity) as total_quantity'))
-        ->whereIn('status', $statuses)
-        ->groupBy('status')
-        ->get();
+        $data = DB::table('orders')
+            ->select('status', DB::raw('COUNT(*) as order_count'), DB::raw('SUM(quantity) as total_quantity'))
+            ->whereIn('status', $statuses)
+            ->where('branch_id', $branchId)
+            ->groupBy('status')
+            ->get();
 
         $result = collect($statuses)->map(function ($status) use ($data) {
-        $row = $data->firstWhere('status', $status);
+            $row = $data->firstWhere('status', $status);
             return [
                 'status' => $status,
                 'order_count' => $row->order_count ?? 0,
@@ -42,9 +45,8 @@ class OrderController extends Controller
         });
 
         return response()->json($result);
-
-
     }
+
 
     public function getOrdersWithoutOrderGroups(Request $request)
 {
