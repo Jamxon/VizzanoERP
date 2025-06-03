@@ -206,6 +206,7 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::get('plans', [GroupController::class, 'getGroupsWithPlan']);
     Route::post('plans', [GroupController::class,'orderGroupStore']);
     Route::get('orders/groups', [OrderController::class, 'getOrdersWithoutOrderGroups']);
+    Route::get('orders/quantity', [OrderController::class, 'getOrdersWithQuantity']);
 
 
     Route::get('users/master', [UserController::class, 'getUsersMaster']);
