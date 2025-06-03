@@ -159,7 +159,6 @@ class GroupController extends Controller
                     });
 
                     $submodel->avgAttendance = round($avgAttendance, 2);
-                    $submodel->totalWorkSeconds = $totalWorkSeconds;
                 } else {
                     $orderGroupItem->orderSubmodel = (object)[
                         'sewing_quantity' => 0,
