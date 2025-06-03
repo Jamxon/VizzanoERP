@@ -131,6 +131,7 @@ class GroupController extends Controller
                 if ($orderGroupItem->orderSubmodel) {
                     $submodel = $orderGroupItem->orderSubmodel;
                     $sewingQuantity = $submodel->sewingOutputs->sum('quantity');
+                    unset($submodel->sewingOutputs);
                     $quantity = $submodel->quantity ?? 0;
                     $remaining = max(0, $quantity - $sewingQuantity);
 
