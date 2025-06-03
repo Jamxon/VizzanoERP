@@ -116,9 +116,9 @@ class GroupController extends Controller
             $employeeCount = $group->employees->count();
 
             // Yangi, aniq o‘rtacha hisoblash
-            $avgAttendance = ($days > 0 && $employeeCount > 0)
+            $avgAttendance = floor(($days > 0 && $employeeCount > 0)
                 ? $uniqueAttendances->count() / $days
-                : 0;
+                : 0);
 
             // Ish vaqtini hisoblash
             $start = Carbon::parse($group->department->start_time);
