@@ -207,7 +207,7 @@ class CuttingMasterController extends Controller
         ini_set('memory_limit', '2G');
         set_time_limit(0);
 
-        $order = Order::with('submodels')->findOrFail($data['order_id']);
+        $order = Order::findOrFail($data['order_id']);
 
         $existingCutForSubmodel = OrderCut::where('order_id', $data['order_id'])
             ->where('submodel_id', $data['submodel_id'])
