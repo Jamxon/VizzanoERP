@@ -142,7 +142,7 @@ class GroupController extends Controller
                     $submodel->sewing_quantity = $sewingQuantity;
                     $submodel->remaining_quantity = $remaining;
 
-                    $spends = $submodel->spends;
+                    $spends = $submodel->submodelSpend;
 
                     $spends->groupBy('region')->each(function ($spendGroup, $region) use ($submodel, $totalWorkSeconds, $remaining) {
                         $spendSeconds = $spendGroup->sum('second');
