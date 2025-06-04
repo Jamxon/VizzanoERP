@@ -12,6 +12,8 @@ class SalaryPayment extends Model
 {
     use HasFactory;
 
+    protected $table = 'salary_payments';
+
     protected $fillable = [
         'employee_id',
         'amount',
