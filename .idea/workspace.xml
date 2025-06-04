@@ -342,23 +342,7 @@
       <workItem from="1748085763506" duration="10129000" />
       <workItem from="1748929470653" duration="19581000" />
       <workItem from="1749008089755" duration="2982000" />
-      <workItem from="1749012396751" duration="14563000" />
-    </task>
-    <task id="LOCAL-00008" summary="huhuh">
-      <option name="closed" value="true" />
-      <created>1748934278596</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1748934278596</updated>
-    </task>
-    <task id="LOCAL-00009" summary="12345">
-      <option name="closed" value="true" />
-      <created>1748934381232</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1748934381232</updated>
+      <workItem from="1749012396751" duration="14922000" />
     </task>
     <task id="LOCAL-00010" summary="12345">
       <option name="closed" value="true" />
@@ -736,7 +720,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749035965512</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749036134401</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1749036134401</updated>
+    </task>
+    <task id="LOCAL-00058" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749036229662</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1749036229662</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
