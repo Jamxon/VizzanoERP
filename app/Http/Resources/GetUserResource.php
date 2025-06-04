@@ -70,9 +70,11 @@ class GetUserResource extends JsonResource
         elseif ($this->payment_type === 'fixed_tailored_bonus_group') {
             if ($this->group) {
                 $groupId = $this->group->id;
+                $today = Carbon::today();
+
                 $orders = Order::with([
-                    'orderModel.submodels.sewingOutputs' => function ($query) {
-                        $query->whereDate('created_at', Carbon::today());
+                    'orderModel.submodels.sewingOutputs' => function ($query) use ($today) {
+                        $query->whereDate('created_at', $today);
                     },
                     'orderGroups'
                 ])
@@ -80,17 +82,25 @@ class GetUserResource extends JsonResource
                     ->whereHas('orderGroups', function ($query) use ($groupId) {
                         $query->where('group_id', $groupId);
                     })
+                    // faqat bugungi natijasi bor orderlar
+                    ->whereHas('orderModel.submodels.sewingOutputs', function ($query) use ($today) {
+                        $query->whereDate('created_at', $today);
+                    })
                     ->get();
 
-                dd($orders);
+                $todayBonus = 0;
 
                 foreach ($orders as $order) {
                     if (!$order->orderModel) continue;
 
+                    $minutes = $order->orderModel->rasxod / 250;
+                    $pricePerItem = $minutes * 9;
+
                     foreach ($order->orderModel->submodels as $submodel) {
                         foreach ($submodel->sewingOutputs as $output) {
-                                $minutes = ($output->seconds ?? 0) / 60;
-                                $todayBonus += $minutes * 9;
+                            if ($output->employee_id === $this->id) {
+                                $todayBonus += $pricePerItem * $output->quantity;
+                            }
                         }
                     }
                 }
