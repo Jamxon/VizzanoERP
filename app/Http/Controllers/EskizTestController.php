@@ -15,9 +15,9 @@ class EskizTestController extends Controller
         ])->post('https://qd2pg3.api.infobip.com/sms/3/messages', [
             'messages' => [
                 [
-                    'from' => 'InfoSMS', // Sender ID (Infobipda sozlangan bo'lishi kerak)
+                    'from' => 'Vizzano', // Sender ID (Infobipda sozlangan bo'lishi kerak)
                     'destinations' => [
-                        ['to' => '+998500079955'], // Qabul qiluvchi raqam (xalqaro formatda)
+                        ['to' => '+998339721882'], // Qabul qiluvchi raqam (xalqaro formatda)
                     ],
                     "content" => [
                         "text" => "Salom! Laravel orqali yuborilgan SMS."
