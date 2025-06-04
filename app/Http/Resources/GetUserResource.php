@@ -51,7 +51,7 @@ class GetUserResource extends JsonResource
 
             foreach ($orders as $order) {
                 $minutes = $order->orderModel->rasxod / 250;
-                $pricePerOrder = $minutes * 1.5;
+                $pricePerOrder = $minutes * 1;
 
                 if (!$order->orderModel) continue;
 
