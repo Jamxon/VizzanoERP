@@ -51,7 +51,7 @@ class CasherController extends Controller
             CashboxTransaction::create([
                 'cashbox_id' => $cashboxId,
                 'currency_id' => $currency->id,
-                'type' => 'out',
+                'type' => 'expense',
                 'amount' => $validated['amount'],
                 'date' => $validated['date'],
                 'source_id' => null,
