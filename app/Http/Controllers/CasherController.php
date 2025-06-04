@@ -157,15 +157,12 @@ class CasherController extends Controller
      */
     private function getEmployeeEarnings($employee, $startDate, $endDate): ?array
     {
-        // Agar xodim 'kicked' va balans 0 bo‘lsa — responsega kiritilmaydi
         if ($employee->status === 'kicked' && ((float) $employee->balance) === 0.0) {
             return null;
         }
 
-        // position, branch, group aloqalarini yuklash (agar kerak bo‘lsa)
         $employee->loadMissing(['position', 'branch', 'group']);
 
-        // 1. Umumiy ishlagan haqqi yoki piece_work bo‘yicha daromad
         $earningDetails = [];
         $totalEarned = 0;
 
@@ -225,17 +222,22 @@ class CasherController extends Controller
             ];
         }
 
-        // 2. StartDate–EndDate oralig‘ida to‘langan jami summa (salary_payments jadvalidan)
+        // To'lovlarni type bo'yicha ajratib olish
         $paidQuery = $employee->salaryPayments();
 
         if ($startDate && $endDate) {
-            // Bu yerda 'date' ustuni bo‘yicha filtrlaymiz
             $paidQuery->whereBetween('date', [$startDate, $endDate]);
         }
 
-        $paidAmount = $paidQuery->sum('amount');
+        $paymentTypes = $paidQuery
+            ->select('type', \DB::raw('SUM(amount) as total'))
+            ->groupBy('type')
+            ->pluck('total', 'type');
 
-        // 3. Natijaviy javob
+        // Misol: ['cash' => 50000, 'bank' => 30000]
+        $paidAmountsByType = $paymentTypes->map(fn($amount) => (float) $amount)->toArray();
+        $paidTotal = array_sum($paidAmountsByType);
+
         return [
             'id' => $employee->id,
             'name' => $employee->name,
@@ -245,11 +247,10 @@ class CasherController extends Controller
             'payment_type' => $employee->payment_type,
 
             'earning' => $earningDetails,
-            'total_earned' => $totalEarned,       // Earning (attendance/piece_work) bo‘yicha olingan jami
-            'paid_amount' => (float) $paidAmount,  // SalaryPayments bo‘yicha to‘langan summa
-
-            // Agarda balansni yangisi: ishlagan minus to‘langan
-            'net_balance' => round($totalEarned - $paidAmount, 2),
+            'total_earned' => $totalEarned,
+            'paid_amounts' => $paidAmountsByType,   // <— Type bo'yicha ajratilgan
+            'total_paid' => $paidTotal,             // <— Yig'indisi
+            'net_balance' => round($totalEarned - $paidTotal, 2),
         ];
     }
 
