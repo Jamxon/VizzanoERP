@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cashbox;
+use App\Models\Group;
 use App\Models\CashboxBalance;
 use App\Models\CashboxTransaction;
 use App\Models\Currency;
@@ -153,7 +154,7 @@ class CasherController extends Controller
      * $employee — Employee eloquent modeli (salaryPayments eager-load qilingan bo‘lishi mumkin)
      * $startDate, $endDate — 'Y-m-d' formatdagi string (yoki null)
      */
-    private function getEmployeeEarnings($employee, $startDate, $endDate)
+    private function getEmployeeEarnings($employee, $startDate, $endDate): ?array
     {
         // Agar xodim 'kicked' va balans 0 bo‘lsa — responsega kiritilmaydi
         if ($employee->status === 'kicked' && ((float) $employee->balance) === 0.0) {
