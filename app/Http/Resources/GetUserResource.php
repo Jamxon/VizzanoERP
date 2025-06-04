@@ -51,8 +51,8 @@ class GetUserResource extends JsonResource
 
             foreach ($orders as $order) {
                 foreach ($order->orderModel->submodels as $submodel) {
-                    $outputs = $submodel->sewingOutputs
-                        ->where('created_at', $today->toDateString());
+                   dd( $outputs = $submodel->sewingOutputs
+                        ->where('created_at', $today->toDateString()));
 
                     foreach ($outputs as $output) {
                         $minutes = $order->rasxod / 250;
