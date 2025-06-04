@@ -58,7 +58,6 @@ class GetUserResource extends JsonResource
                 foreach ($order->orderModel->submodels as $submodel) {
                     foreach ($submodel->sewingOutputs as $output) {
                         if (
-                            $output->employee_id === $this->id &&
                             Carbon::parse($output->created_at)->isSameDay($today)
                         ) {
                             $todayBonus += $pricePerOrder * $output->quantity;
