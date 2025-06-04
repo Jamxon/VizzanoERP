@@ -179,22 +179,22 @@ class CasherController extends Controller
             $earningDetails = [
                 'type' => 'attendance',
                 'total_earned' => $totalEarned,
-                'salaries' => $salaries->map(function ($s) {
-                    $workedHours = null;
-                    if ($s->attendance && $s->attendance->check_in && $s->attendance->check_out) {
-                        $checkIn = Carbon::parse($s->attendance->check_in);
-                        $checkOut = Carbon::parse($s->attendance->check_out);
-                        $workedHours = round($checkOut->floatDiffInHours($checkIn), 2);
-                    }
-
-                    return [
-                        'date' => $s->date,
-                        'amount' => $s->amount,
-                        'worked_hours' => $workedHours,
-                        'check_in' => $s->attendance->check_in ?? null,
-                        'check_out' => $s->attendance->check_out ?? null,
-                    ];
-                })->values(),
+//                'salaries' => $salaries->map(function ($s) {
+//                    $workedHours = null;
+//                    if ($s->attendance && $s->attendance->check_in && $s->attendance->check_out) {
+//                        $checkIn = Carbon::parse($s->attendance->check_in);
+//                        $checkOut = Carbon::parse($s->attendance->check_out);
+//                        $workedHours = round($checkOut->floatDiffInHours($checkIn), 2);
+//                    }
+//
+//                    return [
+//                        'date' => $s->date,
+//                        'amount' => $s->amount,
+//                        'worked_hours' => $workedHours,
+//                        'check_in' => $s->attendance->check_in ?? null,
+//                        'check_out' => $s->attendance->check_out ?? null,
+//                    ];
+//                })->values(),
             ];
         } else {
             $query = $employee->employeeTarificationLogs()->with('tarification');
@@ -209,34 +209,40 @@ class CasherController extends Controller
             $earningDetails = [
                 'type' => 'piece_work',
                 'total_earned' => $totalEarned,
-                'operations' => $logs->map(fn($log) => [
-                    'date' => $log->date,
-                    'tarification' => [
-                        'id' => $log->tarification->id ?? null,
-                        'name' => $log->tarification->name ?? null,
-                        'code' => $log->tarification->code ?? null,
-                    ],
-                    'quantity' => $log->quantity,
-                    'amount_earned' => $log->amount_earned,
-                ])->values(),
+//                'operations' => $logs->map(fn($log) => [
+//                    'date' => $log->date,
+//                    'tarification' => [
+//                        'id' => $log->tarification->id ?? null,
+//                        'name' => $log->tarification->name ?? null,
+//                        'code' => $log->tarification->code ?? null,
+//                    ],
+//                    'quantity' => $log->quantity,
+//                    'amount_earned' => $log->amount_earned,
+//                ])->values(),
             ];
         }
 
-        // To'lovlarni type bo'yicha ajratib olish
+        // To'lovlar type bo‘yicha: ['advance' => [...], 'salary' => [...]]
         $paidQuery = $employee->salaryPayments();
 
         if ($startDate && $endDate) {
             $paidQuery->whereBetween('date', [$startDate, $endDate]);
         }
 
-        $paymentTypes = $paidQuery
-            ->select('type', \DB::raw('SUM(amount) as total'))
-            ->groupBy('type')
-            ->pluck('total', 'type');
+        $paymentsGrouped = $paidQuery->get()->groupBy('type');
 
-        // Misol: ['cash' => 50000, 'bank' => 30000]
-        $paidAmountsByType = $paymentTypes->map(fn($amount) => (float) $amount)->toArray();
-        $paidTotal = array_sum($paidAmountsByType);
+        $paidAmountsByType = [];
+        $paidTotal = 0;
+
+        foreach ($paymentsGrouped as $type => $payments) {
+            $paidAmountsByType[$type] = $payments->map(function ($payment) use (&$paidTotal) {
+                $paidTotal += (float) $payment->amount;
+                return [
+                    'amount' => (float) $payment->amount,
+                    'date' => $payment->date,
+                ];
+            })->values();
+        }
 
         return [
             'id' => $employee->id,
@@ -248,8 +254,9 @@ class CasherController extends Controller
 
             'earning' => $earningDetails,
             'total_earned' => $totalEarned,
-            'paid_amounts' => $paidAmountsByType,   // <— Type bo'yicha ajratilgan
-            'total_paid' => $paidTotal,             // <— Yig'indisi
+
+            'paid_amounts' => $paidAmountsByType,  // <- Type bo‘yicha ro‘yxat
+            'total_paid' => round($paidTotal, 2),
             'net_balance' => round($totalEarned - $paidTotal, 2),
         ];
     }
