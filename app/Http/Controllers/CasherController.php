@@ -257,6 +257,7 @@ class CasherController extends Controller
                 return [
                     'amount' => (float) $payment->amount,
                     'date' => $payment->date,
+                    'comment' => $payment->comment,
                 ];
             })->values();
         }
