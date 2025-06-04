@@ -50,18 +50,24 @@ class GetUserResource extends JsonResource
                 ->get();
 
             foreach ($orders as $order) {
-                foreach ($order->orderModel->submodels as $submodel) {
-                   dd( $outputs = $submodel->sewingOutputs
-                        ->where('created_at', $today->toDateString()));
+                $minutes = $order->rasxod / 250;
+                $pricePerOrder = $minutes * 2;
 
-                    foreach ($outputs as $output) {
-                        $minutes = $order->rasxod / 250;
-                        $pricePerOrder = $minutes * 2;
-                        $todayBonus += $pricePerOrder * $output->quantity;
+                if (!$order->orderModel) continue;
+
+                foreach ($order->orderModel->submodels as $submodel) {
+                    foreach ($submodel->sewingOutputs as $output) {
+                        if (
+                            $output->employee_id === $this->id &&
+                            Carbon::parse($output->created_at)->isSameDay($today)
+                        ) {
+                            $todayBonus += $pricePerOrder * $output->quantity;
+                        }
                     }
                 }
             }
-        } elseif (in_array($this->payment_type, ['monthly', 'hourly', 'daily'])) {
+        }
+        elseif (in_array($this->payment_type, ['monthly', 'hourly', 'daily'])) {
             $todayBonus = AttendanceSalary::where('employee_id', $this->id)
                 ->where('date', $today->toDateString())
                 ->sum('amount');
