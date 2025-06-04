@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @method static create(array $validated)
+ */
 class SalaryPayment extends Model
 {
     use HasFactory;

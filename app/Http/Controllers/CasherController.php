@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cashbox;
 use App\Models\CashboxBalance;
 use App\Models\CashboxTransaction;
+use App\Models\Currency;
 use App\Models\SalaryPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -28,7 +29,6 @@ class CasherController extends Controller
             $validated['date'] = Carbon::now()->toDateString();
             $validated['month'] = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
 
-            // ✅ 1. So'mdagi cashboxni avtomatik topish
             $cashboxBalance = CashboxBalance::with('cashbox')
                 ->whereHas('cashbox', function ($q) {
                     $q->where('branch_id', auth()->user()->employee->branch_id);
@@ -44,13 +44,13 @@ class CasherController extends Controller
 
             $cashboxId = $cashboxBalance->cashbox_id;
 
-            // ✅ 2. Salary yoki avans yozish
             $payment = SalaryPayment::create($validated);
 
-            // ✅ 3. Cashboxdan chiqim yozish
+            $currency = Currency::where('name', "So'm")->first();
+
             CashboxTransaction::create([
                 'cashbox_id' => $cashboxId,
-                'currency_id' => 1, // so‘m
+                'currency_id' => $currency->id,
                 'type' => 'out',
                 'amount' => $validated['amount'],
                 'date' => $validated['date'],
