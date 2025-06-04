@@ -44,7 +44,7 @@ class ShowOrderGroupMaster extends JsonResource
 
         // ✅ Har bir xodimga to‘g‘ri keladigan pul
         $perEmployeeEarning = $attendanceCount > 0
-            ? round($actualTodayEarned / $attendanceCount, 2)
+            ? round($todayEarned / $attendanceCount, 2)
             : 0;
 
         return [
