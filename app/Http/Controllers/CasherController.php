@@ -127,11 +127,11 @@ class CasherController extends Controller
         $ungroupedEmployees = \App\Models\Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
             ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status')
+            ->with('salaryPayments')
             ->get()
             ->map(function ($employee) use ($startDate, $endDate) {
                 return $this->getEmployeeEarnings($employee, $startDate, $endDate);
             })
-            ->with('salaryPayments`')
             ->filter();
 
         if ($ungroupedEmployees->isNotEmpty()) {
