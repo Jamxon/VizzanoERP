@@ -70,7 +70,6 @@ class GetUserResource extends JsonResource
         elseif ($this->payment_type === 'fixed_tailored_bonus_group') {
             if ($this->group) {
                 $groupId = $this->group->id;
-                dd($groupId);
                 $orders = Order::with([
                     'orderModel.submodels.sewingOutputs' => function ($query) {
                         $query->whereDate('created_at', Carbon::today());
@@ -82,6 +81,8 @@ class GetUserResource extends JsonResource
                         $query->where('group_id', $groupId);
                     })
                     ->get();
+
+                dd($orders);
 
                 foreach ($orders as $order) {
                     if (!$order->orderModel) continue;
