@@ -114,22 +114,22 @@ class CasherController extends Controller
             $earningDetails = [
                 'type' => 'attendance',
                 'total_earned' => $total,
-                'salaries' => $salaries->map(function ($s) {
-                    $workedHours = null;
-                    if ($s->attendance && $s->attendance->check_in && $s->attendance->check_out) {
-                        $checkIn = \Carbon\Carbon::parse($s->attendance->check_in);
-                        $checkOut = \Carbon\Carbon::parse($s->attendance->check_out);
-                        $workedHours = round($checkOut->floatDiffInHours($checkIn), 2);
-                    }
-
-                    return [
-                        'date' => $s->date,
-                        'amount' => $s->amount,
-                        'worked_hours' => $workedHours,
-                        'check_in' => $s->attendance->check_in ?? null,
-                        'check_out' => $s->attendance->check_out ?? null,
-                    ];
-                }),
+//                'salaries' => $salaries->map(function ($s) {
+//                    $workedHours = null;
+//                    if ($s->attendance && $s->attendance->check_in && $s->attendance->check_out) {
+//                        $checkIn = \Carbon\Carbon::parse($s->attendance->check_in);
+//                        $checkOut = \Carbon\Carbon::parse($s->attendance->check_out);
+//                        $workedHours = round($checkOut->floatDiffInHours($checkIn), 2);
+//                    }
+//
+//                    return [
+//                        'date' => $s->date,
+//                        'amount' => $s->amount,
+//                        'worked_hours' => $workedHours,
+//                        'check_in' => $s->attendance->check_in ?? null,
+//                        'check_out' => $s->attendance->check_out ?? null,
+//                    ];
+//                }),
             ];
         } else {
             $query = $employee->employeeTarificationLogs()->with('tarification');
@@ -144,16 +144,16 @@ class CasherController extends Controller
             $earningDetails = [
                 'type' => 'piece_work',
                 'total_earned' => $total,
-                'operations' => $logs->map(fn($log) => [
-                    'date' => $log->date,
-                    'tarification' => [
-                        'id' => $log->tarification->id ?? null,
-                        'name' => $log->tarification->name ?? null,
-                        'code' => $log->tarification->code ?? null,
-                    ],
-                    'quantity' => $log->quantity,
-                    'amount_earned' => $log->amount_earned,
-                ]),
+//                'operations' => $logs->map(fn($log) => [
+//                    'date' => $log->date,
+//                    'tarification' => [
+//                        'id' => $log->tarification->id ?? null,
+//                        'name' => $log->tarification->name ?? null,
+//                        'code' => $log->tarification->code ?? null,
+//                    ],
+//                    'quantity' => $log->quantity,
+//                    'amount_earned' => $log->amount_earned,
+//                ]),
             ];
         }
 
