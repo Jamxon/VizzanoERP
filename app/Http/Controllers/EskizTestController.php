@@ -10,7 +10,7 @@ class EskizTestController extends Controller
     public function sendSMS(Request $request): \Illuminate\Http\JsonResponse
     {
         $response = Http::withHeaders([
-            'Authorization' => 'App bdf355b341f5c5a3ac3c02ff6b43b429-7e260cc3-16cd-41c4-ab65-d74ad5c71e8a',
+            'Authorization' => 'App 5e1968d5cc8dd4a6a94756d5ae10319f-530f7fbb-a64d-450d-8448-e79bc5e4a727',
             'Content-Type' => 'application/json',
         ])->post('https://qd2pg3.api.infobip.com/sms/3/messages', [
             'messages' => [
