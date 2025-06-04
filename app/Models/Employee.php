@@ -103,7 +103,7 @@ class Employee extends Model
         return $this->hasMany(EmployeeTarificationLog::class, 'employee_id');
     }
 
-    public function salaryPayments()
+    public function salaryPayments(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(SalaryPayment::class);
     }

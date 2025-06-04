@@ -131,6 +131,7 @@ class CasherController extends Controller
             ->map(function ($employee) use ($startDate, $endDate) {
                 return $this->getEmployeeEarnings($employee, $startDate, $endDate);
             })
+            ->with('salaryPayments`')
             ->filter();
 
         if ($ungroupedEmployees->isNotEmpty()) {
