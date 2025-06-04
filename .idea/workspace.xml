@@ -344,23 +344,7 @@
       <workItem from="1749008089755" duration="2982000" />
       <workItem from="1749012396751" duration="17372000" />
       <workItem from="1749039244580" duration="98000" />
-      <workItem from="1749039358773" duration="4359000" />
-    </task>
-    <task id="LOCAL-00029" summary="12345">
-      <option name="closed" value="true" />
-      <created>1748941013900</created>
-      <option name="number" value="00029" />
-      <option name="presentableId" value="LOCAL-00029" />
-      <option name="project" value="LOCAL" />
-      <updated>1748941013900</updated>
-    </task>
-    <task id="LOCAL-00030" summary="12345">
-      <option name="closed" value="true" />
-      <created>1748941227588</created>
-      <option name="number" value="00030" />
-      <option name="presentableId" value="LOCAL-00030" />
-      <option name="project" value="LOCAL" />
-      <updated>1748941227588</updated>
+      <workItem from="1749039358773" duration="4681000" />
     </task>
     <task id="LOCAL-00031" summary="12345">
       <option name="closed" value="true" />
@@ -738,7 +722,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749043630819</updated>
     </task>
-    <option name="localTasksCounter" value="78" />
+    <task id="LOCAL-00078" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749043779329</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1749043779329</updated>
+    </task>
+    <task id="LOCAL-00079" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749044027128</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1749044027128</updated>
+    </task>
+    <option name="localTasksCounter" value="80" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
