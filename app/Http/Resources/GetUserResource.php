@@ -94,7 +94,6 @@ class GetUserResource extends JsonResource
                     if (!$order->orderModel) continue;
 
                     $minutes = $order->orderModel->rasxod / 250;
-                    dd($minutes);
                     $pricePerItem = $minutes * 9;
                     foreach ($order->orderModel->submodels as $submodel) {
                         foreach ($submodel->sewingOutputs as $output) {
