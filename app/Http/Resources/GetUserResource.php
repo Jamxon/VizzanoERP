@@ -66,6 +66,35 @@ class GetUserResource extends JsonResource
                 }
             }
         }
+        // ✅ Foydalanuvchi o‘z groupiga biriktirilgan orderlardan bonus hisoblash
+        elseif ($this->payment_type === 'fixed_tailored_bonus_group') {
+            if ($this->employee->group) {
+                $groupId = $this->employee->group->id;
+
+                $orders = Order::with([
+                    'orderModel.submodels.sewingOutputs' => function ($query) {
+                        $query->whereDate('created_at', Carbon::today());
+                    },
+                    'orderGroups'
+                ])
+                    ->where('branch_id', auth()->user()->employee->branch_id)
+                    ->whereHas('orderGroups', function ($query) use ($groupId) {
+                        $query->where('group_id', $groupId);
+                    })
+                    ->get();
+
+                foreach ($orders as $order) {
+                    if (!$order->orderModel) continue;
+
+                    foreach ($order->orderModel->submodels as $submodel) {
+                        foreach ($submodel->sewingOutputs as $output) {
+                                $minutes = ($output->seconds ?? 0) / 60;
+                                $todayBonus += $minutes * 9;
+                        }
+                    }
+                }
+            }
+        }
         elseif (in_array($this->payment_type, ['monthly', 'hourly', 'daily'])) {
             $todayBonus = AttendanceSalary::where('employee_id', $this->id)
                 ->where('date', $today->toDateString())
