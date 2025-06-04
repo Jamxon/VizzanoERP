@@ -2,6 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Models\AttendanceSalary;
+use App\Models\EmployeeTarificationLog;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -36,6 +39,37 @@ class GetUserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $today = Carbon::today();
+
+        $todayBonus = 0;
+
+        if ($this->payment_type === 'fixed_tailored_bonus') {
+            $orders = Order::with('orderModel.submodels.sewingOutputs')
+                ->where('branch_id', auth()->user()->employee->branch_id)
+                ->get();
+
+            foreach ($orders as $order) {
+                foreach ($order->orderModel->submodels as $submodel) {
+                    $outputs = $submodel->sewingOutputs
+                        ->where('created_at', $today->toDateString());
+
+                    foreach ($outputs as $output) {
+                        $minutes = $order->rasxod / 250;
+                        $pricePerOrder = $minutes * 2;
+                        $todayBonus += $pricePerOrder * $output->quantity;
+                    }
+                }
+            }
+        } elseif (in_array($this->payment_type, ['monthly', 'hourly', 'daily'])) {
+            $todayBonus = AttendanceSalary::where('employee_id', $this->id)
+                ->where('date', $today->toDateString())
+                ->sum('amount');
+        } elseif ($this->payment_type === 'piece_work') {
+            $todayBonus = EmployeeTarificationLog::where('employee_id', $this->id)
+                ->where('date', $today->toDateString())
+                ->sum('amount_earned');
+        }
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -54,6 +88,8 @@ class GetUserResource extends JsonResource
             'position' => $this->position->name ?? null,
             'user_id' => $this->user_id,
             'gender' => $this->gender,
+            'balance' => $this->balance,
+            'today_bonus' => $todayBonus,
         ];
     }
 }

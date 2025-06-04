@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Resources/GetUserResource.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Resources/GetUserResource.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -346,15 +347,7 @@
       <workItem from="1749008089755" duration="2982000" />
       <workItem from="1749012396751" duration="17372000" />
       <workItem from="1749039244580" duration="98000" />
-      <workItem from="1749039358773" duration="566000" />
-    </task>
-    <task id="LOCAL-00022" summary="12345">
-      <option name="closed" value="true" />
-      <created>1748936972085</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1748936972085</updated>
+      <workItem from="1749039358773" duration="3391000" />
     </task>
     <task id="LOCAL-00023" summary="12345">
       <option name="closed" value="true" />
@@ -740,7 +733,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749039277165</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749040213150</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1749040213150</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
