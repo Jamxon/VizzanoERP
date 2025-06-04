@@ -19,7 +19,9 @@ class EskizTestController extends Controller
                     'destinations' => [
                         ['to' => '+998500079955'], // Qabul qiluvchi raqam (xalqaro formatda)
                     ],
-                    'text' => 'Salom! Laraveldan yuborilgan test SMS.'
+                    "content" => [
+                        "text" => "Salom! Laravel orqali yuborilgan SMS."
+                    ]
                 ]
             ]
         ]);
