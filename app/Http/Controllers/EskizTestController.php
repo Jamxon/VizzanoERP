@@ -10,12 +10,12 @@ class EskizTestController extends Controller
     public function sendSMS(Request $request): \Illuminate\Http\JsonResponse
     {
         $response = Http::withHeaders([
-            'Authorization' => 'App bdf355b341f5c5a3ac3c02ff6b43b429-7e260cc3-16cd-41c4-ab65-d74ad5c71e8a',
+            'Authorization' => 'App bf2595046738a9c99476bd5671cccceb-dea40100-bc70-4741-89bf-166dad6ea250',
             'Content-Type' => 'application/json',
         ])->post('https://qd2pg3.api.infobip.com/sms/3/messages', [
             'messages' => [
                 [
-                    'from' => 'Vizzano', // Sender ID (Infobipda sozlangan bo'lishi kerak)
+                    'from' => 'InfoSMS', // Sender ID (Infobipda sozlangan bo'lishi kerak)
                     'destinations' => [
                         ['to' => '+998500079955'], // Qabul qiluvchi raqam (xalqaro formatda)
                     ],
