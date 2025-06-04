@@ -102,4 +102,10 @@ class Employee extends Model
     {
         return $this->hasMany(EmployeeTarificationLog::class, 'employee_id');
     }
+
+    public function salaryPayments()
+    {
+        return $this->hasMany(SalaryPayment::class);
+    }
+
 }
