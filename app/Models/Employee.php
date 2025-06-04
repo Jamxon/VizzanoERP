@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static whereIn(string $string, $groupIds)
  * @method static find($id)
  * @method static findOrFail($id)
+ * @method static where(string $string, mixed $departmentId)
  */
 class Employee extends Model
 {
