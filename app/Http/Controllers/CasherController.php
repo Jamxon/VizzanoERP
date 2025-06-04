@@ -15,10 +15,10 @@ use function Laravel\Prompts\search;
 
 class CasherController extends Controller
 {
-    public function giveSalaryOrAdvance(array $data): SalaryPayment
+    public function giveSalaryOrAdvance(Request $request)
     {
-        return DB::transaction(function () use ($data) {
-            $validated = validator($data, [
+        return DB::transaction(function () use ($request) {
+            $validated = validator((array)$request, [
                 'employee_id' => 'required|exists:employees,id',
                 'amount' => 'required|numeric|min:0',
                 'type' => 'required|in:advance,salary',
