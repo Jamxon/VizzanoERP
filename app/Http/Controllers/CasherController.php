@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cashbox;
+use App\Models\Employee;
 use App\Models\Group;
 use App\Models\CashboxBalance;
 use App\Models\CashboxTransaction;
