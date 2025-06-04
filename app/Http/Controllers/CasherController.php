@@ -49,7 +49,16 @@ class CasherController extends Controller
             $cashboxId = $cashboxBalance->cashbox_id;
             $currency = Currency::where('name', "So'm")->first();
 
-            // 🔄 mavjud bo‘lsa update, bo‘lmasa create
+            // 🔎 Eski to‘lovni tekshirib olish
+            $existingPayment = SalaryPayment::where([
+                'employee_id' => $validated['employee_id'],
+                'month' => $validated['month'],
+                'type' => $validated['type'],
+            ])->first();
+
+            $oldAmount = $existingPayment?->amount ?? 0;
+
+            // 🔄 Yaratish yoki yangilash
             $payment = SalaryPayment::updateOrCreate(
                 [
                     'employee_id' => $validated['employee_id'],
@@ -81,8 +90,12 @@ class CasherController extends Controller
                 'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
-            // 💰 Balansdan ayirish
-            $employee->decrement('balance', $validated['amount']);
+            // 💰 Balansni to‘g‘ri yangilash (farqni ayirish)
+            $difference = $validated['amount'] - $oldAmount;
+
+            if ($difference !== 0) {
+                $employee->decrement('balance', $difference);
+            }
 
             return $payment;
         });
