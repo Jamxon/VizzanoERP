@@ -12,7 +12,7 @@ use function Laravel\Prompts\search;
 
 class CasherController extends Controller
 {
-    public function getOrders(Request $request)
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $search = mb_strtolower($request->search);
 
@@ -26,49 +26,35 @@ class CasherController extends Controller
         return response()->json($orders);
     }
 
-    public function getGroupsByDepartmentId(Request $request)
+    public function getGroupsByDepartmentId(Request $request): \Illuminate\Http\JsonResponse
     {
         $departmentId = $request->input('department_id');
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        $orderIds = $request->input('order_ids');
+        $group_id = $request->input('group_id');
 
         if (!$departmentId) {
             return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
         }
 
-        // Tarification ID larini aniqlaymiz agar order_ids berilgan bo‘lsa
-        $filteredTarificationIds = [];
-
-        if (!empty($orderIds)) {
-            $orderIds = is_array($orderIds) ? $orderIds : explode(',', $orderIds);
-
-            $orders = \App\Models\Order::with('orderModel.submodels.tarificationCategories.tarifications')
-                ->whereIn('id', $orderIds)
-                ->get();
-
-            $filteredTarificationIds = $orders
-                ->flatMap(fn($order) => $order->orderModel?->submodels ?? [])
-                ->flatMap(fn($submodel) => $submodel->tarificationCategories ?? [])
-                ->flatMap(fn($category) => $category->tarifications->pluck('id'))
-                ->unique()
-                ->values()
-                ->toArray();
-        }
-
-        // GROUPLARGA TEGISHLILAR
-        $groups = \App\Models\Group::where('department_id', $departmentId)
+        // Guruhlarni olish
+        $groupQuery = \App\Models\Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) {
                 $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status');
-            }])
-            ->get();
+            }]);
 
-        $result = $groups->map(function ($group) use ($startDate, $endDate, $filteredTarificationIds) {
+        if (!empty($group_id)) {
+            $groupQuery->where('id', $group_id);
+        }
+
+        $groups = $groupQuery->get();
+
+        $result = $groups->map(function ($group) use ($startDate, $endDate) {
             $employees = $group->employees
-                ->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
-                    return $this->getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds);
+                ->map(function ($employee) use ($startDate, $endDate) {
+                    return $this->getEmployeeEarnings($employee, $startDate, $endDate);
                 })
-                ->filter(); // null qiymatlarni olib tashlaydi
+                ->filter();
 
             $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
 
@@ -80,15 +66,15 @@ class CasherController extends Controller
             ];
         })->values()->toArray();
 
-        // GROUPSIZ EMPLOYEELAR
+        // Guruhsiz xodimlar
         $ungroupedEmployees = \App\Models\Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
             ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status')
             ->get()
-            ->map(function ($employee) use ($startDate, $endDate, $filteredTarificationIds) {
-                return $this->getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds);
+            ->map(function ($employee) use ($startDate, $endDate) {
+                return $this->getEmployeeEarnings($employee, $startDate, $endDate);
             })
-            ->filter(); // null qiymatlarni olib tashlaydi
+            ->filter();
 
         if ($ungroupedEmployees->isNotEmpty()) {
             $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
@@ -104,90 +90,85 @@ class CasherController extends Controller
         return response()->json($result);
     }
 
-private function getEmployeeEarnings($employee, $startDate, $endDate, $filteredTarificationIds)
-{
-    // ❗ Agar xodim 'kicked' va balans 0 bo‘lsa - responsega kiritilmaydi
-    if ($employee->status === 'kicked' && ((float) $employee->balance) === 0.0) {
-        return null;
+    private function getEmployeeEarnings($employee, $startDate, $endDate): ?array
+    {
+        // ❗ Agar xodim 'kicked' va balans 0 bo‘lsa - responsega kiritilmaydi
+        if ($employee->status === 'kicked' && ((float) $employee->balance) === 0.0) {
+            return null;
+        }
+
+        $employee->loadMissing(['position', 'branch', 'group']);
+
+        $earningDetails = [];
+
+        if ($employee->payment_type !== 'piece_work') {
+            $query = $employee->attendanceSalaries()->with('attendance');
+
+            if ($startDate && $endDate) {
+                $query->whereBetween('date', [$startDate, $endDate]);
+            }
+
+            $salaries = $query->get();
+            $total = $salaries->sum('amount');
+
+            $earningDetails = [
+                'type' => 'attendance',
+                'total_earned' => $total,
+                'salaries' => $salaries->map(function ($s) {
+                    $workedHours = null;
+                    if ($s->attendance && $s->attendance->check_in && $s->attendance->check_out) {
+                        $checkIn = \Carbon\Carbon::parse($s->attendance->check_in);
+                        $checkOut = \Carbon\Carbon::parse($s->attendance->check_out);
+                        $workedHours = round($checkOut->floatDiffInHours($checkIn), 2);
+                    }
+
+                    return [
+                        'date' => $s->date,
+                        'amount' => $s->amount,
+                        'worked_hours' => $workedHours,
+                        'check_in' => $s->attendance->check_in ?? null,
+                        'check_out' => $s->attendance->check_out ?? null,
+                    ];
+                }),
+            ];
+        } else {
+            $query = $employee->employeeTarificationLogs()->with('tarification');
+
+            if ($startDate && $endDate) {
+                $query->whereBetween('date', [$startDate, $endDate]);
+            }
+
+            $logs = $query->get();
+            $total = $logs->sum('amount_earned');
+
+            $earningDetails = [
+                'type' => 'piece_work',
+                'total_earned' => $total,
+                'operations' => $logs->map(fn($log) => [
+                    'date' => $log->date,
+                    'tarification' => [
+                        'id' => $log->tarification->id ?? null,
+                        'name' => $log->tarification->name ?? null,
+                        'code' => $log->tarification->code ?? null,
+                    ],
+                    'quantity' => $log->quantity,
+                    'amount_earned' => $log->amount_earned,
+                ]),
+            ];
+        }
+
+        return [
+            'id' => $employee->id,
+            'name' => $employee->name,
+            'position' => $employee->position->name ?? 'N/A',
+            'group' => optional($employee->group)->name ?? 'N/A',
+            'balance' => (float) $employee->balance,
+            'payment_type' => $employee->payment_type,
+            'earning' => $earningDetails,
+        ];
     }
 
-    $employee->loadMissing(['position', 'branch', 'group']);
-
-    $earningDetails = [];
-
-    if ($employee->payment_type !== 'piece_work') {
-        $query = $employee->attendanceSalaries()->with('attendance');
-
-        if ($startDate && $endDate) {
-            $query->whereBetween('date', [$startDate, $endDate]);
-        }
-
-        $salaries = $query->get();
-        $total = $salaries->sum('amount');
-
-        $earningDetails = [
-            'type' => 'attendance',
-            'total_earned' => $total,
-            'salaries' => $salaries->map(function ($s) {
-                $workedHours = null;
-                if ($s->attendance && $s->attendance->check_in && $s->attendance->check_out) {
-                    $checkIn = \Carbon\Carbon::parse($s->attendance->check_in);
-                    $checkOut = \Carbon\Carbon::parse($s->attendance->check_out);
-                    $workedHours = round($checkOut->floatDiffInHours($checkIn), 2);
-                }
-
-                return [
-                    'date' => $s->date,
-                    'amount' => $s->amount,
-                    'worked_hours' => $workedHours,
-                    'check_in' => $s->attendance->check_in ?? null,
-                    'check_out' => $s->attendance->check_out ?? null,
-                ];
-            }),
-        ];
-    } else {
-        $query = $employee->employeeTarificationLogs()->with('tarification');
-
-        if (!empty($filteredTarificationIds)) {
-            $query->whereIn('tarification_id', $filteredTarificationIds);
-        }
-
-        if ($startDate && $endDate) {
-            $query->whereBetween('date', [$startDate, $endDate]);
-        }
-
-        $logs = $query->get();
-        $total = $logs->sum('amount_earned');
-
-        $earningDetails = [
-            'type' => 'piece_work',
-            'total_earned' => $total,
-            'operations' => $logs->map(fn($log) => [
-                'date' => $log->date,
-                'tarification' => [
-                    'id' => $log->tarification->id ?? null,
-                    'name' => $log->tarification->name ?? null,
-                    'code' => $log->tarification->code ?? null,
-                ],
-                'quantity' => $log->quantity,
-                'amount_earned' => $log->amount_earned,
-            ]),
-        ];
-    }
-
-    return [
-        'id' => $employee->id,
-        'name' => $employee->name,
-        'position' => $employee->position->name ?? 'N/A',
-        'group' => optional($employee->group)->name ?? 'N/A',
-        'balance' => (float) $employee->balance,
-        'payment_type' => $employee->payment_type,
-        'earning' => $earningDetails,
-    ];
-}
-
-
-    public function getDepartments()
+    public function getDepartments(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
         $departments = $user->employee->branch->departments()
