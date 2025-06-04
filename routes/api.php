@@ -53,6 +53,7 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::get('groups', [CasherController::class, 'getGroupsByDepartmentId']);
     Route::get('orders', [CasherController::class, 'getOrders']);
+    Route::post('salaries', [CasherController::class, 'giveSalaryOrAdvance']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
