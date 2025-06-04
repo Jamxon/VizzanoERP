@@ -12,7 +12,10 @@ class Cashbox extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name'];
+    protected $fillable = [
+        'name',
+        'branch_id',
+    ];
 
     public function balances(): \Illuminate\Database\Eloquent\Relations\HasMany
     {

@@ -5,13 +5,71 @@ namespace App\Http\Controllers;
 use App\Models\Cashbox;
 use App\Models\CashboxBalance;
 use App\Models\CashboxTransaction;
+use App\Models\SalaryPayment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 use function Laravel\Prompts\search;
 
 class CasherController extends Controller
 {
+    public function giveSalaryOrAdvance(array $data): SalaryPayment
+    {
+        return DB::transaction(function () use ($data) {
+            $validated = validator($data, [
+                'employee_id' => 'required|exists:employees,id',
+                'amount' => 'required|numeric|min:0',
+                'type' => 'required|in:advance,salary',
+                'month' => 'required|date_format:Y-m',
+                'comment' => 'nullable|string',
+                'date' => 'nullable|date',
+            ])->validate();
+
+            $validated['date'] = $validated['date'] ?? Carbon::now()->toDateString();
+            $validated['month'] = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
+
+            // ✅ 1. So'mdagi cashboxni avtomatik topish
+            $cashboxBalance = CashboxBalance::with('cashbox')
+                ->whereHas('cashbox', function ($q) {
+                    $q->where('branch_id', auth()->user()->employee->branch_id);
+                })
+                ->whereHas('currency', function ($q) {
+                    $q->where('name', "So'm");
+                })
+                ->first();
+
+            if (!$cashboxBalance) {
+                throw new \Exception('So‘mda ishlovchi cashbox topilmadi.');
+            }
+
+            $cashboxId = $cashboxBalance->cashbox_id;
+
+            // ✅ 2. Salary yoki avans yozish
+            $payment = SalaryPayment::create($validated);
+
+            // ✅ 3. Cashboxdan chiqim yozish
+            CashboxTransaction::create([
+                'cashbox_id' => $cashboxId,
+                'currency_id' => 1, // so‘m
+                'type' => 'out',
+                'amount' => $validated['amount'],
+                'date' => $validated['date'],
+                'source_id' => null,
+                'destination_id' => $validated['employee_id'],
+                'via_id' => null,
+                'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
+                'comment' => $validated['comment'] ?? null,
+                'target_cashbox_id' => null,
+                'exchange_rate' => null,
+                'target_amount' => null,
+                'branch_id' => $validated['branch_id'],
+            ]);
+
+            return $payment;
+        });
+    }
+
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $search = mb_strtolower($request->search);
