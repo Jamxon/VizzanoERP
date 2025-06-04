@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * @method static create(array $validated)
+ * @method static updateOrCreate(array $array, array $array1)
  */
 class SalaryPayment extends Model
 {

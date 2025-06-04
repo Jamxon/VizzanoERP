@@ -23,13 +23,15 @@ class CasherController extends Controller
             $validated = $request->validate([
                 'employee_id' => 'required|exists:employees,id',
                 'amount' => 'required|numeric|min:1',
-                'month' => 'required',
-                'type' => 'required',
-                'comment' => 'nullable',
+                'month' => 'required|date_format:Y-m',
+                'type' => 'required|in:salary,advance',
+                'comment' => 'nullable|string',
             ]);
 
             $validated['date'] = Carbon::now()->toDateString();
             $validated['month'] = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
+
+            $employee = Employee::findOrFail($validated['employee_id']);
 
             $cashboxBalance = CashboxBalance::with('cashbox')
                 ->whereHas('cashbox', function ($q) {
@@ -45,11 +47,23 @@ class CasherController extends Controller
             }
 
             $cashboxId = $cashboxBalance->cashbox_id;
-
-            $payment = SalaryPayment::create($validated);
-
             $currency = Currency::where('name', "So'm")->first();
 
+            // 🔄 mavjud bo‘lsa update, bo‘lmasa create
+            $payment = SalaryPayment::updateOrCreate(
+                [
+                    'employee_id' => $validated['employee_id'],
+                    'month' => $validated['month'],
+                    'type' => $validated['type'],
+                ],
+                [
+                    'amount' => $validated['amount'],
+                    'date' => $validated['date'],
+                    'comment' => $validated['comment'] ?? null,
+                ]
+            );
+
+            // 🧾 Kassa tranzaktsiyasi
             CashboxTransaction::create([
                 'cashbox_id' => $cashboxId,
                 'currency_id' => $currency->id,
@@ -57,7 +71,7 @@ class CasherController extends Controller
                 'amount' => $validated['amount'],
                 'date' => $validated['date'],
                 'source_id' => null,
-                'destination_id' => $validated['employee_id'],
+                'destination_id' => $employee->id,
                 'via_id' => auth()->user()->employee->id,
                 'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
                 'comment' => $validated['comment'] ?? null,
@@ -66,6 +80,9 @@ class CasherController extends Controller
                 'target_amount' => null,
                 'branch_id' => auth()->user()->employee->branch_id,
             ]);
+
+            // 💰 Balansdan ayirish
+            $employee->decrement('balance', $validated['amount']);
 
             return $payment;
         });
