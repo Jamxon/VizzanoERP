@@ -56,7 +56,7 @@ class CasherController extends Controller
                 'date' => $validated['date'],
                 'source_id' => null,
                 'destination_id' => $validated['employee_id'],
-                'via_id' => null,
+                'via_id' => auth()->id(),
                 'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
                 'comment' => $validated['comment'] ?? null,
                 'target_cashbox_id' => null,
