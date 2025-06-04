@@ -17,7 +17,7 @@ class EskizTestController extends Controller
                 [
                     'from' => 'Vizzano', // Sender ID (Infobipda sozlangan bo'lishi kerak)
                     'destinations' => [
-                        ['to' => '+998339721882'], // Qabul qiluvchi raqam (xalqaro formatda)
+                        ['to' => '+998500079955'], // Qabul qiluvchi raqam (xalqaro formatda)
                     ],
                     "content" => [
                         "text" => "Salom! Laravel orqali yuborilgan SMS."
