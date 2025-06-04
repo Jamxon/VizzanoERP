@@ -18,13 +18,13 @@ class CasherController extends Controller
     public function giveSalaryOrAdvance(Request $request)
     {
         return DB::transaction(function () use ($request) {
-            $validated = validator((array)$request, [
+            $validated = $request->validate([
                 'employee_id' => 'required|exists:employees,id',
-                'amount' => 'required|numeric|min:0',
-                'type' => 'required|in:advance,salary',
-                'month' => 'required|date_format:Y-m',
-                'comment' => 'nullable|string',
-            ])->validate();
+                'amount' => 'required|numeric|min:1',
+                'month' => 'required',
+                'type' => 'required',
+                'comment' => 'nullable',
+            ]);
 
             $validated['date'] = Carbon::now()->toDateString();
             $validated['month'] = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
