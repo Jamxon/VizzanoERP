@@ -68,8 +68,8 @@ class GetUserResource extends JsonResource
         }
         // ✅ Foydalanuvchi o‘z groupiga biriktirilgan orderlardan bonus hisoblash
         elseif ($this->payment_type === 'fixed_tailored_bonus_group') {
-            if ($this->employee->group) {
-                $groupId = $this->employee->group->id;
+            if ($this->group) {
+                $groupId = $this->group->id;
 
                 $orders = Order::with([
                     'orderModel.submodels.sewingOutputs' => function ($query) {
