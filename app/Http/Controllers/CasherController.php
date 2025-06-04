@@ -62,7 +62,7 @@ class CasherController extends Controller
                 'target_cashbox_id' => null,
                 'exchange_rate' => null,
                 'target_amount' => null,
-                'branch_id' => $validated['branch_id'],
+                'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
             return $payment;
