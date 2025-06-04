@@ -25,8 +25,13 @@ class ShowOrderGroupMaster extends JsonResource
                 ->sum('quantity');
         });
 
-        // ✅ Rasxod asosida bugun ishlab topilgan pul
+        // ✅ Oldingi "todayEarned" (bu o‘zgarmaydi)
         $todayEarned = $todaySewn * ($this->orderModel->rasxod ?? 0);
+
+        // ✅ Rasxod asosida haqiqiy hisob-kitob: 1 dona uchun = (rasxod / 250) * 12
+        $minutesPerItem = ($this->orderModel->rasxod ?? 0) / 250;
+        $earningsPerItem = $minutesPerItem * 12;
+        $actualTodayEarned = $todaySewn * $earningsPerItem;
 
         $group = $this->orderModel->submodels->first()?->group?->group;
 
@@ -37,10 +42,9 @@ class ShowOrderGroupMaster extends JsonResource
             })
             ->count();
 
-
         // ✅ Har bir xodimga to‘g‘ri keladigan pul
         $perEmployeeEarning = $attendanceCount > 0
-            ? round($todayEarned / $attendanceCount, 2)
+            ? round($actualTodayEarned / $attendanceCount, 2)
             : 0;
 
         return [
@@ -57,6 +61,7 @@ class ShowOrderGroupMaster extends JsonResource
             // 🔢 Yangi qo‘shilgan hisob-kitoblar
             'todaySewn' => $todaySewn,
             'todayEarned' => round($todayEarned, 2),
+            'actualTodayEarned' => round($actualTodayEarned, 2), // 🆕 Qo‘shildi
             'attendanceCount' => $attendanceCount,
             'perEmployeeEarning' => $perEmployeeEarning,
 
