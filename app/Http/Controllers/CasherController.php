@@ -23,10 +23,9 @@ class CasherController extends Controller
                 'type' => 'required|in:advance,salary',
                 'month' => 'required|date_format:Y-m',
                 'comment' => 'nullable|string',
-                'date' => 'nullable|date',
             ])->validate();
 
-            $validated['date'] = $validated['date'] ?? Carbon::now()->toDateString();
+            $validated['date'] = Carbon::now()->toDateString();
             $validated['month'] = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
 
             // ✅ 1. So'mdagi cashboxni avtomatik topish
