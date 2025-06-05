@@ -191,7 +191,14 @@ class UserController extends Controller
                 if ($start_date && $end_date) {
                     $query->whereBetween('date', [$start_date, $end_date]);
                 }
+
+                // select bilan kerakli ustunlar
+                $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity')
+                    ->with(['tarification' => function ($q) {
+                        $q->select('id', 'name', 'code', 'second', 'summa'); // misol uchun kerakli ustunlar
+                    }]);
             };
+
         } else {
             $relations['attendanceSalaries'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
@@ -202,6 +209,12 @@ class UserController extends Controller
                 if ($start_date && $end_date) {
                     $query->whereBetween('date', [$start_date, $end_date]);
                 }
+
+                // select bilan kerakli ustunlar
+                $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity')
+                    ->with(['tarification' => function ($q) {
+                        $q->select('id', 'name', 'code', 'second', 'summa'); // misol uchun kerakli ustunlar
+                    }]);
             };
             $relations['attendances'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
