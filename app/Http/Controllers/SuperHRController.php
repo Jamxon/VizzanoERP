@@ -341,6 +341,7 @@ class SuperHRController extends Controller
                     'kicked_date' => now(),
                     'salary' => $request->salary ?? $employee->salary,
                     'gender' => $request->gender ?? $employee->gender,
+                    'bonus' => $request->bonus ?? $employee->bonus,
                 ]);
             } else {
                 $employee->update([
