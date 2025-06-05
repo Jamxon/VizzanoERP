@@ -435,11 +435,9 @@ class SuperHRController extends Controller
     public function getAupEmployee(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
-        $employees = DB::table('employees')
-            ->where('branch_id', $user->employee->branch_id)
-            ->where('status', 'working')
+        $employees = Employee::where('branch_id', $user->employee->branch_id)
             ->where('type', 'aup')
-            ->orderBy('id', 'desc')
+            ->where('status', 'working')
             ->get();
 
         return response()->json($employees, 200);
