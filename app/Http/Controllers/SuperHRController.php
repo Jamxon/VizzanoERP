@@ -438,6 +438,7 @@ class SuperHRController extends Controller
         $employees = Employee::where('branch_id', $user->employee->branch_id)
             ->where('type', 'aup')
             ->where('status', 'working')
+            ->with('department', 'position', 'group')
             ->get();
 
         return response()->json($employees, 200);
