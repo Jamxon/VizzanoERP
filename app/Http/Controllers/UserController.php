@@ -174,5 +174,47 @@ class UserController extends Controller
     }
 }
 
+    public function showEmployee(Employee $employee, Request $request): \Illuminate\Http\JsonResponse
+    {
+        $start_date = $request->start_date;
+        $end_date = $request->end_date;
+
+        $relations = [];
+
+        if ($employee->payment_type === 'piece_work') {
+            $relations['attendances'] = function ($query) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $query->whereBetween('date', [$start_date, $end_date]);
+                }
+            };
+            $relations['employeeTarificationLogs'] = function ($query) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $query->whereBetween('date', [$start_date, $end_date]);
+                }
+            };
+        } else {
+            $relations['attendanceSalaries'] = function ($query) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $query->whereBetween('date', [$start_date, $end_date]);
+                }
+            };
+            $relations['employeeTarificationLogs'] = function ($query) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $query->whereBetween('date', [$start_date, $end_date]);
+                }
+            };
+            $relations['attendances'] = function ($query) use ($start_date, $end_date) {
+                if ($start_date && $end_date) {
+                    $query->whereBetween('date', [$start_date, $end_date]);
+                }
+            };
+        }
+
+        $employee->load($relations);
+
+        return response()->json([
+            'employee' => $employee,
+        ]);
+    }
 
 }

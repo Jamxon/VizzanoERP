@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static find($id)
  * @method static findOrFail($id)
  * @method static where(string $string, mixed $departmentId)
+ * @property mixed $payment_type
  */
 class Employee extends Model
 {
