@@ -59,6 +59,7 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('positions' , [SuperHRController::class, 'getPositions']);
     Route::get('roles', [SuperHRController::class, 'getRoles']);
     Route::get('employee/edit/{id}', [SuperHRController::class, 'showEmployee']);
+    Route::patch('employees/{employee}', [SuperHRController::class, 'updateEmployees']);
 
 });
 
