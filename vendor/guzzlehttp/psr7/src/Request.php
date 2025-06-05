@@ -11,6 +11,7 @@ use Psr\Http\Message\UriInterface;
 
 /**
  * PSR-7 request implementation.
+ * @method validated(array $array)
  */
 class Request implements RequestInterface
 {
