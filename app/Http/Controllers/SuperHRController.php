@@ -50,7 +50,7 @@ class SuperHRController extends Controller
             'group_id' => 'nullable|integer|exists:groups,id',
             'status' => 'nullable|string|in:working,kicked,reserv',
             'role_id' => 'nullable|integer|exists:roles,id',
-            'type' => 'nullable|string|in:working,aup,sewing', // <-- type validatsiyasi
+            'type' => 'nullable|string|in:simple,aup', // <-- type validatsiyasi
         ]);
 
         $filters = $request->only(['search', 'department_id', 'group_id', 'status', 'role_id', 'type']);
