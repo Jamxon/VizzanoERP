@@ -39,7 +39,8 @@ class Employee extends Model
         'comment',
         'gender',
         'kicked_date',
-        'balance'
+        'balance',
+        'bonus'
     ];
 
     public function getImgAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
