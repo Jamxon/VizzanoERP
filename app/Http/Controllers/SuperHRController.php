@@ -50,13 +50,14 @@ class SuperHRController extends Controller
             'group_id' => 'nullable|integer|exists:groups,id',
             'status' => 'nullable|string|in:working,kicked,reserv',
             'role_id' => 'nullable|integer|exists:roles,id',
+            'type' => 'nullable|string|in:working,aup,sewing', // <-- type validatsiyasi
         ]);
 
-        $filters = $request->only(['search', 'department_id', 'group_id', 'status', 'role_id']);
+        $filters = $request->only(['search', 'department_id', 'group_id', 'status', 'role_id', 'type']);
         $user = auth()->user();
 
-        $query = Employee::with('user.role', 'position') // role ham kerak bo'ladi endi
-        ->where('branch_id', $user->employee->branch_id);
+        $query = Employee::with('user.role', 'position')
+            ->where('branch_id', $user->employee->branch_id);
 
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
@@ -74,13 +75,12 @@ class SuperHRController extends Controller
                         });
                 }
             });
-
         }
-
 
         $query->when($filters['department_id'] ?? false, fn($q) => $q->where('department_id', $filters['department_id']))
             ->when($filters['group_id'] ?? false, fn($q) => $q->where('group_id', $filters['group_id']))
             ->when($filters['status'] ?? false, fn($q) => $q->where('status', $filters['status']))
+            ->when($filters['type'] ?? false, fn($q) => $q->where('type', $filters['type']))
             ->when($filters['role_id'] ?? false, function ($q) use ($filters) {
                 $q->whereHas('user', fn($q) => $q->where('role_id', $filters['role_id']));
             });
