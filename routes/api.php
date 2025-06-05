@@ -55,7 +55,7 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('orders', [CasherController::class, 'getOrders']);
     Route::post('salaries', [CasherController::class, 'giveSalaryOrAdvance']);
     Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
-    Route::get('employees/aup', [SuperHRController::class, 'getAupEmployee']);
+    Route::get('employee/aup', [SuperHRController::class, 'getAupEmployee']);
 
 });
 
