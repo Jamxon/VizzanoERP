@@ -132,6 +132,13 @@ class TransportController extends Controller
         }
     }
 
+    public function transportShow(Transport $transport): \Illuminate\Http\JsonResponse
+    {
+        $transport->load(['region','transportAttendances','payments']);
+
+        return response()->json($transport);
+    }
+
     public function update(Request $request, $id): \Illuminate\Http\JsonResponse
     {
         try {

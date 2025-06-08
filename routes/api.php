@@ -130,6 +130,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
 Route::prefix('transport')->middleware('role:transport')->group(function () {
     Route::get('transports', [TransportController::class, 'index']);
     Route::get('transports/{id}', [TransportController::class, 'show']);
+    Route::get('transports/show/{transport}', [TransportController::class, 'transportShow']);
     Route::post('transports', [TransportController::class, 'store']);
     Route::patch('transports/{id}', [TransportController::class, 'update']);
 
