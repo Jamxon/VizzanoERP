@@ -312,6 +312,8 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::patch('groups/{group}', [GroupController::class, 'update']);
     Route::get('groups/{group}', [GroupController::class, 'show']);
     Route::get('users/{user}', [UserController::class, 'show']);
+    Route::get('employees/casher/{employee}', [UserController::class, 'showEmployee']);
+
 });
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {
