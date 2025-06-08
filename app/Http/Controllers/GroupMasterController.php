@@ -300,7 +300,7 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Buyurtma topilmadi!'], 404);
         }
 
-        $minutes = $orderModel->rasxod / 250; // 1ta buyum uchun qancha daqiqa ketadi
+        $minutes = $orderModel->rasxod / 250; // 1 dona mahsulot uchun qancha daqiqa ketadi
         $orderQuantity = $order->quantity;
         $totalSewnQuantity = SewingOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
         $newQuantity = $validatedData['quantity'];
@@ -322,7 +322,7 @@ class GroupMasterController extends Controller
             $order->save();
         }
 
-        // Xodimlar uchun bonus hisoblash va balance yangilash
+        // Bonus hisoblash (individual 'fixed_tailored_bonus' xodimlar uchun)
         $employees = Employee::where('poyment_type', 'fixed_tailored_bonus')
             ->where('status', '!=', 'kicked')
             ->where('branch_id', $order->branch_id)
@@ -331,10 +331,18 @@ class GroupMasterController extends Controller
         $total_bonus_logs = [];
 
         foreach ($employees as $employee) {
-            $bonusAmount = $employee->bonus * $minutes * $newQuantity; // jami tikilgan miqdorga ko‘paytiriladi
+            $bonusAmount = $employee->bonus * $minutes * $newQuantity;
             $oldBalance = $employee->balance;
             $employee->balance += $bonusAmount;
             $employee->save();
+
+            $total_bonus_logs[] = [
+                'employee_id' => $employee->id,
+                'old_balance' => $oldBalance,
+                'new_balance' => $employee->balance,
+                'bonus_added' => $bonusAmount,
+                'type' => 'individual',
+            ];
 
             Log::add(
                 auth()->id(),
@@ -345,7 +353,39 @@ class GroupMasterController extends Controller
             );
         }
 
-        // Log yozish
+        // Bonus hisoblash (group 'fixed_tailored_bonus_group' xodimlar uchun)
+        if ($sewingOutput->group_id) {
+            $groupEmployees = Employee::where('poyment_type', 'fixed_tailored_bonus_group')
+                ->where('status', '!=', 'kicked')
+                ->where('group_id', $sewingOutput->group_id)
+                ->where('branch_id', $order->branch_id)
+                ->get();
+
+            foreach ($groupEmployees as $employee) {
+                $bonusAmount = $employee->bonus * $minutes * $newQuantity;
+                $oldBalance = $employee->balance;
+                $employee->balance += $bonusAmount;
+                $employee->save();
+
+                $total_bonus_logs[] = [
+                    'employee_id' => $employee->id,
+                    'old_balance' => $oldBalance,
+                    'new_balance' => $employee->balance,
+                    'bonus_added' => $bonusAmount,
+                    'type' => 'group',
+                ];
+
+                Log::add(
+                    auth()->id(),
+                    'Guruh bo‘yicha maosh yozildi',
+                    'create',
+                    $oldBalance,
+                    $employee->balance
+                );
+            }
+        }
+
+        // Umumiy log yozish
         $time = Time::find($validatedData['time_id']);
         Log::add(
             auth()->id(),
