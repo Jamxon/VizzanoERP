@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345">
-      <change afterPath="$PROJECT_DIR$/app/Models/Bonus.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -354,15 +349,7 @@
       <workItem from="1749039244580" duration="98000" />
       <workItem from="1749039358773" duration="8619000" />
       <workItem from="1749095537237" duration="9790000" />
-      <workItem from="1749370347161" duration="9441000" />
-    </task>
-    <task id="LOCAL-00060" summary="12345">
-      <option name="closed" value="true" />
-      <created>1749036469326</created>
-      <option name="number" value="00060" />
-      <option name="presentableId" value="LOCAL-00060" />
-      <option name="project" value="LOCAL" />
-      <updated>1749036469326</updated>
+      <workItem from="1749370347161" duration="10114000" />
     </task>
     <task id="LOCAL-00061" summary="12345">
       <option name="closed" value="true" />
@@ -748,7 +735,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749380251804</updated>
     </task>
-    <option name="localTasksCounter" value="109" />
+    <task id="LOCAL-00109" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749381525359</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1749381525359</updated>
+    </task>
+    <option name="localTasksCounter" value="110" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

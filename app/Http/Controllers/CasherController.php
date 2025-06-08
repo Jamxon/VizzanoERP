@@ -14,9 +14,78 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 use function Laravel\Prompts\search;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class CasherController extends Controller
 {
+    public function exportGroupsByDepartmentIdPdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+    {
+        $departmentId = $request->input('department_id');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $group_id = $request->input('group_id');
+
+        if (!$departmentId) {
+            return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
+        }
+
+        // Oldingi funksiyadagi kabi ma’lumotlarni olish
+        $groupQuery = Group::where('department_id', $departmentId)
+            ->with(['employees' => function ($query) {
+                $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status')
+                    ->with('salaryPayments');
+            }]);
+
+        if (!empty($group_id)) {
+            $groupQuery->where('id', $group_id);
+        }
+
+        $groups = $groupQuery->get();
+
+        $result = $groups->map(function ($group) use ($startDate, $endDate) {
+            $employees = $group->employees
+                ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
+                ->filter();
+
+            $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
+
+            return [
+                'id' => $group->id,
+                'name' => $group->name,
+                'total_balance' => $groupTotal,
+                'employees' => $employees->values()->toArray(),
+            ];
+        })->values()->toArray();
+
+        // Guruhsiz xodimlar
+        $ungroupedEmployees = Employee::where('department_id', $departmentId)
+            ->whereNull('group_id')
+            ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status')
+            ->with('salaryPayments')
+            ->get()
+            ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
+            ->filter();
+
+        if ($ungroupedEmployees->isNotEmpty()) {
+            $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
+            $result[] = [
+                'id' => null,
+                'name' => 'Guruhsiz',
+                'total_balance' => $ungroupedTotal,
+                'employees' => $ungroupedEmployees->values()->toArray(),
+            ];
+        }
+
+        // PDF yasash
+        $pdf = Pdf::loadView('pdf.group-salary-report', [
+            'data' => $result,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('group-salary-report.pdf');
+    }
+
     public function giveSalaryOrAdvance(Request $request)
     {
         return DB::transaction(function () use ($request) {
