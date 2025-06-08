@@ -9,6 +9,7 @@ use App\Models\CashboxBalance;
 use App\Models\CashboxTransaction;
 use App\Models\Currency;
 use App\Models\SalaryPayment;
+use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,31 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class CasherController extends Controller
 {
+    public function getDailyCost()
+    {
+        $dailyOutput = SewingOutputs::with('orderModel.order') // orderni chaqiramiz
+        ->whereDate('created_at', date('Y-m-d'))
+            ->whereHas('orderModel.order', function ($query) {
+                $query->where('branch_id', auth()->user()->employee->branch_id);
+            })
+            ->get()
+            ->groupBy(fn($item) => optional($item->orderModel)->order_id)
+            ->map(function ($items, $orderId) {
+                $totalQuantity = $items->sum('quantity');
+                $order = optional($items->first()->orderModel)->order;
+                $price = optional($order)->price ?? 0;
+                return [
+                    'order_id' => $orderId,
+                    'price' => $price,
+                    'total_quantity' => $totalQuantity,
+                    'total_cost' => $price * $totalQuantity,
+                ];
+            })
+            ->values();
+
+        return response()->json($dailyOutput);
+    }
+
     public function exportGroupsByDepartmentIdPdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         $departmentId = $request->input('department_id');

@@ -61,6 +61,7 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('employee/edit/{id}', [SuperHRController::class, 'showEmployee']);
     Route::patch('employees/{employee}', [SuperHRController::class, 'updateEmployees']);
     Route::get('pdf/employees', [CasherController::class, 'exportGroupsByDepartmentIdPdf']);
+    Route::get('dailyReport', [CasherController::class, 'getDailyCost']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
