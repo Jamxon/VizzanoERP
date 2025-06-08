@@ -359,7 +359,7 @@ class SuperHRController extends Controller
                     'type' => $request->type ?? $employee->type,
                     'birthday' => $request->birthday ?? $employee->birthday,
                     'img' => $img ?? $employee->img ?? null,
-                    'salary' => $request->salary ?? null,
+                    'salary' => $request->salary ?? $employee->salary,
                     'kicked_date' => null,
                     'gender' => $request->gender ?? $employee->gender,
                     'status' => $request->status ?? 'working',
