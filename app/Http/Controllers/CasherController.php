@@ -22,7 +22,7 @@ class CasherController extends Controller
         return DB::transaction(function () use ($request) {
             $validated = $request->validate([
                 'employee_id' => 'required|exists:employees,id',
-                'amount' => 'required|numeric|min:1',
+                'amount' => 'required|numeric',
                 'month' => 'required|date_format:Y-m',
                 'type' => 'required|in:salary,advance',
                 'comment' => 'nullable|string',
