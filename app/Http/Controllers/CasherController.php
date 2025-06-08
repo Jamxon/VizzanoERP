@@ -21,16 +21,16 @@ class CasherController extends Controller
 {
     public function getDailyCost()
     {
-        $dailyOutput = SewingOutputs::with('orderModel.order') // orderni chaqiramiz
+        $dailyOutput = SewingOutputs::with('orderSubmodel.orderModel.order') // orderni chaqiramiz
         ->whereDate('created_at', date('Y-m-d'))
-            ->whereHas('orderModel.order', function ($query) {
+            ->whereHas('orderSubmodel.orderModel.order', function ($query) {
                 $query->where('branch_id', auth()->user()->employee->branch_id);
             })
             ->get()
-            ->groupBy(fn($item) => optional($item->orderModel)->order_id)
+            ->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id)
             ->map(function ($items, $orderId) {
                 $totalQuantity = $items->sum('quantity');
-                $order = optional($items->first()->orderModel)->order;
+                $order = optional($items->first()->orderSubmodel->orderModel)->order;
                 $price = optional($order)->price ?? 0;
                 return [
                     'order_id' => $orderId,
