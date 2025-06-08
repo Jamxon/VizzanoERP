@@ -36,6 +36,7 @@
                 <td>{{ $employee['name'] }}</td>
                 <td>{{ number_format($employee['total_earned'], 2) }}</td>
                 <td></td>
+                <td></td>
             </tr>
         @endforeach
         </tbody>
