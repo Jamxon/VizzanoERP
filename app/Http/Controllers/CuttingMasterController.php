@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bonus;
 use App\Models\BoxTarification;
 use App\Http\Resources\GetOrderCutResource;
 use App\Http\Resources\GetSpecificationResource;
 use App\Http\Resources\showOrderCuttingMasterResource;
+use App\Models\Employee;
 use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderCut;
@@ -230,6 +232,41 @@ class CuttingMasterController extends Controller
             'submodel_id' => $data['submodel_id'],
             'size_id' => $data['size_id'],
         ]);
+
+        $minutesPerUnit = $order->orderModel->rasxod / 250;
+
+        $employees = Employee::where('payment_type', 'fixed_cutted_bonus')
+            ->where('status', '!=', 'kicked')
+            ->where('branch_id', $order->branch_id)
+            ->get();
+
+        foreach ($employees as $employee) {
+            $bonusAmount = $employee->bonus * $minutesPerUnit * $data['quantity'];
+            $oldBalance = $employee->balance;
+            $employee->balance += $bonusAmount;
+            $employee->save();
+
+            // Bonus log entry
+            Log::add(
+                auth()->id(),
+                'Qadoqlovchiga bonus qo‘shildi',
+                'packaging_bonus',
+                $oldBalance,
+                $employee->balance,
+                request()->ip(),
+                request()->userAgent()
+            );
+
+            // Bonus modelga yozish
+            Bonus::create([
+                'employee_id' => $employee->id,
+                'amount' => $bonusAmount,
+                'type' => 'packaging',
+                'description' => 'Qadoqlash bonusi',
+                'date' => now(),
+                'order_id' => $order->id,
+            ]);
+        }
 
         $totalCut = OrderCut::where('order_id', $order->id)->sum('quantity');
 

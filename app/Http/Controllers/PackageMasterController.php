@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
+use App\Models\Log;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Bonus;
 
 class PackageMasterController extends Controller
 {
@@ -73,6 +76,45 @@ class PackageMasterController extends Controller
                 'package_size' => $request->input('package_size'),
                 'package_quantity' => $request->input('package_quantity'),
             ]);
+
+            // 4.1. Bonus qo‘shish
+            $employees = Employee::where('payment_type', 'fixed_packaged_bonus')
+                ->where('status', '!=', 'kicked')
+                ->where('branch_id', $order->branch_id)
+                ->get();
+
+            $minutes = $order->orderModel->rasxod / 250;
+            $totalPackagedItems = $newTotal;
+
+            foreach ($employees as $employee) {
+                $bonusAmount = $employee->bonus * $minutes * $totalPackagedItems;
+                $oldBalance = $employee->balance;
+                $employee->balance += $bonusAmount;
+                $employee->save();
+
+                // 🔹 Bonus jadvaliga yozamiz
+                Bonus::create([
+                    'employee_id' => $employee->id,
+                    'order_id' => $order->id,
+                    'type' => 'fixed_packaged_bonus',
+                    'amount' => $bonusAmount,
+                    'quantity' => $totalPackagedItems,
+                    'old_balance' => $oldBalance,
+                    'new_balance' => $employee->balance,
+                    'created_by' => auth()->id(),
+                ]);
+
+                // 🔸 Log yozish
+                Log::add(
+                    auth()->id(),
+                    'Qadoqlovchiga bonus qo‘shildi',
+                    'packaging_bonus',
+                    $oldBalance,
+                    $employee->balance,
+                    request()->ip(),
+                    request()->userAgent()
+                );
+            }
 
             // 5. Order statusini yangilaymiz
             if ($combinedTotal === $order->quantity) {

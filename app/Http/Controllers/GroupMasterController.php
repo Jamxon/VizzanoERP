@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
+use App\Models\Bonus;
 use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderCut;
@@ -323,7 +324,7 @@ class GroupMasterController extends Controller
         }
 
         // Bonus hisoblash (individual 'fixed_tailored_bonus' xodimlar uchun)
-        $employees = Employee::where('poyment_type', 'fixed_tailored_bonus')
+        $employees = Employee::where('payment_type', 'fixed_tailored_bonus')
             ->where('status', '!=', 'kicked')
             ->where('branch_id', $order->branch_id)
             ->get();
@@ -344,6 +345,18 @@ class GroupMasterController extends Controller
                 'type' => 'individual',
             ];
 
+            Bonus::create([
+                'employee_id' => $employee->id,
+                'order_id' => $order->id,
+                'type' => 'individual',
+                'amount' => $bonusAmount,
+                'quantity' => $newQuantity,
+                'old_balance' => $oldBalance,
+                'new_balance' => $employee->balance,
+                'created_by' => auth()->id(),
+            ]);
+
+
             Log::add(
                 auth()->id(),
                 'Maosh yozildi',
@@ -355,7 +368,7 @@ class GroupMasterController extends Controller
 
         // Bonus hisoblash (group 'fixed_tailored_bonus_group' xodimlar uchun)
         if ($sewingOutput->group_id) {
-            $groupEmployees = Employee::where('poyment_type', 'fixed_tailored_bonus_group')
+            $groupEmployees = Employee::where('payment_type', 'fixed_tailored_bonus_group')
                 ->where('status', '!=', 'kicked')
                 ->where('group_id', $sewingOutput->group_id)
                 ->where('branch_id', $order->branch_id)
@@ -374,6 +387,17 @@ class GroupMasterController extends Controller
                     'bonus_added' => $bonusAmount,
                     'type' => 'group',
                 ];
+
+                Bonus::create([
+                    'employee_id' => $employee->id,
+                    'order_id' => $order->id,
+                    'type' => 'individual',
+                    'amount' => $bonusAmount,
+                    'quantity' => $newQuantity,
+                    'old_balance' => $oldBalance,
+                    'new_balance' => $employee->balance,
+                    'created_by' => auth()->id(),
+                ]);
 
                 Log::add(
                     auth()->id(),
