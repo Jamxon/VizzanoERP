@@ -17,7 +17,7 @@
 @endif
 
 @foreach ($data as $group)
-    <h3>Guruh: {{ $group['name'] }} (Jami balans: {{ number_format($group['total_balance'], 2) }} so'm)</h3>
+    <h3>Guruh: {{ $group['name'] }} (Jami hisoblangan: {{ number_format(collect($group['employees'])->sum('total_earned'), 2) }} so'm)</h3>
 
     <table>
         <thead>
