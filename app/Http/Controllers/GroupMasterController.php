@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
+use App\Models\Employee;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderGroup;
@@ -299,6 +300,7 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Buyurtma topilmadi!'], 404);
         }
 
+        $minutes = $orderModel->rasxod / 250; // 1ta buyum uchun qancha daqiqa ketadi
         $orderQuantity = $order->quantity;
         $totalSewnQuantity = SewingOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
         $newQuantity = $validatedData['quantity'];
@@ -311,13 +313,36 @@ class GroupMasterController extends Controller
             ], 400);
         }
 
-        // Saqlash
+        // Yangi natijani saqlash
         $sewingOutput = SewingOutputs::create($validatedData);
 
-        // Agar to‘liq tikilgan bo‘lsa — statusni 'tailored' qilamiz
+        // Buyurtma to‘liq tikilgan bo‘lsa — statusni yangilash
         if ($combinedQuantity === $orderQuantity) {
             $order->status = 'tailored';
             $order->save();
+        }
+
+        // Xodimlar uchun bonus hisoblash va balance yangilash
+        $employees = Employee::where('poyment_type', 'fixed_tailored_bonus')
+            ->where('status', '!=', 'kicked')
+            ->where('branch_id', $order->branch_id)
+            ->get();
+
+        $total_bonus_logs = [];
+
+        foreach ($employees as $employee) {
+            $bonusAmount = $employee->bonus * $minutes * $newQuantity; // jami tikilgan miqdorga ko‘paytiriladi
+            $oldBalance = $employee->balance;
+            $employee->balance += $bonusAmount;
+            $employee->save();
+
+            Log::add(
+                auth()->id(),
+                'Maosh yozildi',
+                'create',
+                $oldBalance,
+                $employee->balance
+            );
         }
 
         // Log yozish
@@ -334,12 +359,13 @@ class GroupMasterController extends Controller
                 'time' => $time,
                 'comment' => $validatedData['comment'] ?? null,
                 'order' => $order->name ?? 'Noma’lum buyurtma',
-                'remaining_quantity' => $orderQuantity - $combinedQuantity
+                'remaining_quantity' => $orderQuantity - $combinedQuantity,
+                'balance_bonus_distribution' => $total_bonus_logs,
             ]
         );
 
         return response()->json([
-            'message' => "Sewing output muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
+            'message' => "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
         ]);
     }
 
