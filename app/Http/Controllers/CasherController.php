@@ -95,7 +95,7 @@ class CasherController extends Controller
                     ->where('orders.id', $orderId)
                     ->sum('employee_tarification_logs.amount_earned');
 
-                $totalFixedCost = $bonus + $attendanceSalary + $tarification;
+                $totalFixedCost = $bonus + $attendanceSalary + $rasxod;
 
                 return [
                     'order' => $order,
@@ -132,7 +132,6 @@ class CasherController extends Controller
         $totalEarned = $dailyOutput->sum('total_output_cost_uzs');
         $totalFixedCost = $dailyOutput->sum('total_fixed_cost_uzs') + $transport + $dailyExpense;
         $thisBranchEmployeeIds = Employee::where('branch_id', auth()->user()->employee->branch_id)->pluck('id')->toArray();
-
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
