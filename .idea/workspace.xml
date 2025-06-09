@@ -349,15 +349,7 @@
       <workItem from="1749370347161" duration="10114000" />
       <workItem from="1749382139867" duration="4422000" />
       <workItem from="1749387605241" duration="1606000" />
-      <workItem from="1749443010392" duration="13033000" />
-    </task>
-    <task id="LOCAL-00099" summary="12345">
-      <option name="closed" value="true" />
-      <created>1749102520353</created>
-      <option name="number" value="00099" />
-      <option name="presentableId" value="LOCAL-00099" />
-      <option name="project" value="LOCAL" />
-      <updated>1749102520353</updated>
+      <workItem from="1749443010392" duration="13462000" />
     </task>
     <task id="LOCAL-00100" summary="12345">
       <option name="closed" value="true" />
@@ -743,7 +735,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749468157013</updated>
     </task>
-    <option name="localTasksCounter" value="148" />
+    <task id="LOCAL-00148" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749468390514</created>
+      <option name="number" value="00148" />
+      <option name="presentableId" value="LOCAL-00148" />
+      <option name="project" value="LOCAL" />
+      <updated>1749468390515</updated>
+    </task>
+    <option name="localTasksCounter" value="149" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

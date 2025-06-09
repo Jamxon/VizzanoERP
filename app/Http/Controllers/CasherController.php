@@ -155,7 +155,7 @@ class CasherController extends Controller
         ]);
     }
 
-    public function getMonthlyExpense(Request $request)
+    public function getMonthlyExpense(Request $request): \Illuminate\Http\JsonResponse
     {
         $month = $request->input('month', Carbon::now()->format('Y-m'));
         $expenses = MonthlyExpense::whereMonth('month', Carbon::parse($month)->month)
@@ -171,7 +171,7 @@ class CasherController extends Controller
             'expenses' => $expenses->map(function ($expense) {
                 return [
                     'type' => $expense->type,
-                    'amount' => number_format($expense->amount, 2, '.', ' '),
+                    'amount' => $expense->amount,
                     'date' => $expense->month,
                 ];
             }),
