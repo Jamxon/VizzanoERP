@@ -204,7 +204,6 @@ class CasherController extends Controller
             'month' => 'nullable|date_format:Y-m',
         ]);
         $expense = MonthlyExpense::findOrFail($id);
-        dd($expense);
 
         if (isset($validated['month'])) {
             $validated['month'] .= '-01'; // 2025-06 => 2025-06-01
