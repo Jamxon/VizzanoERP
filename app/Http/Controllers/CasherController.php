@@ -26,7 +26,7 @@ class CasherController extends Controller
         $date = $request->date ?? Carbon::today()->toDateString();
         $dollarRate = $request->dollar_rate ?? 12900;
 
-        // 1. Daromad
+        // 1. Daromad va harajatlarni order bo‘yicha chiqarish
         $dailyOutput = SewingOutputs::with([
             'orderSubmodel.orderModel.order',
             'orderSubmodel.orderModel.model',
@@ -38,14 +38,44 @@ class CasherController extends Controller
             })
             ->get()
             ->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id)
-            ->map(function ($items) use ($dollarRate) {
+            ->map(function ($items) use ($dollarRate, $date) {
                 $first = $items->first();
                 $orderModel = optional($first->orderSubmodel)->orderModel;
                 $order = optional($orderModel)->order;
 
+                $orderId = $order->id ?? null;
+
                 $totalQuantity = $items->sum('quantity');
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
+
+                // Harajatlarni order_id bo‘yicha filterlash
+                $bonus = DB::table('bonuses')
+                    ->whereDate('created_at', $date)
+                    ->where('order_id', $orderId)
+                    ->sum('amount');
+
+                $attendanceSalary = DB::table('attendance_salary')
+                    ->whereDate('date', $date)
+                    ->where('order_id', $orderId)
+                    ->sum('amount');
+
+                $tarification = DB::table('employee_tarification_logs')
+                    ->whereDate('date', $date)
+                    ->where('order_id', $orderId)
+                    ->sum('amount_earned');
+
+                $transport = DB::table('transport_attendance')
+                    ->whereDate('date', $date)
+                    ->where('order_id', $orderId)
+                    ->sum(DB::raw('salary + fuel_bonus'));
+
+                $monthlyExpense = DB::table('monthly_expenses')
+                    ->whereDate('date', $date)
+                    ->where('order_id', $orderId)
+                    ->sum('amount');
+
+                $totalFixedCost = $bonus + $attendanceSalary + $tarification + $transport + $monthlyExpense;
 
                 return [
                     'order' => $order,
@@ -55,31 +85,32 @@ class CasherController extends Controller
                     'price_uzs' => $priceUZS,
                     'total_quantity' => $totalQuantity,
                     'total_cost_uzs' => $priceUSD * $totalQuantity * $dollarRate,
+
+                    // Harajatlar order bo‘yicha
+                    'costs_uzs' => [
+                        'bonuses' => $bonus,
+                        'attendance_salary' => $attendanceSalary,
+                        'employee_tarification_logs' => $tarification,
+                        'transport_attendance' => $transport,
+                        'monthly_expenses' => $monthlyExpense,
+                    ],
+                    'total_cost_uzs' => $totalFixedCost,
+                    'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
                 ];
             })
             ->values();
 
+        // Jami daromad
         $totalEarned = $dailyOutput->sum('total_cost_uzs');
 
-        // 2. Harajatlar
-        $bonusCost = DB::table('bonuses')->whereDate('created_at', $date)->sum('amount');
-        $attendanceSalaryCost = DB::table('attendance_salary')->whereDate('date', $date)->sum('amount');
-        $employeeTarificationCost = DB::table('employee_tarification_logs')->whereDate('date', $date)->sum('amount_earned');
-        $transportCost = DB::table('transport_attendance')->whereDate('date', $date)->sum(DB::raw('salary + fuel_bonus'));
-
-        $totalFixedCost = $bonusCost + $attendanceSalaryCost + $employeeTarificationCost + $transportCost;
+        // Jami harajat
+        $totalFixedCost = $dailyOutput->sum('total_cost_uzs');
 
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
             'orders' => $dailyOutput,
             'total_earned_uzs' => $totalEarned,
-            'fixed_costs_uzs' => [
-                'bonuses' => $bonusCost,
-                'attendance_salary' => $attendanceSalaryCost,
-                'employee_tarification_logs' => $employeeTarificationCost,
-                'transport_attendance' => $transportCost,
-            ],
             'total_fixed_cost_uzs' => $totalFixedCost,
             'net_profit_uzs' => $totalEarned - $totalFixedCost,
         ]);
