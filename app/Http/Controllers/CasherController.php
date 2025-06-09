@@ -86,6 +86,29 @@ class CasherController extends Controller
         ]);
     }
 
+    public function getMonthlyExpense(Request $request)
+    {
+        $month = $request->input('month', Carbon::now()->format('Y-m'));
+        $expenses = MonthlyExpense::whereMonth('month', Carbon::parse($month)->month)
+            ->whereYear('month', Carbon::parse($month)->year)
+            ->get();
+
+        if ($expenses->isEmpty()) {
+            return response()->json(['message' => 'No expenses found for this month.'], 404);
+        }
+
+        return response()->json([
+            'month' => $month,
+            'expenses' => $expenses->map(function ($expense) {
+                return [
+                    'type' => $expense->type,
+                    'amount' => number_format($expense->amount, 2, '.', ' '),
+                    'date' => $expense->month,
+                ];
+            }),
+        ]);
+    }
+
     public function storeMonthlyExpense(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
