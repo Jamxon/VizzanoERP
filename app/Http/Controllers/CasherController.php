@@ -195,6 +195,22 @@ class CasherController extends Controller
         return response()->json(['message' => 'Saved', 'data' => $expense]);
     }
 
+    public function editMonthlyExpense(MonthlyExpense $expense, Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'type' => 'required|string',
+            'amount' => 'required|numeric|min:0',
+            'month' => 'required|date_format:Y-m',
+        ]);
+
+        $expense->update([
+            'type' => $validated['type'],
+            'amount' => $validated['amount'],
+            'month' => $validated['month'] . '-01',
+        ]);
+
+        return response()->json(['message' => 'Updated', 'data' => $expense]);
+    }
 
     public function exportGroupsByDepartmentIdPdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
