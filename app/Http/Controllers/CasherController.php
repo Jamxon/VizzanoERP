@@ -136,6 +136,22 @@ class CasherController extends Controller
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
             'net_profit_uzs' => $totalEarned - $totalFixedCost,
+            'kpi' => DB::table('bonuses')
+                ->whereDate('created_at', $date)
+                ->sum('amount'),
+            'aup' => DB::table('attendance_salary')
+                ->whereDate('date', $date)
+                ->whereIn('employee_id', $relatedEmployeeIds)
+                ->sum('amount'),
+            'tarification' => DB::table('employee_tarification_logs')
+                ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+                ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+                ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+                ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+                ->join('orders', 'order_models.order_id', '=', 'orders.id')
+                ->whereDate('employee_tarification_logs.date', $date)
+                ->whereIn('employee_tarification_logs.employee_id', $relatedEmployeeIds)
+                ->sum('employee_tarification_logs.amount_earned'),
         ]);
     }
 
