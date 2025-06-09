@@ -368,7 +368,7 @@ class GroupMasterController extends Controller
 
             $groupEmployees = Employee::where('payment_type', 'fixed_tailored_bonus_group')
                 ->where('status', '!=', 'kicked')
-                ->where('group_id', $sewingOutput->group_id)
+                ->where('group_id', $orderSubModel->group->group_id)
                 ->where('branch_id', $order->branch_id)
                 ->get();
 
