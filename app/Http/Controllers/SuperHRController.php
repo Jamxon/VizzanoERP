@@ -363,7 +363,7 @@ class SuperHRController extends Controller
                     'kicked_date' => null,
                     'gender' => $request->gender ?? $employee->gender,
                     'status' => $request->status ?? 'working',
-                    'bonus' => $request->bonus ?? null,
+                    'bonus' => $request->bonus ?? $employee->bonus,
                 ]);
             }
 
