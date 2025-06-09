@@ -170,6 +170,7 @@ class CasherController extends Controller
             'month' => $month,
             'expenses' => $expenses->map(function ($expense) {
                 return [
+                    'id' => $expense->id,
                     'type' => $expense->type,
                     'amount' => $expense->amount,
                     'date' => $expense->month,
