@@ -26,32 +26,45 @@ class CasherController extends Controller
         $date = $request->date ?? Carbon::today()->toDateString();
         $dollarRate = $request->dollar_rate ?? 12900;
 
+        $branchId = auth()->user()->employee->branch_id;
+
+        // Ushbu kundagi barcha ishchilarni aniqlash
+        $relatedEmployeeIds = DB::table('employee_tarification_logs')
+            ->whereDate('date', $date)
+            ->pluck('employee_id')
+            ->unique()
+            ->values();
+
+        // TRANSPORT va MONTHLY EXPENSE — orderga bog'lanmagan umumiy
+        $transport = DB::table('transport_attendance')
+            ->whereDate('date', $date)
+            ->sum(DB::raw('salary + fuel_bonus'));
+
+        $monthlyExpense = DB::table('monthly_expenses')
+            ->whereDate('date', $date)
+            ->sum('amount');
+
         $dailyOutput = SewingOutputs::with([
             'orderSubmodel.orderModel.order',
             'orderSubmodel.orderModel.model',
             'orderSubmodel.orderModel.submodels.submodel'
         ])
             ->whereDate('created_at', $date)
-            ->whereHas('orderSubmodel.orderModel.order', function ($query) {
-                $query->where('branch_id', auth()->user()->employee->branch_id);
+            ->whereHas('orderSubmodel.orderModel.order', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
             })
             ->get()
             ->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id)
-            ->map(function ($items) use ($dollarRate, $date) {
+            ->map(function ($items) use ($dollarRate, $date, $relatedEmployeeIds) {
                 $first = $items->first();
                 $orderModel = optional($first->orderSubmodel)->orderModel;
                 $order = optional($orderModel)->order;
-
                 $orderId = $order->id ?? null;
-
-                // 🧠 Shu orderda ishlagan xodimlar
-                $relatedEmployeeIds = $items->pluck('employee_id')->unique()->values();
 
                 $totalQuantity = $items->sum('quantity');
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
 
-                // Harajatlar
                 $bonus = DB::table('bonuses')
                     ->whereDate('created_at', $date)
                     ->where('order_id', $orderId)
@@ -65,20 +78,10 @@ class CasherController extends Controller
                 $tarification = DB::table('employee_tarification_logs')
                     ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
                     ->whereDate('employee_tarification_logs.date', $date)
-                    ->where('tarifications.tarificationCategory.submodel.orderModel.order_id', $orderId)
+                    ->where('tarifications.order_id', $orderId)
                     ->sum('employee_tarification_logs.amount_earned');
 
-                $transport = DB::table('transport_attendance')
-                    ->whereDate('date', $date)
-                    ->where('order_id', $orderId)
-                    ->sum(DB::raw('salary + fuel_bonus'));
-
-                $monthlyExpense = DB::table('monthly_expenses')
-                    ->whereDate('date', $date)
-                    ->where('order_id', $orderId)
-                    ->sum('amount');
-
-                $totalFixedCost = $bonus + $attendanceSalary + $tarification + $transport + $monthlyExpense;
+                $totalFixedCost = $bonus + $attendanceSalary + $tarification;
 
                 return [
                     'order' => $order,
@@ -87,14 +90,12 @@ class CasherController extends Controller
                     'price_usd' => $priceUSD,
                     'price_uzs' => $priceUZS,
                     'total_quantity' => $totalQuantity,
-                    'gross_earned_uzs' => $priceUSD * $totalQuantity * $dollarRate,
+                    'total_cost_uzs' => $priceUSD * $totalQuantity * $dollarRate,
 
                     'costs_uzs' => [
                         'bonuses' => $bonus,
                         'attendance_salary' => $attendanceSalary,
                         'employee_tarification_logs' => $tarification,
-                        'transport_attendance' => $transport,
-                        'monthly_expenses' => $monthlyExpense,
                     ],
                     'total_cost_uzs' => $totalFixedCost,
                     'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
@@ -102,14 +103,17 @@ class CasherController extends Controller
             })
             ->values();
 
-        // Jami
-        $totalEarned = $dailyOutput->sum('gross_earned_uzs');
-        $totalFixedCost = $dailyOutput->sum('total_cost_uzs');
+        // Har bir orderdan tashqari umumiy xarajatlar qo‘shiladi
+        $totalEarned = $dailyOutput->sum('total_cost_uzs');
+        $totalOrderCosts = $dailyOutput->sum('total_cost_uzs');
+        $totalFixedCost = $totalOrderCosts + $transport + $monthlyExpense;
 
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
             'orders' => $dailyOutput,
+            'transport_attendance' => $transport,
+            'monthly_expenses' => $monthlyExpense,
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
             'net_profit_uzs' => $totalEarned - $totalFixedCost,
