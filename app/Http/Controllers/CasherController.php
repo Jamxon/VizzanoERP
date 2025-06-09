@@ -45,6 +45,12 @@ class CasherController extends Controller
             ->whereYear('month', Carbon::parse($date)->year)
             ->sum('amount');
 
+        $carbonDate = Carbon::parse($date);
+        $daysInMonth = $carbonDate->daysInMonth;
+
+// Kunlik xarajat
+        $dailyExpense = $monthlyExpense / $daysInMonth;
+
 
         $dailyOutput = SewingOutputs::with([
             'orderSubmodel.orderModel.order',
@@ -120,14 +126,14 @@ class CasherController extends Controller
         // Har bir orderdan tashqari umumiy xarajatlar qo‘shiladi
         $totalEarned = $dailyOutput->sum('total_cost_uzs');
         $totalOrderCosts = $dailyOutput->sum('total_cost_uzs');
-        $totalFixedCost = $totalOrderCosts + $transport + $monthlyExpense;
+        $totalFixedCost = $totalOrderCosts + $transport + $dailyExpense;
 
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
             'orders' => $dailyOutput,
             'transport_attendance' => $transport,
-            'monthly_expenses' => $monthlyExpense,
+            'monthly_expenses' => $dailyExpense,
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
             'net_profit_uzs' => $totalEarned - $totalFixedCost,
