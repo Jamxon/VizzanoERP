@@ -15,5 +15,6 @@ class MonthlyExpense extends Model
 
     protected $casts = [
         'month' => 'date:Y-m',
+        'amount' => 'float',
     ];
 }
