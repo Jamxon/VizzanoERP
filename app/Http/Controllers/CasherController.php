@@ -196,14 +196,15 @@ class CasherController extends Controller
         return response()->json(['message' => 'Saved', 'data' => $expense]);
     }
 
-    public function editMonthlyExpense(MonthlyExpense $expense, Request $request): \Illuminate\Http\JsonResponse
+    public function editMonthlyExpense($id, Request $request): \Illuminate\Http\JsonResponse
     {
-        dd($expense);
         $validated = $request->validate([
             'type' => 'nullable|string',
             'amount' => 'nullable|numeric|min:0',
             'month' => 'nullable|date_format:Y-m',
         ]);
+        $expense = MonthlyExpense::findOrFail($id);
+        dd($id);
 
         if (isset($validated['month'])) {
             $validated['month'] .= '-01'; // 2025-06 => 2025-06-01
