@@ -32,6 +32,7 @@ class CasherController extends Controller
             ->whereHas('orderSubmodel.orderModel.order', function ($query) {
                 $query->where('branch_id', auth()->user()->employee->branch_id);
             })
+            ->with('orderSubmodel.orderModel.model', 'orderSubmodel.orderModel.submodels.submodel')
             ->get()
             ->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id)
             ->map(function ($items) use ($dollarRate) {
