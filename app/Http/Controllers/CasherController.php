@@ -24,7 +24,7 @@ class CasherController extends Controller
     public function getDailyCost(Request $request)
     {
         $date = $request->date ?? Carbon::today()->toDateString();
-        $dollarRate = $request->dollar_rate ?? 12900; // Default kurs: 1 USD = 12500 so'm
+        $dollarRate = $request->dollar_rate ?? 12900;
 
         // 1. Daromad (Ishlab chiqarishdan olingan tushum)
         $dailyOutput = SewingOutputs::with('orderSubmodel.orderModel.order')
@@ -34,13 +34,14 @@ class CasherController extends Controller
             })
             ->get()
             ->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id)
-            ->map(function ($items, $orderId) use ($dollarRate) {
+            ->map(function ($items) use ($dollarRate) {
                 $totalQuantity = $items->sum('quantity');
                 $order = optional($items->first()->orderSubmodel->orderModel)->order;
                 $priceUSD = optional($order)->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
+
                 return [
-                    'order_id' => $orderId,
+                    'order' => $order, // order_id o‘rniga butun order object
                     'price_usd' => $priceUSD,
                     'price_uzs' => $priceUZS,
                     'total_quantity' => $totalQuantity,
@@ -51,7 +52,7 @@ class CasherController extends Controller
 
         $totalEarned = $dailyOutput->sum('total_cost_uzs');
 
-        // 2. Harajatlar (bonuslar, ish haqi, tariflar, transport)
+        // 2. Harajatlar
         $bonusCost = DB::table('bonuses')
             ->whereDate('created_at', $date)
             ->sum('amount');
