@@ -125,7 +125,6 @@ class CasherController extends Controller
 
         // Har bir orderdan tashqari umumiy xarajatlar qo‘shiladi
         $totalEarned = $dailyOutput->sum('total_output_cost_uzs');
-        $totalOrderCosts = $dailyOutput->sum('total_output_cost_uzs');
         $totalFixedCost = $transport + $dailyExpense;
 
         return response()->json([
