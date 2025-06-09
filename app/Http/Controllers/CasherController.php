@@ -26,7 +26,6 @@ class CasherController extends Controller
         $date = $request->date ?? Carbon::today()->toDateString();
         $dollarRate = $request->dollar_rate ?? 12900;
 
-        // 1. Daromad va harajatlarni order bo‘yicha chiqarish
         $dailyOutput = SewingOutputs::with([
             'orderSubmodel.orderModel.order',
             'orderSubmodel.orderModel.model',
@@ -45,11 +44,14 @@ class CasherController extends Controller
 
                 $orderId = $order->id ?? null;
 
+                // 🧠 Shu orderda ishlagan xodimlar
+                $relatedEmployeeIds = $items->pluck('employee_id')->unique()->values();
+
                 $totalQuantity = $items->sum('quantity');
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
 
-                // Harajatlarni order_id bo‘yicha filterlash
+                // Harajatlar
                 $bonus = DB::table('bonuses')
                     ->whereDate('created_at', $date)
                     ->where('order_id', $orderId)
@@ -57,7 +59,7 @@ class CasherController extends Controller
 
                 $attendanceSalary = DB::table('attendance_salary')
                     ->whereDate('date', $date)
-                    ->where('order_id', $orderId)
+                    ->whereIn('employee_id', $relatedEmployeeIds)
                     ->sum('amount');
 
                 $tarification = DB::table('employee_tarification_logs')
@@ -84,9 +86,8 @@ class CasherController extends Controller
                     'price_usd' => $priceUSD,
                     'price_uzs' => $priceUZS,
                     'total_quantity' => $totalQuantity,
-                    'total_cost_uzs' => $priceUSD * $totalQuantity * $dollarRate,
+                    'gross_earned_uzs' => $priceUSD * $totalQuantity * $dollarRate,
 
-                    // Harajatlar order bo‘yicha
                     'costs_uzs' => [
                         'bonuses' => $bonus,
                         'attendance_salary' => $attendanceSalary,
@@ -100,10 +101,8 @@ class CasherController extends Controller
             })
             ->values();
 
-        // Jami daromad
-        $totalEarned = $dailyOutput->sum('total_cost_uzs');
-
-        // Jami harajat
+        // Jami
+        $totalEarned = $dailyOutput->sum('gross_earned_uzs');
         $totalFixedCost = $dailyOutput->sum('total_cost_uzs');
 
         return response()->json([
