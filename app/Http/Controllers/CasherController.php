@@ -26,23 +26,31 @@ class CasherController extends Controller
         $date = $request->date ?? Carbon::today()->toDateString();
         $dollarRate = $request->dollar_rate ?? 12900;
 
-        // 1. Daromad (Ishlab chiqarishdan olingan tushum)
-        $dailyOutput = SewingOutputs::with('orderSubmodel.orderModel.order')
+        // 1. Daromad
+        $dailyOutput = SewingOutputs::with([
+            'orderSubmodel.orderModel.order',
+            'orderSubmodel.orderModel.model',
+            'orderSubmodel.orderModel.submodels.submodel'
+        ])
             ->whereDate('created_at', $date)
             ->whereHas('orderSubmodel.orderModel.order', function ($query) {
                 $query->where('branch_id', auth()->user()->employee->branch_id);
             })
-            ->with('orderSubmodel.orderModel.model', 'orderSubmodel.orderModel.submodels.submodel')
             ->get()
             ->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id)
             ->map(function ($items) use ($dollarRate) {
+                $first = $items->first();
+                $orderModel = optional($first->orderSubmodel)->orderModel;
+                $order = optional($orderModel)->order;
+
                 $totalQuantity = $items->sum('quantity');
-                $order = optional($items->first()->orderSubmodel->orderModel)->order;
-                $priceUSD = optional($order)->price ?? 0;
+                $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
 
                 return [
-                    'order' => $order, // order_id o‘rniga butun order object
+                    'order' => $order,
+                    'model' => $orderModel->model ?? null,
+                    'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
                     'price_usd' => $priceUSD,
                     'price_uzs' => $priceUZS,
                     'total_quantity' => $totalQuantity,
@@ -54,21 +62,10 @@ class CasherController extends Controller
         $totalEarned = $dailyOutput->sum('total_cost_uzs');
 
         // 2. Harajatlar
-        $bonusCost = DB::table('bonuses')
-            ->whereDate('created_at', $date)
-            ->sum('amount');
-
-        $attendanceSalaryCost = DB::table('attendance_salary')
-            ->whereDate('date', $date)
-            ->sum('amount');
-
-        $employeeTarificationCost = DB::table('employee_tarification_logs')
-            ->whereDate('date', $date)
-            ->sum('amount_earned');
-
-        $transportCost = DB::table('transport_attendance')
-            ->whereDate('date', $date)
-            ->sum(DB::raw('salary + fuel_bonus'));
+        $bonusCost = DB::table('bonuses')->whereDate('created_at', $date)->sum('amount');
+        $attendanceSalaryCost = DB::table('attendance_salary')->whereDate('date', $date)->sum('amount');
+        $employeeTarificationCost = DB::table('employee_tarification_logs')->whereDate('date', $date)->sum('amount_earned');
+        $transportCost = DB::table('transport_attendance')->whereDate('date', $date)->sum(DB::raw('salary + fuel_bonus'));
 
         $totalFixedCost = $bonusCost + $attendanceSalaryCost + $employeeTarificationCost + $transportCost;
 
