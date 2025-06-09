@@ -21,8 +21,11 @@ class CasherController extends Controller
 {
     public function getDailyCost(Request $request)
     {
-        $dailyOutput = SewingOutputs::with('orderSubmodel.orderModel.order') // orderni chaqiramiz
-        ->whereDate('created_at', $request->date ?? Carbon::today()->toDateString())
+        $date = $request->date ?? Carbon::today()->toDateString();
+
+        // 1. Daromad (ishlab chiqarish asosida)
+        $dailyOutput = SewingOutputs::with('orderSubmodel.orderModel.order')
+            ->whereDate('created_at', $date)
             ->whereHas('orderSubmodel.orderModel.order', function ($query) {
                 $query->where('branch_id', auth()->user()->employee->branch_id);
             })
@@ -41,7 +44,39 @@ class CasherController extends Controller
             })
             ->values();
 
-        return response()->json($dailyOutput);
+        $totalEarned = $dailyOutput->sum('total_cost');
+
+        // 2. Harajatlar:
+        $bonusCost = DB::table('bonuses')
+            ->whereDate('created_at', $date)
+            ->sum('amount');
+
+        $attendanceSalaryCost = DB::table('attendance_salary')
+            ->whereDate('date', $date)
+            ->sum('amount');
+
+        $employeeTarificationCost = DB::table('employee_tarification_logs')
+            ->whereDate('date', $date)
+            ->sum('amount_earned');
+
+        $transportCost = DB::table('transport_attendance')
+            ->whereDate('date', $date)
+            ->sum(DB::raw('salary + fuel_bonus'));
+
+        $totalFixedCost = $bonusCost + $attendanceSalaryCost + $employeeTarificationCost + $transportCost;
+
+        return response()->json([
+            'orders' => $dailyOutput,
+            'fixed_costs' => [
+                'bonuses' => $bonusCost,
+                'attendance_salary' => $attendanceSalaryCost,
+                'employee_tarification_logs' => $employeeTarificationCost,
+                'transport_attendance' => $transportCost,
+            ],
+            'total_fixed_cost' => $totalFixedCost,
+            'total_earned' => $totalEarned,
+            'net_profit' => $totalEarned - $totalFixedCost,
+        ]);
     }
 
     public function exportGroupsByDepartmentIdPdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
