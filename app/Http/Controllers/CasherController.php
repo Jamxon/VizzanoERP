@@ -131,6 +131,7 @@ class CasherController extends Controller
         // Har bir orderdan tashqari umumiy xarajatlar qo‘shiladi
         $totalEarned = $dailyOutput->sum('total_output_cost_uzs');
         $totalFixedCost = $dailyOutput->sum('total_fixed_cost_uzs') + $transport + $dailyExpense;
+        $thisBranchEmployeeIds = Employee::where('branch_id', auth()->user()->employee->branch_id);
 
         return response()->json([
             'date' => $date,
@@ -146,7 +147,7 @@ class CasherController extends Controller
                 ->sum('amount'),
             'aup' => DB::table('attendance_salary')
                 ->whereDate('date', $date)
-                ->whereIn('employee_id', $relatedEmployeeIds)
+                ->whereIn('employee_id', $thisBranchEmployeeIds,)
                 ->sum('amount'),
             'tarification' => DB::table('employee_tarification_logs')
                 ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
