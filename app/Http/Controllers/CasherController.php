@@ -204,11 +204,7 @@ class CasherController extends Controller
             'month' => 'nullable|date_format:Y-m',
         ]);
 
-        $expense->update([
-            'type' => $validated['type'] ?? $expense->type,
-            'amount' => $validated['amount'] ?? $expense->amount,
-            'month' => $validated['month'] . '-01' ?? $expense->month,
-        ]);
+        $expense->update($validated);
 
         return response()->json(['message' => 'Updated', 'data' => $expense]);
     }
