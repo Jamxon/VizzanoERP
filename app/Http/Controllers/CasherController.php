@@ -73,7 +73,7 @@ class CasherController extends Controller
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
 
-                $rasxod = $orderModel->rasxod ?? 0;
+                $rasxod = $orderModel->rasxod * $totalQuantity ?? 0;
 
                 $bonus = DB::table('bonuses')
                     ->whereDate('created_at', $date)
@@ -123,7 +123,7 @@ class CasherController extends Controller
                     'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
 
 
-                    'rasxod_limit_uzs' => $rasxod * $totalQuantity,
+                    'rasxod_limit_uzs' => $rasxod,
                 ];
             })
             ->values();
