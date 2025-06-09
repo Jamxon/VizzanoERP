@@ -41,7 +41,7 @@ class CasherController extends Controller
             ->sum(DB::raw('salary + fuel_bonus'));
 
         $monthlyExpense = DB::table('monthly_expenses')
-            ->whereDate('date', $date)
+            ->whereMonth('month', $date)
             ->sum('amount');
 
         $dailyOutput = SewingOutputs::with([
