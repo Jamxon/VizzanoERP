@@ -19,10 +19,10 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class CasherController extends Controller
 {
-    public function getDailyCost()
+    public function getDailyCost(Request $request)
     {
         $dailyOutput = SewingOutputs::with('orderSubmodel.orderModel.order') // orderni chaqiramiz
-        ->whereDate('created_at', date('Y-m-d'))
+        ->whereDate('created_at', $request->date ?? Carbon::today()->toDateString())
             ->whereHas('orderSubmodel.orderModel.order', function ($query) {
                 $query->where('branch_id', auth()->user()->employee->branch_id);
             })
