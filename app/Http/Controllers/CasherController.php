@@ -163,7 +163,12 @@ class CasherController extends Controller
             ->get();
 
         if ($expenses->isEmpty()) {
-            return response()->json(['message' => 'No expenses found for this month.'], 404);
+            return response()->json(
+                [
+                    'month' => $month,
+                'expenses' => []
+                ],
+            );
         }
 
         return response()->json([
