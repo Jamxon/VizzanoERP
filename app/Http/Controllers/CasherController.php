@@ -38,7 +38,7 @@ class CasherController extends Controller
         // TRANSPORT va MONTHLY EXPENSE — orderga bog'lanmagan umumiy
         $transport = DB::table('transport_attendance')
             ->whereDate('date', $date)
-            ->sum(DB::raw('salary + fuel_bonus'));
+            ->sum(DB::raw('(salary + fuel_bonus) * attendance_type'));
 
         $monthlyExpense = DB::table('monthly_expenses')
             ->whereMonth('month', Carbon::parse($date)->month)
