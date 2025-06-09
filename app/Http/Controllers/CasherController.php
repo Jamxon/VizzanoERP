@@ -78,9 +78,9 @@ class CasherController extends Controller
                 $tarification = DB::table('employee_tarification_logs')
                     ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
                     ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
-                    ->join('submodel', 'tarification_categories.submodel_id', '=', 'submodel.id')
-                    ->join('order_model', 'submodel.order_model_id', '=', 'order_model.id')
-                    ->join('orders', 'order_model.order_id', '=', 'orders.id')
+                    ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+                    ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+                    ->join('orders', 'order_models.order_id', '=', 'orders.id')
                     ->whereDate('employee_tarification_logs.date', $date)
                     ->where('orders.id', $orderId)
                     ->sum('employee_tarification_logs.amount_earned');
