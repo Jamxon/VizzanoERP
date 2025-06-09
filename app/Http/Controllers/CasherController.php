@@ -198,6 +198,7 @@ class CasherController extends Controller
 
     public function editMonthlyExpense(MonthlyExpense $expense, Request $request): \Illuminate\Http\JsonResponse
     {
+        dd($expense);
         $validated = $request->validate([
             'type' => 'nullable|string',
             'amount' => 'nullable|numeric|min:0',
