@@ -8,6 +8,7 @@ use App\Models\Group;
 use App\Models\CashboxBalance;
 use App\Models\CashboxTransaction;
 use App\Models\Currency;
+use App\Models\MonthlyExpense;
 use App\Models\SalaryPayment;
 use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class CasherController extends Controller
 {
-    public function getDailyCost(Request $request)
+    public function getDailyCost(Request $request): \Illuminate\Http\JsonResponse
     {
         $date = $request->date ?? Carbon::today()->toDateString();
 
@@ -63,9 +64,25 @@ class CasherController extends Controller
             ->whereDate('date', $date)
             ->sum(DB::raw('salary + fuel_bonus'));
 
-        $totalFixedCost = $bonusCost + $attendanceSalaryCost + $employeeTarificationCost + $transportCost;
+        // 3. Oylik umumiy xarajatlar
+        $monthlyExpenses = MonthlyExpense::whereYear('month', Carbon::parse($date)->year)
+            ->whereMonth('month', Carbon::parse($date)->month)
+            ->get();
+
+        $dailyExtraCosts = [];
+        $totalDailyExtra = 0;
+
+        foreach ($monthlyExpenses as $expense) {
+            $dailyPortion = round($expense->amount / 30, 2);
+            $dailyExtraCosts[$expense->type] = $dailyPortion;
+            $totalDailyExtra += $dailyPortion;
+        }
+
+        // 4. Umumiy xarajatlar va foyda
+        $totalFixedCost = $bonusCost + $attendanceSalaryCost + $employeeTarificationCost + $transportCost + $totalDailyExtra;
 
         return response()->json([
+            'date' => $date,
             'orders' => $dailyOutput,
             'fixed_costs' => [
                 'bonuses' => $bonusCost,
@@ -73,11 +90,30 @@ class CasherController extends Controller
                 'employee_tarification_logs' => $employeeTarificationCost,
                 'transport_attendance' => $transportCost,
             ],
+            'monthly_extra_costs' => $dailyExtraCosts,
             'total_fixed_cost' => $totalFixedCost,
             'total_earned' => $totalEarned,
             'net_profit' => $totalEarned - $totalFixedCost,
         ]);
     }
+
+    public function storeMonthlyExpense(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'type' => 'required|string',
+            'amount' => 'required|numeric|min:0',
+            'month' => 'required|date_format:Y-m',
+        ]);
+
+        $expense = MonthlyExpense::create([
+            'type' => $validated['type'],
+            'amount' => $validated['amount'],
+            'month' => $validated['month'] . '-01',
+        ]);
+
+        return response()->json(['message' => 'Saved', 'data' => $expense]);
+    }
+
 
     public function exportGroupsByDepartmentIdPdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
