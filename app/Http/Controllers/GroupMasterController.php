@@ -366,8 +366,6 @@ class GroupMasterController extends Controller
             );
         }
 
-        // Bonus hisoblash (group 'fixed_tailored_bonus_group' xodimlar uchun)
-        if ($sewingOutput->group_id) {
             $groupEmployees = Employee::where('payment_type', 'fixed_tailored_bonus_group')
                 ->where('status', '!=', 'kicked')
                 ->where('group_id', $sewingOutput->group_id)
@@ -407,7 +405,7 @@ class GroupMasterController extends Controller
                     $employee->balance
                 );
             }
-        }
+
 
         // Umumiy log yozish
         $time = Time::find($validatedData['time_id']);
