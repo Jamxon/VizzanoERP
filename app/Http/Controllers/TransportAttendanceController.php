@@ -185,6 +185,11 @@ class TransportAttendanceController extends Controller
             $salary = $request->has('salary') ? $request->salary : $transport->salary;
             $fuelBonus = $request->has('fuel_bonus') ? $request->fuel_bonus : $transport->fuel_bonus;
 
+            if ($request->attendance_type == 0) {
+                $salary = 0;
+                $fuelBonus = 0;
+            }
+
             $oldSalary = $attendance->salary ?? 0;
             $oldFuelBonus = $attendance->fuel_bonus ?? 0;
             $oldAttendanceType = $attendance->attendance_type ?? 0;
