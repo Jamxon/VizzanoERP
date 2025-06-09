@@ -199,15 +199,15 @@ class CasherController extends Controller
     public function editMonthlyExpense(MonthlyExpense $expense, Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'type' => 'required|string',
-            'amount' => 'required|numeric|min:0',
-            'month' => 'required|date_format:Y-m',
+            'type' => 'nullable|string',
+            'amount' => 'nullable|numeric|min:0',
+            'month' => 'nullable|date_format:Y-m',
         ]);
 
         $expense->update([
-            'type' => $validated['type'],
-            'amount' => $validated['amount'],
-            'month' => $validated['month'] . '-01',
+            'type' => $validated['type'] ?? $expense->type,
+            'amount' => $validated['amount'] ?? $expense->amount,
+            'month' => $validated['month'] . '-01' ?? $expense->month,
         ]);
 
         return response()->json(['message' => 'Updated', 'data' => $expense]);
