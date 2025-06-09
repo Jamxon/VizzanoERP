@@ -73,6 +73,8 @@ class CasherController extends Controller
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
 
+                $rasxod = $orderModel->rasxod ?? 0;
+
                 $bonus = DB::table('bonuses')
                     ->whereDate('created_at', $date)
                     ->where('order_id', $orderId)
@@ -119,6 +121,9 @@ class CasherController extends Controller
 
                     // Foyda = tushum - xarajatlar
                     'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
+
+
+                    'rasxod_limit_uzs' => $rasxod,
                 ];
             })
             ->values();
