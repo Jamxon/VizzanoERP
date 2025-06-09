@@ -86,6 +86,11 @@ class TransportAttendanceController extends Controller
             $salary = $request->has('salary') ? $request->salary : $transport->salary;
             $fuelBonus = $request->has('fuel_bonus') ? $request->fuel_bonus : $transport->fuel_bonus;
 
+            if ($request->attendance_type == 0) {
+                $salary = 0;
+                $fuelBonus = 0;
+            }
+
             $attendance = TransportAttendance::create([
                 'transport_id' => $transport->id,
                 'date' => $date->toDateString(),
@@ -283,6 +288,11 @@ class TransportAttendanceController extends Controller
                 $salary = $transport->salary;
                 $fuelBonus = $transport->fuel_bonus;
 
+                if ($request->attendance_type == 0) {
+                    $salary = 0;
+                    $fuelBonus = 0;
+                }
+
                 // Agar mavjud bo‘lsa, eski yozuvni o‘chir
                 $existing = TransportAttendance::where('transport_id', $transportId)
                     ->whereDate('date', $date->toDateString())
@@ -384,6 +394,11 @@ class TransportAttendanceController extends Controller
 
                 $salary = $request->salary ?? $transport->salary;
                 $fuelBonus = $request->fuel_bonus ?? $transport->fuel_bonus;
+
+                if ($request->attendance_type == 0) {
+                    $salary = 0;
+                    $fuelBonus = 0;
+                }
 
                 $increment = ($salary + $fuelBonus) * $request->attendance_type;
 
