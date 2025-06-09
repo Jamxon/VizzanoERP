@@ -91,17 +91,25 @@ class CasherController extends Controller
                     'order' => $order,
                     'model' => $orderModel->model ?? null,
                     'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
+
                     'price_usd' => $priceUSD,
                     'price_uzs' => $priceUZS,
                     'total_quantity' => $totalQuantity,
-                    'total_cost_uzs' => $priceUSD * $totalQuantity * $dollarRate,
 
+                    // Bu ishlab chiqarish qiymati: qancha tikilgan * narxi
+                    'total_output_cost_uzs' => $priceUSD * $totalQuantity * $dollarRate,
+
+                    // Bu xarajatlar bo‘yicha breakdown
                     'costs_uzs' => [
                         'bonuses' => $bonus,
                         'attendance_salary' => $attendanceSalary,
                         'employee_tarification_logs' => $tarification,
                     ],
-                    'total_cost_uzs' => $totalFixedCost,
+
+                    // Bu esa umumiy xarajatlar yig'indisi
+                    'total_fixed_cost_uzs' => $totalFixedCost,
+
+                    // Foyda = tushum - xarajatlar
                     'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
                 ];
             })
