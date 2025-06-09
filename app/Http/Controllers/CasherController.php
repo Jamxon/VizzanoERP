@@ -123,7 +123,7 @@ class CasherController extends Controller
                     'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
 
 
-                    'rasxod_limit_uzs' => $rasxod,
+                    'rasxod_limit_uzs' => $rasxod * $totalQuantity,
                 ];
             })
             ->values();
