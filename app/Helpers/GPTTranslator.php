@@ -11,7 +11,6 @@ class GPTTranslator
     public static function translate($text, $from = 'ru', $to = 'uz')
     {
         $apiKey = config('services.openai.key');
-        dd($apiKey);
         $prompt = "Translate this from $from to $to: \"$text\"";
 
         try {
