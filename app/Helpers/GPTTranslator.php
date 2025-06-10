@@ -20,6 +20,8 @@ class GPTTranslator
                 'temperature' => 0.2,
             ]);
 
+            dd($response);
+
             return $response->json('choices.0.message.content') ?? $text;
     }
 }
