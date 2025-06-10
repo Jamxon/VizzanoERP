@@ -135,7 +135,7 @@ class CasherController extends Controller
             })->values();
 
         $totalEarned = $orders->sum('total_output_cost_uzs');
-        $totalFixedCost = $orders->sum('total_fixed_cost_uzs') + $transport + $dailyExpense + $aup;
+        $totalFixedCost = $totalEarned - $orders->sum('net_profit_uzs');
 
         return response()->json([
             'date' => $date,
