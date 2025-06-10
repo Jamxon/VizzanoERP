@@ -42,7 +42,7 @@ class VizzanoReportTvController extends Controller
         }
 
         $sewingOutputs = $query
-            ->select('order_submodel_id')
+            ->select('order_submodel_id', 'mode')
             ->selectRaw("SUM(CASE WHEN DATE(created_at) = '{$today}' THEN quantity ELSE 0 END) as today_quantity")
             ->groupBy('order_submodel_id')
             ->with([
@@ -106,7 +106,7 @@ class VizzanoReportTvController extends Controller
                     'today_quantity' => $output->today_quantity,
                     'employee_count' => $employeeCount,
                     'today_plan' => $today_plan,
-                    'mode' => $output->mode
+                    'mode' => $output->mode,
                 ];
             }),
             'motivations' => $motivations,
