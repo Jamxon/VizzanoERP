@@ -1041,9 +1041,9 @@ class TechnologController extends Controller
         }
     }
 
-    public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
+    public function importTarifications(Request $request)
     {
-        dd(GPTTranslator::translate('Привет, как дела?', 'ru', 'uz'));
+        return GPTTranslator::translate('Привет, как дела?', 'ru', 'uz');
 
         ini_set('memory_limit', '512M');
 
