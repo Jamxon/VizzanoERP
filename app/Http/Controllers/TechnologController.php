@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\SpecificationCategoryExport;
 use App\Exports\TarificationCategoryExport;
+use App\Helpers\GPTTranslator;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\Order;
