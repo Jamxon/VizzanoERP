@@ -106,6 +106,7 @@ class VizzanoReportTvController extends Controller
                     'today_quantity' => $output->today_quantity,
                     'employee_count' => $employeeCount,
                     'today_plan' => $today_plan,
+                    'mode' => $output->mode
                 ];
             }),
             'motivations' => $motivations,
