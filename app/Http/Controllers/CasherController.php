@@ -21,25 +21,25 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class CasherController extends Controller
 {
 
-    public function getDailyCost(Request $request)
+    public function getDailyCost(Request $request): \Illuminate\Http\JsonResponse
     {
         $date = $request->date ?? Carbon::today()->toDateString();
         $dollarRate = $request->dollar_rate ?? 12900;
-
         $branchId = auth()->user()->employee->branch_id;
 
-        // Ushbu kundagi barcha ishchilarni aniqlash
+        // Ushbu kunga tegishli ishchilarning IDlari
         $relatedEmployeeIds = DB::table('employee_tarification_logs')
             ->whereDate('date', $date)
             ->pluck('employee_id')
             ->unique()
             ->values();
 
-        // TRANSPORT va MONTHLY EXPENSE — orderga bog'lanmagan umumiy
+        // Transport xarajatlari
         $transport = DB::table('transport_attendance')
             ->whereDate('date', $date)
             ->sum(DB::raw('(salary + fuel_bonus) * attendance_type'));
 
+        // Oylik doimiy xarajat (kunlikka bo‘linadi)
         $monthlyExpense = DB::table('monthly_expenses')
             ->whereMonth('month', Carbon::parse($date)->month)
             ->whereYear('month', Carbon::parse($date)->year)
@@ -47,11 +47,9 @@ class CasherController extends Controller
 
         $carbonDate = Carbon::parse($date);
         $daysInMonth = $carbonDate->daysInMonth;
-
-// Kunlik xarajat
         $dailyExpense = $monthlyExpense / $daysInMonth;
 
-
+        // Har bir buyurtma bo‘yicha ishlab chiqarish va xarajatlar
         $dailyOutput = SewingOutputs::with([
             'orderSubmodel.orderModel.order',
             'orderSubmodel.orderModel.model',
@@ -72,19 +70,21 @@ class CasherController extends Controller
                 $totalQuantity = $items->sum('quantity');
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
-
                 $rasxod = $orderModel->rasxod * $totalQuantity ?? 0;
 
+                // Bonuslar
                 $bonus = DB::table('bonuses')
                     ->whereDate('created_at', $date)
                     ->where('order_id', $orderId)
                     ->sum('amount');
 
+                // AUP (attendance salary)
                 $attendanceSalary = DB::table('attendance_salary')
                     ->whereDate('date', $date)
                     ->whereIn('employee_id', $relatedEmployeeIds)
                     ->sum('amount');
 
+                // Tarifikatsiya (ish haqi)
                 $tarification = DB::table('employee_tarification_logs')
                     ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
                     ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
@@ -101,37 +101,33 @@ class CasherController extends Controller
                     'order' => $order,
                     'model' => $orderModel->model ?? null,
                     'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
-
                     'price_usd' => $priceUSD,
                     'price_uzs' => $priceUZS,
                     'total_quantity' => $totalQuantity,
-
-                    // Bu ishlab chiqarish qiymati: qancha tikilgan * narxi
                     'total_output_cost_uzs' => $priceUSD * $totalQuantity * $dollarRate,
-
-                    // Bu xarajatlar bo‘yicha breakdown
                     'costs_uzs' => [
                         'bonuses' => $bonus,
                         'attendance_salary' => $attendanceSalary,
                         'employee_tarification_logs' => $tarification,
                     ],
-
-                    // Bu esa umumiy xarajatlar yig'indisi
                     'total_fixed_cost_uzs' => $totalFixedCost,
-
-                    // Foyda = tushum - xarajatlar
                     'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
-
-
                     'rasxod_limit_uzs' => $rasxod,
-                ];
-            })
-            ->values();
 
-        // Har bir orderdan tashqari umumiy xarajatlar qo‘shiladi
+                    'cost_per_unit_uzs' => $totalQuantity > 0 ? round($totalFixedCost / $totalQuantity) : 0,
+                    'profit_per_unit_uzs' => $totalQuantity > 0 ? round((($priceUSD * $dollarRate) - ($totalFixedCost / $totalQuantity))) : 0,
+                    'profitability_percent' => $totalFixedCost > 0
+                        ? round((($priceUSD * $totalQuantity * $dollarRate - $totalFixedCost) / $totalFixedCost) * 100, 2)
+                        : null,
+                ];
+            })->values();
+
+        // Umumiy statistika
         $totalEarned = $dailyOutput->sum('total_output_cost_uzs');
         $totalFixedCost = $dailyOutput->sum('total_fixed_cost_uzs') + $transport + $dailyExpense;
-        $thisBranchEmployeeIds = Employee::where('branch_id', auth()->user()->employee->branch_id)->pluck('id')->toArray();
+        $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id')->toArray();
+        $totalQuantityAllOrders = $dailyOutput->sum('total_quantity');
+
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
@@ -146,7 +142,7 @@ class CasherController extends Controller
                 ->sum('amount'),
             'aup' => DB::table('attendance_salary')
                 ->whereDate('date', $date)
-                ->whereIn('employee_id', $thisBranchEmployeeIds,)
+                ->whereIn('employee_id', $thisBranchEmployeeIds)
                 ->sum('amount'),
             'tarification' => DB::table('employee_tarification_logs')
                 ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
