@@ -332,31 +332,32 @@ class GroupMasterController extends Controller
 
         $total_bonus_logs = [];
 
-        foreach ($employees as $employee) {
-            $bonusAmount = $employee->bonus * $minutes * $newQuantity;
-            $oldBalance = $employee->balance;
-            $employee->balance += $bonusAmount;
-            $employee->save();
+        if ($validatedData['mode'] !== 'example') {
+            foreach ($employees as $employee) {
+                $bonusAmount = $employee->bonus * $minutes * $newQuantity;
+                $oldBalance = $employee->balance;
+                $employee->balance += $bonusAmount;
+                $employee->save();
 
-            $total_bonus_logs[] = [
-                'employee_id' => $employee->id,
-                'old_balance' => $oldBalance,
-                'new_balance' => $employee->balance,
-                'bonus_added' => $bonusAmount,
-                'type' => 'individual',
-            ];
+                $total_bonus_logs[] = [
+                    'employee_id' => $employee->id,
+                    'old_balance' => $oldBalance,
+                    'new_balance' => $employee->balance,
+                    'bonus_added' => $bonusAmount,
+                    'type' => 'individual',
+                ];
 
-            Bonus::create([
-                'employee_id' => $employee->id,
-                'order_id' => $order->id,
-                'type' => 'individual',
-                'amount' => $bonusAmount,
-                'quantity' => $newQuantity,
-                'old_balance' => $oldBalance,
-                'new_balance' => $employee->balance,
-                'created_by' => auth()->id(),
-            ]);
-
+                Bonus::create([
+                    'employee_id' => $employee->id,
+                    'order_id' => $order->id,
+                    'type' => 'individual',
+                    'amount' => $bonusAmount,
+                    'quantity' => $newQuantity,
+                    'old_balance' => $oldBalance,
+                    'new_balance' => $employee->balance,
+                    'created_by' => auth()->id(),
+                ]);
+        }
 
             Log::add(
                 auth()->id(),
