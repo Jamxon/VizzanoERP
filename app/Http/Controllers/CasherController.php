@@ -97,8 +97,9 @@ class CasherController extends Controller
                 ->sum('employee_tarification_logs.amount_earned');
 
             $fixedCost = $bonus + $remainder + $tarification;
+            $fixedCost1 = ($bonus + $remainder + $tarification) / $totalQty;
             $totalExtra = $transport + $dailyExpense + $aup;
-            $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
+            $perUnitCost = $totalQty > 0 ? ($fixedCost1 + $totalExtra) / $totalQty : 0;
             $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
 
             return [
