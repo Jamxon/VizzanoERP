@@ -165,19 +165,6 @@ class InternalAccountantController extends Controller
         $plans = [];
         $employeeTarifications = [];
         $date = now()->format('d-m-Y');
-        // Har bir tarification uchun taxminiy 25 pt (ya'ni 9mm) ajratamiz
-        $pointsPerTarification = 50;
-
-        $maxTarifications = max(array_map(function($plan) {
-            return count($plan['tarifications']);
-        }, $plans));
-
-// Minimal height 200mm (~567pt), lekin kerak bo‘lsa oshadi
-        $baseHeight = 566.93; // 200mm in pt
-        $additionalHeight = ($maxTarifications > 5) ? ($maxTarifications - 5) * $pointsPerTarification : 0;
-
-        $finalHeight = $baseHeight + $additionalHeight;
-
 
         // Tarifikatsiya ma'lumotlarini bitta tsiklda to'plash
         foreach ($submodel->tarificationCategories as $category) {
@@ -309,10 +296,21 @@ class InternalAccountantController extends Controller
             ];
         }
 
-        // PDF yaratish va yuklash
+        $counts = array_map(fn($p) => count($p['tarifications']), $plans);
+
+        $maxCount = count($counts) > 0 ? max($counts) : 0;
+
+// heightni hisoblash (masalan har bir tarification uchun 15mm desak)
+        $heightPerTarification = 15; // mm
+        $pageHeight = 80 + ($maxCount * $heightPerTarification); // mm
+
+// Convert mm to points (1 mm ≈ 2.83465 points)
+        $pageHeightPoints = $pageHeight * 2.83465;
+
+// PDF hosil qilish
         $pdf = Pdf::loadView('pdf.daily-plan', [
             'plans' => $plans
-        ])->setPaper([0, 0, 226.77, $finalHeight], 'portrait');
+        ])->setPaper([0, 0, 226.77, $pageHeightPoints], 'portrait'); // width: 80mm
 
         Log::add(
             auth()->id(),
