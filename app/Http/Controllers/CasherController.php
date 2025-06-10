@@ -49,6 +49,13 @@ class CasherController extends Controller
         $daysInMonth = $carbonDate->daysInMonth;
         $dailyExpense = $monthlyExpense / $daysInMonth;
 
+        $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id')->toArray();
+
+        $aup = DB::table('attendance_salary')
+            ->whereDate('date', $date)
+            ->whereIn('employee_id', $thisBranchEmployeeIds)
+            ->sum('amount');
+
         // Har bir buyurtma bo‘yicha ishlab chiqarish va xarajatlar
         $dailyOutput = SewingOutputs::with([
             'orderSubmodel.orderModel.order',
@@ -61,7 +68,7 @@ class CasherController extends Controller
             })
             ->get()
             ->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id)
-            ->map(function ($items) use ($dollarRate, $date, $relatedEmployeeIds) {
+            ->map(function ($items) use ($dollarRate, $date, $relatedEmployeeIds, $dailyExpense, $transport, $aup) {
                 $first = $items->first();
                 $orderModel = optional($first->orderSubmodel)->orderModel;
                 $order = optional($orderModel)->order;
@@ -97,6 +104,9 @@ class CasherController extends Controller
 
                 $totalFixedCost = $bonus + $rasxod;
 
+                $extraCostPerUnit = $totalQuantity > 0 ? ($transport + $dailyExpense + $aup) / $totalQuantity : 0;
+                $totalFixedCostWithExtra = $totalFixedCost + $transport + $dailyExpense + $aup;
+
                 return [
                     'order' => $order,
                     'model' => $orderModel->model ?? null,
@@ -114,10 +124,10 @@ class CasherController extends Controller
                     'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
                     'rasxod_limit_uzs' => $rasxod,
 
-                    'cost_per_unit_uzs' => $totalQuantity > 0 ? round($totalFixedCost / $totalQuantity) : 0,
-                    'profit_per_unit_uzs' => $totalQuantity > 0 ? round((($priceUSD * $dollarRate) - ($totalFixedCost / $totalQuantity))) : 0,
-                    'profitability_percent' => $totalFixedCost > 0
-                        ? round((($priceUSD * $totalQuantity * $dollarRate - $totalFixedCost) / $totalFixedCost) * 100, 2)
+                    'cost_per_unit_uzs' => $totalQuantity > 0 ? round($totalFixedCostWithExtra / $totalQuantity) : 0,
+                    'profit_per_unit_uzs' => $totalQuantity > 0 ? round((($priceUSD * $dollarRate) - ($totalFixedCostWithExtra / $totalQuantity))) : 0,
+                    'profitability_percent' => $totalFixedCostWithExtra > 0
+                        ? round((($priceUSD * $totalQuantity * $dollarRate - $totalFixedCostWithExtra) / $totalFixedCostWithExtra) * 100, 2)
                         : null,
                 ];
             })->values();
@@ -125,13 +135,7 @@ class CasherController extends Controller
         // Umumiy statistika
         $totalEarned = $dailyOutput->sum('total_output_cost_uzs');
         $totalFixedCost = $dailyOutput->sum('total_fixed_cost_uzs') + $transport + $dailyExpense;
-        $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id')->toArray();
-        $totalQuantityAllOrders = $dailyOutput->sum('total_quantity');
 
-        $aup = DB::table('attendance_salary')
-        ->whereDate('date', $date)
-        ->whereIn('employee_id', $thisBranchEmployeeIds)
-        ->sum('amount');
 
         return response()->json([
             'date' => $date,
