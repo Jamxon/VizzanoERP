@@ -8,7 +8,6 @@ class GPTTranslator
 {
     public static function translate($text, $from = 'ru', $to = 'uz')
     {
-        try {
             $apiKey = env('OPENAI_API_KEY');
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $apiKey,
@@ -22,9 +21,5 @@ class GPTTranslator
             ]);
 
             return $response->json('choices.0.message.content') ?? $text;
-
-        } catch (\Exception $e) {
-            return $text;
-        }
     }
 }
