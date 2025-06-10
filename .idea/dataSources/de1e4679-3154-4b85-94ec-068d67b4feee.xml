@@ -10989,9 +10989,10 @@ tokenable_id</ColNames>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="1111" parent="423" name="model">
+    <column id="1111" parent="423" name="mode">
+      <DefaultExpression>&apos;production&apos;::character varying</DefaultExpression>
       <Position>8</Position>
-      <StateNumber>311874</StateNumber>
+      <StateNumber>311892</StateNumber>
       <StoredType>varchar|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
