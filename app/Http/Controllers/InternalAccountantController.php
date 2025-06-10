@@ -147,11 +147,7 @@ class InternalAccountantController extends Controller
 
         $submodel = OrderSubmodel::with([
             'tarificationCategories' => function ($query) use ($region) {
-                $query->whereHas('employee', function ($q) use ($region) {
-                    if ($region) {
-                        $q->where('region', $region);
-                    }
-                });
+                $query->where('region', $region);
             },
             'tarificationCategories.tarifications.employee:id,name'
         ])->findOrFail($request->submodel_id);
