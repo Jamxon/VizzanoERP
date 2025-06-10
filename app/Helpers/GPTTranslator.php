@@ -24,9 +24,11 @@ class GPTTranslator
                 ],
                 'temperature' => 0.2,
             ]);
+            dd( $result = $response->json());
+
 
             if ($response->successful()) {
-               dd( $result = $response->json());
+                $result = $response->json();
                 Log::add(
                     auth()->id(),
                     'GPT translation',
