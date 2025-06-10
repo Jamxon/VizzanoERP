@@ -1147,6 +1147,14 @@ class TechnologController extends Controller
                     $razryad = Razryad::where('name', $razryadName)->first();
                     $razryadId = $razryad?->id;
 
+                    if (!$razryad) {
+                        DB::rollBack();
+                        return response()->json([
+                            'message' => "Razryad topilmadi: '{$razryadName}' satrda: {$rowNum}",
+                        ], 422);
+                    }
+
+
                     $costs = $seconds * ($razryad?->salary ?? 0);
 
                     Tarification::create([
