@@ -1145,7 +1145,6 @@ class TechnologController extends Controller
 
                     $razryadName = $row['D'] ?? '1';
                     $razryad = Razryad::where('name', $razryadName)->first();
-                    $razryadId = $razryad?->id;
 
                     if (!$razryad) {
                         DB::rollBack();
@@ -1154,6 +1153,7 @@ class TechnologController extends Controller
                         ], 422);
                     }
 
+                    $razryadId = $razryad?->id;
 
                     $costs = $seconds * ($razryad?->salary ?? 0);
 
