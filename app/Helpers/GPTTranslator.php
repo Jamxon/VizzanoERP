@@ -11,7 +11,7 @@ class GPTTranslator
     public static function translate($text, $from = 'ru', $to = 'uz')
     {
         $apiKey = config('services.openai.key');
-        $prompt = "Translate this from $from to $to: \"$text\"";
+        $prompt = "Please translate the following text from Russian to Uzbek:\n\"$text\"\nOnly return the translated text without explanation.";
 
         try {
             $response = Http::withHeaders([
@@ -26,7 +26,7 @@ class GPTTranslator
             ]);
 
             if ($response->successful()) {
-                $result = $response->json('choices.0.message.content');
+               dd( $result = $response->json());
                 Log::add(
                     auth()->id(),
                     'GPT translation',
