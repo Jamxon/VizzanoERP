@@ -69,59 +69,70 @@ class CasherController extends Controller
             ->get();
 
         $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);
+        $totalOutputQty = $outputs->sum('quantity');
+        $orders = $grouped->map(function ($items) use (
+                $dollarRate, $date, $relatedEmployeeIds,
+                $dailyExpense, $transport, $aup, $totalOutputQty
+            ) {
+                $first = $items->first();
+                $orderModel = optional($first->orderSubmodel)->orderModel;
+                $order = optional($orderModel)->order;
+                $orderId = $order->id ?? null;
 
-        $orders = $grouped->map(function ($items) use ($dollarRate, $date, $relatedEmployeeIds, $dailyExpense, $transport, $aup) {
-            $first = $items->first();
-            $orderModel = optional($first->orderSubmodel)->orderModel;
-            $order = optional($orderModel)->order;
-            $orderId = $order->id ?? null;
+                $totalQty = $items->sum('quantity');
+                $priceUSD = $order->price ?? 0;
+                $priceUZS = $priceUSD * $dollarRate;
+                $remainder = ($orderModel->rasxod ?? 0) * $totalQty;
 
-            $totalQty = $items->sum('quantity');
-            $priceUSD = $order->price ?? 0;
-            $priceUZS = $priceUSD * $dollarRate;
-            $remainder = ($orderModel->rasxod ?? 0) * $totalQty;
+                $bonus = DB::table('bonuses')
+                    ->whereDate('created_at', $date)
+                    ->where('order_id', $orderId)
+                    ->sum('amount');
 
-            $bonus = DB::table('bonuses')
-                ->whereDate('created_at', $date)
-                ->where('order_id', $orderId)
-                ->sum('amount');
+                $tarification = DB::table('employee_tarification_logs')
+                    ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+                    ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+                    ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+                    ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+                    ->join('orders', 'order_models.order_id', '=', 'orders.id')
+                    ->whereDate('employee_tarification_logs.date', $date)
+                    ->where('orders.id', $orderId)
+                    ->sum('employee_tarification_logs.amount_earned');
 
-            $tarification = DB::table('employee_tarification_logs')
-                ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
-                ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
-                ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
-                ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
-                ->join('orders', 'order_models.order_id', '=', 'orders.id')
-                ->whereDate('employee_tarification_logs.date', $date)
-                ->where('orders.id', $orderId)
-                ->sum('employee_tarification_logs.amount_earned');
+                $fixedCost = $bonus + $remainder + $tarification;
 
-            $fixedCost = $bonus + $remainder + $tarification;
-            $totalExtra = $transport + $dailyExpense + $aup;
-            $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
-            $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
+                $orderShareRatio = $totalOutputQty > 0 ? $totalQty / $totalOutputQty : 0;
 
-            return [
-                'order' => $order,
-                'model' => $orderModel->model ?? null,
-                'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
-                'price_usd' => $priceUSD,
-                'price_uzs' => $priceUZS,
-                'total_quantity' => $totalQty,
-                'rasxod_limit_uzs' => $remainder,
-                'bonus' => $bonus,
-                'tarification' => $tarification,
-                'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
-                'costs_uzs' => compact('bonus', 'tarification', 'remainder'),
-                'total_fixed_cost_uzs' => $fixedCost,
-                'net_profit_uzs' => $profitUZS,
-                'cost_per_unit_uzs' => round($perUnitCost),
-                'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
-                'profitability_percent' => ($fixedCost + $totalExtra) > 0
-                    ? round(($profitUZS / ($fixedCost + $totalExtra)) * 100, 2)
-                    : null,
-            ];
-        })->values();
+                $allocatedTransport = $transport * $orderShareRatio;
+                $allocatedAup = $aup * $orderShareRatio;
+                $allocatedDailyExpense = $dailyExpense * $orderShareRatio;
+
+                $totalExtra = $allocatedTransport + $allocatedAup + $allocatedDailyExpense;
+
+                $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
+                $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
+
+                return [
+                    'order' => $order,
+                    'model' => $orderModel->model ?? null,
+                    'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
+                    'price_usd' => $priceUSD,
+                    'price_uzs' => $priceUZS,
+                    'total_quantity' => $totalQty,
+                    'rasxod_limit_uzs' => $remainder,
+                    'bonus' => $bonus,
+                    'tarification' => $tarification,
+                    'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
+                    'costs_uzs' => compact('bonus', 'tarification', 'remainder', 'allocatedTransport', 'allocatedAup', 'allocatedDailyExpense'),
+                    'total_fixed_cost_uzs' => $fixedCost + $totalExtra,
+                    'net_profit_uzs' => $profitUZS,
+                    'cost_per_unit_uzs' => round($perUnitCost),
+                    'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
+                    'profitability_percent' => ($fixedCost + $totalExtra) > 0
+                        ? round(($profitUZS / ($fixedCost + $totalExtra)) * 100, 2)
+                        : null,
+                ];
+            })->values();
 
         $totalEarned = $orders->sum('total_output_cost_uzs');
         $totalFixedCost = $orders->sum('total_fixed_cost_uzs') + $transport + $dailyExpense + $aup;
