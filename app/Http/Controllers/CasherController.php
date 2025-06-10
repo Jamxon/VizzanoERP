@@ -109,6 +109,8 @@ class CasherController extends Controller
                 'price_uzs' => $priceUZS,
                 'total_quantity' => $totalQty,
                 'rasxod_limit_uzs' => $remainder,
+                'bonus' => $bonus,
+                'tarification' => $tarification,
                 'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
                 'costs_uzs' => compact('bonus', 'tarification', 'remainder'),
                 'total_fixed_cost_uzs' => $fixedCost,
