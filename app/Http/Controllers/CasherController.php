@@ -27,132 +27,113 @@ class CasherController extends Controller
         $dollarRate = $request->dollar_rate ?? 12900;
         $branchId = auth()->user()->employee->branch_id;
 
-        // Ushbu kunga tegishli ishchilarning IDlari
+        $carbonDate = Carbon::parse($date);
+        $daysInMonth = $carbonDate->daysInMonth;
+
+        // Shu sanadagi barcha ishchilarning IDlari
         $relatedEmployeeIds = DB::table('employee_tarification_logs')
             ->whereDate('date', $date)
             ->pluck('employee_id')
             ->unique()
             ->values();
 
-        // Transport xarajatlari
+        // Transport
         $transport = DB::table('transport_attendance')
             ->whereDate('date', $date)
             ->sum(DB::raw('(salary + fuel_bonus) * attendance_type'));
 
-        // Oylik doimiy xarajat (kunlikka bo‘linadi)
+        // Oylik doimiy xarajatlar
         $monthlyExpense = DB::table('monthly_expenses')
-            ->whereMonth('month', Carbon::parse($date)->month)
-            ->whereYear('month', Carbon::parse($date)->year)
+            ->whereMonth('month', $carbonDate->month)
+            ->whereYear('month', $carbonDate->year)
             ->sum('amount');
 
-        $carbonDate = Carbon::parse($date);
-        $daysInMonth = $carbonDate->daysInMonth;
         $dailyExpense = $monthlyExpense / $daysInMonth;
 
-        $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id')->toArray();
+        $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id');
 
         $aup = DB::table('attendance_salary')
             ->whereDate('date', $date)
             ->whereIn('employee_id', $thisBranchEmployeeIds)
             ->sum('amount');
 
-        // Har bir buyurtma bo‘yicha ishlab chiqarish va xarajatlar
-        $dailyOutput = SewingOutputs::with([
+        $outputs = SewingOutputs::with([
             'orderSubmodel.orderModel.order',
             'orderSubmodel.orderModel.model',
             'orderSubmodel.orderModel.submodels.submodel'
         ])
             ->whereDate('created_at', $date)
-            ->whereHas('orderSubmodel.orderModel.order', function ($query) use ($branchId) {
-                $query->where('branch_id', $branchId);
+            ->whereHas('orderSubmodel.orderModel.order', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
             })
-            ->get()
-            ->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id)
-            ->map(function ($items) use ($dollarRate, $date, $relatedEmployeeIds, $dailyExpense, $transport, $aup) {
-                $first = $items->first();
-                $orderModel = optional($first->orderSubmodel)->orderModel;
-                $order = optional($orderModel)->order;
-                $orderId = $order->id ?? null;
+            ->get();
 
-                $totalQuantity = $items->sum('quantity');
-                $priceUSD = $order->price ?? 0;
-                $priceUZS = $priceUSD * $dollarRate;
-                $rasxod = $orderModel->rasxod * $totalQuantity ?? 0;
+        $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);
 
-                // Bonuslar
-                $bonus = DB::table('bonuses')
-                    ->whereDate('created_at', $date)
-                    ->where('order_id', $orderId)
-                    ->sum('amount');
+        $orders = $grouped->map(function ($items) use ($dollarRate, $date, $relatedEmployeeIds, $dailyExpense, $transport, $aup) {
+            $first = $items->first();
+            $orderModel = optional($first->orderSubmodel)->orderModel;
+            $order = optional($orderModel)->order;
+            $orderId = $order->id ?? null;
 
-                // AUP (attendance salary)
-                $attendanceSalary = DB::table('attendance_salary')
-                    ->whereDate('date', $date)
-                    ->whereIn('employee_id', $relatedEmployeeIds)
-                    ->sum('amount');
+            $totalQty = $items->sum('quantity');
+            $priceUSD = $order->price ?? 0;
+            $priceUZS = $priceUSD * $dollarRate;
+            $remainder = ($orderModel->rasxod ?? 0) * $totalQty;
 
-                // Tarifikatsiya (ish haqi)
-                $tarification = DB::table('employee_tarification_logs')
-                    ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
-                    ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
-                    ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
-                    ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
-                    ->join('orders', 'order_models.order_id', '=', 'orders.id')
-                    ->whereDate('employee_tarification_logs.date', $date)
-                    ->where('orders.id', $orderId)
-                    ->sum('employee_tarification_logs.amount_earned');
+            $bonus = DB::table('bonuses')
+                ->whereDate('created_at', $date)
+                ->where('order_id', $orderId)
+                ->sum('amount');
 
-                $totalFixedCost = $bonus + $rasxod;
+            $tarification = DB::table('employee_tarification_logs')
+                ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+                ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+                ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+                ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+                ->join('orders', 'order_models.order_id', '=', 'orders.id')
+                ->whereDate('employee_tarification_logs.date', $date)
+                ->where('orders.id', $orderId)
+                ->sum('employee_tarification_logs.amount_earned');
 
-                $extraCostPerUnit = $totalQuantity > 0 ? ($transport + $dailyExpense + $aup) / $totalQuantity : 0;
-                $totalFixedCostWithExtra = $totalFixedCost + $transport + $dailyExpense + $aup;
+            $fixedCost = $bonus + $remainder + $tarification;
+            $totalExtra = $transport + $dailyExpense + $aup;
+            $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
+            $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
 
-                return [
-                    'order' => $order,
-                    'model' => $orderModel->model ?? null,
-                    'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
-                    'price_usd' => $priceUSD,
-                    'price_uzs' => $priceUZS,
-                    'total_quantity' => $totalQuantity,
-                    'total_output_cost_uzs' => $priceUSD * $totalQuantity * $dollarRate,
-                    'costs_uzs' => [
-                        'bonuses' => $bonus,
-                        'attendance_salary' => $attendanceSalary,
-                        'employee_tarification_logs' => $tarification,
-                    ],
-                    'total_fixed_cost_uzs' => $totalFixedCost,
-                    'net_profit_uzs' => ($priceUSD * $totalQuantity * $dollarRate) - $totalFixedCost,
-                    'rasxod_limit_uzs' => $rasxod,
+            return [
+                'order' => $order,
+                'model' => $orderModel->model ?? null,
+                'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
+                'price_usd' => $priceUSD,
+                'price_uzs' => $priceUZS,
+                'total_quantity' => $totalQty,
+                'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
+                'costs_uzs' => compact('bonus', 'tarification', 'remainder'),
+                'total_fixed_cost_uzs' => $fixedCost,
+                'net_profit_uzs' => $profitUZS,
+                'cost_per_unit_uzs' => round($perUnitCost),
+                'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
+                'profitability_percent' => ($fixedCost + $totalExtra) > 0
+                    ? round(($profitUZS / ($fixedCost + $totalExtra)) * 100, 2)
+                    : null,
+            ];
+        })->values();
 
-                    'cost_per_unit_uzs' => $totalQuantity > 0 ? round($totalFixedCostWithExtra / $totalQuantity) : 0,
-                    'profit_per_unit_uzs' => $totalQuantity > 0 ? round((($priceUSD * $dollarRate) - ($totalFixedCostWithExtra / $totalQuantity))) : 0,
-                    'profitability_percent' => $totalFixedCostWithExtra > 0
-                        ? round((($priceUSD * $totalQuantity * $dollarRate - $totalFixedCostWithExtra) / $totalFixedCostWithExtra) * 100, 2)
-                        : null,
-                ];
-            })->values();
-
-        // Umumiy statistika
-        $totalEarned = $dailyOutput->sum('total_output_cost_uzs');
-        $totalFixedCost = $dailyOutput->sum('total_fixed_cost_uzs') + $transport + $dailyExpense;
-
+        $totalEarned = $orders->sum('total_output_cost_uzs');
+        $totalFixedCost = $orders->sum('total_fixed_cost_uzs') + $transport + $dailyExpense + $aup;
 
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
-            'orders' => $dailyOutput,
+            'orders' => $orders,
             'transport_attendance' => $transport,
             'daily_expenses' => $dailyExpense,
+            'aup' => $aup,
             'total_earned_uzs' => $totalEarned,
-            'total_fixed_cost_uzs' => $totalFixedCost + $aup,
-            'net_profit_uzs' => $totalEarned - $totalFixedCost - $aup,
-            'kpi' => DB::table('bonuses')
-                ->whereDate('created_at', $date)
-                ->sum('amount'),
-            'aup' => DB::table('attendance_salary')
-                ->whereDate('date', $date)
-                ->whereIn('employee_id', $thisBranchEmployeeIds)
-                ->sum('amount'),
+            'total_fixed_cost_uzs' => $totalFixedCost,
+            'net_profit_uzs' => $totalEarned - $totalFixedCost,
+            'kpi' => DB::table('bonuses')->whereDate('created_at', $date)->sum('amount'),
             'tarification' => DB::table('employee_tarification_logs')
                 ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
                 ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
