@@ -1043,7 +1043,7 @@ class TechnologController extends Controller
 
     public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
-        dd(GPTTranslator::translate('Привет, как дела?', 'ru', 'uz'));
+        return GPTTranslator::translate('Привет, как дела?', 'ru', 'uz');
 
         ini_set('memory_limit', '512M');
 
