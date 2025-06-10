@@ -140,7 +140,7 @@ class CasherController extends Controller
             'transport_attendance' => $transport,
             'daily_expenses' => $dailyExpense,
             'total_earned_uzs' => $totalEarned,
-            'total_fixed_cost_uzs' => $totalFixedCost,
+            'total_fixed_cost_uzs' => $totalFixedCost + $aup,
             'net_profit_uzs' => $totalEarned - $totalFixedCost - $aup,
             'kpi' => DB::table('bonuses')
                 ->whereDate('created_at', $date)
