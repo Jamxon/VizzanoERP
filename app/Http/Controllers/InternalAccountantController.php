@@ -301,7 +301,7 @@ class InternalAccountantController extends Controller
         $maxCount = count($counts) > 0 ? max($counts) : 0;
 
 // heightni hisoblash (masalan har bir tarification uchun 15mm desak)
-        $heightPerTarification = 15; // mm
+        $heightPerTarification = 30; // mm
         $pageHeight = 80 + ($maxCount * $heightPerTarification); // mm
 
 // Convert mm to points (1 mm ≈ 2.83465 points)
