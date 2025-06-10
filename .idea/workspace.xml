@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345">
+      <change beforePath="$PROJECT_DIR$/app/Helpers/GPTTranslator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Helpers/GPTTranslator.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -353,15 +355,7 @@
       <workItem from="1749443010392" duration="21336000" />
       <workItem from="1749528590888" duration="11233000" />
       <workItem from="1749549408089" duration="1150000" />
-      <workItem from="1749550589141" duration="408000" />
-    </task>
-    <task id="LOCAL-00139" summary="12345">
-      <option name="closed" value="true" />
-      <created>1749466631416</created>
-      <option name="number" value="00139" />
-      <option name="presentableId" value="LOCAL-00139" />
-      <option name="project" value="LOCAL" />
-      <updated>1749466631416</updated>
+      <workItem from="1749550589141" duration="752000" />
     </task>
     <task id="LOCAL-00140" summary="12345">
       <option name="closed" value="true" />
@@ -747,7 +741,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749550872836</updated>
     </task>
-    <option name="localTasksCounter" value="188" />
+    <task id="LOCAL-00188" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749551149267</created>
+      <option name="number" value="00188" />
+      <option name="presentableId" value="LOCAL-00188" />
+      <option name="project" value="LOCAL" />
+      <updated>1749551149267</updated>
+    </task>
+    <option name="localTasksCounter" value="189" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
