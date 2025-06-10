@@ -290,7 +290,8 @@ class GroupMasterController extends Controller
             'order_submodel_id' => 'required|exists:order_sub_models,id',
             'quantity' => 'required|integer|min:1',
             'time_id' => 'required|exists:times,id',
-            'comment' => 'nullable|string'
+            'comment' => 'nullable|string',
+            'model' => 'nullable|string',
         ]);
 
         $orderSubModel = OrderSubModel::find($validatedData['order_submodel_id']);
