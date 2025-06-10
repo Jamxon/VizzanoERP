@@ -853,7 +853,7 @@ class InternalAccountantController extends Controller
         if (!$orderSubmodel) {
             return response()->json([
                 'error'=> 'Order submodel not found or does not match the region.',
-                ],404);
+                ]);
 
         }
 
