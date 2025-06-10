@@ -1136,7 +1136,8 @@ class TechnologController extends Controller
                     $seconds = is_numeric(str_replace(',', '.', (string)$rawA)) ?
                         (float) str_replace(',', '.', (string)$rawA) : 0;
 
-                    $description = trim((string)$row['C']);
+                    $originalDescription = trim((string)$row['C']);
+                    $description = GPTTranslator::translate($originalDescription, 'ru', 'uz');
                     if (!empty($sectionPrefix) && !str_contains($description, $sectionPrefix)) {
                         $description = "{$sectionPrefix} - {$description}";
                     }
