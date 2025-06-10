@@ -43,7 +43,7 @@ class GPTTranslator
             } else {
                 Log::add(
                     auth()->id(),
-                    'GPT translation',
+                    'GPT translation eeee',
                     'translate',
                     [
                         'text' => $text,
