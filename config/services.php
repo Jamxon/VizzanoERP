@@ -36,4 +36,8 @@ return [
          'chat_id_1' => env('TELEGRAM_GROUP_CHAT_ID'), // -100...
     ],
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+    ],
+
 ];
