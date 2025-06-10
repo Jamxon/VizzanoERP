@@ -96,7 +96,7 @@ class CasherController extends Controller
                 ->where('orders.id', $orderId)
                 ->sum('employee_tarification_logs.amount_earned');
 
-            $fixedCost = $bonus + $remainder + $tarification;
+            $fixedCost = $bonus + ($remainder /$totalQty) + $tarification;
             $totalExtra = $transport + $dailyExpense + $aup;
             $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
             $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
