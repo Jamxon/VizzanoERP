@@ -105,7 +105,7 @@ class ModelController extends Controller
                     while ($request->hasFile('images' . $index)) {
                         $image = $request->file('images' . $index);
                         $fileName = time() . '_' . $image->getClientOriginalName();
-                        $image->storeAs('/images/', $fileName);
+                        $image->storeAs('/public/images/', $fileName);
 
                         ModelImages::create([
                             'model_id' => $model->id,
@@ -200,7 +200,7 @@ class ModelController extends Controller
             while ($request->hasFile('images' . $index)) {
                 $image = $request->file('images' . $index);
                 $fileName = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('/images/', $fileName);
+                $image->storeAs('/public/images/', $fileName);
 
                 ModelImages::create([
                     'model_id' => $model->id,
