@@ -1239,10 +1239,23 @@ class TechnologController extends Controller
         ])
             ->setPaper('A4', 'portrait');
 
+        // Render PDF to access all pages
         $dompdf = $pdf->getDomPDF();
+        $dompdf->render(); // <-- ShART!
+
+        // Get canvas and font
         $canvas = $dompdf->get_canvas();
         $font = $dompdf->getFontMetrics()->get_font("DejaVu Sans", "normal");
-        $canvas->page_text(520, 820, "Sahifa {PAGE_NUM} / {PAGE_COUNT}", $font, 10, [0, 0, 0]);
+
+        // Add footer text to ALL pages
+        $canvas->page_text(
+            520, // X o‘qi (chapdan)
+            820, // Y o‘qi (yuqoridan)
+            "Sahifa {PAGE_NUM} / {PAGE_COUNT}",
+            $font,
+            10,
+            [0, 0, 0] // qora rang
+        );
 
         return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
