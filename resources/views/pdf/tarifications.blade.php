@@ -62,7 +62,6 @@
 @endforeach
 
 <script type="text/php">
-    if (isset($pdf)) {
         $pdf->page_script('
             if ($PAGE_COUNT > 1) {
                 $font = $fontMetrics->get_font("DejaVu Sans", "normal");
@@ -73,7 +72,6 @@
                 $pdf->text($x, $y, $pageText, $font, $size);
             }
         ');
-    }
 </script>
 
 </body>
