@@ -45,6 +45,7 @@ class VizzanoReportTvController extends Controller
         $aup = Attendance::whereDate('date', date('Y-m-d'))
             ->whereHas('employee', function ($q) use ($branchId)  {
             $q->where('status', '!=', 'kicked');
+            $q->where('type', 'aup');
             $q->where('branch_id', $branchId);
         })->count();
 
