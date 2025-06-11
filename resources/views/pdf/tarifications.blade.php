@@ -63,10 +63,18 @@
 
 <script type="text/php">
     if (isset($pdf)) {
-        $pdf->page_text(270, 820, "Sahifa: {PAGE_NUM} / {PAGE_COUNT}", null, 8, array(0,0,0));
+        $pdf->page_script('
+            if ($PAGE_COUNT > 1) {
+                $font = $fontMetrics->get_font("DejaVu Sans, sans-serif", "normal");
+                $size = 8;
+                $pageText = "Sahifa " . $PAGE_NUM . " / " . $PAGE_COUNT;
+                $x = 270;
+                $y = 820;
+                $pdf->text($x, $y, $pageText, $font, $size);
+            }
+        ');
     }
 </script>
-
 
 </body>
 </html>
