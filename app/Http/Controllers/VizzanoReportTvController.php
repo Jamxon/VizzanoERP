@@ -94,7 +94,7 @@ class VizzanoReportTvController extends Controller
 
         // ✅ 7. Natijani yig'ish
         $resource = [
-            'sewing_outputs' => $sewingOutputs->map(function ($output) use ($employeeCounts, $workTimeByGroup) {
+            'sewing_outputs' => $sewingOutputs->map(function ($output) use ($aup, $employeeCounts, $workTimeByGroup) {
                 $group_id = optional($output->orderSubmodel->group->group)->id;
                 $employeeCount = $employeeCounts[$group_id] ?? 0;
                 $workTime = $workTimeByGroup[$group_id] ?? 0;
@@ -109,10 +109,12 @@ class VizzanoReportTvController extends Controller
                     'order_id' => optional($output->orderSubmodel->orderModel->order)->id,
                     'submodel' => $output->orderSubmodel->submodel,
                     'group' => optional($output->orderSubmodel->group)->group,
+                    'responsibleUser' => optional($output->orderSubmodel->group)->group->responsibleUser->employee->name,
                     'total_quantity' => $output->total_quantity,
                     'today_quantity' => $output->today_quantity,
                     'employee_count' => $employeeCount,
                     'today_plan' => $today_plan,
+                    'aup' => $aup,
                 ];
             }),
             'motivations' => $motivations,
