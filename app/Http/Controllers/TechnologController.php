@@ -1217,6 +1217,7 @@ class TechnologController extends Controller
             'submodel_id' => 'required|exists:order_sub_models,id',
             'region' => 'nullable|string|max:255',
         ]);
+
         $submodel = OrderSubmodel::findOrFail($request->submodel_id);
 
         // region bo'yicha tarificationCategories ni olish
@@ -1235,7 +1236,15 @@ class TechnologController extends Controller
 
         $pdf = Pdf::loadView('pdf.tarifications', [
             'submodel' => $submodel
-        ])->setPaper('A4', 'portrait');
+        ])
+            ->setPaper('A4', 'portrait')
+            ->set_option('isPhpEnabled', true)
+            ->set_option('isHtml5ParserEnabled', true)
+            ->setCallbacks([
+                'page_script' => function ($pageNumber, $pageCount, $pdf) {
+                    $pdf->page_text(270, 820, "Sahifa: {PAGE_NUM} / {PAGE_COUNT}", null, 10, [0, 0, 0]);
+                },
+            ]);
 
         return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
