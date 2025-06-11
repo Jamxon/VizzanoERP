@@ -23,7 +23,7 @@
 </head>
 <body>
 
-<h2>📋 Operatsiyalar Ro'yxati</h2>
+<h2>Operatsiyalar Ro'yxati</h2>
 <h4>{{ $submodel->submodel->name ?? '-' }}</h4>
 
 @foreach($submodel->tarificationCategories as $category)
@@ -60,6 +60,13 @@
         </tbody>
     </table>
 @endforeach
+
+<script type="text/php">
+    if (isset($pdf)) {
+        $pdf->page_text(270, 820, "Sahifa: {PAGE_NUM} / {PAGE_COUNT}", null, 8, array(0,0,0));
+    }
+</script>
+
 
 </body>
 </html>

@@ -1237,14 +1237,7 @@ class TechnologController extends Controller
         $pdf = Pdf::loadView('pdf.tarifications', [
             'submodel' => $submodel
         ])
-            ->setPaper('A4', 'portrait')
-            ->set_option('isPhpEnabled', true)
-            ->set_option('isHtml5ParserEnabled', true)
-            ->setCallbacks([
-                'page_script' => function ($pageNumber, $pageCount, $pdf) {
-                    $pdf->page_text(270, 820, "Sahifa: {PAGE_NUM} / {PAGE_COUNT}", null, 10, [0, 0, 0]);
-                },
-            ]);
+            ->setPaper('A4', 'portrait');
 
         return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
