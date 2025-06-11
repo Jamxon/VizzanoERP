@@ -107,7 +107,7 @@ class InternalAccountantController extends Controller
                 'tarificationCategories.tarifications' => function ($query) {
                     $query->with('tarificationLogs');
                 },
-                'tarificationCategories.tarifications.employee:id,name,region'
+                'tarificationCategories.tarifications.employee:id,name'
             ])->findOrFail($submodelId);
 
             $limit = $orderSubmodel->orderModel?->order?->quantity ?? 0;

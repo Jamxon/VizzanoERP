@@ -114,10 +114,11 @@ class VizzanoReportTvController extends Controller
                     'today_quantity' => $output->today_quantity,
                     'employee_count' => $employeeCount,
                     'today_plan' => $today_plan,
-                    'aup' => $aup,
+
                 ];
             }),
             'motivations' => $motivations,
+            'aup' => $aup,
         ];
 
         return response()->json($resource);
