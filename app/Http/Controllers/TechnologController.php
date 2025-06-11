@@ -1260,14 +1260,16 @@ class TechnologController extends Controller
             'quantity' => $request->quantity,
         ])
             ->setPaper('A4', 'portrait')
-            ->set_option('isHtml5ParserEnabled', true)
             ->set_option('isPhpEnabled', true)
+            ->set_option('isHtml5ParserEnabled', true)
             ->setCallbacks([
                 'page_script' => function ($pageNumber, $pageCount, $pdf) {
-                    $pdf->page_text(520, 820, "Sahifa: {PAGE_NUM} / {PAGE_COUNT}", null, 10, [0, 0, 0]);
+                    // Sahifa pastiga markazda chiqarish
+                    $pdf->page_text(270, 820, "Sahifa: {PAGE_NUM} / {PAGE_COUNT}", null, 10, [0, 0, 0]);
                 },
             ]);
 
         return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
+
 }
