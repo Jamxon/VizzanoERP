@@ -66,7 +66,6 @@ class CasherController extends Controller
             ->whereHas('orderSubmodel.orderModel.order', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
             })
-            ->where('mode', 'production')
             ->get();
 
         $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);

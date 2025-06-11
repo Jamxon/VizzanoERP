@@ -24,7 +24,6 @@ class SewingOutputs extends Model
         'time_id',
         'comment',
         'created_at',
-        'mode'
     ];
 
     public function orderSubmodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo

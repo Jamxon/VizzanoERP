@@ -291,7 +291,6 @@ class GroupMasterController extends Controller
             'quantity' => 'required|integer|min:1',
             'time_id' => 'required|exists:times,id',
             'comment' => 'nullable|string',
-            'mode' => 'nullable|string',
         ]);
 
         $orderSubModel = OrderSubModel::find($validatedData['order_submodel_id']);
@@ -332,7 +331,6 @@ class GroupMasterController extends Controller
 
         $total_bonus_logs = [];
 
-        if ($validatedData['mode'] !== 'example') {
             foreach ($employees as $employee) {
                 $bonusAmount = $employee->bonus * $minutes * $newQuantity;
                 $oldBalance = $employee->balance;
@@ -357,7 +355,7 @@ class GroupMasterController extends Controller
                     'new_balance' => $employee->balance,
                     'created_by' => auth()->id(),
                 ]);
-        }
+
 
             Log::add(
                 auth()->id(),
