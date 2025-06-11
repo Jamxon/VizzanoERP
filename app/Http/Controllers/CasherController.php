@@ -111,10 +111,14 @@ class CasherController extends Controller
 
                 $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
                 $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
+            $responsibleUsers = $orderModel->submodels->map(function ($submodel) {
+                return optional($submodel->group->group)->responsibleUser;
+            })->filter()->unique('id')->values();
 
-                return [
+
+            return [
                     'order' => $order,
-                    'responsibleUser' => $order->orderModel->submodels->group->group->responsibleUser ?? null,
+                    'responsibleUser' => $responsibleUsers,
                     'model' => $orderModel->model ?? null,
                     'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
                     'price_usd' => $priceUSD,
