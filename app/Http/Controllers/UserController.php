@@ -52,7 +52,7 @@ class UserController extends Controller
             if ($request->hasFile('img')) {
                 $file = $request->file('img');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/images/', $filename);
+                $file->storeAs('/public/images/', $filename);
                 $employee->img = 'images/' . $filename;
                 $employee->save();
             }
