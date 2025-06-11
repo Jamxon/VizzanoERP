@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Employee;
 use App\Models\Motivation;
 use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
@@ -40,6 +41,12 @@ class VizzanoReportTvController extends Controller
         } else {
             $query->whereDate('created_at', $startDate);
         }
+
+        $aup = Attendance::whereDate('date', date('Y-m-d'))
+            ->whereHas('employee', function ($q) use ($branchId)  {
+            $q->where('status', '!=', 'kicked');
+            $q->where('branch_id', $branchId);
+        })->count();
 
         $sewingOutputs = $query
             ->select('order_submodel_id')
@@ -106,7 +113,6 @@ class VizzanoReportTvController extends Controller
                     'today_quantity' => $output->today_quantity,
                     'employee_count' => $employeeCount,
                     'today_plan' => $today_plan,
-                    'mode' => $output->mode,
                 ];
             }),
             'motivations' => $motivations,

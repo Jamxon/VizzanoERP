@@ -288,7 +288,7 @@ class GroupMasterController extends Controller
     {
         $validatedData = $request->validate([
             'order_submodel_id' => 'required|exists:order_sub_models,id',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:0',
             'time_id' => 'required|exists:times,id',
             'comment' => 'nullable|string',
         ]);
