@@ -114,6 +114,7 @@ class CasherController extends Controller
 
                 return [
                     'order' => $order,
+                    'responsibleUser' => $order->orderModel->submodels->group->group->responsibleUser ?? null,
                     'model' => $orderModel->model ?? null,
                     'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
                     'price_usd' => $priceUSD,
