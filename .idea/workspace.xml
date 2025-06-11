@@ -356,23 +356,7 @@
       <workItem from="1749550589141" duration="13025000" />
       <workItem from="1749614493650" duration="1548000" />
       <workItem from="1749629603254" duration="6560000" />
-      <workItem from="1749644433774" duration="1966000" />
-    </task>
-    <task id="LOCAL-00191" summary="12345">
-      <option name="closed" value="true" />
-      <created>1749552220792</created>
-      <option name="number" value="00191" />
-      <option name="presentableId" value="LOCAL-00191" />
-      <option name="project" value="LOCAL" />
-      <updated>1749552220792</updated>
-    </task>
-    <task id="LOCAL-00192" summary="12345">
-      <option name="closed" value="true" />
-      <created>1749554041125</created>
-      <option name="number" value="00192" />
-      <option name="presentableId" value="LOCAL-00192" />
-      <option name="project" value="LOCAL" />
-      <updated>1749554041125</updated>
+      <workItem from="1749644433774" duration="2553000" />
     </task>
     <task id="LOCAL-00193" summary="12345">
       <option name="closed" value="true" />
@@ -750,7 +734,23 @@
       <option name="project" value="LOCAL" />
       <updated>1749646399472</updated>
     </task>
-    <option name="localTasksCounter" value="240" />
+    <task id="LOCAL-00240" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749646497907</created>
+      <option name="number" value="00240" />
+      <option name="presentableId" value="LOCAL-00240" />
+      <option name="project" value="LOCAL" />
+      <updated>1749646497907</updated>
+    </task>
+    <task id="LOCAL-00241" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749646575229</created>
+      <option name="number" value="00241" />
+      <option name="presentableId" value="LOCAL-00241" />
+      <option name="project" value="LOCAL" />
+      <updated>1749646575229</updated>
+    </task>
+    <option name="localTasksCounter" value="242" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

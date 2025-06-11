@@ -1239,6 +1239,11 @@ class TechnologController extends Controller
         ])
             ->setPaper('A4', 'portrait');
 
+        $dompdf = $pdf->getDomPDF();
+        $canvas = $dompdf->get_canvas();
+        $font = $dompdf->getFontMetrics()->get_font("DejaVu Sans", "normal");
+        $canvas->page_text(520, 820, "Sahifa {PAGE_NUM} / {PAGE_COUNT}", $font, 10, [0, 0, 0]);
+
         return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
 

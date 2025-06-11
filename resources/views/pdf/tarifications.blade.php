@@ -61,20 +61,5 @@
     </table>
 @endforeach
 
-<script type="text/php">
-    if (isset($pdf)) {
-        $pdf->page_script('
-            $font = $fontMetrics->get_font("DejaVu Sans", "normal");
-            $size = 10;
-            $pageText = "Sahifa " . $PAGE_NUM . " / " . $PAGE_COUNT;
-            $x = 520;
-            $y = 820;
-            $pdf->text($x, $y, $pageText, $font, $size);
-        ');
-    }
-</script>
-
-
-
 </body>
 </html>
