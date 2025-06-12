@@ -172,14 +172,14 @@ class CasherController extends Controller
         $totalIncomePercentageExpense = $orders->sum('costs_uzs.incomePercentageExpense');
         $totalAmortizationExpense = $orders->sum('costs_uzs.amortizationExpense');
 
+        $dailyExpense = $dailyExpenseMonthly + $totalIncomePercentageExpense + $totalAmortizationExpense;
+
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
             'orders' => $orders,
             'transport_attendance' => $transport,
-            'daily_expenses_monthly' => $dailyExpenseMonthly,
-            'total_income_percentage_expense' => $totalIncomePercentageExpense,
-            'total_amortization_expense' => $totalAmortizationExpense,
+            'daily_expense' => $dailyExpense,
             'aup' => $aup,
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
