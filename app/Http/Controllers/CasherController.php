@@ -123,7 +123,7 @@ class CasherController extends Controller
 
             // Amortization type xarajat (har bir mahsulot uchun 10 sent)
             $amortizationExpense = 0;
-            $amortizationExpenses = $monthlyExpenses->where('type', 'amortization');
+           dd( $amortizationExpenses = $monthlyExpenses->where('type', 'amortization'));
             if ($amortizationExpenses->count() > 0) {
                 $amortizationExpense = $totalQty * $monthlyExpenses->amount * $dollarRate;
             }
