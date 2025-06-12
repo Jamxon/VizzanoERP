@@ -174,6 +174,7 @@ class TransportController extends Controller
                     ['name' => $data['region_name']],
                 );
                 $data['region_id'] = $region->id;
+                dd($region);
             }
 
             unset($data['region_name']); // region_name kerak emas modelga
