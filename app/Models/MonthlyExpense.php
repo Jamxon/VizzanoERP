@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class MonthlyExpense extends Model
 {
     protected $fillable = [
-        'type', 'amount', 'month',
+        'type', 'amount', 'month', 'branch_id',
     ];
 
     protected $casts = [
