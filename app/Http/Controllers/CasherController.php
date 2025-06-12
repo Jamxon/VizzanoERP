@@ -45,14 +45,17 @@ class CasherController extends Controller
             ->where('transport.branch_id', $branchId)
             ->sum(DB::raw('(transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type'));
 
-        // Oylik doimiy xarajatlar
-        $monthlyExpense = DB::table('monthly_expenses')
+        // Monthly expenses ni type bo'yicha ajratish
+        $monthlyExpenses = DB::table('monthly_expenses')
             ->whereMonth('month', $carbonDate->month)
             ->whereYear('month', $carbonDate->year)
             ->where('branch_id', $branchId)
-            ->sum('amount');
+            ->get();
 
-        $dailyExpense = $monthlyExpense / $daysInMonth;
+        // Type = 'monthly' bo'lgan xarajatlarni kuniga bo'lib hisoblash
+        $dailyExpenseMonthly = $monthlyExpenses
+                ->where('type', 'monthly')
+                ->sum('amount') / $daysInMonth;
 
         $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id');
 
@@ -74,84 +77,109 @@ class CasherController extends Controller
 
         $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);
         $totalOutputQty = $outputs->sum('quantity');
+
         $orders = $grouped->map(function ($items) use (
-                $dollarRate, $date, $relatedEmployeeIds,
-                $dailyExpense, $transport, $aup, $totalOutputQty
-            ) {
-                $first = $items->first();
-                $orderModel = optional($first->orderSubmodel)->orderModel;
-                $order = optional($orderModel)->order;
-                $orderId = $order->id ?? null;
+            $dollarRate, $date, $relatedEmployeeIds,
+            $dailyExpenseMonthly, $transport, $aup, $totalOutputQty, $monthlyExpenses
+        ) {
+            $first = $items->first();
+            $orderModel = optional($first->orderSubmodel)->orderModel;
+            $order = optional($orderModel)->order;
+            $orderId = $order->id ?? null;
 
-                $totalQty = $items->sum('quantity');
-                $priceUSD = $order->price ?? 0;
-                $priceUZS = $priceUSD * $dollarRate;
-                $remainder = ($orderModel->rasxod ?? 0) * $totalQty;
+            $totalQty = $items->sum('quantity');
+            $priceUSD = $order->price ?? 0;
+            $priceUZS = $priceUSD * $dollarRate;
+            $remainder = ($orderModel->rasxod ?? 0) * $totalQty;
 
-                $bonus = DB::table('bonuses')
-                    ->whereDate('created_at', $date)
-                    ->where('order_id', $orderId)
-                    ->sum('amount');
+            $bonus = DB::table('bonuses')
+                ->whereDate('created_at', $date)
+                ->where('order_id', $orderId)
+                ->sum('amount');
 
-                $tarification = DB::table('employee_tarification_logs')
-                    ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
-                    ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
-                    ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
-                    ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
-                    ->join('orders', 'order_models.order_id', '=', 'orders.id')
-                    ->whereDate('employee_tarification_logs.date', $date)
-                    ->where('orders.id', $orderId)
-                    ->sum('employee_tarification_logs.amount_earned');
+            $tarification = DB::table('employee_tarification_logs')
+                ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+                ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+                ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+                ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+                ->join('orders', 'order_models.order_id', '=', 'orders.id')
+                ->whereDate('employee_tarification_logs.date', $date)
+                ->where('orders.id', $orderId)
+                ->sum('employee_tarification_logs.amount_earned');
 
-                $fixedCost = $bonus + $remainder + $tarification;
+            // Type bo'yicha xarajatlarni hisoblash
+            $orderShareRatio = $totalOutputQty > 0 ? $totalQty / $totalOutputQty : 0;
 
-                $orderShareRatio = $totalOutputQty > 0 ? $totalQty / $totalOutputQty : 0;
+            // Monthly type xarajat
+            $allocatedDailyExpenseMonthly = $dailyExpenseMonthly * $orderShareRatio;
 
-                $allocatedTransport = $transport * $orderShareRatio;
-                $allocatedAup = $aup * $orderShareRatio;
-                $allocatedDailyExpense = $dailyExpense * $orderShareRatio;
+            // Income percentage type xarajat
+            $incomePercentageExpense = 0;
+            $incomePercentageExpenses = $monthlyExpenses->where('type', 'income_percentage');
+            foreach ($incomePercentageExpenses as $expense) {
+                $percentageAmount = ($priceUZS * $totalQty) * ($expense->amount / 100);
+                $incomePercentageExpense += $percentageAmount;
+            }
 
-                $totalExtra = $allocatedTransport + $allocatedAup + $allocatedDailyExpense;
+            // Amortization type xarajat (har bir mahsulot uchun 10 sent)
+            $amortizationExpense = 0;
+            $amortizationExpenses = $monthlyExpenses->where('type', 'amortization');
+            if ($amortizationExpenses->count() > 0) {
+                $amortizationExpense = $totalQty * 0.10 * $dollarRate; // 10 sent = 0.10 USD
+            }
 
-                $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
-                $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
+            $fixedCost = $bonus + $remainder + $tarification;
+
+            $allocatedTransport = $transport * $orderShareRatio;
+            $allocatedAup = $aup * $orderShareRatio;
+
+            $totalExtra = $allocatedTransport + $allocatedAup + $allocatedDailyExpenseMonthly + $incomePercentageExpense + $amortizationExpense;
+
+            $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
+            $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
+
             $responsibleUsers = $orderModel->submodels->map(function ($submodel) {
                 return optional($submodel->group->group)->responsibleUser;
             })->filter()->unique('id')->values();
 
-
             return [
-                    'order' => $order,
-                    'responsibleUser' => $responsibleUsers,
-                    'model' => $orderModel->model ?? null,
-                    'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
-                    'price_usd' => $priceUSD,
-                    'price_uzs' => $priceUZS,
-                    'total_quantity' => $totalQty,
-                    'rasxod_limit_uzs' => $remainder,
-                    'bonus' => $bonus,
-                    'tarification' => $tarification,
-                    'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
-                    'costs_uzs' => compact('bonus', 'tarification', 'remainder', 'allocatedTransport', 'allocatedAup', 'allocatedDailyExpense'),
-                    'total_fixed_cost_uzs' => $fixedCost + $totalExtra,
-                    'net_profit_uzs' => $profitUZS,
-                    'cost_per_unit_uzs' => round($perUnitCost),
-                    'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
-                    'profitability_percent' => ($fixedCost + $totalExtra) > 0
-                        ? round(($profitUZS / ($fixedCost + $totalExtra)) * 100, 2)
-                        : null,
-                ];
-            })->values();
+                'order' => $order,
+                'responsibleUser' => $responsibleUsers,
+                'model' => $orderModel->model ?? null,
+                'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
+                'price_usd' => $priceUSD,
+                'price_uzs' => $priceUZS,
+                'total_quantity' => $totalQty,
+                'rasxod_limit_uzs' => $remainder,
+                'bonus' => $bonus,
+                'tarification' => $tarification,
+                'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
+                'costs_uzs' => compact('bonus', 'tarification', 'remainder', 'allocatedTransport', 'allocatedAup', 'allocatedDailyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
+                'total_fixed_cost_uzs' => $fixedCost + $totalExtra,
+                'net_profit_uzs' => $profitUZS,
+                'cost_per_unit_uzs' => round($perUnitCost),
+                'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
+                'profitability_percent' => ($fixedCost + $totalExtra) > 0
+                    ? round(($profitUZS / ($fixedCost + $totalExtra)) * 100, 2)
+                    : null,
+            ];
+        })->values();
 
         $totalEarned = $orders->sum('total_output_cost_uzs');
         $totalFixedCost = $totalEarned - $orders->sum('net_profit_uzs');
+
+        // Umumiy xarajatlarni hisoblash
+        $totalIncomePercentageExpense = $orders->sum('costs_uzs.incomePercentageExpense');
+        $totalAmortizationExpense = $orders->sum('costs_uzs.amortizationExpense');
 
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
             'orders' => $orders,
             'transport_attendance' => $transport,
-            'daily_expenses' => $dailyExpense,
+            'daily_expenses_monthly' => $dailyExpenseMonthly,
+            'total_income_percentage_expense' => $totalIncomePercentageExpense,
+            'total_amortization_expense' => $totalAmortizationExpense,
             'aup' => $aup,
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
@@ -190,6 +218,7 @@ class CasherController extends Controller
             'expenses' => $expenses->map(function ($expense) {
                 return [
                     'id' => $expense->id,
+                    'name' => $expense->name,
                     'type' => $expense->type,
                     'amount' => $expense->amount,
                     'date' => $expense->month,
@@ -204,12 +233,14 @@ class CasherController extends Controller
             'type' => 'required|string',
             'amount' => 'required|numeric|min:0',
             'month' => 'required|date_format:Y-m',
+            'name' => 'required|string|max:255',
         ]);
 
         $expense = MonthlyExpense::create([
             'type' => $validated['type'],
             'amount' => $validated['amount'],
             'month' => $validated['month'] . '-01',
+            'name' => $validated['name'],
         ]);
 
         return response()->json(['message' => 'Saved', 'data' => $expense]);
@@ -221,6 +252,7 @@ class CasherController extends Controller
             'type' => 'nullable|string',
             'amount' => 'nullable|numeric|min:0',
             'month' => 'nullable|date_format:Y-m',
+            'name' => 'nullable|string|max:255',
         ]);
         $expense = MonthlyExpense::findOrFail($id);
 
