@@ -125,7 +125,7 @@ class CasherController extends Controller
             $amortizationExpense = 0;
             $amortizationExpenses = $monthlyExpenses->where('type', 'amortization');
             if ($amortizationExpenses->count() > 0) {
-                $amortizationExpense = $totalQty * $monthlyExpenses->amount * $dollarRate;
+                $amortizationExpense = $totalQty * 0.10 * $dollarRate;
             }
 
             $fixedCost = $bonus + $remainder + $tarification;
