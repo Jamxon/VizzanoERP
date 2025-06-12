@@ -169,6 +169,15 @@ class TransportController extends Controller
                 'fuel_bonus' => 'nullable|numeric',
             ]);
 
+            if (empty($data['region_id']) && !empty($data['region_name'])) {
+                $region = \App\Models\Region::firstOrCreate(
+                    ['name' => $data['region_name']],
+                );
+                $data['region_id'] = $region->id;
+            }
+
+            unset($data['region_name']); // region_name kerak emas modelga
+
             $transport->update($data);
 
             Log::add(Auth::id(), 'Transport tahrirlandi', 'edit', $oldData, $transport);
