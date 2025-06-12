@@ -40,9 +40,9 @@ class CasherController extends Controller
 
         // Transport
         $transport = DB::table('transport_attendance')
-            ->join('transports', 'transport_attendance.transport_id', '=', 'transports.id')
+            ->join('transport', 'transport_attendance.transport_id', '=', 'transport.id')
             ->whereDate('transport_attendance.date', $date)
-            ->where('transports.branch_id', $branchId)
+            ->where('transport.branch_id', $branchId)
             ->sum(DB::raw('(salary + fuel_bonus) * attendance_type'));
 
         // Oylik doimiy xarajatlar
