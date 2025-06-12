@@ -152,7 +152,8 @@ class TransportController extends Controller
                 'phone' => 'sometimes|string',
                 'phone_2' => 'nullable|string',
                 'capacity' => 'sometimes|numeric',
-                'region_id' => 'sometimes|exists:routes,id',
+                'region_id' => 'nullable|exists:routes,id',
+                'region_name' => 'nullable',
                 'is_active' => 'boolean',
                 'vin_number' => 'nullable|string',
                 'tech_passport_number' => 'nullable|string',
@@ -174,7 +175,6 @@ class TransportController extends Controller
                     ['name' => $data['region_name']],
                 );
                 $data['region_id'] = $region->id;
-                dd($region);
             }
 
             unset($data['region_name']); // region_name kerak emas modelga
