@@ -179,7 +179,7 @@ class CasherController extends Controller
             'dollar_rate' => $dollarRate,
             'orders' => $orders,
             'transport_attendance' => $transport,
-            'daily_expense' => $dailyExpense,
+            'daily_expenses' => $dailyExpense,
             'aup' => $aup,
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
