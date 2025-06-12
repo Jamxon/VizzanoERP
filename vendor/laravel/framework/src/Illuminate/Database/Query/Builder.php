@@ -28,6 +28,9 @@ use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
 
+/**
+ * @method whereHas(string $string, Closure $param)
+ */
 class Builder implements BuilderContract
 {
     use BuildsQueries, ExplainsQueries, ForwardsCalls, Macroable {

@@ -33,6 +33,7 @@ class CasherController extends Controller
         // Shu sanadagi barcha ishchilarning IDlari
         $relatedEmployeeIds = DB::table('employee_tarification_logs')
             ->whereDate('date', $date)
+            ->whereIn('employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
             ->pluck('employee_id')
             ->unique()
             ->values();
@@ -40,12 +41,16 @@ class CasherController extends Controller
         // Transport
         $transport = DB::table('transport_attendance')
             ->whereDate('date', $date)
+            ->whereHas('transport', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+            })
             ->sum(DB::raw('(salary + fuel_bonus) * attendance_type'));
 
         // Oylik doimiy xarajatlar
         $monthlyExpense = DB::table('monthly_expenses')
             ->whereMonth('month', $carbonDate->month)
             ->whereYear('month', $carbonDate->year)
+            ->where('branch_id', $branchId)
             ->sum('amount');
 
         $dailyExpense = $monthlyExpense / $daysInMonth;
