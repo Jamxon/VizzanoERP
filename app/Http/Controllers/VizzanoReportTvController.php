@@ -140,7 +140,7 @@ class VizzanoReportTvController extends Controller
                 $group_id = optional($output->orderSubmodel->group->group)->id;
                 $employeeCount = $employeeCounts[$group_id] ?? 0;
                 $workTime = $workTimeByGroup[$group_id] ?? 0;
-                $spend = optional($output->orderSubmodel->submodelSpend->first())->seconds;
+                $spend = (optional($output->orderSubmodel)->orderModel->rasxod / 250) / 60;
 
                 $today_plan = ($spend > 0 && $employeeCount > 0)
                     ? intval(($workTime * $employeeCount) / $spend)
