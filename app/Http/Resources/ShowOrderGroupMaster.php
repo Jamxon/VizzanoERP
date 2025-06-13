@@ -40,10 +40,13 @@ class ShowOrderGroupMaster extends JsonResource
         // ✅ Oldingi "todayEarned" (bu o‘zgarmaydi)
         $todayEarned = $todaySewn * ($this->orderModel->rasxod ?? 0);
 
+        $todayEarnedExample = $todayExample * ($this->orderModel->rasxod ?? 0);
+
         // ✅ Rasxod asosida haqiqiy hisob-kitob: 1 dona uchun = (rasxod / 250) * 12
         $minutesPerItem = ($this->orderModel->rasxod ?? 0) / 250;
         $earningsPerItem = $minutesPerItem * 9;
         $actualTodayEarned = $todaySewn * $earningsPerItem;
+        $actualTodayExample = $todayEarnedExample * $earningsPerItem;
 
         $group = $this->orderModel->submodels->first()?->group?->group;
 
@@ -75,7 +78,8 @@ class ShowOrderGroupMaster extends JsonResource
             'todaySewn' => $todaySewn,
             'todayExample' => $todayExample,
             'todayEarned' => round($todayEarned, 2),
-            'actualTodayEarned' => round($actualTodayEarned, 2), // 🆕 Qo‘shildi
+            'actualTodayEarned' => round($actualTodayEarned, 2),
+            'actualEarnedExample' => round($actualTodayExample, 2),
             'attendanceCount' => $attendanceCount,
             'perEmployeeEarning' => $perEmployeeEarning,
 
