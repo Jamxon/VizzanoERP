@@ -46,8 +46,8 @@ class ShowOrderGroupMaster extends JsonResource
         $minutesPerItem = ($this->orderModel->rasxod ?? 0) / 250;
         $earningsPerItem = $minutesPerItem * 9;
         $actualTodayEarned = $todaySewn * $earningsPerItem;
-        $actualTodayExample = $todayEarnedExample * $earningsPerItem;
-        return $earningsPerItem;
+        $actualTodayExample = $todayExample * $earningsPerItem;
+
         $group = $this->orderModel->submodels->first()?->group?->group;
 
         $attendanceCount = $group
