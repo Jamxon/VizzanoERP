@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/VizzanoReportTvController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/VizzanoReportTvController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -365,15 +367,7 @@
       <workItem from="1749790147274" duration="127000" />
       <workItem from="1749795627660" duration="68000" />
       <workItem from="1749795785216" duration="607000" />
-      <workItem from="1749809534077" duration="3911000" />
-    </task>
-    <task id="LOCAL-00227" summary="12345">
-      <option name="closed" value="true" />
-      <created>1749644723368</created>
-      <option name="number" value="00227" />
-      <option name="presentableId" value="LOCAL-00227" />
-      <option name="project" value="LOCAL" />
-      <updated>1749644723368</updated>
+      <workItem from="1749809534077" duration="4271000" />
     </task>
     <task id="LOCAL-00228" summary="12345">
       <option name="closed" value="true" />
@@ -759,7 +753,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749813192608</updated>
     </task>
-    <option name="localTasksCounter" value="276" />
+    <task id="LOCAL-00276" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749813680897</created>
+      <option name="number" value="00276" />
+      <option name="presentableId" value="LOCAL-00276" />
+      <option name="project" value="LOCAL" />
+      <updated>1749813680897</updated>
+    </task>
+    <option name="localTasksCounter" value="277" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

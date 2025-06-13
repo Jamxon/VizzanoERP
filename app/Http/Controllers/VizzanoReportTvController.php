@@ -89,6 +89,47 @@ class VizzanoReportTvController extends Controller
     ')
             ->pluck('work_seconds', 'group_id');
 
+        // ✅ ExampleOutputs ni qo‘shamiz (planlarsiz, lekin batafsil)
+        $exampleQuery = \App\Models\ExampleOutput::whereIn('order_submodel_id', $orderSubmodelIds);
+
+        if ($endDate) {
+            $exampleQuery->whereBetween('created_at', [$startDate, $endDate]);
+        } else {
+            $exampleQuery->whereDate('created_at', $startDate);
+        }
+
+        $exampleGrouped = $exampleQuery
+            ->select('order_submodel_id')
+            ->selectRaw("SUM(CASE WHEN DATE(created_at) = '{$today}' THEN quantity ELSE 0 END) as today_quantity")
+            ->groupBy('order_submodel_id')
+            ->with([
+                'orderSubmodel.orderModel.model',
+                'orderSubmodel.submodel',
+                'orderSubmodel.group.group',
+            ])
+            ->get();
+
+        $exampleTotalQuantities = \App\Models\ExampleOutput::whereIn('order_submodel_id', $orderSubmodelIds)
+            ->select('order_submodel_id', DB::raw('SUM(quantity) as total_quantity'))
+            ->groupBy('order_submodel_id')
+            ->pluck('total_quantity', 'order_submodel_id');
+
+        $exampleGrouped->transform(function ($item) use ($exampleTotalQuantities) {
+            $item->total_quantity = $exampleTotalQuantities[$item->order_submodel_id] ?? 0;
+            return $item;
+        });
+
+        $exampleOutputsData = $exampleGrouped->map(function ($output) {
+            return [
+                'model' => optional($output->orderSubmodel->orderModel)->model,
+                'order_id' => optional($output->orderSubmodel->orderModel->order)->id,
+                'submodel' => $output->orderSubmodel->submodel,
+                'group' => optional($output->orderSubmodel->group)->group,
+                'responsibleUser' => optional($output->orderSubmodel->group)->group->responsibleUser->employee->name,
+                'today_quantity' => $output->today_quantity,
+                'total_quantity' => $output->total_quantity,
+            ];
+        });
 
         // ✅ 6. Motivatsiyalar
         $motivations = \App\Models\Motivation::all()->map(fn($m) => ['title' => $m->title]);
@@ -120,6 +161,7 @@ class VizzanoReportTvController extends Controller
             }),
             'motivations' => $motivations,
             'aup' => $aup,
+            'example_outputs' => $exampleOutputsData,
         ];
 
         return response()->json($resource);
