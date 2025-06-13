@@ -13,14 +13,14 @@ class ShowOrderGroupMaster extends JsonResource
         $orderQuantity = $this->orderModel->order->quantity ?? 0;
 
         $totalSewn = $this->orderModel->submodels->sum(function ($submodel) {
-            return $submodel->sewingOutputs->sum('quantity');
+            return $submodel->exampleOutputs->sum('quantity');
         });
 
         $remainAmount = $orderQuantity - $totalSewn;
 
         // ✅ Bugungi tikilgan mahsulotlar soni
         $todaySewn = $this->orderModel->submodels->sum(function ($submodel) {
-            return $submodel->sewingOutputs
+            return $submodel->exampleOutputs
                 ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
                 ->sum('quantity');
         });
