@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GetOrderGroupMasterResource;
+use App\Http\Resources\ShowOrderGroupMaster;
 use App\Models\Bonus;
 use App\Models\Employee;
 use App\Models\ExampleOutputs;
@@ -205,5 +206,40 @@ class GroupHelperController extends Controller
         return response()->json([
             'message' => "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
         ]);
+    }
+
+    public function showOrder($id): \Illuminate\Http\JsonResponse
+    {
+        $order = Order::where('id', $id)
+            ->with([
+                'orderModel',
+                'orderModel.model',
+                'orderModel.material',
+                'orderModel.sizes.size',
+                'orderModel.submodels.submodel',
+                'orderModel.submodels.group.group',
+                'instructions',
+                'orderModel.submodels.sewingOutputs',
+                'orderModel.submodels.exampleOutputs',
+            ])
+            ->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        $orderGroups = OrderGroup::where('order_id', $id)
+            ->where('group_id', auth()->user()->employee->group->id)
+            ->get();
+
+        if ($order->orderModel) {
+            $linkedSubmodelIds = $orderGroups->pluck('submodel_id');
+
+            $order->orderModel->submodels = $order->orderModel->submodels
+                ->whereIn('id', $linkedSubmodelIds)
+                ->values();
+        }
+
+        return response()->json(new ShowOrderGroupMaster($order));
     }
 }
