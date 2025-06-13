@@ -185,7 +185,8 @@ class GroupMasterController extends Controller
                 'orderModel.submodels.submodel',
                 'orderModel.submodels.group.group',
                 'instructions',
-                'orderModel.submodels.sewingOutputs'
+                'orderModel.submodels.sewingOutputs',
+                'orderModel.submodels.exampleOutputs',
             ])
             ->first();
 

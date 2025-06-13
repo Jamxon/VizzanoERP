@@ -80,4 +80,9 @@ class OrderSubModel extends Model
     {
         return $this->hasOne(OtkOrderGroup::class, 'order_sub_model_id');
     }
+
+    public function exampleOutputs(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ExampleOutputs::class, 'order_submodel_id');
+    }
 }
