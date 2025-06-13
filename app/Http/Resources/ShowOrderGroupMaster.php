@@ -62,6 +62,11 @@ class ShowOrderGroupMaster extends JsonResource
             ? round($todayEarned / $attendanceCount, 2)
             : 0;
 
+        // ✅ Har bir xodimga to‘g‘ri keladigan pul (example uchun)
+        $perEmployeeExampleEarning = $attendanceCount > 0
+            ? round($todayEarnedExample / $attendanceCount, 2)
+            : 0;
+
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -78,10 +83,12 @@ class ShowOrderGroupMaster extends JsonResource
             'todaySewn' => $todaySewn,
             'todayExample' => $todayExample,
             'todayEarned' => round($todayEarned, 2),
+            'todayEarnedExample' => round($todayEarnedExample, 2),
             'actualTodayEarned' => round($actualTodayEarned, 2),
             'actualEarnedExample' => round($actualTodayExample, 2),
             'attendanceCount' => $attendanceCount,
             'perEmployeeEarning' => $perEmployeeEarning,
+            'perEmployeeExampleEarning' => $perEmployeeExampleEarning,
 
             'orderModel' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
