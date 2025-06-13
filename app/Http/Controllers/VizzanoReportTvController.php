@@ -90,7 +90,7 @@ class VizzanoReportTvController extends Controller
             ->pluck('work_seconds', 'group_id');
 
         // ✅ ExampleOutputs ni qo‘shamiz (planlarsiz, lekin batafsil)
-        $exampleQuery = \App\Models\ExampleOutput::whereIn('order_submodel_id', $orderSubmodelIds);
+        $exampleQuery = \App\Models\ExampleOutputs::whereIn('order_submodel_id', $orderSubmodelIds);
 
         if ($endDate) {
             $exampleQuery->whereBetween('created_at', [$startDate, $endDate]);
