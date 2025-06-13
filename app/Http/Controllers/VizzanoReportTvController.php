@@ -109,7 +109,7 @@ class VizzanoReportTvController extends Controller
             ])
             ->get();
 
-        $exampleTotalQuantities = \App\Models\ExampleOutput::whereIn('order_submodel_id', $orderSubmodelIds)
+        $exampleTotalQuantities = \App\Models\ExampleOutputs::whereIn('order_submodel_id', $orderSubmodelIds)
             ->select('order_submodel_id', DB::raw('SUM(quantity) as total_quantity'))
             ->groupBy('order_submodel_id')
             ->pluck('total_quantity', 'order_submodel_id');
