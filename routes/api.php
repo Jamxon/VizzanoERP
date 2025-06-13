@@ -205,6 +205,7 @@ Route::prefix('groupHelper')->middleware('role:groupHelper')->group(function () 
     Route::post('receiveOrder',[GroupHelperController::class, 'receiveOrder']);
     Route::get('times',[GroupMasterController::class, 'getTimes']);
     Route::post('exampleOutputs', [GroupHelperController::class, 'storeExampleOutput']);
+    Route::get('orders/show/{id}',[\App\Http\Controllers\GroupMasterController::class, 'showOrder']);
 
 });
 
