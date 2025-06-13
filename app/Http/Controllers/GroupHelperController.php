@@ -59,8 +59,13 @@ class GroupHelperController extends Controller
                     return $submodel->sewingOutputs;
                 })->sum('quantity');
 
+                $totalExample = $order->orderModel->submodels->flatMap(function ($submodel) {
+                    return $submodel->exampleOutputs;
+                })->sum('quantity');
+
                 // Dinamik property qo‘shish yoki resource ichida ishlatish
                 $order->total_sewn_quantity = $totalSewn;
+                $order->total_example_quantity = $totalExample;
             }
 
             return $firstOrderGroup;
