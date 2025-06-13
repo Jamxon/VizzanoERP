@@ -9,6 +9,7 @@ use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CuttingMasterController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\GroupHelperController;
 use App\Http\Controllers\GroupMasterController;
 use App\Http\Controllers\HikvisionEventController;
 use App\Http\Controllers\InternalAccountantController;
@@ -196,6 +197,11 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
        Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
 
+});
+
+Route::prefix('groupHelper')->middleware('role:groupHelper')->group(function () {
+   Route::get('orders', [GroupHelperController::class, 'getOrders']);
+    Route::get('orders/pending',[\App\Http\Controllers\GroupMasterController::class, 'getPendingOrders']);
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
