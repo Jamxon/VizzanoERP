@@ -203,6 +203,8 @@ Route::prefix('groupHelper')->middleware('role:groupHelper')->group(function () 
    Route::get('orders', [GroupHelperController::class, 'getOrders']);
     Route::get('orders/pending',[\App\Http\Controllers\GroupMasterController::class, 'getPendingOrders']);
     Route::post('receiveOrder',[GroupHelperController::class, 'receiveOrder']);
+    Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
+
 });
 
 Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
