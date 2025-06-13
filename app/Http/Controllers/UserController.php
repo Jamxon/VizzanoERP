@@ -108,7 +108,7 @@ class UserController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('issues', $filename);
+            $file->storeAs('/public/issues/', $filename);
         }
 
         $issue = Issue::create([
