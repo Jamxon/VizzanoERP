@@ -44,8 +44,8 @@ class ShowOrderGroupMaster extends JsonResource
 
         // ✅ Rasxod asosida haqiqiy hisob-kitob: 1 dona uchun = (rasxod / 250) * 12
         $minutesPerItem = ($this->orderModel->rasxod ?? 0) / 250;
-        return $minutesPerItem;
         $earningsPerItem = $minutesPerItem * 9;
+        return $earningsPerItem;
         $actualTodayEarned = $todaySewn * $earningsPerItem;
         $actualTodayExample = $todayEarnedExample * $earningsPerItem;
 
