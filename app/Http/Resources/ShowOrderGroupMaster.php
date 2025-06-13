@@ -16,11 +16,23 @@ class ShowOrderGroupMaster extends JsonResource
             return $submodel->sewingOutputs->sum('quantity');
         });
 
+        $totalExample = $this->orderModel->submodels->sum(function ($submodel) {
+            return $submodel->exampleOutputs->sum('quantity');
+        });
+
         $remainAmount = $orderQuantity - $totalSewn;
 
-        // ✅ Bugungi tikilgan mahsulotlar soni
+        $remainExample = $orderQuantity - $totalExample;
+
         $todaySewn = $this->orderModel->submodels->sum(function ($submodel) {
             return $submodel->sewingOutputs
+                ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+                ->sum('quantity');
+        });
+        // ✅ Bugungi tikilgan mahsulotlar soni
+
+        $todayExample = $this->orderModel->submodels->sum(function ($submodel) {
+            return $submodel->exampleOutputs
                 ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
                 ->sum('quantity');
         });
@@ -57,9 +69,11 @@ class ShowOrderGroupMaster extends JsonResource
             'status' => $this->status,
             'comment' => $this->comment,
             'remainAmount' => $remainAmount,
+            'remainExample' => $remainExample,
 
             // 🔢 Yangi qo‘shilgan hisob-kitoblar
             'todaySewn' => $todaySewn,
+            'todayExample' => $todayExample,
             'todayEarned' => round($todayEarned, 2),
             'actualTodayEarned' => round($actualTodayEarned, 2), // 🆕 Qo‘shildi
             'attendanceCount' => $attendanceCount,
