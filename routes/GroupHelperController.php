@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GetOrderGroupMasterResource;
+use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderSubModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class GroupHelperController extends Controller
 {
@@ -59,4 +62,89 @@ class GroupHelperController extends Controller
 
         return response()->json(GetOrderGroupMasterResource::collection($orders));
     }
+
+    public function receiveOrder(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $orderId = $request->input('order_id');
+        $submodelId = $request->input('submodel_id');
+
+        try {
+            DB::beginTransaction();
+
+            $order = Order::find($orderId);
+
+            if (!$order) {
+                return response()->json(['message' => 'Order not found'], 404);
+            }
+
+            $orderSubmodel = OrderSubmodel::find($submodelId);
+
+            if (!$orderSubmodel) {
+                return response()->json(['message' => 'OrderSubmodel not found'], 404);
+            }
+
+            $allOrderSubmodels = OrderSubmodel::where('order_model_id', $orderSubmodel->order_model_id)->pluck('id')->toArray();
+
+            $existingOrderGroup = OrderGroup::where('submodel_id', $submodelId)->first();
+
+            $oldData = null;
+            $newData = [
+                'order_id' => $order->id,
+                'group_id' => auth()->user()->employee->group->id,
+                'submodel_id' => $submodelId
+            ];
+
+            if ($existingOrderGroup) {
+                $oldData = $existingOrderGroup->toArray();
+                $existingOrderGroup->update([
+                    'group_id' => auth()->user()->employee->group->id,
+                ]);
+                $newData = $existingOrderGroup->fresh()->toArray();
+            } else {
+                OrderGroup::create([
+                    'order_id' => $order->id,
+                    'group_id' => auth()->user()->employee->group->id,
+                    'submodel_id' => $submodelId,
+                ]);
+            }
+
+            $linkedSubmodels = OrderGroup::whereIn('submodel_id', $allOrderSubmodels)->distinct('submodel_id')->count();
+
+            $orderOldStatus = $order->status;
+
+            if (count($allOrderSubmodels) > 0 && count($allOrderSubmodels) == $linkedSubmodels) {
+                $order->update(['status' => 'tailoring']);
+
+                // Log order status change separately
+                if ($orderOldStatus !== 'tailoring') {
+                    Log::add(
+                        auth()->id(),
+                        "Buyurtma statusi o'zgartirildi!",
+                        'receive',
+                        ['order_id' => $order->id, 'status' => $orderOldStatus],
+                        ['order_id' => $order->id, 'status' => 'tailoring']
+                    );
+                }
+            }
+
+            DB::commit();
+
+            // Log the main action
+            Log::add(
+                auth()->id(),
+                'Buyurtma qabul qilindi',
+                $oldData,
+                $newData
+            );
+
+            return response()->json([
+                'message' => 'Order received successfully',
+                'order' => $order,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Error receiving order: ' . $e->getMessage()], 500);
+        }
+    }
+
 }
