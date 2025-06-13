@@ -4,10 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GetOrderGroupMasterResource;
+use App\Models\Bonus;
+use App\Models\Employee;
+use App\Models\ExampleOutputs;
 use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderGroup;
+use App\Models\OrderModel;
 use App\Models\OrderSubModel;
+use App\Models\SewingOutputs;
+use App\Models\Time;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -147,4 +153,57 @@ class GroupHelperController extends Controller
         }
     }
 
+    public function storeExampleOutput(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validatedData = $request->validate([
+            'order_submodel_id' => 'required|exists:order_sub_models,id',
+            'quantity' => 'required|integer|min:0',
+            'time_id' => 'required|exists:times,id',
+            'comment' => 'nullable|string',
+        ]);
+
+        $orderSubModel = OrderSubModel::find($validatedData['order_submodel_id']);
+        $orderModel = OrderModel::find($orderSubModel->order_model_id);
+        $order = Order::find($orderModel->order_id);
+
+        if (!$order) {
+            return response()->json(['message' => 'Buyurtma topilmadi!'], 404);
+        }
+
+        $orderQuantity = $order->quantity;
+        $totalSewnQuantity = ExampleOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
+        $newQuantity = $validatedData['quantity'];
+        $combinedQuantity = $totalSewnQuantity + $newQuantity;
+
+        if ($combinedQuantity > $orderQuantity) {
+            $a = $orderQuantity - $totalSewnQuantity;
+            return response()->json([
+                'message' => "Siz faqat $a dona qo'shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."
+            ], 400);
+        }
+
+        // Yangi natijani saqlash
+        $exampleOutput = ExampleOutputs::create($validatedData);
+        
+        $time = Time::find($validatedData['time_id']);
+        Log::add(
+            auth()->id(),
+            'Patok Master zagatovka natija kiritdi',
+            'sewing',
+            null,
+            [
+                'example_output' => $exampleOutput->id,
+                'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
+                'quantity' => $validatedData['quantity'],
+                'time' => $time,
+                'comment' => $validatedData['comment'] ?? null,
+                'order' => $order->name ?? 'Noma’lum buyurtma',
+                'remaining_quantity' => $orderQuantity - $combinedQuantity,
+            ]
+        );
+
+        return response()->json([
+            'message' => "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
+        ]);
+    }
 }

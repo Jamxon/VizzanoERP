@@ -201,9 +201,10 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
 
 Route::prefix('groupHelper')->middleware('role:groupHelper')->group(function () {
    Route::get('orders', [GroupHelperController::class, 'getOrders']);
-    Route::get('orders/pending',[\App\Http\Controllers\GroupMasterController::class, 'getPendingOrders']);
+    Route::get('orders/pending',[GroupMasterController::class, 'getPendingOrders']);
     Route::post('receiveOrder',[GroupHelperController::class, 'receiveOrder']);
-    Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
+    Route::get('times',[GroupMasterController::class, 'getTimes']);
+    Route::post('exampleOutputs', [GroupHelperController::class, 'storeExampleOutput']);
 
 });
 
