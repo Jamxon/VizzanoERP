@@ -391,7 +391,7 @@ class TechnologController extends Controller
             '*.tarifications.*.employee_id' => 'nullable|integer|exists:employees,id',
             '*.tarifications.*.name' => 'required|string|max:255',
             '*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
-            '*.tarifications.*.typewriter_id' => 'required|integer|exists:type_writers,id',
+            '*.tarifications.*.typewriter_id' => 'nullable|integer|exists:type_writers,id',
             '*.tarifications.*.second' => 'required|numeric|min:0',
         ]);
 
@@ -438,7 +438,7 @@ class TechnologController extends Controller
                     'name' => $tarification['name'],
                     'user_id' => $tarification['employee_id'] ?? null,
                     'razryad_id' => $tarification['razryad_id'],
-                    'typewriter_id' => $tarification['typewriter_id'],
+                    'typewriter_id' => $tarification['typewriter_id'] ?? null,
                     'second' => $tarification['second'],
                     'summa' => $summa,
                     'code' => $this->generateSequentialCode(),
