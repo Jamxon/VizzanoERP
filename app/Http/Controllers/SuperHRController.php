@@ -68,7 +68,7 @@ class SuperHRController extends Controller
                     $status[] = ['date' => $date, 'status' => '✅ Kelgan'];
                 } else {
                     $absentCount++;
-                    $status[] = ['date' => $date, 'status' => '&#10005; Kelmagan'];
+                    $status[] = ['date' => $date, 'status' => '❌ Kelmagan'];
                 }
             }
 
