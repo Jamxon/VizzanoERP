@@ -22,9 +22,8 @@ class SuperHRController extends Controller
 {
     public function exportAttendancePdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
-        $filter = $request->get('filter');
-        $manualStart = $request->get('start_date'); // format: Y-m-d
-        $manualEnd = $request->get('end_date');     // format: Y-m-d
+        $startDate = $request->get('start_date'); // format: Y-m-d
+        $endDate = $request->get('end_date');     // format: Y-m-d
 
         ini_set('memory_limit', '2G');
         set_time_limit(120);
@@ -34,42 +33,20 @@ class SuperHRController extends Controller
             return response()->json(['message' => '❌ Foydalanuvchining filial aniqlanmadi'], 422);
         }
 
+        if (!$startDate || !$endDate) {
+            return response()->json(['message' => '❌ Sana noto‘g‘ri yoki to‘liq emas'], 422);
+        }
+
         $employees = \App\Models\Employee::where('branch_id', $branchId)
             ->where('status', '!=', 'kicked')
             ->select('id', 'name')
             ->get();
 
-        $today = now()->toDateString();
-        $yesterday = now()->subDay()->toDateString();
-        $daysAgo7 = now()->subDays(7)->toDateString();
-        $daysAgo10 = now()->subDays(10)->toDateString();
-
-        // 🧠 Sana aniqlash logikasi
-        $startDate = match($filter) {
-            'today' => $today,
-            'yesterday' => $yesterday,
-            'last_7_days', 'absent_7_days' => $daysAgo7,
-            'last_10_days', 'absent_10_days' => $daysAgo10,
-            'last_30_days', 'absent_30_days' => now()->subDays(30)->toDateString(),
-            'custom' => $manualStart,
-            default => null,
-        };
-
-        $endDate = in_array($filter, ['today', 'yesterday'])
-            ? $startDate
-            : ($filter === 'custom' ? $manualEnd : $today);
-
-        if (!$startDate || !$endDate) {
-            return response()->json(['message' => '❌ Sana noto‘g‘ri yoki to‘liq emas'], 422);
-        }
-
-        // ✅ Attendance
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
             ->get()
             ->groupBy('employee_id');
 
-        // 📅 Sana oralig'ini tayyorlash
         $dateRange = collect();
         $current = \Carbon\Carbon::parse($startDate);
         $end = \Carbon\Carbon::parse($endDate);
@@ -78,8 +55,7 @@ class SuperHRController extends Controller
             $current->addDay();
         }
 
-        // 🔁 Har bir xodim bo‘yicha
-        $result = $employees->map(function ($employee) use ($attendances, $dateRange, $filter) {
+        $result = $employees->map(function ($employee) use ($attendances, $dateRange) {
             $employeeAttendances = $attendances[$employee->id] ?? collect();
             $presentCount = 0;
             $absentCount = 0;
@@ -100,18 +76,16 @@ class SuperHRController extends Controller
                 'name' => $employee->name,
                 'present_count' => $presentCount,
                 'absent_count' => $absentCount,
-                'status_detail' => in_array($filter, ['today', 'yesterday', 'custom']) ? $status : null
+                'status_detail' => $status,
             ];
         });
 
-        // 🧾 PDF yaratish
         $pdf = PDF::loadView('pdf.attendance-report', [
             'employees' => $result,
             'date_range' => [$startDate, $endDate],
-            'filter' => $filter,
         ])->setPaper('a4', 'portrait');
 
-        return $pdf->download("attendance_{$filter}.pdf");
+        return $pdf->download("attendance_{$startDate}_{$endDate}.pdf");
     }
 
     public function filterAttendance(Request $request): \Illuminate\Http\JsonResponse

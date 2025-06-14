@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-<h2>📋 Davomat Hisoboti ({{ $filter }})</h2>
+<h2>📋 Davomat Hisoboti</h2>
 <p><strong>Sana oralig‘i:</strong> {{ $date_range[0] }} - {{ $date_range[1] }}</p>
 
 <table>
@@ -18,12 +18,7 @@
     <tr>
         <th>#</th>
         <th>F.I.Sh</th>
-        @if (in_array($filter, ['today', 'yesterday', 'custom']))
-            <th>Holat</th>
-        @else
-            <th>Kelgan kunlar</th>
-            <th>Kelmagan kunlar</th>
-        @endif
+        <th>Davomat Tafsiloti</th>
     </tr>
     </thead>
     <tbody>
@@ -31,20 +26,13 @@
         <tr>
             <td>{{ $i + 1 }}</td>
             <td>{{ $employee['name'] }}</td>
-
-            @if (in_array($filter, ['today', 'yesterday', 'custom']))
-                <td>
-                    @foreach ($employee['status_detail'] as $status)
-                        {{ $status['date'] }} - {{ $status['status'] }}<br>
-                    @endforeach
-                </td>
-            @else
-                <td>{{ $employee['present_count'] }}</td>
-                <td>{{ $employee['absent_count'] }}</td>
-            @endif
+            <td>
+                @foreach ($employee['status_detail'] as $status)
+                    {{ $status['date'] }} - {{ $status['status'] }}<br>
+                @endforeach
+            </td>
         </tr>
     @endforeach
-
     </tbody>
 </table>
 </body>
