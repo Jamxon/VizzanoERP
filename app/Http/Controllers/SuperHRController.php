@@ -27,6 +27,7 @@ class SuperHRController extends Controller
         $manualEnd = $request->get('end_date');     // format: Y-m-d
 
         ini_set('memory_limit', '2G');
+        set_time_limit(120);
 
         $branchId = auth()->user()?->employee?->branch_id;
         if (!$branchId) {
