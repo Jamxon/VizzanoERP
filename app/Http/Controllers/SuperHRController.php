@@ -73,6 +73,7 @@ class SuperHRController extends Controller
             }
 
             return [
+                'employee_id' => $employee->id,
                 'name' => $employee->name,
                 'present_count' => $presentCount,
                 'absent_count' => $absentCount,

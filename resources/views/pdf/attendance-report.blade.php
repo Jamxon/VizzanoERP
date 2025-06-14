@@ -44,7 +44,7 @@
     <tbody>
     @foreach ($employees as $i => $employee)
         <tr>
-            <td>{{ $employee['id'] }}</td>
+            <td>{{ $employee['employee_id'] }}</td>
             <td>{{ $employee['name'] }}</td>
             <td>
                 @foreach ($employee['status_detail'] as $status)
