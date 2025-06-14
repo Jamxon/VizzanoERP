@@ -68,6 +68,9 @@ class SuperHRController extends Controller
                     return [
                         'date' => $att->date,
                         'status' => $att->status,
+                        'check_in' => $att->check_in,
+                        'check_out' => $att->check_out,
+                        'check_in_image' => $att->check_in_image,
                     ];
                 })->values()
             ];
