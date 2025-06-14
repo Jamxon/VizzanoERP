@@ -65,10 +65,10 @@ class SuperHRController extends Controller
                 $att = $employeeAttendances->firstWhere('date', $date);
                 if ($att && $att->status === 'present') {
                     $presentCount++;
-                    $status[] = ['date' => $date, 'status' => '&#10003; Kelgan'];
+                    $status[] = ['date' => $date, 'status' => 'Kelgan'];
                 } else {
                     $absentCount++;
-                    $status[] = ['date' => $date, 'status' => '&#10005; Kelmagan'];
+                    $status[] = ['date' => $date, 'status' => 'Kelmagan'];
                 }
             }
 

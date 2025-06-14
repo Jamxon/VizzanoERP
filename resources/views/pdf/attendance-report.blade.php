@@ -27,7 +27,7 @@
     </style>
 </head>
 <body>
-<h2>📋 Davomat Hisoboti</h2>
+<h2>Davomat Hisoboti</h2>
 <p><strong>Sana oralig‘i:</strong> {{ $date_range[0] }} - {{ $date_range[1] }}</p>
 
 <table>
@@ -46,10 +46,12 @@
             <td>
                 @foreach ($employee['status_detail'] as $status)
                     @php
-                        $class = str_contains($status['status'], 'Kelgan') ? 'green' : 'red';
+                        $isPresent = str_contains($status['status'], 'Kelgan');
+                        $class = $isPresent ? 'green' : 'red';
+                        $symbol = $isPresent ? '&#10003;' : '&#10005;';
                     @endphp
                     <span class="{{ $class }}">
-                        {{ $status['date'] }} ; {{ $status['status'] }}
+                        {!! $symbol !!} {{ $status['date'] }} ; {{ $status['status'] }}
                     </span><br>
                 @endforeach
             </td>
