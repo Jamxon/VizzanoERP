@@ -90,11 +90,16 @@ class SuperHRController extends Controller
 
     public function filterAttendance(Request $request): \Illuminate\Http\JsonResponse
     {
-        $filter = $request->get('filter'); // 'today', 'yesterday', 'last_7_days', 'last_10_days'
+        $startDate = $request->get('start_date'); // format: Y-m-d
+        $endDate = $request->get('end_date');     // format: Y-m-d
 
         $branchId = auth()->user()?->employee?->branch_id;
         if (!$branchId) {
             return response()->json(['message' => '❌ Foydalanuvchining filial aniqlanmadi'], 422);
+        }
+
+        if (!$startDate || !$endDate) {
+            return response()->json(['message' => '❌ Sana noto‘g‘ri yoki to‘liq emas'], 422);
         }
 
         $employees = \App\Models\Employee::where('branch_id', $branchId)
@@ -102,34 +107,13 @@ class SuperHRController extends Controller
             ->select('id', 'name')
             ->get();
 
-        $today = now()->toDateString();
-        $yesterday = now()->subDay()->toDateString();
-        $daysAgo7 = now()->subDays(7)->toDateString();
-        $daysAgo10 = now()->subDays(10)->toDateString();
-
-        $startDate = match($filter) {
-            'today' => $today,
-            'yesterday' => $yesterday,
-            'last_7_days', 'absent_7_days' => $daysAgo7,
-            'last_10_days', 'absent_10_days' => $daysAgo10,
-            'last_30_days', 'absent_30_days' => now()->subDays(30)->toDateString(),
-            'all' => null,
-            default => null,
-        };
-
-        if (!$startDate) {
-            return response()->json(['message' => '❌ Noto‘g‘ri filter'], 422);
-        }
-
-        $endDate = in_array($filter, ['today', 'yesterday']) ? $startDate : $today;
-
         // 📌 Attendance larni oldindan yig'amiz
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
             ->get()
             ->groupBy('employee_id');
 
-        // 📆 Filtr oralig'idagi barcha kunlar ro'yxati
+        // 📆 Sana oralig'idagi barcha kunlar ro'yxati
         $dateRange = collect();
         $current = \Carbon\Carbon::parse($startDate);
         $end = \Carbon\Carbon::parse($endDate);
@@ -149,25 +133,22 @@ class SuperHRController extends Controller
             foreach ($dateRange as $date) {
                 $att = $employeeAttendances->firstWhere('date', $date);
 
-                if ($att) {
-                    if ($att->status === 'present'){
-                        $present[] = [
-                            'date' => $att->date,
-                            'status' => $att->status,
-                            'check_in' => $att->check_in,
-                            'check_out' => $att->check_out,
-                            'check_in_image' => $att->check_in_image,
-                        ];
-                    }
-                    else {
-                        $absent[] = [
-                            'date' => $date,
-                            'status' => 'absent',
-                            'check_in' => null,
-                            'check_out' => null,
-                            'check_in_image' => null,
-                        ];
-                    }
+                if ($att && $att->status === 'present') {
+                    $present[] = [
+                        'date' => $att->date,
+                        'status' => $att->status,
+                        'check_in' => $att->check_in,
+                        'check_out' => $att->check_out,
+                        'check_in_image' => $att->check_in_image,
+                    ];
+                } else {
+                    $absent[] = [
+                        'date' => $date,
+                        'status' => 'absent',
+                        'check_in' => null,
+                        'check_out' => null,
+                        'check_in_image' => null,
+                    ];
                 }
             }
 
