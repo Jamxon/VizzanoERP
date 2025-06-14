@@ -49,6 +49,13 @@ class VizzanoReportTvController extends Controller
             $q->where('branch_id', $branchId);
         })->count();
 
+        $simple = Attendance::whereDate('date', date('Y-m-d'))
+            ->whereHas('employee', function ($q) use ($branchId)  {
+                $q->where('status', '!=', 'kicked');
+                $q->where('type', 'simple');
+                $q->where('branch_id', $branchId);
+            })->count();
+
         $sewingOutputs = $query
             ->select('order_submodel_id')
             ->selectRaw("SUM(CASE WHEN DATE(created_at) = '{$today}' THEN quantity ELSE 0 END) as today_quantity")
@@ -162,6 +169,7 @@ class VizzanoReportTvController extends Controller
             }),
             'motivations' => $motivations,
             'aup' => $aup,
+            'simple' => $simple,
             'example_outputs' => $exampleOutputsData,
         ];
 
