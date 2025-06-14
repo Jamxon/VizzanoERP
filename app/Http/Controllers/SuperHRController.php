@@ -15,9 +15,92 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class SuperHRController extends Controller
 {
+    public function exportAttendancePdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+    {
+        $filter = $request->get('filter');
+
+        $branchId = auth()->user()?->employee?->branch_id;
+        if (!$branchId) {
+            return response()->json(['message' => '❌ Foydalanuvchining filial aniqlanmadi'], 422);
+        }
+
+        $employees = \App\Models\Employee::where('branch_id', $branchId)
+            ->where('status', '!=', 'kicked')
+            ->select('id', 'name')
+            ->get();
+
+        $today = now()->toDateString();
+        $yesterday = now()->subDay()->toDateString();
+        $daysAgo7 = now()->subDays(7)->toDateString();
+        $daysAgo10 = now()->subDays(10)->toDateString();
+
+        $startDate = match($filter) {
+            'today' => $today,
+            'yesterday' => $yesterday,
+            'last_7_days', 'absent_7_days' => $daysAgo7,
+            'last_10_days', 'absent_10_days' => $daysAgo10,
+            'last_30_days', 'absent_30_days' => now()->subDays(30)->toDateString(),
+            default => null,
+        };
+
+        if (!$startDate) {
+            return response()->json(['message' => '❌ Noto‘g‘ri filter'], 422);
+        }
+
+        $endDate = in_array($filter, ['today', 'yesterday']) ? $startDate : $today;
+
+        $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
+            ->whereIn('employee_id', $employees->pluck('id'))
+            ->get()
+            ->groupBy('employee_id');
+
+        $dateRange = collect();
+        $current = \Carbon\Carbon::parse($startDate);
+        $end = \Carbon\Carbon::parse($endDate);
+        while ($current->lte($end)) {
+            $dateRange->push($current->toDateString());
+            $current->addDay();
+        }
+
+        $result = $employees->map(function ($employee) use ($attendances, $dateRange, $filter) {
+            $employeeAttendances = $attendances[$employee->id] ?? collect();
+            $presentCount = 0;
+            $absentCount = 0;
+            $status = [];
+
+            foreach ($dateRange as $date) {
+                $att = $employeeAttendances->firstWhere('date', $date);
+                if ($att && $att->status === 'present') {
+                    $presentCount++;
+                    $status[] = ['date' => $date, 'status' => '✅ Kelgan'];
+                } else {
+                    $absentCount++;
+                    $status[] = ['date' => $date, 'status' => '❌ Kelmagan'];
+                }
+            }
+
+            return [
+                'name' => $employee->name,
+                'present_count' => $presentCount,
+                'absent_count' => $absentCount,
+                'status_detail' => in_array($filter, ['today', 'yesterday']) ? $status : null
+            ];
+        });
+
+        $pdf = PDF::loadView('pdf.attendance-report', [
+            'employees' => $result,
+            'date_range' => [$startDate, $endDate],
+            'filter' => $filter,
+        ])->setPaper('a4', 'portrait');
+
+        return $pdf->download("attendance_{$filter}.pdf");
+    }
+
     public function filterAttendance(Request $request): \Illuminate\Http\JsonResponse
     {
         $filter = $request->get('filter'); // 'today', 'yesterday', 'last_7_days', 'last_10_days'

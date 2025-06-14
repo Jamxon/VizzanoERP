@@ -329,6 +329,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('users/{user}', [UserController::class, 'show']);
     Route::get('employees/casher/{employee}', [UserController::class, 'showEmployee']);
     Route::get('filterAttendance', [SuperHRController::class, 'filterAttendance']);
+    Route::get('export-attendance', [SuperHRController::class, 'exportAttendancePdf']);
 
 });
 
