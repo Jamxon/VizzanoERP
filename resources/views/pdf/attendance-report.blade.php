@@ -18,7 +18,7 @@
     <tr>
         <th>#</th>
         <th>F.I.Sh</th>
-        @if (in_array($filter, ['today', 'yesterday']))
+        @if (in_array($filter, ['today', 'yesterday', 'custom']))
             <th>Holat</th>
         @else
             <th>Kelgan kunlar</th>
