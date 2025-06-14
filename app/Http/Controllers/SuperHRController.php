@@ -79,6 +79,8 @@ class SuperHRController extends Controller
             return [
                 'employee_id' => $employee->id,
                 'name' => $employee->name,
+                'department' => $employee->department->name ?? null,
+                'group' => $employee->group->name ?? null,
                 'present_count' => $presentCount,
                 'absent_count' => $absentCount,
                 'status_detail' => $status,
@@ -161,6 +163,8 @@ class SuperHRController extends Controller
             return [
                 'employee_id' => $employee->id,
                 'name' => $employee->name,
+                'department' => $employee->department->name ?? null,
+                'group' => $employee->group->name ?? null,
                 'attendances' => [
                     'present' => $present,
                     'absent' => $absent,

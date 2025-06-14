@@ -38,6 +38,8 @@
     <tr>
         <th>#</th>
         <th>F.I.Sh</th>
+        <th>Bo'lim</th>
+        <th>Guruh</th>
         <th>Davomat Tafsiloti</th>
     </tr>
     </thead>
@@ -46,6 +48,8 @@
         <tr>
             <td>{{ $employee['employee_id'] }}</td>
             <td>{{ $employee['name'] }}</td>
+            <td>{{ $employee['department'] ?? "-" }}</td>
+            <td>{{ $employee['group'] ?? "-" }}</td>
             <td>
                 @foreach ($employee['status_detail'] as $status)
                     @php
