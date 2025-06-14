@@ -31,7 +31,8 @@
         <tr>
             <td>{{ $i + 1 }}</td>
             <td>{{ $employee['name'] }}</td>
-            @if ($employee['status_detail'])
+
+            @if (in_array($filter, ['today', 'yesterday', 'custom']))
                 <td>
                     @foreach ($employee['status_detail'] as $status)
                         {{ $status['date'] }} - {{ $status['status'] }}<br>
@@ -43,6 +44,7 @@
             @endif
         </tr>
     @endforeach
+
     </tbody>
 </table>
 </body>
