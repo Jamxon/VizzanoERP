@@ -18,7 +18,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
-    public function getAttendanceStatus(Request $request): JsonResponse
+    public function filterAttendance(Request $request): \Illuminate\Http\JsonResponse
     {
         $filter = $request->get('filter'); // 'today', 'yesterday', 'last_7_days', 'last_10_days'
 
