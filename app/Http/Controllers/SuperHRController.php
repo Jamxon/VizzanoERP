@@ -80,21 +80,24 @@ class SuperHRController extends Controller
                 $att = $employeeAttendances->firstWhere('date', $date);
 
                 if ($att) {
-                    $present[] = [
-                        'date' => $att->date,
-                        'status' => $att->status,
-                        'check_in' => $att->check_in,
-                        'check_out' => $att->check_out,
-                        'check_in_image' => $att->check_in_image,
-                    ];
-                } else {
-                    $absent[] = [
-                        'date' => $date,
-                        'status' => 'ABSENT',
-                        'check_in' => null,
-                        'check_out' => null,
-                        'check_in_image' => null,
-                    ];
+                    if ($att->status === 'present'){
+                        $present[] = [
+                            'date' => $att->date,
+                            'status' => $att->status,
+                            'check_in' => $att->check_in,
+                            'check_out' => $att->check_out,
+                            'check_in_image' => $att->check_in_image,
+                        ];
+                    }
+                    else {
+                        $absent[] = [
+                            'date' => $date,
+                            'status' => 'absent',
+                            'check_in' => null,
+                            'check_out' => null,
+                            'check_in_image' => null,
+                        ];
+                    }
                 }
             }
 
