@@ -18,69 +18,65 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
-    public function filterAttendance(Request $request): \Illuminate\Http\JsonResponse
+    public function getAttendanceStatus(Request $request): JsonResponse
     {
-        $filter = $request->get('filter'); // 'yesterday', 'today', 'last_7_days', 'absent_7_days', ...
+        $filter = $request->get('filter'); // 'today', 'yesterday', 'last_7_days', 'last_10_days'
 
         $branchId = auth()->user()?->employee?->branch_id;
         if (!$branchId) {
             return response()->json(['message' => '❌ Foydalanuvchining filial aniqlanmadi'], 422);
         }
 
-        $employees = Employee::where('branch_id', $branchId)
+        $employees = \App\Models\Employee::where('branch_id', $branchId)
             ->where('status', '!=', 'kicked')
-            ->pluck('id');
-
-        $attendanceQuery = Attendance::whereIn('employee_id', $employees)
-            ->where('status', '!=', 'ABSENT');
+            ->select('id', 'name')
+            ->get();
 
         $today = now()->toDateString();
         $yesterday = now()->subDay()->toDateString();
         $daysAgo7 = now()->subDays(7)->toDateString();
         $daysAgo10 = now()->subDays(10)->toDateString();
 
-        switch ($filter) {
-            case 'today':
-                $attendance = $attendanceQuery->whereDate('date', $today)->get();
-                break;
+        $startDate = match($filter) {
+            'today' => $today,
+            'yesterday' => $yesterday,
+            'last_7_days', 'absent_7_days' => $daysAgo7,
+            'last_10_days', 'absent_10_days' => $daysAgo10,
+            default => null,
+        };
 
-            case 'yesterday':
-                $attendance = $attendanceQuery->whereDate('date', $yesterday)->get();
-                break;
-
-            case 'last_7_days':
-                $attendance = $attendanceQuery->whereBetween('date', [$daysAgo7, $today])->get();
-                break;
-
-            case 'last_10_days':
-                $attendance = $attendanceQuery->whereBetween('date', [$daysAgo10, $today])->get();
-                break;
-
-            case 'absent_7_days':
-                $presentIds = $attendanceQuery
-                    ->whereBetween('date', [$daysAgo7, $today])
-                    ->pluck('employee_id')
-                    ->unique();
-                $absents = Employee::whereIn('id', $employees)
-                    ->whereNotIn('id', $presentIds)
-                    ->get();
-                return response()->json(['absents' => $absents]);
-
-            case 'absent_10_days':
-                $presentIds = $attendanceQuery
-                    ->whereBetween('date', [$daysAgo10, $today])
-                    ->pluck('employee_id')
-                    ->unique();
-                $absents = Employee::whereIn('id', $employees)
-                    ->whereNotIn('id', $presentIds)
-                    ->get();
-                return response()->json(['absents' => $absents]);
-
-            default:
-                return response()->json(['message' => '❌ Noto‘g‘ri filter'], 422);
+        if (!$startDate) {
+            return response()->json(['message' => '❌ Noto‘g‘ri filter'], 422);
         }
 
-        return response()->json(['attendance' => $attendance]);
+        $endDate = in_array($filter, ['today', 'yesterday']) ? $startDate : $today;
+
+        // Shu oraliqdagi barcha attendance ma'lumotlar
+        $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
+            ->whereIn('employee_id', $employees->pluck('id'))
+            ->get()
+            ->groupBy('employee_id');
+
+        // Employee + ichida attendances formatini tuzamiz
+        $result = $employees->map(function ($employee) use ($attendances) {
+            $employeeAttendances = $attendances[$employee->id] ?? collect();
+
+            return [
+                'employee_id' => $employee->id,
+                'name' => $employee->name,
+                'attendances' => $employeeAttendances->map(function ($att) {
+                    return [
+                        'date' => $att->date,
+                        'status' => $att->status,
+                    ];
+                })->values()
+            ];
+        });
+
+        return response()->json([
+            'date_range' => [$startDate, $endDate],
+            'data' => $result
+        ]);
     }
 
     public function getRegions(): \Illuminate\Http\JsonResponse
