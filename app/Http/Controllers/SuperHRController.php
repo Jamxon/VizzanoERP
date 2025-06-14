@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GetEmployeeResourceCollection;
+use App\Models\Attendance;
 use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Log;
@@ -17,6 +18,70 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class SuperHRController extends Controller
 {
+    public function filterAttendance(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $filter = $request->get('filter'); // 'yesterday', 'today', 'last_7_days', 'absent_7_days', ...
+
+        $branchId = auth()->user()?->employee?->branch_id;
+        if (!$branchId) {
+            return response()->json(['message' => '❌ Foydalanuvchining filial aniqlanmadi'], 422);
+        }
+
+        $employees = Employee::where('branch_id', $branchId)
+            ->where('status', '!=', 'kicked')
+            ->pluck('id');
+
+        $attendanceQuery = Attendance::whereIn('employee_id', $employees)
+            ->where('status', '!=', 'ABSENT');
+
+        $today = now()->toDateString();
+        $yesterday = now()->subDay()->toDateString();
+        $daysAgo7 = now()->subDays(7)->toDateString();
+        $daysAgo10 = now()->subDays(10)->toDateString();
+
+        switch ($filter) {
+            case 'today':
+                $attendance = $attendanceQuery->whereDate('date', $today)->get();
+                break;
+
+            case 'yesterday':
+                $attendance = $attendanceQuery->whereDate('date', $yesterday)->get();
+                break;
+
+            case 'last_7_days':
+                $attendance = $attendanceQuery->whereBetween('date', [$daysAgo7, $today])->get();
+                break;
+
+            case 'last_10_days':
+                $attendance = $attendanceQuery->whereBetween('date', [$daysAgo10, $today])->get();
+                break;
+
+            case 'absent_7_days':
+                $presentIds = $attendanceQuery
+                    ->whereBetween('date', [$daysAgo7, $today])
+                    ->pluck('employee_id')
+                    ->unique();
+                $absents = Employee::whereIn('id', $employees)
+                    ->whereNotIn('id', $presentIds)
+                    ->get();
+                return response()->json(['absents' => $absents]);
+
+            case 'absent_10_days':
+                $presentIds = $attendanceQuery
+                    ->whereBetween('date', [$daysAgo10, $today])
+                    ->pluck('employee_id')
+                    ->unique();
+                $absents = Employee::whereIn('id', $employees)
+                    ->whereNotIn('id', $presentIds)
+                    ->get();
+                return response()->json(['absents' => $absents]);
+
+            default:
+                return response()->json(['message' => '❌ Noto‘g‘ri filter'], 422);
+        }
+
+        return response()->json(['attendance' => $attendance]);
+    }
 
     public function getRegions(): \Illuminate\Http\JsonResponse
     {

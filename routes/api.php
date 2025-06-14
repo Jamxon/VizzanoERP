@@ -328,6 +328,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('groups/{group}', [GroupController::class, 'show']);
     Route::get('users/{user}', [UserController::class, 'show']);
     Route::get('employees/casher/{employee}', [UserController::class, 'showEmployee']);
+    Route::get('filterAttendance', [SuperHRController::class, 'filterAttendance']);
 
 });
 
