@@ -51,17 +51,20 @@ class SuperHRController extends Controller
 
         $endDate = in_array($filter, ['today', 'yesterday']) ? $startDate : $today;
 
-        // Shu oraliqdagi barcha attendance ma'lumotlar
+        // Attendance ma'lumotlarini yig'amiz
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
             ->get()
             ->groupBy('employee_id');
 
-        // Employee + ichida attendances formatini tuzamiz
-        $result = $employees->map(function ($employee) use ($attendances) {
+        // Xodimlarni bo‘lib chiqamiz: present va absent
+        $present = [];
+        $absent = [];
+
+        foreach ($employees as $employee) {
             $employeeAttendances = $attendances[$employee->id] ?? collect();
 
-            return [
+            $record = [
                 'employee_id' => $employee->id,
                 'name' => $employee->name,
                 'attendances' => $employeeAttendances->map(function ($att) {
@@ -74,11 +77,18 @@ class SuperHRController extends Controller
                     ];
                 })->values()
             ];
-        });
+
+            if ($employeeAttendances->isNotEmpty()) {
+                $present[] = $record;
+            } else {
+                $absent[] = $record;
+            }
+        }
 
         return response()->json([
             'date_range' => [$startDate, $endDate],
-            'data' => $result
+            'present' => $present,
+            'absent' => $absent,
         ]);
     }
 
