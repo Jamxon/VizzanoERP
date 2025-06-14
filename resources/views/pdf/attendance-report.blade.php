@@ -28,7 +28,10 @@
 </head>
 <body>
 <h2>Davomat Hisoboti</h2>
-<p><strong>Sana oralig‘i:</strong> {{ $date_range[0] }} - {{ $date_range[1] }}</p>
+<p><strong>Sana oralig‘i:</strong>
+    {{ \Carbon\Carbon::parse($date_range[0])->format('d.m.Y') }} -
+    {{ \Carbon\Carbon::parse($date_range[1])->format('d.m.Y') }}
+</p>
 
 <table>
     <thead>
@@ -51,7 +54,7 @@
                         $symbol = $isPresent ? '&#10003;' : '&#10005;';
                     @endphp
                     <span class="{{ $class }}">
-                        {!! $symbol !!} {{ $status['date'] }} ; {{ $status['status'] }}
+                        {{ \Carbon\Carbon::parse($status['date'])->format('d.m.Y') }} {!! $symbol !!}  {{ $status['status'] }}
                     </span><br>
                 @endforeach
             </td>
