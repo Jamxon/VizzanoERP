@@ -22,8 +22,10 @@ class SuperHRController extends Controller
 {
     public function exportAttendancePdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
-        $startDate = $request->get('start_date'); // format: Y-m-d
-        $endDate = $request->get('end_date');     // format: Y-m-d
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $groupId = $request->get('group_id');
+        $departmentId = $request->get('department_id');
 
         ini_set('memory_limit', '2G');
         set_time_limit(120);
@@ -39,6 +41,8 @@ class SuperHRController extends Controller
 
         $employees = \App\Models\Employee::where('branch_id', $branchId)
             ->where('status', '!=', 'kicked')
+            ->when($groupId, fn($q) => $q->where('group_id', $groupId))
+            ->when($departmentId, fn($q) => $q->where('department_id', $departmentId))
             ->select('id', 'name')
             ->get();
 
@@ -91,8 +95,10 @@ class SuperHRController extends Controller
 
     public function filterAttendance(Request $request): \Illuminate\Http\JsonResponse
     {
-        $startDate = $request->get('start_date'); // format: Y-m-d
-        $endDate = $request->get('end_date');     // format: Y-m-d
+        $startDate = $request->get('start_date');
+        $endDate = $request->get('end_date');
+        $groupId = $request->get('group_id');
+        $departmentId = $request->get('department_id');
 
         $branchId = auth()->user()?->employee?->branch_id;
         if (!$branchId) {
@@ -105,16 +111,16 @@ class SuperHRController extends Controller
 
         $employees = \App\Models\Employee::where('branch_id', $branchId)
             ->where('status', '!=', 'kicked')
+            ->when($groupId, fn($q) => $q->where('group_id', $groupId))
+            ->when($departmentId, fn($q) => $q->where('department_id', $departmentId))
             ->select('id', 'name')
             ->get();
 
-        // 📌 Attendance larni oldindan yig'amiz
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
             ->get()
             ->groupBy('employee_id');
 
-        // 📆 Sana oralig'idagi barcha kunlar ro'yxati
         $dateRange = collect();
         $current = \Carbon\Carbon::parse($startDate);
         $end = \Carbon\Carbon::parse($endDate);
@@ -124,7 +130,6 @@ class SuperHRController extends Controller
             $current->addDay();
         }
 
-        // 🔁 Employee'larni qayta ishlaymiz
         $result = $employees->map(function ($employee) use ($attendances, $dateRange) {
             $employeeAttendances = $attendances[$employee->id] ?? collect();
 
