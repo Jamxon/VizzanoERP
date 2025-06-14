@@ -42,6 +42,8 @@ class SuperHRController extends Controller
             'yesterday' => $yesterday,
             'last_7_days', 'absent_7_days' => $daysAgo7,
             'last_10_days', 'absent_10_days' => $daysAgo10,
+            'last_30_days', 'absent_30_days' => now()->subDays(30)->toDateString(),
+            'all' => null, // 'all' filtri uchun maxsus hech narsa qilinmaydi
             default => null,
         };
 
