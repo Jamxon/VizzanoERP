@@ -43,7 +43,7 @@ class SuperHRController extends Controller
             'last_7_days', 'absent_7_days' => $daysAgo7,
             'last_10_days', 'absent_10_days' => $daysAgo10,
             'last_30_days', 'absent_30_days' => now()->subDays(30)->toDateString(),
-            'all' => null, // 'all' filtri uchun maxsus hech narsa qilinmaydi
+            'all' => null,
             default => null,
         };
 
@@ -53,44 +53,64 @@ class SuperHRController extends Controller
 
         $endDate = in_array($filter, ['today', 'yesterday']) ? $startDate : $today;
 
-        // Attendance ma'lumotlarini yig'amiz
+        // 📌 Attendance larni oldindan yig'amiz
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
             ->get()
             ->groupBy('employee_id');
 
-        // Xodimlarni bo‘lib chiqamiz: present va absent
-        $present = [];
-        $absent = [];
+        // 📆 Filtr oralig'idagi barcha kunlar ro'yxati
+        $dateRange = collect();
+        $current = \Carbon\Carbon::parse($startDate);
+        $end = \Carbon\Carbon::parse($endDate);
 
-        foreach ($employees as $employee) {
+        while ($current->lte($end)) {
+            $dateRange->push($current->toDateString());
+            $current->addDay();
+        }
+
+        // 🔁 Employee'larni qayta ishlaymiz
+        $result = $employees->map(function ($employee) use ($attendances, $dateRange) {
             $employeeAttendances = $attendances[$employee->id] ?? collect();
 
-            $record = [
-                'employee_id' => $employee->id,
-                'name' => $employee->name,
-                'attendances' => $employeeAttendances->map(function ($att) {
-                    return [
+            $present = [];
+            $absent = [];
+
+            foreach ($dateRange as $date) {
+                $att = $employeeAttendances->firstWhere('date', $date);
+
+                if ($att) {
+                    $present[] = [
                         'date' => $att->date,
                         'status' => $att->status,
                         'check_in' => $att->check_in,
                         'check_out' => $att->check_out,
                         'check_in_image' => $att->check_in_image,
                     ];
-                })->values()
-            ];
-
-            if ($employeeAttendances->isNotEmpty()) {
-                $present[] = $record;
-            } else {
-                $absent[] = $record;
+                } else {
+                    $absent[] = [
+                        'date' => $date,
+                        'status' => 'ABSENT',
+                        'check_in' => null,
+                        'check_out' => null,
+                        'check_in_image' => null,
+                    ];
+                }
             }
-        }
+
+            return [
+                'employee_id' => $employee->id,
+                'name' => $employee->name,
+                'attendances' => [
+                    'present' => $present,
+                    'absent' => $absent,
+                ]
+            ];
+        });
 
         return response()->json([
             'date_range' => [$startDate, $endDate],
-            'present' => $present,
-            'absent' => $absent,
+            'data' => $result,
         ]);
     }
 
