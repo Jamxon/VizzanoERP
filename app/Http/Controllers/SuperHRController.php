@@ -26,6 +26,8 @@ class SuperHRController extends Controller
         $manualStart = $request->get('start_date'); // format: Y-m-d
         $manualEnd = $request->get('end_date');     // format: Y-m-d
 
+        ini_set('memory_limit', '2G');
+
         $branchId = auth()->user()?->employee?->branch_id;
         if (!$branchId) {
             return response()->json(['message' => '❌ Foydalanuvchining filial aniqlanmadi'], 422);
