@@ -43,7 +43,7 @@ class SuperHRController extends Controller
             ->where('status', '!=', 'kicked')
             ->when($groupId, fn($q) => $q->where('group_id', $groupId))
             ->when($departmentId, fn($q) => $q->where('department_id', $departmentId))
-            ->select('id', 'name')
+            ->select('id', 'name', 'department_id', 'group_id')
             ->get();
 
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
@@ -115,7 +115,7 @@ class SuperHRController extends Controller
             ->where('status', '!=', 'kicked')
             ->when($groupId, fn($q) => $q->where('group_id', $groupId))
             ->when($departmentId, fn($q) => $q->where('department_id', $departmentId))
-            ->select('id', 'name')
+            ->select('id', 'name', 'department_id', 'group_id')
             ->get();
 
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
