@@ -28,7 +28,7 @@
             <td>{{ $employee['name'] }}</td>
             <td>
                 @foreach ($employee['status_detail'] as $status)
-                    {{ $status['date'] }} - {{ $status['status'] }}<br>
+                    {{ $status['date'] }} - &#10005; {{ $status['status'] }}<br>
                 @endforeach
             </td>
         </tr>

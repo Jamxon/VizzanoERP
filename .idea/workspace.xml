@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -368,15 +366,7 @@
       <workItem from="1749795627660" duration="68000" />
       <workItem from="1749795785216" duration="607000" />
       <workItem from="1749809534077" duration="12577000" />
-      <workItem from="1749873632137" duration="7872000" />
-    </task>
-    <task id="LOCAL-00267" summary="12345">
-      <option name="closed" value="true" />
-      <created>1749811338819</created>
-      <option name="number" value="00267" />
-      <option name="presentableId" value="LOCAL-00267" />
-      <option name="project" value="LOCAL" />
-      <updated>1749811338819</updated>
+      <workItem from="1749873632137" duration="9027000" />
     </task>
     <task id="LOCAL-00268" summary="12345">
       <option name="closed" value="true" />
@@ -762,7 +752,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749891342813</updated>
     </task>
-    <option name="localTasksCounter" value="316" />
+    <task id="LOCAL-00316" summary="12345">
+      <option name="closed" value="true" />
+      <created>1749891962444</created>
+      <option name="number" value="00316" />
+      <option name="presentableId" value="LOCAL-00316" />
+      <option name="project" value="LOCAL" />
+      <updated>1749891962444</updated>
+    </task>
+    <option name="localTasksCounter" value="317" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
