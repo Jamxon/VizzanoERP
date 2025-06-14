@@ -51,7 +51,6 @@
                     <span class="{{ $class }}">
                         {{ $status['date'] }} ; {{ $status['status'] }}
                     </span><br>
-
                 @endforeach
             </td>
         </tr>
