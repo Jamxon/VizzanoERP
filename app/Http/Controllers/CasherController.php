@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\Cashbox;
 use App\Models\Employee;
 use App\Models\Group;
@@ -63,6 +64,12 @@ class CasherController extends Controller
             ->whereDate('date', $date)
             ->whereIn('employee_id', $thisBranchEmployeeIds)
             ->sum('amount');
+
+        $employees = Attendance::whereDate('date', date('Y-m-d'))
+            ->whereHas('employee', function ($q) use ($branchId)  {
+                $q->where('status', '!=', 'kicked');
+                $q->where('branch_id', $branchId);
+            })->count();
 
         $outputs = SewingOutputs::with([
             'orderSubmodel.orderModel.order',
@@ -188,6 +195,8 @@ class CasherController extends Controller
             'aup' => $aup,
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
+            'employee_count' => $employees,
+            'per_employee_cost_uzs' => $totalFixedCost / max($employees, 1),
             'net_profit_uzs' => $totalEarned - $totalFixedCost,
             'kpi' => DB::table('bonuses')->whereDate('created_at', $date)->sum('amount'),
             'tarification' => DB::table('employee_tarification_logs')
