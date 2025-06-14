@@ -142,6 +142,10 @@ class CasherController extends Controller
                 return optional($submodel->group->group)->responsibleUser;
             })->filter()->unique('id')->values();
 
+            $rasxodPercentOfPrice = $priceUZS > 0
+                ? round((($orderModel->rasxod ?? 0) / $priceUZS) * 100, 2)
+                : null;
+
             return [
                 'order' => $order,
                 'responsibleUser' => $responsibleUsers,
@@ -151,6 +155,7 @@ class CasherController extends Controller
                 'price_uzs' => $priceUZS,
                 'total_quantity' => $totalQty,
                 'rasxod_limit_uzs' => $remainder,
+                'rasxod_percent_of_price' => $rasxodPercentOfPrice,
                 'bonus' => $bonus,
                 'tarification' => $tarification,
                 'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
