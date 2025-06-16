@@ -72,6 +72,7 @@ class GetGroupsForResultCheckerResource extends JsonResource
                         'id' => $submodel->submodel->id ?? null,
                         'name' => $submodel->submodel->name ?? null,
                     ],
+                    'status' => $order->order->status ?? null,
                     'todayPlan' => $todayPlan,
                     'sewingOutputs' => $todaySewingOutputs->map(function ($sewingOutput) {
                         return [
