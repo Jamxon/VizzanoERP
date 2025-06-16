@@ -52,11 +52,14 @@ class GetGroupsForResultCheckerResource extends JsonResource
                     ->distinct('employee_id')
                     ->count('employee_id');
 
+                $totalQuantity = $submodel->sewingOutputs
+                    ->sum('quantity');
+
                 $todaySewingOutputs = $submodel->sewingOutputs
                     ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
                     ->values();
 
-                $totalQuantity = $todaySewingOutputs->sum('quantity');
+                $todayTotalQuantity = $todaySewingOutputs->sum('quantity');
 
                 $todayPlan = ($spend > 0 && $employeeCount > 0)
                     ? intval(($workTimeInSeconds * $employeeCount) / $spend)
@@ -84,6 +87,7 @@ class GetGroupsForResultCheckerResource extends JsonResource
                             ],
                         ];
                     }),
+                    'todayTotalQuantity' => $todayTotalQuantity,
                     'totalQuantity' => $totalQuantity,
                 ];
             }),
