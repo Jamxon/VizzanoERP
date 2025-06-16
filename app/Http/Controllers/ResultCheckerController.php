@@ -14,12 +14,12 @@ class ResultCheckerController extends Controller
     public function getGroups(Request $request): \Illuminate\Http\JsonResponse
     {
         $groups = Group::where('department_id', $request->input('department_id'))
-            ->whereHas('orders', function ($q) {
+            ->whereHas('orders.order', function ($q) {
                 $q->whereIn('status', ['tailoring', 'pending', 'cutting']);
             })
             ->with([
                 'responsibleUser',
-                'orders' => function ($q) {
+                'orders.order' => function ($q) {
                     $q->whereIn('status', ['tailoring', 'pending', 'cutting']);
                 },
                 'orders.orderSubmodel.submodel',
