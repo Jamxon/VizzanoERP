@@ -16,7 +16,7 @@ jobs:
         with:
           host: '176.124.208.61'
           username: 'root'
-          password: 'hS+mN_w4+@SaWm'
+          password: 'vizzanoERP2025'
           script: |
             cd /home/jamkhan/VizzanoERP/
             git pull --no-rebase
