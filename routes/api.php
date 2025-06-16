@@ -41,6 +41,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
     Route::get('groups', [ResultCheckerController::class, 'getGroups']);
+    Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
+    Route::get('departments', [SuperHRController::class, 'getDepartments']);
+
 });
 
 Route::prefix('casher')->middleware('role:casher')->group(function () {
