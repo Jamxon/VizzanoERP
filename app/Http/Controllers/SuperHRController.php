@@ -26,6 +26,7 @@ class SuperHRController extends Controller
         $endDate = $request->get('end_date');
         $groupId = $request->get('group_id');
         $departmentId = $request->get('department_id');
+        $statusFilter = $request->get('status'); // 'all' or 'absent'
 
         ini_set('memory_limit', '2G');
         set_time_limit(120);
@@ -87,6 +88,11 @@ class SuperHRController extends Controller
             ];
         });
 
+        // ✅ Agar 'absent' filtri bo‘lsa, faqat absent_count > 0 bo'lganlarni qaytaramiz
+        if ($statusFilter === 'absent') {
+            $result = $result->filter(fn($emp) => $emp['absent_count'] > 0)->values();
+        }
+
         $pdf = PDF::loadView('pdf.attendance-report', [
             'employees' => $result,
             'date_range' => [$startDate, $endDate],
@@ -101,6 +107,7 @@ class SuperHRController extends Controller
         $endDate = $request->get('end_date');
         $groupId = $request->get('group_id');
         $departmentId = $request->get('department_id');
+        $statusFilter = $request->get('status'); // 'all' or 'absent'
 
         $branchId = auth()->user()?->employee?->branch_id;
         if (!$branchId) {
@@ -171,6 +178,13 @@ class SuperHRController extends Controller
                 ]
             ];
         });
+
+        // ✅ Agar 'absent' bo‘lsa, faqat biror kun bo‘lsa ham kelmaganlar
+        if ($statusFilter === 'absent') {
+            $result = $result->filter(function ($emp) {
+                return count($emp['attendances']['absent']) > 0;
+            })->values();
+        }
 
         return response()->json([
             'date_range' => [$startDate, $endDate],
