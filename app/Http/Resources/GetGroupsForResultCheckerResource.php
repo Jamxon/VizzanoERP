@@ -44,6 +44,8 @@ class GetGroupsForResultCheckerResource extends JsonResource
                                 ],
                             ];
                         }),
+                    'totalQuantity' => $order->orderSubmodel->sewingOutputs
+                        ->sum('quantity'),
                 ];
             }),
         ];
