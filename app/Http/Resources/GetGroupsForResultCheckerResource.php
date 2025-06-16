@@ -34,6 +34,7 @@ class GetGroupsForResultCheckerResource extends JsonResource
                     ],
                     'sewingOutputs' => $order->orderSubmodel->sewingOutputs
                         ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+                        ->values()
                         ->map(function ($sewingOutput) {
                             return [
                                 'id' => $sewingOutput->id,
