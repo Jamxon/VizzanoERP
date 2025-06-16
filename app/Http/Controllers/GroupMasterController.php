@@ -298,6 +298,12 @@ class GroupMasterController extends Controller
         $orderModel = OrderModel::find($orderSubModel->order_model_id);
         $order = Order::find($orderModel->order_id);
 
+        if ($order->status === 'pending'){
+            $order->update([
+                'status' => 'tailoring',
+            ]);
+        }
+
         if (!$order) {
             return response()->json(['message' => 'Buyurtma topilmadi!'], 404);
         }
