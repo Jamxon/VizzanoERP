@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
-use GuzzleHttp\Psr7\Request;
+use Illuminate\Http\Request;
 
 class ResultCheckerController extends Controller
 {
