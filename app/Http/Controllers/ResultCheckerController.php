@@ -14,24 +14,9 @@ class ResultCheckerController extends Controller
                 'responsibleUser',
                 'orders.orderSubmodel.submodel',
                 'orders.order',
-                'orders.orderSubmodel.sewingOutputs' => function ($query) {
-                    $query->whereDate('created_at', date('Y-m-d'));
-                }
+                'orders.orderSubmodel.sewingOutputs'
             ])
-            ->get()
-            ->map(function ($group) {
-                $totalQuantity = 0;
-
-                foreach ($group->orders as $order) {
-                    $outputs = $order->orderSubmodel->sewingOutputs ?? collect();
-                    foreach ($outputs as $output) {
-                        $totalQuantity += $output->quantity;
-                    }
-                }
-
-                $group->total_quantity = $totalQuantity;
-                return $group;
-            });
+            ->get();
 
         return response()->json($groups);
     }
