@@ -43,6 +43,7 @@ Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function
     Route::get('groups', [ResultCheckerController::class, 'getGroups']);
     Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
+    Route::post('sewingOutputs',[\App\Http\Controllers\GroupMasterController::class, 'SewingOutputsStore']);
 
 });
 
