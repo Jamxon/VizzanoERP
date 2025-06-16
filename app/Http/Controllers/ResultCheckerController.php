@@ -14,14 +14,9 @@ class ResultCheckerController extends Controller
     public function getGroups(Request $request): \Illuminate\Http\JsonResponse
     {
         $groups = Group::where('department_id', $request->input('department_id'))
-            ->whereHas('orders.order', function ($q) {
-                $q->whereIn('status', ['tailoring', 'pending', 'cutting']);
-            })
             ->with([
                 'responsibleUser',
-                'orders.order' => function ($q) {
-                    $q->whereIn('status', ['tailoring', 'pending', 'cutting']);
-                },
+                'orders.order',
                 'orders.orderSubmodel.submodel',
                 'orders.orderSubmodel.orderModel.model',
                 'orders.orderSubmodel.sewingOutputs' => function ($q) {
@@ -30,9 +25,7 @@ class ResultCheckerController extends Controller
             ])
             ->get();
 
-        $resource = GetGroupsForResultCheckerResource::collection($groups);
-
-        return response()->json($resource);
+        return response()->json(GetGroupsForResultCheckerResource::collection($groups));
     }
 
 }

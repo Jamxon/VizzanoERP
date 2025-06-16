@@ -35,7 +35,10 @@ class GetGroupsForResultCheckerResource extends JsonResource
                 'id' => $this->responsibleUser->employee->id ?? null,
                 'name' => $this->responsibleUser->employee->name ?? null,
             ],
-            'orders' => $this->orders->map(function ($order) use ($today, $workTimeByGroup) {
+            'orders' => $this->orders
+                ->filter(function ($order) {
+                    return in_array($order->order->status, ['tailoring', 'pending', 'cutting']);
+                })->map(function ($order) use ($today, $workTimeByGroup) {
                 $submodel = $order->orderSubmodel;
                 $orderModel = $submodel->orderModel ?? null;
                 $rasxod = $orderModel->rasxod ?? 0;
