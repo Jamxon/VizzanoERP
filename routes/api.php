@@ -23,6 +23,7 @@ use App\Http\Controllers\QualityController;
 use App\Http\Controllers\QualityControllerMasterController;
 use App\Http\Controllers\RazryadController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\ResultCheckerController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\SuperHRController;
@@ -37,6 +38,10 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
+    Route::get('groups', [ResultCheckerController::class, 'getGroups']);
+});
 
 Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::post('incomes', [CasherController::class, 'storeIncome']);

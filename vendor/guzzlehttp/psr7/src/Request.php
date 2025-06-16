@@ -12,6 +12,7 @@ use Psr\Http\Message\UriInterface;
 /**
  * PSR-7 request implementation.
  * @method validated(array $array)
+ * @method input(string $string)
  */
 class Request implements RequestInterface
 {
