@@ -48,7 +48,7 @@ class GetGroupsForResultCheckerResource extends JsonResource
                     $groupId = $order->group_id;
                     $workTimeInSeconds = $workTimeByGroup[$groupId] ?? (500 * 60);
 
-                    $employeeCount = \App\Models\Attendance::whereDate($today)
+                    $employeeCount = \App\Models\Attendance::whereDate('date', $today)
                         ->where('status', 'present')
                         ->whereHas('employee', function ($q) use ($groupId) {
                             $q->where('group_id', $groupId);
