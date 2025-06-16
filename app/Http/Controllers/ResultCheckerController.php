@@ -14,7 +14,9 @@ class ResultCheckerController extends Controller
             ->with([
                 'responsibleUser',
                 'orders.orderSubmodel.submodel',
-                'orders.order',
+                'orders.order' => function ($q) {
+                    $q->whereIn('status', ['tailoring', 'pending', 'cutting']);
+                },
                 'orders.orderSubmodel.sewingOutputs'
             ])
             ->get();
