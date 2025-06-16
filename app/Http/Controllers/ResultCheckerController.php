@@ -19,6 +19,8 @@ class ResultCheckerController extends Controller
             ])
             ->get();
 
+
+
         $resource = GetGroupsForResultCheckerResource::collection($groups);
 
         return response()->json($resource);
