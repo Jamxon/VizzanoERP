@@ -10,13 +10,9 @@ class ResultCheckerController extends Controller
     public function getGroups(Request $request): \Illuminate\Http\JsonResponse
     {
         $groups = Group::where('department_id', $request->input('department_id'))
-            ->whereHas('orders.orderSubmodel.sewingOutputs', function ($query) {
-                $query->whereDate('created_at', date('Y-m-d'));
-            })
             ->with([
                 'responsibleUser',
                 'orders.orderSubmodel.submodel',
-                'orders.orderSubmodel.orderModel.model',
                 'orders.order',
                 'orders.orderSubmodel.sewingOutputs' => function ($query) {
                     $query->whereDate('created_at', date('Y-m-d'));
@@ -24,10 +20,11 @@ class ResultCheckerController extends Controller
             ])
             ->get()
             ->map(function ($group) {
-                // Yig'indi hisoblash
                 $totalQuantity = 0;
+
                 foreach ($group->orders as $order) {
-                    foreach ($order->orderSubmodel->sewingOutputs ?? [] as $output) {
+                    $outputs = $order->orderSubmodel->sewingOutputs ?? collect();
+                    foreach ($outputs as $output) {
                         $totalQuantity += $output->quantity;
                     }
                 }
@@ -38,4 +35,5 @@ class ResultCheckerController extends Controller
 
         return response()->json($groups);
     }
+
 }
