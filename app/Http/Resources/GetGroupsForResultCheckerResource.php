@@ -15,7 +15,18 @@ class GetGroupsForResultCheckerResource extends JsonResource
     public function toArray(Request $request): array
     {
         $today = now()->toDateString();
-        $workTimeInSeconds = 500 * 60; // 500 daqiqa
+
+        // 1. Guruhlar ro'yxati
+        $groupIds = $this->orders->pluck('group_id')->filter()->unique();
+
+        // 2. Har bir group uchun work time ni hisoblab olish
+        $workTimeByGroup = \App\Models\Group::whereIn('groups.id', $groupIds)
+            ->join('departments', 'groups.department_id', '=', 'departments.id')
+            ->selectRaw("
+            groups.id as group_id,
+            EXTRACT(EPOCH FROM (departments.end_time - departments.start_time - (departments.break_time * INTERVAL '1 second'))) as work_seconds
+        ")
+            ->pluck('work_seconds', 'group_id'); // [group_id => work_seconds]
 
         return [
             'id' => $this->id,
@@ -24,16 +35,15 @@ class GetGroupsForResultCheckerResource extends JsonResource
                 'id' => $this->responsibleUser->employee->id ?? null,
                 'name' => $this->responsibleUser->employee->name ?? null,
             ],
-            'orders' => $this->orders->map(function ($order) use ($today, $workTimeInSeconds) {
+            'orders' => $this->orders->map(function ($order) use ($today, $workTimeByGroup) {
                 $submodel = $order->orderSubmodel;
                 $orderModel = $submodel->orderModel ?? null;
                 $rasxod = $orderModel->rasxod ?? 0;
                 $spend = ($rasxod / 250) * 60; // har bir dona uchun sekund
 
-                // Guruh ID ni olish
-                $groupId = $order->group_id ?? $order->employee?->group_id;
+                $groupId = $order->group_id;
+                $workTimeInSeconds = $workTimeByGroup[$groupId] ?? (500 * 60); // fallback
 
-                // Xodimlar soni (bugun kelganlar)
                 $employeeCount = \App\Models\Attendance::whereDate('date', $today)
                     ->where('status', 'present')
                     ->whereHas('employee', function ($q) use ($groupId) {
@@ -42,7 +52,6 @@ class GetGroupsForResultCheckerResource extends JsonResource
                     ->distinct('employee_id')
                     ->count('employee_id');
 
-                // Bugungi sewing outputs
                 $todaySewingOutputs = $submodel->sewingOutputs
                     ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
                     ->values();
