@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GetGroupsForResultCheckerResource;
 use App\Models\Group;
 use Illuminate\Http\Request;
 
@@ -18,7 +19,9 @@ class ResultCheckerController extends Controller
             ])
             ->get();
 
-        return response()->json($groups);
+        $resource = GetGroupsForResultCheckerResource::collection($groups);
+
+        return response()->json($resource);
     }
 
 }
