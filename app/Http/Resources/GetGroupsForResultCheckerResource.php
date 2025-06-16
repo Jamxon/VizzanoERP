@@ -37,63 +37,63 @@ class GetGroupsForResultCheckerResource extends JsonResource
             ],
             'orders' => $this->orders
                 ->filter(function ($order) {
-                    return in_array($order->order->status, ['tailoring', 'pending', 'cutting']);
-                })->map(function ($order) use ($today, $workTimeByGroup) {
-                $submodel = $order->orderSubmodel;
-                $orderModel = $submodel->orderModel ?? null;
-                $rasxod = $orderModel->rasxod ?? 0;
-                $spend = ($rasxod / 250) * 60; // har bir dona uchun sekund
+                    return in_array(optional($order->order)->status, ['tailoring', 'pending', 'cutting']);
+                })
+                ->map(function ($order) use ($today, $workTimeByGroup) {
+                    $submodel = $order->orderSubmodel;
+                    $orderModel = $submodel->orderModel ?? null;
+                    $rasxod = $orderModel->rasxod ?? 0;
+                    $spend = ($rasxod / 250) * 60;
 
-                $groupId = $order->group_id;
-                $workTimeInSeconds = $workTimeByGroup[$groupId] ?? (500 * 60); // fallback
+                    $groupId = $order->group_id;
+                    $workTimeInSeconds = $workTimeByGroup[$groupId] ?? (500 * 60);
 
-                $employeeCount = \App\Models\Attendance::whereDate('date', $today)
-                    ->where('status', 'present')
-                    ->whereHas('employee', function ($q) use ($groupId) {
-                        $q->where('group_id', $groupId);
-                    })
-                    ->distinct('employee_id')
-                    ->count('employee_id');
+                    $employeeCount = \App\Models\Attendance::whereDate($today)
+                        ->where('status', 'present')
+                        ->whereHas('employee', function ($q) use ($groupId) {
+                            $q->where('group_id', $groupId);
+                        })
+                        ->distinct('employee_id')
+                        ->count('employee_id');
 
-                $totalQuantity = $submodel->sewingOutputs
-                    ->sum('quantity');
+                    $totalQuantity = $submodel->sewingOutputs->sum('quantity');
 
-                $todaySewingOutputs = $submodel->sewingOutputs
-                    ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
-                    ->values();
+                    $todaySewingOutputs = $submodel->sewingOutputs
+                        ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
+                        ->values();
 
-                $todayTotalQuantity = $todaySewingOutputs->sum('quantity');
+                    $todayTotalQuantity = $todaySewingOutputs->sum('quantity');
 
-                $todayPlan = ($spend > 0 && $employeeCount > 0)
-                    ? intval(($workTimeInSeconds * $employeeCount) / $spend)
-                    : 0;
+                    $todayPlan = ($spend > 0 && $employeeCount > 0)
+                        ? intval(($workTimeInSeconds * $employeeCount) / $spend)
+                        : 0;
 
-                return [
-                    'id' => $order->id,
-                    'model' => [
-                        'id' => $orderModel->model->id ?? null,
-                        'name' => $orderModel->model->name ?? null,
-                    ],
-                    'submodel' => [
-                        'id' => $submodel->id ?? null,
-                        'name' => $submodel->submodel->name ?? null,
-                    ],
-                    'status' => $order->order->status ?? null,
-                    'todayPlan' => $todayPlan,
-                    'sewingOutputs' => $todaySewingOutputs->map(function ($sewingOutput) {
-                        return [
-                            'id' => $sewingOutput->id,
-                            'quantity' => $sewingOutput->quantity,
-                            'time' => [
-                                'id' => $sewingOutput->time->id ?? null,
-                                'time' => $sewingOutput->time->time ?? null,
-                            ],
-                        ];
-                    }),
-                    'todayTotalQuantity' => $todayTotalQuantity,
-                    'totalQuantity' => $totalQuantity,
-                ];
-            }),
+                    return [
+                        'id' => $order->id,
+                        'model' => [
+                            'id' => $orderModel->model->id ?? null,
+                            'name' => $orderModel->model->name ?? null,
+                        ],
+                        'submodel' => [
+                            'id' => $submodel->id ?? null,
+                            'name' => $submodel->submodel->name ?? null,
+                        ],
+                        'status' => $order->order->status ?? null,
+                        'todayPlan' => $todayPlan,
+                        'sewingOutputs' => $todaySewingOutputs->map(function ($sewingOutput) {
+                            return [
+                                'id' => $sewingOutput->id,
+                                'quantity' => $sewingOutput->quantity,
+                                'time' => [
+                                    'id' => $sewingOutput->time->id ?? null,
+                                    'time' => $sewingOutput->time->time ?? null,
+                                ],
+                            ];
+                        }),
+                        'todayTotalQuantity' => $todayTotalQuantity,
+                        'totalQuantity' => $totalQuantity,
+                    ];
+                })->values(), // values() qo‘shiladi
         ];
     }
 
