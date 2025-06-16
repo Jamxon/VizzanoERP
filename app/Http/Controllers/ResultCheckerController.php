@@ -16,6 +16,7 @@ class ResultCheckerController extends Controller
             ->with([
                 'responsibleUser',
                 'orders.orderSubmodel.submodel',
+                'orders.orderSubmodel.orderModel.model',
                 'orders.order',
                 'orders.orderSubmodel.sewingOutputs' => function ($query) {
                     $query->whereDate('created_at', date('Y-m-d'));
