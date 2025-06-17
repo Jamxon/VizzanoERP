@@ -88,7 +88,7 @@ class VizzanoReportTvController extends Controller
 
         $sewingOutputs->transform(function ($item) use ($totalQuantities, $latestOutputs) {
             $item->total_quantity = $totalQuantities[$item->order_submodel_id] ?? 0;
-            $item->latest_time = optional($latestOutputs[$item->order_submodel_id]?->time)->format('H:i');
+            $item->latest_time = optional($latestOutputs[$item->order_submodel_id]?->time);
             return $item;
         });
 
