@@ -10,6 +10,7 @@ use App\Models\OrderGroup;
 use App\Models\Tarification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class  ResultCheckerController extends Controller
 {
@@ -89,5 +90,25 @@ class  ResultCheckerController extends Controller
         );
 
         return response()->json(['message' => 'Employee Result stored']);
+    }
+
+    public function getDailyWorkStatistics(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $date = $request->input('date') ?? now()->toDateString();
+
+        $statistics = DB::table('employee_results')
+            ->join('tarifications', 'employee_results.tarification_id', '=', 'tarifications.id')
+            ->join('employees', 'employee_results.employee_id', '=', 'employees.id')
+            ->select(
+                'employees.id as employee_id',
+                'employees.name as employee_name',
+                DB::raw('SUM(employee_results.quantity * tarifications.second) as total_seconds')
+            )
+            ->whereDate('employee_results.created_at', $date)
+            ->groupBy('employees.id', 'employees.name')
+            ->orderByDesc('total_seconds')
+            ->get();
+
+        return response()->json($statistics);
     }
 }
