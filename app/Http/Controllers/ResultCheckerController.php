@@ -32,8 +32,9 @@ class ResultCheckerController extends Controller
         $group = Group::with([
             'employees.employeeResults' => function ($query) {
                 $query->whereDate('created_at', Carbon::today())
-                    ->with(['time', 'tarification', 'createdBy.employee']); // relationlar ichkaridan yuklanadi
-            }
+                    ->with(['time', 'tarification', 'createdBy.employee']);
+            },
+            'employees.tarifications'
         ])
             ->find($request->input('group_id'));
 
