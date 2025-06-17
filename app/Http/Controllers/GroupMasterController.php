@@ -308,6 +308,20 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Buyurtma topilmadi!'], 404);
         }
 
+        $date = now()->toDateString();
+
+        $exists = SewingOutputs::where('order_submodel_id', $validatedData['order_submodel_id'])
+            ->where('time_id', $validatedData['time_id'])
+            ->whereDate('created_at', $date)
+            ->exists();
+
+        if ($exists) {
+            return response()->json([
+                'message' => '❗️Bugun bu uchun natija kiritilgan, sahifani yangilang.'
+            ], 422);
+        }
+
+
         $minutes = $orderModel->rasxod / 250; // 1 dona mahsulot uchun qancha daqiqa ketadi
         $orderQuantity = $order->quantity;
         $totalSewnQuantity = SewingOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
