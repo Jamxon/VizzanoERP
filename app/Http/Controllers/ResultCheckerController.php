@@ -46,23 +46,26 @@ class  ResultCheckerController extends Controller
 
         // 3. Group + employee + filtered tarifications + bugungi results
         $group = Group::with([
-            'employees' => function ($q) use ($tarificationIds) {
+            'employees' => function ($q) {
                 $q->where('status', '!=', 'kicked')
                     ->with([
                         'employeeResults' => function ($query) {
                             $query->whereDate('created_at', Carbon::today())
                                 ->with(['time', 'tarification', 'createdBy.employee']);
                         },
-                        'tarifications' => function ($tq) use ($tarificationIds) {
-                            $tq->whereIn('tarifications.id', $tarificationIds);
-                        }
+                        'tarifications'
                     ]);
             }
         ])->find($groupId);
 
-        return response()->json($group?->employees);
-    }
+        // filtered_tarifications qo‘shamiz
+        $employees = $group?->employees->map(function ($employee) use ($tarificationIds) {
+            $employee->filtered_tarifications = $employee->tarifications->whereIn('id', $tarificationIds)->values();
+            return $employee;
+        });
 
+        return response()->json($employees);
+    }
 
     public function storeEmployeeResult(Request $request): \Illuminate\Http\JsonResponse
     {

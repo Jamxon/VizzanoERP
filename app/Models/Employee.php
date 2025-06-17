@@ -116,4 +116,9 @@ class Employee extends Model
         return $this->hasMany(EmployeeResult::class);
     }
 
+    public function filteredTarifications($allowedIds)
+    {
+        return $this->tarifications()->whereIn('tarifications.id', $allowedIds);
+    }
+
 }
