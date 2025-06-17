@@ -44,7 +44,7 @@ class  ResultCheckerController extends Controller
             $q->whereIn('submodel_id', $orderSubmodelIds);
         })->pluck('id');
 
-        // 3. Group + employees + filtered tarifications + bugungi results
+        // 3. Group + employees + bugungi results (tarifications yuklanmaydi)
         $group = Group::with([
             'employees' => function ($q) {
                 $q->where('status', '!=', 'kicked')
@@ -57,11 +57,11 @@ class  ResultCheckerController extends Controller
             }
         ])->find($groupId);
 
-        // filtered_tarifications qo‘shib, tarifications ni yuklamaymiz
+        // Faqat kerakli tarification larni qo‘shamiz
         $employees = $group?->employees->map(function ($employee) use ($tarificationIds) {
             $filtered = $employee->tarifications()->whereIn('tarifications.id', $tarificationIds)->get();
-            $employee->setRelation('filtered_tarifications', $filtered); // Eloquent tarzida relation sifatida qo‘shamiz
-            return $employee->makeHidden('tarifications'); // eski to‘liq `tarifications` ni yashiramiz
+            $employee->setRelation('tarifications', $filtered); // nomini o‘zgartirdik
+            return $employee;
         });
 
         return response()->json($employees);
