@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetGroupsForResultCheckerResource;
 use App\Models\EmployeeResult;
 use App\Models\Group;
+use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -51,9 +52,17 @@ class  ResultCheckerController extends Controller
             'time_id' => 'required',
         ]);
 
-        $data['createdBy'] = auth()->id();
+        $data['created_by'] = auth()->id();
 
         EmployeeResult::create($data);
+
+        Log::add(
+            auth()->id(),
+            "Hodim uchun statistika yozildi",
+            "create",
+            null,
+            EmployeeResult::all()->last()->id
+        );
 
         return response()->json(['message' => 'Employee Result stored']);
     }

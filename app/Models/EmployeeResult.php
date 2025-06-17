@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static create(array $data)
+ */
 class EmployeeResult extends Model
 {
     protected $table = 'employee_results';
