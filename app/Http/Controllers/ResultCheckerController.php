@@ -32,13 +32,17 @@ class  ResultCheckerController extends Controller
     public function getEmployeeByGroupId(Request $request): \Illuminate\Http\JsonResponse
     {
         $group = Group::with([
-            'employees.employeeResults' => function ($query) {
-                $query->whereDate('created_at', Carbon::today())
-                    ->with(['time', 'tarification', 'createdBy.employee']);
-            },
-            'employees.tarifications'
-        ])
-            ->find($request->input('group_id'));
+            'employees' => function ($q) {
+                $q->where('status', '!=', 'kicked')
+                ->with([
+                    'employeeResults' => function ($query) {
+                        $query->whereDate('created_at', Carbon::today())
+                            ->with(['time', 'tarification', 'createdBy.employee']);
+                    },
+                    'tarifications',
+                ]);
+            }
+        ])->find($request->input('group_id'));
 
         return response()->json($group?->employees);
     }
