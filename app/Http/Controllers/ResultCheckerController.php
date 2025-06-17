@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GetGroupsForResultCheckerResource;
+use App\Models\EmployeeResult;
 use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -41,4 +42,19 @@ class  ResultCheckerController extends Controller
         return response()->json($group?->employees);
     }
 
+    public function storeEmployeeResult(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'employee_id' => 'required',
+            'quantity' => 'required',
+            'tarification_id' => 'required',
+            'time' => 'required',
+        ]);
+
+        $data['createdBy'] = auth()->id();
+
+        EmployeeResult::create($data);
+
+        return response()->json(['message' => 'Employee Result stored']);
+    }
 }
