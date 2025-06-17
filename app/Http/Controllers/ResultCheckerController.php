@@ -6,6 +6,8 @@ use App\Http\Resources\GetGroupsForResultCheckerResource;
 use App\Models\EmployeeResult;
 use App\Models\Group;
 use App\Models\Log;
+use App\Models\OrderGroup;
+use App\Models\Tarification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -31,21 +33,36 @@ class  ResultCheckerController extends Controller
 
     public function getEmployeeByGroupId(Request $request): \Illuminate\Http\JsonResponse
     {
+        $groupId = $request->input('group_id');
+
+        // 1. Group orqali tegishli order_submodel_id larni topamiz
+        $orderSubmodelIds = OrderGroup::where('group_id', $groupId)
+            ->pluck('submodel_id');
+
+        // 2. Shu order_submodel_id lar orqali tarification_id larni topamiz
+        $tarificationIds = Tarification::whereHas('category', function ($q) use ($orderSubmodelIds) {
+            $q->whereIn('submodel_id', $orderSubmodelIds);
+        })->pluck('id');
+
+        // 3. Group + employee + filtered tarifications + bugungi results
         $group = Group::with([
-            'employees' => function ($q) {
+            'employees' => function ($q) use ($tarificationIds) {
                 $q->where('status', '!=', 'kicked')
-                ->with([
-                    'employeeResults' => function ($query) {
-                        $query->whereDate('created_at', Carbon::today())
-                            ->with(['time', 'tarification', 'createdBy.employee']);
-                    },
-                    'tarifications',
-                ]);
+                    ->with([
+                        'employeeResults' => function ($query) {
+                            $query->whereDate('created_at', Carbon::today())
+                                ->with(['time', 'tarification', 'createdBy.employee']);
+                        },
+                        'tarifications' => function ($tq) use ($tarificationIds) {
+                            $tq->whereIn('tarifications.id', $tarificationIds);
+                        }
+                    ]);
             }
-        ])->find($request->input('group_id'));
+        ])->find($groupId);
 
         return response()->json($group?->employees);
     }
+
 
     public function storeEmployeeResult(Request $request): \Illuminate\Http\JsonResponse
     {
