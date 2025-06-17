@@ -80,10 +80,9 @@ class InternalAccountantController extends Controller
                 ->orWhere('typewriter_id', 'like', "%$search%")
                 ->orWhere('code', 'like', "%$search%")
             ->with(
-                'tarifications',
-                'tarifications.employee',
-                'tarifications.razryad',
-                'tarifications.typewriter',
+                'employee',
+                'razryad',
+                'typewriter',
             )
             ->orderBy('id', 'desc')
             ->get();
