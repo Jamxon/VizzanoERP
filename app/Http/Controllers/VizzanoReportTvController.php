@@ -73,8 +73,22 @@ class VizzanoReportTvController extends Controller
             ->groupBy('order_submodel_id')
             ->pluck('total_quantity', 'order_submodel_id');
 
-        $sewingOutputs->transform(function ($item) use ($totalQuantities) {
+        $latestOutputs = SewingOutputs::whereIn('order_submodel_id', $orderSubmodelIds)
+            ->select('id', 'order_submodel_id') // faqat kerakli ustunlar
+            ->whereIn(DB::raw('(order_submodel_id, created_at)'), function ($query) use ($orderSubmodelIds) {
+                $query->selectRaw('DISTINCT ON (order_submodel_id) order_submodel_id, created_at')
+                    ->from('sewing_outputs')
+                    ->whereIn('order_submodel_id', $orderSubmodelIds)
+                    ->orderBy('order_submodel_id')
+                    ->orderByDesc('created_at');
+            })
+            ->with('time')
+            ->get()
+            ->keyBy('order_submodel_id');
+
+        $sewingOutputs->transform(function ($item) use ($totalQuantities, $latestOutputs) {
             $item->total_quantity = $totalQuantities[$item->order_submodel_id] ?? 0;
+            $item->latest_time = optional($latestOutputs[$item->order_submodel_id]?->time)->format('H:i');
             return $item;
         });
 
@@ -98,6 +112,9 @@ class VizzanoReportTvController extends Controller
 
         // ✅ ExampleOutputs ni qo‘shamiz (planlarsiz, lekin batafsil)
         $exampleQuery = \App\Models\ExampleOutputs::whereIn('order_submodel_id', $orderSubmodelIds);
+
+
+
 
         if ($endDate) {
             $exampleQuery->whereBetween('created_at', [$startDate, $endDate]);
@@ -164,6 +181,7 @@ class VizzanoReportTvController extends Controller
                     'today_quantity' => $output->today_quantity,
                     'employee_count' => $employeeCount,
                     'today_plan' => $today_plan,
+                    'last_time' => $output->latest_time,
 
                 ];
             }),
