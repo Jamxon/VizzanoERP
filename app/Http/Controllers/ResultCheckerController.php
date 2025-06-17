@@ -92,6 +92,29 @@ class  ResultCheckerController extends Controller
         return response()->json(['message' => 'Employee Result stored']);
     }
 
+    public function updateEmployeeResult(EmployeeResult $employeeResult, Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'employee_id' => 'required',
+            'quantity' => 'required',
+            'minute' => 'required',
+            'time_id' => 'required',
+        ]);
+
+        $data['created_by'] = auth()->id();
+
+        EmployeeResult::update($data);
+
+        Log::add(
+            auth()->id(),
+            "Hodim uchun statistika yozildi",
+            "update",
+            null,
+            EmployeeResult::all()->last()->id
+        );
+        return response()->json(['message' => 'Employee Result updated']);
+    }
+
     public function getDailyWorkStatistics(Request $request): \Illuminate\Http\JsonResponse
     {
         $date = $request->input('date') ?? now()->toDateString();

@@ -49,6 +49,7 @@ Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
     Route::get('tarifications/search', [InternalAccountantController::class, 'searchTarifications']);
     Route::get('employeeStatistics', [ResultCheckerController::class, 'getDailyWorkStatistics']);
+    Route::patch('employeeResults/{employeeResult}', [ResultCheckerController::class, 'updateEmployeeResult']);
 });
 
 Route::prefix('casher')->middleware('role:casher')->group(function () {
