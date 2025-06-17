@@ -99,16 +99,20 @@ class  ResultCheckerController extends Controller
         $statistics = DB::table('employee_results')
             ->join('tarifications', 'employee_results.tarification_id', '=', 'tarifications.id')
             ->join('employees', 'employee_results.employee_id', '=', 'employees.id')
+            ->leftJoin('groups', 'employees.group_id', '=', 'groups.id') // group qo‘shildi
             ->select(
                 'employees.id as employee_id',
                 'employees.name as employee_name',
+                'employees.group_id',
+                'groups.name as group_name',
                 DB::raw('SUM(employee_results.quantity * tarifications.second) as total_seconds')
             )
             ->whereDate('employee_results.created_at', $date)
-            ->groupBy('employees.id', 'employees.name')
+            ->groupBy('employees.id', 'employees.name', 'employees.group_id', 'groups.name')
             ->orderByDesc('total_seconds')
             ->get();
 
         return response()->json($statistics);
     }
+
 }
