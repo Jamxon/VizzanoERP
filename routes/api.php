@@ -44,7 +44,7 @@ Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function
     Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::post('sewingOutputs',[\App\Http\Controllers\GroupMasterController::class, 'SewingOutputsStore']);
-
+    Route::get('employeeResults', [ResultCheckerController::class, 'getEmployeeByGroupId']);
 });
 
 Route::prefix('casher')->middleware('role:casher')->group(function () {

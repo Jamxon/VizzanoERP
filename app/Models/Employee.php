@@ -111,4 +111,9 @@ class Employee extends Model
         return $this->hasMany(SalaryPayment::class);
     }
 
+    public function employeeResults(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(EmployeeResult::class);
+    }
+
 }
