@@ -7,7 +7,7 @@ use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
-class ResultCheckerController extends Controller
+class  ResultCheckerController extends Controller
 {
 
     public function getGroups(Request $request): \Illuminate\Http\JsonResponse

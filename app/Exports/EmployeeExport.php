@@ -61,7 +61,7 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
     {
         return [
             'ID', 'ФИО', 'Логин', 'Разрешение', 'Телефон', 'Группа', 'Отдел', 'Ишга келган сана',
-            'Статус', 'Позиция', 'Тип', 'Тип оплаты', 'Маош', 'Паспорт', 'Адрес', 'Дата рождения',
+            'Статус', 'Позиция', 'Тип', 'Тип оплаты', 'Паспорт', 'Адрес', 'Дата рождения',
             'Комментарий', 'Фото',
         ];
     }
@@ -81,7 +81,6 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
             $employee->position->name ?? '',
             $employee->type,
             $employee->payment_type,
-            $employee->salary,
             $employee->passport_number,
             $employee->address,
             $employee->birthday,
@@ -124,7 +123,6 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
             'J' => 18,  // Позиция
             'K' => 10,  // Тип
             'L' => 12,  // Тип оплаты
-            'M' => 12,  // Маош
             'N' => 15,  // Паспорт
             'O' => 30,  // Адрес
             'P' => 15,  // Дата рождения
