@@ -40,7 +40,7 @@ class  ResultCheckerController extends Controller
             ->pluck('submodel_id');
 
         // 2. Shu order_submodel_id lar orqali tarification_id larni topamiz
-        $tarificationIds = Tarification::whereHas('category', function ($q) use ($orderSubmodelIds) {
+        $tarificationIds = Tarification::whereHas('tarificationCategory', function ($q) use ($orderSubmodelIds) {
             $q->whereIn('submodel_id', $orderSubmodelIds);
         })->pluck('id');
 

@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static whereIn(string $string, \Illuminate\Support\Collection $userIds)
  * @method static updateOrCreate(null[] $array, array $array1)
  * @method static findOrFail(mixed $tarificationId)
+ * @method static whereHas(string $string, \Closure $param)
  */
 class Tarification extends Model
 {
