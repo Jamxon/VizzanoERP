@@ -92,27 +92,31 @@ class  ResultCheckerController extends Controller
         return response()->json(['message' => 'Employee Result stored']);
     }
 
-    public function updateEmployeeResult(EmployeeResult $employeeResult, Request $request): \Illuminate\Http\JsonResponse
+    public function updateEmployeeResult(Request $request, EmployeeResult $employeeResult): \Illuminate\Http\JsonResponse
     {
+        // Faqat yuborilgan maydonlargina tekshiriladi (PATCHga mos tarzda)
         $data = $request->validate([
-            'employee_id' => 'required',
-            'quantity' => 'required',
-            'minute' => 'required',
-            'time_id' => 'required',
+            'employee_id' => 'sometimes|exists:employees,id',
+            'quantity'    => 'sometimes|numeric',
+            'minute'      => 'sometimes|numeric',
+            'time_id'     => 'sometimes|exists:times,id',
         ]);
 
+        // Auth ID ni qo‘shish (agar kerak bo‘lsa)
         $data['created_by'] = auth()->id();
 
-        EmployeeResult::update($data);
+        // PATCH — faqat mavjud maydonlarni yangilash
+        $employeeResult->fill($data)->save();
 
         Log::add(
             auth()->id(),
-            "Hodim uchun statistika yozildi",
+            "EmployeeResult PATCH update",
             "update",
-            null,
-            EmployeeResult::all()->last()->id
+            $employeeResult->getOriginal(),  // eski holat
+            $employeeResult->toArray()       // yangi holat
         );
-        return response()->json(['message' => 'Employee Result updated']);
+
+        return response()->json(['message' => 'Employee Result successfully patched.']);
     }
 
     public function getDailyWorkStatistics(Request $request): \Illuminate\Http\JsonResponse
