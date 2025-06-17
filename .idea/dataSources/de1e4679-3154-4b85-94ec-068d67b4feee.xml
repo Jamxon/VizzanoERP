@@ -5796,7 +5796,7 @@ gas</Labels>
     </table>
     <table id="377" parent="263" name="employee_results">
       <ObjectId>23652</ObjectId>
-      <StateNumber>338543</StateNumber>
+      <StateNumber>339106</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -7736,12 +7736,12 @@ currency_id</ColNames>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="657" parent="377" name="tarification_id">
-      <NotNull>1</NotNull>
+    <column id="657" parent="377" name="minute">
+      <DefaultExpression>0</DefaultExpression>
       <Position>5</Position>
-      <StateNumber>338543</StateNumber>
-      <StoredType>integer|0s</StoredType>
-      <TypeId>23</TypeId>
+      <StateNumber>339111</StateNumber>
+      <StoredType>double precision|0s</StoredType>
+      <TypeId>701</TypeId>
     </column>
     <column id="658" parent="377" name="created_by">
       <Position>6</Position>
@@ -7777,7 +7777,7 @@ currency_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>23658</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>338543</StateNumber>
+      <StateNumber>339106</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>

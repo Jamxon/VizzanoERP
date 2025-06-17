@@ -52,7 +52,7 @@ class  ResultCheckerController extends Controller
                     ->with([
                         'employeeResults' => function ($query) {
                             $query->whereDate('created_at', Carbon::today())
-                                ->with(['time', 'tarification', 'createdBy.employee']);
+                                ->with(['time', 'createdBy.employee']);
                         }
                     ]);
             }
@@ -73,7 +73,7 @@ class  ResultCheckerController extends Controller
         $data = $request->validate([
             'employee_id' => 'required',
             'quantity' => 'required',
-            'tarification_id' => 'required',
+            'minute' => 'required',
             'time_id' => 'required',
         ]);
 

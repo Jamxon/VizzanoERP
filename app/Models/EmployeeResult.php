@@ -15,14 +15,13 @@ class EmployeeResult extends Model
         'employee_id',
         'quantity',
         'time_id',
-        'tarification_id',
+        'minute',
         'created_by'
     ];
 
     protected $hidden = [
         'employee_id',
         'time_id',
-        'tarification_id',
         'created_by'
     ];
 
@@ -34,11 +33,6 @@ class EmployeeResult extends Model
     public function time(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Time::class);
-    }
-
-    public function tarification(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(Tarification::class);
     }
 
     public function createdBy(): \Illuminate\Database\Eloquent\Relations\BelongsTo
