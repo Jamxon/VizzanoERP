@@ -74,7 +74,7 @@ class VizzanoReportTvController extends Controller
             ->pluck('total_quantity', 'order_submodel_id');
 
         $latestOutputs = SewingOutputs::whereIn('order_submodel_id', $orderSubmodelIds)
-            ->select('id', 'order_submodel_id') // faqat kerakli ustunlar
+            ->select('id', 'order_submodel_id', 'time_id') // faqat kerakli ustunlar
             ->whereIn(DB::raw('(order_submodel_id, created_at)'), function ($query) use ($orderSubmodelIds) {
                 $query->selectRaw('DISTINCT ON (order_submodel_id) order_submodel_id, created_at')
                     ->from('sewing_outputs')
