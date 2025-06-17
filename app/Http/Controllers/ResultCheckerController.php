@@ -44,7 +44,7 @@ class  ResultCheckerController extends Controller
             $q->whereIn('submodel_id', $orderSubmodelIds);
         })->pluck('id');
 
-        // 3. Group + employee + filtered tarifications + bugungi results
+        // 3. Group + employees + filtered tarifications + bugungi results
         $group = Group::with([
             'employees' => function ($q) {
                 $q->where('status', '!=', 'kicked')
@@ -52,16 +52,16 @@ class  ResultCheckerController extends Controller
                         'employeeResults' => function ($query) {
                             $query->whereDate('created_at', Carbon::today())
                                 ->with(['time', 'tarification', 'createdBy.employee']);
-                        },
-                        'tarifications'
+                        }
                     ]);
             }
         ])->find($groupId);
 
-        // filtered_tarifications qo‘shamiz
+        // filtered_tarifications qo‘shib, tarifications ni yuklamaymiz
         $employees = $group?->employees->map(function ($employee) use ($tarificationIds) {
-            $employee->filtered_tarifications = $employee->tarifications->whereIn('id', $tarificationIds)->values();
-            return $employee;
+            $filtered = $employee->tarifications()->whereIn('tarifications.id', $tarificationIds)->get();
+            $employee->setRelation('filtered_tarifications', $filtered); // Eloquent tarzida relation sifatida qo‘shamiz
+            return $employee->makeHidden('tarifications'); // eski to‘liq `tarifications` ni yashiramiz
         });
 
         return response()->json($employees);
