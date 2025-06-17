@@ -48,7 +48,7 @@ class  ResultCheckerController extends Controller
             'employee_id' => 'required',
             'quantity' => 'required',
             'tarification_id' => 'required',
-            'time' => 'required',
+            'time_id' => 'required',
         ]);
 
         $data['createdBy'] = auth()->id();
