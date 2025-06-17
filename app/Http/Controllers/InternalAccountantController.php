@@ -91,8 +91,8 @@ class InternalAccountantController extends Controller
         return response()->json($tarifications);
     }
 
-    public function getTarifications(Request $request)
-        {
+    public function getTarifications(Request $request): \Illuminate\Http\JsonResponse
+    {
             $region = $request->input('region');
             $submodelId = $request->input('submodel_id');
 
@@ -327,7 +327,7 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan.pdf');
     }
 
-    public function generateDailyPlanForOneEmployee(Request $request)
+    public function generateDailyPlanForOneEmployee(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         $request->validate([
             'submodel_id' => 'required|exists:order_sub_models,id',
@@ -786,7 +786,8 @@ class InternalAccountantController extends Controller
         }
     }
 
-    public function getEmployeeByGroupID(){
+    public function getEmployeeByGroupID(): \Illuminate\Http\JsonResponse
+    {
         $groupId = request()->input('group_id');
         $employees = Employee::where('group_id', $groupId)
             ->get();
@@ -850,7 +851,7 @@ class InternalAccountantController extends Controller
         }
     }
 
-    public function getEmployeeTarificationLog(Request $request)
+    public function getEmployeeTarificationLog(Request $request): \Illuminate\Http\JsonResponse
     {
         $orderSubmodel = OrderSubModel::where('id', $request->submodel_id)
         ->whereHas('tarificationCategories', function ($query) use ($request) {
