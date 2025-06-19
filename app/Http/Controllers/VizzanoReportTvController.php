@@ -159,46 +159,60 @@ class VizzanoReportTvController extends Controller
         $motivations = \App\Models\Motivation::all()->map(fn($m) => ['title' => $m->title]);
 
         $groupEarnings = collect();
+
         foreach ($groupIds as $groupId) {
-            $submodelIds = \App\Models\OrderGroup::where('group_id', $groupId)->pluck('submodel_id');
+            $groupEarnings = collect();
 
-            $todayQuantity = SewingOutputs::whereIn('order_submodel_id', $submodelIds)
-                ->whereDate('created_at', $today)
-                ->sum('quantity');
-
-            // O'rtacha rasxodni olish
-            $rasxod = \App\Models\OrderSubModel::whereIn('id', $submodelIds)
-                ->with('orderModel')
-                ->get()
-                ->pluck('orderModel.rasxod')
-                ->filter()
-                ->avg() ?? 0;
-
-            $todayEarning = round($todayQuantity * $rasxod, 2);
-
-            $attendanceCount = \App\Models\Attendance::whereDate('date', $today)
-                ->whereHas('employee', function ($q) use ($groupId) {
-                    $q->where('status', '!=', 'kicked')
-                        ->where('group_id', $groupId);
+            foreach ($groupIds as $groupId) {
+                // ❗️ Faqat bugun natija kiritilgan submodel_id larni olish
+                $todaySewn = SewingOutputs::whereHas('orderSubmodel.group', function ($q) use ($groupId) {
+                    $q->where('group_id', $groupId);
                 })
-                ->where('status', '!=', 'ABSENT')
-                ->count();
+                    ->whereDate('created_at', $today)
+                    ->select('order_submodel_id', DB::raw('SUM(quantity) as quantity'))
+                    ->groupBy('order_submodel_id')
+                    ->get();
 
-            $perEmployeeEarning = $attendanceCount > 0
-                ? round($todayEarning / $attendanceCount, 2)
-                : 0;
+                // ❗️ Faqat shu kiritilgan submodel_id larni rasxodlari
+                $submodelIds = $todaySewn->pluck('order_submodel_id');
 
-            $groupEarnings->push([
-                'group_id' => $groupId,
-                'group_name' => optional(\App\Models\Group::find($groupId))->name,
-                'quantity' => $todayQuantity,
-                'rasxod' => $rasxod,
-                'today_earning' => $todayEarning,
-                'attendance_count' => $attendanceCount,
-                'per_employee_earning' => $perEmployeeEarning
-            ]);
+                $rasxodlar = \App\Models\OrderSubModel::with('orderModel')
+                    ->whereIn('id', $submodelIds)
+                    ->get()
+                    ->pluck('orderModel.rasxod', 'id');
+
+                // ❗️Bugungi umumiy topilgan pul = faqat natija kiritilgan submodellarning (miqdor * rasxod)
+                $todayEarning = $todaySewn->sum(function ($row) use ($rasxodlar) {
+                    $rasxod = $rasxodlar[$row->order_submodel_id] ?? 0;
+                    return $row->quantity * $rasxod;
+                });
+
+                $todayEarning = round($todayEarning, 2);
+
+                // ❗️Bugun shu groupda ishlagan xodimlar soni
+                $attendanceCount = \App\Models\Attendance::whereDate('date', $today)
+                    ->whereHas('employee', function ($q) use ($groupId) {
+                        $q->where('status', '!=', 'kicked')
+                            ->where('group_id', $groupId);
+                    })
+                    ->where('status', '!=', 'ABSENT')
+                    ->count();
+
+                // ❗️Bugun ishlagan har bir xodimga tushadigan o‘rtacha summa
+                $perEmployeeEarning = $attendanceCount > 0
+                    ? round($todayEarning / $attendanceCount, 2)
+                    : 0;
+
+                $groupEarnings->push([
+                    'group_id' => $groupId,
+                    'group_name' => optional(\App\Models\Group::find($groupId))->name,
+                    'quantity' => $todaySewn->sum('quantity'),
+                    'today_earning' => $todayEarning,
+                    'attendance_count' => $attendanceCount,
+                    'per_employee_earning' => $perEmployeeEarning,
+                ]);
+            }
         }
-
 
         // ✅ 7. Natijani yig'ish
         $resource = [
