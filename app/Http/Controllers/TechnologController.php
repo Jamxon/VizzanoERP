@@ -24,6 +24,14 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
+    public function getLastTarification()
+    {
+        return Tarification::select('id', 'name')
+            ->orderBy('id', 'desc')
+            ->take(1000)
+            ->get();
+    }
+
     public function confirmOrder(Request $request)
     {
         $orderId = $request->input('order_id');
