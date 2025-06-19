@@ -354,7 +354,7 @@ class InternalAccountantController extends Controller
 
     public function getGroups()
     {
-        $groups = Group::with('department')
+        $groups = Group::with('department.mainDepartment')
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->get();
 
