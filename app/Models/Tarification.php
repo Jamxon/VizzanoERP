@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static findOrFail(mixed $tarificationId)
  * @method static whereHas(string $string, \Closure $param)
  * @method static select(string $string, string $string1)
+ * @method static without(string $string, string $string1, string $string2)
  */
 class Tarification extends Model
 {

@@ -383,6 +383,8 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::post('tarification/fastening', [TechnologController::class, 'fasteningToEmployee']);
     Route::get('confirmOrder', [TechnologController::class, 'confirmOrder']);
     Route::get('lastTarification', [TechnologController::class, 'getLastTarification']);
+    Route::get('nakladnoy', [InternalAccountantController::class, 'generateAttendanceNakladnoy']);
+    Route::get('groups', [InternalAccountantController::class, 'getGroups']);
 });
 
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
