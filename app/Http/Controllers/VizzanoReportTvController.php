@@ -163,11 +163,19 @@ class VizzanoReportTvController extends Controller
 
         $groupEarnings = collect();
 
-        foreach ($groupIds as $groupId) {
-            $groupEarnings = collect();
+        // Bugun sewing qilgan submodellarga tegishli group_id larni topamiz
+        $activeGroupIds = SewingOutputs::whereIn('order_submodel_id', $orderSubmodelIds)
+            ->whereDate('created_at', $today)
+            ->with('orderSubmodel.group') // Eager loading orqali
+            ->get()
+            ->pluck('orderSubmodel.group.group_id') // group_id larini yig'ish
+            ->unique()
+            ->filter()
+            ->values();
 
-            foreach ($groupIds as $groupId) {
-                // ❗️ Faqat bugun natija kiritilgan submodel_id larni olish
+
+        foreach ($activeGroupIds as $groupId) {
+            // ❗️ Faqat bugun natija kiritilgan submodel_id larni olish
                 $todaySewn = SewingOutputs::whereHas('orderSubmodel.group', function ($q) use ($groupId) {
                     $q->where('group_id', $groupId);
                 })
@@ -215,7 +223,7 @@ class VizzanoReportTvController extends Controller
                     'per_employee_earning' => $perEmployeeEarning,
                 ]);
             }
-        }
+
 
         // ✅ 7. Natijani yig'ish
         $resource = [
