@@ -346,8 +346,6 @@ class InternalAccountantController extends Controller
             ];
         });
 
-        dd($plans);
-
         $pdf = PDF::loadView('pdf.nakladnoy_blank', ['plans' => $plans])
             ->setPaper([0, 0, 226.77, 999.0], 'portrait');
 

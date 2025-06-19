@@ -96,23 +96,10 @@
             <strong>Xodim:</strong> {{ $plan['employee_name'] }} <br>
         </div>
 
-        <div class="summary">
-            <div>Umumiy vaqt: {{ $plan['total_minutes'] }} daq</div>
-            <div>Umumiy summa: {{ number_format($plan['total_earned'], 0, ',', ' ') }} so'm</div>
-        </div>
-
-        <div class="summary">
-            <div>Ishga ketadigan vaqt: {{ $plan['used_minutes'] }} daq</div>
-            <div>Qo'shimcha vaqt: {{ number_format($plan['total_minutes'] - $plan['used_minutes'], 0, ',', ' ') }} daq</div>
-        </div>
-
         <table>
             <thead>
             <tr>
-                <th>Ish</th>
-                <th>Vaqt</th>
-                <th>Narx</th>
-                <th>Reja</th>
+                <th>Code</th>
                 <th>Natija</th>
             </tr>
             </thead>
@@ -120,22 +107,7 @@
             @for($i = 0; $i < 10; $i++) {{-- Har bir ishchi uchun 10 ta bo‘sh qator --}}
             <tr>
                 <td class="task-name">&nbsp;</td>
-                <td>
-                    <div class="double-cell">
-                        <div>&nbsp;</div>
-                        <hr />
-                        <div>&nbsp;</div>
-                    </div>
-                </td>
-                <td>
-                    <div class="double-cell">
-                        <div>&nbsp;</div>
-                        <hr />
-                        <div>&nbsp;</div>
-                    </div>
-                </td>
                 <td>&nbsp;</td>
-                <td></td>
             </tr>
             @endfor
             </tbody>
@@ -153,8 +125,8 @@
         </table>
 
         <div class="barcode">
-            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG('E' . $plan['employee_id'], 'C128', 1.5, 40) }}">
-            <h2>{{ $plan['employee_id'] }}</h2>
+            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('ymd'), 'C128', 1.5, 40) }}">
+            <h2>{{ 'E' . $plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('ymd') }}</h2>
             <hr style="margin-top: 40px">
         </div>
     </div>
