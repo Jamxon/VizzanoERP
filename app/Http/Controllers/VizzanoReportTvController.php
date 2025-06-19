@@ -97,6 +97,9 @@ class VizzanoReportTvController extends Controller
             ->where('attendance.status', '!=', 'ABSENT')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
             ->whereIn('employees.group_id', $groupIds)
+            ->whereHas('employee', function ($q) {
+                $q->where('status', '!=', 'kicked');
+            })
             ->groupBy('employees.group_id')
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
