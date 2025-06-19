@@ -158,6 +158,46 @@ class VizzanoReportTvController extends Controller
         // ✅ 6. Motivatsiyalar
         $motivations = \App\Models\Motivation::all()->map(fn($m) => ['title' => $m->title]);
 
+        $groupEarnings = collect();
+        foreach ($groupIds as $groupId) {
+            $submodelIds = \App\Models\OrderGroup::where('group_id', $groupId)->pluck('submodel_id');
+
+            $todayQuantity = SewingOutputs::whereIn('order_submodel_id', $submodelIds)
+                ->whereDate('created_at', $today)
+                ->sum('quantity');
+
+            // O'rtacha rasxodni olish
+            $rasxod = \App\Models\OrderSubModel::whereIn('id', $submodelIds)
+                ->with('orderModel')
+                ->get()
+                ->pluck('orderModel.rasxod')
+                ->filter()
+                ->avg() ?? 0;
+
+            $todayEarning = round($todayQuantity * $rasxod, 2);
+
+            $attendanceCount = \App\Models\Attendance::whereDate('date', $today)
+                ->whereHas('employee', function ($q) use ($groupId) {
+                    $q->where('status', '!=', 'kicked')
+                        ->where('group_id', $groupId);
+                })->count();
+
+            $perEmployeeEarning = $attendanceCount > 0
+                ? round($todayEarning / $attendanceCount, 2)
+                : 0;
+
+            $groupEarnings->push([
+                'group_id' => $groupId,
+                'group_name' => optional(\App\Models\Group::find($groupId))->name,
+                'quantity' => $todayQuantity,
+                'rasxod' => $rasxod,
+                'today_earning' => $todayEarning,
+                'attendance_count' => $attendanceCount,
+                'per_employee_earning' => $perEmployeeEarning
+            ]);
+        }
+
+
         // ✅ 7. Natijani yig'ish
         $resource = [
             'sewing_outputs' => $sewingOutputs->map(function ($output) use ($aup, $employeeCounts, $workTimeByGroup) {
@@ -189,6 +229,7 @@ class VizzanoReportTvController extends Controller
             'aup' => $aup,
             'simple' => $simple,
             'example_outputs' => $exampleOutputsData,
+            'group_earnings' => $groupEarnings,
         ];
 
         return response()->json($resource);
