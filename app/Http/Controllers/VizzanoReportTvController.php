@@ -217,6 +217,7 @@ class VizzanoReportTvController extends Controller
                 $groupEarnings->push([
                     'group_id' => $groupId,
                     'group_name' => optional(\App\Models\Group::find($groupId))->name,
+                    'responsibleUser' => optional(\App\Models\Group::find($groupId)->responsibleUser->employee)->name,
                     'quantity' => $todaySewn->sum('quantity'),
                     'today_earning' => $todayEarning,
                     'attendance_count' => $attendanceCount,
