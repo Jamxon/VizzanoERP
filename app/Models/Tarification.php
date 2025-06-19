@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static updateOrCreate(null[] $array, array $array1)
  * @method static findOrFail(mixed $tarificationId)
  * @method static whereHas(string $string, \Closure $param)
+ * @method static select(string $string, string $string1)
  */
 class Tarification extends Model
 {

@@ -352,6 +352,15 @@ class InternalAccountantController extends Controller
         return $pdf->download('nakladnoy.pdf');
     }
 
+    public function getGroups()
+    {
+        $groups = Group::with('department')
+            ->where('branch_id', auth()->user()->employee->branch_id)
+            ->get();
+
+        return response()->json($groups);
+    }
+
     public function generateDailyPlanForOneEmployee(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         $request->validate([
