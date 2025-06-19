@@ -352,7 +352,7 @@ class InternalAccountantController extends Controller
         return $pdf->download('nakladnoy.pdf');
     }
 
-    public function getGroups()
+    public function getGroups(): \Illuminate\Http\JsonResponse
     {
         $groups = Group::whereHas('department.mainDepartment', function ($query) {
             $query->where('branch_id', auth()->user()->employee->branch_id);
