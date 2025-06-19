@@ -331,10 +331,9 @@ class InternalAccountantController extends Controller
         $groupId = $request->group_id;
         $date = $request->date ?? now()->toDateString();
 
-        // Faqat kelgan xodimlar (PRESENT yoki KETDI)
         $employees = \App\Models\Employee::where('group_id', $groupId)
             ->whereHas('attendances', function ($q) use ($date) {
-                $q->where('date', $date)->whereIn('status', ['PRESENT', 'KETDI']);
+                $q->where('date', $date)->where('status', 'present');
             })
             ->with(['attendances' => fn($q) => $q->where('date', $date)])
             ->get();
@@ -342,7 +341,7 @@ class InternalAccountantController extends Controller
         $plans = $employees->map(function ($employee) use ($date) {
             return [
                 'employee_name' => $employee->name,
-                'total_minutes' => 500, // yoki siz hohlagan umumiy vaqt
+                'total_minutes' => 500,
                 'used_minutes' => 0,
                 'total_earned' => 0,
                 'employee_id' => $employee->id,
@@ -358,8 +357,10 @@ class InternalAccountantController extends Controller
             ];
         });
 
-        $pdf = \PDF::loadView('pdf.nakladnoy_blank', ['plans' => $plans])
-            ->setPaper([0, 0, 226.77, 999.0], 'portrait'); // 80mm eni (226.77pt) va avtomatik balandlik
+        dd($plans);
+
+        $pdf = PDF::loadView('pdf.nakladnoy_blank', ['plans' => $plans])
+            ->setPaper([0, 0, 226.77, 999.0], 'portrait');
 
         return $pdf->download('nakladnoy.pdf');
     }
