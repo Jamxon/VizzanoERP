@@ -14,6 +14,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('database:backup')->dailyAt('02:00');
         $schedule->command('attendance:mark-absent')->dailyAt('23:50');
+        $schedule->command('attendance:mark-left')->dailyAt('17:30');
     }
 
     /**
