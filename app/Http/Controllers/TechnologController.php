@@ -26,10 +26,10 @@ class TechnologController extends Controller
 {
     public function getLastTarification()
     {
-        return Tarification::without('category', 'submodel', 'unit')
-            ->select('id', 'name')
+        return Tarification::select('id', 'name')
             ->orderBy('id', 'desc')
             ->take(1000)
+            ->makeHidden(['employee', 'razryad', 'typewriter'])
             ->get();
     }
 
