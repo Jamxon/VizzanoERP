@@ -111,6 +111,7 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('boxTarifications/{boxTarification}', [InternalAccountantController::class, 'boxTarificationShow']);
     Route::post('salaryCalculate', [InternalAccountantController::class, 'salaryCalculation']);
     Route::get('tarificationLogs', [InternalAccountantController::class, 'getEmployeeTarificationLog']);
+    Route::get('nakladnoy', [InternalAccountantController::class, 'generateAttendanceNakladnoy']);
 });
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {

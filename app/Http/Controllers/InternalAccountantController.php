@@ -326,6 +326,44 @@ class InternalAccountantController extends Controller
         return $pdf->download('daily_plan.pdf');
     }
 
+    public function generateAttendanceNakladnoy(Request $request)
+    {
+        $groupId = $request->group_id;
+        $date = $request->date ?? now()->toDateString();
+
+        // Faqat kelgan xodimlar (PRESENT yoki KETDI)
+        $employees = \App\Models\Employee::where('group_id', $groupId)
+            ->whereHas('attendances', function ($q) use ($date) {
+                $q->where('date', $date)->whereIn('status', ['PRESENT', 'KETDI']);
+            })
+            ->with(['attendances' => fn($q) => $q->where('date', $date)])
+            ->get();
+
+        $plans = $employees->map(function ($employee) use ($date) {
+            return [
+                'employee_name' => $employee->name,
+                'total_minutes' => 500, // yoki siz hohlagan umumiy vaqt
+                'used_minutes' => 0,
+                'total_earned' => 0,
+                'employee_id' => $employee->id,
+                'tarifications' => array_fill(0, 10, [
+                    'code' => '',
+                    'tarification_name' => '',
+                    'seconds' => '',
+                    'count' => '',
+                    'sum' => '',
+                    'amount_earned' => '',
+                ]),
+                'date' => $date,
+            ];
+        });
+
+        $pdf = \PDF::loadView('pdf.nakladnoy_blank', ['plans' => $plans])
+            ->setPaper([0, 0, 226.77, 999.0], 'portrait'); // 80mm eni (226.77pt) va avtomatik balandlik
+
+        return $pdf->download('nakladnoy.pdf');
+    }
+
     public function generateDailyPlanForOneEmployee(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         $request->validate([

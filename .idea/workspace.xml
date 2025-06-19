@@ -5,10 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345">
-      <change afterPath="$PROJECT_DIR$/app/Console/Commands/MarkAttendanceAsLeft.php" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/resources/views/pdf/nakladnoy_blank.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Console/Kernel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Kernel.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Attendance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Attendance.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -374,15 +374,7 @@
       <workItem from="1750047278709" duration="20720000" />
       <workItem from="1750131005853" duration="19487000" />
       <workItem from="1750221634660" duration="7862000" />
-      <workItem from="1750305899667" duration="12411000" />
-    </task>
-    <task id="LOCAL-00346" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750056967230</created>
-      <option name="number" value="00346" />
-      <option name="presentableId" value="LOCAL-00346" />
-      <option name="project" value="LOCAL" />
-      <updated>1750056967230</updated>
+      <workItem from="1750305899667" duration="15852000" />
     </task>
     <task id="LOCAL-00347" summary="12345">
       <option name="closed" value="true" />
@@ -768,7 +760,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750333184178</updated>
     </task>
-    <option name="localTasksCounter" value="395" />
+    <task id="LOCAL-00395" summary="12345">
+      <option name="closed" value="true" />
+      <created>1750333927073</created>
+      <option name="number" value="00395" />
+      <option name="presentableId" value="LOCAL-00395" />
+      <option name="project" value="LOCAL" />
+      <updated>1750333927073</updated>
+    </task>
+    <option name="localTasksCounter" value="396" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
