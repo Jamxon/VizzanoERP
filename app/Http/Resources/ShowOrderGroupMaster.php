@@ -52,6 +52,7 @@ class ShowOrderGroupMaster extends JsonResource
 
         $attendanceCount = $group
             ?->employees()
+            ->where('status', '!=', 'kicked')
             ->whereHas('attendances', function ($query) {
                 $query->whereDate('date', now()->toDateString());
                 $query->where('status', 'present');
