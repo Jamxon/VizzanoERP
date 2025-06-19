@@ -340,19 +340,8 @@ class InternalAccountantController extends Controller
 
         $plans = $employees->map(function ($employee) use ($date) {
             return [
-                'employee_name' => $employee->name,
-                'total_minutes' => 500,
-                'used_minutes' => 0,
-                'total_earned' => 0,
                 'employee_id' => $employee->id,
-                'tarifications' => array_fill(0, 10, [
-                    'code' => '',
-                    'tarification_name' => '',
-                    'seconds' => '',
-                    'count' => '',
-                    'sum' => '',
-                    'amount_earned' => '',
-                ]),
+                'employee_name' => $employee->name,
                 'date' => $date,
             ];
         });
