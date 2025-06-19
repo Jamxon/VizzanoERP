@@ -11,6 +11,7 @@ use App\Models\OrderSubModel;
  * @method static where(string $string, string $string1, mixed $startDate)
  * @method static whereDate(string $string, string $string1, mixed $startDate)
  * @method static join(string $string, string $string1, string $string2, string $string3)
+ * @method static whereIn(string $string, $orderSubmodelIds)
  */
 class SewingOutputs extends Model
 {

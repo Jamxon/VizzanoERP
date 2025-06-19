@@ -24,16 +24,13 @@ class VizzanoReportTvController extends Controller
         $endDate = $request->get('end_date');
         $today = $startDate;
 
-        // ✅ 1. Shu branchga tegishli group_id larni topamiz
         $groupIds = \App\Models\Group::whereHas('department.mainDepartment', function ($q) use ($branchId) {
             $q->where('branch_id', $branchId);
         })->pluck('id');
 
-        // ✅ 2. Group_id orqali order_submodel_id larni topamiz
         $orderSubmodelIds = \App\Models\OrderGroup::whereIn('group_id', $groupIds)
             ->pluck('submodel_id');
 
-        // ✅ 3. Unga tegishli sewing_outputs larni yuklab olamiz
         $query = SewingOutputs::whereIn('order_submodel_id', $orderSubmodelIds);
 
         if ($endDate) {
@@ -74,7 +71,7 @@ class VizzanoReportTvController extends Controller
             ->pluck('total_quantity', 'order_submodel_id');
 
         $latestOutputs = SewingOutputs::whereIn('order_submodel_id', $orderSubmodelIds)
-            ->select('id', 'order_submodel_id', 'time_id') // faqat kerakli ustunlar
+            ->select('id', 'order_submodel_id', 'time_id')
             ->whereIn(DB::raw('(order_submodel_id, created_at)'), function ($query) use ($orderSubmodelIds) {
                 $query->selectRaw('DISTINCT ON (order_submodel_id) order_submodel_id, created_at')
                     ->from('sewing_outputs')
@@ -92,7 +89,6 @@ class VizzanoReportTvController extends Controller
             return $item;
         });
 
-        // ✅ 4. Attendance ma'lumotlari
         $employeeCounts = \App\Models\Attendance::whereDate('attendance.date', $today)
             ->where('attendance.status', '!=', 'ABSENT')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
@@ -104,7 +100,6 @@ class VizzanoReportTvController extends Controller
             ->selectRaw('employees.group_id, COUNT(DISTINCT attendance.employee_id) as employee_count')
             ->pluck('employee_count', 'employees.group_id');
 
-        // ✅ 5. Work time hisoblash
         $workTimeByGroup = \App\Models\Group::whereIn('groups.id', $groupIds)
             ->join('departments', 'groups.department_id', '=', 'departments.id')
             ->selectRaw('
@@ -113,11 +108,7 @@ class VizzanoReportTvController extends Controller
     ')
             ->pluck('work_seconds', 'group_id');
 
-        // ✅ ExampleOutputs ni qo‘shamiz (planlarsiz, lekin batafsil)
         $exampleQuery = \App\Models\ExampleOutputs::whereIn('order_submodel_id', $orderSubmodelIds);
-
-
-
 
         if ($endDate) {
             $exampleQuery->whereBetween('created_at', [$startDate, $endDate]);
@@ -225,7 +216,6 @@ class VizzanoReportTvController extends Controller
                 ]);
             }
 
-
         // ✅ 7. Natijani yig'ish
         $resource = [
             'sewing_outputs' => $sewingOutputs->map(function ($output) use ($aup, $employeeCounts, $workTimeByGroup) {
@@ -233,7 +223,6 @@ class VizzanoReportTvController extends Controller
                 $employeeCount = $employeeCounts[$group_id] ?? 0;
                 $workTime = $workTimeByGroup[$group_id] ?? 0;
                 $spend = (optional($output->orderSubmodel)->orderModel->rasxod / 250) * 60;
-
 
                 $today_plan = ($spend > 0 && $employeeCount > 0)
                     ? intval(($workTime * $employeeCount) / $spend)
