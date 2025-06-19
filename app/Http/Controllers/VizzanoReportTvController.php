@@ -180,7 +180,9 @@ class VizzanoReportTvController extends Controller
                 ->whereHas('employee', function ($q) use ($groupId) {
                     $q->where('status', '!=', 'kicked')
                         ->where('group_id', $groupId);
-                })->count();
+                })
+                ->where('status', '!=', 'ABSENT')
+                ->count();
 
             $perEmployeeEarning = $attendanceCount > 0
                 ? round($todayEarning / $attendanceCount, 2)
