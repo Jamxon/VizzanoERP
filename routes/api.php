@@ -382,7 +382,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::delete('tarification/{id}', [TechnologController::class, 'deleteTarification']);
     Route::post('tarification/fastening', [TechnologController::class, 'fasteningToEmployee']);
     Route::get('confirmOrder', [TechnologController::class, 'confirmOrder']);
-    Route::get('lastTarification', [TechnologController::class, 'getLastTarification']);
+    Route::get('lastTarifications', [TechnologController::class, 'getLastTarifications']);
     Route::get('nakladnoy', [InternalAccountantController::class, 'generateAttendanceNakladnoy']);
     Route::get('groups', [InternalAccountantController::class, 'getGroups']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);

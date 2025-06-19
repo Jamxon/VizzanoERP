@@ -24,7 +24,7 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class TechnologController extends Controller
 {
-    public function getLastTarification()
+    public function getLastTarifications()
     {
         return Tarification::select('id', 'name')
             ->orderBy('id', 'desc')
