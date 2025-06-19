@@ -29,8 +29,10 @@ class TechnologController extends Controller
         return Tarification::select('id', 'name')
             ->orderBy('id', 'desc')
             ->take(1000)
-            ->makeHidden(['employee', 'razryad', 'typewriter'])
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                return \Illuminate\Support\Arr::only($item->toArray(), ['id', 'name']);
+            });
     }
 
     public function confirmOrder(Request $request)
