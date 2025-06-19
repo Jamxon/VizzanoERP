@@ -35,7 +35,7 @@ class TechnologController extends Controller
             });
     }
 
-    public function confirmOrder(Request $request)
+    public function confirmOrder(Request $request): \Illuminate\Http\JsonResponse
     {
         $orderId = $request->input('order_id');
 
