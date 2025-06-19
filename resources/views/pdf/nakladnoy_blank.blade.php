@@ -126,7 +126,6 @@
 
         <div class="barcode">
             <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG($plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('ymd'), 'C128', 1.5, 40) }}">
-            <h2>{{ 'E' . $plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('ymd') }}</h2>
             <hr style="margin-top: 40px">
         </div>
     </div>
