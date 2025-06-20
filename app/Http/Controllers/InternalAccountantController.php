@@ -861,8 +861,6 @@ class InternalAccountantController extends Controller
                 ]
             );
 
-            // Agar xodimning to'lov turi "piece_work" bo'lsa, balansni yangilash
-
             if ($employee->payment_type === 'piece_work') {
                 $amountEarned = $tarification->summa * $quantity;
                 $employee->increment('balance', $amountEarned);
