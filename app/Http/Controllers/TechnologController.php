@@ -599,7 +599,7 @@ class TechnologController extends Controller
 
             $submodelSpend = SubmodelSpend::firstOrNew([
                 'submodel_id' => $tarificationCategory->submodel_id,
-                'region' => $datum['region'] ?? null,
+                'region' => $data['region'] ?? null,
             ]);
 
             $submodelSpend->seconds = ($submodelSpend->exists ? $submodelSpend->seconds : 0) + $totalSecond;
