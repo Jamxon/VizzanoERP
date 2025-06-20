@@ -415,6 +415,7 @@ class TechnologController extends Controller
             ], 422);
         }
 
+
         $validatedData = $validator->validated();
         $createdData = [];
 
@@ -429,6 +430,9 @@ class TechnologController extends Controller
                 'submodel_id' => $submodelId,
                 'region' => $datum['region'] ?? null,
             ]);
+            $oldSubmodelSpend = SubmodelSpend::where('submodel_id', $tarificationCategory->submodel_id)
+                ->where('region', $data['region'] ?? null)
+                ->first();
 
             $tarifications = [];
             foreach ($datum['tarifications'] as $tarification) {
@@ -461,11 +465,16 @@ class TechnologController extends Controller
                 $totalSumma += $summa;
             }
 
-            $submodelSpend = SubmodelSpend::updateOrCreate(
-                ['submodel_id' => $tarificationCategory->submodel_id
-                    , 'region' => $datum['region'] ?? null],
-                ['seconds' => $totalSecond, 'summa' => $totalSumma]
-            );
+            $submodelSpend = SubmodelSpend::firstOrNew([
+                'submodel_id' => $tarificationCategory->submodel_id,
+                'region' => $datum['region'] ?? null,
+            ]);
+
+            $submodelSpend->seconds = ($submodelSpend->exists ? $submodelSpend->seconds : 0) + $totalSecond;
+            $submodelSpend->summa = ($submodelSpend->exists ? $submodelSpend->summa : 0) + $totalSumma;
+
+            $submodelSpend->save();
+
 
             $createdData[] = [
                 'category' => $tarificationCategory,
