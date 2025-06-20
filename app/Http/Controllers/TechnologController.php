@@ -1240,9 +1240,11 @@ class TechnologController extends Controller
             ->get();
 
         $submodel->tarificationCategories = $filteredCategories;
+        $model = $submodel->orderModel->model->name;
 
         $pdf = Pdf::loadView('pdf.tarifications', [
-            'submodel' => $submodel
+            'submodel' => $submodel,
+            'model' => $model,
         ])
             ->setPaper('A4', 'portrait');
 

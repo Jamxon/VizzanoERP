@@ -8,6 +8,7 @@ use App\Models\DailyPlanItem;
 use App\Models\EmployeeTarificationLog;
 use App\Models\Group;
 use App\Models\Log;
+use App\Models\Models;
 use App\Models\Order;
 use App\Models\OrderSubModel;
 use App\Models\Tarification;
@@ -330,6 +331,9 @@ class InternalAccountantController extends Controller
     {
         $groupId = $request->group_id;
         $date = $request->date ?? now()->toDateString();
+        $modelId = $request->model_id;
+
+        $model = Models::find($modelId);
 
         $employees = \App\Models\Employee::where('group_id', $groupId)
             ->whereHas('attendances', function ($q) use ($date) {
@@ -338,11 +342,12 @@ class InternalAccountantController extends Controller
             ->with(['attendances' => fn($q) => $q->where('date', $date)])
             ->get();
 
-        $plans = $employees->map(function ($employee) use ($date) {
+        $plans = $employees->map(function ($employee) use ($date, $model) {
             return [
                 'employee_id' => $employee->id,
                 'employee_name' => $employee->name,
                 'date' => $date,
+                'model' => $model->name,
             ];
         });
 

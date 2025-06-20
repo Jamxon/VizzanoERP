@@ -93,7 +93,7 @@
 @foreach($plans as $plan)
     <div class="page">
         <div class="employee-info">
-            <br><br><strong>Xodim:</strong> {{ $plan['employee_name'] }} <br><br><br>
+            <br><br><strong>Xodim:</strong> {{ $plan['employee_name'] }} {{ $plan['model'] }} <br><br><br>
         </div>
 
         <table>

@@ -24,7 +24,7 @@
 <body>
 
 <h2>Operatsiyalar Ro'yxati</h2>
-<h4>{{ $submodel->submodel->name ?? '-' }}</h4>
+<h4>{{ $model }} {{ $submodel->submodel->name ?? '-' }}</h4>
 
 @foreach($submodel->tarificationCategories as $category)
     <div class="category-title">{{ $category->name }}</div>
