@@ -148,7 +148,7 @@ class SuperHRController extends Controller
             foreach ($dateRange as $date) {
                 $att = $employeeAttendances->firstWhere('date', $date);
 
-                if ($att->status === 'present' && $att) {
+                if ($att && $att->status === 'present') {
                     $present[] = [
                         'date' => $att->date,
                         'status' => $att->status,
@@ -156,7 +156,7 @@ class SuperHRController extends Controller
                         'check_out' => $att->check_out,
                         'check_in_image' => $att->check_in_image,
                     ];
-                } elseif($att->status === 'absent' && $att) {
+                } elseif($att && $att->status === 'absent') {
                     $absent[] = [
                         'date' => $date,
                         'status' => 'absent',
