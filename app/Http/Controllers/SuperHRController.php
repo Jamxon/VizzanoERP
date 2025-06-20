@@ -20,6 +20,49 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class SuperHRController extends Controller
 {
+    public function storeEmployeeHoliday(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'employee_id' => 'required|integer|exists:employees,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'comment' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $holiday = \App\Models\EmployeeHolidays::create([
+                'employee_id' => $request->employee_id,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'comment' => $request->comment,
+            ]);
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Xodim ta‘tili qo‘shildi',
+                'create',
+                null,
+                $holiday
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Xodim ta‘tili muvaffaqiyatli qo‘shildi', 'holiday' => $holiday], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::add(
+                auth()->user()->id,
+                "Xodim ta‘tilini qo‘shishda xatolik",
+                "error",
+                null,
+                $e->getMessage()
+            );
+            return response()->json(['status' => 'error', 'message' => 'Xodim ta‘tilini qo‘shishda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function exportAttendancePdf(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         $startDate = $request->get('start_date');
