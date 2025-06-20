@@ -590,7 +590,7 @@ class TechnologController extends Controller
             }
 
             // 🔁 SubmodelSpend qayta hisoblash — butun submodel bo‘yicha
-            $allTarifications = Tarification::whereHas('category', function ($q) use ($tarificationCategory, $data) {
+            $allTarifications = Tarification::whereHas('tarificationCategory', function ($q) use ($tarificationCategory, $data) {
                 $q->where('submodel_id', $tarificationCategory->submodel_id)
                     ->where('region', $data['region'] ?? null);
             })->with('razryad')->get();
