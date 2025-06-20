@@ -126,7 +126,7 @@
         </table>
 
         <div class="barcode" style="text-align: center; padding: 20px 0;">
-            <img src="data:image/png;base64,{{ DNS2D::getBarcodePNG('A' . $plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('Y-m-d'), 'QRCODE', 3, 3) }}" alt="qrcode">
+            <img src="data:image/png;base64,{{ DNS2D::getBarcodePNG('A' . $plan['employee_id'] . '+' . \Carbon\Carbon::parse($plan['date'])->format('Y-m-d'), 'QRCODE', 3, 3) }}" alt="qrcode">
         </div>
 
 
