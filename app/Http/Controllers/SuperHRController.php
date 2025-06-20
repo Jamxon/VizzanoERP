@@ -156,7 +156,7 @@ class SuperHRController extends Controller
                         'check_out' => $att->check_out,
                         'check_in_image' => $att->check_in_image,
                     ];
-                } elseif($att->status === 'absent') {
+                } elseif($att->status === 'absent' && $att) {
                     $absent[] = [
                         'date' => $date,
                         'status' => 'absent',
