@@ -834,7 +834,8 @@ class InternalAccountantController extends Controller
         return response()->json($employees);
     }
 
-    public function salaryCalculation(Request $request){
+    public function salaryCalculation(Request $request): \Illuminate\Http\JsonResponse
+    {
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'tarifications' => 'required|array',
@@ -844,21 +845,36 @@ class InternalAccountantController extends Controller
         ]);
 
         $employee = Employee::findOrFail($request->employee_id);
+        $date = $request->date ?: now()->toDateString();
 
         if ($employee->status === 'kicked') {
             return response()->json(['message' => '❌ Xodim ishdan bo‘shatilgan.'], 403);
         }
 
         foreach ($request->tarifications as $tarificationData) {
-            $tarification = Tarification::findOrFail($tarificationData['id']);
+            $tarificationId = $tarificationData['id'];
             $quantity = $tarificationData['quantity'];
 
-            // Hisob-kitob logini yaratish
+            $tarification = Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
+            $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
+
+            // Avvalgi bajarilgan miqdorni hisoblash
+            $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)
+                ->whereDate('date', $date)
+                ->sum('quantity');
+
+            if (($alreadyDone + $quantity) > $orderQuantity) {
+                return response()->json([
+                    'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: $quantity"
+                ], 422);
+            }
+
+            // Hisob-kitob logini yangilash yoki yaratish
             EmployeeTarificationLog::updateOrCreate(
                 [
                     'employee_id' => $employee->id,
                     'tarification_id' => $tarification->id,
-                    'date' => $request->date ?: now()->toDateString(),
+                    'date' => $date,
                 ],
                 [
                     'quantity' => $quantity,
@@ -871,6 +887,7 @@ class InternalAccountantController extends Controller
                 $amountEarned = $tarification->summa * $quantity;
                 $employee->increment('balance', $amountEarned);
             }
+
             // Log yozish
             Log::add(
                 auth()->id(),
@@ -887,6 +904,8 @@ class InternalAccountantController extends Controller
                 ]
             );
         }
+
+        return response()->json(['message' => '✅ Hisob-kitob muvaffaqiyatli bajarildi.']);
     }
 
     public function getEmployeeTarificationLog(Request $request): \Illuminate\Http\JsonResponse
