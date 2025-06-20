@@ -597,11 +597,15 @@ class TechnologController extends Controller
                 }
             }
 
-            $submodelSpend = SubmodelSpend::updateOrCreate(
-                ['submodel_id' => $tarificationCategory->submodel_id
-                    , 'region' => $data['region'] ?? null],
-                ['seconds' => $totalSecond, 'summa' => $totalSumma]
-            );
+            $submodelSpend = SubmodelSpend::firstOrNew([
+                'submodel_id' => $tarificationCategory->submodel_id,
+                'region' => $datum['region'] ?? null,
+            ]);
+
+            $submodelSpend->seconds = ($submodelSpend->exists ? $submodelSpend->seconds : 0) + $totalSecond;
+            $submodelSpend->summa = ($submodelSpend->exists ? $submodelSpend->summa : 0) + $totalSumma;
+
+            $submodelSpend->save();
 
             $submodelSpendChanged = [];
             if ($oldSubmodelSpend) {
