@@ -37,7 +37,6 @@
                 <th>Kod</th>
                 <th>Ish nomi</th>
                 <th>Razryad</th>
-                <th>Tikuv mashinasi</th>
                 <th>1 dona vaqti (sekund)</th>
                 <th>1 dona narxi (so'm)</th>
                 <th>Xodim</th>
@@ -45,13 +44,12 @@
             </thead>
         @endif
         <tbody>
-        @foreach($category->tarifications as $index => $tar)
+        @foreach($category->tarifications->sortBy('code') as $index => $tar)
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $tar->code ?? '-' }}</td>
                 <td>{{ $tar->name }}</td>
                 <td>{{ $tar->razryad->name ?? '-' }}</td>
-                <td>{{ $tar->typewriter->name ?? '-' }}</td>
                 <td>{{ number_format($tar->second, 2, '.', ' ') }}</td>
                 <td>{{ number_format($tar->summa, 0, ',', ' ') }}</td>
                 <td>{{ $tar->employee->name ?? '-' }}</td>
