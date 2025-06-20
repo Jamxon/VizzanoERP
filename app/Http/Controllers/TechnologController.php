@@ -511,8 +511,8 @@ class TechnologController extends Controller
                 $oldCategory = $tarificationCategory->getOriginal();
                 $oldTarifications = $tarificationCategory->tarifications()->get()->keyBy('id');
                 $oldSubmodelSpend = SubmodelSpend::where('submodel_id', $tarificationCategory->submodel_id)
-                ->where('region', $data['region'] ?? null)
-                ->first();
+                    ->where('region', $data['region'] ?? null)
+                    ->first();
             }
 
             if (!$tarificationCategory) {
@@ -530,8 +530,6 @@ class TechnologController extends Controller
                 ]);
             }
 
-            $totalSecond = 0;
-            $totalSumma = 0;
             $oldTarificationsChanged = [];
             $newTarificationsChanged = [];
 
@@ -549,12 +547,10 @@ class TechnologController extends Controller
 
                     $summa = $tarification['second'] * $razryad->salary;
 
-                    // update yoki create holatini ajratish
                     $existing = isset($tarification['id']) && $oldTarifications->has($tarification['id'])
                         ? $oldTarifications[$tarification['id']] : null;
 
                     if ($existing) {
-                        // o'zgarish bormi, tekshiramiz
                         $hasChanges = $existing->name !== $tarification['name'] ||
                             $existing->razryad_id != $tarification['razryad_id'] ||
                             $existing->typewriter_id != $tarification['typewriter_id'] ||
@@ -577,7 +573,6 @@ class TechnologController extends Controller
                             $newTarificationsChanged[] = $existing->fresh()->toArray();
                         }
                     } else {
-                        // yangi yaratilgan
                         $created = Tarification::create([
                             'tarification_category_id' => $tarificationCategory->id,
                             'name' => $tarification['name'],
@@ -591,22 +586,30 @@ class TechnologController extends Controller
 
                         $newTarificationsChanged[] = $created->toArray();
                     }
-
-                    $totalSecond += $tarification['second'];
-                    $totalSumma += $summa;
                 }
             }
 
-            $submodelSpend = SubmodelSpend::firstOrNew([
-                'submodel_id' => $tarificationCategory->submodel_id,
-                'region' => $data['region'] ?? null,
-            ]);
+            // 🔁 SubmodelSpend qayta hisoblash — butun submodel bo‘yicha
+            $allTarifications = Tarification::whereHas('category', function ($q) use ($tarificationCategory, $data) {
+                $q->where('submodel_id', $tarificationCategory->submodel_id)
+                    ->where('region', $data['region'] ?? null);
+            })->with('razryad')->get();
 
-            $submodelSpend->seconds = $totalSecond;
-            $submodelSpend->summa = $totalSumma;
+            $totalSecond = $allTarifications->sum('second');
+            $totalSumma = $allTarifications->sum(function ($t) {
+                return $t->second * ($t->razryad->salary ?? 0);
+            });
 
-
-            $submodelSpend->save();
+            $submodelSpend = SubmodelSpend::updateOrCreate(
+                [
+                    'submodel_id' => $tarificationCategory->submodel_id,
+                    'region' => $data['region'] ?? null,
+                ],
+                [
+                    'seconds' => $totalSecond,
+                    'summa' => $totalSumma,
+                ]
+            );
 
             $submodelSpendChanged = [];
             if ($oldSubmodelSpend) {
@@ -618,7 +621,6 @@ class TechnologController extends Controller
                 $submodelSpendChanged['new'] = $submodelSpend->fresh()->toArray();
             }
 
-            // Logga faqat o‘zgargan qismlar yoziladi
             $logOldData = [
                 'category' => $oldCategory,
                 'tarifications' => $oldTarificationsChanged,
