@@ -44,7 +44,7 @@
             </thead>
         @endif
         <tbody>
-        @foreach($category->tarifications->sortBy('code') as $index => $tar)
+        @foreach($category->tarifications->sortBy('code')->values() as $index => $tar)
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $tar->code ?? '-' }}</td>
