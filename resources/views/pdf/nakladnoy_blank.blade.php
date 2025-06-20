@@ -125,10 +125,10 @@
             </tr>
         </table>
 
-        <div class="barcode">
-            <img src="data:image/png;base64,{{ DNS1D::getBarcodePNG('A' . $plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('Y-m-d'), 'C39', 0.8, 25) }}" alt="barcode" />
-            <hr style="margin-top: 40px">
-        </div>
+            <div class="barcode" style="text-align: center; padding: 20px 0;">
+                {!! QrCode::size(80)->generate('A' . $plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('Y-m-d')) !!}
+            </div>
+
     </div>
 @endforeach
 </body>
