@@ -463,7 +463,7 @@ class TechnologController extends Controller
 
             $submodelSpend = SubmodelSpend::updateOrCreate(
                 ['submodel_id' => $tarificationCategory->submodel_id
-                    , 'region' => $data['region'] ?? null],
+                    , 'region' => $datum['region'] ?? null],
                 ['seconds' => $totalSecond, 'summa' => $totalSumma]
             );
 
