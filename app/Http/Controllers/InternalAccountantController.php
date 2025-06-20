@@ -840,6 +840,7 @@ class InternalAccountantController extends Controller
             'tarifications' => 'required|array',
             'tarifications.*.id' => 'required|exists:tarifications,id',
             'tarifications.*.quantity' => 'required|numeric',
+            'date' => 'nullable|date_format:Y-m-d',
         ]);
 
         $employee = Employee::findOrFail($request->employee_id);
@@ -857,7 +858,7 @@ class InternalAccountantController extends Controller
                 [
                     'employee_id' => $employee->id,
                     'tarification_id' => $tarification->id,
-                    'date' => now()->toDateString(),
+                    'date' => $request->date ?: now()->toDateString(),
                 ],
                 [
                     'quantity' => $quantity,
