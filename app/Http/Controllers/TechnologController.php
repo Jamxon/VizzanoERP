@@ -602,8 +602,9 @@ class TechnologController extends Controller
                 'region' => $data['region'] ?? null,
             ]);
 
-            $submodelSpend->seconds = ($submodelSpend->exists ? $submodelSpend->seconds : 0) + $totalSecond;
-            $submodelSpend->summa = ($submodelSpend->exists ? $submodelSpend->summa : 0) + $totalSumma;
+            $submodelSpend->seconds = $totalSecond;
+            $submodelSpend->summa = $totalSumma;
+
 
             $submodelSpend->save();
 
