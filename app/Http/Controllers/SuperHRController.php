@@ -182,7 +182,7 @@ class SuperHRController extends Controller
             $current->addDay();
         }
 
-        $result = $employees->map(function ($employee) use ($attendances, $dateRange) {
+        $result = $employees->map(function ($employee) use ($attendances, $dateRange, $startDate, $endDate) {
             $employeeAttendances = $attendances[$employee->id] ?? collect();
 
             $present = [];
@@ -218,7 +218,18 @@ class SuperHRController extends Controller
                 'attendances' => [
                     'present' => $present,
                     'absent' => $absent,
-                ]
+                ],
+                'holidays' => \App\Models\EmployeeHolidays::where('employee_id', $employee->id)
+                    ->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate])
+                    ->get()
+                    ->map(function ($holiday) {
+                        return [
+                            'start_date' => $holiday->start_date,
+                            'end_date' => $holiday->end_date,
+                            'comment' => $holiday->comment,
+                        ];
+                    })->toArray(),
             ];
         });
 

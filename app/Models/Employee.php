@@ -116,9 +116,14 @@ class Employee extends Model
         return $this->hasMany(EmployeeResult::class);
     }
 
-    public function filteredTarifications($allowedIds)
+    public function filteredTarifications($allowedIds): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->tarifications()->whereIn('tarifications.id', $allowedIds);
+    }
+
+    public function employeeHolidays(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(EmployeeHolidays::class, 'employee_id');
     }
 
 }
