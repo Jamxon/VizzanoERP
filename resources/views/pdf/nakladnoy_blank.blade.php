@@ -125,9 +125,10 @@
             </tr>
         </table>
 
-            <div class="barcode" style="text-align: center; padding: 20px 0;">
-                {!! QrCode::size(80)->generate('A' . $plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('Y-m-d')) !!}
-            </div>
+        <div class="barcode" style="text-align: center; padding: 20px 0;">
+            {!! \SimpleSoftwareIO\QrCode\Facades\QrCode::size(80)->generate('A' . $plan['employee_id'] . '-' . \Carbon\Carbon::parse($plan['date'])->format('Y-m-d')) !!}
+        </div>
+
 
     </div>
 @endforeach
