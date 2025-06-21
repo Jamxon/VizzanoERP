@@ -6,6 +6,7 @@ use App\Http\Resources\GetEmployeeResourceCollection;
 use App\Models\Attendance;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\EmployeeHolidays;
 use App\Models\Log;
 use App\Models\MainDepartment;
 use App\Models\Region;
@@ -24,12 +25,77 @@ class SuperHRController extends Controller
     {
         $user = auth()->user();
         $branchId = $user->employee->branch_id;
+        $startDate = request()->get('start_date');
+        $endDate = request()->get('end_date');
+        $search = request()->get('search');
 
-        $holidays = \App\Models\EmployeeHolidays::whereHas('employee', function ($query) use ($branchId) {
-            $query->where('branch_id', $branchId);
-        })->with('employee')->get();
+        $query = EmployeeHolidays::whereHas('employee', function ($q) use ($branchId) {
+            $q->where('branch_id', $branchId);
+        });
+
+        if ($startDate && $endDate) {
+            $query->whereBetween('start_date', [$startDate, $endDate])
+                ->orWhereBetween('end_date', [$startDate, $endDate]);
+        }
+
+        if ($search) {
+            $query->whereHas('employee', function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%');
+            });
+
+            $query->orWhere('comment', 'like', '%' . $search . '%');
+        }
+
+        $holidays = $query->paginate(10);
 
         return response()->json($holidays, 200);
+    }
+
+    public function editEmployeeHoliday(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $holiday = EmployeeHolidays::findOrFail($id);
+
+        if (!$holiday){
+            return response()->json(['status' => 'error', 'message' => 'Xodim ta‘tili topilmadi'], 404);
+        }
+
+        $request->validate([
+            'start_date' => 'sometimes|date',
+            'end_date' => 'sometimes|date|after_or_equal:start_date',
+            'comment' => 'sometimes|nullable|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $holiday->update([
+                'start_date' => $request->start_date ?? $holiday->start_date,
+                'end_date' => $request->end_date ?? $holiday->end_date,
+                'comment' => $request->comment ?? $holiday->comment,
+            ]);
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Xodim ta‘tili yangilandi',
+                'edit',
+                null,
+                $holiday
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Xodim ta‘tili muvaffaqiyatli yangilandi', 'holiday' => $holiday], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::add(
+                auth()->user()->id,
+                "Xodim ta‘tilini yangilashda xatolik",
+                "error",
+                null,
+                $e->getMessage()
+            );
+            return response()->json(['status' => 'error', 'message' => 'Xodim ta‘tilini yangilashda xatolik: ' . $e->getMessage()], 500);
+        }
     }
 
     public function storeEmployeeHoliday(Request $request): \Illuminate\Http\JsonResponse

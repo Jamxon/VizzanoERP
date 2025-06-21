@@ -7750,9 +7750,9 @@ currency_id</ColNames>
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="659" parent="378" name="comments">
+    <column id="659" parent="378" name="comment">
       <Position>5</Position>
-      <StateNumber>356547</StateNumber>
+      <StateNumber>359706</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
