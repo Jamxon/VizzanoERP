@@ -20,7 +20,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class SuperHRController extends Controller
 {
-    public function getEmployeeHolidays()
+    public function getEmployeeHolidays(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
         $branchId = $user->employee->branch_id;
