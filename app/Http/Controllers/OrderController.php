@@ -67,7 +67,7 @@ class OrderController extends Controller
     
     public function getLogs(): \Illuminate\Http\JsonResponse
     {
-        $logs = Log::orderBy('created_at', 'desc')->get();
+        $logs = Log::orderBy('created_at', 'desc')->paginate(100);
         return response()->json($logs);
     }
 
