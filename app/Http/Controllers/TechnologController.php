@@ -26,13 +26,10 @@ class TechnologController extends Controller
 {
     public function getLastTarifications()
     {
-        return Tarification::select('id', 'name')
+        return Tarification::select('id', 'name', 'razryad_id', 'typewriter_id', 'second',)
             ->orderBy('id', 'desc')
             ->take(1000)
-            ->get()
-            ->map(function ($item) {
-                return \Illuminate\Support\Arr::only($item->toArray(), ['id', 'name']);
-            });
+            ->get();
     }
 
     public function confirmOrder(Request $request): \Illuminate\Http\JsonResponse
