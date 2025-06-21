@@ -48,7 +48,7 @@ class SuperHRController extends Controller
             $query->orWhere('comment', 'like', '%' . $search . '%');
         }
 
-        $holidays = $query->with('employee.department','employee.group')->paginate(10);
+        $holidays = $query->with('employee.department','employee.group')->orderBy('id', 'DESC')->paginate(10);
 
         return response()->json($holidays, 200);
     }

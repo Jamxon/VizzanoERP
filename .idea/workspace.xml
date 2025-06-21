@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="12345">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="refactor: enhance holiday query to include employee department and group">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -374,15 +374,7 @@
       <workItem from="1750305899667" duration="19360000" />
       <workItem from="1750392497866" duration="20029000" />
       <workItem from="1750427572972" duration="288000" />
-      <workItem from="1750478676942" duration="17052000" />
-    </task>
-    <task id="LOCAL-00409" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750344429645</created>
-      <option name="number" value="00409" />
-      <option name="presentableId" value="LOCAL-00409" />
-      <option name="project" value="LOCAL" />
-      <updated>1750344429645</updated>
+      <workItem from="1750478676942" duration="18553000" />
     </task>
     <task id="LOCAL-00410" summary="12345">
       <option name="closed" value="true" />
@@ -768,7 +760,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750500981341</updated>
     </task>
-    <option name="localTasksCounter" value="458" />
+    <task id="LOCAL-00458" summary="refactor: enhance holiday query to include employee department and group">
+      <option name="closed" value="true" />
+      <created>1750505439884</created>
+      <option name="number" value="00458" />
+      <option name="presentableId" value="LOCAL-00458" />
+      <option name="project" value="LOCAL" />
+      <updated>1750505439884</updated>
+    </task>
+    <option name="localTasksCounter" value="459" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -801,7 +801,8 @@
     <MESSAGE value="wq" />
     <MESSAGE value="huhuh" />
     <MESSAGE value="12345" />
-    <option name="LAST_COMMIT_MESSAGE" value="" />
+    <MESSAGE value="refactor: enhance holiday query to include employee department and group" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: enhance holiday query to include employee department and group" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
