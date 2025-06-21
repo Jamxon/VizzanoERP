@@ -65,9 +65,16 @@ class OrderController extends Controller
     return response()->json($orders);
     }
     
-    public function getLogs(): \Illuminate\Http\JsonResponse
+    public function getLogs(Request $request): \Illuminate\Http\JsonResponse
     {
-        $logs = Log::orderBy('created_at', 'desc')->paginate(100);
+        $user_id = $request->input('user_id');
+
+        $logs = Log::when($user_id, function ($query, $user_id) {
+                return $query->where('user_id', $user_id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->with('user')
+            ->paginate(100);
         return response()->json($logs);
     }
 
