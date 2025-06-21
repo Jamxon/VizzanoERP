@@ -430,22 +430,42 @@ class GroupMasterController extends Controller
 
         // Umumiy log yozish
         $time = Time::find($validatedData['time_id']);
-        Log::add(
-            auth()->id(),
-            'Patok Master natija kiritdi',
-            'sewing',
-            null,
-            [
-                'sewing_output' => $sewingOutput->id,
-                'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
-                'quantity' => $validatedData['quantity'],
-                'time' => $time,
-                'comment' => $validatedData['comment'] ?? null,
-                'order' => $order->name ?? 'Noma’lum buyurtma',
-                'remaining_quantity' => $orderQuantity - $combinedQuantity,
-                'balance_bonus_distribution' => $total_bonus_logs,
-            ]
-        );
+
+            if (auth()->user()->role->name === 'groupMaster') {
+                Log::add(
+                    auth()->id(),
+                    'Patok Master natija kiritdi',
+                    'sewing',
+                    null,
+                    [
+                        'sewing_output' => $sewingOutput->id,
+                        'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
+                        'quantity' => $validatedData['quantity'],
+                        'time' => $time,
+                        'comment' => $validatedData['comment'] ?? null,
+                        'order' => $order->name ?? 'Noma’lum buyurtma',
+                        'remaining_quantity' => $orderQuantity - $combinedQuantity,
+                        'balance_bonus_distribution' => $total_bonus_logs,
+                    ]
+                );
+            }else   {
+                Log::add(
+                    auth()->id(),
+                    'Tekshiruvchi natija kiritdi',
+                    'sewing',
+                    null,
+                    [
+                        'sewing_output' => $sewingOutput->id,
+                        'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
+                        'quantity' => $validatedData['quantity'],
+                        'time' => $time,
+                        'comment' => $validatedData['comment'] ?? null,
+                        'order' => $order->name ?? 'Noma’lum buyurtma',
+                        'remaining_quantity' => $orderQuantity - $combinedQuantity,
+                        'balance_bonus_distribution' => $total_bonus_logs,
+                    ]
+                );
+            }
 
         return response()->json([
             'message' => "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
