@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 
 class SuperHRController extends Controller
