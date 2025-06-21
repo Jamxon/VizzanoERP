@@ -349,6 +349,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('filterAttendance', [SuperHRController::class, 'filterAttendance']);
     Route::get('export-attendance', [SuperHRController::class, 'exportAttendancePdf']);
     Route::post('employeeHolidays', [SuperHRController::class, 'storeEmployeeHoliday']);
+    Route::get('employeeHolidays', [SuperHRController::class, 'getEmployeeHolidays']);
 });
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {

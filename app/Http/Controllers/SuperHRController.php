@@ -20,6 +20,18 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class SuperHRController extends Controller
 {
+    public function getEmployeeHolidays()
+    {
+        $user = auth()->user();
+        $branchId = $user->employee->branch_id;
+
+        $holidays = \App\Models\EmployeeHolidays::whereHas('employee', function ($query) use ($branchId) {
+            $query->where('branch_id', $branchId);
+        })->with('employee')->get();
+
+        return response()->json($holidays, 200);
+    }
+
     public function storeEmployeeHoliday(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
