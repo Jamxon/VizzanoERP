@@ -92,7 +92,7 @@ class SuperHRController extends Controller
         // 4) Shu filialdagi hodimlardan, topilgan IDlarga mos kelganlar
         $employees = \App\Models\Employee::whereIn('id', $allIds)
             ->where('branch_id', $branchId)
-            ->with(['department', 'group', 'position', 'employeeHoliday'])
+            ->with(['department', 'group', 'position', 'employeeHolidays'])
             ->get();
 
         // 5) Formatlash
