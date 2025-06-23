@@ -65,8 +65,6 @@ class SuperHRController extends Controller
             $yesterday = $yesterday->copy()->subDay(); // shanba
         }
 
-        dd($yesterday);
-
         // Bugun present bo‘lganlar
         $todayPresentIds = Attendance::whereDate('date', $today)
             ->where('status', 'present')
@@ -82,9 +80,13 @@ class SuperHRController extends Controller
         // 1) Har ikki shartga tushadiganlar
         $filteredIds = array_intersect($yesterdayAbsentIds, $todayPresentIds);
 
-        // 2) Kecha ruxsatda bo‘lgan employee_id larni olish
+        // 2) Kecha ruxsatda bo‘lgan va kelmagan hodimlar
         $holidayIds = \App\Models\EmployeeHolidays::whereDate('start_date', '<=', $yesterday)
             ->whereDate('end_date', '>=', $yesterday)
+            ->whereHas('employee.attendances', function ($query) use ($yesterday) {
+                $query->whereDate('date', $yesterday)
+                    ->where('status', 'present');
+            })
             ->pluck('employee_id')
             ->toArray();
 
