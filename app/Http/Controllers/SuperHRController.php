@@ -41,7 +41,7 @@ class SuperHRController extends Controller
             ->toArray();
 
         // 2. Bugungi ruxsatda (holiday) bo‘lgan employee_id lar
-        $holidayIds = \App\Models\EmployeeHoliday::whereDate('start_date', '<=', $today)
+        $holidayIds = \App\Models\EmployeeHolidays::whereDate('start_date', '<=', $today)
             ->whereDate('end_date', '>=', $today)
             ->pluck('employee_id')
             ->toArray();
