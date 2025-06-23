@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add payment type to user profile retrieval" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -374,15 +374,7 @@
       <workItem from="1750427572972" duration="288000" />
       <workItem from="1750478676942" duration="19056000" />
       <workItem from="1750506843742" duration="1274000" />
-      <workItem from="1750650436924" duration="20981000" />
-    </task>
-    <task id="LOCAL-00427" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750412517367</created>
-      <option name="number" value="00427" />
-      <option name="presentableId" value="LOCAL-00427" />
-      <option name="project" value="LOCAL" />
-      <updated>1750412517367</updated>
+      <workItem from="1750650436924" duration="21606000" />
     </task>
     <task id="LOCAL-00428" summary="12345">
       <option name="closed" value="true" />
@@ -768,7 +760,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750685167449</updated>
     </task>
-    <option name="localTasksCounter" value="476" />
+    <task id="LOCAL-00476" summary="fix: add payment type to user profile retrieval">
+      <option name="closed" value="true" />
+      <created>1750686220973</created>
+      <option name="number" value="00476" />
+      <option name="presentableId" value="LOCAL-00476" />
+      <option name="project" value="LOCAL" />
+      <updated>1750686220973</updated>
+    </task>
+    <option name="localTasksCounter" value="477" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -818,7 +818,8 @@
     <MESSAGE value="fix: correct model reference for holiday employee IDs in date calculation" />
     <MESSAGE value="fix: remove unused bonus calculation logic for fixed tailored bonus types" />
     <MESSAGE value="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
+    <MESSAGE value="fix: add payment type to user profile retrieval" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add payment type to user profile retrieval" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
