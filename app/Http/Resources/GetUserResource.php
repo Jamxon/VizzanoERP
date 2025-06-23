@@ -40,20 +40,6 @@ class GetUserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $today = Carbon::today();
-
-        $todayBonus = 0;
-
-        if (in_array($this->payment_type, ['monthly', 'hourly', 'daily'])) {
-            $todayBonus = AttendanceSalary::where('employee_id', $this->id)
-                ->where('date', $today->toDateString())
-                ->sum('amount');
-        } elseif ($this->payment_type === 'piece_work') {
-            $todayBonus = EmployeeTarificationLog::where('employee_id', $this->id)
-                ->where('date', $today->toDateString())
-                ->sum('amount_earned');
-        }
-
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -73,7 +59,9 @@ class GetUserResource extends JsonResource
             'user_id' => $this->user_id,
             'gender' => $this->gender,
             'balance' => $this->balance,
-            'today_bonus' => $todayBonus,
+            'attendance_salaries' => $this->attendanceSalaries,
+            'employee_tarification_logs' => $this->employeeTarificationLogs,
+            'attendances' => $this->attendances,
         ];
     }
 }

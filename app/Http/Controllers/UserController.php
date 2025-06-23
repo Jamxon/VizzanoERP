@@ -14,11 +14,43 @@ use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
-    public function getProfile(): \Illuminate\Http\JsonResponse
+    public function getProfile(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = Auth::user();
 
         $employee = Employee::where('id', $user->employee->id)->first();
+
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        if ($startDate && $endDate) {
+            $employee->load([
+                'attendanceSalaries' => function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                },
+                'employeeTarificationLogs' => function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate])
+                        ->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'is_own', 'amount_earned')
+                        ->with(['tarification' => function ($q) {
+                            $q->select('id', 'name', 'code', 'second', 'summa');
+                        }]);
+                },
+                'attendances' => function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('date', [$startDate, $endDate]);
+                },
+            ]);
+        } else {
+            $employee->load([
+                'attendanceSalaries',
+                'employeeTarificationLogs' => function ($query) {
+                    $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity')
+                        ->with(['tarification' => function ($q) {
+                            $q->select('id', 'name', 'code', 'second', 'summa');
+                        }]);
+                },
+                'attendances',
+            ]);
+        }
 
         $resource = new GetUserResource($employee);
 
