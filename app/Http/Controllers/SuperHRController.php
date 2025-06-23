@@ -62,7 +62,7 @@ class SuperHRController extends Controller
         $yesterday = $today->copy()->subDay();
 
         if ($yesterday->isSunday()) {
-            $yesterday = $today->copy()->subDays(2); // shanba
+            $yesterday = $yesterday->copy()->subDay(); // shanba
         }
 
         // Bugun present bo‘lganlar

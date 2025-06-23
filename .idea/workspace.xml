@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add endpoint to retrieve potential absents for today">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: correct model relationship name for employee holidays in absent employees logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -376,31 +376,7 @@
       <workItem from="1750427572972" duration="288000" />
       <workItem from="1750478676942" duration="19056000" />
       <workItem from="1750506843742" duration="1274000" />
-      <workItem from="1750650436924" duration="11479000" />
-    </task>
-    <task id="LOCAL-00415" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750394268845</created>
-      <option name="number" value="00415" />
-      <option name="presentableId" value="LOCAL-00415" />
-      <option name="project" value="LOCAL" />
-      <updated>1750394268845</updated>
-    </task>
-    <task id="LOCAL-00416" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750395023535</created>
-      <option name="number" value="00416" />
-      <option name="presentableId" value="LOCAL-00416" />
-      <option name="project" value="LOCAL" />
-      <updated>1750395023535</updated>
-    </task>
-    <task id="LOCAL-00417" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750395901073</created>
-      <option name="number" value="00417" />
-      <option name="presentableId" value="LOCAL-00417" />
-      <option name="project" value="LOCAL" />
-      <updated>1750395901073</updated>
+      <workItem from="1750650436924" duration="13160000" />
     </task>
     <task id="LOCAL-00418" summary="12345">
       <option name="closed" value="true" />
@@ -770,7 +746,31 @@
       <option name="project" value="LOCAL" />
       <updated>1750666707480</updated>
     </task>
-    <option name="localTasksCounter" value="464" />
+    <task id="LOCAL-00464" summary="feat: include holiday status in absent employees response">
+      <option name="closed" value="true" />
+      <created>1750667563618</created>
+      <option name="number" value="00464" />
+      <option name="presentableId" value="LOCAL-00464" />
+      <option name="project" value="LOCAL" />
+      <updated>1750667563618</updated>
+    </task>
+    <task id="LOCAL-00465" summary="feat: update model reference for holiday date filtering in absent employees logic">
+      <option name="closed" value="true" />
+      <created>1750667634155</created>
+      <option name="number" value="00465" />
+      <option name="presentableId" value="LOCAL-00465" />
+      <option name="project" value="LOCAL" />
+      <updated>1750667634155</updated>
+    </task>
+    <task id="LOCAL-00466" summary="feat: correct model relationship name for employee holidays in absent employees logic">
+      <option name="closed" value="true" />
+      <created>1750667689541</created>
+      <option name="number" value="00466" />
+      <option name="presentableId" value="LOCAL-00466" />
+      <option name="project" value="LOCAL" />
+      <updated>1750667689541</updated>
+    </task>
+    <option name="localTasksCounter" value="467" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,7 +808,10 @@
     <MESSAGE value="feat: return JSON response for yesterday's absent employees" />
     <MESSAGE value="feat: add branch filtering for yesterday's absent employees response" />
     <MESSAGE value="feat: add endpoint to retrieve potential absents for today" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add endpoint to retrieve potential absents for today" />
+    <MESSAGE value="feat: include holiday status in absent employees response" />
+    <MESSAGE value="feat: update model reference for holiday date filtering in absent employees logic" />
+    <MESSAGE value="feat: correct model relationship name for employee holidays in absent employees logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: correct model relationship name for employee holidays in absent employees logic" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
