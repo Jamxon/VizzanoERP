@@ -43,6 +43,7 @@ class SuperHRController extends Controller
         // Faqat shu filialdagi hodimlardan, hali attendance yozilmaganlar
         $notYetCheckedEmployees = Employee::where('branch_id', $branchId)
             ->whereNotIn('id', $presentIds)
+            ->where('status', '!=', 'kicked') // Kicked bo‘lmaganlarni olish
             ->with(['department', 'group', 'position']) // optional: agar kerak bo‘lsa
             ->get();
 
