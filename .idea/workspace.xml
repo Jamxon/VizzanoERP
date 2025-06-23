@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct model reference for holiday employee IDs in date calculation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -377,23 +374,7 @@
       <workItem from="1750427572972" duration="288000" />
       <workItem from="1750478676942" duration="19056000" />
       <workItem from="1750506843742" duration="1274000" />
-      <workItem from="1750650436924" duration="20084000" />
-    </task>
-    <task id="LOCAL-00425" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750410528424</created>
-      <option name="number" value="00425" />
-      <option name="presentableId" value="LOCAL-00425" />
-      <option name="project" value="LOCAL" />
-      <updated>1750410528424</updated>
-    </task>
-    <task id="LOCAL-00426" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750412489500</created>
-      <option name="number" value="00426" />
-      <option name="presentableId" value="LOCAL-00426" />
-      <option name="project" value="LOCAL" />
-      <updated>1750412489500</updated>
+      <workItem from="1750650436924" duration="20981000" />
     </task>
     <task id="LOCAL-00427" summary="12345">
       <option name="closed" value="true" />
@@ -771,7 +752,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750672343770</updated>
     </task>
-    <option name="localTasksCounter" value="474" />
+    <task id="LOCAL-00474" summary="fix: remove unused bonus calculation logic for fixed tailored bonus types">
+      <option name="closed" value="true" />
+      <created>1750684935992</created>
+      <option name="number" value="00474" />
+      <option name="presentableId" value="LOCAL-00474" />
+      <option name="project" value="LOCAL" />
+      <updated>1750684935992</updated>
+    </task>
+    <task id="LOCAL-00475" summary="fix: refactor user profile retrieval to include attendance and salary data based on date range">
+      <option name="closed" value="true" />
+      <created>1750685167449</created>
+      <option name="number" value="00475" />
+      <option name="presentableId" value="LOCAL-00475" />
+      <option name="project" value="LOCAL" />
+      <updated>1750685167449</updated>
+    </task>
+    <option name="localTasksCounter" value="476" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -819,7 +816,9 @@
     <MESSAGE value="fix: exclude kicked employees from yesterday's date calculation for absent employees" />
     <MESSAGE value="fix: improve yesterday's date calculation to include holiday and attendance checks for absent employees" />
     <MESSAGE value="fix: correct model reference for holiday employee IDs in date calculation" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct model reference for holiday employee IDs in date calculation" />
+    <MESSAGE value="fix: remove unused bonus calculation logic for fixed tailored bonus types" />
+    <MESSAGE value="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
