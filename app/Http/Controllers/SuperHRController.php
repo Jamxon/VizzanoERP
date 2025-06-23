@@ -35,19 +35,48 @@ class SuperHRController extends Controller
 
         $today = Carbon::today()->toDateString();
 
-        // Bugungi attendance yozilgan employee_id lar
+        // 1. Bugungi attendance yozilgan hodimlar
         $presentIds = Attendance::whereDate('date', $today)
             ->pluck('employee_id')
             ->toArray();
 
-        // Faqat shu filialdagi hodimlardan, hali attendance yozilmaganlar
-        $notYetCheckedEmployees = Employee::where('branch_id', $branchId)
+        // 2. Bugungi ruxsatda (holiday) bo‘lgan employee_id lar
+        $holidayIds = \App\Models\EmployeeHoliday::whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
+            ->pluck('employee_id')
+            ->toArray();
+
+        // 3. Bugungi attendance yozilmagan hodimlar (shu filialda va kicked bo‘lmagan)
+        $notCheckedIds = Employee::where('branch_id', $branchId)
             ->whereNotIn('id', $presentIds)
-            ->where('status', '!=', 'kicked') // Kicked bo‘lmaganlarni olish
-            ->with(['department', 'group', 'position']) // optional: agar kerak bo‘lsa
+            ->where('status', '!=', 'kicked')
+            ->pluck('id')
+            ->toArray();
+
+        // 4. Ikkisini birlashtiramiz (holiday + attendance yozilmaganlar)
+        $allIds = array_unique(array_merge($notCheckedIds, $holidayIds));
+
+        // 5. Hodimlarni olib kelamiz
+        $employees = Employee::whereIn('id', $allIds)
+            ->where('branch_id', $branchId)
+            ->where('status', '!=', 'kicked')
+            ->with(['department', 'group', 'position', 'employeeHolidays']) // optional
             ->get();
 
-        return response()->json($notYetCheckedEmployees);
+        // 6. Formatlab response tayyorlaymiz
+        $result = $employees->map(function ($employee) use ($holidayIds) {
+            return [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'phone' => $employee->phone,
+                'department' => $employee->department->name ?? null,
+                'group' => $employee->group->name ?? null,
+                'position' => $employee->position->name ?? null,
+                'was_on_holiday' => in_array($employee->id, $holidayIds),
+            ];
+        });
+
+        return response()->json($result);
     }
 
     public function getYesterdayAbsent(): \Illuminate\Http\JsonResponse
