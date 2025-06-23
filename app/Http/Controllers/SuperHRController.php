@@ -24,6 +24,31 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class SuperHRController extends Controller
 {
+    public function getPotentialAbsents(): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+        $branchId = $user?->employee?->branch_id;
+
+        if (!$branchId) {
+            return response()->json(['message' => '❌ Foydalanuvchining filial (branch) aniqlanmadi.'], 422);
+        }
+
+        $today = Carbon::today()->toDateString();
+
+        // Bugungi attendance yozilgan employee_id lar
+        $presentIds = Attendance::whereDate('date', $today)
+            ->pluck('employee_id')
+            ->toArray();
+
+        // Faqat shu filialdagi hodimlardan, hali attendance yozilmaganlar
+        $notYetCheckedEmployees = Employee::where('branch_id', $branchId)
+            ->whereNotIn('id', $presentIds)
+            ->with(['department', 'group', 'position']) // optional: agar kerak bo‘lsa
+            ->get();
+
+        return response()->json($notYetCheckedEmployees);
+    }
+
     public function getYesterdayAbsent(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
