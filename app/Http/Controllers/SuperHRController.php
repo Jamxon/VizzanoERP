@@ -85,7 +85,7 @@ class SuperHRController extends Controller
             ->whereDate('end_date', '>=', $yesterday)
             ->whereHas('employee.attendances', function ($query) use ($yesterday) {
                 $query->whereDate('date', $yesterday)
-                    ->where('status', 'present');
+                    ->where('status', 'absent');
             })
             ->pluck('employee_id')
             ->toArray();

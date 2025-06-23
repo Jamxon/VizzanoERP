@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="debug: add dump of yesterday's date calculation in SuperHRController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance yesterday's date calculation logic for absent employees" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -374,15 +374,7 @@
       <workItem from="1750427572972" duration="288000" />
       <workItem from="1750478676942" duration="19056000" />
       <workItem from="1750506843742" duration="1274000" />
-      <workItem from="1750650436924" duration="13472000" />
-    </task>
-    <task id="LOCAL-00420" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750397731121</created>
-      <option name="number" value="00420" />
-      <option name="presentableId" value="LOCAL-00420" />
-      <option name="project" value="LOCAL" />
-      <updated>1750397731121</updated>
+      <workItem from="1750650436924" duration="14009000" />
     </task>
     <task id="LOCAL-00421" summary="12345">
       <option name="closed" value="true" />
@@ -768,7 +760,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750669583402</updated>
     </task>
-    <option name="localTasksCounter" value="469" />
+    <task id="LOCAL-00469" summary="feat: enhance yesterday's date calculation logic for absent employees">
+      <option name="closed" value="true" />
+      <created>1750670114084</created>
+      <option name="number" value="00469" />
+      <option name="presentableId" value="LOCAL-00469" />
+      <option name="project" value="LOCAL" />
+      <updated>1750670114084</updated>
+    </task>
+    <option name="localTasksCounter" value="470" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -811,7 +811,8 @@
     <MESSAGE value="feat: correct model relationship name for employee holidays in absent employees logic" />
     <MESSAGE value="fix: adjust yesterday's date calculation for absent employees logic" />
     <MESSAGE value="debug: add dump of yesterday's date calculation in SuperHRController" />
-    <option name="LAST_COMMIT_MESSAGE" value="debug: add dump of yesterday's date calculation in SuperHRController" />
+    <MESSAGE value="feat: enhance yesterday's date calculation logic for absent employees" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance yesterday's date calculation logic for absent employees" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
