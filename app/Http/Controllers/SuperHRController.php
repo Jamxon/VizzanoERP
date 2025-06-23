@@ -26,36 +26,50 @@ class SuperHRController extends Controller
 {
     public function getYesterdayAbsent(): \Illuminate\Http\JsonResponse
     {
+        $user = auth()->user();
+        $branchId = $user?->employee?->branch_id;
+
+        if (!$branchId) {
+            return response()->json(['message' => '❌ Foydalanuvchining filial (branch) aniqlanmadi.'], 422);
+        }
 
         $today = Carbon::today();
         $yesterday = $today->copy()->subDay();
 
         if ($yesterday->isSunday()) {
-            $yesterday = $today->copy()->subDays(2);
+            $yesterday = $today->copy()->subDays(2); // shanba
         }
 
+        // Bugun present bo‘lganlar
         $todayPresentIds = Attendance::whereDate('date', $today)
             ->where('status', 'present')
             ->pluck('employee_id')
             ->toArray();
 
+        // Kecha absent bo‘lganlar
         $yesterdayAbsentIds = Attendance::whereDate('date', $yesterday)
             ->where('status', 'absent')
             ->pluck('employee_id')
             ->toArray();
 
+        // Har ikki shartga tushadiganlar
         $filteredIds = array_intersect($yesterdayAbsentIds, $todayPresentIds);
 
-        $employees = Employee::whereIn('id', $filteredIds)->get();
+        // Faqat shu filialga tegishli hodimlar ichidan olish
+        $employees = Employee::whereIn('id', $filteredIds)
+            ->where('branch_id', $branchId)
+            ->with(['department', 'group', 'position']) // optimizatsiya uchun eager load
+            ->get();
 
+        // Formatlash
         $absentEmployees = $employees->map(function ($employee) use ($yesterday) {
             return [
                 'id' => $employee->id,
                 'name' => $employee->name,
                 'phone' => $employee->phone,
-                'department' => $employee->department ? $employee->department->name : null,
-                'group' => $employee->group ? $employee->group->name : null,
-                'position' => $employee->position ? $employee->position->name : null,
+                'department' => $employee->department->name ?? null,
+                'group' => $employee->group->name ?? null,
+                'position' => $employee->position->name ?? null,
                 'absent_date' => $yesterday->toDateString(),
             ];
         });
