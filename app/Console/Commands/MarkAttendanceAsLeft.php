@@ -32,7 +32,7 @@ class MarkAttendanceAsLeft extends Command
             $attendance->status = 'present';
             $attendance->save();
 
-            if ($employee->payment_type === 'monthly') {
+            if ($employee->payment_type === 'monthly' || $employee->payment_type === 'fixed_tailored_bonus' || $employee->payment_type === 'fixed_cutted_bonus' || $employee->payment_type === 'fixed_tailored_bonus_group') {
                 $salaryToAdd = $employee->salary / 26;
             } elseif ($employee->payment_type === 'daily') {
                 $salaryToAdd = $employee->salary;
