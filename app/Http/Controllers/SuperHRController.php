@@ -24,7 +24,7 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class SuperHRController extends Controller
 {
-    public function getYesterdayAbsent()
+    public function getYesterdayAbsent(): \Illuminate\Http\JsonResponse
     {
 
         $today = Carbon::today();
@@ -59,6 +59,8 @@ class SuperHRController extends Controller
                 'absent_date' => $yesterday->toDateString(),
             ];
         });
+
+        return response()->json($absentEmployees);
     }
 
     public function getEmployeeHolidays(): \Illuminate\Http\JsonResponse
