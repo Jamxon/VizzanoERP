@@ -65,6 +65,8 @@ class SuperHRController extends Controller
             $yesterday = $yesterday->copy()->subDay(); // shanba
         }
 
+        dd($yesterday);
+
         // Bugun present bo‘lganlar
         $todayPresentIds = Attendance::whereDate('date', $today)
             ->where('status', 'present')
