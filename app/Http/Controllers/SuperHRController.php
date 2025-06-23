@@ -13,6 +13,7 @@ use App\Models\Region;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Exports\EmployeeExport;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,6 +24,43 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class SuperHRController extends Controller
 {
+    public function getYesterdayAbsent()
+    {
+
+        $today = Carbon::today();
+        $yesterday = $today->copy()->subDay();
+
+        if ($yesterday->isSunday()) {
+            $yesterday = $today->copy()->subDays(2);
+        }
+
+        $todayPresentIds = Attendance::whereDate('date', $today)
+            ->where('status', 'present')
+            ->pluck('employee_id')
+            ->toArray();
+
+        $yesterdayAbsentIds = Attendance::whereDate('date', $yesterday)
+            ->where('status', 'absent')
+            ->pluck('employee_id')
+            ->toArray();
+
+        $filteredIds = array_intersect($yesterdayAbsentIds, $todayPresentIds);
+
+        $employees = Employee::whereIn('id', $filteredIds)->get();
+
+        $absentEmployees = $employees->map(function ($employee) use ($yesterday) {
+            return [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'phone' => $employee->phone,
+                'department' => $employee->department ? $employee->department->name : null,
+                'group' => $employee->group ? $employee->group->name : null,
+                'position' => $employee->position ? $employee->position->name : null,
+                'absent_date' => $yesterday->toDateString(),
+            ];
+        });
+    }
+
     public function getEmployeeHolidays(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
