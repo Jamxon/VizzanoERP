@@ -81,7 +81,7 @@ class SuperHRController extends Controller
         $filteredIds = array_intersect($yesterdayAbsentIds, $todayPresentIds);
 
         // 2) Kecha ruxsatda bo‘lgan employee_id larni olish
-        $holidayIds = \App\Models\EmployeeHoliday::whereDate('start_date', '<=', $yesterday)
+        $holidayIds = \App\Models\EmployeeHolidays::whereDate('start_date', '<=', $yesterday)
             ->whereDate('end_date', '>=', $yesterday)
             ->pluck('employee_id')
             ->toArray();
