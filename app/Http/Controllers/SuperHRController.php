@@ -77,17 +77,26 @@ class SuperHRController extends Controller
             ->pluck('employee_id')
             ->toArray();
 
-        // Har ikki shartga tushadiganlar
+        // 1) Har ikki shartga tushadiganlar
         $filteredIds = array_intersect($yesterdayAbsentIds, $todayPresentIds);
 
-        // Faqat shu filialga tegishli hodimlar ichidan olish
-        $employees = Employee::whereIn('id', $filteredIds)
+        // 2) Kecha ruxsatda bo‘lgan employee_id larni olish
+        $holidayIds = \App\Models\EmployeeHoliday::whereDate('start_date', '<=', $yesterday)
+            ->whereDate('end_date', '>=', $yesterday)
+            ->pluck('employee_id')
+            ->toArray();
+
+        // 3) ID larni birlashtirish (unique qilib)
+        $allIds = array_unique(array_merge($filteredIds, $holidayIds));
+
+        // 4) Shu filialdagi hodimlardan, topilgan IDlarga mos kelganlar
+        $employees = \App\Models\Employee::whereIn('id', $allIds)
             ->where('branch_id', $branchId)
-            ->with(['department', 'group', 'position']) // optimizatsiya uchun eager load
+            ->with(['department', 'group', 'position', 'employeeHoliday'])
             ->get();
 
-        // Formatlash
-        $absentEmployees = $employees->map(function ($employee) use ($yesterday) {
+        // 5) Formatlash
+        $absentEmployees = $employees->map(function ($employee) use ($yesterday, $holidayIds) {
             return [
                 'id' => $employee->id,
                 'name' => $employee->name,
@@ -96,6 +105,7 @@ class SuperHRController extends Controller
                 'group' => $employee->group->name ?? null,
                 'position' => $employee->position->name ?? null,
                 'absent_date' => $yesterday->toDateString(),
+                'was_on_holiday' => in_array($employee->id, $holidayIds),
             ];
         });
 

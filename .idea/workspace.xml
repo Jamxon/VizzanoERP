@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: return JSON response for yesterday's absent employees" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add endpoint to retrieve potential absents for today">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -374,23 +376,7 @@
       <workItem from="1750427572972" duration="288000" />
       <workItem from="1750478676942" duration="19056000" />
       <workItem from="1750506843742" duration="1274000" />
-      <workItem from="1750650436924" duration="10725000" />
-    </task>
-    <task id="LOCAL-00413" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750344877692</created>
-      <option name="number" value="00413" />
-      <option name="presentableId" value="LOCAL-00413" />
-      <option name="project" value="LOCAL" />
-      <updated>1750344877693</updated>
-    </task>
-    <task id="LOCAL-00414" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750393121504</created>
-      <option name="number" value="00414" />
-      <option name="presentableId" value="LOCAL-00414" />
-      <option name="project" value="LOCAL" />
-      <updated>1750393121505</updated>
+      <workItem from="1750650436924" duration="11479000" />
     </task>
     <task id="LOCAL-00415" summary="12345">
       <option name="closed" value="true" />
@@ -768,7 +754,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750666244479</updated>
     </task>
-    <option name="localTasksCounter" value="462" />
+    <task id="LOCAL-00462" summary="feat: add branch filtering for yesterday's absent employees response">
+      <option name="closed" value="true" />
+      <created>1750666530408</created>
+      <option name="number" value="00462" />
+      <option name="presentableId" value="LOCAL-00462" />
+      <option name="project" value="LOCAL" />
+      <updated>1750666530408</updated>
+    </task>
+    <task id="LOCAL-00463" summary="feat: add endpoint to retrieve potential absents for today">
+      <option name="closed" value="true" />
+      <created>1750666707480</created>
+      <option name="number" value="00463" />
+      <option name="presentableId" value="LOCAL-00463" />
+      <option name="project" value="LOCAL" />
+      <updated>1750666707480</updated>
+    </task>
+    <option name="localTasksCounter" value="464" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,7 +806,9 @@
     <MESSAGE value="refactor: enhance holiday query to include employee department and group" />
     <MESSAGE value="feat: add endpoint to retrieve employees absent yesterday" />
     <MESSAGE value="feat: return JSON response for yesterday's absent employees" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: return JSON response for yesterday's absent employees" />
+    <MESSAGE value="feat: add branch filtering for yesterday's absent employees response" />
+    <MESSAGE value="feat: add endpoint to retrieve potential absents for today" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add endpoint to retrieve potential absents for today" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
