@@ -38,7 +38,16 @@ class ShowOrderResource extends JsonResource
             'price' => $this->price,
             'order_model' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
-                'model' => $this->orderModel->model,
+                'model' => $this->orderModel->model ? [
+                    'id' => $this->orderModel->model->id,
+                    'name' => $this->orderModel->model->name,
+                    'images' => $this->orderModel->model->images->map(function ($image) {
+                        return [
+                            'id' => $image->id,
+                            'image' => $image->image,
+                        ];
+                    })->toArray(),
+                ] : null,
                 'material' => $this->orderModel->material,
                 'rasxod' => $this->orderModel->rasxod,
                 'status' => $this->orderModel->status,

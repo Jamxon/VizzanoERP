@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add payment type to user profile retrieval" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update salary calculation to include additional payment types">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -374,15 +376,8 @@
       <workItem from="1750427572972" duration="288000" />
       <workItem from="1750478676942" duration="19056000" />
       <workItem from="1750506843742" duration="1274000" />
-      <workItem from="1750650436924" duration="22270000" />
-    </task>
-    <task id="LOCAL-00429" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750412706023</created>
-      <option name="number" value="00429" />
-      <option name="presentableId" value="LOCAL-00429" />
-      <option name="project" value="LOCAL" />
-      <updated>1750412706023</updated>
+      <workItem from="1750650436924" duration="23353000" />
+      <workItem from="1750741289727" duration="2052000" />
     </task>
     <task id="LOCAL-00430" summary="12345">
       <option name="closed" value="true" />
@@ -768,7 +763,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750686289934</updated>
     </task>
-    <option name="localTasksCounter" value="478" />
+    <task id="LOCAL-00478" summary="fix: update salary calculation to include additional payment types">
+      <option name="closed" value="true" />
+      <created>1750687459010</created>
+      <option name="number" value="00478" />
+      <option name="presentableId" value="LOCAL-00478" />
+      <option name="project" value="LOCAL" />
+      <updated>1750687459010</updated>
+    </task>
+    <option name="localTasksCounter" value="479" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -819,7 +822,8 @@
     <MESSAGE value="fix: remove unused bonus calculation logic for fixed tailored bonus types" />
     <MESSAGE value="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
     <MESSAGE value="fix: add payment type to user profile retrieval" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add payment type to user profile retrieval" />
+    <MESSAGE value="fix: update salary calculation to include additional payment types" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update salary calculation to include additional payment types" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
