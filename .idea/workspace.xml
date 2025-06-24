@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add 'rasxod' field to order model in ShowOrderResource">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add 'minute' field to models and update related resources">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/OrderImportController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/OrderImportController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -377,15 +379,7 @@
       <workItem from="1750478676942" duration="19056000" />
       <workItem from="1750506843742" duration="1274000" />
       <workItem from="1750650436924" duration="23353000" />
-      <workItem from="1750741289727" duration="4330000" />
-    </task>
-    <task id="LOCAL-00432" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750412966132</created>
-      <option name="number" value="00432" />
-      <option name="presentableId" value="LOCAL-00432" />
-      <option name="project" value="LOCAL" />
-      <updated>1750412966132</updated>
+      <workItem from="1750741289727" duration="8941000" />
     </task>
     <task id="LOCAL-00433" summary="12345">
       <option name="closed" value="true" />
@@ -771,7 +765,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750752929997</updated>
     </task>
-    <option name="localTasksCounter" value="481" />
+    <task id="LOCAL-00481" summary="fix: add 'minute' field to models and update related resources">
+      <option name="closed" value="true" />
+      <created>1750753761125</created>
+      <option name="number" value="00481" />
+      <option name="presentableId" value="LOCAL-00481" />
+      <option name="project" value="LOCAL" />
+      <updated>1750753761125</updated>
+    </task>
+    <option name="localTasksCounter" value="482" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -824,7 +826,8 @@
     <MESSAGE value="fix: add payment type to user profile retrieval" />
     <MESSAGE value="fix: update salary calculation to include additional payment types" />
     <MESSAGE value="fix: add 'rasxod' field to order model in ShowOrderResource" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add 'rasxod' field to order model in ShowOrderResource" />
+    <MESSAGE value="fix: add 'minute' field to models and update related resources" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add 'minute' field to models and update related resources" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

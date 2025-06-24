@@ -37,6 +37,7 @@ class OrderImportController extends Controller
                     'name' => $data['model'],
                     'rasxod' => $data['model_summa'],
                     'branch_id' => auth()->user()->employee->branch_id,
+                    'minute' => $data['minute'] ?? 0,
                 ]);
             }
 
@@ -87,6 +88,7 @@ class OrderImportController extends Controller
                 'material_id' => null,
                 'status' => false,
                 'rasxod' => $data['model_summa'],
+                'minute' => $data['minute'] ?? 0,
             ]);
 
             $orderSubModel = OrderSubModel::create([
@@ -225,6 +227,7 @@ class OrderImportController extends Controller
                         'sizes' => array_values(array_unique($currentSizes)),
                         'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
                         'images' => $modelImages[$row] ?? [],
+                        'minute' => array_sum(array_column($currentBlock, 'minute')),
                     ];
                 }
 
@@ -249,7 +252,8 @@ class OrderImportController extends Controller
                     'size' => $aValue,
                     'price' => $fValue,
                     'quantity' => $gValue,
-                    'model_summa' => $mValue
+                    'model_summa' => $mValue,
+                    'minute' => $iValue,
                 ];
             }
         }
@@ -268,6 +272,7 @@ class OrderImportController extends Controller
                 'sizes' => array_values(array_unique($currentSizes)),
                 'model_summa' => array_sum(array_column($currentBlock, 'model_summa')),
                 'images' => $modelImages[$highestRow] ?? [],
+                'minute' => array_sum(array_column($currentBlock, 'minute')),
             ];
         }
 
