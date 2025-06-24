@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
-    public function getOrdersWithQuantity()
+    public function getOrdersWithQuantity(): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()->employee->branch_id;
 
@@ -47,8 +47,8 @@ class OrderController extends Controller
         return response()->json($result);
     }
 
-    public function getOrdersWithoutOrderGroups(Request $request)
-{
+    public function getOrdersWithoutOrderGroups(Request $request): \Illuminate\Http\JsonResponse
+    {
     $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
 
     $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
@@ -237,12 +237,14 @@ class OrderController extends Controller
             ]);
 
             $modelRasxod = Models::find($request->model['id'])->rasxod;
+            $minute = Models::find($request->model['id'])->minute ?? 0;
 
             $orderModel = OrderModel::create([
                 'order_id' => $order->id,
                 'model_id' => $request->model['id'],
                 'rasxod' => $modelRasxod ?? 0,
                 'material_id' => $request->model['material_id'],
+                'minute' => $minute,
             ]);
 
             $instructions = [];
@@ -341,6 +343,7 @@ class OrderController extends Controller
                 'model.material_id' => 'sometimes|integer|exists:items,id',
                 'model.submodels' => 'sometimes|array',
                 'model.sizes' => 'sometimes|array',
+                'model.minute' => 'sometimes|integer',
                 'instructions' => 'sometimes|array',
                 'recipes' => 'sometimes|array',
             ]);
@@ -384,6 +387,7 @@ class OrderController extends Controller
                         'model_id'    => $modelData['id'] ?? optional($order->orderModel)->model_id,
                         'material_id' => $modelData['material_id'] ?? optional($order->orderModel)->material_id,
                         'rasxod'      => isset($modelData['id']) ? Models::find($modelData['id'])->rasxod : optional($order->orderModel)->rasxod,
+                        'minute'      => $modelData['minute'] ?? optional($order->orderModel)->minute,
                     ]
                 );
 

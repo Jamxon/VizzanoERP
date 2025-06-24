@@ -42,6 +42,7 @@ class ShowOrderResource extends JsonResource
                     'id' => $this->orderModel->model->id,
                     'name' => $this->orderModel->model->name,
                     'rasxod' => $this->orderModel->model->rasxod,
+                    'minute' => $this->orderModel->model->minute ?? 0,
                     'images' => $this->orderModel->model->images->map(function ($image) {
                         return [
                             'id' => $image->id,
@@ -50,6 +51,7 @@ class ShowOrderResource extends JsonResource
                     })->toArray(),
                 ] : null,
                 'material' => $this->orderModel->material,
+                'minute' => $this->orderModel->minute ?? 0,
                 'rasxod' => $this->orderModel->rasxod,
                 'status' => $this->orderModel->status,
                 'sizes' => $this->orderModel->sizes->map(function ($size) {

@@ -21,6 +21,7 @@ class OrderModel extends Model
         'rasxod',
         'material_id',
         'status',
+        'minute'
     ];
 
     protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id','material_id'];

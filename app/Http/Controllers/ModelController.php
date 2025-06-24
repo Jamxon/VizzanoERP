@@ -31,6 +31,7 @@ class ModelController extends Controller
                 'name' => $model->name,
                 'rasxod' => $model->rasxod,
                 'description' => $model->description,
+                'minute' => $model->minute ?? 0,
                 'sizes' => $model->sizes->map(function ($size) {
                     return [
                         'id' => $size->id,
@@ -92,6 +93,7 @@ class ModelController extends Controller
                     'rasxod' => (double)($data['rasxod'] ?? 0),
                     'branch_id' => auth()->user()->employee->branch_id,
                     'description' => $data['description'] ?? null,
+                    'minute' => $data['minute'] ?? 0,
                 ]);
             } catch (\Exception $e) {
                 return response()->json([
@@ -194,6 +196,7 @@ class ModelController extends Controller
                 'name' => $data['name'] ?? $model->name,
                 'rasxod' => (double) ($data['rasxod'] ?? $model->rasxod),
                 'description' => $data['description'] ?? null,
+                'minute' => $data['minute'] ?? $model->minute,
             ]);
 
             $index = 1;
