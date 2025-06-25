@@ -866,15 +866,24 @@ class InternalAccountantController extends Controller
             $tarification = Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
             $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
 
-            // Avvalgi bajarilgan miqdorni hisoblash
-            $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)
+            // Ushbu tarification bo‘yicha kimlar ishlagan
+            $employeeIds = EmployeeTarificationLog::where('tarification_id', $tarificationId)
                 ->whereDate('date', $date)
-                ->sum('quantity');
+                ->pluck('employee_id')
+                ->unique();
 
-            if (($alreadyDone + $quantity) > $orderQuantity) {
-                return response()->json([
-                    'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: $quantity"
-                ], 422);
+            if ($employeeIds->count() > 1 || ($employeeIds->count() === 1 && $employeeIds->first() !== $employee->id)) {
+
+                // Umumiy bajarilgan miqdor
+                $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)
+                    ->whereDate('date', $date)
+                    ->sum('quantity');
+
+                if (($alreadyDone + $quantity) > $orderQuantity) {
+                    return response()->json([
+                        'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: $quantity"
+                    ], 422);
+                }
             }
 
             // Hisob-kitob logini yangilash yoki yaratish

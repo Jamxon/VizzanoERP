@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add 'minute' field to order import and related resources">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove unnecessary blank lines in API route definitions">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -378,23 +378,7 @@
       <workItem from="1750506843742" duration="1274000" />
       <workItem from="1750650436924" duration="23353000" />
       <workItem from="1750741289727" duration="14461000" />
-      <workItem from="1750824048570" duration="5408000" />
-    </task>
-    <task id="LOCAL-00434" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750413263680</created>
-      <option name="number" value="00434" />
-      <option name="presentableId" value="LOCAL-00434" />
-      <option name="project" value="LOCAL" />
-      <updated>1750413263680</updated>
-    </task>
-    <task id="LOCAL-00435" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750413430631</created>
-      <option name="number" value="00435" />
-      <option name="presentableId" value="LOCAL-00435" />
-      <option name="project" value="LOCAL" />
-      <updated>1750413430631</updated>
+      <workItem from="1750824048570" duration="7535000" />
     </task>
     <task id="LOCAL-00436" summary="12345">
       <option name="closed" value="true" />
@@ -772,7 +756,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750757839675</updated>
     </task>
-    <option name="localTasksCounter" value="483" />
+    <task id="LOCAL-00483" summary="fix: add new salary calculation endpoint for employee with validation">
+      <option name="closed" value="true" />
+      <created>1750836279364</created>
+      <option name="number" value="00483" />
+      <option name="presentableId" value="LOCAL-00483" />
+      <option name="project" value="LOCAL" />
+      <updated>1750836279364</updated>
+    </task>
+    <task id="LOCAL-00484" summary="fix: remove unnecessary blank lines in API route definitions">
+      <option name="closed" value="true" />
+      <created>1750836900238</created>
+      <option name="number" value="00484" />
+      <option name="presentableId" value="LOCAL-00484" />
+      <option name="project" value="LOCAL" />
+      <updated>1750836900238</updated>
+    </task>
+    <option name="localTasksCounter" value="485" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -802,8 +802,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="wq" />
-    <MESSAGE value="huhuh" />
     <MESSAGE value="12345" />
     <MESSAGE value="refactor: enhance holiday query to include employee department and group" />
     <MESSAGE value="feat: add endpoint to retrieve employees absent yesterday" />
@@ -827,7 +825,9 @@
     <MESSAGE value="fix: add 'rasxod' field to order model in ShowOrderResource" />
     <MESSAGE value="fix: add 'minute' field to models and update related resources" />
     <MESSAGE value="fix: add 'minute' field to order import and related resources" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add 'minute' field to order import and related resources" />
+    <MESSAGE value="fix: add new salary calculation endpoint for employee with validation" />
+    <MESSAGE value="fix: remove unnecessary blank lines in API route definitions" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: remove unnecessary blank lines in API route definitions" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
