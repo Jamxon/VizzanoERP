@@ -994,6 +994,7 @@ class InternalAccountantController extends Controller
         $employeeId = $log->employee_id;
         $tarificationId = $log->tarification_id;
 
+        $employee = Employee::findOrFail($employeeId);
         $tarification = Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
         $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
 
@@ -1001,7 +1002,6 @@ class InternalAccountantController extends Controller
             ->where('employee_id', '!=', $employeeId)
             ->sum('quantity');
 
-        // Shu employeega maksimal ruxsat berilgan quantity
         $allowedQuantity = $orderQuantity - $otherEmployeesDone;
 
         if ($newQuantity > $allowedQuantity) {
@@ -1010,11 +1010,40 @@ class InternalAccountantController extends Controller
             ], 422);
         }
 
-        // Yangilash
+        // Balansni yangilash uchun farqni hisobla
+        $oldAmount = $log->amount_earned;
+        $newAmount = $tarification->summa * $newQuantity;
+        $difference = $newAmount - $oldAmount;
+
+        // Logni yangilash
         $log->update([
             'quantity' => $newQuantity,
-            'amount_earned' => $tarification->summa * $newQuantity,
+            'amount_earned' => $newAmount,
         ]);
+
+        // Agar xodimning to'lov turi 'piece_work' bo‘lsa, balance ni yangilash
+        if ($employee->payment_type === 'piece_work' && $difference != 0) {
+            $employee->increment('balance', $difference);
+        }
+
+        // Log yozish
+        Log::add(
+            auth()->id(),
+            "Hisob-kitob logi yangilandi",
+            'accounting',
+            null,
+            [
+                'employee_id' => $employeeId,
+                'employee_name' => $employee->name,
+                'tarification_id' => $tarificationId,
+                'tarification_name' => $tarification->name,
+                'old_quantity' => $log->quantity,
+                'new_quantity' => $newQuantity,
+                'old_amount' => $oldAmount,
+                'new_amount' => $newAmount,
+                'balance_difference' => $difference,
+            ]
+        );
 
         return response()->json([
             'message' => '✅ Hisob-kitob logi yangilandi.',
