@@ -4,8 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove unnecessary blank lines in API route definitions">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: improve employee tarification log validation for order quantity">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/EmployeeTarificationLog.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/EmployeeTarificationLog.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -378,15 +380,7 @@
       <workItem from="1750506843742" duration="1274000" />
       <workItem from="1750650436924" duration="23353000" />
       <workItem from="1750741289727" duration="14461000" />
-      <workItem from="1750824048570" duration="7535000" />
-    </task>
-    <task id="LOCAL-00436" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750419731634</created>
-      <option name="number" value="00436" />
-      <option name="presentableId" value="LOCAL-00436" />
-      <option name="project" value="LOCAL" />
-      <updated>1750419731634</updated>
+      <workItem from="1750824048570" duration="8767000" />
     </task>
     <task id="LOCAL-00437" summary="12345">
       <option name="closed" value="true" />
@@ -772,7 +766,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750836900238</updated>
     </task>
-    <option name="localTasksCounter" value="485" />
+    <task id="LOCAL-00485" summary="fix: improve employee tarification log validation for order quantity">
+      <option name="closed" value="true" />
+      <created>1750838800856</created>
+      <option name="number" value="00485" />
+      <option name="presentableId" value="LOCAL-00485" />
+      <option name="project" value="LOCAL" />
+      <updated>1750838800856</updated>
+    </task>
+    <option name="localTasksCounter" value="486" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -802,7 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="12345" />
     <MESSAGE value="refactor: enhance holiday query to include employee department and group" />
     <MESSAGE value="feat: add endpoint to retrieve employees absent yesterday" />
     <MESSAGE value="feat: return JSON response for yesterday's absent employees" />
@@ -827,7 +828,8 @@
     <MESSAGE value="fix: add 'minute' field to order import and related resources" />
     <MESSAGE value="fix: add new salary calculation endpoint for employee with validation" />
     <MESSAGE value="fix: remove unnecessary blank lines in API route definitions" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: remove unnecessary blank lines in API route definitions" />
+    <MESSAGE value="fix: improve employee tarification log validation for order quantity" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: improve employee tarification log validation for order quantity" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

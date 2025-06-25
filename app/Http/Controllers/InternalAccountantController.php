@@ -982,76 +982,44 @@ class InternalAccountantController extends Controller
 
     }
 
-    public function salaryCalculation2(Request $request): \Illuminate\Http\JsonResponse
+    public function updateEmployeeTarificationLog($id, Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'employee_id' => 'required|exists:employees,id',
-            'tarifications' => 'required|array',
-            'tarifications.*.id' => 'required|exists:tarifications,id',
-            'tarifications.*.quantity' => 'required|numeric',
-            'date' => 'nullable',
+            'quantity' => 'required|numeric|min:0',
         ]);
 
-        $employee = Employee::findOrFail($request->employee_id);
-        $date = $request->date ?: now()->toDateString();
+        $log = EmployeeTarificationLog::findOrFail($id);
+        $newQuantity = $request->quantity;
 
-        if ($employee->status === 'kicked') {
-            return response()->json(['message' => '❌ Xodim ishdan bo‘shatilgan.'], 403);
+        $employeeId = $log->employee_id;
+        $tarificationId = $log->tarification_id;
+
+        $tarification = Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
+        $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
+
+        $otherEmployeesDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)
+            ->where('employee_id', '!=', $employeeId)
+            ->sum('quantity');
+
+        // Shu employeega maksimal ruxsat berilgan quantity
+        $allowedQuantity = $orderQuantity - $otherEmployeesDone;
+
+        if ($newQuantity > $allowedQuantity) {
+            return response()->json([
+                'message' => "❌ Limitdan oshib ketdi. Buyurtma soni: $orderQuantity, boshqa xodimlar bajargani: $otherEmployeesDone, siz uchun limit: $allowedQuantity"
+            ], 422);
         }
 
-        foreach ($request->tarifications as $tarificationData) {
-            $tarificationId = $tarificationData['id'];
-            $quantity = $tarificationData['quantity'];
+        // Yangilash
+        $log->update([
+            'quantity' => $newQuantity,
+            'amount_earned' => $tarification->summa * $newQuantity,
+        ]);
 
-            $tarification = Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
-            $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
-
-            // Avvalgi bajarilgan miqdorni hisoblash
-            $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)
-                ->whereDate('date', $date)
-                ->sum('quantity');
-
-            if (($alreadyDone + $quantity) > $orderQuantity) {
-                return response()->json([
-                    'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: $quantity"
-                ], 422);
-            }
-
-            // Hisob-kitob logini yangilash yoki yaratish
-            EmployeeTarificationLog::create(
-                [
-                    'employee_id' => $employee->id,
-                    'tarification_id' => $tarification->id,
-                    'date' => $date,
-                    'quantity' => $quantity,
-                    'is_own' => in_array($tarification->id, $employee->tarifications->pluck('id')->toArray()),
-                    'amount_earned' => $tarification->summa * $quantity,
-                ]
-            );
-
-            if ($employee->payment_type === 'piece_work') {
-                $amountEarned = $tarification->summa * $quantity;
-                $employee->increment('balance', $amountEarned);
-            }
-
-            // Log yozish
-            Log::add(
-                auth()->id(),
-                "Hisob-kitob amalga oshirildi",
-                'accounting',
-                null,
-                [
-                    'employee_id' => $employee->id,
-                    'employee_name' => $employee->name,
-                    'tarification_id' => $tarification->id,
-                    'tarification_name' => $tarification->name,
-                    'quantity' => $quantity,
-                    'amount_earned' => $tarification->summa * $quantity,
-                ]
-            );
-        }
-
-        return response()->json(['message' => '✅ Hisob-kitob muvaffaqiyatli bajarildi.']);
+        return response()->json([
+            'message' => '✅ Hisob-kitob logi yangilandi.',
+            'log' => $log
+        ]);
     }
 
 }
