@@ -126,4 +126,9 @@ class Employee extends Model
         return $this->hasMany(EmployeeHolidays::class, 'employee_id');
     }
 
+    public function employeeAbsences(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(EmployeeAbsence::class, 'employee_id');
+    }
+
 }

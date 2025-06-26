@@ -353,6 +353,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::patch('employeeHolidays/{id}', [SuperHRController::class, 'editEmployeeHoliday']);
     Route::get('yesterdayAbsent',[SuperHRController::class, 'getYesterdayAbsent']);
     Route::get('todayAbsent',[SuperHRController::class, 'getPotentialAbsents']);
+    Route::post('employeeAbsence', [SuperHRController::class, 'storeEmployeeAbsence']);
 });
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {

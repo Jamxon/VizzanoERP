@@ -6,6 +6,7 @@ use App\Http\Resources\GetEmployeeResourceCollection;
 use App\Models\Attendance;
 use App\Models\Department;
 use App\Models\Employee;
+use App\Models\EmployeeAbsence;
 use App\Models\EmployeeHolidays;
 use App\Models\Log;
 use App\Models\MainDepartment;
@@ -24,6 +25,50 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class SuperHRController extends Controller
 {
+    public function storeEmployeeAbsence(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'employee_id' => 'required|integer|exists:employees,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'comment' => 'nullable|string|max:255',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $absence = EmployeeAbsence::create([
+                'employee_id' => $request->employee_id,
+                'start_date' => $request->start_date,
+                'end_date' => $request->end_date,
+                'comment' => $request->comment,
+            ]);
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Xodimning sababsiz kelmaganligi aniqlandi',
+                'create',
+                null,
+                $absence
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Xodimning yo‘qligi muvaffaqiyatli qo‘shildi', 'absence' => $absence], 201);
+        }
+        catch (\Exception $e) {
+            DB::rollBack();
+            Log::add(
+                auth()->user()->id,
+                'Xodimning yo‘qligini qo‘shishda xatolik',
+                'error',
+                null,
+                $e->getMessage()
+            );
+            return response()->json(['status' => 'error', 'message' => 'Xodimning yo‘qligini qo‘shishda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
     public function getPotentialAbsents(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();

@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to update employee tarification log with validation">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update workspace configuration to reflect recent changes in employee tarification log">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -379,15 +378,8 @@
       <workItem from="1750506843742" duration="1274000" />
       <workItem from="1750650436924" duration="23353000" />
       <workItem from="1750741289727" duration="14461000" />
-      <workItem from="1750824048570" duration="11430000" />
-    </task>
-    <task id="LOCAL-00438" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750420216875</created>
-      <option name="number" value="00438" />
-      <option name="presentableId" value="LOCAL-00438" />
-      <option name="project" value="LOCAL" />
-      <updated>1750420216876</updated>
+      <workItem from="1750824048570" duration="16212000" />
+      <workItem from="1750911476513" duration="1230000" />
     </task>
     <task id="LOCAL-00439" summary="12345">
       <option name="closed" value="true" />
@@ -773,7 +765,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750839696841</updated>
     </task>
-    <option name="localTasksCounter" value="487" />
+    <task id="LOCAL-00487" summary="fix: update workspace configuration to reflect recent changes in employee tarification log">
+      <option name="closed" value="true" />
+      <created>1750842249143</created>
+      <option name="number" value="00487" />
+      <option name="presentableId" value="LOCAL-00487" />
+      <option name="project" value="LOCAL" />
+      <updated>1750842249143</updated>
+    </task>
+    <option name="localTasksCounter" value="488" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -803,7 +803,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add endpoint to retrieve employees absent yesterday" />
     <MESSAGE value="feat: return JSON response for yesterday's absent employees" />
     <MESSAGE value="feat: add branch filtering for yesterday's absent employees response" />
     <MESSAGE value="feat: add endpoint to retrieve potential absents for today" />
@@ -828,7 +827,8 @@
     <MESSAGE value="fix: remove unnecessary blank lines in API route definitions" />
     <MESSAGE value="fix: improve employee tarification log validation for order quantity" />
     <MESSAGE value="fix: add endpoint to update employee tarification log with validation" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add endpoint to update employee tarification log with validation" />
+    <MESSAGE value="fix: update workspace configuration to reflect recent changes in employee tarification log" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update workspace configuration to reflect recent changes in employee tarification log" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
