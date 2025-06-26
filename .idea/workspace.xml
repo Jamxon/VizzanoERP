@@ -377,15 +377,7 @@
       <workItem from="1750650436924" duration="23353000" />
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
-      <workItem from="1750911476513" duration="1798000" />
-    </task>
-    <task id="LOCAL-00440" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750421327268</created>
-      <option name="number" value="00440" />
-      <option name="presentableId" value="LOCAL-00440" />
-      <option name="project" value="LOCAL" />
-      <updated>1750421327269</updated>
+      <workItem from="1750911476513" duration="2154000" />
     </task>
     <task id="LOCAL-00441" summary="12345">
       <option name="closed" value="true" />
@@ -771,7 +763,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750913504173</updated>
     </task>
-    <option name="localTasksCounter" value="489" />
+    <task id="LOCAL-00489" summary="fix: add endpoint to store employee absence with validation">
+      <option name="closed" value="true" />
+      <created>1750913746695</created>
+      <option name="number" value="00489" />
+      <option name="presentableId" value="LOCAL-00489" />
+      <option name="project" value="LOCAL" />
+      <updated>1750913746695</updated>
+    </task>
+    <option name="localTasksCounter" value="490" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

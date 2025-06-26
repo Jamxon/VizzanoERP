@@ -155,13 +155,15 @@ class SuperHRController extends Controller
         // Kecha kelmagan, bugun kelganlar
         $filteredIds = array_intersect($yesterdayAbsentIds, $todayPresentIds);
 
-        // Holiday bo‘lganlar
-        $holidayIds = \App\Models\EmployeeHolidays::whereDate('date', $yesterday)
+        // Holiday bo‘lganlar (yesterday shu oraliqda bo‘lsa)
+        $holidayIds = \App\Models\EmployeeHolidays::whereDate('start_date', '<=', $yesterday)
+            ->whereDate('end_date', '>=', $yesterday)
             ->pluck('employee_id')
             ->toArray();
 
-        // Absence bo‘lganlar
-        $absenceIds = \App\Models\EmployeeAbsence::whereDate('date', $yesterday)
+        // Absence bo‘lganlar (yesterday shu oraliqda bo‘lsa)
+        $absenceIds = \App\Models\EmployeeAbsence::whereDate('start_date', '<=', $yesterday)
+            ->whereDate('end_date', '>=', $yesterday)
             ->pluck('employee_id')
             ->toArray();
 
@@ -183,11 +185,13 @@ class SuperHRController extends Controller
 
             if ($wasOnHoliday) {
                 $comment = \App\Models\EmployeeHolidays::where('employee_id', $employee->id)
-                    ->whereDate('date', $yesterday)
+                    ->whereDate('start_date', '<=', $yesterday)
+                    ->whereDate('end_date', '>=', $yesterday)
                     ->value('comment');
             } elseif ($wasOnAbsence) {
                 $comment = \App\Models\EmployeeAbsence::where('employee_id', $employee->id)
-                    ->whereDate('date', $yesterday)
+                    ->whereDate('start_date', '<=', $yesterday)
+                    ->whereDate('end_date', '>=', $yesterday)
                     ->value('comment');
             }
 
