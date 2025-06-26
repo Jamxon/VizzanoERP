@@ -347,12 +347,12 @@ class SuperHRController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'comment' => 'nullable|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
-
         ]);
 
         try {
             DB::beginTransaction();
 
+            $filename = null;
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
@@ -364,7 +364,7 @@ class SuperHRController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'comment' => $request->comment,
-                'image' => 'holidays/' . ($filename ?? null),
+                'image' => $filename ? 'holidays/' . $filename : null,
             ]);
 
             DB::commit();
@@ -377,9 +377,42 @@ class SuperHRController extends Controller
                 $holiday
             );
 
-            return response()->json(['status' => 'success', 'message' => 'Xodim ta‘tili muvaffaqiyatli qo‘shildi', 'holiday' => $holiday], 201);
+            // 🟢 Telegramga yuborish
+            $employee = \App\Models\Employee::find($request->employee_id);
+            $messageText = "🏖 *Xodim ta’tili haqida ma’lumot:*\n\n"
+                . "*Ismi:* {$employee->name}\n"
+                . "*Telefon:* {$employee->phone}\n"
+                . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
+                . "*Izoh:* " . ($request->comment ?? 'Yo‘q');
+
+            $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
+            $chatId = -1002655761088;
+
+            if ($filename) {
+                $imagePath = storage_path("app/public/holidays/" . $filename);
+
+                Http::attach('photo', file_get_contents($imagePath), $filename)
+                    ->post("https://api.telegram.org/bot{$telegramToken}/sendPhoto", [
+                        'chat_id' => $chatId,
+                        'caption' => $messageText,
+                        'parse_mode' => 'Markdown',
+                    ]);
+            } else {
+                Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $messageText,
+                    'parse_mode' => 'Markdown',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Xodim ta‘tili muvaffaqiyatli qo‘shildi',
+                'holiday' => $holiday,
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
+
             Log::add(
                 auth()->user()->id,
                 "Xodim ta‘tilini qo‘shishda xatolik",
@@ -387,7 +420,11 @@ class SuperHRController extends Controller
                 null,
                 $e->getMessage()
             );
-            return response()->json(['status' => 'error', 'message' => 'Xodim ta‘tilini qo‘shishda xatolik: ' . $e->getMessage()], 500);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Xodim ta‘tilini qo‘shishda xatolik: ' . $e->getMessage()
+            ], 500);
         }
     }
 

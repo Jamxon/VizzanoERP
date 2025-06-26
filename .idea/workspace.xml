@@ -4,12 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update holiday and absence checks to use date range validation">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance employee absence storage with Telegram notification and image handling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/EmployeeAbsence.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/EmployeeAbsence.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/EmployeeHolidays.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/EmployeeHolidays.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -383,23 +379,7 @@
       <workItem from="1750650436924" duration="23353000" />
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
-      <workItem from="1750911476513" duration="4805000" />
-    </task>
-    <task id="LOCAL-00442" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750424552480</created>
-      <option name="number" value="00442" />
-      <option name="presentableId" value="LOCAL-00442" />
-      <option name="project" value="LOCAL" />
-      <updated>1750424552480</updated>
-    </task>
-    <task id="LOCAL-00443" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750424860125</created>
-      <option name="number" value="00443" />
-      <option name="presentableId" value="LOCAL-00443" />
-      <option name="project" value="LOCAL" />
-      <updated>1750424860125</updated>
+      <workItem from="1750911476513" duration="5497000" />
     </task>
     <task id="LOCAL-00444" summary="12345">
       <option name="closed" value="true" />
@@ -777,7 +757,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750913964592</updated>
     </task>
-    <option name="localTasksCounter" value="491" />
+    <task id="LOCAL-00491" summary="fix: add image field to employee absence and holiday models with validation">
+      <option name="closed" value="true" />
+      <created>1750917467792</created>
+      <option name="number" value="00491" />
+      <option name="presentableId" value="LOCAL-00491" />
+      <option name="project" value="LOCAL" />
+      <updated>1750917467792</updated>
+    </task>
+    <task id="LOCAL-00492" summary="fix: enhance employee absence storage with Telegram notification and image handling">
+      <option name="closed" value="true" />
+      <created>1750917669889</created>
+      <option name="number" value="00492" />
+      <option name="presentableId" value="LOCAL-00492" />
+      <option name="project" value="LOCAL" />
+      <updated>1750917669889</updated>
+    </task>
+    <option name="localTasksCounter" value="493" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,8 +803,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add endpoint to retrieve potential absents for today" />
-    <MESSAGE value="feat: include holiday status in absent employees response" />
     <MESSAGE value="feat: update model reference for holiday date filtering in absent employees logic" />
     <MESSAGE value="feat: correct model relationship name for employee holidays in absent employees logic" />
     <MESSAGE value="fix: adjust yesterday's date calculation for absent employees logic" />
@@ -832,7 +826,9 @@
     <MESSAGE value="fix: update workspace configuration to reflect recent changes in employee tarification log" />
     <MESSAGE value="fix: add endpoint to store employee absence with validation" />
     <MESSAGE value="fix: update holiday and absence checks to use date range validation" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update holiday and absence checks to use date range validation" />
+    <MESSAGE value="fix: add image field to employee absence and holiday models with validation" />
+    <MESSAGE value="fix: enhance employee absence storage with Telegram notification and image handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance employee absence storage with Telegram notification and image handling" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
