@@ -20,6 +20,7 @@ class EmployeeHolidays extends Model
         'start_date',
         'end_date',
         'comment',
+        'image'
     ];
 
     public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo

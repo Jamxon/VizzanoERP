@@ -32,16 +32,24 @@ class SuperHRController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'comment' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
         ]);
 
         try {
             DB::beginTransaction();
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('/public/absences/', $filename);
+            }
 
             $absence = EmployeeAbsence::create([
                 'employee_id' => $request->employee_id,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'comment' => $request->comment,
+                'image' => 'absences/' . $filename ?? null,
             ]);
 
             DB::commit();
@@ -140,59 +148,58 @@ class SuperHRController extends Controller
             $yesterday = $yesterday->copy()->subDay(); // shanba
         }
 
-        // Bugun kelganlar
         $todayPresentIds = Attendance::whereDate('date', $today)
             ->where('status', 'present')
             ->pluck('employee_id')
             ->toArray();
 
-        // Kecha kelmaganlar
         $yesterdayAbsentIds = Attendance::whereDate('date', $yesterday)
             ->where('status', 'absent')
             ->pluck('employee_id')
             ->toArray();
 
-        // Kecha kelmagan, bugun kelganlar
         $filteredIds = array_intersect($yesterdayAbsentIds, $todayPresentIds);
 
-        // Holiday bo‘lganlar (yesterday shu oraliqda bo‘lsa)
         $holidayIds = \App\Models\EmployeeHolidays::whereDate('start_date', '<=', $yesterday)
             ->whereDate('end_date', '>=', $yesterday)
             ->pluck('employee_id')
             ->toArray();
 
-        // Absence bo‘lganlar (yesterday shu oraliqda bo‘lsa)
         $absenceIds = \App\Models\EmployeeAbsence::whereDate('start_date', '<=', $yesterday)
             ->whereDate('end_date', '>=', $yesterday)
             ->pluck('employee_id')
             ->toArray();
 
-        // ID larni birlashtirish
         $allIds = array_unique(array_merge($filteredIds, $holidayIds, $absenceIds));
 
-        // Hodimlar
         $employees = \App\Models\Employee::whereIn('id', $allIds)
             ->where('branch_id', $branchId)
             ->with(['department', 'group', 'position'])
             ->get();
 
-        // Formatlash
         $absentEmployees = $employees->map(function ($employee) use ($yesterday, $holidayIds, $absenceIds) {
             $wasOnHoliday = in_array($employee->id, $holidayIds);
             $wasOnAbsence = in_array($employee->id, $absenceIds);
 
             $comment = null;
+            $image = null;
 
             if ($wasOnHoliday) {
-                $comment = \App\Models\EmployeeHolidays::where('employee_id', $employee->id)
+                $holiday = \App\Models\EmployeeHolidays::where('employee_id', $employee->id)
                     ->whereDate('start_date', '<=', $yesterday)
                     ->whereDate('end_date', '>=', $yesterday)
-                    ->value('comment');
+                    ->first();
+
+                $comment = $holiday?->comment;
+                $image = $holiday?->image;
             } elseif ($wasOnAbsence) {
-                $comment = \App\Models\EmployeeAbsence::where('employee_id', $employee->id)
+                $absence = \App\Models\EmployeeAbsence::where('employee_id', $employee->id)
                     ->whereDate('start_date', '<=', $yesterday)
                     ->whereDate('end_date', '>=', $yesterday)
-                    ->value('comment');
+                    ->first();
+
+                $comment = $absence?->comment;
+                $image = $absence?->image;
             }
 
             return [
@@ -206,6 +213,7 @@ class SuperHRController extends Controller
                 'was_on_holiday' => $wasOnHoliday,
                 'was_on_absence' => $wasOnAbsence,
                 'comment' => $comment,
+                'image' => url($image) ?: null,
             ];
         });
 
@@ -296,16 +304,25 @@ class SuperHRController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'comment' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+
         ]);
 
         try {
             DB::beginTransaction();
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('/public/holidays/', $filename);
+            }
 
             $holiday = \App\Models\EmployeeHolidays::create([
                 'employee_id' => $request->employee_id,
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'comment' => $request->comment,
+                'image' => 'holidays/' . ($filename ?? null),
             ]);
 
             DB::commit();

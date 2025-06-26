@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to store employee absence with validation" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update holiday and absence checks to use date range validation">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/EmployeeAbsence.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/EmployeeAbsence.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/EmployeeHolidays.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/EmployeeHolidays.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -377,15 +383,7 @@
       <workItem from="1750650436924" duration="23353000" />
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
-      <workItem from="1750911476513" duration="2154000" />
-    </task>
-    <task id="LOCAL-00441" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750421822214</created>
-      <option name="number" value="00441" />
-      <option name="presentableId" value="LOCAL-00441" />
-      <option name="project" value="LOCAL" />
-      <updated>1750421822214</updated>
+      <workItem from="1750911476513" duration="4805000" />
     </task>
     <task id="LOCAL-00442" summary="12345">
       <option name="closed" value="true" />
@@ -771,7 +769,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750913746695</updated>
     </task>
-    <option name="localTasksCounter" value="490" />
+    <task id="LOCAL-00490" summary="fix: update holiday and absence checks to use date range validation">
+      <option name="closed" value="true" />
+      <created>1750913964591</created>
+      <option name="number" value="00490" />
+      <option name="presentableId" value="LOCAL-00490" />
+      <option name="project" value="LOCAL" />
+      <updated>1750913964592</updated>
+    </task>
+    <option name="localTasksCounter" value="491" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -801,7 +807,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add branch filtering for yesterday's absent employees response" />
     <MESSAGE value="feat: add endpoint to retrieve potential absents for today" />
     <MESSAGE value="feat: include holiday status in absent employees response" />
     <MESSAGE value="feat: update model reference for holiday date filtering in absent employees logic" />
@@ -826,7 +831,8 @@
     <MESSAGE value="fix: add endpoint to update employee tarification log with validation" />
     <MESSAGE value="fix: update workspace configuration to reflect recent changes in employee tarification log" />
     <MESSAGE value="fix: add endpoint to store employee absence with validation" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add endpoint to store employee absence with validation" />
+    <MESSAGE value="fix: update holiday and absence checks to use date range validation" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update holiday and absence checks to use date range validation" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
