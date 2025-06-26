@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Exports\EmployeeExport;
+use Illuminate\Support\Facades\Http;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Psr\Container\ContainerExceptionInterface;
@@ -25,6 +26,7 @@ use Psr\Container\NotFoundExceptionInterface;
 
 class SuperHRController extends Controller
 {
+
     public function storeEmployeeAbsence(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
@@ -38,6 +40,7 @@ class SuperHRController extends Controller
         try {
             DB::beginTransaction();
 
+            $filename = null;
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
@@ -49,7 +52,7 @@ class SuperHRController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'comment' => $request->comment,
-                'image' => 'absences/' . $filename ?? null,
+                'image' => $filename ? 'absences/' . $filename : null,
             ]);
 
             DB::commit();
@@ -62,10 +65,45 @@ class SuperHRController extends Controller
                 $absence
             );
 
-            return response()->json(['status' => 'success', 'message' => 'Xodimning yo‘qligi muvaffaqiyatli qo‘shildi', 'absence' => $absence], 201);
+            // 🟢 Telegramga yuborish
+            $employee = \App\Models\Employee::find($request->employee_id);
+            $messageText = "🚫 *Xodim yo‘qligi haqida ma’lumot:*\n\n"
+                . "*Ismi:* {$employee->name}\n"
+                . "*Telefon:* {$employee->phone}\n"
+                . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
+                . "*Izoh:* " . ($request->comment ?? 'Yo‘q');
+
+            $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
+            $chatId = -1002655761088;
+
+            if ($filename) {
+                // Rasm bilan yuborish
+                $imagePath = storage_path("app/public/absences/" . $filename);
+
+                Http::attach('photo', file_get_contents($imagePath), $filename)
+                    ->post("https://api.telegram.org/bot{$telegramToken}/sendPhoto", [
+                        'chat_id' => $chatId,
+                        'caption' => $messageText,
+                        'parse_mode' => 'Markdown',
+                    ]);
+            } else {
+                // Faqat matn
+                Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $messageText,
+                    'parse_mode' => 'Markdown',
+                ]);
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Xodimning yo‘qligi muvaffaqiyatli qo‘shildi',
+                'absence' => $absence,
+            ], 201);
         }
         catch (\Exception $e) {
             DB::rollBack();
+
             Log::add(
                 auth()->user()->id,
                 'Xodimning yo‘qligini qo‘shishda xatolik',
@@ -73,7 +111,11 @@ class SuperHRController extends Controller
                 null,
                 $e->getMessage()
             );
-            return response()->json(['status' => 'error', 'message' => 'Xodimning yo‘qligini qo‘shishda xatolik: ' . $e->getMessage()], 500);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Xodimning yo‘qligini qo‘shishda xatolik: ' . $e->getMessage()
+            ], 500);
         }
     }
 
