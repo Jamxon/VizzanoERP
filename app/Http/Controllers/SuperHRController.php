@@ -255,7 +255,7 @@ class SuperHRController extends Controller
                 'was_on_holiday' => $wasOnHoliday,
                 'was_on_absence' => $wasOnAbsence,
                 'comment' => $comment,
-                'image' => url('storage/' .$image) ?? null,
+                'image' => $image ? url('storage/' .$image) : null,
             ];
         });
 
