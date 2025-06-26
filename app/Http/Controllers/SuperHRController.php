@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Exports\EmployeeExport;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Psr\Container\ContainerExceptionInterface;
@@ -255,7 +256,7 @@ class SuperHRController extends Controller
                 'was_on_holiday' => $wasOnHoliday,
                 'was_on_absence' => $wasOnAbsence,
                 'comment' => $comment,
-                'image' => $image ? url('storage/' .$image) : null,
+                'image' => (!empty($image) && Str::contains($image, '/')) ? url('storage/' . $image) : null,
             ];
         });
 
