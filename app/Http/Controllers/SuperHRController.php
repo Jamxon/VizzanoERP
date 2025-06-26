@@ -233,7 +233,7 @@ class SuperHRController extends Controller
                     ->first();
 
                 $comment = $holiday?->comment;
-                $image = $holiday?->image;
+                $image = $holiday?->image ?? null;
             } elseif ($wasOnAbsence) {
                 $absence = \App\Models\EmployeeAbsence::where('employee_id', $employee->id)
                     ->whereDate('start_date', '<=', $yesterday)
@@ -241,7 +241,7 @@ class SuperHRController extends Controller
                     ->first();
 
                 $comment = $absence?->comment;
-                $image = $absence?->image;
+                $image = $absence?->image ?? null;
             }
 
             return [
