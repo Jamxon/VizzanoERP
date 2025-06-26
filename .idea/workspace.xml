@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update workspace configuration to reflect recent changes in employee tarification log">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to store employee absence with validation" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -379,15 +377,7 @@
       <workItem from="1750650436924" duration="23353000" />
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
-      <workItem from="1750911476513" duration="1230000" />
-    </task>
-    <task id="LOCAL-00439" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750420916811</created>
-      <option name="number" value="00439" />
-      <option name="presentableId" value="LOCAL-00439" />
-      <option name="project" value="LOCAL" />
-      <updated>1750420916811</updated>
+      <workItem from="1750911476513" duration="1798000" />
     </task>
     <task id="LOCAL-00440" summary="12345">
       <option name="closed" value="true" />
@@ -773,7 +763,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750842249143</updated>
     </task>
-    <option name="localTasksCounter" value="488" />
+    <task id="LOCAL-00488" summary="fix: add endpoint to store employee absence with validation">
+      <option name="closed" value="true" />
+      <created>1750913504173</created>
+      <option name="number" value="00488" />
+      <option name="presentableId" value="LOCAL-00488" />
+      <option name="project" value="LOCAL" />
+      <updated>1750913504173</updated>
+    </task>
+    <option name="localTasksCounter" value="489" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -803,7 +801,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: return JSON response for yesterday's absent employees" />
     <MESSAGE value="feat: add branch filtering for yesterday's absent employees response" />
     <MESSAGE value="feat: add endpoint to retrieve potential absents for today" />
     <MESSAGE value="feat: include holiday status in absent employees response" />
@@ -828,7 +825,8 @@
     <MESSAGE value="fix: improve employee tarification log validation for order quantity" />
     <MESSAGE value="fix: add endpoint to update employee tarification log with validation" />
     <MESSAGE value="fix: update workspace configuration to reflect recent changes in employee tarification log" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update workspace configuration to reflect recent changes in employee tarification log" />
+    <MESSAGE value="fix: add endpoint to store employee absence with validation" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add endpoint to store employee absence with validation" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -140,42 +140,57 @@ class SuperHRController extends Controller
             $yesterday = $yesterday->copy()->subDay(); // shanba
         }
 
-        // Bugun present bo‘lganlar
+        // Bugun kelganlar
         $todayPresentIds = Attendance::whereDate('date', $today)
             ->where('status', 'present')
             ->pluck('employee_id')
             ->toArray();
 
-        // Kecha absent bo‘lganlar
+        // Kecha kelmaganlar
         $yesterdayAbsentIds = Attendance::whereDate('date', $yesterday)
             ->where('status', 'absent')
             ->pluck('employee_id')
             ->toArray();
 
-        // 1) Har ikki shartga tushadiganlar
+        // Kecha kelmagan, bugun kelganlar
         $filteredIds = array_intersect($yesterdayAbsentIds, $todayPresentIds);
 
-        // 2) Kecha ruxsatda bo‘lgan va kelmagan hodimlar
-        $holidayIds = \App\Models\EmployeeHolidays::whereDate('start_date', '<=', $yesterday)
-            ->whereDate('end_date', '>=', $yesterday)
-            ->whereHas('employee.attendances', function ($query) use ($yesterday) {
-                $query->whereDate('date', $yesterday)
-                    ->where('status', 'absent');
-            })
+        // Holiday bo‘lganlar
+        $holidayIds = \App\Models\EmployeeHolidays::whereDate('date', $yesterday)
             ->pluck('employee_id')
             ->toArray();
 
-        // 3) ID larni birlashtirish (unique qilib)
-        $allIds = array_unique(array_merge($filteredIds, $holidayIds));
+        // Absence bo‘lganlar
+        $absenceIds = \App\Models\EmployeeAbsence::whereDate('date', $yesterday)
+            ->pluck('employee_id')
+            ->toArray();
 
-        // 4) Shu filialdagi hodimlardan, topilgan IDlarga mos kelganlar
+        // ID larni birlashtirish
+        $allIds = array_unique(array_merge($filteredIds, $holidayIds, $absenceIds));
+
+        // Hodimlar
         $employees = \App\Models\Employee::whereIn('id', $allIds)
             ->where('branch_id', $branchId)
-            ->with(['department', 'group', 'position', 'employeeHolidays'])
+            ->with(['department', 'group', 'position'])
             ->get();
 
-        // 5) Formatlash
-        $absentEmployees = $employees->map(function ($employee) use ($yesterday, $holidayIds) {
+        // Formatlash
+        $absentEmployees = $employees->map(function ($employee) use ($yesterday, $holidayIds, $absenceIds) {
+            $wasOnHoliday = in_array($employee->id, $holidayIds);
+            $wasOnAbsence = in_array($employee->id, $absenceIds);
+
+            $comment = null;
+
+            if ($wasOnHoliday) {
+                $comment = \App\Models\EmployeeHolidays::where('employee_id', $employee->id)
+                    ->whereDate('date', $yesterday)
+                    ->value('comment');
+            } elseif ($wasOnAbsence) {
+                $comment = \App\Models\EmployeeAbsence::where('employee_id', $employee->id)
+                    ->whereDate('date', $yesterday)
+                    ->value('comment');
+            }
+
             return [
                 'id' => $employee->id,
                 'name' => $employee->name,
@@ -184,7 +199,9 @@ class SuperHRController extends Controller
                 'group' => $employee->group->name ?? null,
                 'position' => $employee->position->name ?? null,
                 'absent_date' => $yesterday->toDateString(),
-                'was_on_holiday' => in_array($employee->id, $holidayIds),
+                'was_on_holiday' => $wasOnHoliday,
+                'was_on_absence' => $wasOnAbsence,
+                'comment' => $comment,
             ];
         });
 
