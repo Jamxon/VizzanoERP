@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct HTML formatting for quantity display in GroupMasterController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,23 +378,7 @@
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
-      <workItem from="1750997346621" duration="1904000" />
-    </task>
-    <task id="LOCAL-00452" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750499249054</created>
-      <option name="number" value="00452" />
-      <option name="presentableId" value="LOCAL-00452" />
-      <option name="project" value="LOCAL" />
-      <updated>1750499249054</updated>
-    </task>
-    <task id="LOCAL-00453" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750499274569</created>
-      <option name="number" value="00453" />
-      <option name="presentableId" value="LOCAL-00453" />
-      <option name="project" value="LOCAL" />
-      <updated>1750499274569</updated>
+      <workItem from="1750997346621" duration="2291000" />
     </task>
     <task id="LOCAL-00454" summary="12345">
       <option name="closed" value="true" />
@@ -774,7 +756,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751000029887</updated>
     </task>
-    <option name="localTasksCounter" value="501" />
+    <task id="LOCAL-00501" summary="fix: update user name retrieval and enhance quantity display in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751000493703</created>
+      <option name="number" value="00501" />
+      <option name="presentableId" value="LOCAL-00501" />
+      <option name="project" value="LOCAL" />
+      <updated>1751000493704</updated>
+    </task>
+    <task id="LOCAL-00502" summary="fix: correct HTML formatting for quantity display in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751000752799</created>
+      <option name="number" value="00502" />
+      <option name="presentableId" value="LOCAL-00502" />
+      <option name="project" value="LOCAL" />
+      <updated>1751000752799</updated>
+    </task>
+    <option name="localTasksCounter" value="503" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,8 +802,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: correct model reference for holiday employee IDs in date calculation" />
-    <MESSAGE value="fix: remove unused bonus calculation logic for fixed tailored bonus types" />
     <MESSAGE value="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
     <MESSAGE value="fix: add payment type to user profile retrieval" />
     <MESSAGE value="fix: update salary calculation to include additional payment types" />
@@ -829,7 +825,9 @@
     <MESSAGE value="fix: update image URL generation to ensure valid image paths in absence and holiday storage" />
     <MESSAGE value="fix: update workspace configuration and clean up task entries in SuperHRController" />
     <MESSAGE value="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController" />
+    <MESSAGE value="fix: update user name retrieval and enhance quantity display in GroupMasterController" />
+    <MESSAGE value="fix: correct HTML formatting for quantity display in GroupMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: correct HTML formatting for quantity display in GroupMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
