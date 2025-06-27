@@ -276,8 +276,24 @@ class UserController extends Controller
 
         return response()->json([
             'employee' => $employee,
-            'absences' => $absences,
-            'holidays' => $holidays,
+            'absences' => $absences->map(function ($absence) {
+                return [
+                    'id' => $absence->id,
+                    'start_date' => $absence->start_date,
+                    'end_date' => $absence->end_date,
+                    'comment' => $absence->comment,
+                    'image' => $absence->image ? url('storage/' . $absence->image) : null,
+                ];
+            }),
+            'holidays' => $holidays->map(function ($holiday) {
+                return [
+                    'id' => $holiday->id,
+                    'start_date' => $holiday->start_date,
+                    'end_date' => $holiday->end_date,
+                    'comment' => $holiday->comment,
+                    'image' => $holiday->image ? url('storage/' . $holiday->image) : null,
+                ];
+            }),
         ]);
     }
 
