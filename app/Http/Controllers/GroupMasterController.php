@@ -347,7 +347,7 @@ class GroupMasterController extends Controller
 
         // 🧵 Yangi natija
         $newEntryMessage = "<b>🧵 Yangi natija kiritildi</b>\n";
-        $newEntryMessage .= "⏰<b>{$time->name}</b>\n";
+        $newEntryMessage .= "⏰<b>{$time->time}</b>\n";
         $newEntryMessage .= "➕ <b>Kiritilgan:</b> {$newQuantity} dona\n";
         $newEntryMessage .= "👤 <b>Foydalanuvchi:</b> {$user->employee->name}\n";
         $newEntryMessage .= "📦 <b>Buyurtma:</b> {$orderName}\n";
@@ -374,7 +374,7 @@ class GroupMasterController extends Controller
             ->get()
             ->groupBy('order_submodel_id');
 
-        $summaryMessage = "⏰ <b>{$time->name}</b> dagi natijalar:\n";
+        $summaryMessage = "⏰ <b>{$time->time}</b> dagi natijalar:\n";
 
         $sortedOutputs = $sameTimeOutputs->map(function ($outputs) {
             return [
