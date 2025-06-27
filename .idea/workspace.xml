@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,15 +378,7 @@
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
-      <workItem from="1750997346621" duration="5054000" />
-    </task>
-    <task id="LOCAL-00457" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750500981341</created>
-      <option name="number" value="00457" />
-      <option name="presentableId" value="LOCAL-00457" />
-      <option name="project" value="LOCAL" />
-      <updated>1750500981341</updated>
+      <workItem from="1750997346621" duration="5830000" />
     </task>
     <task id="LOCAL-00458" summary="refactor: enhance holiday query to include employee department and group">
       <option name="closed" value="true" />
@@ -774,7 +764,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751002022003</updated>
     </task>
-    <option name="localTasksCounter" value="506" />
+    <task id="LOCAL-00506" summary="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751014486652</created>
+      <option name="number" value="00506" />
+      <option name="presentableId" value="LOCAL-00506" />
+      <option name="project" value="LOCAL" />
+      <updated>1751014486652</updated>
+    </task>
+    <option name="localTasksCounter" value="507" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,7 +802,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: add 'rasxod' field to order model in ShowOrderResource" />
     <MESSAGE value="fix: add 'minute' field to models and update related resources" />
     <MESSAGE value="fix: add 'minute' field to order import and related resources" />
     <MESSAGE value="fix: add new salary calculation endpoint for employee with validation" />
@@ -829,7 +826,8 @@
     <MESSAGE value="fix: refactor bonus calculation logic and update Telegram message formatting in GroupMasterController" />
     <MESSAGE value="fix: update time display in new entry and summary messages in GroupMasterController" />
     <MESSAGE value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
+    <MESSAGE value="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
