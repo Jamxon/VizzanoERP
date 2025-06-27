@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update summary message formatting in GroupMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance employee absence and holiday data structure in UserController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -378,23 +378,7 @@
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
-      <workItem from="1750997346621" duration="8575000" />
-    </task>
-    <task id="LOCAL-00460" summary="feat: add endpoint to retrieve employees absent yesterday">
-      <option name="closed" value="true" />
-      <created>1750663850113</created>
-      <option name="number" value="00460" />
-      <option name="presentableId" value="LOCAL-00460" />
-      <option name="project" value="LOCAL" />
-      <updated>1750663850113</updated>
-    </task>
-    <task id="LOCAL-00461" summary="feat: return JSON response for yesterday's absent employees">
-      <option name="closed" value="true" />
-      <created>1750666244479</created>
-      <option name="number" value="00461" />
-      <option name="presentableId" value="LOCAL-00461" />
-      <option name="project" value="LOCAL" />
-      <updated>1750666244479</updated>
+      <workItem from="1750997346621" duration="9363000" />
     </task>
     <task id="LOCAL-00462" summary="feat: add branch filtering for yesterday's absent employees response">
       <option name="closed" value="true" />
@@ -772,7 +756,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751021472290</updated>
     </task>
-    <option name="localTasksCounter" value="509" />
+    <task id="LOCAL-00509" summary="feat: add employee absence and holiday retrieval to UserController">
+      <option name="closed" value="true" />
+      <created>1751021789464</created>
+      <option name="number" value="00509" />
+      <option name="presentableId" value="LOCAL-00509" />
+      <option name="project" value="LOCAL" />
+      <updated>1751021789464</updated>
+    </task>
+    <task id="LOCAL-00510" summary="feat: enhance employee absence and holiday data structure in UserController">
+      <option name="closed" value="true" />
+      <created>1751022805157</created>
+      <option name="number" value="00510" />
+      <option name="presentableId" value="LOCAL-00510" />
+      <option name="project" value="LOCAL" />
+      <updated>1751022805157</updated>
+    </task>
+    <option name="localTasksCounter" value="511" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -802,8 +802,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: add 'minute' field to order import and related resources" />
-    <MESSAGE value="fix: add new salary calculation endpoint for employee with validation" />
     <MESSAGE value="fix: remove unnecessary blank lines in API route definitions" />
     <MESSAGE value="fix: improve employee tarification log validation for order quantity" />
     <MESSAGE value="fix: add endpoint to update employee tarification log with validation" />
@@ -827,7 +825,9 @@
     <MESSAGE value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
     <MESSAGE value="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
     <MESSAGE value="fix: update summary message formatting in GroupMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update summary message formatting in GroupMasterController" />
+    <MESSAGE value="feat: add employee absence and holiday retrieval to UserController" />
+    <MESSAGE value="feat: enhance employee absence and holiday data structure in UserController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance employee absence and holiday data structure in UserController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

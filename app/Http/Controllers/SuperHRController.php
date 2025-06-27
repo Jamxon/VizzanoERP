@@ -290,6 +290,11 @@ class SuperHRController extends Controller
 
         $holidays = $query->with('employee.department','employee.group')->orderBy('id', 'DESC')->paginate(10);
 
+        $holidays->getCollection()->transform(function ($holiday) {
+            $holiday->image = $holiday->image ? url('storage/' . $holiday->image) : null;
+            return $holiday;
+        });
+
         return response()->json($holidays, 200);
     }
 
