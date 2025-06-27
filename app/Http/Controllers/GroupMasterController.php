@@ -418,7 +418,7 @@ class GroupMasterController extends Controller
         $newEntryMessage .= "🧶 <b>Submodel:</b> {$submodelName}\n";
         $newEntryMessage .= "👥 <b>Guruh:</b> {$groupName}\n";
         $newEntryMessage .= "🧑‍💼 <b>Mas’ul:</b> {$responsible}\n";
-        $newEntryMessage .= "➕ <b>Kiritilgan:</b> <b><i>{$newQuantity}</i></i></b> dona\n\n";
+        $newEntryMessage .= "➕ <b>Kiritilgan:</b> <b><i>{$newQuantity}</i></b> dona\n\n";
 
         // Bugungi umumiy natijalar (shu filialdagi barcha orderlar bo‘yicha)
         $today = now()->toDateString();
