@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update image URL generation to ensure valid image paths in absence and holiday storage">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update workspace configuration and clean up task entries in SuperHRController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -381,14 +381,7 @@
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
-    </task>
-    <task id="LOCAL-00450" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750496701388</created>
-      <option name="number" value="00450" />
-      <option name="presentableId" value="LOCAL-00450" />
-      <option name="project" value="LOCAL" />
-      <updated>1750496701388</updated>
+      <workItem from="1750997346621" duration="1476000" />
     </task>
     <task id="LOCAL-00451" summary="12345">
       <option name="closed" value="true" />
@@ -774,7 +767,15 @@
       <option name="project" value="LOCAL" />
       <updated>1750918928506</updated>
     </task>
-    <option name="localTasksCounter" value="499" />
+    <task id="LOCAL-00499" summary="fix: update workspace configuration and clean up task entries in SuperHRController">
+      <option name="closed" value="true" />
+      <created>1750997403396</created>
+      <option name="number" value="00499" />
+      <option name="presentableId" value="LOCAL-00499" />
+      <option name="project" value="LOCAL" />
+      <updated>1750997403396</updated>
+    </task>
+    <option name="localTasksCounter" value="500" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,7 +805,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: exclude kicked employees from yesterday's date calculation for absent employees" />
     <MESSAGE value="fix: improve yesterday's date calculation to include holiday and attendance checks for absent employees" />
     <MESSAGE value="fix: correct model reference for holiday employee IDs in date calculation" />
     <MESSAGE value="fix: remove unused bonus calculation logic for fixed tailored bonus types" />
@@ -829,7 +829,8 @@
     <MESSAGE value="fix: update image URL handling in employee absence and holiday storage" />
     <MESSAGE value="fix: ensure image URL is only generated if an image is provided in absence and holiday storage" />
     <MESSAGE value="fix: update image URL generation to ensure valid image paths in absence and holiday storage" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update image URL generation to ensure valid image paths in absence and holiday storage" />
+    <MESSAGE value="fix: update workspace configuration and clean up task entries in SuperHRController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update workspace configuration and clean up task entries in SuperHRController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

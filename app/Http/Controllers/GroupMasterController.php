@@ -18,6 +18,7 @@ use App\Models\Time;
 use App\Models\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class GroupMasterController extends Controller
 {
@@ -298,31 +299,25 @@ class GroupMasterController extends Controller
         $orderModel = OrderModel::find($orderSubModel->order_model_id);
         $order = Order::find($orderModel->order_id);
 
-        if ($order->status === 'pending'){
-            $order->update([
-                'status' => 'tailoring',
-            ]);
-        }
-
         if (!$order) {
             return response()->json(['message' => 'Buyurtma topilmadi!'], 404);
         }
 
-        $date = now()->toDateString();
+        if ($order->status === 'pending') {
+            $order->update(['status' => 'tailoring']);
+        }
 
+        $date = now()->toDateString();
         $exists = SewingOutputs::where('order_submodel_id', $validatedData['order_submodel_id'])
             ->where('time_id', $validatedData['time_id'])
             ->whereDate('created_at', $date)
             ->exists();
 
         if ($exists) {
-            return response()->json([
-                'message' => '❗️Bugun bu uchun natija kiritilgan, sahifani yangilang.'
-            ], 422);
+            return response()->json(['message' => '❗️Bugun bu uchun natija kiritilgan, sahifani yangilang.'], 422);
         }
 
-
-        $minutes = $orderModel->rasxod / 250; // 1 dona mahsulot uchun qancha daqiqa ketadi
+        $minutes = $orderModel->rasxod / 250;
         $orderQuantity = $order->quantity;
         $totalSewnQuantity = SewingOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
         $newQuantity = $validatedData['quantity'];
@@ -330,145 +325,147 @@ class GroupMasterController extends Controller
 
         if ($combinedQuantity > $orderQuantity) {
             $a = $orderQuantity - $totalSewnQuantity;
-            return response()->json([
-                'message' => "Siz faqat $a dona qo'shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."
-            ], 400);
+            return response()->json(['message' => "Siz faqat $a dona qo'shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."], 400);
         }
 
-        // Yangi natijani saqlash
         $sewingOutput = SewingOutputs::create($validatedData);
 
-        // Buyurtma to‘liq tikilgan bo‘lsa — statusni yangilash
         if ($combinedQuantity === $orderQuantity) {
-            $order->status = 'tailored';
-            $order->save();
+            $order->update(['status' => 'tailored']);
         }
 
-        // Bonus hisoblash (individual 'fixed_tailored_bonus' xodimlar uchun)
-        $employees = Employee::where('payment_type', 'fixed_tailored_bonus')
+        // Bonuslar yoziladi
+        $total_bonus_logs = [];
+
+        $individualEmployees = Employee::where('payment_type', 'fixed_tailored_bonus')
             ->where('status', '!=', 'kicked')
             ->where('branch_id', $order->branch_id)
             ->get();
 
-        $total_bonus_logs = [];
+        foreach ($individualEmployees as $employee) {
+            $bonusAmount = $employee->bonus * $minutes * $newQuantity;
+            $oldBalance = $employee->balance;
+            $employee->balance += $bonusAmount;
+            $employee->save();
 
-            foreach ($employees as $employee) {
-                $bonusAmount = $employee->bonus * $minutes * $newQuantity;
-                $oldBalance = $employee->balance;
-                $employee->balance += $bonusAmount;
-                $employee->save();
+            $total_bonus_logs[] = [
+                'employee_id' => $employee->id,
+                'old_balance' => $oldBalance,
+                'new_balance' => $employee->balance,
+                'bonus_added' => $bonusAmount,
+                'type' => 'individual',
+            ];
 
-                $total_bonus_logs[] = [
-                    'employee_id' => $employee->id,
-                    'old_balance' => $oldBalance,
-                    'new_balance' => $employee->balance,
-                    'bonus_added' => $bonusAmount,
-                    'type' => 'individual',
-                ];
+            Bonus::create([
+                'employee_id' => $employee->id,
+                'order_id' => $order->id,
+                'type' => 'individual',
+                'amount' => $bonusAmount,
+                'quantity' => $newQuantity,
+                'old_balance' => $oldBalance,
+                'new_balance' => $employee->balance,
+                'created_by' => auth()->id(),
+            ]);
 
-                Bonus::create([
-                    'employee_id' => $employee->id,
-                    'order_id' => $order->id,
-                    'type' => 'individual',
-                    'amount' => $bonusAmount,
-                    'quantity' => $newQuantity,
-                    'old_balance' => $oldBalance,
-                    'new_balance' => $employee->balance,
-                    'created_by' => auth()->id(),
-                ]);
-
-
-            Log::add(
-                auth()->id(),
-                'Maosh yozildi',
-                'create',
-                $oldBalance,
-                $employee->balance
-            );
+            Log::add(auth()->id(), 'Maosh yozildi', 'create', $oldBalance, $employee->balance);
         }
 
-            $groupEmployees = Employee::where('payment_type', 'fixed_tailored_bonus_group')
-                ->where('status', '!=', 'kicked')
-                ->where('group_id', $orderSubModel->group->group_id)
-                ->where('branch_id', $order->branch_id)
-                ->get();
+        $groupEmployees = Employee::where('payment_type', 'fixed_tailored_bonus_group')
+            ->where('status', '!=', 'kicked')
+            ->where('group_id', $orderSubModel->group->group_id)
+            ->where('branch_id', $order->branch_id)
+            ->get();
 
-            foreach ($groupEmployees as $employee) {
-                $bonusAmount = $employee->bonus * $minutes * $newQuantity;
-                $oldBalance = $employee->balance;
-                $employee->balance += $bonusAmount;
-                $employee->save();
+        foreach ($groupEmployees as $employee) {
+            $bonusAmount = $employee->bonus * $minutes * $newQuantity;
+            $oldBalance = $employee->balance;
+            $employee->balance += $bonusAmount;
+            $employee->save();
 
-                $total_bonus_logs[] = [
-                    'employee_id' => $employee->id,
-                    'old_balance' => $oldBalance,
-                    'new_balance' => $employee->balance,
-                    'bonus_added' => $bonusAmount,
-                    'type' => 'group',
-                ];
+            $total_bonus_logs[] = [
+                'employee_id' => $employee->id,
+                'old_balance' => $oldBalance,
+                'new_balance' => $employee->balance,
+                'bonus_added' => $bonusAmount,
+                'type' => 'group',
+            ];
 
-                Bonus::create([
-                    'employee_id' => $employee->id,
-                    'order_id' => $order->id,
-                    'type' => 'individual',
-                    'amount' => $bonusAmount,
-                    'quantity' => $newQuantity,
-                    'old_balance' => $oldBalance,
-                    'new_balance' => $employee->balance,
-                    'created_by' => auth()->id(),
-                ]);
+            Bonus::create([
+                'employee_id' => $employee->id,
+                'order_id' => $order->id,
+                'type' => 'individual',
+                'amount' => $bonusAmount,
+                'quantity' => $newQuantity,
+                'old_balance' => $oldBalance,
+                'new_balance' => $employee->balance,
+                'created_by' => auth()->id(),
+            ]);
 
-                Log::add(
-                    auth()->id(),
-                    'Guruh bo‘yicha maosh yozildi',
-                    'create',
-                    $oldBalance,
-                    $employee->balance
-                );
-            }
+            Log::add(auth()->id(), 'Guruh bo‘yicha maosh yozildi', 'create', $oldBalance, $employee->balance);
+        }
 
-
-        // Umumiy log yozish
         $time = Time::find($validatedData['time_id']);
+        $user = auth()->user();
+        $submodelName = $orderSubModel->submodel->name ?? '—';
+        $orderName = $order->name ?? '—';
+        $groupName = $orderSubModel->group->group->name ?? '—';
+        $responsible = optional($orderSubModel->group->group->responsibleUser->employee)->name ?? '—';
 
-            if (auth()->user()->role->name === 'groupMaster') {
-                Log::add(
-                    auth()->id(),
-                    'Patok Master natija kiritdi',
-                    'sewing',
-                    null,
-                    [
-                        'sewing_output' => $sewingOutput->id,
-                        'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
-                        'quantity' => $validatedData['quantity'],
-                        'time' => $time,
-                        'comment' => $validatedData['comment'] ?? null,
-                        'order' => $order->name ?? 'Noma’lum buyurtma',
-                        'remaining_quantity' => $orderQuantity - $combinedQuantity,
-                        'balance_bonus_distribution' => $total_bonus_logs,
-                    ]
-                );
-            }else   {
-                Log::add(
-                    auth()->id(),
-                    'Tekshiruvchi natija kiritdi',
-                    'sewing',
-                    null,
-                    [
-                        'sewing_output' => $sewingOutput->id,
-                        'order_submodel' => $orderSubModel->submodel->name ?? 'Noma’lum submodel',
-                        'quantity' => $validatedData['quantity'],
-                        'time' => $time,
-                        'comment' => $validatedData['comment'] ?? null,
-                        'order' => $order->name ?? 'Noma’lum buyurtma',
-                        'remaining_quantity' => $orderQuantity - $combinedQuantity,
-                        'balance_bonus_distribution' => $total_bonus_logs,
-                    ]
-                );
-            }
+        // Yangi natija haqida xabar
+        $newEntryMessage = "<b>🧵 Yangi natija kiritildi</b>\n";
+        $newEntryMessage .= "👤 <b>Foydalanuvchi:</b> {$user->name}\n";
+        $newEntryMessage .= "📦 <b>Buyurtma:</b> {$orderName}\n";
+        $newEntryMessage .= "🧶 <b>Submodel:</b> {$submodelName}\n";
+        $newEntryMessage .= "👥 <b>Guruh:</b> {$groupName}\n";
+        $newEntryMessage .= "🧑‍💼 <b>Mas’ul:</b> {$responsible}\n";
+        $newEntryMessage .= "➕ <b>Kiritilgan:</b> {$newQuantity} dona\n\n";
+
+        // Bugungi umumiy natijalar (shu filialdagi barcha orderlar bo‘yicha)
+        $today = now()->toDateString();
+
+        $groupedSewings = SewingOutputs::whereDate('created_at', $today)
+            ->whereHas('orderSubmodel.orderModel.order', function ($q) use ($order) {
+                $q->where('branch_id', $order->branch_id);
+            })
+            ->with([
+                'orderSubmodel.orderModel.model',
+                'orderSubmodel.submodel',
+                'orderSubmodel.group.group',
+                'orderSubmodel.group.group.responsibleUser.employee',
+            ])
+            ->get()
+            ->groupBy('order_submodel_id');
+
+        $todaySummaryMessage = "📊 <b>Bugungi umumiy tikuv natijalari</b>\n";
+
+        foreach ($groupedSewings as $submodelId => $outputs) {
+            $first = $outputs->first();
+            $model = optional($first->orderSubmodel->orderModel->model)->code ?? '—';
+            $group = optional($first->orderSubmodel->group->group)->name ?? '—';
+            $responsible = optional($first->orderSubmodel->group->group->responsibleUser->employee)->name ?? '—';
+            $sum = $outputs->sum('quantity');
+
+            $todaySummaryMessage .= "🔹 <b>{$model}</b> — <i>{$group}</i>\n";
+            $todaySummaryMessage .= "👤 {$responsible} | ✅ {$sum} dona\n\n";
+        }
+
+        // Yuborish
+        $this->sendTelegramMessage($newEntryMessage . $todaySummaryMessage);
 
         return response()->json([
             'message' => "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
+        ]);
+    }
+
+    private function sendTelegramMessage(string $message): void
+    {
+        $token = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
+        $chatId = -1001883536528;
+
+        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+            'chat_id' => $chatId,
+            'text' => $message,
+            'parse_mode' => 'HTML',
         ]);
     }
 
