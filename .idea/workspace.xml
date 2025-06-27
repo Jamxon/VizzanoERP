@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update time display in new entry and summary messages in GroupMasterController">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -380,15 +380,7 @@
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
-      <workItem from="1750997346621" duration="3343000" />
-    </task>
-    <task id="LOCAL-00456" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750500539752</created>
-      <option name="number" value="00456" />
-      <option name="presentableId" value="LOCAL-00456" />
-      <option name="project" value="LOCAL" />
-      <updated>1750500539752</updated>
+      <workItem from="1750997346621" duration="5054000" />
     </task>
     <task id="LOCAL-00457" summary="12345">
       <option name="closed" value="true" />
@@ -774,7 +766,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751001122068</updated>
     </task>
-    <option name="localTasksCounter" value="505" />
+    <task id="LOCAL-00505" summary="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController">
+      <option name="closed" value="true" />
+      <created>1751002022003</created>
+      <option name="number" value="00505" />
+      <option name="presentableId" value="LOCAL-00505" />
+      <option name="project" value="LOCAL" />
+      <updated>1751002022003</updated>
+    </task>
+    <option name="localTasksCounter" value="506" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,7 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update salary calculation to include additional payment types" />
     <MESSAGE value="fix: add 'rasxod' field to order model in ShowOrderResource" />
     <MESSAGE value="fix: add 'minute' field to models and update related resources" />
     <MESSAGE value="fix: add 'minute' field to order import and related resources" />
@@ -829,7 +828,8 @@
     <MESSAGE value="fix: correct HTML formatting for quantity display in GroupMasterController" />
     <MESSAGE value="fix: refactor bonus calculation logic and update Telegram message formatting in GroupMasterController" />
     <MESSAGE value="fix: update time display in new entry and summary messages in GroupMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update time display in new entry and summary messages in GroupMasterController" />
+    <MESSAGE value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -383,6 +383,8 @@ class GroupMasterController extends Controller
             ];
         })->sortByDesc('total_quantity');
 
+        $totalSumForTime = $sameTimeOutputs->flatten()->sum('quantity');
+
         foreach ($sortedOutputs as $entry) {
             $outputs = $entry['outputs'];
             $first = $outputs->first();
@@ -393,6 +395,7 @@ class GroupMasterController extends Controller
 
             $summaryMessage .= "🔹 {$model} — {$group}\n";
             $summaryMessage .= "👤 {$responsible} | ✅ {$sum} dona\n\n";
+            $summaryMessage = "⏰ <b>{$time->time}</b> dagi natijalar (jami: <b>{$totalSumForTime}</b> dona):\n";
         }
 
 
