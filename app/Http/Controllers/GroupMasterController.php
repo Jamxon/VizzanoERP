@@ -413,12 +413,12 @@ class GroupMasterController extends Controller
 
         // Yangi natija haqida xabar
         $newEntryMessage = "<b>🧵 Yangi natija kiritildi</b>\n";
-        $newEntryMessage .= "👤 <b>Foydalanuvchi:</b> {$user->name}\n";
+        $newEntryMessage .= "👤 <b>Foydalanuvchi:</b> {$user->employee->name}\n";
         $newEntryMessage .= "📦 <b>Buyurtma:</b> {$orderName}\n";
         $newEntryMessage .= "🧶 <b>Submodel:</b> {$submodelName}\n";
         $newEntryMessage .= "👥 <b>Guruh:</b> {$groupName}\n";
         $newEntryMessage .= "🧑‍💼 <b>Mas’ul:</b> {$responsible}\n";
-        $newEntryMessage .= "➕ <b>Kiritilgan:</b> {$newQuantity} dona\n\n";
+        $newEntryMessage .= "➕ <b>Kiritilgan:</b> <b><i>{$newQuantity}</i></i></b> dona\n\n";
 
         // Bugungi umumiy natijalar (shu filialdagi barcha orderlar bo‘yicha)
         $today = now()->toDateString();
@@ -440,7 +440,7 @@ class GroupMasterController extends Controller
 
         foreach ($groupedSewings as $submodelId => $outputs) {
             $first = $outputs->first();
-            $model = optional($first->orderSubmodel->orderModel->model)->code ?? '—';
+            $model = optional($first->orderSubmodel->orderModel->model)->name ?? '—';
             $group = optional($first->orderSubmodel->group->group)->name ?? '—';
             $responsible = optional($first->orderSubmodel->group->group->responsibleUser->employee)->name ?? '—';
             $sum = $outputs->sum('quantity');
