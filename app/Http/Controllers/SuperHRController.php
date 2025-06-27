@@ -188,7 +188,7 @@ class SuperHRController extends Controller
         $yesterday = $today->copy()->subDay();
 
         if ($yesterday->isSunday()) {
-            $yesterday = $yesterday->copy()->subDay(); // shanba
+            $yesterday = $yesterday->copy()->subDay();
         }
 
         $todayPresentIds = Attendance::whereDate('date', $today)

@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: ensure image handling defaults to null in absence and holiday retrieval" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update image URL generation to ensure valid image paths in absence and holiday storage">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -377,31 +380,7 @@
       <workItem from="1750650436924" duration="23353000" />
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
-      <workItem from="1750911476513" duration="6136000" />
-    </task>
-    <task id="LOCAL-00447" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750484640000</created>
-      <option name="number" value="00447" />
-      <option name="presentableId" value="LOCAL-00447" />
-      <option name="project" value="LOCAL" />
-      <updated>1750484640000</updated>
-    </task>
-    <task id="LOCAL-00448" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750492843165</created>
-      <option name="number" value="00448" />
-      <option name="presentableId" value="LOCAL-00448" />
-      <option name="project" value="LOCAL" />
-      <updated>1750492843165</updated>
-    </task>
-    <task id="LOCAL-00449" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750493177470</created>
-      <option name="number" value="00449" />
-      <option name="presentableId" value="LOCAL-00449" />
-      <option name="project" value="LOCAL" />
-      <updated>1750493177470</updated>
+      <workItem from="1750911476513" duration="8486000" />
     </task>
     <task id="LOCAL-00450" summary="12345">
       <option name="closed" value="true" />
@@ -771,7 +750,31 @@
       <option name="project" value="LOCAL" />
       <updated>1750918548508</updated>
     </task>
-    <option name="localTasksCounter" value="496" />
+    <task id="LOCAL-00496" summary="fix: update image URL handling in employee absence and holiday storage">
+      <option name="closed" value="true" />
+      <created>1750918735849</created>
+      <option name="number" value="00496" />
+      <option name="presentableId" value="LOCAL-00496" />
+      <option name="project" value="LOCAL" />
+      <updated>1750918735849</updated>
+    </task>
+    <task id="LOCAL-00497" summary="fix: ensure image URL is only generated if an image is provided in absence and holiday storage">
+      <option name="closed" value="true" />
+      <created>1750918781646</created>
+      <option name="number" value="00497" />
+      <option name="presentableId" value="LOCAL-00497" />
+      <option name="project" value="LOCAL" />
+      <updated>1750918781646</updated>
+    </task>
+    <task id="LOCAL-00498" summary="fix: update image URL generation to ensure valid image paths in absence and holiday storage">
+      <option name="closed" value="true" />
+      <created>1750918928506</created>
+      <option name="number" value="00498" />
+      <option name="presentableId" value="LOCAL-00498" />
+      <option name="project" value="LOCAL" />
+      <updated>1750918928506</updated>
+    </task>
+    <option name="localTasksCounter" value="499" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -801,9 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="debug: add dump of yesterday's date calculation in SuperHRController" />
-    <MESSAGE value="feat: enhance yesterday's date calculation logic for absent employees" />
-    <MESSAGE value="fix: update yesterday's date calculation to filter absent employees" />
     <MESSAGE value="fix: exclude kicked employees from yesterday's date calculation for absent employees" />
     <MESSAGE value="fix: improve yesterday's date calculation to include holiday and attendance checks for absent employees" />
     <MESSAGE value="fix: correct model reference for holiday employee IDs in date calculation" />
@@ -826,7 +826,10 @@
     <MESSAGE value="fix: enhance employee holiday storage with Telegram notification and image handling" />
     <MESSAGE value="fix: update image handling in employee absence and holiday storage" />
     <MESSAGE value="fix: ensure image handling defaults to null in absence and holiday retrieval" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: ensure image handling defaults to null in absence and holiday retrieval" />
+    <MESSAGE value="fix: update image URL handling in employee absence and holiday storage" />
+    <MESSAGE value="fix: ensure image URL is only generated if an image is provided in absence and holiday storage" />
+    <MESSAGE value="fix: update image URL generation to ensure valid image paths in absence and holiday storage" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update image URL generation to ensure valid image paths in absence and holiday storage" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
