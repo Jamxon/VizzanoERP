@@ -129,7 +129,7 @@ class SuperHRController extends Controller
             return response()->json(['message' => '❌ Foydalanuvchining filial (branch) aniqlanmadi.'], 422);
         }
 
-        $today = Carbon::today()->toDateString();
+        $today = Carbon::today();
 
         // 1. Bugungi attendance yozilgan hodimlar
         $presentIds = Attendance::whereDate('date', $today)
@@ -137,30 +137,59 @@ class SuperHRController extends Controller
             ->toArray();
 
         // 2. Bugungi ruxsatda (holiday) bo‘lgan employee_id lar
-        $holidayIds = \App\Models\EmployeeHolidays::whereDate('start_date', '<=', $today)
+        $holidayIds = EmployeeHolidays::whereDate('start_date', '<=', $today)
             ->whereDate('end_date', '>=', $today)
             ->pluck('employee_id')
             ->toArray();
 
-        // 3. Bugungi attendance yozilmagan hodimlar (shu filialda va kicked bo‘lmagan)
+        // 3. Bugungi ruxsatli yo'qlik (absence) bo'lganlar
+        $absenceIds = EmployeeAbsence::whereDate('start_date', '<=', $today)
+            ->whereDate('end_date', '>=', $today)
+            ->pluck('employee_id')
+            ->toArray();
+
+        // 4. Bugun attendance yozilmaganlar (lekin kicked bo‘lmaganlar)
         $notCheckedIds = Employee::where('branch_id', $branchId)
             ->whereNotIn('id', $presentIds)
             ->where('status', '!=', 'kicked')
             ->pluck('id')
             ->toArray();
 
-        // 4. Ikkisini birlashtiramiz (holiday + attendance yozilmaganlar)
-        $allIds = array_unique(array_merge($notCheckedIds, $holidayIds));
+        // 5. Holiday + Absence + Not checked larni birlashtiramiz
+        $allIds = array_unique(array_merge($notCheckedIds, $holidayIds, $absenceIds));
 
-        // 5. Hodimlarni olib kelamiz
         $employees = Employee::whereIn('id', $allIds)
             ->where('branch_id', $branchId)
             ->where('status', '!=', 'kicked')
-            ->with(['department', 'group', 'position', 'employeeHolidays']) // optional
+            ->with(['department', 'group', 'position'])
             ->get();
 
-        // 6. Formatlab response tayyorlaymiz
-        $result = $employees->map(function ($employee) use ($holidayIds) {
+        // 6. Natija
+        $result = $employees->map(function ($employee) use ($today, $holidayIds, $absenceIds) {
+            $wasOnHoliday = in_array($employee->id, $holidayIds);
+            $wasOnAbsence = in_array($employee->id, $absenceIds);
+
+            $comment = null;
+            $image = null;
+
+            if ($wasOnHoliday) {
+                $holiday = EmployeeHolidays::where('employee_id', $employee->id)
+                    ->whereDate('start_date', '<=', $today)
+                    ->whereDate('end_date', '>=', $today)
+                    ->first();
+
+                $comment = $holiday?->comment;
+                $image = $holiday?->image ?? null;
+            } elseif ($wasOnAbsence) {
+                $absence = EmployeeAbsence::where('employee_id', $employee->id)
+                    ->whereDate('start_date', '<=', $today)
+                    ->whereDate('end_date', '>=', $today)
+                    ->first();
+
+                $comment = $absence?->comment;
+                $image = $absence?->image ?? null;
+            }
+
             return [
                 'id' => $employee->id,
                 'name' => $employee->name,
@@ -168,7 +197,11 @@ class SuperHRController extends Controller
                 'department' => $employee->department->name ?? null,
                 'group' => $employee->group->name ?? null,
                 'position' => $employee->position->name ?? null,
-                'was_on_holiday' => in_array($employee->id, $holidayIds),
+                'absent_date' => $today->toDateString(),
+                'was_on_holiday' => $wasOnHoliday,
+                'was_on_absence' => $wasOnAbsence,
+                'comment' => $comment,
+                'image' => (!empty($image) && Str::contains($image, '/')) ? url('storage/' . $image) : null,
             ];
         });
 

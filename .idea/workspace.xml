@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance employee absence and holiday data structure in UserController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance employee absence and holiday data structure in UserController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -378,15 +381,7 @@
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
-      <workItem from="1750997346621" duration="9363000" />
-    </task>
-    <task id="LOCAL-00462" summary="feat: add branch filtering for yesterday's absent employees response">
-      <option name="closed" value="true" />
-      <created>1750666530408</created>
-      <option name="number" value="00462" />
-      <option name="presentableId" value="LOCAL-00462" />
-      <option name="project" value="LOCAL" />
-      <updated>1750666530408</updated>
+      <workItem from="1750997346621" duration="11454000" />
     </task>
     <task id="LOCAL-00463" summary="feat: add endpoint to retrieve potential absents for today">
       <option name="closed" value="true" />
@@ -772,7 +767,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751022805157</updated>
     </task>
-    <option name="localTasksCounter" value="511" />
+    <task id="LOCAL-00511" summary="feat: enhance employee absence and holiday data structure in UserController">
+      <option name="closed" value="true" />
+      <created>1751024801078</created>
+      <option name="number" value="00511" />
+      <option name="presentableId" value="LOCAL-00511" />
+      <option name="project" value="LOCAL" />
+      <updated>1751024801078</updated>
+    </task>
+    <option name="localTasksCounter" value="512" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
