@@ -68,7 +68,7 @@ class SuperHRController extends Controller
 
             // 🟢 Telegramga yuborish
             $employee = \App\Models\Employee::find($request->employee_id);
-            $messageText = "🚫 *Xodim yo‘qligi haqida ma’lumot:*\n\n"
+            $messageText = "🚫 *Sababsiz:*\n\n"
                 . "*Ismi:* {$employee->name}\n"
                 . "*Telefon:* {$employee->phone}\n"
                 . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
@@ -380,7 +380,7 @@ class SuperHRController extends Controller
 
             // 🟢 Telegramga yuborish
             $employee = \App\Models\Employee::find($request->employee_id);
-            $messageText = "🏖 *Xodim ta’tili haqida ma’lumot:*\n\n"
+            $messageText = "🏖 *Sababli:*\n\n"
                 . "*Ismi:* {$employee->name}\n"
                 . "*Telefon:* {$employee->phone}\n"
                 . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"

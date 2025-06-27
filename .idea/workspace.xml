@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct HTML formatting for quantity display in GroupMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update time display in new entry and summary messages in GroupMasterController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -378,23 +380,7 @@
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
-      <workItem from="1750997346621" duration="2291000" />
-    </task>
-    <task id="LOCAL-00454" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750499543088</created>
-      <option name="number" value="00454" />
-      <option name="presentableId" value="LOCAL-00454" />
-      <option name="project" value="LOCAL" />
-      <updated>1750499543088</updated>
-    </task>
-    <task id="LOCAL-00455" summary="12345">
-      <option name="closed" value="true" />
-      <created>1750500477799</created>
-      <option name="number" value="00455" />
-      <option name="presentableId" value="LOCAL-00455" />
-      <option name="project" value="LOCAL" />
-      <updated>1750500477799</updated>
+      <workItem from="1750997346621" duration="3343000" />
     </task>
     <task id="LOCAL-00456" summary="12345">
       <option name="closed" value="true" />
@@ -772,7 +758,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751000752799</updated>
     </task>
-    <option name="localTasksCounter" value="503" />
+    <task id="LOCAL-00503" summary="fix: refactor bonus calculation logic and update Telegram message formatting in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751000989740</created>
+      <option name="number" value="00503" />
+      <option name="presentableId" value="LOCAL-00503" />
+      <option name="project" value="LOCAL" />
+      <updated>1751000989740</updated>
+    </task>
+    <task id="LOCAL-00504" summary="fix: update time display in new entry and summary messages in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751001122068</created>
+      <option name="number" value="00504" />
+      <option name="presentableId" value="LOCAL-00504" />
+      <option name="project" value="LOCAL" />
+      <updated>1751001122068</updated>
+    </task>
+    <option name="localTasksCounter" value="505" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -802,8 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: refactor user profile retrieval to include attendance and salary data based on date range" />
-    <MESSAGE value="fix: add payment type to user profile retrieval" />
     <MESSAGE value="fix: update salary calculation to include additional payment types" />
     <MESSAGE value="fix: add 'rasxod' field to order model in ShowOrderResource" />
     <MESSAGE value="fix: add 'minute' field to models and update related resources" />
@@ -827,7 +827,9 @@
     <MESSAGE value="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController" />
     <MESSAGE value="fix: update user name retrieval and enhance quantity display in GroupMasterController" />
     <MESSAGE value="fix: correct HTML formatting for quantity display in GroupMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct HTML formatting for quantity display in GroupMasterController" />
+    <MESSAGE value="fix: refactor bonus calculation logic and update Telegram message formatting in GroupMasterController" />
+    <MESSAGE value="fix: update time display in new entry and summary messages in GroupMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update time display in new entry and summary messages in GroupMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
