@@ -224,10 +224,9 @@ class UserController extends Controller
                     $query->whereBetween('date', [$start_date, $end_date]);
                 }
 
-                // select bilan kerakli ustunlar
                 $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity')
                     ->with(['tarification' => function ($q) {
-                        $q->select('id', 'name', 'code', 'second', 'summa'); // misol uchun kerakli ustunlar
+                        $q->select('id', 'name', 'code', 'second', 'summa');
                     }]);
             };
 
@@ -242,10 +241,9 @@ class UserController extends Controller
                     $query->whereBetween('date', [$start_date, $end_date]);
                 }
 
-                // select bilan kerakli ustunlar
                 $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity')
                     ->with(['tarification' => function ($q) {
-                        $q->select('id', 'name', 'code', 'second', 'summa'); // misol uchun kerakli ustunlar
+                        $q->select('id', 'name', 'code', 'second', 'summa');
                     }]);
             };
             $relations['attendances'] = function ($query) use ($start_date, $end_date) {
@@ -257,8 +255,29 @@ class UserController extends Controller
 
         $employee->load($relations);
 
+        // 🟨 Yangi qo‘shilayotgan qismlar (ta'til va yo‘qliklar):
+        $absenceQuery = $employee->employeeAbsences();
+        $holidayQuery = $employee->employeeHolidays();
+
+        if ($start_date && $end_date) {
+            $absenceQuery->where(function ($query) use ($start_date, $end_date) {
+                $query->whereBetween('start_date', [$start_date, $end_date])
+                    ->orWhereBetween('end_date', [$start_date, $end_date]);
+            });
+
+            $holidayQuery->where(function ($query) use ($start_date, $end_date) {
+                $query->whereBetween('start_date', [$start_date, $end_date])
+                    ->orWhereBetween('end_date', [$start_date, $end_date]);
+            });
+        }
+
+        $absences = $absenceQuery->get(['id', 'start_date', 'end_date', 'comment', 'image']);
+        $holidays = $holidayQuery->get(['id', 'start_date', 'end_date', 'comment', 'image']);
+
         return response()->json([
             'employee' => $employee,
+            'absences' => $absences,
+            'holidays' => $holidays,
         ]);
     }
 
