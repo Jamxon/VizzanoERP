@@ -395,8 +395,8 @@ class GroupMasterController extends Controller
 
             $summaryMessage .= "🔹 {$model} — {$group}\n";
             $summaryMessage .= "👤 {$responsible} | ✅ {$sum} dona\n\n";
-            $summaryMessage .= "⏰ <b>{$time->time}</b> dagi natijalar (jami: <b>{$totalSumForTime}</b> dona):\n";
         }
+        $summaryMessage .= "⏰ <b>Jami natijalar : <b>{$totalSumForTime}</b> dona\n";
 
 
         // Telegramga yuborish

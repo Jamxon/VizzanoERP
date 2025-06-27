@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update summary message formatting in GroupMasterController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -378,15 +380,7 @@
       <workItem from="1750741289727" duration="14461000" />
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
-      <workItem from="1750997346621" duration="5830000" />
-    </task>
-    <task id="LOCAL-00458" summary="refactor: enhance holiday query to include employee department and group">
-      <option name="closed" value="true" />
-      <created>1750505439884</created>
-      <option name="number" value="00458" />
-      <option name="presentableId" value="LOCAL-00458" />
-      <option name="project" value="LOCAL" />
-      <updated>1750505439884</updated>
+      <workItem from="1750997346621" duration="8249000" />
     </task>
     <task id="LOCAL-00459" summary="refactor: enhance holiday query to include employee department and group">
       <option name="closed" value="true" />
@@ -772,7 +766,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751014486652</updated>
     </task>
-    <option name="localTasksCounter" value="507" />
+    <task id="LOCAL-00507" summary="fix: update summary message formatting in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751016800813</created>
+      <option name="number" value="00507" />
+      <option name="presentableId" value="LOCAL-00507" />
+      <option name="project" value="LOCAL" />
+      <updated>1751016800813</updated>
+    </task>
+    <option name="localTasksCounter" value="508" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -802,7 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: add 'minute' field to models and update related resources" />
     <MESSAGE value="fix: add 'minute' field to order import and related resources" />
     <MESSAGE value="fix: add new salary calculation endpoint for employee with validation" />
     <MESSAGE value="fix: remove unnecessary blank lines in API route definitions" />
@@ -827,7 +828,8 @@
     <MESSAGE value="fix: update time display in new entry and summary messages in GroupMasterController" />
     <MESSAGE value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
     <MESSAGE value="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
+    <MESSAGE value="fix: update summary message formatting in GroupMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update summary message formatting in GroupMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
