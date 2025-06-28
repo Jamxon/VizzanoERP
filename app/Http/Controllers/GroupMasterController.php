@@ -402,6 +402,15 @@ class GroupMasterController extends Controller
         // Telegramga yuborish
         $this->sendTelegramMessage($newEntryMessage . $summaryMessage);
 
+            Log::add(
+                auth()->id(),
+                'Natija kiritildi',
+                'sewing_output',
+                null,
+                $sewingOutput->toArray()
+            );
+
+
         return response()->json([
             'message' => "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
         ]);

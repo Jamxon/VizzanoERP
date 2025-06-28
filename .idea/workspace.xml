@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance employee absence and holiday handling in SuperHRController">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct summary message formatting in GroupMasterController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -381,15 +381,7 @@
       <workItem from="1750824048570" duration="16212000" />
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
-      <workItem from="1751084029479" duration="1877000" />
-    </task>
-    <task id="LOCAL-00464" summary="feat: include holiday status in absent employees response">
-      <option name="closed" value="true" />
-      <created>1750667563618</created>
-      <option name="number" value="00464" />
-      <option name="presentableId" value="LOCAL-00464" />
-      <option name="project" value="LOCAL" />
-      <updated>1750667563618</updated>
+      <workItem from="1751084029479" duration="2676000" />
     </task>
     <task id="LOCAL-00465" summary="feat: update model reference for holiday date filtering in absent employees logic">
       <option name="closed" value="true" />
@@ -775,7 +767,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751029002181</updated>
     </task>
-    <option name="localTasksCounter" value="513" />
+    <task id="LOCAL-00513" summary="fix: correct summary message formatting in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751085976808</created>
+      <option name="number" value="00513" />
+      <option name="presentableId" value="LOCAL-00513" />
+      <option name="project" value="LOCAL" />
+      <updated>1751085976808</updated>
+    </task>
+    <option name="localTasksCounter" value="514" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -805,7 +805,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: improve employee tarification log validation for order quantity" />
     <MESSAGE value="fix: add endpoint to update employee tarification log with validation" />
     <MESSAGE value="fix: update workspace configuration to reflect recent changes in employee tarification log" />
     <MESSAGE value="fix: add endpoint to store employee absence with validation" />
@@ -830,7 +829,8 @@
     <MESSAGE value="feat: add employee absence and holiday retrieval to UserController" />
     <MESSAGE value="feat: enhance employee absence and holiday data structure in UserController" />
     <MESSAGE value="feat: enhance employee absence and holiday handling in SuperHRController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance employee absence and holiday handling in SuperHRController" />
+    <MESSAGE value="fix: correct summary message formatting in GroupMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: correct summary message formatting in GroupMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
