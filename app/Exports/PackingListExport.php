@@ -3,13 +3,13 @@
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
-use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\BeforeSheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PackingListExport implements FromArray, WithHeadings, WithColumnWidths, WithStyles, WithEvents
+class PackingListExport implements FromArray, WithColumnWidths, WithStyles, WithEvents
 {
     protected array $data;
 
@@ -23,21 +23,6 @@ class PackingListExport implements FromArray, WithHeadings, WithColumnWidths, Wi
         return $this->data;
     }
 
-    public function headings(): array
-    {
-        return [
-            '№',
-            'Модель',
-            'Размер',
-            'Имя',
-            '№ упаковки',
-            'кол-во мест',
-            'кол-во в упаковке (шт)',
-            'Вес нетто (кг)',
-            'Вес брутто (кг)',
-        ];
-    }
-
     public function columnWidths(): array
     {
         return [
@@ -47,7 +32,7 @@ class PackingListExport implements FromArray, WithHeadings, WithColumnWidths, Wi
             'D' => 20,
             'E' => 10,
             'F' => 12,
-            'G' => 12,
+            'G' => 18,
             'H' => 12,
             'I' => 12,
         ];
@@ -60,8 +45,10 @@ class PackingListExport implements FromArray, WithHeadings, WithColumnWidths, Wi
                 /** @var Worksheet $sheet */
                 $sheet = $event->sheet->getDelegate();
 
-                // 2 qatorli sarlavha
+                // Insert two header rows before data
                 $sheet->insertNewRowBefore(1, 2);
+
+                // First row of headers
                 $sheet->setCellValue('A1', '№');
                 $sheet->setCellValue('B1', 'Модель');
                 $sheet->setCellValue('C1', 'Размер');
@@ -72,38 +59,36 @@ class PackingListExport implements FromArray, WithHeadings, WithColumnWidths, Wi
                 $sheet->setCellValue('H1', 'Вес нетто');
                 $sheet->setCellValue('I1', 'Вес брутто');
 
-                // 2-qatordagi pastki sarlavhalar
+                // Second row of headers
                 $sheet->setCellValue('C2', 'Рост');
                 $sheet->setCellValue('D2', 'заказчик');
                 $sheet->setCellValue('G2', '(шт)');
                 $sheet->setCellValue('H2', '(кг)');
                 $sheet->setCellValue('I2', '(кг)');
 
+                // Merge cells
+                $sheet->mergeCells('A1:A2');
+                $sheet->mergeCells('B1:B2');
+                $sheet->mergeCells('C1:C1');
+                $sheet->mergeCells('D1:D1');
+                $sheet->mergeCells('E1:E2');
+                $sheet->mergeCells('F1:F2');
+                $sheet->mergeCells('G1:G1');
+                $sheet->mergeCells('H1:H1');
+                $sheet->mergeCells('I1:I1');
+
                 // Center alignment
                 $sheet->getStyle("A1:I2")->getAlignment()->setHorizontal('center');
                 $sheet->getStyle("A1:I2")->getAlignment()->setVertical('center');
-
-                // Merge cells for upper headers
-                $sheet->mergeCells('A1:A2');
-                $sheet->mergeCells('B1:B2');
-                $sheet->mergeCells('C1:C1'); // C2 ostida 'Рост' yoziladi
-                $sheet->mergeCells('D1:D1'); // D2 ostida 'заказчик'
-                $sheet->mergeCells('E1:E2');
-                $sheet->mergeCells('F1:F2');
-                $sheet->mergeCells('G1:G1'); // G2 ostida '(шт)'
-                $sheet->mergeCells('H1:H1');
-                $sheet->mergeCells('I1:I1');
+                $sheet->getStyle("A1:I2")->getFont()->setBold(true);
             }
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        $lastRow = count($this->data) + 1; // +1 because headings are at row 1
-
-        // Range from A1 to I[lastRow]
-        $sheet->getStyle("A1:I$lastRow")->getAlignment()->setHorizontal('center');
-
+        $lastRow = count($this->data) + 2; // +2 because we added two header rows
+        $sheet->getStyle("A3:I$lastRow")->getAlignment()->setHorizontal('center');
         return [];
     }
 }
