@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update sheet titles to localized versions in PackingListExport">
-      <change afterPath="$PROJECT_DIR$/app/Models/TelegramSewingMessage.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -385,15 +380,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="10935000" />
-    </task>
-    <task id="LOCAL-00499" summary="fix: update workspace configuration and clean up task entries in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1750997403396</created>
-      <option name="number" value="00499" />
-      <option name="presentableId" value="LOCAL-00499" />
-      <option name="project" value="LOCAL" />
-      <updated>1750997403396</updated>
+      <workItem from="1751087818667" duration="11319000" />
     </task>
     <task id="LOCAL-00500" summary="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController">
       <option name="closed" value="true" />
@@ -779,7 +766,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751098286414</updated>
     </task>
-    <option name="localTasksCounter" value="548" />
+    <task id="LOCAL-00548" summary="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751108564911</created>
+      <option name="number" value="00548" />
+      <option name="presentableId" value="LOCAL-00548" />
+      <option name="project" value="LOCAL" />
+      <updated>1751108564911</updated>
+    </task>
+    <option name="localTasksCounter" value="549" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -809,7 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: implement WithColumnWidths in PackingListExport for enhanced export formatting" />
     <MESSAGE value="fix: adjust column widths in PackingListExport for improved formatting" />
     <MESSAGE value="feat: add styling support and refactor column widths in PackingListExport" />
     <MESSAGE value="feat: refactor color handling and packing logic in PackageMasterController" />
@@ -834,7 +828,8 @@
     <MESSAGE value="feat: enhance packing list export with summary data and improved structure" />
     <MESSAGE value="feat: add title support for sheets in PackingListExport" />
     <MESSAGE value="feat: update sheet titles to localized versions in PackingListExport" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update sheet titles to localized versions in PackingListExport" />
+    <MESSAGE value="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

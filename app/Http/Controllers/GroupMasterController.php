@@ -442,8 +442,8 @@ class GroupMasterController extends Controller
 
     private function sendTelegramMessage(string $message)
     {
-        $botToken = config('services.telegram.bot_token');
-        $chatId = config('services.telegram.chat_id');
+        $botToken = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
+        $chatId = -4894281196;
         $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
 
         $response = Http::post($url, [
