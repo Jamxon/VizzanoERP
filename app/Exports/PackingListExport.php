@@ -106,40 +106,44 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
         $totalRows = count($this->data);
         $groupCount = (int)($totalRows / 3);
 
+        // Ranglar ro‘yxati (kataklarni bo‘yash uchun)
+        $colors = [
+            'Неви' => '000080',
+            'Синый' => '0000FF',
+            'Серый' => '808080',
+            'Кэмел чёрный' => '5C4033',
+            'Хаки черный' => '3B3C36',
+        ];
+
         for ($i = 0; $i < $groupCount; $i++) {
             $rowStart = $startRow + ($i * 3);
             $rowEnd = $rowStart + 2;
 
-            // 1️⃣ Ramka (outline border)
-            $sheet->getStyle("A{$rowStart}:I{$rowEnd}")->applyFromArray([
-                'borders' => [
-                    'outline' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['argb' => '000000'],
-                    ],
-                ],
-                'alignment' => [
-                    'horizontal' => 'center',
-                    'vertical' => 'center',
-                ]
-            ]);
+            // 1️⃣ Har bir katak (A-I ustunlar) bo‘yicha border va align
+            foreach (range('A', 'I') as $col) {
+                for ($r = $rowStart; $r <= $rowEnd; $r++) {
+                    $sheet->getStyle("{$col}{$r}")->applyFromArray([
+                        'alignment' => [
+                            'horizontal' => 'center',
+                            'vertical' => 'center',
+                        ],
+                        'borders' => [
+                            'allBorders' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                        ],
+                    ]);
+                }
+            }
 
-            // 2️⃣ Contragentni qalin qilish
+            // 2️⃣ Contragent ustunini (D) faqat o‘rtadagi qatorda bold
             $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
 
-            // 3️⃣ Rangni aniqlab, rangga mos katakka fon rangi berish (B ustun, 2-qator)
+            // 3️⃣ Rang nomiga qarab B ustunidagi katakni bo‘yash (o‘rtadagi qatordagi B)
             $colorText = $sheet->getCell("B" . ($rowStart + 1))->getValue();
             preg_match('/Цвет:\s*(.+)/u', $colorText, $matches);
             $colorName = $matches[1] ?? null;
-
-            $colors = [
-                'Неви' => '000080',
-                'Синый' => '0000FF',
-                'Серый' => '808080',
-                'Кэмел чёрный' => '5C4033',
-                'Хаки черный' => '3B3C36',
-                // Boshqa ranglarni ham shu yerga qo‘shishingiz mumkin
-            ];
 
             if ($colorName && isset($colors[$colorName])) {
                 $sheet->getStyle("B" . ($rowStart + 1))->getFill()->applyFromArray([
@@ -151,6 +155,7 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
 
         return [];
     }
+
 
 
 }
