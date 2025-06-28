@@ -1,14 +1,14 @@
 <?php
 
-// app/Exports/PackingListExport.php
-
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PackingListExport implements FromArray, WithHeadings, WithColumnWidths
+class PackingListExport implements FromArray, WithHeadings, WithColumnWidths, WithStyles
 {
     protected array $data;
 
@@ -20,21 +20,6 @@ class PackingListExport implements FromArray, WithHeadings, WithColumnWidths
     public function array(): array
     {
         return $this->data;
-    }
-
-    public function columnWidths(): array
-    {
-        return [
-            'A' => 10,   // №
-            'B' => 30,  // Модель
-            'C' => 12,  // Размер
-            'D' => 20,  // Имя
-            'E' => 10,  // № упаковки
-            'F' => 12,  // кол-во мест
-            'G' => 12,  // кол-во в упаковке
-            'H' => 12,  // Вес нетто
-            'I' => 12,  // Вес брутто
-        ];
     }
 
     public function headings(): array
@@ -50,5 +35,30 @@ class PackingListExport implements FromArray, WithHeadings, WithColumnWidths
             'Вес нетто (кг)',
             'Вес брутто (кг)',
         ];
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 10,
+            'B' => 30,
+            'C' => 12,
+            'D' => 20,
+            'E' => 10,
+            'F' => 12,
+            'G' => 12,
+            'H' => 12,
+            'I' => 12,
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        $lastRow = count($this->data) + 1; // +1 because headings are at row 1
+
+        // Range from A1 to I[lastRow]
+        $sheet->getStyle("A1:I$lastRow")->getAlignment()->setHorizontal('center');
+
+        return [];
     }
 }
