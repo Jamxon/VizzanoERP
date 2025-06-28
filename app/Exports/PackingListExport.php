@@ -102,22 +102,30 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
 
     public function styles(Worksheet $sheet)
     {
-        $lastRow = count($this->data) + 2; // 2 qator sarlavha bor
-        $sheet->getStyle("A3:I$lastRow")->applyFromArray([
-            'alignment' => ['horizontal' => 'center'],
-            'borders' => [
-                'allBorders' => [
-                    'borderStyle' => Border::BORDER_THIN,
-                    'color' => ['argb' => '000000'],
-                ],
-            ],
-        ]);
+        $startRow = 3; // ma'lumotlar 3-qatordan boshlanadi
+        $totalRows = count($this->data);
+        $groupCount = (int)($totalRows / 3); // Har 3 qator 1 guruh (1 row)
 
-        // Contragent (D column) qalin (bold)
-        for ($i = 3; $i <= $lastRow; $i++) {
-            $sheet->getStyle("D$i")->getFont()->setBold(true);
+        for ($i = 0; $i < $groupCount; $i++) {
+            $rowStart = $startRow + ($i * 3);
+            $rowEnd = $rowStart + 2;
+
+            // Har 3 qatorga border va markazlashtirish
+            $sheet->getStyle("A{$rowStart}:I{$rowEnd}")->applyFromArray([
+                'alignment' => ['horizontal' => 'center', 'vertical' => 'center'],
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => '000000'],
+                    ],
+                ],
+            ]);
+
+            // Faqat o‘rtadagi qatordagi D ustunini bold (Contragent)
+            $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
         }
 
         return [];
     }
+
 }
