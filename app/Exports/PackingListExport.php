@@ -6,16 +6,25 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithStartCell;
 use Maatwebsite\Excel\Events\BeforeSheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PackingListExport implements FromArray, WithColumnWidths, WithStyles, WithEvents
+class PackingListExport implements FromArray, WithColumnWidths, WithStyles, WithEvents, WithStartCell
 {
     protected array $data;
 
     public function __construct(array $data)
     {
         $this->data = $data;
+    }
+
+    // Ma'lumotlar 3-qatordan boshlansin
+    public function startCell(): string
+    {
+        return 'A3';
     }
 
     public function array(): array
@@ -42,13 +51,9 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
     {
         return [
             BeforeSheet::class => function (BeforeSheet $event) {
-                /** @var Worksheet $sheet */
                 $sheet = $event->sheet->getDelegate();
 
-                // Insert two header rows before data
-                $sheet->insertNewRowBefore(1, 2);
-
-                // First row of headers
+                // Sarlavha yozish (2 qator)
                 $sheet->setCellValue('A1', '№');
                 $sheet->setCellValue('B1', 'Модель');
                 $sheet->setCellValue('C1', 'Размер');
@@ -59,7 +64,6 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
                 $sheet->setCellValue('H1', 'Вес нетто');
                 $sheet->setCellValue('I1', 'Вес брутто');
 
-                // Second row of headers
                 $sheet->setCellValue('C2', 'Рост');
                 $sheet->setCellValue('D2', 'заказчик');
                 $sheet->setCellValue('G2', '(шт)');
@@ -77,18 +81,48 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
                 $sheet->mergeCells('H1:H1');
                 $sheet->mergeCells('I1:I1');
 
-                // Center alignment
-                $sheet->getStyle("A1:I2")->getAlignment()->setHorizontal('center');
-                $sheet->getStyle("A1:I2")->getAlignment()->setVertical('center');
-                $sheet->getStyle("A1:I2")->getFont()->setBold(true);
+                // Stil: markazlashtirish + border + bold
+                $sheet->getStyle("A1:I2")->applyFromArray([
+                    'alignment' => [
+                        'horizontal' => 'center',
+                        'vertical' => 'center',
+                    ],
+                    'font' => [
+                        'bold' => true,
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['argb' => '000000'],
+                        ],
+                    ],
+                    'fill' => [
+                        'fillType' => Fill::FILL_SOLID,
+                        'startColor' => ['argb' => 'FFEFEFEF'],
+                    ]
+                ]);
             }
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        $lastRow = count($this->data) + 2; // +2 because we added two header rows
-        $sheet->getStyle("A3:I$lastRow")->getAlignment()->setHorizontal('center');
+        $lastRow = count($this->data) + 2; // 2 qator sarlavha bor
+        $sheet->getStyle("A3:I$lastRow")->applyFromArray([
+            'alignment' => ['horizontal' => 'center'],
+            'borders' => [
+                'allBorders' => [
+                    'borderStyle' => Border::BORDER_THIN,
+                    'color' => ['argb' => '000000'],
+                ],
+            ],
+        ]);
+
+        // Contragent (D column) qalin (bold)
+        for ($i = 3; $i <= $lastRow; $i++) {
+            $sheet->getStyle("D$i")->getFont()->setBold(true);
+        }
+
         return [];
     }
 }
