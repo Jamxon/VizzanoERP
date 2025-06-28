@@ -414,7 +414,7 @@ class GroupMasterController extends Controller
 
     private function sendTelegramMessageWithEditSupport(string $message, string $timeName, int $timeId, int $branchId): void
     {
-        $chatId = config('services.telegram.chat_id');
+        $chatId = -4894281196; // Replace with your actual chat ID
         $today = now()->toDateString();
 
         $existing = TelegramSewingMessage::where([
@@ -457,7 +457,7 @@ class GroupMasterController extends Controller
 
     private function editTelegramMessage(string $chatId, string $messageId, string $message): void
     {
-        $botToken = config('services.telegram.bot_token');
+        $botToken = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
         $url = "https://api.telegram.org/bot{$botToken}/editMessageText";
 
         Http::post($url, [
