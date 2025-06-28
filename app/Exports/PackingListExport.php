@@ -110,23 +110,24 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
             $rowStart = $startRow + ($i * 3);
             $rowEnd = $rowStart + 2;
 
-            for ($row = $rowStart; $row <= $rowEnd; $row++) {
-                foreach (range('A', 'I') as $col) {
+            // Faqat A dan C gacha borderlar uchun: ustunlar orasiga ajratish
+            foreach (range('A', 'C') as $col) {
+                for ($row = $rowStart; $row <= $rowEnd; $row++) {
                     $sheet->getStyle("{$col}{$row}")->applyFromArray([
                         'borders' => [
+                            'left' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                            'right' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
                             'top' => [
                                 'borderStyle' => Border::BORDER_THIN,
                                 'color' => ['argb' => '000000'],
                             ],
                             'bottom' => [
-                                'borderStyle' => Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                            'left' => [
-                                'borderStyle' => Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                            'right' => [
                                 'borderStyle' => Border::BORDER_THIN,
                                 'color' => ['argb' => '000000'],
                             ],
@@ -139,12 +140,29 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
                 }
             }
 
-            // Contragent (middle row, column D) bold
+            // D dan I gacha umumiy 3x3 blok border
+            $sheet->getStyle("D{$rowStart}:I{$rowEnd}")->applyFromArray([
+                'borders' => [
+                    'outline' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => '000000'],
+                    ],
+                    'inside' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => '000000'],
+                    ],
+                ],
+                'alignment' => [
+                    'horizontal' => 'center',
+                    'vertical' => 'center',
+                ]
+            ]);
+
+            // Contragent ustunini bold qilish (o‘rtadagi qator)
             $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
         }
 
         return [];
     }
-
 
 }
