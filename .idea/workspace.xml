@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: refactor color handling and packing logic in PackageMasterController">
-      <change beforePath="$PROJECT_DIR$/app/Exports/PackingListExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/PackingListExport.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add start cell functionality and enhance styling in PackingListExport" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -382,31 +380,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="3683000" />
-    </task>
-    <task id="LOCAL-00478" summary="fix: update salary calculation to include additional payment types">
-      <option name="closed" value="true" />
-      <created>1750687459010</created>
-      <option name="number" value="00478" />
-      <option name="presentableId" value="LOCAL-00478" />
-      <option name="project" value="LOCAL" />
-      <updated>1750687459010</updated>
-    </task>
-    <task id="LOCAL-00479" summary="fix: update salary calculation to include additional payment types">
-      <option name="closed" value="true" />
-      <created>1750748574350</created>
-      <option name="number" value="00479" />
-      <option name="presentableId" value="LOCAL-00479" />
-      <option name="project" value="LOCAL" />
-      <updated>1750748574350</updated>
-    </task>
-    <task id="LOCAL-00480" summary="fix: add 'rasxod' field to order model in ShowOrderResource">
-      <option name="closed" value="true" />
-      <created>1750752929997</created>
-      <option name="number" value="00480" />
-      <option name="presentableId" value="LOCAL-00480" />
-      <option name="project" value="LOCAL" />
-      <updated>1750752929997</updated>
+      <workItem from="1751087818667" duration="3983000" />
     </task>
     <task id="LOCAL-00481" summary="fix: add 'minute' field to models and update related resources">
       <option name="closed" value="true" />
@@ -776,7 +750,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751090925104</updated>
     </task>
-    <option name="localTasksCounter" value="527" />
+    <task id="LOCAL-00527" summary="feat: add event registration for enhanced header formatting in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751091712607</created>
+      <option name="number" value="00527" />
+      <option name="presentableId" value="LOCAL-00527" />
+      <option name="project" value="LOCAL" />
+      <updated>1751091712607</updated>
+    </task>
+    <task id="LOCAL-00528" summary="feat: enhance header formatting and adjust column widths in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751091818086</created>
+      <option name="number" value="00528" />
+      <option name="presentableId" value="LOCAL-00528" />
+      <option name="project" value="LOCAL" />
+      <updated>1751091818086</updated>
+    </task>
+    <task id="LOCAL-00529" summary="feat: add start cell functionality and enhance styling in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751091983182</created>
+      <option name="number" value="00529" />
+      <option name="presentableId" value="LOCAL-00529" />
+      <option name="project" value="LOCAL" />
+      <updated>1751091983182</updated>
+    </task>
+    <option name="localTasksCounter" value="530" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -806,9 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController" />
-    <MESSAGE value="fix: update user name retrieval and enhance quantity display in GroupMasterController" />
-    <MESSAGE value="fix: correct HTML formatting for quantity display in GroupMasterController" />
     <MESSAGE value="fix: refactor bonus calculation logic and update Telegram message formatting in GroupMasterController" />
     <MESSAGE value="fix: update time display in new entry and summary messages in GroupMasterController" />
     <MESSAGE value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
@@ -831,7 +826,10 @@
     <MESSAGE value="fix: adjust column widths in PackingListExport for improved formatting" />
     <MESSAGE value="feat: add styling support and refactor column widths in PackingListExport" />
     <MESSAGE value="feat: refactor color handling and packing logic in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor color handling and packing logic in PackageMasterController" />
+    <MESSAGE value="feat: add event registration for enhanced header formatting in PackingListExport" />
+    <MESSAGE value="feat: enhance header formatting and adjust column widths in PackingListExport" />
+    <MESSAGE value="feat: add start cell functionality and enhance styling in PackingListExport" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add start cell functionality and enhance styling in PackingListExport" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

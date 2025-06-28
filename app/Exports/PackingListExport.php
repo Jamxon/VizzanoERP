@@ -6,13 +6,12 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\WithStartCell;
 use Maatwebsite\Excel\Events\BeforeSheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PackingListExport implements FromArray, WithColumnWidths, WithStyles, WithEvents, WithStartCell
+class PackingListExport implements FromArray, WithColumnWidths, WithStyles, WithEvents
 {
     protected array $data;
 
@@ -21,16 +20,21 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
         $this->data = $data;
     }
 
-    // Ma'lumotlar 3-qatordan boshlansin
-    public function startCell(): string
-    {
-        return 'A3';
-    }
 
     public function array(): array
     {
-        return $this->data;
+        return array_merge([
+            [
+                '№', 'Модель', 'Размер', 'Имя', '№ упаковки',
+                'кол-во мест', 'кол-во в упаковке', 'Вес нетто', 'Вес брутто'
+            ],
+            [
+                '', '', 'Рост', 'заказчик', '',
+                '', '(шт)', '(кг)', '(кг)'
+            ]
+        ], $this->data);
     }
+
 
     public function columnWidths(): array
     {
