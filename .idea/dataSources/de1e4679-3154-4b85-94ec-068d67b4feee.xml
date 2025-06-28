@@ -6210,7 +6210,7 @@ gas</Labels>
     </table>
     <table id="445" parent="263" name="telegram_sewing_messages">
       <ObjectId>23799</ObjectId>
-      <StateNumber>397321</StateNumber>
+      <StateNumber>397410</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -12324,16 +12324,16 @@ tokenable_id</ColNames>
     <column id="1296" parent="445" name="chat_id">
       <NotNull>1</NotNull>
       <Position>8</Position>
-      <StateNumber>397321</StateNumber>
-      <StoredType>integer|0s</StoredType>
-      <TypeId>23</TypeId>
+      <StateNumber>397410</StateNumber>
+      <StoredType>varchar|0s</StoredType>
+      <TypeId>1043</TypeId>
     </column>
     <index id="1297" parent="445" name="telegram_sewing_messages_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>23805</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>397317</StateNumber>
+      <StateNumber>397410</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>

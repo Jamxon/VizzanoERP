@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update Telegram message handling with hardcoded chat ID and bot token" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,31 +380,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="11319000" />
-    </task>
-    <task id="LOCAL-00500" summary="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751000029887</created>
-      <option name="number" value="00500" />
-      <option name="presentableId" value="LOCAL-00500" />
-      <option name="project" value="LOCAL" />
-      <updated>1751000029887</updated>
-    </task>
-    <task id="LOCAL-00501" summary="fix: update user name retrieval and enhance quantity display in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751000493703</created>
-      <option name="number" value="00501" />
-      <option name="presentableId" value="LOCAL-00501" />
-      <option name="project" value="LOCAL" />
-      <updated>1751000493704</updated>
-    </task>
-    <task id="LOCAL-00502" summary="fix: correct HTML formatting for quantity display in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751000752799</created>
-      <option name="number" value="00502" />
-      <option name="presentableId" value="LOCAL-00502" />
-      <option name="project" value="LOCAL" />
-      <updated>1751000752799</updated>
+      <workItem from="1751087818667" duration="11622000" />
     </task>
     <task id="LOCAL-00503" summary="fix: refactor bonus calculation logic and update Telegram message formatting in GroupMasterController">
       <option name="closed" value="true" />
@@ -774,7 +750,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751108564911</updated>
     </task>
-    <option name="localTasksCounter" value="549" />
+    <task id="LOCAL-00549" summary="feat: update Telegram message handling in GroupMasterController">
+      <option name="closed" value="true" />
+      <created>1751108650465</created>
+      <option name="number" value="00549" />
+      <option name="presentableId" value="LOCAL-00549" />
+      <option name="project" value="LOCAL" />
+      <updated>1751108650465</updated>
+    </task>
+    <task id="LOCAL-00550" summary="feat: refactor Telegram message handling to use TelegramSewingMessage model">
+      <option name="closed" value="true" />
+      <created>1751108719245</created>
+      <option name="number" value="00550" />
+      <option name="presentableId" value="LOCAL-00550" />
+      <option name="project" value="LOCAL" />
+      <updated>1751108719245</updated>
+    </task>
+    <task id="LOCAL-00551" summary="feat: update Telegram message handling with hardcoded chat ID and bot token">
+      <option name="closed" value="true" />
+      <created>1751108849641</created>
+      <option name="number" value="00551" />
+      <option name="presentableId" value="LOCAL-00551" />
+      <option name="project" value="LOCAL" />
+      <updated>1751108849641</updated>
+    </task>
+    <option name="localTasksCounter" value="552" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,9 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: adjust column widths in PackingListExport for improved formatting" />
-    <MESSAGE value="feat: add styling support and refactor column widths in PackingListExport" />
-    <MESSAGE value="feat: refactor color handling and packing logic in PackageMasterController" />
     <MESSAGE value="feat: add event registration for enhanced header formatting in PackingListExport" />
     <MESSAGE value="feat: enhance header formatting and adjust column widths in PackingListExport" />
     <MESSAGE value="feat: add start cell functionality and enhance styling in PackingListExport" />
@@ -829,7 +826,10 @@
     <MESSAGE value="feat: add title support for sheets in PackingListExport" />
     <MESSAGE value="feat: update sheet titles to localized versions in PackingListExport" />
     <MESSAGE value="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
+    <MESSAGE value="feat: update Telegram message handling in GroupMasterController" />
+    <MESSAGE value="feat: refactor Telegram message handling to use TelegramSewingMessage model" />
+    <MESSAGE value="feat: update Telegram message handling with hardcoded chat ID and bot token" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update Telegram message handling with hardcoded chat ID and bot token" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
