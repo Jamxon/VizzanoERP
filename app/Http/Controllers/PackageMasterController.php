@@ -72,6 +72,8 @@ class PackageMasterController extends Controller
             $capacity = $sizeItem['capacity'];
             $colors = $sizeItem['colors'];
 
+            $sizeName = OrderModelSize::find($sizeId)?->size ?? 'Размер топилмади';
+
             foreach ($colors as $colorItem) {
                 foreach ($colorItem as $colorName => $qty) {
                     $remaining = $qty;
@@ -80,20 +82,48 @@ class PackageMasterController extends Controller
                     while ($remaining > 0) {
                         $thisPack = min($remaining, $capacity);
 
+                        // 1-qator: Модель + Артикул
                         $data[] = [
-                            $index++,
-                            "Артикул: $modelName\nЦвет: $colorName\nЮбка для девочки",
-                            '', // Размер keyin to‘ldiriladi
-                            $customerName,
+                            $index,
+                            "Артикул: $modelName",
+                            '',
+                            '',
                             $packNo,
                             1,
+                            '',
+                            '-1.4', // Вес нетто
+                            '',     // Вес брутто
+                        ];
+
+                        // 2-qator: Цвет + Размер + Имя + Кол-во
+                        $data[] = [
+                            '',
+                            "Цвет: $colorName",
+                            $sizeName,
+                            $customerName,
+                            '',
+                            '',
                             $thisPack,
-                            '', // Вес нетто
-                            '', // Вес брутто
+                            '',
+                            ''
+                        ];
+
+                        // 3-qator: Mahsulot turi
+                        $data[] = [
+                            '',
+                            "Юбка для девочки",
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            ''
                         ];
 
                         $remaining -= $thisPack;
                         $packNo++;
+                        $index++;
                     }
                 }
             }
