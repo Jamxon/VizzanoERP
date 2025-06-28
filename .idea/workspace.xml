@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add styling support and refactor column widths in PackingListExport" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,31 +380,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="2203000" />
-    </task>
-    <task id="LOCAL-00474" summary="fix: remove unused bonus calculation logic for fixed tailored bonus types">
-      <option name="closed" value="true" />
-      <created>1750684935992</created>
-      <option name="number" value="00474" />
-      <option name="presentableId" value="LOCAL-00474" />
-      <option name="project" value="LOCAL" />
-      <updated>1750684935992</updated>
-    </task>
-    <task id="LOCAL-00475" summary="fix: refactor user profile retrieval to include attendance and salary data based on date range">
-      <option name="closed" value="true" />
-      <created>1750685167449</created>
-      <option name="number" value="00475" />
-      <option name="presentableId" value="LOCAL-00475" />
-      <option name="project" value="LOCAL" />
-      <updated>1750685167449</updated>
-    </task>
-    <task id="LOCAL-00476" summary="fix: add payment type to user profile retrieval">
-      <option name="closed" value="true" />
-      <created>1750686220973</created>
-      <option name="number" value="00476" />
-      <option name="presentableId" value="LOCAL-00476" />
-      <option name="project" value="LOCAL" />
-      <updated>1750686220973</updated>
+      <workItem from="1751087818667" duration="2951000" />
     </task>
     <task id="LOCAL-00477" summary="fix: add payment type to user profile retrieval">
       <option name="closed" value="true" />
@@ -774,7 +750,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751090021919</updated>
     </task>
-    <option name="localTasksCounter" value="523" />
+    <task id="LOCAL-00523" summary="feat: implement WithColumnWidths in PackingListExport for enhanced export formatting">
+      <option name="closed" value="true" />
+      <created>1751090098290</created>
+      <option name="number" value="00523" />
+      <option name="presentableId" value="LOCAL-00523" />
+      <option name="project" value="LOCAL" />
+      <updated>1751090098290</updated>
+    </task>
+    <task id="LOCAL-00524" summary="fix: adjust column widths in PackingListExport for improved formatting">
+      <option name="closed" value="true" />
+      <created>1751090181853</created>
+      <option name="number" value="00524" />
+      <option name="presentableId" value="LOCAL-00524" />
+      <option name="project" value="LOCAL" />
+      <updated>1751090181853</updated>
+    </task>
+    <task id="LOCAL-00525" summary="feat: add styling support and refactor column widths in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751090355297</created>
+      <option name="number" value="00525" />
+      <option name="presentableId" value="LOCAL-00525" />
+      <option name="project" value="LOCAL" />
+      <updated>1751090355297</updated>
+    </task>
+    <option name="localTasksCounter" value="526" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,9 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update image URL handling in employee absence and holiday storage" />
-    <MESSAGE value="fix: ensure image URL is only generated if an image is provided in absence and holiday storage" />
-    <MESSAGE value="fix: update image URL generation to ensure valid image paths in absence and holiday storage" />
     <MESSAGE value="fix: update workspace configuration and clean up task entries in SuperHRController" />
     <MESSAGE value="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController" />
     <MESSAGE value="fix: update user name retrieval and enhance quantity display in GroupMasterController" />
@@ -829,7 +826,10 @@
     <MESSAGE value="feat: enhance data structure in PackageMasterController and update headings in PackingListExport" />
     <MESSAGE value="fix: correct size name retrieval in PackageMasterController" />
     <MESSAGE value="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController" />
+    <MESSAGE value="feat: implement WithColumnWidths in PackingListExport for enhanced export formatting" />
+    <MESSAGE value="fix: adjust column widths in PackingListExport for improved formatting" />
+    <MESSAGE value="feat: add styling support and refactor column widths in PackingListExport" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add styling support and refactor column widths in PackingListExport" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

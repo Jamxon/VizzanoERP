@@ -65,68 +65,78 @@ class PackageMasterController extends Controller
         $modelName = $orders->first()?->orderModel?->model->name ?? 'Model nomi yo‘q';
         $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yo‘q';
 
-        $data = [];
-        $index = 1;
+        // Bir rangli itemlarni yig'ib olish
+        $colorMap = [];
 
         foreach ($validated['sizes'] as $sizeItem) {
             $sizeId = $sizeItem['size_id'];
             $capacity = $sizeItem['capacity'];
             $colors = $sizeItem['colors'];
-
             $sizeName = OrderSize::find($sizeId)?->size->name ?? 'Размер топилмади';
 
             foreach ($colors as $colorItem) {
                 foreach ($colorItem as $colorName => $qty) {
-                    $remaining = $qty;
-                    $packNo = 1;
-
-                    while ($remaining > 0) {
-                        $thisPack = min($remaining, $capacity);
-
-                        // 1-qator: Модель + Артикул
-                        $data[] = [
-                            '',
-                            "Артикул: $modelName",
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            '', // Вес нетто
-                            '',     // Вес брутто
-                        ];
-
-                        // 2-qator: Цвет + Размер + Имя + Кол-во
-                        $data[] = [
-                            $index,
-                            "Цвет: $colorName",
-                            $sizeName,
-                            $customerName,
-                            $packNo,
-                            1,
-                            $thisPack,
-                            '',
-                            ''
-                        ];
-
-                        // 3-qator: Mahsulot turi
-                        $data[] = [
-                            '',
-                            "Юбка для девочки",
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            '',
-                            ''
-                        ];
-
-                        $remaining -= $thisPack;
-                        $packNo++;
-                        $index++;
-                    }
+                    $colorMap[$colorName][] = [
+                        'size_name' => $sizeName,
+                        'qty' => $qty,
+                        'capacity' => $capacity
+                    ];
                 }
+            }
+        }
+
+        $data = [];
+        $index = 1;
+
+        foreach ($colorMap as $color => $items) {
+            $leftovers = [];
+
+            foreach ($items as $item) {
+                $qty = $item['qty'];
+                $sizeName = $item['size_name'];
+                $capacity = $item['capacity'];
+                $packNo = 1;
+
+                while ($qty >= $capacity) {
+                    $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
+                    $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, '', ''];
+                    $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
+
+                    $qty -= $capacity;
+                    $packNo++;
+                    $index++;
+                }
+
+                if ($qty > 0) {
+                    $leftovers[] = ['size_name' => $sizeName, 'qty' => $qty];
+                }
+            }
+
+            if (count($leftovers)) {
+                $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
+                $data[] = [
+                    $index,
+                    "Цвет: $color",
+                    $leftovers[0]['size_name'] ?? '',
+                    $customerName,
+                    $packNo,
+                    1,
+                    $leftovers[0]['qty'] ?? '',
+                    '',
+                    ''
+                ];
+                $data[] = [
+                    '',
+                    "Юбка для девочки",
+                    $leftovers[1]['size_name'] ?? '',
+                    '',
+                    '',
+                    '',
+                    $leftovers[1]['qty'] ?? '',
+                    '',
+                    ''
+                ];
+                $index++;
             }
         }
 
