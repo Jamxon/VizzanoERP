@@ -102,52 +102,18 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
 
     public function styles(Worksheet $sheet)
     {
-        $startRow = 3;
+        $startRow = 3; // ma'lumotlar boshlanadigan qator
         $totalRows = count($this->data);
-        $groupCount = (int)($totalRows / 3);
+        $groupCount = (int)($totalRows / 3); // har bir 3 qator = 1 ma'lumot bloki
 
         for ($i = 0; $i < $groupCount; $i++) {
             $rowStart = $startRow + ($i * 3);
             $rowEnd = $rowStart + 2;
 
-            // Faqat A dan C gacha borderlar uchun: ustunlar orasiga ajratish
-            foreach (range('A', 'C') as $col) {
-                for ($row = $rowStart; $row <= $rowEnd; $row++) {
-                    $sheet->getStyle("{$col}{$row}")->applyFromArray([
-                        'borders' => [
-                            'left' => [
-                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                            'right' => [
-                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                            'top' => [
-                                'borderStyle' => Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                            'bottom' => [
-                                'borderStyle' => Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                        ],
-                        'alignment' => [
-                            'horizontal' => 'center',
-                            'vertical' => 'center',
-                        ]
-                    ]);
-                }
-            }
-
-            // D dan I gacha umumiy 3x3 blok border
-            $sheet->getStyle("D{$rowStart}:I{$rowEnd}")->applyFromArray([
+            // Faqat blok atrofini chizamiz: outline border
+            $sheet->getStyle("A{$rowStart}:I{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'outline' => [
-                        'borderStyle' => Border::BORDER_THIN,
-                        'color' => ['argb' => '000000'],
-                    ],
-                    'inside' => [
                         'borderStyle' => Border::BORDER_THIN,
                         'color' => ['argb' => '000000'],
                     ],
@@ -158,7 +124,7 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
                 ]
             ]);
 
-            // Contragent ustunini bold qilish (o‘rtadagi qator)
+            // Contragent (D ustuni, o‘rtadagi qator)
             $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
         }
 
