@@ -105,46 +105,31 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
         $startRow = 3;
         $totalRows = count($this->data);
         $groupCount = (int)($totalRows / 3);
-        $columnLetters = range('A', 'I');
+        $cols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
         for ($i = 0; $i < $groupCount; $i++) {
-            $rowStart = $startRow + ($i * 3);
-            $rowEnd = $rowStart + 2;
+            $row1 = $startRow + ($i * 3);
+            $row2 = $row1 + 1;
+            $row3 = $row1 + 2;
 
-            for ($row = $rowStart; $row <= $rowEnd; $row++) {
-                foreach ($columnLetters as $col) {
-                    $sheet->getStyle("{$col}{$row}")->applyFromArray([
-                        'alignment' => [
-                            'horizontal' => 'center',
-                            'vertical' => 'center',
-                        ],
-                        'borders' => [
-                            'left' => [
-                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                            'right' => [
-                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                            'top' => [
-                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                            'bottom' => [
-                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                                'color' => ['argb' => '000000'],
-                            ],
-                        ],
-                    ]);
-                }
+            foreach ($cols as $col) {
+                // Yuqori chiziq (faqat birinchi qatorda)
+                $sheet->getStyle("{$col}{$row1}")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THIN);
+                // Pastki chiziq (faqat uchinchi qatorda)
+                $sheet->getStyle("{$col}{$row3}")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
             }
 
-            // Contragent ustunini (D) o‘rtadagi qatorda bold
-            $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
+            // Har bir qatorning chap va o‘ng chiziqlari (A va I)
+            for ($r = $row1; $r <= $row3; $r++) {
+                $sheet->getStyle("A{$r}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
+                $sheet->getStyle("I{$r}")->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
+            }
 
-            // Rangli bo‘yash (B ustun, 2-qatorda)
-            $colorCell = $sheet->getCell("B" . ($rowStart + 1))->getValue();
+            // D ustuni (contragent) ni ikkinchi qatorda bold qilish
+            $sheet->getStyle("D{$row2}")->getFont()->setBold(true);
+
+            // Rangga qarab B ustunini bo‘yash (ikkinchi qatordagi)
+            $colorCell = $sheet->getCell("B{$row2}")->getValue();
             if (preg_match('/Цвет:\s*(.+)/u', $colorCell, $matches)) {
                 $colorName = $matches[1];
                 $colors = [
@@ -155,7 +140,7 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
                     'Хаки черный' => '3B3C36',
                 ];
                 if (isset($colors[$colorName])) {
-                    $sheet->getStyle("B" . ($rowStart + 1))->getFill()->applyFromArray([
+                    $sheet->getStyle("B{$row2}")->getFill()->applyFromArray([
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'startColor' => ['rgb' => $colors[$colorName]],
                     ]);

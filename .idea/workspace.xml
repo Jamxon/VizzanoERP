@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: improve border styling and color assignment in PackingListExport" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance cell alignment and add top/bottom border styling in PackingListExport">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,23 +382,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="6048000" />
-    </task>
-    <task id="LOCAL-00491" summary="fix: add image field to employee absence and holiday models with validation">
-      <option name="closed" value="true" />
-      <created>1750917467792</created>
-      <option name="number" value="00491" />
-      <option name="presentableId" value="LOCAL-00491" />
-      <option name="project" value="LOCAL" />
-      <updated>1750917467792</updated>
-    </task>
-    <task id="LOCAL-00492" summary="fix: enhance employee absence storage with Telegram notification and image handling">
-      <option name="closed" value="true" />
-      <created>1750917669889</created>
-      <option name="number" value="00492" />
-      <option name="presentableId" value="LOCAL-00492" />
-      <option name="project" value="LOCAL" />
-      <updated>1750917669889</updated>
+      <workItem from="1751087818667" duration="7048000" />
     </task>
     <task id="LOCAL-00493" summary="fix: enhance employee holiday storage with Telegram notification and image handling">
       <option name="closed" value="true" />
@@ -774,7 +760,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751095994538</updated>
     </task>
-    <option name="localTasksCounter" value="540" />
+    <task id="LOCAL-00540" summary="feat: update border styling and color assignment logic in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751096102336</created>
+      <option name="number" value="00540" />
+      <option name="presentableId" value="LOCAL-00540" />
+      <option name="project" value="LOCAL" />
+      <updated>1751096102336</updated>
+    </task>
+    <task id="LOCAL-00541" summary="feat: enhance cell alignment and add top/bottom border styling in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751096194267</created>
+      <option name="number" value="00541" />
+      <option name="presentableId" value="LOCAL-00541" />
+      <option name="project" value="LOCAL" />
+      <updated>1751096194267</updated>
+    </task>
+    <option name="localTasksCounter" value="542" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,8 +806,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add search functionality to getOrders in PackageMasterController" />
-    <MESSAGE value="feat: implement bulk package creation and export functionality in PackageMasterController" />
     <MESSAGE value="fix: update model and customer name retrieval in PackageMasterController" />
     <MESSAGE value="fix: update model and contragent name retrieval in PackageMasterController" />
     <MESSAGE value="feat: add PackingListExport import in PackageMasterController" />
@@ -829,7 +829,9 @@
     <MESSAGE value="feat: simplify border styling and enhance alignment in PackingListExport" />
     <MESSAGE value="feat: enhance cell styling and color assignment in PackingListExport" />
     <MESSAGE value="feat: improve border styling and color assignment in PackingListExport" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: improve border styling and color assignment in PackingListExport" />
+    <MESSAGE value="feat: update border styling and color assignment logic in PackingListExport" />
+    <MESSAGE value="feat: enhance cell alignment and add top/bottom border styling in PackingListExport" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance cell alignment and add top/bottom border styling in PackingListExport" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
