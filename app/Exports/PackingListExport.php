@@ -110,58 +110,41 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
             $rowStart = $startRow + ($i * 3);
             $rowEnd = $rowStart + 2;
 
-            // Tashqi borderlar (outline only)
-            foreach (range('A', 'I') as $col) {
-                // Ustki border faqat birinchi qatorga
-                $sheet->getStyle("{$col}{$rowStart}")->applyFromArray([
-                    'borders' => [
-                        'top' => [
-                            'borderStyle' => Border::BORDER_THIN,
-                            'color' => ['argb' => '000000'],
+            for ($row = $rowStart; $row <= $rowEnd; $row++) {
+                foreach (range('A', 'I') as $col) {
+                    $sheet->getStyle("{$col}{$row}")->applyFromArray([
+                        'borders' => [
+                            'top' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                            'bottom' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                            'left' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                            'right' => [
+                                'borderStyle' => Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
                         ],
-                    ],
-                ]);
-
-                // Pastki border faqat uchinchi qatorga
-                $sheet->getStyle("{$col}{$rowEnd}")->applyFromArray([
-                    'borders' => [
-                        'bottom' => [
-                            'borderStyle' => Border::BORDER_THIN,
-                            'color' => ['argb' => '000000'],
-                        ],
-                    ],
-                ]);
+                        'alignment' => [
+                            'horizontal' => 'center',
+                            'vertical' => 'center',
+                        ]
+                    ]);
+                }
             }
 
-            // Chap va o‘ng chekkalar
-            foreach (range($rowStart, $rowEnd) as $row) {
-                $sheet->getStyle("A{$row}")->applyFromArray([
-                    'borders' => [
-                        'left' => [
-                            'borderStyle' => Border::BORDER_THIN,
-                            'color' => ['argb' => '000000'],
-                        ],
-                    ],
-                ]);
-                $sheet->getStyle("I{$row}")->applyFromArray([
-                    'borders' => [
-                        'right' => [
-                            'borderStyle' => Border::BORDER_THIN,
-                            'color' => ['argb' => '000000'],
-                        ],
-                    ],
-                ]);
-            }
-
-            // Center align for whole block
-            $sheet->getStyle("A{$rowStart}:I{$rowEnd}")->getAlignment()->setHorizontal('center');
-            $sheet->getStyle("A{$rowStart}:I{$rowEnd}")->getAlignment()->setVertical('center');
-
-            // Contragent (D column, ikkinchi qator) bold
+            // Contragent (middle row, column D) bold
             $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
         }
 
         return [];
     }
+
 
 }

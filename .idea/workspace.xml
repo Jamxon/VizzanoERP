@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: remove hardcoded header values in PackingListExport">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Exports/PackingListExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/PackingListExport.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance border styling and alignment in PackingListExport" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -383,31 +380,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="5086000" />
-    </task>
-    <task id="LOCAL-00483" summary="fix: add new salary calculation endpoint for employee with validation">
-      <option name="closed" value="true" />
-      <created>1750836279364</created>
-      <option name="number" value="00483" />
-      <option name="presentableId" value="LOCAL-00483" />
-      <option name="project" value="LOCAL" />
-      <updated>1750836279364</updated>
-    </task>
-    <task id="LOCAL-00484" summary="fix: remove unnecessary blank lines in API route definitions">
-      <option name="closed" value="true" />
-      <created>1750836900238</created>
-      <option name="number" value="00484" />
-      <option name="presentableId" value="LOCAL-00484" />
-      <option name="project" value="LOCAL" />
-      <updated>1750836900238</updated>
-    </task>
-    <task id="LOCAL-00485" summary="fix: improve employee tarification log validation for order quantity">
-      <option name="closed" value="true" />
-      <created>1750838800856</created>
-      <option name="number" value="00485" />
-      <option name="presentableId" value="LOCAL-00485" />
-      <option name="project" value="LOCAL" />
-      <updated>1750838800856</updated>
+      <workItem from="1751087818667" duration="5404000" />
     </task>
     <task id="LOCAL-00486" summary="fix: add endpoint to update employee tarification log with validation">
       <option name="closed" value="true" />
@@ -777,7 +750,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751092167399</updated>
     </task>
-    <option name="localTasksCounter" value="532" />
+    <task id="LOCAL-00532" summary="feat: streamline data structure and enhance header setup in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751095065935</created>
+      <option name="number" value="00532" />
+      <option name="presentableId" value="LOCAL-00532" />
+      <option name="project" value="LOCAL" />
+      <updated>1751095065935</updated>
+    </task>
+    <task id="LOCAL-00533" summary="feat: enhance row styling and grouping in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751095202174</created>
+      <option name="number" value="00533" />
+      <option name="presentableId" value="LOCAL-00533" />
+      <option name="project" value="LOCAL" />
+      <updated>1751095202174</updated>
+    </task>
+    <task id="LOCAL-00534" summary="feat: enhance border styling and alignment in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751095337256</created>
+      <option name="number" value="00534" />
+      <option name="presentableId" value="LOCAL-00534" />
+      <option name="project" value="LOCAL" />
+      <updated>1751095337256</updated>
+    </task>
+    <option name="localTasksCounter" value="535" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,9 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
-    <MESSAGE value="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
-    <MESSAGE value="fix: update summary message formatting in GroupMasterController" />
     <MESSAGE value="feat: add employee absence and holiday retrieval to UserController" />
     <MESSAGE value="feat: enhance employee absence and holiday data structure in UserController" />
     <MESSAGE value="feat: enhance employee absence and holiday handling in SuperHRController" />
@@ -832,7 +826,10 @@
     <MESSAGE value="feat: add start cell functionality and enhance styling in PackingListExport" />
     <MESSAGE value="feat: remove start cell functionality and enhance data structure in PackingListExport" />
     <MESSAGE value="feat: remove hardcoded header values in PackingListExport" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: remove hardcoded header values in PackingListExport" />
+    <MESSAGE value="feat: streamline data structure and enhance header setup in PackingListExport" />
+    <MESSAGE value="feat: enhance row styling and grouping in PackingListExport" />
+    <MESSAGE value="feat: enhance border styling and alignment in PackingListExport" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance border styling and alignment in PackingListExport" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
