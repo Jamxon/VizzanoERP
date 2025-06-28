@@ -11,10 +11,17 @@ use App\Models\Bonus;
 
 class PackageMasterController extends Controller
 {
-    public function getOrders(): \Illuminate\Http\JsonResponse
+    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
+        $search = $request->input('search', '');
+
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
             ->whereIn('status', ['tailoring', 'tailored', 'checking', 'checked'])
+            ->where(function ($query) use ($search) {
+                $query->whereHas('orderModel.model', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            })
             ->with(
                 'orderModel.model',
                 'orderModel.material',
