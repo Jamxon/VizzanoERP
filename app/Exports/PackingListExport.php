@@ -31,9 +31,7 @@ class PackingListExport implements WithMultipleSheets
                 protected array $data;
                 public function __construct(array $data) { $this->data = $data; }
 
-                public function title(): string {
-                    return 'Packaging';
-                }
+                public function title(): string { return 'Модель'; }
 
                 public function array(): array { return $this->data; }
 
@@ -143,13 +141,10 @@ class PackingListExport implements WithMultipleSheets
                     return [];
                 }
             },
-
             new class($this->summary) implements FromArray, WithStyles, WithTitle {
                 protected array $summary;
                 public function __construct(array $summary) { $this->summary = $summary; }
-                public function title(): string {
-                    return 'Summary';
-                }
+                public function title(): string { return 'Итого'; }
                 public function array(): array { return $this->summary; }
                 public function styles(Worksheet $sheet): array {
                     $lastRow = count($this->summary);
