@@ -417,7 +417,7 @@ class GroupMasterController extends Controller
         $chatId = config('services.telegram.chat_id');
         $today = now()->toDateString();
 
-        $existing = TelegramMessage::where([
+        $existing = TelegramSewingMessage::where([
             'time_id' => $timeId,
             'date' => $today,
             'branch_id' => $branchId,
@@ -429,7 +429,7 @@ class GroupMasterController extends Controller
             $response = $this->sendTelegramMessage($message);
 
             if ($response && isset($response['result']['message_id'])) {
-                TelegramMessage::create([
+                TelegramSewingMessage::create([
                     'time_id' => $timeId,
                     'date' => $today,
                     'branch_id' => $branchId,
