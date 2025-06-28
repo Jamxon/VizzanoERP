@@ -6,6 +6,7 @@ namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 
 class PackingListExport implements FromArray, WithHeadings
 {
@@ -19,6 +20,21 @@ class PackingListExport implements FromArray, WithHeadings
     public function array(): array
     {
         return $this->data;
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 5,   // №
+            'B' => 100,  // Модель
+            'C' => 12,  // Размер
+            'D' => 20,  // Имя
+            'E' => 10,  // № упаковки
+            'F' => 12,  // кол-во мест
+            'G' => 18,  // кол-во в упаковке
+            'H' => 12,  // Вес нетто
+            'I' => 12,  // Вес брутто
+        ];
     }
 
     public function headings(): array

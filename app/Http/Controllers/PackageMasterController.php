@@ -85,25 +85,25 @@ class PackageMasterController extends Controller
 
                         // 1-qator: Модель + Артикул
                         $data[] = [
-                            $index,
+                            '',
                             "Артикул: $modelName",
                             '',
                             '',
-                            $packNo,
-                            1,
                             '',
-                            '-1.4', // Вес нетто
+                            '',
+                            '',
+                            '', // Вес нетто
                             '',     // Вес брутто
                         ];
 
                         // 2-qator: Цвет + Размер + Имя + Кол-во
                         $data[] = [
-                            '',
+                            $index,
                             "Цвет: $colorName",
                             $sizeName,
                             $customerName,
-                            '',
-                            '',
+                            $packNo,
+                            1,
                             $thisPack,
                             '',
                             ''

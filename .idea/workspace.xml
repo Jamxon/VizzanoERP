@@ -4,8 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add PackingListExport import in PackageMasterController">
-      <change beforePath="$PROJECT_DIR$/app/Exports/PackingListExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/PackingListExport.php" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct size name retrieval in PackageMasterController">
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -383,23 +382,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="1782000" />
-    </task>
-    <task id="LOCAL-00471" summary="fix: exclude kicked employees from yesterday's date calculation for absent employees">
-      <option name="closed" value="true" />
-      <created>1750670814261</created>
-      <option name="number" value="00471" />
-      <option name="presentableId" value="LOCAL-00471" />
-      <option name="project" value="LOCAL" />
-      <updated>1750670814261</updated>
-    </task>
-    <task id="LOCAL-00472" summary="fix: improve yesterday's date calculation to include holiday and attendance checks for absent employees">
-      <option name="closed" value="true" />
-      <created>1750672269497</created>
-      <option name="number" value="00472" />
-      <option name="presentableId" value="LOCAL-00472" />
-      <option name="project" value="LOCAL" />
-      <updated>1750672269497</updated>
+      <workItem from="1751087818667" duration="2096000" />
     </task>
     <task id="LOCAL-00473" summary="fix: correct model reference for holiday employee IDs in date calculation">
       <option name="closed" value="true" />
@@ -777,7 +760,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751089321001</updated>
     </task>
-    <option name="localTasksCounter" value="520" />
+    <task id="LOCAL-00520" summary="feat: enhance data structure in PackageMasterController and update headings in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751089655234</created>
+      <option name="number" value="00520" />
+      <option name="presentableId" value="LOCAL-00520" />
+      <option name="project" value="LOCAL" />
+      <updated>1751089655234</updated>
+    </task>
+    <task id="LOCAL-00521" summary="fix: correct size name retrieval in PackageMasterController">
+      <option name="closed" value="true" />
+      <created>1751089747685</created>
+      <option name="number" value="00521" />
+      <option name="presentableId" value="LOCAL-00521" />
+      <option name="project" value="LOCAL" />
+      <updated>1751089747686</updated>
+    </task>
+    <option name="localTasksCounter" value="522" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,8 +806,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: enhance employee holiday storage with Telegram notification and image handling" />
-    <MESSAGE value="fix: update image handling in employee absence and holiday storage" />
     <MESSAGE value="fix: ensure image handling defaults to null in absence and holiday retrieval" />
     <MESSAGE value="fix: update image URL handling in employee absence and holiday storage" />
     <MESSAGE value="fix: ensure image URL is only generated if an image is provided in absence and holiday storage" />
@@ -832,7 +829,9 @@
     <MESSAGE value="fix: update model and customer name retrieval in PackageMasterController" />
     <MESSAGE value="fix: update model and contragent name retrieval in PackageMasterController" />
     <MESSAGE value="feat: add PackingListExport import in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add PackingListExport import in PackageMasterController" />
+    <MESSAGE value="feat: enhance data structure in PackageMasterController and update headings in PackingListExport" />
+    <MESSAGE value="fix: correct size name retrieval in PackageMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: correct size name retrieval in PackageMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
