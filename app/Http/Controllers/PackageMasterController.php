@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\PackingListExport;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\Order;
