@@ -102,15 +102,15 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
 
     public function styles(Worksheet $sheet)
     {
-        $startRow = 3; // ma'lumotlar boshlanadigan qator
+        $startRow = 3;
         $totalRows = count($this->data);
-        $groupCount = (int)($totalRows / 3); // har bir 3 qator = 1 ma'lumot bloki
+        $groupCount = (int)($totalRows / 3);
 
         for ($i = 0; $i < $groupCount; $i++) {
             $rowStart = $startRow + ($i * 3);
             $rowEnd = $rowStart + 2;
 
-            // Faqat blok atrofini chizamiz: outline border
+            // 1️⃣ Ramka (outline border)
             $sheet->getStyle("A{$rowStart}:I{$rowEnd}")->applyFromArray([
                 'borders' => [
                     'outline' => [
@@ -124,11 +124,33 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
                 ]
             ]);
 
-            // Contragent (D ustuni, o‘rtadagi qator)
+            // 2️⃣ Contragentni qalin qilish
             $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
+
+            // 3️⃣ Rangni aniqlab, rangga mos katakka fon rangi berish (B ustun, 2-qator)
+            $colorText = $sheet->getCell("B" . ($rowStart + 1))->getValue();
+            preg_match('/Цвет:\s*(.+)/u', $colorText, $matches);
+            $colorName = $matches[1] ?? null;
+
+            $colors = [
+                'Неви' => '000080',
+                'Синый' => '0000FF',
+                'Серый' => '808080',
+                'Кэмел чёрный' => '5C4033',
+                'Хаки черный' => '3B3C36',
+                // Boshqa ranglarni ham shu yerga qo‘shishingiz mumkin
+            ];
+
+            if ($colorName && isset($colors[$colorName])) {
+                $sheet->getStyle("B" . ($rowStart + 1))->getFill()->applyFromArray([
+                    'fillType' => Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => $colors[$colorName]],
+                ]);
+            }
         }
 
         return [];
     }
+
 
 }
