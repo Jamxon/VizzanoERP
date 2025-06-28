@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct size name retrieval in PackageMasterController">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -382,15 +380,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="2096000" />
-    </task>
-    <task id="LOCAL-00473" summary="fix: correct model reference for holiday employee IDs in date calculation">
-      <option name="closed" value="true" />
-      <created>1750672343770</created>
-      <option name="number" value="00473" />
-      <option name="presentableId" value="LOCAL-00473" />
-      <option name="project" value="LOCAL" />
-      <updated>1750672343770</updated>
+      <workItem from="1751087818667" duration="2203000" />
     </task>
     <task id="LOCAL-00474" summary="fix: remove unused bonus calculation logic for fixed tailored bonus types">
       <option name="closed" value="true" />
@@ -776,7 +766,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751089747686</updated>
     </task>
-    <option name="localTasksCounter" value="522" />
+    <task id="LOCAL-00522" summary="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController">
+      <option name="closed" value="true" />
+      <created>1751090021919</created>
+      <option name="number" value="00522" />
+      <option name="presentableId" value="LOCAL-00522" />
+      <option name="project" value="LOCAL" />
+      <updated>1751090021919</updated>
+    </task>
+    <option name="localTasksCounter" value="523" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -806,7 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: ensure image handling defaults to null in absence and holiday retrieval" />
     <MESSAGE value="fix: update image URL handling in employee absence and holiday storage" />
     <MESSAGE value="fix: ensure image URL is only generated if an image is provided in absence and holiday storage" />
     <MESSAGE value="fix: update image URL generation to ensure valid image paths in absence and holiday storage" />
@@ -831,7 +828,8 @@
     <MESSAGE value="feat: add PackingListExport import in PackageMasterController" />
     <MESSAGE value="feat: enhance data structure in PackageMasterController and update headings in PackingListExport" />
     <MESSAGE value="fix: correct size name retrieval in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct size name retrieval in PackageMasterController" />
+    <MESSAGE value="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

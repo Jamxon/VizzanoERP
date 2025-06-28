@@ -8,7 +8,7 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 
-class PackingListExport implements FromArray, WithHeadings
+class PackingListExport implements FromArray, WithHeadings, WithColumnWidths
 {
     protected array $data;
 
