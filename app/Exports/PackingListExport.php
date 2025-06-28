@@ -25,13 +25,13 @@ class PackingListExport implements FromArray, WithHeadings, WithColumnWidths
     public function columnWidths(): array
     {
         return [
-            'A' => 5,   // №
-            'B' => 100,  // Модель
+            'A' => 10,   // №
+            'B' => 30,  // Модель
             'C' => 12,  // Размер
             'D' => 20,  // Имя
             'E' => 10,  // № упаковки
             'F' => 12,  // кол-во мест
-            'G' => 18,  // кол-во в упаковке
+            'G' => 12,  // кол-во в упаковке
             'H' => 12,  // Вес нетто
             'I' => 12,  // Вес брутто
         ];
