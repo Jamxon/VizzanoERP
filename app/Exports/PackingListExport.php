@@ -23,16 +23,7 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
 
     public function array(): array
     {
-        return array_merge([
-            [
-                '№', 'Модель', 'Размер', 'Имя', '№ упаковки',
-                'кол-во мест', 'кол-во в упаковке', 'Вес нетто', 'Вес брутто'
-            ],
-            [
-                '', '', 'Рост', 'заказчик', '',
-                '', '(шт)', '(кг)', '(кг)'
-            ]
-        ], $this->data);
+        return $this->data;
     }
 
 
@@ -56,6 +47,23 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
         return [
             BeforeSheet::class => function (BeforeSheet $event) {
                 $sheet = $event->sheet->getDelegate();
+
+                // Sarlavha yozish (2 qator)
+                $sheet->setCellValue('A1', '№');
+                $sheet->setCellValue('B1', 'Модель');
+                $sheet->setCellValue('C1', 'Размер');
+                $sheet->setCellValue('D1', 'Имя');
+                $sheet->setCellValue('E1', '№ упаковки');
+                $sheet->setCellValue('F1', 'кол-во мест');
+                $sheet->setCellValue('G1', 'кол-во в упаковке');
+                $sheet->setCellValue('H1', 'Вес нетто');
+                $sheet->setCellValue('I1', 'Вес брутто');
+
+                $sheet->setCellValue('C2', 'Рост');
+                $sheet->setCellValue('D2', 'заказчик');
+                $sheet->setCellValue('G2', '(шт)');
+                $sheet->setCellValue('H2', '(кг)');
+                $sheet->setCellValue('I2', '(кг)');
 
                 // Merge cells
                 $sheet->mergeCells('A1:A2');

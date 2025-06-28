@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add start cell functionality and enhance styling in PackingListExport" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: remove hardcoded header values in PackingListExport">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Exports/PackingListExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/PackingListExport.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,23 +383,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="3983000" />
-    </task>
-    <task id="LOCAL-00481" summary="fix: add 'minute' field to models and update related resources">
-      <option name="closed" value="true" />
-      <created>1750753761125</created>
-      <option name="number" value="00481" />
-      <option name="presentableId" value="LOCAL-00481" />
-      <option name="project" value="LOCAL" />
-      <updated>1750753761125</updated>
-    </task>
-    <task id="LOCAL-00482" summary="fix: add 'minute' field to order import and related resources">
-      <option name="closed" value="true" />
-      <created>1750757839675</created>
-      <option name="number" value="00482" />
-      <option name="presentableId" value="LOCAL-00482" />
-      <option name="project" value="LOCAL" />
-      <updated>1750757839675</updated>
+      <workItem from="1751087818667" duration="5086000" />
     </task>
     <task id="LOCAL-00483" summary="fix: add new salary calculation endpoint for employee with validation">
       <option name="closed" value="true" />
@@ -774,7 +761,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751091983182</updated>
     </task>
-    <option name="localTasksCounter" value="530" />
+    <task id="LOCAL-00530" summary="feat: remove start cell functionality and enhance data structure in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751092092704</created>
+      <option name="number" value="00530" />
+      <option name="presentableId" value="LOCAL-00530" />
+      <option name="project" value="LOCAL" />
+      <updated>1751092092704</updated>
+    </task>
+    <task id="LOCAL-00531" summary="feat: remove hardcoded header values in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751092167399</created>
+      <option name="number" value="00531" />
+      <option name="presentableId" value="LOCAL-00531" />
+      <option name="project" value="LOCAL" />
+      <updated>1751092167399</updated>
+    </task>
+    <option name="localTasksCounter" value="532" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,8 +807,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: refactor bonus calculation logic and update Telegram message formatting in GroupMasterController" />
-    <MESSAGE value="fix: update time display in new entry and summary messages in GroupMasterController" />
     <MESSAGE value="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController" />
     <MESSAGE value="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController" />
     <MESSAGE value="fix: update summary message formatting in GroupMasterController" />
@@ -829,7 +830,9 @@
     <MESSAGE value="feat: add event registration for enhanced header formatting in PackingListExport" />
     <MESSAGE value="feat: enhance header formatting and adjust column widths in PackingListExport" />
     <MESSAGE value="feat: add start cell functionality and enhance styling in PackingListExport" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add start cell functionality and enhance styling in PackingListExport" />
+    <MESSAGE value="feat: remove start cell functionality and enhance data structure in PackingListExport" />
+    <MESSAGE value="feat: remove hardcoded header values in PackingListExport" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: remove hardcoded header values in PackingListExport" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
