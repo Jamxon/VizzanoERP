@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add styling support and refactor column widths in PackingListExport" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: refactor color handling and packing logic in PackageMasterController">
+      <change beforePath="$PROJECT_DIR$/app/Exports/PackingListExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/PackingListExport.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,15 +382,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="2951000" />
-    </task>
-    <task id="LOCAL-00477" summary="fix: add payment type to user profile retrieval">
-      <option name="closed" value="true" />
-      <created>1750686289934</created>
-      <option name="number" value="00477" />
-      <option name="presentableId" value="LOCAL-00477" />
-      <option name="project" value="LOCAL" />
-      <updated>1750686289934</updated>
+      <workItem from="1751087818667" duration="3683000" />
     </task>
     <task id="LOCAL-00478" summary="fix: update salary calculation to include additional payment types">
       <option name="closed" value="true" />
@@ -774,7 +768,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751090355297</updated>
     </task>
-    <option name="localTasksCounter" value="526" />
+    <task id="LOCAL-00526" summary="feat: refactor color handling and packing logic in PackageMasterController">
+      <option name="closed" value="true" />
+      <created>1751090925104</created>
+      <option name="number" value="00526" />
+      <option name="presentableId" value="LOCAL-00526" />
+      <option name="project" value="LOCAL" />
+      <updated>1751090925104</updated>
+    </task>
+    <option name="localTasksCounter" value="527" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,7 +806,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update workspace configuration and clean up task entries in SuperHRController" />
     <MESSAGE value="fix: refactor order status update and enhance bonus calculation logic in GroupMasterController" />
     <MESSAGE value="fix: update user name retrieval and enhance quantity display in GroupMasterController" />
     <MESSAGE value="fix: correct HTML formatting for quantity display in GroupMasterController" />
@@ -829,7 +830,8 @@
     <MESSAGE value="feat: implement WithColumnWidths in PackingListExport for enhanced export formatting" />
     <MESSAGE value="fix: adjust column widths in PackingListExport for improved formatting" />
     <MESSAGE value="feat: add styling support and refactor column widths in PackingListExport" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add styling support and refactor column widths in PackingListExport" />
+    <MESSAGE value="feat: refactor color handling and packing logic in PackageMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor color handling and packing logic in PackageMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
