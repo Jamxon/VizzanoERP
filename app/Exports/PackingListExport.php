@@ -105,22 +105,33 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
         $startRow = 3;
         $totalRows = count($this->data);
         $groupCount = (int)($totalRows / 3);
-
         $columnLetters = range('A', 'I');
 
         for ($i = 0; $i < $groupCount; $i++) {
             $rowStart = $startRow + ($i * 3);
             $rowEnd = $rowStart + 2;
 
-            foreach ($columnLetters as $col) {
-                for ($row = $rowStart; $row <= $rowEnd; $row++) {
+            for ($row = $rowStart; $row <= $rowEnd; $row++) {
+                foreach ($columnLetters as $col) {
                     $sheet->getStyle("{$col}{$row}")->applyFromArray([
+                        'alignment' => [
+                            'horizontal' => 'center',
+                            'vertical' => 'center',
+                        ],
                         'borders' => [
                             'left' => [
                                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                                 'color' => ['argb' => '000000'],
                             ],
                             'right' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                            'top' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                            'bottom' => [
                                 'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                                 'color' => ['argb' => '000000'],
                             ],
@@ -132,7 +143,7 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
             // Contragent ustunini (D) o‘rtadagi qatorda bold
             $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
 
-            // Rangga qarab katakni bo‘yash
+            // Rangli bo‘yash (B ustun, 2-qatorda)
             $colorCell = $sheet->getCell("B" . ($rowStart + 1))->getValue();
             if (preg_match('/Цвет:\s*(.+)/u', $colorCell, $matches)) {
                 $colorName = $matches[1];
