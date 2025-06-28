@@ -6,6 +6,7 @@ use App\Exports\PackingListExport;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\Order;
+use App\Models\OrderSize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Bonus;
@@ -72,7 +73,7 @@ class PackageMasterController extends Controller
             $capacity = $sizeItem['capacity'];
             $colors = $sizeItem['colors'];
 
-            $sizeName = OrderModelSize::find($sizeId)?->size ?? 'Размер топилмади';
+            $sizeName = OrderSize::find($sizeId)?->size->name ?? 'Размер топилмади';
 
             foreach ($colors as $colorItem) {
                 foreach ($colorItem as $colorName => $qty) {
