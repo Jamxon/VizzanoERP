@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -26,9 +27,13 @@ class PackingListExport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            'Packaging' => new class($this->data) implements FromArray, WithColumnWidths, WithStyles, WithEvents {
+            new class($this->data) implements FromArray, WithColumnWidths, WithStyles, WithEvents, WithTitle {
                 protected array $data;
                 public function __construct(array $data) { $this->data = $data; }
+
+                public function title(): string {
+                    return 'Packaging';
+                }
 
                 public function array(): array { return $this->data; }
 
@@ -138,9 +143,13 @@ class PackingListExport implements WithMultipleSheets
                     return [];
                 }
             },
-            'Summary' => new class($this->summary) implements FromArray, WithStyles {
+
+            new class($this->summary) implements FromArray, WithStyles, WithTitle {
                 protected array $summary;
                 public function __construct(array $summary) { $this->summary = $summary; }
+                public function title(): string {
+                    return 'Summary';
+                }
                 public function array(): array { return $this->summary; }
                 public function styles(Worksheet $sheet): array {
                     $lastRow = count($this->summary);
