@@ -65,8 +65,8 @@ class PackageMasterController extends Controller
         $modelName = $orders->first()?->orderModel?->model->name ?? 'Model nomi yo‘q';
         $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yo‘q';
 
-        // Bir rangli itemlarni yig'ib olish
         $colorMap = [];
+        $summaryMap = [];
 
         foreach ($validated['sizes'] as $sizeItem) {
             $sizeId = $sizeItem['size_id'];
@@ -87,9 +87,16 @@ class PackageMasterController extends Controller
 
         $data = [];
         $index = 1;
+        $summaryList = [
+            ['№', 'Артикул', 'Коллекция зима Комбинезон', 'Коробка (шт)', 'Обший (шт)', 'Нетто (кг)', 'Брутто (кг)']
+        ];
 
         foreach ($colorMap as $color => $items) {
             $leftovers = [];
+            $packCount = 0;
+            $totalQty = 0;
+            $netto = 0;
+            $brutto = 0;
 
             foreach ($items as $item) {
                 $qty = $item['qty'];
@@ -105,6 +112,11 @@ class PackageMasterController extends Controller
                     $qty -= $capacity;
                     $packNo++;
                     $index++;
+
+                    $packCount++;
+                    $totalQty += $capacity;
+                    $netto += $capacity * 1.45;
+                    $brutto += $capacity * 1.62;
                 }
 
                 if ($qty > 0) {
@@ -137,10 +149,31 @@ class PackageMasterController extends Controller
                     ''
                 ];
                 $index++;
+                $packCount++;
+                $totalQty += ($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0);
+                $netto += (($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0)) * 1.45;
+                $brutto += (($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0)) * 1.62;
             }
+
+            $summaryList[] = [
+                count($summaryList),
+                $modelName,
+                'Комбенизон для девочки',
+                $packCount,
+                $totalQty,
+                round($netto, 2),
+                round($brutto, 2),
+            ];
         }
 
-        return Excel::download(new PackingListExport($data), 'packing_list.xlsx');
-    }
+        $summaryList[] = [
+            '', '', '',
+            array_sum(array_column($summaryList, 3)),
+            array_sum(array_column($summaryList, 4)),
+            array_sum(array_column($summaryList, 5)),
+            array_sum(array_column($summaryList, 6)),
+        ];
 
+        return Excel::download(new PackingListExport($data, $summaryList), 'packing_list.xlsx');
+    }
 }

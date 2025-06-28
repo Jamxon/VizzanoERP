@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: improve border styling and alignment in PackingListExport">
-      <change beforePath="$PROJECT_DIR$/app/Exports/PackingListExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/PackingListExport.php" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: expand color assignment options and improve color naming in PackingListExport">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -382,15 +382,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="7528000" />
-    </task>
-    <task id="LOCAL-00495" summary="fix: ensure image handling defaults to null in absence and holiday retrieval">
-      <option name="closed" value="true" />
-      <created>1750918548508</created>
-      <option name="number" value="00495" />
-      <option name="presentableId" value="LOCAL-00495" />
-      <option name="project" value="LOCAL" />
-      <updated>1750918548508</updated>
+      <workItem from="1751087818667" duration="7851000" />
     </task>
     <task id="LOCAL-00496" summary="fix: update image URL handling in employee absence and holiday storage">
       <option name="closed" value="true" />
@@ -776,7 +768,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751097217809</updated>
     </task>
-    <option name="localTasksCounter" value="544" />
+    <task id="LOCAL-00544" summary="feat: expand color assignment options and improve color naming in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751097570168</created>
+      <option name="number" value="00544" />
+      <option name="presentableId" value="LOCAL-00544" />
+      <option name="project" value="LOCAL" />
+      <updated>1751097570168</updated>
+    </task>
+    <option name="localTasksCounter" value="545" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -806,7 +806,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add PackingListExport import in PackageMasterController" />
     <MESSAGE value="feat: enhance data structure in PackageMasterController and update headings in PackingListExport" />
     <MESSAGE value="fix: correct size name retrieval in PackageMasterController" />
     <MESSAGE value="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController" />
@@ -831,7 +830,8 @@
     <MESSAGE value="feat: enhance cell alignment and add top/bottom border styling in PackingListExport" />
     <MESSAGE value="feat: refine border styling and improve cell alignment in PackingListExport" />
     <MESSAGE value="feat: improve border styling and alignment in PackingListExport" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: improve border styling and alignment in PackingListExport" />
+    <MESSAGE value="feat: expand color assignment options and improve color naming in PackingListExport" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: expand color assignment options and improve color naming in PackingListExport" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
