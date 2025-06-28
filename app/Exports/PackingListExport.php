@@ -98,7 +98,7 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
         ];
     }
 
-    public function styles(Worksheet $sheet)
+    public function styles(Worksheet $sheet): array
     {
         $startRow = 3;
         $totalRows = count($this->data);
@@ -136,12 +136,42 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
             if (preg_match('/Цвет:\s*(.+)/u', $colorCell, $matches)) {
                 $colorName = $matches[1];
                 $colors = [
-                    'Неви' => '000080',
-                    'Синый' => '0000FF',
-                    'Серый' => '808080',
-                    'Кэмел чёрный' => '5C4033',
-                    'Хаки черный' => '3B3C36',
+                    'Неви' => '000080',             // navy
+                    'Синий' => '0000FF',            // blue (to‘g‘ri yozilishi)
+                    'Синый' => '0000FF',            // noto‘g‘ri yozilgan variant
+                    'Светло-синий' => '87CEFA',     // light blue
+                    'Темно-синий' => '00008B',      // dark blue
+                    'Серый' => '808080',            // gray
+                    'Светло-серый' => 'D3D3D3',     // light gray
+                    'Темно-серый' => 'A9A9A9',      // dark gray
+                    'Черный' => '000000',           // black
+                    'Кэмел' => 'C19A6B',            // camel
+                    'Кэмел чёрный' => '5C4033',     // camel + black (aralash)
+                    'Хаки' => '78866B',             // khaki
+                    'Хаки черный' => '3B3C36',      // khaki + black (aralash)
+                    'Белый' => 'FFFFFF',            // white
+                    'Бежевый' => 'F5F5DC',          // beige
+                    'Красный' => 'FF0000',          // red
+                    'Темно-красный' => '8B0000',    // dark red
+                    'Розовый' => 'FFC0CB',          // pink
+                    'Желтый' => 'FFFF00',           // yellow
+                    'Оранжевый' => 'FFA500',        // orange
+                    'Зеленый' => '008000',          // green
+                    'Салатовый' => '7CFC00',        // light green
+                    'Темно-зеленый' => '006400',    // dark green
+                    'Фиолетовый' => '800080',       // purple
+                    'Бордовый' => '800000',         // maroon
+                    'Бирюзовый' => '40E0D0',        // turquoise
+                    'Голубой' => 'ADD8E6',          // light blue
+                    'Шоколадный' => '7B3F00',       // chocolate
+                    'Кофейный' => '6F4E37',         // coffee
+                    'Золотой' => 'FFD700',          // gold
+                    'Серебряный' => 'C0C0C0',       // silver
+
+                    // Default fallback color:
+                    'default' => 'D3D3D3',          // light gray
                 ];
+
                 if (isset($colors[$colorName])) {
                     $sheet->getStyle("B{$row2}")->getFill()->applyFromArray([
                         'fillType' => Fill::FILL_SOLID,
