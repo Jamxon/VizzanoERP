@@ -54,7 +54,7 @@ class PackageMasterController extends Controller
             'sizes' => 'required|array',
         ]);
 
-        $orders = Order::with(['orderModels.model', 'customer'])->whereIn('id', $validated['orders'])->get();
+        $orders = Order::with(['orderModel.model', 'contragent'])->whereIn('id', $validated['orders'])->get();
 
         if ($orders->isEmpty()) {
             return response()->json(['message' => 'Buyurtmalar topilmadi'], 404);
