@@ -14,6 +14,7 @@ use App\Models\OrderModel;
 use App\Models\OrderSubModel;
 use App\Models\SewingOutputs;
 use App\Models\Tarification;
+use App\Models\TelegramSewingMessage;
 use App\Models\Time;
 use App\Models\Log;
 use Illuminate\Http\Request;
@@ -317,7 +318,6 @@ class GroupMasterController extends Controller
             return response()->json(['message' => '❗️Bugun bu uchun natija kiritilgan, sahifani yangilang.'], 422);
         }
 
-        $minutes = $orderModel->rasxod / 250;
         $orderQuantity = $order->quantity;
         $totalSewnQuantity = SewingOutputs::where('order_submodel_id', $orderSubModel->id)->sum('quantity');
         $newQuantity = $validatedData['quantity'];
@@ -325,7 +325,7 @@ class GroupMasterController extends Controller
 
         if ($combinedQuantity > $orderQuantity) {
             $a = $orderQuantity - $totalSewnQuantity;
-            return response()->json(['message' => "Siz faqat $a dona qo'shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}."], 400);
+            return response()->json(['message' => "Siz faqat $a dona qo'shishingiz mumkin. Buyurtma umumiy miqdori: {$orderQuantity}, allaqachon tikilgan: {$totalSewnQuantity}.",], 400);
         }
 
         $sewingOutput = SewingOutputs::create($validatedData);
@@ -334,10 +334,6 @@ class GroupMasterController extends Controller
             $order->update(['status' => 'tailored']);
         }
 
-        // Bonuslar yoziladi (individual va guruh)
-        // ... (shu qismni siz oldingidek qoldirishingiz mumkin)
-
-        // Foydalanuvchi va boshqa ma’lumotlar
         $time = Time::find($validatedData['time_id']);
         $user = auth()->user();
         $submodelName = $orderSubModel->submodel->name ?? '—';
@@ -345,7 +341,6 @@ class GroupMasterController extends Controller
         $groupName = $orderSubModel->group->group->name ?? '—';
         $responsible = optional($orderSubModel->group->group->responsibleUser->employee)->name ?? '—';
 
-        // 🧵 Yangi natija
         $newEntryMessage = "<b>🧵 Yangi natija kiritildi</b>\n";
         $newEntryMessage .= "⏰<b>{$time->time}</b>\n";
         $newEntryMessage .= "➕ <b>Kiritilgan:</b> {$newQuantity} dona\n";
@@ -355,7 +350,6 @@ class GroupMasterController extends Controller
         $newEntryMessage .= "👥 <b>Guruh:</b> {$groupName}\n";
         $newEntryMessage .= "🧑‍💼 <b>Mas’ul:</b> {$responsible}\n\n";
 
-        // 🔄 Shu time_id uchun bugungi barcha natijalarni olish
         $today = now()->toDateString();
         $branchId = $order->branch_id;
         $timeId = $validatedData['time_id'];
@@ -398,33 +392,79 @@ class GroupMasterController extends Controller
         }
         $summaryMessage .= "⏰ <b>Jami natijalar :{$totalSumForTime}</b> dona\n";
 
+        $this->sendTelegramMessageWithEditSupport(
+            $newEntryMessage . $summaryMessage,
+            $time->time,
+            $timeId,
+            $branchId
+        );
 
-        // Telegramga yuborish
-        $this->sendTelegramMessage($newEntryMessage . $summaryMessage);
-
-            Log::add(
-                auth()->id(),
-                'Natija kiritildi',
-                'sewing_output',
-                null,
-                $sewingOutput->toArray()
-            );
-
+        Log::add(
+            auth()->id(),
+            'Natija kiritildi',
+            'sewing_output',
+            null,
+            $sewingOutput->toArray()
+        );
 
         return response()->json([
             'message' => "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
         ]);
     }
 
-    private function sendTelegramMessage(string $message): void
+    private function sendTelegramMessageWithEditSupport(string $message, string $timeName, int $timeId, int $branchId): void
     {
-        $token = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
-        $chatId = -1001883536528;
+        $chatId = config('services.telegram.chat_id');
+        $today = now()->toDateString();
 
-        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
+        $existing = TelegramMessage::where([
+            'time_id' => $timeId,
+            'date' => $today,
+            'branch_id' => $branchId,
+        ])->first();
+
+        if ($existing) {
+            $this->editTelegramMessage($chatId, $existing->message_id, $message);
+        } else {
+            $response = $this->sendTelegramMessage($message);
+
+            if ($response && isset($response['result']['message_id'])) {
+                TelegramMessage::create([
+                    'time_id' => $timeId,
+                    'date' => $today,
+                    'branch_id' => $branchId,
+                    'chat_id' => $chatId,
+                    'message_id' => $response['result']['message_id'],
+                ]);
+            }
+        }
+    }
+
+    private function sendTelegramMessage(string $message)
+    {
+        $botToken = config('services.telegram.bot_token');
+        $chatId = config('services.telegram.chat_id');
+        $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
+
+        $response = Http::post($url, [
             'chat_id' => $chatId,
             'text' => $message,
-            'parse_mode' => 'HTML',
+            'parse_mode' => 'HTML'
+        ]);
+
+        return $response->json();
+    }
+
+    private function editTelegramMessage(string $chatId, string $messageId, string $message): void
+    {
+        $botToken = config('services.telegram.bot_token');
+        $url = "https://api.telegram.org/bot{$botToken}/editMessageText";
+
+        Http::post($url, [
+            'chat_id' => $chatId,
+            'message_id' => $messageId,
+            'text' => $message,
+            'parse_mode' => 'HTML'
         ]);
     }
 
@@ -560,4 +600,5 @@ class GroupMasterController extends Controller
 
         return response()->json($resultData);
     }
+
 }
