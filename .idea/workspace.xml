@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: refine border styling and alignment in PackingListExport" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: improve border styling and color assignment in PackingListExport" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,31 +380,7 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="5706000" />
-    </task>
-    <task id="LOCAL-00488" summary="fix: add endpoint to store employee absence with validation">
-      <option name="closed" value="true" />
-      <created>1750913504173</created>
-      <option name="number" value="00488" />
-      <option name="presentableId" value="LOCAL-00488" />
-      <option name="project" value="LOCAL" />
-      <updated>1750913504173</updated>
-    </task>
-    <task id="LOCAL-00489" summary="fix: add endpoint to store employee absence with validation">
-      <option name="closed" value="true" />
-      <created>1750913746695</created>
-      <option name="number" value="00489" />
-      <option name="presentableId" value="LOCAL-00489" />
-      <option name="project" value="LOCAL" />
-      <updated>1750913746695</updated>
-    </task>
-    <task id="LOCAL-00490" summary="fix: update holiday and absence checks to use date range validation">
-      <option name="closed" value="true" />
-      <created>1750913964591</created>
-      <option name="number" value="00490" />
-      <option name="presentableId" value="LOCAL-00490" />
-      <option name="project" value="LOCAL" />
-      <updated>1750913964592</updated>
+      <workItem from="1751087818667" duration="6048000" />
     </task>
     <task id="LOCAL-00491" summary="fix: add image field to employee absence and holiday models with validation">
       <option name="closed" value="true" />
@@ -774,7 +750,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751095562320</updated>
     </task>
-    <option name="localTasksCounter" value="537" />
+    <task id="LOCAL-00537" summary="feat: simplify border styling and enhance alignment in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751095740234</created>
+      <option name="number" value="00537" />
+      <option name="presentableId" value="LOCAL-00537" />
+      <option name="project" value="LOCAL" />
+      <updated>1751095740234</updated>
+    </task>
+    <task id="LOCAL-00538" summary="feat: enhance cell styling and color assignment in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751095882419</created>
+      <option name="number" value="00538" />
+      <option name="presentableId" value="LOCAL-00538" />
+      <option name="project" value="LOCAL" />
+      <updated>1751095882419</updated>
+    </task>
+    <task id="LOCAL-00539" summary="feat: improve border styling and color assignment in PackingListExport">
+      <option name="closed" value="true" />
+      <created>1751095994538</created>
+      <option name="number" value="00539" />
+      <option name="presentableId" value="LOCAL-00539" />
+      <option name="project" value="LOCAL" />
+      <updated>1751095994538</updated>
+    </task>
+    <option name="localTasksCounter" value="540" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,9 +804,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: enhance employee absence and holiday handling in SuperHRController" />
-    <MESSAGE value="fix: correct summary message formatting in GroupMasterController" />
-    <MESSAGE value="fix: log sewing output result in GroupMasterController" />
     <MESSAGE value="feat: add search functionality to getOrders in PackageMasterController" />
     <MESSAGE value="feat: implement bulk package creation and export functionality in PackageMasterController" />
     <MESSAGE value="fix: update model and customer name retrieval in PackageMasterController" />
@@ -829,7 +826,10 @@
     <MESSAGE value="feat: enhance border styling and alignment in PackingListExport" />
     <MESSAGE value="feat: optimize border styling and alignment in PackingListExport" />
     <MESSAGE value="feat: refine border styling and alignment in PackingListExport" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: refine border styling and alignment in PackingListExport" />
+    <MESSAGE value="feat: simplify border styling and enhance alignment in PackingListExport" />
+    <MESSAGE value="feat: enhance cell styling and color assignment in PackingListExport" />
+    <MESSAGE value="feat: improve border styling and color assignment in PackingListExport" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: improve border styling and color assignment in PackingListExport" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

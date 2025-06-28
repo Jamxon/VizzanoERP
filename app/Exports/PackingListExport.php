@@ -106,30 +106,22 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
         $totalRows = count($this->data);
         $groupCount = (int)($totalRows / 3);
 
-        // Ranglar ro‘yxati (kataklarni bo‘yash uchun)
-        $colors = [
-            'Неви' => '000080',
-            'Синый' => '0000FF',
-            'Серый' => '808080',
-            'Кэмел чёрный' => '5C4033',
-            'Хаки черный' => '3B3C36',
-        ];
+        $columnLetters = range('A', 'I');
 
         for ($i = 0; $i < $groupCount; $i++) {
             $rowStart = $startRow + ($i * 3);
             $rowEnd = $rowStart + 2;
 
-            // 1️⃣ Har bir katak (A-I ustunlar) bo‘yicha border va align
-            foreach (range('A', 'I') as $col) {
-                for ($r = $rowStart; $r <= $rowEnd; $r++) {
-                    $sheet->getStyle("{$col}{$r}")->applyFromArray([
-                        'alignment' => [
-                            'horizontal' => 'center',
-                            'vertical' => 'center',
-                        ],
+            foreach ($columnLetters as $col) {
+                for ($row = $rowStart; $row <= $rowEnd; $row++) {
+                    $sheet->getStyle("{$col}{$row}")->applyFromArray([
                         'borders' => [
-                            'allBorders' => [
-                                'borderStyle' => Border::BORDER_THIN,
+                            'left' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['argb' => '000000'],
+                            ],
+                            'right' => [
+                                'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
                                 'color' => ['argb' => '000000'],
                             ],
                         ],
@@ -137,25 +129,30 @@ class PackingListExport implements FromArray, WithColumnWidths, WithStyles, With
                 }
             }
 
-            // 2️⃣ Contragent ustunini (D) faqat o‘rtadagi qatorda bold
+            // Contragent ustunini (D) o‘rtadagi qatorda bold
             $sheet->getStyle("D" . ($rowStart + 1))->getFont()->setBold(true);
 
-            // 3️⃣ Rang nomiga qarab B ustunidagi katakni bo‘yash (o‘rtadagi qatordagi B)
-            $colorText = $sheet->getCell("B" . ($rowStart + 1))->getValue();
-            preg_match('/Цвет:\s*(.+)/u', $colorText, $matches);
-            $colorName = $matches[1] ?? null;
-
-            if ($colorName && isset($colors[$colorName])) {
-                $sheet->getStyle("B" . ($rowStart + 1))->getFill()->applyFromArray([
-                    'fillType' => Fill::FILL_SOLID,
-                    'startColor' => ['rgb' => $colors[$colorName]],
-                ]);
+            // Rangga qarab katakni bo‘yash
+            $colorCell = $sheet->getCell("B" . ($rowStart + 1))->getValue();
+            if (preg_match('/Цвет:\s*(.+)/u', $colorCell, $matches)) {
+                $colorName = $matches[1];
+                $colors = [
+                    'Неви' => '000080',
+                    'Синый' => '0000FF',
+                    'Серый' => '808080',
+                    'Кэмел чёрный' => '5C4033',
+                    'Хаки черный' => '3B3C36',
+                ];
+                if (isset($colors[$colorName])) {
+                    $sheet->getStyle("B" . ($rowStart + 1))->getFill()->applyFromArray([
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'startColor' => ['rgb' => $colors[$colorName]],
+                    ]);
+                }
             }
         }
 
         return [];
     }
-
-
 
 }
