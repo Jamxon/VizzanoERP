@@ -60,8 +60,8 @@ class PackageMasterController extends Controller
             return response()->json(['message' => 'Buyurtmalar topilmadi'], 404);
         }
 
-        $modelName = $orders->first()?->orderModels->first()?->model->name ?? 'Model nomi yo‘q';
-        $customerName = $orders->first()?->customer->name ?? 'Buyurtmachi yo‘q';
+        $modelName = $orders->first()?->orderModel?->model->name ?? 'Model nomi yo‘q';
+        $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yo‘q';
 
         $data = [];
         $index = 1;
