@@ -17,7 +17,6 @@ class UserController extends Controller
     public function getProfile(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = Auth::user();
-
         $employee = Employee::where('id', $user->employee->id)->first();
 
         $startDate = $request->start_date;
@@ -38,6 +37,26 @@ class UserController extends Controller
                 'attendances' => function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('date', [$startDate, $endDate]);
                 },
+                'employeeHolidays' => function ($query) use ($startDate, $endDate) {
+                    $query->where(function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('start_date', [$startDate, $endDate])
+                            ->orWhereBetween('end_date', [$startDate, $endDate])
+                            ->orWhere(function ($q2) use ($startDate, $endDate) {
+                                $q2->where('start_date', '<=', $startDate)
+                                    ->where('end_date', '>=', $endDate);
+                            });
+                    });
+                },
+                'employeeAbsences' => function ($query) use ($startDate, $endDate) {
+                    $query->where(function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('start_date', [$startDate, $endDate])
+                            ->orWhereBetween('end_date', [$startDate, $endDate])
+                            ->orWhere(function ($q2) use ($startDate, $endDate) {
+                                $q2->where('start_date', '<=', $startDate)
+                                    ->where('end_date', '>=', $endDate);
+                            });
+                    });
+                },
             ]);
         } else {
             $employee->load([
@@ -49,6 +68,8 @@ class UserController extends Controller
                         }]);
                 },
                 'attendances',
+                'employeeHolidays',
+                'employeeAbsences',
             ]);
         }
 

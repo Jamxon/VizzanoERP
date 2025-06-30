@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add region, total work seconds, and spend seconds to submodel in GroupController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -381,31 +381,7 @@
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
       <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="2746000" />
-    </task>
-    <task id="LOCAL-00514" summary="fix: log sewing output result in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751086908009</created>
-      <option name="number" value="00514" />
-      <option name="presentableId" value="LOCAL-00514" />
-      <option name="project" value="LOCAL" />
-      <updated>1751086908009</updated>
-    </task>
-    <task id="LOCAL-00515" summary="feat: add search functionality to getOrders in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751086980355</created>
-      <option name="number" value="00515" />
-      <option name="presentableId" value="LOCAL-00515" />
-      <option name="project" value="LOCAL" />
-      <updated>1751086980355</updated>
-    </task>
-    <task id="LOCAL-00516" summary="feat: implement bulk package creation and export functionality in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751089048004</created>
-      <option name="number" value="00516" />
-      <option name="presentableId" value="LOCAL-00516" />
-      <option name="project" value="LOCAL" />
-      <updated>1751089048005</updated>
+      <workItem from="1751255793996" duration="3095000" />
     </task>
     <task id="LOCAL-00517" summary="fix: update model and customer name retrieval in PackageMasterController">
       <option name="closed" value="true" />
@@ -775,7 +751,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751261523334</updated>
     </task>
-    <option name="localTasksCounter" value="563" />
+    <task id="LOCAL-00563" summary="feat: update spend seconds calculation in GroupController and adjust workspace.xml">
+      <option name="closed" value="true" />
+      <created>1751261590360</created>
+      <option name="number" value="00563" />
+      <option name="presentableId" value="LOCAL-00563" />
+      <option name="project" value="LOCAL" />
+      <updated>1751261590360</updated>
+    </task>
+    <task id="LOCAL-00564" summary="feat: replace spendSeconds calculation with debug output in GroupController">
+      <option name="closed" value="true" />
+      <created>1751261656541</created>
+      <option name="number" value="00564" />
+      <option name="presentableId" value="LOCAL-00564" />
+      <option name="project" value="LOCAL" />
+      <updated>1751261656541</updated>
+    </task>
+    <task id="LOCAL-00565" summary="feat: update spendSeconds calculation in GroupController to use submodel's rasxod">
+      <option name="closed" value="true" />
+      <created>1751261869485</created>
+      <option name="number" value="00565" />
+      <option name="presentableId" value="LOCAL-00565" />
+      <option name="project" value="LOCAL" />
+      <updated>1751261869485</updated>
+    </task>
+    <option name="localTasksCounter" value="566" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -805,9 +805,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: enhance row styling and grouping in PackingListExport" />
-    <MESSAGE value="feat: enhance border styling and alignment in PackingListExport" />
-    <MESSAGE value="feat: optimize border styling and alignment in PackingListExport" />
     <MESSAGE value="feat: refine border styling and alignment in PackingListExport" />
     <MESSAGE value="feat: simplify border styling and enhance alignment in PackingListExport" />
     <MESSAGE value="feat: enhance cell styling and color assignment in PackingListExport" />
@@ -830,7 +827,10 @@
     <MESSAGE value="feat: remove debug statement for spend seconds calculation in GroupController" />
     <MESSAGE value="feat: remove debug statement for average plan calculation in GroupController" />
     <MESSAGE value="feat: add region, total work seconds, and spend seconds to submodel in GroupController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add region, total work seconds, and spend seconds to submodel in GroupController" />
+    <MESSAGE value="feat: update spend seconds calculation in GroupController and adjust workspace.xml" />
+    <MESSAGE value="feat: replace spendSeconds calculation with debug output in GroupController" />
+    <MESSAGE value="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
