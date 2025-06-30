@@ -123,7 +123,6 @@ class GroupController extends Controller
             $break = $group->department->break_time ?? 0;
             $workMinutes = $end->diffInMinutes($start) - $break;
             $workSeconds = $workMinutes * 60;
-            dd($avgAttendance);
             $totalWorkSeconds = $workSeconds * $avgAttendance;
 
             // Order statuslar bo‘yicha filtr
@@ -150,6 +149,7 @@ class GroupController extends Controller
 
                     $spends->groupBy('region')->each(function ($spendGroup, $region) use ($avgAttendance, $submodel, $totalWorkSeconds, $remaining) {
                         $spendSeconds = $spendGroup->sum('seconds');
+                        dd($spendSeconds);
                         $averagePlan = $spendSeconds > 0 ? floor($totalWorkSeconds / $spendSeconds) : 0;
                         $finalPlan = ($averagePlan > 0) ? floor($remaining / $averagePlan) : 0;
                         $submodel->{"plan_$region"} = $finalPlan;

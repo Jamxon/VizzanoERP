@@ -381,23 +381,7 @@
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
       <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="1325000" />
-    </task>
-    <task id="LOCAL-00506" summary="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751014486652</created>
-      <option name="number" value="00506" />
-      <option name="presentableId" value="LOCAL-00506" />
-      <option name="project" value="LOCAL" />
-      <updated>1751014486652</updated>
-    </task>
-    <task id="LOCAL-00507" summary="fix: update summary message formatting in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751016800813</created>
-      <option name="number" value="00507" />
-      <option name="presentableId" value="LOCAL-00507" />
-      <option name="project" value="LOCAL" />
-      <updated>1751016800813</updated>
+      <workItem from="1751255793996" duration="1629000" />
     </task>
     <task id="LOCAL-00508" summary="fix: update summary message formatting in GroupMasterController">
       <option name="closed" value="true" />
@@ -775,7 +759,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751260098535</updated>
     </task>
-    <option name="localTasksCounter" value="555" />
+    <task id="LOCAL-00555" summary="feat: debug total work seconds calculation in GroupController">
+      <option name="closed" value="true" />
+      <created>1751260276035</created>
+      <option name="number" value="00555" />
+      <option name="presentableId" value="LOCAL-00555" />
+      <option name="project" value="LOCAL" />
+      <updated>1751260276035</updated>
+    </task>
+    <task id="LOCAL-00556" summary="feat: debug total work seconds calculation in GroupController">
+      <option name="closed" value="true" />
+      <created>1751260371747</created>
+      <option name="number" value="00556" />
+      <option name="presentableId" value="LOCAL-00556" />
+      <option name="project" value="LOCAL" />
+      <updated>1751260371747</updated>
+    </task>
+    <option name="localTasksCounter" value="557" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
