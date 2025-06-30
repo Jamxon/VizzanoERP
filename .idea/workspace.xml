@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: remove debug statement for spend seconds calculation in GroupController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add region, total work seconds, and spend seconds to submodel in GroupController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -381,31 +381,7 @@
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
       <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="1998000" />
-    </task>
-    <task id="LOCAL-00510" summary="feat: enhance employee absence and holiday data structure in UserController">
-      <option name="closed" value="true" />
-      <created>1751022805157</created>
-      <option name="number" value="00510" />
-      <option name="presentableId" value="LOCAL-00510" />
-      <option name="project" value="LOCAL" />
-      <updated>1751022805157</updated>
-    </task>
-    <task id="LOCAL-00511" summary="feat: enhance employee absence and holiday data structure in UserController">
-      <option name="closed" value="true" />
-      <created>1751024801078</created>
-      <option name="number" value="00511" />
-      <option name="presentableId" value="LOCAL-00511" />
-      <option name="project" value="LOCAL" />
-      <updated>1751024801078</updated>
-    </task>
-    <task id="LOCAL-00512" summary="feat: enhance employee absence and holiday handling in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751029002181</created>
-      <option name="number" value="00512" />
-      <option name="presentableId" value="LOCAL-00512" />
-      <option name="project" value="LOCAL" />
-      <updated>1751029002181</updated>
+      <workItem from="1751255793996" duration="2299000" />
     </task>
     <task id="LOCAL-00513" summary="fix: correct summary message formatting in GroupMasterController">
       <option name="closed" value="true" />
@@ -775,7 +751,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751260643146</updated>
     </task>
-    <option name="localTasksCounter" value="559" />
+    <task id="LOCAL-00559" summary="feat: remove debug statement for average plan calculation in GroupController">
+      <option name="closed" value="true" />
+      <created>1751260882798</created>
+      <option name="number" value="00559" />
+      <option name="presentableId" value="LOCAL-00559" />
+      <option name="project" value="LOCAL" />
+      <updated>1751260882798</updated>
+    </task>
+    <task id="LOCAL-00560" summary="feat: remove debug statement for average plan calculation in GroupController">
+      <option name="closed" value="true" />
+      <created>1751260948588</created>
+      <option name="number" value="00560" />
+      <option name="presentableId" value="LOCAL-00560" />
+      <option name="project" value="LOCAL" />
+      <updated>1751260948588</updated>
+    </task>
+    <task id="LOCAL-00561" summary="feat: add region, total work seconds, and spend seconds to submodel in GroupController">
+      <option name="closed" value="true" />
+      <created>1751261071316</created>
+      <option name="number" value="00561" />
+      <option name="presentableId" value="LOCAL-00561" />
+      <option name="project" value="LOCAL" />
+      <updated>1751261071316</updated>
+    </task>
+    <option name="localTasksCounter" value="562" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -805,8 +805,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: remove hardcoded header values in PackingListExport" />
-    <MESSAGE value="feat: streamline data structure and enhance header setup in PackingListExport" />
     <MESSAGE value="feat: enhance row styling and grouping in PackingListExport" />
     <MESSAGE value="feat: enhance border styling and alignment in PackingListExport" />
     <MESSAGE value="feat: optimize border styling and alignment in PackingListExport" />
@@ -830,7 +828,9 @@
     <MESSAGE value="feat: update total work seconds calculation in GroupController" />
     <MESSAGE value="feat: debug total work seconds calculation in GroupController" />
     <MESSAGE value="feat: remove debug statement for spend seconds calculation in GroupController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: remove debug statement for spend seconds calculation in GroupController" />
+    <MESSAGE value="feat: remove debug statement for average plan calculation in GroupController" />
+    <MESSAGE value="feat: add region, total work seconds, and spend seconds to submodel in GroupController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add region, total work seconds, and spend seconds to submodel in GroupController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
