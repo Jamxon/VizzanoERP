@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: debug total work seconds calculation in GroupController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: remove debug statement for spend seconds calculation in GroupController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -381,23 +381,7 @@
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
       <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="1629000" />
-    </task>
-    <task id="LOCAL-00508" summary="fix: update summary message formatting in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751021472290</created>
-      <option name="number" value="00508" />
-      <option name="presentableId" value="LOCAL-00508" />
-      <option name="project" value="LOCAL" />
-      <updated>1751021472290</updated>
-    </task>
-    <task id="LOCAL-00509" summary="feat: add employee absence and holiday retrieval to UserController">
-      <option name="closed" value="true" />
-      <created>1751021789464</created>
-      <option name="number" value="00509" />
-      <option name="presentableId" value="LOCAL-00509" />
-      <option name="project" value="LOCAL" />
-      <updated>1751021789464</updated>
+      <workItem from="1751255793996" duration="1998000" />
     </task>
     <task id="LOCAL-00510" summary="feat: enhance employee absence and holiday data structure in UserController">
       <option name="closed" value="true" />
@@ -775,7 +759,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751260371747</updated>
     </task>
-    <option name="localTasksCounter" value="557" />
+    <task id="LOCAL-00557" summary="feat: debug total work seconds calculation in GroupController">
+      <option name="closed" value="true" />
+      <created>1751260529458</created>
+      <option name="number" value="00557" />
+      <option name="presentableId" value="LOCAL-00557" />
+      <option name="project" value="LOCAL" />
+      <updated>1751260529458</updated>
+    </task>
+    <task id="LOCAL-00558" summary="feat: remove debug statement for spend seconds calculation in GroupController">
+      <option name="closed" value="true" />
+      <created>1751260643146</created>
+      <option name="number" value="00558" />
+      <option name="presentableId" value="LOCAL-00558" />
+      <option name="project" value="LOCAL" />
+      <updated>1751260643146</updated>
+    </task>
+    <option name="localTasksCounter" value="559" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -805,7 +805,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: remove start cell functionality and enhance data structure in PackingListExport" />
     <MESSAGE value="feat: remove hardcoded header values in PackingListExport" />
     <MESSAGE value="feat: streamline data structure and enhance header setup in PackingListExport" />
     <MESSAGE value="feat: enhance row styling and grouping in PackingListExport" />
@@ -830,7 +829,8 @@
     <MESSAGE value="feat: update Telegram message handling with new chat ID and adjust StateNumber" />
     <MESSAGE value="feat: update total work seconds calculation in GroupController" />
     <MESSAGE value="feat: debug total work seconds calculation in GroupController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: debug total work seconds calculation in GroupController" />
+    <MESSAGE value="feat: remove debug statement for spend seconds calculation in GroupController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: remove debug statement for spend seconds calculation in GroupController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
