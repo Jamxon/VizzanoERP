@@ -123,7 +123,7 @@ class GroupController extends Controller
             $break = $group->department->break_time ?? 0;
             $workMinutes = $end->diffInMinutes($start) - $break;
             $workSeconds = $workMinutes * 60;
-            dd($workSeconds);
+            dd($avgAttendance);
             $totalWorkSeconds = $workSeconds * $avgAttendance;
 
             // Order statuslar bo‘yicha filtr
