@@ -125,6 +125,7 @@ class GroupController extends Controller
             $workSeconds = $workMinutes * 60;
 
             $totalWorkSeconds = $workSeconds * $avgAttendance;
+            return $totalWorkSeconds;
 
             // Order statuslar bo‘yicha filtr
             $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {

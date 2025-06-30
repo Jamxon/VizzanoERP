@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update Telegram message handling with hardcoded chat ID and bot token" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update Telegram message handling with new chat ID and adjust StateNumber">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -380,15 +382,8 @@
       <workItem from="1750911476513" duration="8486000" />
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="11622000" />
-    </task>
-    <task id="LOCAL-00503" summary="fix: refactor bonus calculation logic and update Telegram message formatting in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751000989740</created>
-      <option name="number" value="00503" />
-      <option name="presentableId" value="LOCAL-00503" />
-      <option name="project" value="LOCAL" />
-      <updated>1751000989740</updated>
+      <workItem from="1751087818667" duration="13824000" />
+      <workItem from="1751255793996" duration="1015000" />
     </task>
     <task id="LOCAL-00504" summary="fix: update time display in new entry and summary messages in GroupMasterController">
       <option name="closed" value="true" />
@@ -774,7 +769,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751108849641</updated>
     </task>
-    <option name="localTasksCounter" value="552" />
+    <task id="LOCAL-00552" summary="feat: update Telegram message handling with new chat ID and adjust StateNumber">
+      <option name="closed" value="true" />
+      <created>1751109179328</created>
+      <option name="number" value="00552" />
+      <option name="presentableId" value="LOCAL-00552" />
+      <option name="project" value="LOCAL" />
+      <updated>1751109179328</updated>
+    </task>
+    <option name="localTasksCounter" value="553" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -804,7 +807,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add event registration for enhanced header formatting in PackingListExport" />
     <MESSAGE value="feat: enhance header formatting and adjust column widths in PackingListExport" />
     <MESSAGE value="feat: add start cell functionality and enhance styling in PackingListExport" />
     <MESSAGE value="feat: remove start cell functionality and enhance data structure in PackingListExport" />
@@ -829,7 +831,8 @@
     <MESSAGE value="feat: update Telegram message handling in GroupMasterController" />
     <MESSAGE value="feat: refactor Telegram message handling to use TelegramSewingMessage model" />
     <MESSAGE value="feat: update Telegram message handling with hardcoded chat ID and bot token" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update Telegram message handling with hardcoded chat ID and bot token" />
+    <MESSAGE value="feat: update Telegram message handling with new chat ID and adjust StateNumber" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update Telegram message handling with new chat ID and adjust StateNumber" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
