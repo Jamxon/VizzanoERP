@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add holidays and absences to user resource response">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance deletion process in TechnologController with logging and response handling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -383,15 +383,7 @@
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
       <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="6077000" />
-    </task>
-    <task id="LOCAL-00519" summary="feat: add PackingListExport import in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751089321001</created>
-      <option name="number" value="00519" />
-      <option name="presentableId" value="LOCAL-00519" />
-      <option name="project" value="LOCAL" />
-      <updated>1751089321001</updated>
+      <workItem from="1751255793996" duration="7095000" />
     </task>
     <task id="LOCAL-00520" summary="feat: enhance data structure in PackageMasterController and update headings in PackingListExport">
       <option name="closed" value="true" />
@@ -777,7 +769,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751262142957</updated>
     </task>
-    <option name="localTasksCounter" value="568" />
+    <task id="LOCAL-00568" summary="feat: enhance deletion process in TechnologController with logging and response handling">
+      <option name="closed" value="true" />
+      <created>1751267000402</created>
+      <option name="number" value="00568" />
+      <option name="presentableId" value="LOCAL-00568" />
+      <option name="project" value="LOCAL" />
+      <updated>1751267000402</updated>
+    </task>
+    <option name="localTasksCounter" value="569" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,7 +807,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: enhance cell styling and color assignment in PackingListExport" />
     <MESSAGE value="feat: improve border styling and color assignment in PackingListExport" />
     <MESSAGE value="feat: update border styling and color assignment logic in PackingListExport" />
     <MESSAGE value="feat: enhance cell alignment and add top/bottom border styling in PackingListExport" />
@@ -832,7 +831,8 @@
     <MESSAGE value="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
     <MESSAGE value="feat: add employee holidays and absences loading to UserController" />
     <MESSAGE value="feat: add holidays and absences to user resource response" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add holidays and absences to user resource response" />
+    <MESSAGE value="feat: enhance deletion process in TechnologController with logging and response handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance deletion process in TechnologController with logging and response handling" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

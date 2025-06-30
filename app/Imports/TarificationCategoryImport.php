@@ -94,17 +94,19 @@ class TarificationCategoryImport implements ToCollection
      */
     private function generateSequentialCode(): string
     {
-        $lastTarification = Tarification::latest('id')->first();
+        $lastTarification = Tarification::orderByRaw("LENGTH(code) DESC, code DESC")->first();
 
         if (!$lastTarification) {
             return 'A1';
         }
 
         $lastCode = $lastTarification->code;
+
         preg_match('/([A-Z]+)(\d+)/', $lastCode, $matches);
 
         $letter = $matches[1] ?? 'A';
         $number = (int)($matches[2] ?? 0);
+
         $number++;
 
         if ($number > 999) {
@@ -124,21 +126,18 @@ class TarificationCategoryImport implements ToCollection
     private function incrementLetter(string $letter): string
     {
         $length = strlen($letter);
-        $incremented = false;
+        $i = $length - 1;
 
-        for ($i = $length - 1; $i >= 0; $i--) {
+        while ($i >= 0) {
             if ($letter[$i] !== 'Z') {
                 $letter[$i] = chr(ord($letter[$i]) + 1);
-                $incremented = true;
-                break;
+                return $letter;
             }
+
             $letter[$i] = 'A';
+            $i--;
         }
 
-        if (!$incremented) {
-            $letter = 'A' . $letter;
-        }
-
-        return $letter;
+        return 'A' . $letter;
     }
 }
