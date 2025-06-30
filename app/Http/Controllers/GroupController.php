@@ -123,9 +123,8 @@ class GroupController extends Controller
             $break = $group->department->break_time ?? 0;
             $workMinutes = $end->diffInMinutes($start) - $break;
             $workSeconds = $workMinutes * 60;
-
+            dd($workSeconds);
             $totalWorkSeconds = $workSeconds * $avgAttendance;
-            dd($totalWorkSeconds);
 
             // Order statuslar bo‘yicha filtr
             $filteredOrders = $group->orders->filter(function ($orderGroupItem) use ($excludedStatuses) {

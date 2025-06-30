@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update Telegram message handling with new chat ID and adjust StateNumber">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: debug total work seconds calculation in GroupController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -383,23 +381,7 @@
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
       <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="1015000" />
-    </task>
-    <task id="LOCAL-00504" summary="fix: update time display in new entry and summary messages in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751001122068</created>
-      <option name="number" value="00504" />
-      <option name="presentableId" value="LOCAL-00504" />
-      <option name="project" value="LOCAL" />
-      <updated>1751001122068</updated>
-    </task>
-    <task id="LOCAL-00505" summary="fix: update Telegram message formatting for employee absence and leave notifications in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751002022003</created>
-      <option name="number" value="00505" />
-      <option name="presentableId" value="LOCAL-00505" />
-      <option name="project" value="LOCAL" />
-      <updated>1751002022003</updated>
+      <workItem from="1751255793996" duration="1325000" />
     </task>
     <task id="LOCAL-00506" summary="fix: calculate total quantity for time outputs and update summary message formatting in GroupMasterController">
       <option name="closed" value="true" />
@@ -777,7 +759,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751109179328</updated>
     </task>
-    <option name="localTasksCounter" value="553" />
+    <task id="LOCAL-00553" summary="feat: update total work seconds calculation in GroupController">
+      <option name="closed" value="true" />
+      <created>1751260034230</created>
+      <option name="number" value="00553" />
+      <option name="presentableId" value="LOCAL-00553" />
+      <option name="project" value="LOCAL" />
+      <updated>1751260034230</updated>
+    </task>
+    <task id="LOCAL-00554" summary="feat: debug total work seconds calculation in GroupController">
+      <option name="closed" value="true" />
+      <created>1751260098535</created>
+      <option name="number" value="00554" />
+      <option name="presentableId" value="LOCAL-00554" />
+      <option name="project" value="LOCAL" />
+      <updated>1751260098535</updated>
+    </task>
+    <option name="localTasksCounter" value="555" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,8 +805,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: enhance header formatting and adjust column widths in PackingListExport" />
-    <MESSAGE value="feat: add start cell functionality and enhance styling in PackingListExport" />
     <MESSAGE value="feat: remove start cell functionality and enhance data structure in PackingListExport" />
     <MESSAGE value="feat: remove hardcoded header values in PackingListExport" />
     <MESSAGE value="feat: streamline data structure and enhance header setup in PackingListExport" />
@@ -832,7 +828,9 @@
     <MESSAGE value="feat: refactor Telegram message handling to use TelegramSewingMessage model" />
     <MESSAGE value="feat: update Telegram message handling with hardcoded chat ID and bot token" />
     <MESSAGE value="feat: update Telegram message handling with new chat ID and adjust StateNumber" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update Telegram message handling with new chat ID and adjust StateNumber" />
+    <MESSAGE value="feat: update total work seconds calculation in GroupController" />
+    <MESSAGE value="feat: debug total work seconds calculation in GroupController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: debug total work seconds calculation in GroupController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
