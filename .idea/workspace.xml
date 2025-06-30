@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add holidays and absences to user resource response">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -381,23 +383,7 @@
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
       <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="3095000" />
-    </task>
-    <task id="LOCAL-00517" summary="fix: update model and customer name retrieval in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751089228707</created>
-      <option name="number" value="00517" />
-      <option name="presentableId" value="LOCAL-00517" />
-      <option name="project" value="LOCAL" />
-      <updated>1751089228707</updated>
-    </task>
-    <task id="LOCAL-00518" summary="fix: update model and contragent name retrieval in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751089304680</created>
-      <option name="number" value="00518" />
-      <option name="presentableId" value="LOCAL-00518" />
-      <option name="project" value="LOCAL" />
-      <updated>1751089304680</updated>
+      <workItem from="1751255793996" duration="6077000" />
     </task>
     <task id="LOCAL-00519" summary="feat: add PackingListExport import in PackageMasterController">
       <option name="closed" value="true" />
@@ -775,7 +761,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751261869485</updated>
     </task>
-    <option name="localTasksCounter" value="566" />
+    <task id="LOCAL-00566" summary="feat: add employee holidays and absences loading to UserController">
+      <option name="closed" value="true" />
+      <created>1751262034053</created>
+      <option name="number" value="00566" />
+      <option name="presentableId" value="LOCAL-00566" />
+      <option name="project" value="LOCAL" />
+      <updated>1751262034053</updated>
+    </task>
+    <task id="LOCAL-00567" summary="feat: add holidays and absences to user resource response">
+      <option name="closed" value="true" />
+      <created>1751262142957</created>
+      <option name="number" value="00567" />
+      <option name="presentableId" value="LOCAL-00567" />
+      <option name="project" value="LOCAL" />
+      <updated>1751262142957</updated>
+    </task>
+    <option name="localTasksCounter" value="568" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -805,8 +807,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: refine border styling and alignment in PackingListExport" />
-    <MESSAGE value="feat: simplify border styling and enhance alignment in PackingListExport" />
     <MESSAGE value="feat: enhance cell styling and color assignment in PackingListExport" />
     <MESSAGE value="feat: improve border styling and color assignment in PackingListExport" />
     <MESSAGE value="feat: update border styling and color assignment logic in PackingListExport" />
@@ -830,7 +830,9 @@
     <MESSAGE value="feat: update spend seconds calculation in GroupController and adjust workspace.xml" />
     <MESSAGE value="feat: replace spendSeconds calculation with debug output in GroupController" />
     <MESSAGE value="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
+    <MESSAGE value="feat: add employee holidays and absences loading to UserController" />
+    <MESSAGE value="feat: add holidays and absences to user resource response" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add holidays and absences to user resource response" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

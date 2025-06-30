@@ -796,41 +796,43 @@ class TechnologController extends Controller
     {
         $tarificationCategory = TarificationCategory::find($id);
 
-        if ($tarificationCategory) {
-            $tarifications = Tarification::where('tarification_category_id', $id)->get();
+        if (!$tarificationCategory) {
+            Log::add(auth()->id(), 'Tarifikatsiya kategoriyasi topilmadi (ID: ' . $id . ')', 'attempt', null, null);
+            return response()->json(['message' => 'Tarifikatsiya kategoriyasi topilmadi'], 404);
+        }
 
-            // Eski ma'lumotlarni log uchun olish
-            $oldData = [
-                'category' => $tarificationCategory->toArray(),
-                'tarifications' => $tarifications->toArray()
-            ];
+        $tarifications = Tarification::where('tarification_category_id', $id)->get();
+        $oldData = [
+            'category' => $tarificationCategory->toArray(),
+            'tarifications' => $tarifications->toArray()
+        ];
 
-            if ($tarifications) {
-                foreach ($tarifications as $tarification) {
-                    $tarification->delete();
-                }
+        if ($tarifications->isNotEmpty()) {
+            $totalSeconds = $tarifications->sum('second');
+            $totalSumma = $tarifications->sum('summa');
 
-                $tarificationCategory->delete();
+            $submodelId = $tarificationCategory->submodel_id;
+            $region = $tarificationCategory->region;
 
-                // Log yozish
-                Log::add(auth()->id(), 'Tarifikatsiya kategoriyasi va tarifikatsiyalar o‘chirildi', 'delete',$oldData, null);
+            $spend = \App\Models\SubmodelSpend::where('submodel_id', $submodelId)->where('region', $region)->first();
 
-                return response()->json([
-                    'message' => 'Tarifikatsiyalar va kategoriya muvaffaqiyatli o‘chirildi'
-                ], 200);
-            } else {
-                Log::add(auth()->id(), 'Tarifikatsiyalar topilmadi, lekin kategoriya mavjud', 'attempt', $oldData, null);
-
-                return response()->json([
-                    'message' => 'Tarifikatsiyalar topilmadi'
-                ], 404);
+            if ($spend) {
+                $spend->decrement('seconds', $totalSeconds);
+                $spend->decrement('summa', $totalSumma);
             }
-        } else {
-            Log::add(auth()->id(), 'Tarifikatsiya kategoriyasi topilmadi (ID: ' . $id . ')', 'attempt',null, null);
 
-            return response()->json([
-                'message' => 'Tarifikatsiya kategoriyasi topilmadi'
-            ], 404);
+            foreach ($tarifications as $tarification) {
+                $tarification->delete();
+            }
+
+            $tarificationCategory->delete();
+
+            Log::add(auth()->id(), 'Tarifikatsiya kategoriyasi va tarifikatsiyalar o‘chirildi', 'delete', $oldData, null);
+
+            return response()->json(['message' => 'Tarifikatsiyalar va kategoriya muvaffaqiyatli o‘chirildi'], 200);
+        } else {
+            Log::add(auth()->id(), 'Tarifikatsiyalar topilmadi, lekin kategoriya mavjud', 'attempt', $oldData, null);
+            return response()->json(['message' => 'Tarifikatsiyalar topilmadi'], 404);
         }
     }
 
@@ -838,25 +840,29 @@ class TechnologController extends Controller
     {
         $tarification = Tarification::find($id);
 
-        if ($tarification) {
-            // Eski ma'lumotlarni log uchun olish
-            $oldData = $tarification->toArray();
-
-            $tarification->delete();
-
-            // Log yozish
-            Log::add(auth()->id(), 'Tarifikatsiya o‘chirildi', 'delete', $oldData, null);
-
-            return response()->json([
-                'message' => 'Tarifikatsiya muvaffaqiyatli o‘chirildi'
-            ], 200);
-        } else {
-            Log::add(auth()->id(), 'Tarifikatsiya topilmadi (ID: ' . $id . ')', 'attempt',null, null);
-
-            return response()->json([
-                'message' => 'Tarifikatsiya topilmadi'
-            ], 404);
+        if (!$tarification) {
+            Log::add(auth()->id(), 'Tarifikatsiya topilmadi (ID: ' . $id . ')', 'attempt', null, null);
+            return response()->json(['message' => 'Tarifikatsiya topilmadi'], 404);
         }
+
+        $oldData = $tarification->toArray();
+
+        $category = $tarification->tarificationCategory;
+        $submodelId = $category->submodel_id;
+        $region = $category->region;
+
+        $spend = \App\Models\SubmodelSpend::where('submodel_id', $submodelId)->where('region', $region)->first();
+
+        if ($spend) {
+            $spend->decrement('seconds', $tarification->second);
+            $spend->decrement('summa', $tarification->summa);
+        }
+
+        $tarification->delete();
+
+        Log::add(auth()->id(), 'Tarifikatsiya o‘chirildi', 'delete', $oldData, null);
+
+        return response()->json(['message' => 'Tarifikatsiya muvaffaqiyatli o‘chirildi'], 200);
     }
 
     public function getOrders(): \Illuminate\Http\JsonResponse
