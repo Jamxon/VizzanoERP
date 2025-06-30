@@ -381,15 +381,7 @@
       <workItem from="1750997346621" duration="12577000" />
       <workItem from="1751084029479" duration="3709000" />
       <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="2299000" />
-    </task>
-    <task id="LOCAL-00513" summary="fix: correct summary message formatting in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751085976808</created>
-      <option name="number" value="00513" />
-      <option name="presentableId" value="LOCAL-00513" />
-      <option name="project" value="LOCAL" />
-      <updated>1751085976808</updated>
+      <workItem from="1751255793996" duration="2746000" />
     </task>
     <task id="LOCAL-00514" summary="fix: log sewing output result in GroupMasterController">
       <option name="closed" value="true" />
@@ -775,7 +767,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751261071316</updated>
     </task>
-    <option name="localTasksCounter" value="562" />
+    <task id="LOCAL-00562" summary="feat: add region, total work seconds, and spend seconds to submodel in GroupController">
+      <option name="closed" value="true" />
+      <created>1751261523334</created>
+      <option name="number" value="00562" />
+      <option name="presentableId" value="LOCAL-00562" />
+      <option name="project" value="LOCAL" />
+      <updated>1751261523334</updated>
+    </task>
+    <option name="localTasksCounter" value="563" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
