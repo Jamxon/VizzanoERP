@@ -535,11 +535,9 @@ class SuperHRController extends Controller
             ];
         });
 
-        // ✅ Agar 'absent' filtri bo‘lsa, faqat absent_count > 0 bo'lganlarni qaytaramiz
+        // 🧠 Faqat to'liq "Kelmagan"lar uchun filtr
         if ($statusFilter === 'absent') {
-            $result = $result->filter(function ($emp) {
-                return count($emp['attendances']['absent']) > 0 && count($emp['attendances']['present']) === 0;
-            })->values();
+            $result = $result->filter(fn($emp) => $emp['present_count'] === 0 && $emp['absent_count'] > 0)->values();
         }
 
         $pdf = PDF::loadView('pdf.attendance-report', [
