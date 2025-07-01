@@ -216,6 +216,7 @@ class CasherController extends Controller
         $month = $request->input('month', Carbon::now()->format('Y-m'));
         $expenses = MonthlyExpense::whereMonth('month', Carbon::parse($month)->month)
             ->whereYear('month', Carbon::parse($month)->year)
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->get();
 
         if ($expenses->isEmpty()) {
@@ -255,6 +256,7 @@ class CasherController extends Controller
             'amount' => $validated['amount'],
             'month' => $validated['month'] . '-01',
             'name' => $validated['name'],
+            'branch_id' => auth()->user()->employee->branch_id,
         ]);
 
         return response()->json(['message' => 'Saved', 'data' => $expense]);
