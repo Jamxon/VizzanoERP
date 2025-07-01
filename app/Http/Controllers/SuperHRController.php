@@ -80,7 +80,7 @@ class SuperHRController extends Controller
                 if ($group) {
                     $messageText .= "\n*Guruh:* {$group->name}";
                     if ($group->responsibleUser) {
-                        $messageText .= "\n*Masʼul:* {$group->responsibleUser->name}";
+                        $messageText .= "\n*Masʼul:* {$group->responsibleUser->employee->name}";
                     }
                 }
             }
@@ -442,7 +442,7 @@ class SuperHRController extends Controller
                 if ($group) {
                     $messageText .= "\n*Guruh:* {$group->name}";
                     if ($group->responsibleUser) {
-                        $messageText .= "\n*Masʼul:* {$group->responsibleUser->name}";
+                        $messageText .= "\n*Masʼul:* {$group->responsibleUser->employee->name}";
                     }
                 }
             }
