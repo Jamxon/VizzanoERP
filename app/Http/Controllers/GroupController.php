@@ -15,7 +15,7 @@ use Illuminate\Validation\ValidationException;
 
 class GroupController extends Controller
 {
-    public function orderGroupStore(Request $request)
+    public function orderGroupStore(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
             $submodelId = $request->submodel_id;
@@ -75,8 +75,7 @@ class GroupController extends Controller
         }
     }
 
-
-    public function getGroupsWithPlan(Request $request)
+    public function getGroupsWithPlan(Request $request): \Illuminate\Http\JsonResponse
     {
         $departments = Department::where("id", $request->department_id)
             ->with([
