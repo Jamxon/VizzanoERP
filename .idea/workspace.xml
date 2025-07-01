@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add group and responsible user details to attendance notifications in SuperHRController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update responsible user details in attendance notifications in SuperHRController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -383,15 +385,7 @@
       <workItem from="1751087818667" duration="13824000" />
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
-      <workItem from="1751343592281" duration="4119000" />
-    </task>
-    <task id="LOCAL-00528" summary="feat: enhance header formatting and adjust column widths in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751091818086</created>
-      <option name="number" value="00528" />
-      <option name="presentableId" value="LOCAL-00528" />
-      <option name="project" value="LOCAL" />
-      <updated>1751091818086</updated>
+      <workItem from="1751343592281" duration="5438000" />
     </task>
     <task id="LOCAL-00529" summary="feat: add start cell functionality and enhance styling in PackingListExport">
       <option name="closed" value="true" />
@@ -777,7 +771,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751349785786</updated>
     </task>
-    <option name="localTasksCounter" value="577" />
+    <task id="LOCAL-00577" summary="feat: update responsible user details in attendance notifications in SuperHRController">
+      <option name="closed" value="true" />
+      <created>1751350021133</created>
+      <option name="number" value="00577" />
+      <option name="presentableId" value="LOCAL-00577" />
+      <option name="project" value="LOCAL" />
+      <updated>1751350021133</updated>
+    </task>
+    <option name="localTasksCounter" value="578" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,7 +809,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update sheet titles to localized versions in PackingListExport" />
     <MESSAGE value="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
     <MESSAGE value="feat: update Telegram message handling in GroupMasterController" />
     <MESSAGE value="feat: refactor Telegram message handling to use TelegramSewingMessage model" />
@@ -832,7 +833,8 @@
     <MESSAGE value="feat: refine attendance filtering logic in SuperHRController to include present and absent counts" />
     <MESSAGE value="feat: optimize absent attendance filtering logic in SuperHRController" />
     <MESSAGE value="feat: add group and responsible user details to attendance notifications in SuperHRController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add group and responsible user details to attendance notifications in SuperHRController" />
+    <MESSAGE value="feat: update responsible user details in attendance notifications in SuperHRController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update responsible user details in attendance notifications in SuperHRController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

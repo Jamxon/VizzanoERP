@@ -49,7 +49,7 @@ class OrderController extends Controller
 
     public function getOrdersWithoutOrderGroups(Request $request): \Illuminate\Http\JsonResponse
     {
-    $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
+    $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged', 'tailored'];
 
     $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
         ->whereNotIn('status', $excludedStatuses) // 🔍 bu yerda status filtr qo‘shildi
