@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: optimize sequential code generation in Tarification and Technolog controllers">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="refactor: remove unused import in CasherController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -385,22 +383,7 @@
       <workItem from="1751087818667" duration="13824000" />
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
-    </task>
-    <task id="LOCAL-00521" summary="fix: correct size name retrieval in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751089747685</created>
-      <option name="number" value="00521" />
-      <option name="presentableId" value="LOCAL-00521" />
-      <option name="project" value="LOCAL" />
-      <updated>1751089747686</updated>
-    </task>
-    <task id="LOCAL-00522" summary="feat: add column width specifications in PackingListExport and adjust data structure in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751090021919</created>
-      <option name="number" value="00522" />
-      <option name="presentableId" value="LOCAL-00522" />
-      <option name="project" value="LOCAL" />
-      <updated>1751090021919</updated>
+      <workItem from="1751343592281" duration="304000" />
     </task>
     <task id="LOCAL-00523" summary="feat: implement WithColumnWidths in PackingListExport for enhanced export formatting">
       <option name="closed" value="true" />
@@ -778,7 +761,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751271718801</updated>
     </task>
-    <option name="localTasksCounter" value="570" />
+    <task id="LOCAL-00570" summary="feat: filter monthly expenses by branch and include branch_id in expense creation">
+      <option name="closed" value="true" />
+      <created>1751343846103</created>
+      <option name="number" value="00570" />
+      <option name="presentableId" value="LOCAL-00570" />
+      <option name="project" value="LOCAL" />
+      <updated>1751343846103</updated>
+    </task>
+    <task id="LOCAL-00571" summary="refactor: remove unused import in CasherController">
+      <option name="closed" value="true" />
+      <created>1751343901056</created>
+      <option name="number" value="00571" />
+      <option name="presentableId" value="LOCAL-00571" />
+      <option name="project" value="LOCAL" />
+      <updated>1751343901056</updated>
+    </task>
+    <option name="localTasksCounter" value="572" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +807,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update border styling and color assignment logic in PackingListExport" />
-    <MESSAGE value="feat: enhance cell alignment and add top/bottom border styling in PackingListExport" />
     <MESSAGE value="feat: refine border styling and improve cell alignment in PackingListExport" />
     <MESSAGE value="feat: improve border styling and alignment in PackingListExport" />
     <MESSAGE value="feat: expand color assignment options and improve color naming in PackingListExport" />
@@ -833,7 +830,9 @@
     <MESSAGE value="feat: add holidays and absences to user resource response" />
     <MESSAGE value="feat: enhance deletion process in TechnologController with logging and response handling" />
     <MESSAGE value="feat: optimize sequential code generation in Tarification and Technolog controllers" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: optimize sequential code generation in Tarification and Technolog controllers" />
+    <MESSAGE value="feat: filter monthly expenses by branch and include branch_id in expense creation" />
+    <MESSAGE value="refactor: remove unused import in CasherController" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: remove unused import in CasherController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

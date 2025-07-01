@@ -554,7 +554,7 @@ class SuperHRController extends Controller
         $endDate = $request->get('end_date');
         $groupId = $request->get('group_id');
         $departmentId = $request->get('department_id');
-        $statusFilter = $request->get('status'); // 'all' or 'absent'
+        $statusFilter = $request->get('status');
 
         $branchId = auth()->user()?->employee?->branch_id;
         if (!$branchId) {
@@ -574,6 +574,7 @@ class SuperHRController extends Controller
 
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
+            ->where('status', $statusFilter)
             ->get()
             ->groupBy('employee_id');
 
@@ -637,7 +638,6 @@ class SuperHRController extends Controller
             ];
         });
 
-        // ✅ Agar 'absent' bo‘lsa, faqat biror kun bo‘lsa ham kelmaganlar
         if ($statusFilter === 'absent') {
             $result = $result->filter(function ($emp) {
                 return count($emp['attendances']['absent']) > 0;
