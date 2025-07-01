@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static create(array $array)
  * @method static updateOrCreate(array $array, array $array1)
  * @method static where(string $string, string $today)
+ * @method static whereBetween(string $string, array $array)
  */
 class Attendance extends Model
 {

@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="refactor: remove unused import in CasherController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: filter attendances by status in SuperHRController">
+      <change beforePath="$PROJECT_DIR$/app/Models/Attendance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Attendance.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -383,15 +385,7 @@
       <workItem from="1751087818667" duration="13824000" />
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
-      <workItem from="1751343592281" duration="304000" />
-    </task>
-    <task id="LOCAL-00523" summary="feat: implement WithColumnWidths in PackingListExport for enhanced export formatting">
-      <option name="closed" value="true" />
-      <created>1751090098290</created>
-      <option name="number" value="00523" />
-      <option name="presentableId" value="LOCAL-00523" />
-      <option name="project" value="LOCAL" />
-      <updated>1751090098290</updated>
+      <workItem from="1751343592281" duration="1005000" />
     </task>
     <task id="LOCAL-00524" summary="fix: adjust column widths in PackingListExport for improved formatting">
       <option name="closed" value="true" />
@@ -777,7 +771,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751343901056</updated>
     </task>
-    <option name="localTasksCounter" value="572" />
+    <task id="LOCAL-00572" summary="feat: filter attendances by status in SuperHRController">
+      <option name="closed" value="true" />
+      <created>1751344608247</created>
+      <option name="number" value="00572" />
+      <option name="presentableId" value="LOCAL-00572" />
+      <option name="project" value="LOCAL" />
+      <updated>1751344608247</updated>
+    </task>
+    <option name="localTasksCounter" value="573" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,7 +809,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: refine border styling and improve cell alignment in PackingListExport" />
     <MESSAGE value="feat: improve border styling and alignment in PackingListExport" />
     <MESSAGE value="feat: expand color assignment options and improve color naming in PackingListExport" />
     <MESSAGE value="feat: enhance packing list export with summary data and improved structure" />
@@ -832,7 +833,8 @@
     <MESSAGE value="feat: optimize sequential code generation in Tarification and Technolog controllers" />
     <MESSAGE value="feat: filter monthly expenses by branch and include branch_id in expense creation" />
     <MESSAGE value="refactor: remove unused import in CasherController" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: remove unused import in CasherController" />
+    <MESSAGE value="feat: filter attendances by status in SuperHRController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: filter attendances by status in SuperHRController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

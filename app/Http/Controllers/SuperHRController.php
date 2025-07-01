@@ -574,7 +574,6 @@ class SuperHRController extends Controller
 
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
-            ->where('status', $statusFilter)
             ->get()
             ->groupBy('employee_id');
 
@@ -640,7 +639,7 @@ class SuperHRController extends Controller
 
         if ($statusFilter === 'absent') {
             $result = $result->filter(function ($emp) {
-                return count($emp['attendances']['absent']) > 0;
+                return count($emp['attendances']['absent']) > 0 && count($emp['attendances']['present']) === 0;
             })->values();
         }
 
