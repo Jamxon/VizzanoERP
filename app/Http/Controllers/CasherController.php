@@ -15,8 +15,6 @@ use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-
-use function Laravel\Prompts\search;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 class CasherController extends Controller
