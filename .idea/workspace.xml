@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add whereBetween method to Attendance model and refine attendance filtering logic in SuperHRController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: optimize absent attendance filtering logic in SuperHRController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -383,23 +386,7 @@
       <workItem from="1751087818667" duration="13824000" />
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
-      <workItem from="1751343592281" duration="1503000" />
-    </task>
-    <task id="LOCAL-00525" summary="feat: add styling support and refactor column widths in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751090355297</created>
-      <option name="number" value="00525" />
-      <option name="presentableId" value="LOCAL-00525" />
-      <option name="project" value="LOCAL" />
-      <updated>1751090355297</updated>
-    </task>
-    <task id="LOCAL-00526" summary="feat: refactor color handling and packing logic in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751090925104</created>
-      <option name="number" value="00526" />
-      <option name="presentableId" value="LOCAL-00526" />
-      <option name="project" value="LOCAL" />
-      <updated>1751090925104</updated>
+      <workItem from="1751343592281" duration="3793000" />
     </task>
     <task id="LOCAL-00527" summary="feat: add event registration for enhanced header formatting in PackingListExport">
       <option name="closed" value="true" />
@@ -777,7 +764,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751345117152</updated>
     </task>
-    <option name="localTasksCounter" value="574" />
+    <task id="LOCAL-00574" summary="feat: refine attendance filtering logic in SuperHRController to include present and absent counts">
+      <option name="closed" value="true" />
+      <created>1751345207310</created>
+      <option name="number" value="00574" />
+      <option name="presentableId" value="LOCAL-00574" />
+      <option name="project" value="LOCAL" />
+      <updated>1751345207310</updated>
+    </task>
+    <task id="LOCAL-00575" summary="feat: optimize absent attendance filtering logic in SuperHRController">
+      <option name="closed" value="true" />
+      <created>1751345289269</created>
+      <option name="number" value="00575" />
+      <option name="presentableId" value="LOCAL-00575" />
+      <option name="project" value="LOCAL" />
+      <updated>1751345289269</updated>
+    </task>
+    <option name="localTasksCounter" value="576" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,8 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: expand color assignment options and improve color naming in PackingListExport" />
-    <MESSAGE value="feat: enhance packing list export with summary data and improved structure" />
     <MESSAGE value="feat: add title support for sheets in PackingListExport" />
     <MESSAGE value="feat: update sheet titles to localized versions in PackingListExport" />
     <MESSAGE value="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
@@ -832,7 +833,9 @@
     <MESSAGE value="refactor: remove unused import in CasherController" />
     <MESSAGE value="feat: filter attendances by status in SuperHRController" />
     <MESSAGE value="feat: add whereBetween method to Attendance model and refine attendance filtering logic in SuperHRController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add whereBetween method to Attendance model and refine attendance filtering logic in SuperHRController" />
+    <MESSAGE value="feat: refine attendance filtering logic in SuperHRController to include present and absent counts" />
+    <MESSAGE value="feat: optimize absent attendance filtering logic in SuperHRController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: optimize absent attendance filtering logic in SuperHRController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

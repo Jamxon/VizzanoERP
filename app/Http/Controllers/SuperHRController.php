@@ -74,6 +74,18 @@ class SuperHRController extends Controller
                 . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
                 . "*Izoh:* " . ($request->comment ?? 'Yo‘q');
 
+// 🔽 Guruh va masʼul shaxs haqida qo‘shimcha
+            if ($employee->group_id) {
+                $group = \App\Models\Group::with('responsibleUser')->find($employee->group_id);
+                if ($group) {
+                    $messageText .= "\n*Guruh:* {$group->name}";
+                    if ($group->responsibleUser) {
+                        $messageText .= "\n*Masʼul:* {$group->responsibleUser->name}";
+                    }
+                }
+            }
+
+
             $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
             $chatId = -1002655761088;
 
@@ -418,11 +430,23 @@ class SuperHRController extends Controller
 
             // 🟢 Telegramga yuborish
             $employee = \App\Models\Employee::find($request->employee_id);
-            $messageText = "🏖 *Sababli:*\n\n"
+            $messageText = "🚫 *Sababsiz:*\n\n"
                 . "*Ismi:* {$employee->name}\n"
                 . "*Telefon:* {$employee->phone}\n"
                 . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
                 . "*Izoh:* " . ($request->comment ?? 'Yo‘q');
+
+// 🔽 Guruh va masʼul shaxs haqida qo‘shimcha
+            if ($employee->group_id) {
+                $group = \App\Models\Group::with('responsibleUser')->find($employee->group_id);
+                if ($group) {
+                    $messageText .= "\n*Guruh:* {$group->name}";
+                    if ($group->responsibleUser) {
+                        $messageText .= "\n*Masʼul:* {$group->responsibleUser->name}";
+                    }
+                }
+            }
+
 
             $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
             $chatId = -1002655761088;
