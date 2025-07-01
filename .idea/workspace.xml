@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update responsible user details in attendance notifications in SuperHRController">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -385,31 +383,7 @@
       <workItem from="1751087818667" duration="13824000" />
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
-      <workItem from="1751343592281" duration="5438000" />
-    </task>
-    <task id="LOCAL-00529" summary="feat: add start cell functionality and enhance styling in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751091983182</created>
-      <option name="number" value="00529" />
-      <option name="presentableId" value="LOCAL-00529" />
-      <option name="project" value="LOCAL" />
-      <updated>1751091983182</updated>
-    </task>
-    <task id="LOCAL-00530" summary="feat: remove start cell functionality and enhance data structure in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751092092704</created>
-      <option name="number" value="00530" />
-      <option name="presentableId" value="LOCAL-00530" />
-      <option name="project" value="LOCAL" />
-      <updated>1751092092704</updated>
-    </task>
-    <task id="LOCAL-00531" summary="feat: remove hardcoded header values in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751092167399</created>
-      <option name="number" value="00531" />
-      <option name="presentableId" value="LOCAL-00531" />
-      <option name="project" value="LOCAL" />
-      <updated>1751092167399</updated>
+      <workItem from="1751343592281" duration="6998000" />
     </task>
     <task id="LOCAL-00532" summary="feat: streamline data structure and enhance header setup in PackingListExport">
       <option name="closed" value="true" />
@@ -779,7 +753,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751350021133</updated>
     </task>
-    <option name="localTasksCounter" value="578" />
+    <task id="LOCAL-00578" summary="feat: add 'tailored' status to excluded order statuses in OrderController">
+      <option name="closed" value="true" />
+      <created>1751355045476</created>
+      <option name="number" value="00578" />
+      <option name="presentableId" value="LOCAL-00578" />
+      <option name="project" value="LOCAL" />
+      <updated>1751355045476</updated>
+    </task>
+    <task id="LOCAL-00579" summary="feat: update excluded order statuses in GroupController and OrderController">
+      <option name="closed" value="true" />
+      <created>1751355164459</created>
+      <option name="number" value="00579" />
+      <option name="presentableId" value="LOCAL-00579" />
+      <option name="project" value="LOCAL" />
+      <updated>1751355164459</updated>
+    </task>
+    <task id="LOCAL-00580" summary="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController">
+      <option name="closed" value="true" />
+      <created>1751355191131</created>
+      <option name="number" value="00580" />
+      <option name="presentableId" value="LOCAL-00580" />
+      <option name="project" value="LOCAL" />
+      <updated>1751355191131</updated>
+    </task>
+    <option name="localTasksCounter" value="581" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -809,9 +807,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController" />
-    <MESSAGE value="feat: update Telegram message handling in GroupMasterController" />
-    <MESSAGE value="feat: refactor Telegram message handling to use TelegramSewingMessage model" />
     <MESSAGE value="feat: update Telegram message handling with hardcoded chat ID and bot token" />
     <MESSAGE value="feat: update Telegram message handling with new chat ID and adjust StateNumber" />
     <MESSAGE value="feat: update total work seconds calculation in GroupController" />
@@ -834,7 +829,10 @@
     <MESSAGE value="feat: optimize absent attendance filtering logic in SuperHRController" />
     <MESSAGE value="feat: add group and responsible user details to attendance notifications in SuperHRController" />
     <MESSAGE value="feat: update responsible user details in attendance notifications in SuperHRController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update responsible user details in attendance notifications in SuperHRController" />
+    <MESSAGE value="feat: add 'tailored' status to excluded order statuses in OrderController" />
+    <MESSAGE value="feat: update excluded order statuses in GroupController and OrderController" />
+    <MESSAGE value="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

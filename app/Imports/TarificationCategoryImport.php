@@ -94,18 +94,18 @@ class TarificationCategoryImport implements ToCollection
      */
     private function generateSequentialCode(): string
     {
-        $lastTarification = Tarification::orderByRaw("LENGTH(code) DESC, code DESC")->first();
+        $lastTarification = Tarification::latest('id')->first();
 
-        if (!$lastTarification) {
+        if (!$lastTarification || !preg_match('/^[A-Z]+\d+$/', $lastTarification->code)) {
             return 'A1';
         }
 
         $lastCode = $lastTarification->code;
 
-        preg_match('/([A-Z]+)(\d+)/', $lastCode, $matches);
+        preg_match('/^([A-Z]+)(\d+)$/', $lastCode, $matches);
 
-        $letter = $matches[1] ?? 'A';
-        $number = (int)($matches[2] ?? 0);
+        $letter = $matches[1]; // Harf qismi
+        $number = (int)$matches[2]; // Raqam qismi
 
         $number++;
 
@@ -117,6 +117,7 @@ class TarificationCategoryImport implements ToCollection
         return $letter . $number;
     }
 
+
     /**
      * Harf ketma-ketligini oshiradi.
      *
@@ -125,19 +126,24 @@ class TarificationCategoryImport implements ToCollection
      */
     private function incrementLetter(string $letter): string
     {
-        $length = strlen($letter);
-        $i = $length - 1;
+        $chars = str_split($letter);
+        $i = count($chars) - 1;
 
         while ($i >= 0) {
-            if ($letter[$i] !== 'Z') {
-                $letter[$i] = chr(ord($letter[$i]) + 1);
-                return $letter;
+            if ($chars[$i] !== 'Z') {
+                $chars[$i] = chr(ord($chars[$i]) + 1);
+                break;
             }
 
-            $letter[$i] = 'A';
+            $chars[$i] = 'A';
             $i--;
         }
 
-        return 'A' . $letter;
+        if ($i < 0) {
+            array_unshift($chars, 'A');
+        }
+
+        return implode('', $chars);
     }
+
 }
