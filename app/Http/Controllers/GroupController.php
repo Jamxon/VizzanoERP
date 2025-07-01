@@ -93,7 +93,7 @@ class GroupController extends Controller
             return response()->json(['message' => 'Department topilmadi.'], 404);
         }
 
-        $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged'];
+        $excludedStatuses = ['completed', 'checking', 'checked', 'packaging', 'packaged', 'tailored'];
 
         $departments->groups->each(function ($group) use ($excludedStatuses) {
             $pastWeek = now()->subDays(7);
