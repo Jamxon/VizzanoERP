@@ -8,14 +8,14 @@
 {{--                <strong>Logo yo'q</strong>--}}
 {{--            @endif--}}
         </td>
-        <td colspan="2" rowspan="3" style="text-align: center; font-weight: bold; font-size: 66px;">{{ $index }}</td>
+        <td colspan="2" rowspan="3" style="text-align: center; font-weight: bold; font-size: 55px;">{{ $index }}</td>
     </tr>
     <tr></tr>
     <tr></tr>
 
     {{-- 5-6 qator: Submodel --}}
     <tr>
-        <td colspan="7" style="text-align: center; font-weight: bold; font-size: 14px;">
+        <td colspan="7" style="text-align: center; font-weight: bold; font-size: 30px;">
             {{ $submodel ?? 'Submodel nomi yo‘q' }}
         </td>
     </tr>
