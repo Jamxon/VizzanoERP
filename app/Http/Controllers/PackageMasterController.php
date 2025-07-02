@@ -213,14 +213,10 @@ class PackageMasterController extends Controller
             $stickers[] = [
                 ['Костюм для девочки'],
                 [''],
-                ['Арт:', $modelName],
-                ['Цвет:', $color],
                 ['Размер', 'Количество'],
                 ...$sizeRows,
-                [''],
                 ['Нетто(кг)', 'Брутто(кг)'],
                 [round($netto, 2), round($brutto, 2)],
-                [''],
             ];
         }
 
