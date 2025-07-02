@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: refactor file handling and improve directory management in PackageExportJob">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: adjust table layout for improved display of art and color in box_sticker view" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,31 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="23909000" />
-    </task>
-    <task id="LOCAL-00627" summary="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout">
-      <option name="closed" value="true" />
-      <created>1751446964651</created>
-      <option name="number" value="00627" />
-      <option name="presentableId" value="LOCAL-00627" />
-      <option name="project" value="LOCAL" />
-      <updated>1751446964651</updated>
-    </task>
-    <task id="LOCAL-00628" summary="feat: update BoxStickerExport to remove redundant empty rows for improved layout">
-      <option name="closed" value="true" />
-      <created>1751447086971</created>
-      <option name="number" value="00628" />
-      <option name="presentableId" value="LOCAL-00628" />
-      <option name="project" value="LOCAL" />
-      <updated>1751447086971</updated>
-    </task>
-    <task id="LOCAL-00629" summary="feat: update BoxStickerExport to remove redundant empty rows for improved layout">
-      <option name="closed" value="true" />
-      <created>1751447242034</created>
-      <option name="number" value="00629" />
-      <option name="presentableId" value="LOCAL-00629" />
-      <option name="project" value="LOCAL" />
-      <updated>1751447242034</updated>
+      <workItem from="1751432833774" duration="24235000" />
     </task>
     <task id="LOCAL-00630" summary="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout">
       <option name="closed" value="true" />
@@ -780,7 +754,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751458629023</updated>
     </task>
-    <option name="localTasksCounter" value="676" />
+    <task id="LOCAL-00676" summary="feat: comment out unused table rows in box_sticker view for layout clarity">
+      <option name="closed" value="true" />
+      <created>1751459054936</created>
+      <option name="number" value="00676" />
+      <option name="presentableId" value="LOCAL-00676" />
+      <option name="project" value="LOCAL" />
+      <updated>1751459054936</updated>
+    </task>
+    <task id="LOCAL-00677" summary="feat: enhance layout and styling for art and color display in box_sticker view">
+      <option name="closed" value="true" />
+      <created>1751459272080</created>
+      <option name="number" value="00677" />
+      <option name="presentableId" value="LOCAL-00677" />
+      <option name="project" value="LOCAL" />
+      <updated>1751459272080</updated>
+    </task>
+    <task id="LOCAL-00678" summary="feat: adjust table layout for improved display of art and color in box_sticker view">
+      <option name="closed" value="true" />
+      <created>1751459353259</created>
+      <option name="number" value="00678" />
+      <option name="presentableId" value="LOCAL-00678" />
+      <option name="project" value="LOCAL" />
+      <updated>1751459353259</updated>
+    </task>
+    <option name="localTasksCounter" value="679" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: adjust logo size in BoxStickerExport for better display" />
-    <MESSAGE value="feat: update logo display in BoxStickerExport for fixed dimensions" />
-    <MESSAGE value="feat: enhance logo handling in BoxStickerExport with conditional drawing and updated dimensions" />
     <MESSAGE value="feat: update logo width in BoxStickerExport for improved display" />
     <MESSAGE value="feat: adjust logo display in BoxStickerExport by reducing rowspan for improved layout" />
     <MESSAGE value="feat: adjust rowspan in BoxStickerExport for improved logo index display" />
@@ -835,7 +830,10 @@
     <MESSAGE value="feat: update file path handling for packing and box sticker exports in PackageExportJob" />
     <MESSAGE value="feat: simplify temporary directory and file handling in PackageExportJob" />
     <MESSAGE value="feat: refactor file handling and improve directory management in PackageExportJob" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor file handling and improve directory management in PackageExportJob" />
+    <MESSAGE value="feat: comment out unused table rows in box_sticker view for layout clarity" />
+    <MESSAGE value="feat: enhance layout and styling for art and color display in box_sticker view" />
+    <MESSAGE value="feat: adjust table layout for improved display of art and color in box_sticker view" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: adjust table layout for improved display of art and color in box_sticker view" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

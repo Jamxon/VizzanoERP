@@ -23,15 +23,15 @@
     <tr></tr>
 
     <tr>
-        <td rowspan="2" style="font-size: 30px" ><strong>Арт:</strong></td>
-        <td colspan="6" rowspan="2" style="font-weight: bold; font-size: 46px;">{{ $model ?? '---' }}</td>
+        <td rowspan="2" style="font-size: 25px" ><p>Арт:</p></td>
+        <td colspan="6" rowspan="2" style="font-weight: bold; text-align: center; font-size: 40px;">{{ $model ?? '---' }}</td>
     </tr>
 
     <tr></tr>
 
     <tr>
-        <td rowspan="2" style="font-size: 30px"><strong>Цвет:</strong></td>
-        <td colspan="6" rowspan="2" style="font-weight: bold; font-size: 34px;">{{ $sticker['color'] ?? '---' }}</td>
+        <td rowspan="2" style="font-size: 25px"><p>Цвет:</p></td>
+        <td colspan="6" rowspan="2" style="font-weight: bold; text-align: center; font-size: 34px;">{{ $sticker['color'] ?? '---' }}</td>
     </tr>
 
     <tr></tr>
