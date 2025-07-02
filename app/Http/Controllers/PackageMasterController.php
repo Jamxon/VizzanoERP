@@ -129,7 +129,6 @@ class PackageMasterController extends Controller
                     foreach ($sizesMap as $sizeName) {
                         $qty = $qtyBySize[$sizeName] ?? '';
                         $sizes[] = [$sizeName, $qty];
-                        $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                     }
 
                     return $sizes;

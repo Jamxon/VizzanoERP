@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor size handling logic in PackageMasterController to improve quantity mapping and preparation for stickers" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update size handling logic in PackageMasterController to return sizes array with quantities">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="30413000" />
-    </task>
-    <task id="LOCAL-00666" summary="feat: remove unnecessary fields in PackageMasterController for cleaner output">
-      <option name="closed" value="true" />
-      <created>1751456931339</created>
-      <option name="number" value="00666" />
-      <option name="presentableId" value="LOCAL-00666" />
-      <option name="project" value="LOCAL" />
-      <updated>1751456931339</updated>
-    </task>
-    <task id="LOCAL-00667" summary="feat: add model name to sticker output for enhanced detail">
-      <option name="closed" value="true" />
-      <created>1751457128938</created>
-      <option name="number" value="00667" />
-      <option name="presentableId" value="LOCAL-00667" />
-      <option name="project" value="LOCAL" />
-      <updated>1751457128938</updated>
+      <workItem from="1751432833774" duration="30716000" />
     </task>
     <task id="LOCAL-00668" summary="feat: enhance box sticker output by adding model name and improving layout">
       <option name="closed" value="true" />
@@ -778,7 +764,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751465562365</updated>
     </task>
-    <option name="localTasksCounter" value="715" />
+    <task id="LOCAL-00715" summary="fix: update return logic in PackageMasterController to return sizes array">
+      <option name="closed" value="true" />
+      <created>1751465634392</created>
+      <option name="number" value="00715" />
+      <option name="presentableId" value="LOCAL-00715" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465634392</updated>
+    </task>
+    <task id="LOCAL-00716" summary="fix: update size handling logic in PackageMasterController to return sizes array with quantities">
+      <option name="closed" value="true" />
+      <created>1751465830868</created>
+      <option name="number" value="00716" />
+      <option name="presentableId" value="LOCAL-00716" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465830868</updated>
+    </task>
+    <option name="localTasksCounter" value="717" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: adjust colspan for brutto weight display in box sticker" />
-    <MESSAGE value="fix: add header row for size and quantity in box sticker" />
     <MESSAGE value="fix: update colspan and styling for size and quantity in box sticker" />
     <MESSAGE value="fix: remove unnecessary empty row in box sticker" />
     <MESSAGE value="fix: add height styling to rows in box sticker" />
@@ -833,7 +833,9 @@
     <MESSAGE value="fix: correct sizesMap update logic in packageStore method to properly append size names" />
     <MESSAGE value="fix: update return logic in PackageMasterController to ensure sizes are properly returned" />
     <MESSAGE value="fix: refactor size handling logic in PackageMasterController to improve quantity mapping and preparation for stickers" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor size handling logic in PackageMasterController to improve quantity mapping and preparation for stickers" />
+    <MESSAGE value="fix: update return logic in PackageMasterController to return sizes array" />
+    <MESSAGE value="fix: update size handling logic in PackageMasterController to return sizes array with quantities" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update size handling logic in PackageMasterController to return sizes array with quantities" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
