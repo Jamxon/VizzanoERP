@@ -155,60 +155,63 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
 
                 foreach ($this->stickers as $index => $sticker) {
                     if ($index > 0) {
-                        $row += 2; // Oraliq bo‘sh qator
+                        $row += 2; // Har bir sticker orasida 2 ta bo‘sh qator
                     }
 
-                    // 1. Logo uchun 4 qator
+                    // 1️⃣ Logo uchun 4 qator (qator 1–4)
                     for ($i = 0; $i < 4; $i++) {
-                        $sheet->getRowDimension($row + $i)->setRowHeight(15); // 15x4 = 60px
+                        $sheet->getRowDimension($row + $i)->setRowHeight(15); // 4 × 15 = 60px
                     }
 
-                    // Logo joylashuvi
+                    // Logo rasm
                     if ($this->imagePath && file_exists($this->imagePath)) {
                         $drawing = new Drawing();
                         $drawing->setName('Logo');
                         $drawing->setPath($this->imagePath);
-                        $drawing->setHeight(60);
-                        $drawing->setWidth(320);
-                        $drawing->setCoordinates('A' . $row);
+                        $drawing->setHeight(60); // 4 qatorni egallaydi
+                        $drawing->setWidth(320); // A–E ustunlar oralig‘i
+                        $drawing->setCoordinates('A' . $row); // 1-qatordan joylashadi
                         $drawing->setOffsetX(5);
-                        $drawing->setOffsetY(0); // 0 yoki 2 bo‘lishi mumkin
+                        $drawing->setOffsetY(0);
                         $drawing->setWorksheet($sheet);
                     }
 
                     $row += 4;
 
-                    // 2. Submodel: 2 qator
+                    // 2️⃣ Submodel uchun 2 qator (qator 5–6)
                     for ($i = 0; $i < 2; $i++) {
                         $sheet->getRowDimension($row)->setRowHeight(15);
                         $row++;
                     }
 
-                    // 3. Костюм (product name)
+                    // 3️⃣ Костюм yoki mahsulot nomi (qator 7)
                     $sheet->getRowDimension($row)->setRowHeight(25);
                     $row++;
 
-                    // 4. Art
+                    // 4️⃣ Art (qator 8)
                     $sheet->getRowDimension($row)->setRowHeight(18);
                     $row++;
 
-                    // 5. Rang
+                    // 5️⃣ Rang (qator 9)
                     $sheet->getRowDimension($row)->setRowHeight(18);
                     $row++;
 
-                    // 6. Razmer header
+                    // 6️⃣ Размер/Количество sarlavha (qator 10)
                     $sheet->getRowDimension($row)->setRowHeight(20);
                     $row++;
 
-                    // 7. Razmerlar (N qator)
+                    // 7️⃣ Razmer, Netto/Brutto, Qiymatlar (qator 11+)
                     foreach ($sticker as $r) {
                         if (isset($r[0]) && strpos($r[0], '-') !== false) {
+                            // Razmerlar
                             $sheet->getRowDimension($row)->setRowHeight(20);
                             $row++;
                         } elseif (isset($r[0]) && str_contains($r[0], 'Нетто')) {
+                            // Netto/Brutto Header
                             $sheet->getRowDimension($row)->setRowHeight(22);
                             $row++;
                         } elseif (!empty($r[0]) && is_numeric($r[0])) {
+                            // Qiymatlar
                             $sheet->getRowDimension($row)->setRowHeight(24);
                             $row++;
                         }
