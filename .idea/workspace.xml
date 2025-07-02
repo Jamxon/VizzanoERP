@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to modify submodel output format" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,31 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="10943000" />
-    </task>
-    <task id="LOCAL-00561" summary="feat: add region, total work seconds, and spend seconds to submodel in GroupController">
-      <option name="closed" value="true" />
-      <created>1751261071316</created>
-      <option name="number" value="00561" />
-      <option name="presentableId" value="LOCAL-00561" />
-      <option name="project" value="LOCAL" />
-      <updated>1751261071316</updated>
-    </task>
-    <task id="LOCAL-00562" summary="feat: add region, total work seconds, and spend seconds to submodel in GroupController">
-      <option name="closed" value="true" />
-      <created>1751261523334</created>
-      <option name="number" value="00562" />
-      <option name="presentableId" value="LOCAL-00562" />
-      <option name="project" value="LOCAL" />
-      <updated>1751261523334</updated>
-    </task>
-    <task id="LOCAL-00563" summary="feat: update spend seconds calculation in GroupController and adjust workspace.xml">
-      <option name="closed" value="true" />
-      <created>1751261590360</created>
-      <option name="number" value="00563" />
-      <option name="presentableId" value="LOCAL-00563" />
-      <option name="project" value="LOCAL" />
-      <updated>1751261590360</updated>
+      <workItem from="1751432833774" duration="11250000" />
     </task>
     <task id="LOCAL-00564" summary="feat: replace spendSeconds calculation with debug output in GroupController">
       <option name="closed" value="true" />
@@ -778,7 +754,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751444072587</updated>
     </task>
-    <option name="localTasksCounter" value="610" />
+    <task id="LOCAL-00610" summary="feat: update BoxStickerExport to enhance output format and styling for submodel and stickers">
+      <option name="closed" value="true" />
+      <created>1751444413130</created>
+      <option name="number" value="00610" />
+      <option name="presentableId" value="LOCAL-00610" />
+      <option name="project" value="LOCAL" />
+      <updated>1751444413130</updated>
+    </task>
+    <task id="LOCAL-00611" summary="feat: remove unused columnWidths method from BoxStickerExport">
+      <option name="closed" value="true" />
+      <created>1751444536465</created>
+      <option name="number" value="00611" />
+      <option name="presentableId" value="LOCAL-00611" />
+      <option name="project" value="LOCAL" />
+      <updated>1751444536466</updated>
+    </task>
+    <task id="LOCAL-00612" summary="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout">
+      <option name="closed" value="true" />
+      <created>1751444620425</created>
+      <option name="number" value="00612" />
+      <option name="presentableId" value="LOCAL-00612" />
+      <option name="project" value="LOCAL" />
+      <updated>1751444620425</updated>
+    </task>
+    <option name="localTasksCounter" value="613" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: swap brutto and netto weight positions in PackageMasterController data array" />
-    <MESSAGE value="feat: update total weight calculations and summary output in PackageMasterController" />
-    <MESSAGE value="feat: comment out summary list calculation in PackageMasterController" />
     <MESSAGE value="feat: implement BoxStickerExport and PackageExportJob for packaging functionality" />
     <MESSAGE value="feat: update error message in InternalAccountantController for better clarity" />
     <MESSAGE value="feat: restore packing list export functionality in PackageMasterController" />
@@ -833,7 +830,10 @@
     <MESSAGE value="feat: update BoxStickerExport to include submodel and adjust layout for improved styling" />
     <MESSAGE value="feat: update BoxStickerExport to simplify output format for Upakovka and Submodel" />
     <MESSAGE value="feat: update BoxStickerExport to modify submodel output format" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to modify submodel output format" />
+    <MESSAGE value="feat: update BoxStickerExport to enhance output format and styling for submodel and stickers" />
+    <MESSAGE value="feat: remove unused columnWidths method from BoxStickerExport" />
+    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

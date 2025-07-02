@@ -57,13 +57,13 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
     public function columnWidths(): array
     {
         return [
-            'A' => 3,
-            'B' => 2,
-            'C' => 2,
-            'D' => 2,
-            'E' => 2,
-            'F' => 2,
-            'G' => 2,
+            'A' => 6,
+            'B' => 3,
+            'C' => 3,
+            'D' => 3,
+            'E' => 3,
+            'F' => 3,
+            'G' => 3,
         ];
     }
 
