@@ -24,14 +24,14 @@
 
     {{-- 7-qator: Artikul --}}
     <tr>
-        <td style="font-size: 25px" colspan="2"><strong>Арт:</strong></td>
+        <td style="font-size: 25px" rowspan="2"><strong>Арт:</strong></td>
         <td colspan="6" style="font-weight: bold; font-size: 40px">{{ $sticker[2][1] ?? '---' }}</td>
     </tr>
     <tr></tr>
 
     {{-- 8-qator: Color --}}
     <tr>
-        <td style="font-size: 25px" colspan="2"><strong>Цвет:</strong></td>
+        <td style="font-size: 25px" rowspan="2"><strong>Цвет:</strong></td>
         <td colspan="6" style="font-weight: bold; font-size: 30px">{{ $sticker[3][1] ?? '---' }}</td>
     </tr>
 
