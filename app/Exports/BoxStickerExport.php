@@ -7,13 +7,12 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
-use Maatwebsite\Excel\Concerns\WithRowHeight;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Font;
 
-class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWidths, WithRowHeight
+class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWidths
 {
     protected array $stickers;
 
