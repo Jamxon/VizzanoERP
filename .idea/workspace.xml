@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to enhance layout and styling for stickers">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to modify submodel output format" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -387,31 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="10500000" />
-    </task>
-    <task id="LOCAL-00558" summary="feat: remove debug statement for spend seconds calculation in GroupController">
-      <option name="closed" value="true" />
-      <created>1751260643146</created>
-      <option name="number" value="00558" />
-      <option name="presentableId" value="LOCAL-00558" />
-      <option name="project" value="LOCAL" />
-      <updated>1751260643146</updated>
-    </task>
-    <task id="LOCAL-00559" summary="feat: remove debug statement for average plan calculation in GroupController">
-      <option name="closed" value="true" />
-      <created>1751260882798</created>
-      <option name="number" value="00559" />
-      <option name="presentableId" value="LOCAL-00559" />
-      <option name="project" value="LOCAL" />
-      <updated>1751260882798</updated>
-    </task>
-    <task id="LOCAL-00560" summary="feat: remove debug statement for average plan calculation in GroupController">
-      <option name="closed" value="true" />
-      <created>1751260948588</created>
-      <option name="number" value="00560" />
-      <option name="presentableId" value="LOCAL-00560" />
-      <option name="project" value="LOCAL" />
-      <updated>1751260948588</updated>
+      <workItem from="1751432833774" duration="10943000" />
     </task>
     <task id="LOCAL-00561" summary="feat: add region, total work seconds, and spend seconds to submodel in GroupController">
       <option name="closed" value="true" />
@@ -781,7 +754,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751442854301</updated>
     </task>
-    <option name="localTasksCounter" value="607" />
+    <task id="LOCAL-00607" summary="feat: update BoxStickerExport to include submodel and adjust layout for improved styling">
+      <option name="closed" value="true" />
+      <created>1751443883846</created>
+      <option name="number" value="00607" />
+      <option name="presentableId" value="LOCAL-00607" />
+      <option name="project" value="LOCAL" />
+      <updated>1751443883846</updated>
+    </task>
+    <task id="LOCAL-00608" summary="feat: update BoxStickerExport to simplify output format for Upakovka and Submodel">
+      <option name="closed" value="true" />
+      <created>1751443994525</created>
+      <option name="number" value="00608" />
+      <option name="presentableId" value="LOCAL-00608" />
+      <option name="project" value="LOCAL" />
+      <updated>1751443994525</updated>
+    </task>
+    <task id="LOCAL-00609" summary="feat: update BoxStickerExport to modify submodel output format">
+      <option name="closed" value="true" />
+      <created>1751444072587</created>
+      <option name="number" value="00609" />
+      <option name="presentableId" value="LOCAL-00609" />
+      <option name="project" value="LOCAL" />
+      <updated>1751444072587</updated>
+    </task>
+    <option name="localTasksCounter" value="610" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -811,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController" />
-    <MESSAGE value="feat: add PDF export route for tarifications in TechnologController" />
-    <MESSAGE value="feat: add brutto and netto weight calculations in PackageMasterController" />
     <MESSAGE value="feat: swap brutto and netto weight positions in PackageMasterController data array" />
     <MESSAGE value="feat: update total weight calculations and summary output in PackageMasterController" />
     <MESSAGE value="feat: comment out summary list calculation in PackageMasterController" />
@@ -836,7 +830,10 @@
     <MESSAGE value="feat: update BoxStickerExport to adjust image width for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to include submodel and upakovka in export layout" />
     <MESSAGE value="feat: update BoxStickerExport to enhance layout and styling for stickers" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to enhance layout and styling for stickers" />
+    <MESSAGE value="feat: update BoxStickerExport to include submodel and adjust layout for improved styling" />
+    <MESSAGE value="feat: update BoxStickerExport to simplify output format for Upakovka and Submodel" />
+    <MESSAGE value="feat: update BoxStickerExport to modify submodel output format" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to modify submodel output format" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

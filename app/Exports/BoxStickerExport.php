@@ -34,17 +34,13 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
 
         foreach ($this->stickers as $index => $sticker) {
             if ($index > 0) {
-                $result[] = ['', ''];
-                $result[] = ['', ''];
+                $result[] = [''];
+                $result[] = [''];
             }
 
-            // 1-qator: Logo (A), Upakovka No (B)
-            $result[] = ['', ($index + 1)];
+            $result[] = ['', '', '', '', '', ($index + 1), '']; // Row 1
+            $result[] = [$this->submodel]; // Row 2
 
-            // 2-qator: Submodel
-            $result[] = [$this->submodel];
-
-            // 3+ qatorlar: sticker contents
             foreach ($sticker as $row) {
                 $result[] = $row;
             }
@@ -61,8 +57,13 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
     public function columnWidths(): array
     {
         return [
-            'A' => 25,
-            'B' => 30,
+            'A' => 15,
+            'B' => 15,
+            'C' => 15,
+            'D' => 15,
+            'E' => 15,
+            'F' => 15,
+            'G' => 15,
         ];
     }
 
@@ -72,74 +73,62 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         $row = 1;
 
         foreach ($this->stickers as $index => $sticker) {
-            if ($index > 0) {
-                $row += 2;
-            }
+            if ($index > 0) $row += 2;
 
-            // Upakovka No
-            $styles["B{$row}"] = [
-                'font' => ['bold' => true, 'size' => 13],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            // Row 1: logo (A-E), upakovka no (F-G)
+            $sheet->mergeCells("A{$row}:E{$row}");
+            $sheet->mergeCells("F{$row}:G{$row}");
+
+            $styles["F{$row}"] = [
+                'font' => ['bold' => true, 'size' => 12],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ];
             $row++;
 
-            // Submodel
-            $styles["B{$row}"] = [
-                'font' => ['italic' => true, 'size' => 11],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            // Row 2: submodel
+            $sheet->mergeCells("A{$row}:G{$row}");
+            $styles["A{$row}"] = [
+                'font' => ['italic' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ];
             $row++;
 
             foreach ($sticker as $i => $stickerRow) {
                 if ($i == 0) {
-                    // Header (e.g. Костюм для девочки)
-                    $styles["A{$row}:B{$row}"] = [
+                    $sheet->mergeCells("A{$row}:G{$row}");
+                    $styles["A{$row}"] = [
                         'font' => ['bold' => true, 'size' => 12],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
                     ];
                 } elseif (in_array($i, [2, 3])) {
-                    // Арт va Цвет
-                    $styles["A{$row}"] = [
-                        'font' => ['bold' => true],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
-                    ];
-                    $styles["B{$row}"] = [
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
-                    ];
+                    $sheet->mergeCells("B{$row}:G{$row}");
+                    $styles["A{$row}"] = ['font' => ['bold' => true], 'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]];
+                    $styles["B{$row}"] = ['alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]];
                 } elseif ($i == 4) {
-                    // Размер, Количество
-                    $styles["A{$row}:B{$row}"] = [
+                    $sheet->mergeCells("A{$row}:C{$row}");
+                    $sheet->mergeCells("E{$row}:G{$row}");
+                    $styles["A{$row}"] = $styles["E{$row}"] = [
                         'font' => ['bold' => true],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['argb' => 'FFE0E0E0']
-                        ],
+                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFE0E0E0']],
                     ];
                 } elseif (isset($stickerRow[0]) && strpos($stickerRow[0], '-') !== false) {
-                    // Size rows
-                    $styles["A{$row}:B{$row}"] = [
+                    $styles["A{$row}:C{$row}"] = [
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
                     ];
                 } elseif (isset($stickerRow[0]) && str_contains($stickerRow[0], 'Нетто')) {
-                    // Нетто/Брутто Header
-                    $styles["A{$row}:B{$row}"] = [
+                    $sheet->mergeCells("E{$row}:G{$row}");
+                    $styles["E{$row}"] = [
                         'font' => ['bold' => true],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['argb' => 'FFF0F0F0']
-                        ],
+                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFF0F0F0']],
                     ];
                 } elseif (!empty($stickerRow[0]) && is_numeric($stickerRow[0])) {
-                    // Weight values
-                    $styles["A{$row}:B{$row}"] = [
+                    $styles["E{$row}:G{$row}"] = [
                         'font' => ['bold' => true],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THICK]],
@@ -161,23 +150,21 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                 $row = 1;
 
                 foreach ($this->stickers as $index => $sticker) {
-                    if ($index > 0) {
-                        $row += 2;
-                    }
+                    if ($index > 0) $row += 2;
 
                     if ($this->imagePath && file_exists($this->imagePath)) {
                         $drawing = new Drawing();
                         $drawing->setName('Logo');
                         $drawing->setPath($this->imagePath);
                         $drawing->setHeight(50);
-                        $drawing->setWidth(100);
+                        $drawing->setWidth(130);
                         $drawing->setCoordinates('A' . $row);
                         $drawing->setOffsetX(5);
                         $drawing->setOffsetY(2);
                         $drawing->setWorksheet($sheet);
                     }
 
-                    $row += count($sticker) + 2; // Sticker rows + 2 header
+                    $row += count($sticker) + 2;
                 }
             }
         ];
