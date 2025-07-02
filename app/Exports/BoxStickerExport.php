@@ -44,7 +44,7 @@ class BoxStickerExport implements WithMultipleSheets
 
                 public function view(): View
                 {
-                    return view('exports.box_sticker_single', [
+                    return view('exports.box_sticker', [
                         'sticker' => $this->sticker,
                         'imagePath' => $this->imagePath,
                         'submodel' => $this->submodel,
