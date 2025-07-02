@@ -55,7 +55,7 @@
             // sticker massivida string kalitlar ('color', 'model', 'orderSizes') ham bor, ulardan tashqari index asosida massiv qatorlari bor deb taxmin qilamiz.
             $sizes = [];
             foreach ($sticker as $key => $value) {
-                if (is_int($key) && is_array($value) && count($value) === 2) {
+                if ($key == 'orderSizes') {
                     $sizes[] = $value;
                 }
             }
