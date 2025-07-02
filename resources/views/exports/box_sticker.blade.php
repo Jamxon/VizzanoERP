@@ -37,11 +37,6 @@
 
     <tr></tr>
 
-{{--    <tr>--}}
-{{--        <td colspan="3" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Размер</td>--}}
-{{--        <td colspan="4" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Количество</td>--}}
-{{--    </tr>--}}
-
     @foreach($sticker as $key => $row)
         @if(is_int($key) && is_array($row) && count($row) == 2 && is_string($row[0]))
             <tr>

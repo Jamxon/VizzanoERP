@@ -108,26 +108,27 @@ class PackageMasterController extends Controller
             $netto = 0;
             $brutto = 0;
 
+            // Box uchun barcha o'lchamlarni yig'amiz, qiymatlari bo'lsa ko'rsatamiz, aks holda ''
+            $allSizes = [];
+
+            foreach ($items as $item) {
+                $allSizes[$item['size_name']] = '';  // Hamma o'lchamlar bo'sh qiymat bilan
+            }
+
             foreach ($items as $item) {
                 $qty = $item['qty'];
                 $sizeName = $item['size_name'];
                 $capacity = $item['capacity'];
                 $packNo = 1;
 
+                // Qo'shish - qiymati bor bo'lsa yozamiz
+                $allSizes[$sizeName] = $qty > 0 ? $qty : '';
+
                 while ($qty >= $capacity) {
                     // Packing fayl
                     $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
                     $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, $item['netto'],  $item['brutto']];
                     $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
-
-                    // Box sticker fayl
-                    $stickers[] = [
-                        ['Размер', 'Количество'],
-                        [$sizeName, $capacity],
-                        [$item['netto'], $item['brutto']],
-                        'color' => $color,
-                        'model' => $modelName,
-                    ];
 
                     $qty -= $capacity;
                     $packNo++;
@@ -149,20 +150,14 @@ class PackageMasterController extends Controller
                 $data[] = [$index, "Цвет: $color", $leftovers[0]['size_name'] ?? '', $customerName, $packNo, 1, $leftovers[0]['qty'] ?? '', '', ''];
                 $data[] = ['', "Юбка для девочки", $leftovers[1]['size_name'] ?? '', '', '', '', $leftovers[1]['qty'] ?? '', '', ''];
 
-                $sizes = [];
+                if (isset($leftovers[0])) {
+                    $allSizes[$leftovers[0]['size_name']] = $leftovers[0]['qty'];
+                }
+                if (isset($leftovers[1])) {
+                    $allSizes[$leftovers[1]['size_name']] = $leftovers[1]['qty'];
+                }
 
-                if (isset($leftovers[0])) $sizes[] = [$leftovers[0]['size_name'], $leftovers[0]['qty']];
-                if (isset($leftovers[1])) $sizes[] = [$leftovers[1]['size_name'], $leftovers[1]['qty']];
-
-                $qtySum = array_sum(array_column($sizes, 1));
-
-                $stickers[] = [
-                    ['Размер', 'Количество'],
-                    ...$sizes,
-                    [round($qtySum * 1.45, 2), round($qtySum * 1.62, 2)],
-                    'color' => $color,
-                    'model' => $modelName,
-                ];
+                $qtySum = array_sum(array_filter($allSizes));
 
                 $index++;
                 $packCount++;
@@ -170,6 +165,19 @@ class PackageMasterController extends Controller
                 $netto += round($qtySum * 1.45, 2);
                 $brutto += round($qtySum * 1.62, 2);
             }
+
+            // Box stickerga barcha o'lchamlar, qiymatlari bilan (bo'sh qiymatlari ham bor)
+            $sizesRows = [['Размер', 'Количество']];
+            foreach ($allSizes as $sizeName => $qty) {
+                $sizesRows[] = [$sizeName, $qty];
+            }
+            $sizesRows[] = [round($netto, 2), round($brutto, 2)];
+
+            $stickers[] = [
+                ...$sizesRows,
+                'color' => $color,
+                'model' => $modelName,
+            ];
 
             // Summary hisob
             $totalPacks += $packCount;

@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: adjust table cell formatting for improved color display in box_sticker view">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: adjust font size for color label in box_sticker view">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -386,31 +387,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="24554000" />
-    </task>
-    <task id="LOCAL-00632" summary="feat: update BoxStickerExport to enhance cell merging and styling for improved layout">
-      <option name="closed" value="true" />
-      <created>1751450368918</created>
-      <option name="number" value="00632" />
-      <option name="presentableId" value="LOCAL-00632" />
-      <option name="project" value="LOCAL" />
-      <updated>1751450368918</updated>
-    </task>
-    <task id="LOCAL-00633" summary="feat: update BoxStickerExport to implement view-based export for improved layout and styling">
-      <option name="closed" value="true" />
-      <created>1751451777116</created>
-      <option name="number" value="00633" />
-      <option name="presentableId" value="LOCAL-00633" />
-      <option name="project" value="LOCAL" />
-      <updated>1751451777116</updated>
-    </task>
-    <task id="LOCAL-00634" summary="feat: update BoxStickerExport to include submodel in export layout for improved styling">
-      <option name="closed" value="true" />
-      <created>1751453143982</created>
-      <option name="number" value="00634" />
-      <option name="presentableId" value="LOCAL-00634" />
-      <option name="project" value="LOCAL" />
-      <updated>1751453143982</updated>
+      <workItem from="1751432833774" duration="24947000" />
     </task>
     <task id="LOCAL-00635" summary="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching">
       <option name="closed" value="true" />
@@ -780,7 +757,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751459608653</updated>
     </task>
-    <option name="localTasksCounter" value="681" />
+    <task id="LOCAL-00681" summary="feat: update table cell content for improved clarity in box_sticker view">
+      <option name="closed" value="true" />
+      <created>1751459806095</created>
+      <option name="number" value="00681" />
+      <option name="presentableId" value="LOCAL-00681" />
+      <option name="project" value="LOCAL" />
+      <updated>1751459806095</updated>
+    </task>
+    <task id="LOCAL-00682" summary="fix: update table cell content to correctly display color in box_sticker view">
+      <option name="closed" value="true" />
+      <created>1751459873498</created>
+      <option name="number" value="00682" />
+      <option name="presentableId" value="LOCAL-00682" />
+      <option name="project" value="LOCAL" />
+      <updated>1751459873498</updated>
+    </task>
+    <task id="LOCAL-00683" summary="fix: adjust font size for color label in box_sticker view">
+      <option name="closed" value="true" />
+      <created>1751459930985</created>
+      <option name="number" value="00683" />
+      <option name="presentableId" value="LOCAL-00683" />
+      <option name="project" value="LOCAL" />
+      <updated>1751459930985</updated>
+    </task>
+    <option name="localTasksCounter" value="684" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,9 +811,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: adjust rowspan in BoxStickerExport for improved logo index display" />
-    <MESSAGE value="feat: remove unnecessary empty row in BoxStickerExport for cleaner layout" />
-    <MESSAGE value="feat: increase font size for index display in BoxStickerExport for better visibility" />
     <MESSAGE value="feat: decrease font size for index display and increase font size for submodel in BoxStickerExport for improved layout" />
     <MESSAGE value="feat: adjust rowspan for submodel display in BoxStickerExport for improved layout" />
     <MESSAGE value="feat: increase font size for Artikul display in BoxStickerExport for better visibility" />
@@ -835,7 +833,10 @@
     <MESSAGE value="feat: adjust table layout for improved display of art and color in box_sticker view" />
     <MESSAGE value="feat: update table layout and styling for improved display of art and color in box_sticker view" />
     <MESSAGE value="fix: adjust table cell formatting for improved color display in box_sticker view" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: adjust table cell formatting for improved color display in box_sticker view" />
+    <MESSAGE value="feat: update table cell content for improved clarity in box_sticker view" />
+    <MESSAGE value="fix: update table cell content to correctly display color in box_sticker view" />
+    <MESSAGE value="fix: adjust font size for color label in box_sticker view" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: adjust font size for color label in box_sticker view" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
