@@ -30,7 +30,7 @@
     <tr></tr>
 
     <tr>
-        <td rowspan="2" style="font-size: 25px"><p>Цвет:</p></td>
+        <td rowspan="2" style="font-size: 25px" ><p>Цвет:</p></td>
         <td colspan="6" rowspan="2" style="font-weight: bold; text-align: center; font-size: 34px;">{{ $sticker['color'] ?? '---' }}</td>
     </tr>
 
