@@ -87,7 +87,7 @@ class BoxStickerExport implements WithMultipleSheets
 
                     // 🔧 Rasm hajmini shu yerda belgilaysiz:
                     $drawing->setHeight(90);  // px bo‘yicha bo‘ladi
-                    $drawing->setWidth(120);  // optional
+                    $drawing->setWidth(300);  // optional
 
                     $drawing->setCoordinates('A1'); // Qayerga qo‘yilishi
                     $drawing->setOffsetX(10);
