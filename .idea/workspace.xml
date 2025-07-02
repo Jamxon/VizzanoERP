@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: increase font size for index display in BoxStickerExport for better visibility">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: increase font size for Artikul display in BoxStickerExport for better visibility">
       <change beforePath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -386,31 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="20802000" />
-    </task>
-    <task id="LOCAL-00609" summary="feat: update BoxStickerExport to modify submodel output format">
-      <option name="closed" value="true" />
-      <created>1751444072587</created>
-      <option name="number" value="00609" />
-      <option name="presentableId" value="LOCAL-00609" />
-      <option name="project" value="LOCAL" />
-      <updated>1751444072587</updated>
-    </task>
-    <task id="LOCAL-00610" summary="feat: update BoxStickerExport to enhance output format and styling for submodel and stickers">
-      <option name="closed" value="true" />
-      <created>1751444413130</created>
-      <option name="number" value="00610" />
-      <option name="presentableId" value="LOCAL-00610" />
-      <option name="project" value="LOCAL" />
-      <updated>1751444413130</updated>
-    </task>
-    <task id="LOCAL-00611" summary="feat: remove unused columnWidths method from BoxStickerExport">
-      <option name="closed" value="true" />
-      <created>1751444536465</created>
-      <option name="number" value="00611" />
-      <option name="presentableId" value="LOCAL-00611" />
-      <option name="project" value="LOCAL" />
-      <updated>1751444536466</updated>
+      <workItem from="1751432833774" duration="21144000" />
     </task>
     <task id="LOCAL-00612" summary="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout">
       <option name="closed" value="true" />
@@ -780,7 +756,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751455825222</updated>
     </task>
-    <option name="localTasksCounter" value="658" />
+    <task id="LOCAL-00658" summary="feat: decrease font size for index display and increase font size for submodel in BoxStickerExport for improved layout">
+      <option name="closed" value="true" />
+      <created>1751455917596</created>
+      <option name="number" value="00658" />
+      <option name="presentableId" value="LOCAL-00658" />
+      <option name="project" value="LOCAL" />
+      <updated>1751455917596</updated>
+    </task>
+    <task id="LOCAL-00659" summary="feat: adjust rowspan for submodel display in BoxStickerExport for improved layout">
+      <option name="closed" value="true" />
+      <created>1751455985449</created>
+      <option name="number" value="00659" />
+      <option name="presentableId" value="LOCAL-00659" />
+      <option name="project" value="LOCAL" />
+      <updated>1751455985449</updated>
+    </task>
+    <task id="LOCAL-00660" summary="feat: increase font size for Artikul display in BoxStickerExport for better visibility">
+      <option name="closed" value="true" />
+      <created>1751456152570</created>
+      <option name="number" value="00660" />
+      <option name="presentableId" value="LOCAL-00660" />
+      <option name="project" value="LOCAL" />
+      <updated>1751456152571</updated>
+    </task>
+    <option name="localTasksCounter" value="661" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,9 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout" />
-    <MESSAGE value="feat: update BoxStickerExport to streamline empty row handling for improved layout" />
-    <MESSAGE value="feat: update BoxStickerExport to enhance cell merging and styling for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to implement view-based export for improved layout and styling" />
     <MESSAGE value="feat: update BoxStickerExport to include submodel in export layout for improved styling" />
     <MESSAGE value="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching" />
@@ -835,7 +832,10 @@
     <MESSAGE value="feat: adjust rowspan in BoxStickerExport for improved logo index display" />
     <MESSAGE value="feat: remove unnecessary empty row in BoxStickerExport for cleaner layout" />
     <MESSAGE value="feat: increase font size for index display in BoxStickerExport for better visibility" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: increase font size for index display in BoxStickerExport for better visibility" />
+    <MESSAGE value="feat: decrease font size for index display and increase font size for submodel in BoxStickerExport for improved layout" />
+    <MESSAGE value="feat: adjust rowspan for submodel display in BoxStickerExport for improved layout" />
+    <MESSAGE value="feat: increase font size for Artikul display in BoxStickerExport for better visibility" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: increase font size for Artikul display in BoxStickerExport for better visibility" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
