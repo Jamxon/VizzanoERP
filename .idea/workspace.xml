@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add PDF export route for tarifications in TechnologController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -386,15 +387,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="894000" />
-    </task>
-    <task id="LOCAL-00533" summary="feat: enhance row styling and grouping in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751095202174</created>
-      <option name="number" value="00533" />
-      <option name="presentableId" value="LOCAL-00533" />
-      <option name="project" value="LOCAL" />
-      <updated>1751095202174</updated>
+      <workItem from="1751432833774" duration="2252000" />
     </task>
     <task id="LOCAL-00534" summary="feat: enhance border styling and alignment in PackingListExport">
       <option name="closed" value="true" />
@@ -780,7 +773,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751359517104</updated>
     </task>
-    <option name="localTasksCounter" value="582" />
+    <task id="LOCAL-00582" summary="feat: add PDF export route for tarifications in TechnologController">
+      <option name="closed" value="true" />
+      <created>1751433757862</created>
+      <option name="number" value="00582" />
+      <option name="presentableId" value="LOCAL-00582" />
+      <option name="project" value="LOCAL" />
+      <updated>1751433757863</updated>
+    </task>
+    <option name="localTasksCounter" value="583" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,7 +811,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update Telegram message handling with new chat ID and adjust StateNumber" />
     <MESSAGE value="feat: update total work seconds calculation in GroupController" />
     <MESSAGE value="feat: debug total work seconds calculation in GroupController" />
     <MESSAGE value="feat: remove debug statement for spend seconds calculation in GroupController" />
@@ -835,7 +835,8 @@
     <MESSAGE value="feat: update excluded order statuses in GroupController and OrderController" />
     <MESSAGE value="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
     <MESSAGE value="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController" />
+    <MESSAGE value="feat: add PDF export route for tarifications in TechnologController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add PDF export route for tarifications in TechnologController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

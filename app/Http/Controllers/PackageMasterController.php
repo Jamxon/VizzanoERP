@@ -71,6 +71,9 @@ class PackageMasterController extends Controller
         foreach ($validated['sizes'] as $sizeItem) {
             $sizeId = $sizeItem['size_id'];
             $capacity = $sizeItem['capacity'];
+            $bruttoKg = $sizeItem['kg'] ?? 0; // <-- bu brutto (Вес брутто)
+            $nettoKg = round($bruttoKg - 1.4, 2); // <-- bu neto
+
             $colors = $sizeItem['colors'];
             $sizeName = OrderSize::find($sizeId)?->size->name ?? 'Размер топилмади';
 
@@ -79,7 +82,9 @@ class PackageMasterController extends Controller
                     $colorMap[$colorName][] = [
                         'size_name' => $sizeName,
                         'qty' => $qty,
-                        'capacity' => $capacity
+                        'capacity' => $capacity,
+                        'brutto' => $bruttoKg,
+                        'netto' => $nettoKg,
                     ];
                 }
             }
@@ -106,7 +111,7 @@ class PackageMasterController extends Controller
 
                 while ($qty >= $capacity) {
                     $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
-                    $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, '', ''];
+                    $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, $item['brutto'],  $item['netto']];
                     $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
 
                     $qty -= $capacity;
