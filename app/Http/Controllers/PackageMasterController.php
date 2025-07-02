@@ -123,7 +123,6 @@ class PackageMasterController extends Controller
 
                     // Box sticker uchun shu paketdagi faqat bitta o'lcham va miqdor
                     $stickers[] = [
-                        ['Размер', 'Количество'],
                         [$sizeName, $capacity],
                         [round($item['netto'], 2), round($item['brutto'], 2)],
                         'color' => $color,
