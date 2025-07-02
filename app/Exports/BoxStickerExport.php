@@ -3,9 +3,12 @@
 namespace App\Exports;
 
 use Illuminate\Contracts\View\View;
-use Maatwebsite\Excel\Concerns\WithMultipleSheets;
+use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithDrawings;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class BoxStickerExport implements WithMultipleSheets
+class BoxStickerExport implements FromView, WithStyles, WithDrawings
 {
     protected array $stickers;
     protected string $imagePath;
@@ -20,79 +23,39 @@ class BoxStickerExport implements WithMultipleSheets
         $this->model = $model;
     }
 
-    public function sheets(): array
+    public function view(): View
     {
-        $sheets = [];
+        return view('exports.box_sticker', [
+            'stickers' => $this->stickers,
+            'imagePath' => $this->imagePath,
+            'submodel' => $this->submodel,
+            'model' => $this->model,
+        ]);
+    }
 
-        foreach ($this->stickers as $index => $sticker) {
-            $sheets[] = new class($sticker, $this->imagePath, $this->submodel, $this->model, $index + 1)
-                implements \Maatwebsite\Excel\Concerns\FromView,
-                \Maatwebsite\Excel\Concerns\WithTitle,
-                \Maatwebsite\Excel\Concerns\WithStyles,
-                \Maatwebsite\Excel\Concerns\WithDrawings {
+    public function styles(Worksheet $sheet)
+    {
+        $sheet->getDefaultRowDimension()->setRowHeight(25);
+        $sheet->getColumnDimension('A')->setWidth(12);
+        $sheet->getColumnDimension('B')->setWidth(12);
+        $sheet->getColumnDimension('C')->setWidth(12);
+        $sheet->getColumnDimension('D')->setWidth(12);
+        $sheet->getColumnDimension('E')->setWidth(12);
+        $sheet->getColumnDimension('F')->setWidth(12);
+        $sheet->getColumnDimension('G')->setWidth(12);
+    }
 
-                protected $sticker;
-                protected $imagePath;
-                protected $submodel;
-                protected $model;
-                protected $index;
+    public function drawings(): array
+    {
+        if (!file_exists($this->imagePath)) return [];
 
-                public function __construct($sticker, $imagePath, $submodel, $model, $index)
-                {
-                    $this->sticker = $sticker;
-                    $this->imagePath = $imagePath;
-                    $this->submodel = $submodel;
-                    $this->model = $model;
-                    $this->index = $index;
-                }
+        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+        $drawing->setName('Logo');
+        $drawing->setDescription('Contragent Logo');
+        $drawing->setPath($this->imagePath);
+        $drawing->setHeight(70);
+        $drawing->setCoordinates('A1');
 
-                public function view(): View
-                {
-                    return view('exports.box_sticker', [
-                        'sticker' => $this->sticker,
-                        'imagePath' => $this->imagePath,
-                        'submodel' => $this->submodel,
-                        'model' => $this->model,
-                        'index' => $this->index,
-                    ]);
-                }
-
-                public function title(): string
-                {
-                    return 'Quti ' . $this->index;
-                }
-
-                public function styles(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet)
-                {
-                    $sheet->getDefaultRowDimension()->setRowHeight(20);
-                    $sheet->getColumnDimension('A')->setWidth(12);
-                    $sheet->getColumnDimension('B')->setWidth(9);
-                    $sheet->getColumnDimension('C')->setWidth(9);
-                    $sheet->getColumnDimension('D')->setWidth(9);
-                    $sheet->getColumnDimension('E')->setWidth(9);
-                    $sheet->getColumnDimension('F')->setWidth(9);
-                    $sheet->getColumnDimension('G')->setWidth(9);
-                }
-
-                public function drawings(): array
-                {
-                    if (!file_exists($this->imagePath)) return [];
-
-                    $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
-                    $drawing->setName('Contragent Logo');
-                    $drawing->setDescription('Logo');
-                    $drawing->setPath($this->imagePath);
-                    $drawing->setHeight(70);
-                    $drawing->setWidth(300);
-                    $drawing->setCoordinates('A1');
-                    $drawing->setOffsetX(10);
-                    $drawing->setOffsetY(5);
-
-                    return [$drawing];
-                }
-            };
-        }
-
-        return $sheets;
+        return [$drawing];
     }
 }
