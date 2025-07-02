@@ -17,27 +17,32 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
 {
     protected array $stickers;
     protected ?string $imagePath;
+    protected ?string $submodel;
+    protected ?string $upakovka;
 
-    public function __construct(array $stickers, ?string $imagePath = null)
+    public function __construct(array $stickers, ?string $imagePath = null, ?string $submodel = null, ?string $upakovka = null)
     {
         $this->stickers = $stickers;
         $this->imagePath = $imagePath;
+        $this->submodel = $submodel ?? '';
+        $this->upakovka = $upakovka ?? '';
     }
 
     public function array(): array
     {
         $result = [];
-        $currentRow = 1;
 
-        foreach ($this->stickers as $stickerIndex => $sticker) {
-            if ($stickerIndex > 0) {
-                $result[] = ['', ''];
-                $currentRow++;
+        foreach ($this->stickers as $index => $sticker) {
+            if ($index > 0) {
+                $result[] = ['', '']; // oraliq bo‘sh qator
             }
+
+            // Rasm va Upakovka bitta qatorda joylashadi (rasm A ustunda, matn B ustunda)
+            $result[] = ['', 'Upakovka №: ' . ($index + 1)];
+            $result[] = ['', 'Submodel: ' . $this->submodel];
 
             foreach ($sticker as $row) {
                 $result[] = $row;
-                $currentRow++;
             }
         }
 
@@ -53,73 +58,37 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
     {
         return [
             'A' => 20,
-            'B' => 15,
+            'B' => 30,
         ];
     }
 
     public function styles(Worksheet $sheet): array
     {
         $styles = [];
-        $currentRow = 1;
+        $row = 1;
 
-        foreach ($this->stickers as $stickerIndex => $sticker) {
-            if ($stickerIndex > 0) {
-                $currentRow++;
+        foreach ($this->stickers as $index => $sticker) {
+            if ($index > 0) {
+                $row++;
             }
 
-            $stickerStartRow = $currentRow;
+            // Rasm + Upakovka
+            $styles["B{$row}"] = [
+                'font' => ['bold' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            ];
+            $row++;
 
-            foreach ($sticker as $rowIndex => $row) {
-                if ($rowIndex == 0) {
-                    $styles["A{$currentRow}:B{$currentRow}"] = [
-                        'font' => ['bold' => true, 'size' => 14],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THICK]],
-                    ];
-                } elseif (in_array($rowIndex, [2, 3])) {
-                    $styles["A{$currentRow}:B{$currentRow}"] = [
-                        'font' => ['bold' => true, 'size' => 12],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
-                    ];
-                } elseif ($rowIndex == 4) {
-                    $styles["A{$currentRow}:B{$currentRow}"] = [
-                        'font' => ['bold' => true, 'size' => 11],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
-                        'fill' => [
-                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                            'startColor' => ['argb' => 'FFE0E0E0']
-                        ]
-                    ];
-                } elseif (!empty($row[0]) && !empty($row[1]) && is_numeric($row[1])) {
-                    $styles["A{$currentRow}:B{$currentRow}"] = [
-                        'font' => ['size' => 10],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                    ];
-                } elseif (isset($row[0]) && ($row[0] == 'Нетто(кг)' || strpos($row[0], 'Нетто') !== false)) {
-                    $styles["A{$currentRow}:B{$currentRow}"] = [
-                        'font' => ['bold' => true, 'size' => 10],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
-                        'fill' => [
-                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                            'startColor' => ['argb' => 'FFF0F0F0']
-                        ]
-                    ];
-                } elseif (!empty($row[0]) && is_numeric($row[0])) {
-                    $styles["A{$currentRow}:B{$currentRow}"] = [
-                        'font' => ['bold' => true, 'size' => 12],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THICK]],
-                    ];
-                }
+            // Submodel qatori
+            $styles["B{$row}"] = [
+                'font' => ['italic' => true],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            ];
+            $row++;
 
-                $currentRow++;
+            foreach ($sticker as $stickerRow) {
+                $row++;
             }
-
-            $stickerEndRow = $currentRow - 1;
-            $styles["A{$stickerStartRow}:B{$stickerEndRow}"]['borders']['outline'] = ['borderStyle' => Border::BORDER_THICK];
         }
 
         return $styles;
@@ -130,26 +99,27 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         return [
             \Maatwebsite\Excel\Events\AfterSheet::class => function (\Maatwebsite\Excel\Events\AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $rowOffset = 0;
+                $row = 1;
 
                 foreach ($this->stickers as $index => $sticker) {
                     if ($index > 0) {
-                        $rowOffset++;
+                        $row++;
                     }
 
+                    // Rasm A ustunida joylashadi
                     if ($this->imagePath && file_exists($this->imagePath)) {
                         $drawing = new Drawing();
                         $drawing->setPath($this->imagePath);
-                        $drawing->setHeight(40);
+                        $drawing->setHeight(60);
                         $drawing->setWidth(135);
-                        $drawing->setCoordinates('A' . ($rowOffset + 1));
+                        $drawing->setCoordinates('A' . $row);
+                        $drawing->setOffsetX(10);
+                        $drawing->setOffsetY(5);
                         $drawing->setWorksheet($sheet);
-
-                        $sheet->insertNewRowBefore($rowOffset + 1, 5);
-                        $rowOffset += 5;
                     }
 
-                    $rowOffset += count($sticker);
+                    $row += 2; // Upakovka va Submodel
+                    $row += count($sticker); // Sticker rows
                 }
             }
         ];

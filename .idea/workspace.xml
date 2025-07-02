@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update PackageMasterController to use contragent's image for path handling" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to adjust image width for improved layout">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +387,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="8625000" />
-    </task>
-    <task id="LOCAL-00554" summary="feat: debug total work seconds calculation in GroupController">
-      <option name="closed" value="true" />
-      <created>1751260098535</created>
-      <option name="number" value="00554" />
-      <option name="presentableId" value="LOCAL-00554" />
-      <option name="project" value="LOCAL" />
-      <updated>1751260098535</updated>
-    </task>
-    <task id="LOCAL-00555" summary="feat: debug total work seconds calculation in GroupController">
-      <option name="closed" value="true" />
-      <created>1751260276035</created>
-      <option name="number" value="00555" />
-      <option name="presentableId" value="LOCAL-00555" />
-      <option name="project" value="LOCAL" />
-      <updated>1751260276035</updated>
+      <workItem from="1751432833774" duration="9111000" />
     </task>
     <task id="LOCAL-00556" summary="feat: debug total work seconds calculation in GroupController">
       <option name="closed" value="true" />
@@ -778,7 +765,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751441893663</updated>
     </task>
-    <option name="localTasksCounter" value="603" />
+    <task id="LOCAL-00603" summary="feat: update BoxStickerExport to adjust image dimensions for better layout">
+      <option name="closed" value="true" />
+      <created>1751442031467</created>
+      <option name="number" value="00603" />
+      <option name="presentableId" value="LOCAL-00603" />
+      <option name="project" value="LOCAL" />
+      <updated>1751442031467</updated>
+    </task>
+    <task id="LOCAL-00604" summary="feat: update BoxStickerExport to adjust image width for improved layout">
+      <option name="closed" value="true" />
+      <created>1751442104512</created>
+      <option name="number" value="00604" />
+      <option name="presentableId" value="LOCAL-00604" />
+      <option name="project" value="LOCAL" />
+      <updated>1751442104512</updated>
+    </task>
+    <option name="localTasksCounter" value="605" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +811,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update responsible user details in attendance notifications in SuperHRController" />
-    <MESSAGE value="feat: add 'tailored' status to excluded order statuses in OrderController" />
     <MESSAGE value="feat: update excluded order statuses in GroupController and OrderController" />
     <MESSAGE value="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
     <MESSAGE value="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController" />
@@ -833,7 +834,9 @@
     <MESSAGE value="feat: update BoxStickerExport to use absolute path for exports and improve file handling" />
     <MESSAGE value="feat: update PackageMasterController to use public path for image handling" />
     <MESSAGE value="feat: update PackageMasterController to use contragent's image for path handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update PackageMasterController to use contragent's image for path handling" />
+    <MESSAGE value="feat: update BoxStickerExport to adjust image dimensions for better layout" />
+    <MESSAGE value="feat: update BoxStickerExport to adjust image width for improved layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to adjust image width for improved layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
