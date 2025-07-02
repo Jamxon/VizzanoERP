@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update size handling logic in PackageMasterController to return sizes array with quantities">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove unnecessary casting of qty and capacity in PackageMasterController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,47 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="30716000" />
-    </task>
-    <task id="LOCAL-00668" summary="feat: enhance box sticker output by adding model name and improving layout">
-      <option name="closed" value="true" />
-      <created>1751457830942</created>
-      <option name="number" value="00668" />
-      <option name="presentableId" value="LOCAL-00668" />
-      <option name="project" value="LOCAL" />
-      <updated>1751457830942</updated>
-    </task>
-    <task id="LOCAL-00669" summary="feat: streamline packing and box sticker export processes for improved file handling">
-      <option name="closed" value="true" />
-      <created>1751457997319</created>
-      <option name="number" value="00669" />
-      <option name="presentableId" value="LOCAL-00669" />
-      <option name="project" value="LOCAL" />
-      <updated>1751457997319</updated>
-    </task>
-    <task id="LOCAL-00670" summary="feat: update return type for packageStore method to ensure consistent response handling">
-      <option name="closed" value="true" />
-      <created>1751458073771</created>
-      <option name="number" value="00670" />
-      <option name="presentableId" value="LOCAL-00670" />
-      <option name="project" value="LOCAL" />
-      <updated>1751458073771</updated>
-    </task>
-    <task id="LOCAL-00671" summary="feat: improve temporary directory handling and file storage in PackageExportJob">
-      <option name="closed" value="true" />
-      <created>1751458197582</created>
-      <option name="number" value="00671" />
-      <option name="presentableId" value="LOCAL-00671" />
-      <option name="project" value="LOCAL" />
-      <updated>1751458197582</updated>
-    </task>
-    <task id="LOCAL-00672" summary="feat: enhance error handling for packing and box sticker file creation in PackageExportJob">
-      <option name="closed" value="true" />
-      <created>1751458297413</created>
-      <option name="number" value="00672" />
-      <option name="presentableId" value="LOCAL-00672" />
-      <option name="project" value="LOCAL" />
-      <updated>1751458297413</updated>
+      <workItem from="1751432833774" duration="31082000" />
     </task>
     <task id="LOCAL-00673" summary="feat: update file path handling for packing and box sticker exports in PackageExportJob">
       <option name="closed" value="true" />
@@ -780,7 +738,47 @@
       <option name="project" value="LOCAL" />
       <updated>1751465830868</updated>
     </task>
-    <option name="localTasksCounter" value="717" />
+    <task id="LOCAL-00717" summary="fix: remove total quantity calculation from size handling logic in PackageMasterController">
+      <option name="closed" value="true" />
+      <created>1751465876374</created>
+      <option name="number" value="00717" />
+      <option name="presentableId" value="LOCAL-00717" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465876374</updated>
+    </task>
+    <task id="LOCAL-00718" summary="fix: remove unnecessary size mapping logic in PackageMasterController">
+      <option name="closed" value="true" />
+      <created>1751465946683</created>
+      <option name="number" value="00718" />
+      <option name="presentableId" value="LOCAL-00718" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465946683</updated>
+    </task>
+    <task id="LOCAL-00719" summary="fix: cast quantity to integer in PackageMasterController for consistency">
+      <option name="closed" value="true" />
+      <created>1751466098100</created>
+      <option name="number" value="00719" />
+      <option name="presentableId" value="LOCAL-00719" />
+      <option name="project" value="LOCAL" />
+      <updated>1751466098100</updated>
+    </task>
+    <task id="LOCAL-00720" summary="fix: cast capacity to integer in PackageMasterController for consistency">
+      <option name="closed" value="true" />
+      <created>1751466147835</created>
+      <option name="number" value="00720" />
+      <option name="presentableId" value="LOCAL-00720" />
+      <option name="project" value="LOCAL" />
+      <updated>1751466147835</updated>
+    </task>
+    <task id="LOCAL-00721" summary="fix: remove unnecessary casting of qty and capacity in PackageMasterController">
+      <option name="closed" value="true" />
+      <created>1751466228398</created>
+      <option name="number" value="00721" />
+      <option name="presentableId" value="LOCAL-00721" />
+      <option name="project" value="LOCAL" />
+      <updated>1751466228398</updated>
+    </task>
+    <option name="localTasksCounter" value="722" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,11 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update colspan and styling for size and quantity in box sticker" />
-    <MESSAGE value="fix: remove unnecessary empty row in box sticker" />
-    <MESSAGE value="fix: add height styling to rows in box sticker" />
-    <MESSAGE value="fix: move height styling to table cells in box sticker" />
-    <MESSAGE value="fix: increase height styling for table cells in box sticker" />
     <MESSAGE value="fix: adjust rowspan and height styling for table cells in box sticker" />
     <MESSAGE value="fix: remove rowspan from table cells in box sticker for improved layout" />
     <MESSAGE value="fix: update font size for header cells in box sticker for better visibility" />
@@ -835,7 +828,12 @@
     <MESSAGE value="fix: refactor size handling logic in PackageMasterController to improve quantity mapping and preparation for stickers" />
     <MESSAGE value="fix: update return logic in PackageMasterController to return sizes array" />
     <MESSAGE value="fix: update size handling logic in PackageMasterController to return sizes array with quantities" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update size handling logic in PackageMasterController to return sizes array with quantities" />
+    <MESSAGE value="fix: remove total quantity calculation from size handling logic in PackageMasterController" />
+    <MESSAGE value="fix: remove unnecessary size mapping logic in PackageMasterController" />
+    <MESSAGE value="fix: cast quantity to integer in PackageMasterController for consistency" />
+    <MESSAGE value="fix: cast capacity to integer in PackageMasterController for consistency" />
+    <MESSAGE value="fix: remove unnecessary casting of qty and capacity in PackageMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: remove unnecessary casting of qty and capacity in PackageMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

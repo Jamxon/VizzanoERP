@@ -68,7 +68,7 @@ class PackageMasterController extends Controller
         $imagePath = $orders->first()?->contragent->image ?? null;
         $absolutePath = public_path($imagePath);
         $submodelName = $orders->first()?->orderModel?->submodels->first()?->submodel?->name ?? 'Submodel nomi yo‘q';
-
+        $orderSizes = $orders->first()?->orderModel?->sizes->size->pluck('name')->toArray() ?? [];
         $colorMap = [];
         $sizesMap = [];
 
@@ -132,6 +132,7 @@ class PackageMasterController extends Controller
                         [round($item['netto'], 2), round($item['brutto'], 2)],
                         'color' => $color,
                         'model' => $modelName,
+                        'orderSizes' => $orderSizes,
                     ];
 
                     $qty -= $capacity;
@@ -180,6 +181,7 @@ class PackageMasterController extends Controller
                     ...$sizesRows,
                     'color' => $color,
                     'model' => $modelName,
+                    'orderSizes' => $orderSizes,
                 ];
 
                 $index++;
