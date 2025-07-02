@@ -15,7 +15,7 @@
 
     {{-- 5-6 qator: Submodel --}}
     <tr>
-        <td colspan="7" style="text-align: center; font-weight: bold; font-size: 30px;">
+        <td colspan="7" rowspan="2" style="text-align: center; font-weight: bold; font-size: 30px;">
             {{ $submodel ?? 'Submodel nomi yo‘q' }}
         </td>
     </tr>
