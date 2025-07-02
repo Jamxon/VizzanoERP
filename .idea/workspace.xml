@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update columnWidths method in BoxStickerExport to decrease width values for better layout">
-      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,39 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="11570000" />
-    </task>
-    <task id="LOCAL-00568" summary="feat: enhance deletion process in TechnologController with logging and response handling">
-      <option name="closed" value="true" />
-      <created>1751267000402</created>
-      <option name="number" value="00568" />
-      <option name="presentableId" value="LOCAL-00568" />
-      <option name="project" value="LOCAL" />
-      <updated>1751267000402</updated>
-    </task>
-    <task id="LOCAL-00569" summary="feat: optimize sequential code generation in Tarification and Technolog controllers">
-      <option name="closed" value="true" />
-      <created>1751271718801</created>
-      <option name="number" value="00569" />
-      <option name="presentableId" value="LOCAL-00569" />
-      <option name="project" value="LOCAL" />
-      <updated>1751271718801</updated>
-    </task>
-    <task id="LOCAL-00570" summary="feat: filter monthly expenses by branch and include branch_id in expense creation">
-      <option name="closed" value="true" />
-      <created>1751343846103</created>
-      <option name="number" value="00570" />
-      <option name="presentableId" value="LOCAL-00570" />
-      <option name="project" value="LOCAL" />
-      <updated>1751343846103</updated>
-    </task>
-    <task id="LOCAL-00571" summary="refactor: remove unused import in CasherController">
-      <option name="closed" value="true" />
-      <created>1751343901056</created>
-      <option name="number" value="00571" />
-      <option name="presentableId" value="LOCAL-00571" />
-      <option name="project" value="LOCAL" />
-      <updated>1751343901056</updated>
+      <workItem from="1751432833774" duration="11917000" />
     </task>
     <task id="LOCAL-00572" summary="feat: filter attendances by status in SuperHRController">
       <option name="closed" value="true" />
@@ -780,7 +746,39 @@
       <option name="project" value="LOCAL" />
       <updated>1751444941715</updated>
     </task>
-    <option name="localTasksCounter" value="617" />
+    <task id="LOCAL-00617" summary="feat: update columnWidths method in BoxStickerExport to decrease width value for column A">
+      <option name="closed" value="true" />
+      <created>1751445024185</created>
+      <option name="number" value="00617" />
+      <option name="presentableId" value="LOCAL-00617" />
+      <option name="project" value="LOCAL" />
+      <updated>1751445024185</updated>
+    </task>
+    <task id="LOCAL-00618" summary="feat: update columnWidths method in BoxStickerExport to decrease width values for columns B to G">
+      <option name="closed" value="true" />
+      <created>1751445100220</created>
+      <option name="number" value="00618" />
+      <option name="presentableId" value="LOCAL-00618" />
+      <option name="project" value="LOCAL" />
+      <updated>1751445100220</updated>
+    </task>
+    <task id="LOCAL-00619" summary="feat: update columnWidths method in BoxStickerExport to decrease width values for columns B to G">
+      <option name="closed" value="true" />
+      <created>1751445214767</created>
+      <option name="number" value="00619" />
+      <option name="presentableId" value="LOCAL-00619" />
+      <option name="project" value="LOCAL" />
+      <updated>1751445214767</updated>
+    </task>
+    <task id="LOCAL-00620" summary="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G">
+      <option name="closed" value="true" />
+      <created>1751445288395</created>
+      <option name="number" value="00620" />
+      <option name="presentableId" value="LOCAL-00620" />
+      <option name="project" value="LOCAL" />
+      <updated>1751445288395</updated>
+    </task>
+    <option name="localTasksCounter" value="621" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update packing list export to use zip file and return processing status" />
-    <MESSAGE value="feat: enhance BoxStickerExport with column widths, row heights, and improved styling for better presentation" />
-    <MESSAGE value="feat: remove WithRowHeight from BoxStickerExport for streamlined export functionality" />
     <MESSAGE value="feat: refine packing list export logic and enhance sticker generation for improved clarity" />
     <MESSAGE value="feat: add image upload functionality to Contragent model and update OrderController for image handling" />
     <MESSAGE value="feat: add debugging output for image upload handling in OrderController" />
@@ -835,7 +830,10 @@
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for improved layout" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for better layout" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width values for better layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update columnWidths method in BoxStickerExport to decrease width values for better layout" />
+    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width value for column A" />
+    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width values for columns B to G" />
+    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
