@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to streamline empty row handling for improved layout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -386,15 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="14370000" />
-    </task>
-    <task id="LOCAL-00582" summary="feat: add PDF export route for tarifications in TechnologController">
-      <option name="closed" value="true" />
-      <created>1751433757862</created>
-      <option name="number" value="00582" />
-      <option name="presentableId" value="LOCAL-00582" />
-      <option name="project" value="LOCAL" />
-      <updated>1751433757863</updated>
+      <workItem from="1751432833774" duration="15478000" />
     </task>
     <task id="LOCAL-00583" summary="feat: add brutto and netto weight calculations in PackageMasterController">
       <option name="closed" value="true" />
@@ -780,7 +772,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751447413329</updated>
     </task>
-    <option name="localTasksCounter" value="631" />
+    <task id="LOCAL-00631" summary="feat: update BoxStickerExport to streamline empty row handling for improved layout">
+      <option name="closed" value="true" />
+      <created>1751447825970</created>
+      <option name="number" value="00631" />
+      <option name="presentableId" value="LOCAL-00631" />
+      <option name="project" value="LOCAL" />
+      <updated>1751447825970</updated>
+    </task>
+    <option name="localTasksCounter" value="632" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,7 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update PackageMasterController to use contragent's image for path handling" />
     <MESSAGE value="feat: update BoxStickerExport to adjust image dimensions for better layout" />
     <MESSAGE value="feat: update BoxStickerExport to adjust image width for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to include submodel and upakovka in export layout" />
@@ -835,7 +834,8 @@
     <MESSAGE value="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to remove redundant empty rows for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout" />
+    <MESSAGE value="feat: update BoxStickerExport to streamline empty row handling for improved layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to streamline empty row handling for improved layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

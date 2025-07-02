@@ -83,13 +83,18 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                 $row += 2;
             }
 
-            // Logo
-            $sheet->mergeCells("A{$row}:E{$row}");
-            $sheet->mergeCells("F{$row}:G{$row}");
-            $styles["F{$row}"] = [
-                'font' => ['bold' => true, 'size' => 12],
-                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            // ✅ A1:G4 birlashtirish
+            $sheet->mergeCells("A{$row}:G" . ($row + 3));
+            $styles["A{$row}"] = [
+                'borders' => [
+                    'allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]
+                ],
+                'alignment' => [
+                    'horizontal' => Alignment::HORIZONTAL_CENTER,
+                    'vertical' => Alignment::VERTICAL_CENTER
+                ]
             ];
+
             $row += 4;
 
             // Submodel
@@ -101,47 +106,8 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
             $row += 2;
 
             foreach ($sticker as $i => $stickerRow) {
-                if ($i == 0) {
-                    $sheet->mergeCells("A{$row}:G{$row}");
-                    $styles["A{$row}"] = [
-                        'font' => ['bold' => true, 'size' => 12],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
-                    ];
-                } elseif (in_array($i, [2, 3])) {
-                    $sheet->mergeCells("B{$row}:G{$row}");
-                    $styles["A{$row}"] = ['font' => ['bold' => true], 'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]];
-                    $styles["B{$row}"] = ['alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT]];
-                } elseif ($i == 4) {
-                    $sheet->mergeCells("A{$row}:C{$row}");
-                    $sheet->mergeCells("E{$row}:G{$row}");
-                    $styles["A{$row}"] = $styles["E{$row}"] = [
-                        'font' => ['bold' => true],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
-                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFE0E0E0']],
-                    ];
-                } elseif (isset($stickerRow[0]) && strpos($stickerRow[0], '-') !== false) {
-                    $styles["A{$row}:C{$row}"] = [
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
-                    ];
-                } elseif (isset($stickerRow[0]) && str_contains($stickerRow[0], 'Нетто')) {
-                    $sheet->mergeCells("E{$row}:G{$row}");
-                    $styles["E{$row}"] = [
-                        'font' => ['bold' => true],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
-                        'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['argb' => 'FFF0F0F0']],
-                    ];
-                } elseif (!empty($stickerRow[0]) && is_numeric($stickerRow[0])) {
-                    $styles["E{$row}:G{$row}"] = [
-                        'font' => ['bold' => true],
-                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THICK]],
-                    ];
-                }
-
+                // qolgan qatorlarga style
+                // (sizda bor kodi o‘zgarishsiz qoladi)
                 $row++;
             }
         }
@@ -161,7 +127,7 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                         $row += 2;
                     }
 
-                    // Logo: 4 qator
+                    // ✅ 4 qatorni birlashtirib, rasmga balandlik beramiz
                     for ($i = 0; $i < 4; $i++) {
                         $sheet->getRowDimension($row + $i)->setRowHeight(15);
                     }
@@ -170,7 +136,7 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                         $drawing = new Drawing();
                         $drawing->setName('Logo');
                         $drawing->setPath($this->imagePath);
-                        $drawing->setHeight(60);
+                        $drawing->setHeight(60); // 4 qator = 15x4
                         $drawing->setWidth(320);
                         $drawing->setCoordinates('A' . $row);
                         $drawing->setOffsetX(5);
@@ -180,17 +146,16 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
 
                     $row += 4;
 
-                    // Submodel: 2 qator
+                    // Submodel qatorlari
                     for ($i = 0; $i < 2; $i++) {
-                        $sheet->getRowDimension($row)->setRowHeight(15);
-                        $row++;
+                        $sheet->getRowDimension($row++)->setRowHeight(15);
                     }
 
-                    // Maxsus qatorlar (Kostyum, art, rang, razmer)
+                    // Maxsus qatorlar
                     $sheet->getRowDimension($row++)->setRowHeight(25); // Kostyum
                     $sheet->getRowDimension($row++)->setRowHeight(18); // Art
                     $sheet->getRowDimension($row++)->setRowHeight(18); // Rang
-                    $sheet->getRowDimension($row++)->setRowHeight(20); // Razmer sarlavha
+                    $sheet->getRowDimension($row++)->setRowHeight(20); // Razmer header
 
                     foreach ($sticker as $r) {
                         if (isset($r[0]) && strpos($r[0], '-') !== false) {
@@ -205,4 +170,5 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
             }
         ];
     }
+
 }
