@@ -2,11 +2,11 @@
     {{-- 1-4 qator: Logo va № --}}
     <tr>
         <td colspan="5" rowspan="4" style="text-align: center;">
-            @if(file_exists($imagePath))
-                <img src="{{ $imagePath }}" alt="Logo" style="width: 100px; height: 100px;">
-            @else
-                <strong>Logo yo'q</strong>
-            @endif
+{{--            @if(file_exists($imagePath))--}}
+{{--                <img src="{{ $imagePath }}" alt="Logo" style="width: 100px; height: 100px;">--}}
+{{--            @else--}}
+{{--                <strong>Logo yo'q</strong>--}}
+{{--            @endif--}}
         </td>
         <td colspan="2" style="text-align: center; font-weight: bold; font-size: 16px;">№ {{ $index }}</td>
     </tr>

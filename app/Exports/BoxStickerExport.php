@@ -78,8 +78,24 @@ class BoxStickerExport implements WithMultipleSheets
 
                 public function drawings(): array
                 {
-                    return [];
+                    if (!file_exists($this->imagePath)) return [];
+
+                    $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                    $drawing->setName('Contragent Logo');
+                    $drawing->setDescription('Logo');
+                    $drawing->setPath($this->imagePath);
+
+                    // 🔧 Rasm hajmini shu yerda belgilaysiz:
+                    $drawing->setHeight(90);  // px bo‘yicha bo‘ladi
+                    $drawing->setWidth(120);  // optional
+
+                    $drawing->setCoordinates('A1'); // Qayerga qo‘yilishi
+                    $drawing->setOffsetX(10);
+                    $drawing->setOffsetY(5);
+
+                    return [$drawing];
                 }
+
             };
         }
 
