@@ -39,10 +39,10 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
             }
 
             // 1-qator: Logo (A), Upakovka No (B)
-            $result[] = ['', 'Upakovka №: ' . ($index + 1)];
+            $result[] = ['', ($index + 1)];
 
             // 2-qator: Submodel
-            $result[] = ['', 'Submodel: ' . $this->submodel];
+            $result[] = ['', $this->submodel];
 
             // 3+ qatorlar: sticker contents
             foreach ($sticker as $row) {
