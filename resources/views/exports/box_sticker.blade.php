@@ -51,8 +51,6 @@
         @endif
     @endforeach
 
-    <tr><td colspan="7">&nbsp;</td></tr>
-
     @php
         $indexedItems = array_filter($sticker, fn($key) => is_int($key), ARRAY_FILTER_USE_KEY);
         $last = end($indexedItems);
