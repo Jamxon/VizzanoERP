@@ -65,15 +65,15 @@ class BoxStickerExport implements WithMultipleSheets
                     $sheet->getStyle('A:G')->getFont()->setSize(12);
 
                     // 👉 A ustunini kichikroq qilish:
-                    $sheet->getColumnDimension('A')->setWidth(14); // yoki 10, 12 — qanday bo'lishini istasang
+                    $sheet->getColumnDimension('A')->setWidth(12); // yoki 10, 12 — qanday bo'lishini istasang
 
                     // Optional: boshqa ustunlar ham sozlansa yaxshi bo'ladi
-                    $sheet->getColumnDimension('B')->setWidth(18);
-                    $sheet->getColumnDimension('C')->setWidth(18);
-                    $sheet->getColumnDimension('D')->setWidth(18);
-                    $sheet->getColumnDimension('E')->setWidth(18);
-                    $sheet->getColumnDimension('F')->setWidth(18);
-                    $sheet->getColumnDimension('G')->setWidth(18);
+                    $sheet->getColumnDimension('B')->setWidth(9);
+                    $sheet->getColumnDimension('C')->setWidth(9);
+                    $sheet->getColumnDimension('D')->setWidth(9);
+                    $sheet->getColumnDimension('E')->setWidth(9);
+                    $sheet->getColumnDimension('F')->setWidth(9);
+                    $sheet->getColumnDimension('G')->setWidth(9);
                 }
 
                 public function drawings(): array
