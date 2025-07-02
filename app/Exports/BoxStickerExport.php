@@ -19,11 +19,13 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
 {
     protected array $stickers;
     protected ?string $imagePath;
+    protected ?string $submodel;
 
-    public function __construct(array $stickers, ?string $imagePath = null)
+    public function __construct(array $stickers, ?string $imagePath = null, ?string $submodel = null)
     {
         $this->stickers = $stickers;
         $this->imagePath = $imagePath;
+        $this->submodel = $submodel ?? '';
     }
 
     public function array(): array
@@ -31,12 +33,18 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         $result = [];
 
         foreach ($this->stickers as $index => $sticker) {
-            // Har bir sticker orasiga bo'sh qator (birinchisidan tashqari)
             if ($index > 0) {
                 $result[] = ['', ''];
                 $result[] = ['', ''];
             }
 
+            // 1-qator: Logo (A), Upakovka No (B)
+            $result[] = ['', 'Upakovka №: ' . ($index + 1)];
+
+            // 2-qator: Submodel
+            $result[] = ['', 'Submodel: ' . $this->submodel];
+
+            // 3+ qatorlar: sticker contents
             foreach ($sticker as $row) {
                 $result[] = $row;
             }
@@ -54,35 +62,8 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
     {
         return [
             'A' => 25,
-            'B' => 20,
+            'B' => 30,
         ];
-    }
-
-    public function rowHeight(): array
-    {
-        $heights = [];
-        $row = 1;
-
-        foreach ($this->stickers as $index => $sticker) {
-            if ($index > 0) {
-                $heights[$row] = 15; // Bo'sh qator
-                $row++;
-                $heights[$row] = 15; // Bo'sh qator
-                $row++;
-            }
-
-            // Har bir sticker qatori uchun balandlik
-            foreach ($sticker as $stickerRowIndex => $stickerRow) {
-                if ($stickerRowIndex == 0) {
-                    $heights[$row] = 30; // Header row
-                } else {
-                    $heights[$row] = 20; // Oddiy qator
-                }
-                $row++;
-            }
-        }
-
-        return $heights;
     }
 
     public function styles(Worksheet $sheet): array
@@ -91,129 +72,82 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         $row = 1;
 
         foreach ($this->stickers as $index => $sticker) {
-            $stickerStartRow = $row;
-
-            // Bo'sh qatorlar (birinchisidan tashqari)
             if ($index > 0) {
                 $row += 2;
-                $stickerStartRow = $row;
             }
 
-            foreach ($sticker as $rowIndex => $stickerRow) {
-                if ($rowIndex == 0) {
-                    // NIKASTYLE header
+            // Upakovka No
+            $styles["B{$row}"] = [
+                'font' => ['bold' => true, 'size' => 13],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            ];
+            $row++;
+
+            // Submodel
+            $styles["B{$row}"] = [
+                'font' => ['italic' => true, 'size' => 11],
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+            ];
+            $row++;
+
+            foreach ($sticker as $i => $stickerRow) {
+                if ($i == 0) {
+                    // Header (e.g. Костюм для девочки)
                     $styles["A{$row}:B{$row}"] = [
-                        'font' => ['bold' => true, 'size' => 12, 'name' => 'Arial'],
-                        'alignment' => [
-                            'horizontal' => Alignment::HORIZONTAL_CENTER,
-                            'vertical' => Alignment::VERTICAL_CENTER
-                        ],
-                        'borders' => [
-                            'allBorders' => ['borderStyle' => Border::BORDER_THICK]
-                        ],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['argb' => 'FFE6E6FA']
-                        ]
+                        'font' => ['bold' => true, 'size' => 12],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
                     ];
-                } elseif ($rowIndex == 1) {
-                    // Костюм для девочки
-                    $styles["A{$row}:B{$row}"] = [
-                        'font' => ['bold' => true, 'size' => 11, 'name' => 'Arial'],
-                        'alignment' => [
-                            'horizontal' => Alignment::HORIZONTAL_CENTER,
-                            'vertical' => Alignment::VERTICAL_CENTER
-                        ],
-                        'borders' => [
-                            'allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]
-                        ]
-                    ];
-                } elseif ($rowIndex == 2 || $rowIndex == 3) {
-                    // Арт va Цвет qatorlari
+                } elseif (in_array($i, [2, 3])) {
+                    // Арт va Цвет
                     $styles["A{$row}"] = [
-                        'font' => ['bold' => true, 'size' => 10, 'name' => 'Arial'],
-                        'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+                        'font' => ['bold' => true],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
                     ];
                     $styles["B{$row}"] = [
-                        'font' => ['size' => 10, 'name' => 'Arial'],
-                        'alignment' => ['vertical' => Alignment::VERTICAL_CENTER],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
                     ];
-                } elseif ($rowIndex == 4) {
-                    // Size header (Размер, Количество)
+                } elseif ($i == 4) {
+                    // Размер, Количество
                     $styles["A{$row}:B{$row}"] = [
-                        'font' => ['bold' => true, 'size' => 10, 'name' => 'Arial'],
-                        'alignment' => [
-                            'horizontal' => Alignment::HORIZONTAL_CENTER,
-                            'vertical' => Alignment::VERTICAL_CENTER
+                        'font' => ['bold' => true],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
+                        'fill' => [
+                            'fillType' => Fill::FILL_SOLID,
+                            'startColor' => ['argb' => 'FFE0E0E0']
                         ],
-                        'borders' => [
-                            'allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]
-                        ],
+                    ];
+                } elseif (isset($stickerRow[0]) && strpos($stickerRow[0], '-') !== false) {
+                    // Size rows
+                    $styles["A{$row}:B{$row}"] = [
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+                    ];
+                } elseif (isset($stickerRow[0]) && str_contains($stickerRow[0], 'Нетто')) {
+                    // Нетто/Брутто Header
+                    $styles["A{$row}:B{$row}"] = [
+                        'font' => ['bold' => true],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
                         'fill' => [
                             'fillType' => Fill::FILL_SOLID,
                             'startColor' => ['argb' => 'FFF0F0F0']
-                        ]
-                    ];
-                } elseif (!empty($stickerRow[0]) && is_string($stickerRow[0]) && strpos($stickerRow[0], '-') !== false) {
-                    // Size qatorlari (92-52, 98-52, ...)
-                    $styles["A{$row}"] = [
-                        'font' => ['size' => 10, 'name' => 'Arial'],
-                        'alignment' => [
-                            'horizontal' => Alignment::HORIZONTAL_CENTER,
-                            'vertical' => Alignment::VERTICAL_CENTER
                         ],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
-                    ];
-                    $styles["B{$row}"] = [
-                        'font' => ['size' => 10, 'name' => 'Arial'],
-                        'alignment' => [
-                            'horizontal' => Alignment::HORIZONTAL_CENTER,
-                            'vertical' => Alignment::VERTICAL_CENTER
-                        ],
-                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
-                    ];
-                } elseif (isset($stickerRow[0]) && ($stickerRow[0] == 'Нетто(кг)' || strpos($stickerRow[0], 'Нетто') !== false)) {
-                    // Weight header
-                    $styles["A{$row}:B{$row}"] = [
-                        'font' => ['bold' => true, 'size' => 10, 'name' => 'Arial'],
-                        'alignment' => [
-                            'horizontal' => Alignment::HORIZONTAL_CENTER,
-                            'vertical' => Alignment::VERTICAL_CENTER
-                        ],
-                        'borders' => [
-                            'allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]
-                        ],
-                        'fill' => [
-                            'fillType' => Fill::FILL_SOLID,
-                            'startColor' => ['argb' => 'FFF0F0F0']
-                        ]
                     ];
                 } elseif (!empty($stickerRow[0]) && is_numeric($stickerRow[0])) {
                     // Weight values
                     $styles["A{$row}:B{$row}"] = [
-                        'font' => ['bold' => true, 'size' => 11, 'name' => 'Arial'],
-                        'alignment' => [
-                            'horizontal' => Alignment::HORIZONTAL_CENTER,
-                            'vertical' => Alignment::VERTICAL_CENTER
-                        ],
-                        'borders' => [
-                            'allBorders' => ['borderStyle' => Border::BORDER_THICK]
-                        ]
+                        'font' => ['bold' => true],
+                        'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+                        'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THICK]],
                     ];
                 }
 
                 $row++;
             }
-
-            // Har bir sticker uchun umumiy border
-            $stickerEndRow = $row - 1;
-            $styles["A{$stickerStartRow}:B{$stickerEndRow}"] = [
-                'borders' => [
-                    'outline' => ['borderStyle' => Border::BORDER_THICK]
-                ]
-            ];
         }
 
         return $styles;
@@ -224,29 +158,26 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
+                $row = 1;
 
-                if ($this->imagePath && file_exists($this->imagePath)) {
-                    $row = 1;
+                foreach ($this->stickers as $index => $sticker) {
+                    if ($index > 0) {
+                        $row += 2;
+                    }
 
-                    foreach ($this->stickers as $index => $sticker) {
-                        if ($index > 0) {
-                            $row += 2; // Bo'sh qatorlar
-                        }
-
-                        // Rasm A1 katakchaga logo sifatida
+                    if ($this->imagePath && file_exists($this->imagePath)) {
                         $drawing = new Drawing();
-                        $drawing->setName('NIKASTYLE_LOGO');
-                        $drawing->setDescription('NIKASTYLE Logo');
+                        $drawing->setName('Logo');
                         $drawing->setPath($this->imagePath);
-                        $drawing->setHeight(20);
-                        $drawing->setWidth(20);
+                        $drawing->setHeight(50);
+                        $drawing->setWidth(100);
                         $drawing->setCoordinates('A' . $row);
                         $drawing->setOffsetX(5);
-                        $drawing->setOffsetY(5);
+                        $drawing->setOffsetY(2);
                         $drawing->setWorksheet($sheet);
-
-                        $row += count($sticker);
                     }
+
+                    $row += count($sticker) + 2; // Sticker rows + 2 header
                 }
             }
         ];
