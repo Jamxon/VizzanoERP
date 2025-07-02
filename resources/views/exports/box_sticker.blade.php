@@ -51,6 +51,24 @@
         @endforeach
 
         @php
+            // $sticker ichidagi o'lcham-qty juftliklarini olish
+            // sticker massivida string kalitlar ('color', 'model', 'orderSizes') ham bor, ulardan tashqari index asosida massiv qatorlari bor deb taxmin qilamiz.
+            $sizes = [];
+            foreach ($sticker as $key => $value) {
+                if (is_int($key) && is_array($value) && count($value) === 2) {
+                    $sizes[] = $value;
+                }
+            }
+        @endphp
+
+        @foreach ($sizes as $size)
+            <tr>
+                <td>{{ $size[0] }}</td> {{-- O'lcham nomi --}}
+                <td>{{ $size[1] }}</td> {{-- Miqdor --}}
+            </tr>
+        @endforeach
+
+        @php
             $indexedItems = array_filter($sticker, fn($key) => is_int($key), ARRAY_FILTER_USE_KEY);
             $last = end($indexedItems);
         @endphp
