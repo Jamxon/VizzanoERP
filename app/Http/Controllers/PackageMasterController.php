@@ -183,14 +183,14 @@ class PackageMasterController extends Controller
             round($totalNetto, 2),
             round($totalBrutto, 2),
         ];
-
-        $summaryList[] = [
-            '', '', '',
-            array_sum(array_column($summaryList, 3)),
-            array_sum(array_column($summaryList, 4)),
-            array_sum(array_column($summaryList, 5)),
-            array_sum(array_column($summaryList, 6)),
-        ];
+//
+//        $summaryList[] = [
+//            '', '', '',
+//            array_sum(array_column($summaryList, 3)),
+//            array_sum(array_column($summaryList, 4)),
+//            array_sum(array_column($summaryList, 5)),
+//            array_sum(array_column($summaryList, 6)),
+//        ];
 
         return Excel::download(new PackingListExport($data, $summaryList), 'packing_list.xlsx');
     }
