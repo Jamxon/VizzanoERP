@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: restore packing list export functionality in PackageMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update packing list export to use zip file and return processing status">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,15 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="5847000" />
-    </task>
-    <task id="LOCAL-00541" summary="feat: enhance cell alignment and add top/bottom border styling in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751096194267</created>
-      <option name="number" value="00541" />
-      <option name="presentableId" value="LOCAL-00541" />
-      <option name="project" value="LOCAL" />
-      <updated>1751096194267</updated>
+      <workItem from="1751432833774" duration="6173000" />
     </task>
     <task id="LOCAL-00542" summary="feat: refine border styling and improve cell alignment in PackingListExport">
       <option name="closed" value="true" />
@@ -778,7 +772,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751439207872</updated>
     </task>
-    <option name="localTasksCounter" value="590" />
+    <task id="LOCAL-00590" summary="feat: update packing list export to use zip file and return processing status">
+      <option name="closed" value="true" />
+      <created>1751439376504</created>
+      <option name="number" value="00590" />
+      <option name="presentableId" value="LOCAL-00590" />
+      <option name="project" value="LOCAL" />
+      <updated>1751439376504</updated>
+    </task>
+    <option name="localTasksCounter" value="591" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,7 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
     <MESSAGE value="feat: add employee holidays and absences loading to UserController" />
     <MESSAGE value="feat: add holidays and absences to user resource response" />
     <MESSAGE value="feat: enhance deletion process in TechnologController with logging and response handling" />
@@ -833,7 +834,8 @@
     <MESSAGE value="feat: implement BoxStickerExport and PackageExportJob for packaging functionality" />
     <MESSAGE value="feat: update error message in InternalAccountantController for better clarity" />
     <MESSAGE value="feat: restore packing list export functionality in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: restore packing list export functionality in PackageMasterController" />
+    <MESSAGE value="feat: update packing list export to use zip file and return processing status" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update packing list export to use zip file and return processing status" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

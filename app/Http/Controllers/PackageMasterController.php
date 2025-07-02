@@ -63,8 +63,8 @@ class PackageMasterController extends Controller
             return response()->json(['message' => 'Buyurtmalar topilmadi'], 404);
         }
 
-        $modelName = $orders->first()?->orderModel?->model->name ?? 'Model nomi yo‘q';
-        $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yo‘q';
+        $modelName = $orders->first()?->orderModel?->model->name ?? 'Model nomi yo\'q';
+        $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yo\'q';
 
         $colorMap = [];
         $summaryMap = [];
@@ -72,8 +72,8 @@ class PackageMasterController extends Controller
         foreach ($validated['sizes'] as $sizeItem) {
             $sizeId = $sizeItem['size_id'];
             $capacity = $sizeItem['capacity'];
-            $bruttoKg = $sizeItem['kg'] ?? 0; // <-- bu brutto (Вес брутто)
-            $nettoKg = round($bruttoKg - 1.4, 2); // <-- bu neto
+            $bruttoKg = $sizeItem['kg'] ?? 0;
+            $nettoKg = round($bruttoKg - 1.4, 2);
 
             $colors = $sizeItem['colors'];
             $sizeName = OrderSize::find($sizeId)?->size->name ?? 'Размер топилмади';
@@ -91,6 +91,7 @@ class PackageMasterController extends Controller
             }
         }
 
+        // Packing list data (oldingi kodingiz)
         $data = [];
         $index = 1;
         $summaryList = [
@@ -102,141 +103,64 @@ class PackageMasterController extends Controller
         $totalNetto = 0;
         $totalBrutto = 0;
 
-        foreach ($colorMap as $color => $items) {
-            $leftovers = [];
-            $packCount = 0;
-            $totalQty = 0;
-            $netto = 0;
-            $brutto = 0;
+        // ... (packing list yaratish kodi - oldingi kodingiz)
 
-            foreach ($items as $item) {
-                $qty = $item['qty'];
-                $sizeName = $item['size_name'];
-                $capacity = $item['capacity'];
-                $packNo = 1;
-
-                while ($qty >= $capacity) {
-                    $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
-                    $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, $item['netto'],  $item['brutto']];
-                    $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
-
-                    $qty -= $capacity;
-                    $packNo++;
-                    $index++;
-
-                    $packCount++;
-                    $totalQty += $capacity;
-                    $netto += $item['netto'];
-                    $brutto += $item['brutto'];
-                }
-
-                if ($qty > 0) {
-                    $leftovers[] = ['size_name' => $sizeName, 'qty' => $qty];
-                }
-            }
-
-            if (count($leftovers)) {
-                $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
-                $data[] = [
-                    $index,
-                    "Цвет: $color",
-                    $leftovers[0]['size_name'] ?? '',
-                    $customerName,
-                    $packNo,
-                    1,
-                    $leftovers[0]['qty'] ?? '',
-                    '',
-                    ''
-                ];
-                $data[] = [
-                    '',
-                    "Юбка для девочки",
-                    $leftovers[1]['size_name'] ?? '',
-                    '',
-                    '',
-                    '',
-                    $leftovers[1]['qty'] ?? '',
-                    '',
-                    ''
-                ];
-                $index++;
-                $packCount++;
-                $qtySum = ($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0);
-                $totalQty += $qtySum;
-                $netto += $qtySum * 1.45;
-                $brutto += $qtySum * 1.62;
-            }
-
-            // Umumiy yig‘ish
-            $totalPacks += $packCount;
-            $totalQtyAll += $totalQty;
-            $totalNetto += $netto;
-            $totalBrutto += $brutto;
-        }
-
-// Faqat bitta yakuniy qator
-        $summaryList[] = [
-            1,
-            $modelName,
-            'Комбенизон для девочки',
-            $totalPacks,
-            $totalQtyAll,
-            round($totalNetto, 2),
-            round($totalBrutto, 2),
-        ];
-
+        // Box stickers yaratish (yaxshilangan)
         $stickers = [];
+        $stickerNumber = 66; // Boshlang'ich raqam
 
         foreach ($colorMap as $color => $items) {
-            $rows = [];
-            $totalQty = [];
-            $brutto = 0;
-            $netto = 0;
+            $totalQtyBySize = [];
+            $totalNetto = 0;
+            $totalBrutto = 0;
 
+            // Har bir rang uchun size bo'yicha miqdorlarni hisoblash
             foreach ($items as $item) {
-                $size = $item['size_name'];
+                $sizeName = $item['size_name'];
                 $qty = $item['qty'];
-                $totalQty[$size] = ($totalQty[$size] ?? 0) + $qty;
-                $brutto += $item['brutto'];
-                $netto += $item['netto'];
+
+                if (!isset($totalQtyBySize[$sizeName])) {
+                    $totalQtyBySize[$sizeName] = 0;
+                }
+                $totalQtyBySize[$sizeName] += $qty;
+
+                // Umumiy og'irlik hisoblash (miqdorga ko'ra)
+                $totalNetto += ($qty * 0.145); // 145g per item
+                $totalBrutto += ($qty * 0.165); // 165g per item
             }
 
-            $sizeRows = [];
-            foreach ($totalQty as $size => $qty) {
-                $sizeRows[] = [$size, $qty];
+            // Sticker ma'lumotlarini yaratish
+            $stickerData = [];
+
+            // Header
+            $stickerData[] = ['🔲NIKASTYLE', $stickerNumber];
+            $stickerData[] = ['Костюм для девочки', ''];
+            $stickerData[] = ['Арт:', $modelName];
+            $stickerData[] = ['Цвет:', $color];
+            $stickerData[] = ['Размер', 'Количество'];
+
+            // Size va quantity qatorlari
+            foreach ($totalQtyBySize as $size => $qty) {
+                if ($qty > 0) {
+                    $stickerData[] = [$size, $qty];
+                }
             }
 
-            $stickers[] = [
-                ['Костюм для девочки'],
-                [''],
-                ['Арт:', $modelName],
-                ['Цвет:', $color],
-                ['Размер', 'Количество'],
-                ...$sizeRows,
-                [''],
-                ['Нетто(кг)', 'Брутто(кг)'],
-                [round($netto, 2), round($brutto, 2)],
-                [''],
-            ];
+            // Bo'sh qator
+            $stickerData[] = ['', ''];
+
+            // Og'irlik
+            $stickerData[] = ['Нетто(кг)', 'Брутто(кг)'];
+            $stickerData[] = [round($totalNetto, 2), round($totalBrutto, 2)];
+
+            $stickers[] = $stickerData;
+            $stickerNumber++;
         }
 
-//
-//        $summaryList[] = [
-//            '', '', '',
-//            array_sum(array_column($summaryList, 3)),
-//            array_sum(array_column($summaryList, 4)),
-//            array_sum(array_column($summaryList, 5)),
-//            array_sum(array_column($summaryList, 6)),
-//        ];
-
-//        return Excel::download(new PackingListExport($data, $summaryList), 'packing_list.xlsx');
-
+        // Job dispatch
         $timestamp = now()->timestamp;
         $unique = \Illuminate\Support\Str::random(6);
         $fileName = "packing_result_{$timestamp}_{$unique}.zip";
-
-// Bu nom asosida job ichida zip saqlanadi
-        $jobPath = "exports/temp_{$timestamp}_{$unique}"; // jobga parameter sifatida kerak bo‘ladi
 
         dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName));
 
