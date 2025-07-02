@@ -2,20 +2,16 @@
 
 namespace App\Exports;
 
-use Maatwebsite\Excel\Concerns\FromView;
-use Maatwebsite\Excel\Concerns\WithTitle;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Maatwebsite\Excel\Concerns\WithDrawings;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class BoxStickerExport implements FromView, WithTitle, WithStyles, WithDrawings
+class BoxStickerExport implements WithMultipleSheets
 {
-    protected $stickers;
-    protected $imagePath;
-    protected $submodel;
+    protected array $stickers;
+    protected string $imagePath;
+    protected string $submodel;
 
-    public function __construct($stickers, $imagePath, $submodel)
+    public function __construct(array $stickers, string $imagePath, string $submodel)
     {
         $this->stickers = $stickers;
         $this->imagePath = $imagePath;
@@ -27,8 +23,16 @@ class BoxStickerExport implements FromView, WithTitle, WithStyles, WithDrawings
         $sheets = [];
 
         foreach ($this->stickers as $index => $sticker) {
-            $sheets[] = new class($sticker, $this->imagePath, $this->submodel, $index) implements FromView, WithTitle, WithDrawings {
-                protected $sticker, $imagePath, $submodel, $index;
+            $sheets[] = new class($sticker, $this->imagePath, $this->submodel, $index + 1)
+                implements \Maatwebsite\Excel\Concerns\FromView,
+                \Maatwebsite\Excel\Concerns\WithTitle,
+                \Maatwebsite\Excel\Concerns\WithStyles,
+                \Maatwebsite\Excel\Concerns\WithDrawings {
+
+                protected $sticker;
+                protected $imagePath;
+                protected $submodel;
+                protected $index;
 
                 public function __construct($sticker, $imagePath, $submodel, $index)
                 {
@@ -38,28 +42,40 @@ class BoxStickerExport implements FromView, WithTitle, WithStyles, WithDrawings
                     $this->index = $index;
                 }
 
-                public function title(): string
-                {
-                    return 'Sticker ' . ($this->index + 1);
-                }
-
-                public function view(): \Illuminate\View\View
+                public function view(): View
                 {
                     return view('exports.box_sticker_single', [
                         'sticker' => $this->sticker,
                         'imagePath' => $this->imagePath,
                         'submodel' => $this->submodel,
+                        'index' => $this->index,
                     ]);
                 }
 
-                public function drawings()
+                public function title(): string
                 {
-                    $drawing = new Drawing();
-                    $drawing->setName('Logo');
-                    $drawing->setDescription('Logo for sticker');
+                    return 'Quti ' . $this->index;
+                }
+
+                public function styles(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet)
+                {
+                    $sheet->getDefaultRowDimension()->setRowHeight(20);
+                    $sheet->getStyle('A:G')->getFont()->setSize(12);
+                }
+
+                public function drawings(): array
+                {
+                    if (!file_exists($this->imagePath)) return [];
+
+                    $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+                    $drawing->setName('Contragent Logo');
+                    $drawing->setDescription('Logo');
                     $drawing->setPath($this->imagePath);
                     $drawing->setHeight(90);
-                    $drawing->setCoordinates('A1'); // har bir sheetda A1 dan boshlanadi
+                    $drawing->setCoordinates('A1');
+                    $drawing->setOffsetX(10);
+                    $drawing->setOffsetY(5);
+
                     return [$drawing];
                 }
             };
@@ -67,38 +83,4 @@ class BoxStickerExport implements FromView, WithTitle, WithStyles, WithDrawings
 
         return $sheets;
     }
-    public function drawings()
-    {
-        $drawings = [];
-        foreach (range(0, count($this->stickers) - 1) as $i) {
-            $drawing = new Drawing();
-            $drawing->setName("Logo-$i");
-            $drawing->setPath($this->imagePath);
-            $drawing->setHeight(90);
-            $drawing->setCoordinates('A' . ($i * 20 + 1)); // masalan A1, A21, A41
-            $drawings[] = $drawing;
-        }
-        return $drawings;
-    }
-
-    public function view(): \Illuminate\View\View
-    {
-        return view('exports.box_sticker', [
-            'stickers' => $this->stickers,
-            'imagePath' => $this->imagePath,
-            'submodel' => $this->submodel,
-        ]);
-    }
-
-    public function title(): string
-    {
-        return 'Box Stickers';
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        $sheet->getDefaultRowDimension()->setRowHeight(20);
-        $sheet->getStyle('A:G')->getFont()->setSize(12);
-    }
 }
-
