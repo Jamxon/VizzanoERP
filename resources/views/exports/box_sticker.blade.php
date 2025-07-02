@@ -23,14 +23,18 @@
     <tr></tr>
 
     <tr>
-        <td><strong>Арт:</strong></td>
-        <td colspan="6" style="font-weight: bold; font-size: 16px;">{{ $model ?? '---' }}</td>
+        <td rowspan="2" style="font-size: 30px" ><strong>Арт:</strong></td>
+        <td colspan="6" style="font-weight: bold; font-size: 46px;">{{ $model ?? '---' }}</td>
     </tr>
 
+    <tr></tr>
+
     <tr>
-        <td><strong>Цвет:</strong></td>
-        <td colspan="6" style="font-weight: bold; font-size: 14px;">{{ $sticker['color'] ?? '---' }}</td>
+        <td rowspan="2" style="font-size: 30px"><strong>Цвет:</strong></td>
+        <td colspan="6" style="font-weight: bold; font-size: 34px;">{{ $sticker['color'] ?? '---' }}</td>
     </tr>
+
+    <tr></tr>
 
 {{--    <tr>--}}
 {{--        <td colspan="3" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Размер</td>--}}
