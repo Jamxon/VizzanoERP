@@ -3,7 +3,7 @@
     <tr>
         <td colspan="5" rowspan="4" style="text-align: center;">
             @if(file_exists($imagePath))
-                <img src="{{ $imagePath }}" alt="Logo" style="max-width: 100px; max-height: 100px; object-fit: contain;">
+                <img src="{{ $imagePath }}" alt="Logo" style="width: 100px; height: 100px;">
             @else
                 <strong>Logo yo'q</strong>
             @endif
