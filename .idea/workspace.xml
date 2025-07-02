@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add image upload functionality to Contragent model and update OrderController for image handling" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: remove debugging output from updateContragents method in OrderController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Jobs/PackageExportJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Jobs/PackageExportJob.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +389,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="7340000" />
-    </task>
-    <task id="LOCAL-00547" summary="feat: update sheet titles to localized versions in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751098286414</created>
-      <option name="number" value="00547" />
-      <option name="presentableId" value="LOCAL-00547" />
-      <option name="project" value="LOCAL" />
-      <updated>1751098286414</updated>
-    </task>
-    <task id="LOCAL-00548" summary="feat: add TelegramSewingMessage model and implement message editing support in GroupMasterController">
-      <option name="closed" value="true" />
-      <created>1751108564911</created>
-      <option name="number" value="00548" />
-      <option name="presentableId" value="LOCAL-00548" />
-      <option name="project" value="LOCAL" />
-      <updated>1751108564911</updated>
+      <workItem from="1751432833774" duration="7941000" />
     </task>
     <task id="LOCAL-00549" summary="feat: update Telegram message handling in GroupMasterController">
       <option name="closed" value="true" />
@@ -778,7 +767,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751440643365</updated>
     </task>
-    <option name="localTasksCounter" value="596" />
+    <task id="LOCAL-00596" summary="feat: add debugging output for image upload handling in OrderController">
+      <option name="closed" value="true" />
+      <created>1751440734514</created>
+      <option name="number" value="00596" />
+      <option name="presentableId" value="LOCAL-00596" />
+      <option name="project" value="LOCAL" />
+      <updated>1751440734514</updated>
+    </task>
+    <task id="LOCAL-00597" summary="feat: remove debugging output from updateContragents method in OrderController">
+      <option name="closed" value="true" />
+      <created>1751440927695</created>
+      <option name="number" value="00597" />
+      <option name="presentableId" value="LOCAL-00597" />
+      <option name="project" value="LOCAL" />
+      <updated>1751440927695</updated>
+    </task>
+    <option name="localTasksCounter" value="598" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +813,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: filter monthly expenses by branch and include branch_id in expense creation" />
-    <MESSAGE value="refactor: remove unused import in CasherController" />
     <MESSAGE value="feat: filter attendances by status in SuperHRController" />
     <MESSAGE value="feat: add whereBetween method to Attendance model and refine attendance filtering logic in SuperHRController" />
     <MESSAGE value="feat: refine attendance filtering logic in SuperHRController to include present and absent counts" />
@@ -833,7 +836,9 @@
     <MESSAGE value="feat: remove WithRowHeight from BoxStickerExport for streamlined export functionality" />
     <MESSAGE value="feat: refine packing list export logic and enhance sticker generation for improved clarity" />
     <MESSAGE value="feat: add image upload functionality to Contragent model and update OrderController for image handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add image upload functionality to Contragent model and update OrderController for image handling" />
+    <MESSAGE value="feat: add debugging output for image upload handling in OrderController" />
+    <MESSAGE value="feat: remove debugging output from updateContragents method in OrderController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: remove debugging output from updateContragents method in OrderController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

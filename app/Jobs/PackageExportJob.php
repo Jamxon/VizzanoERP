@@ -23,13 +23,15 @@ class PackageExportJob implements ShouldQueue
 
     protected array $stickers;
     protected string $fileName;
+    protected string $absolutePath;
 
-    public function __construct(array $data, array $summary, array $stickers, string $fileName)
+    public function __construct(array $data, array $summary, array $stickers, string $fileName, string $absolutePath)
     {
         $this->data = $data;
         $this->summary = $summary;
         $this->stickers = $stickers;
         $this->fileName = $fileName;
+        $this->absolutePath = $absolutePath;
     }
 
 // App\Jobs\PackageExportJob.php ichida
@@ -42,9 +44,10 @@ class PackageExportJob implements ShouldQueue
         $packingPath = "$folder/packing_list.xlsx";
         $stickerPath = "$folder/box_sticker.xlsx";
         $zipPath = "$folder/packing_result.zip";
+        $absolutePath = $this->absolutePath ? 'public' : 'local';
 
         Excel::store(new PackingListExport($this->data, $this->summary), $packingPath);
-        Excel::store(new BoxStickerExport($this->stickers), $stickerPath);
+        Excel::store(new BoxStickerExport($this->stickers), $stickerPath, $absolutePath);
 
         $zip = new \ZipArchive;
         $zipPath = "exports/{$this->fileName}";

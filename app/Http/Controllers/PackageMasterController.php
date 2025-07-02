@@ -65,6 +65,9 @@ class PackageMasterController extends Controller
 
         $modelName = $orders->first()?->orderModel?->model->name ?? 'Model nomi yo‘q';
         $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yo‘q';
+        $imagePath = $orders->first()?->contragent?->images[0]?->path ?? null;
+        $absolutePath = storage_path('app/public/' . ltrim($imagePath, '/'));
+
 
         $colorMap = [];
         $summaryMap = [];
@@ -237,7 +240,7 @@ class PackageMasterController extends Controller
 
         $jobPath = "exports/temp_{$timestamp}_{$unique}";
 
-        dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName));
+        dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName, $absolutePath));
 
         $url = asset("storage/exports/{$fileName}");
 

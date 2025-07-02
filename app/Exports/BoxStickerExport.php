@@ -1,24 +1,27 @@
 <?php
 
-// App\Exports\BoxStickerExport.php
 namespace App\Exports;
 
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Font;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWidths
+class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWidths, WithEvents
 {
     protected array $stickers;
+    protected ?string $imagePath;
 
-    public function __construct(array $stickers)
+    public function __construct(array $stickers, ?string $imagePath = null)
     {
         $this->stickers = $stickers;
+        $this->imagePath = $imagePath;
     }
 
     public function array(): array
@@ -27,7 +30,6 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         $currentRow = 1;
 
         foreach ($this->stickers as $stickerIndex => $sticker) {
-            // Har bir sticker uchun bo'sh qator qo'shish (birinchisidan tashqari)
             if ($stickerIndex > 0) {
                 $result[] = ['', ''];
                 $currentRow++;
@@ -55,20 +57,12 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         ];
     }
 
-    public function rowHeight(): array
-    {
-        return [
-            1 => 25, // Header row height
-        ];
-    }
-
     public function styles(Worksheet $sheet): array
     {
         $styles = [];
         $currentRow = 1;
 
         foreach ($this->stickers as $stickerIndex => $sticker) {
-            // Har bir sticker uchun bo'sh qator (birinchisidan tashqari)
             if ($stickerIndex > 0) {
                 $currentRow++;
             }
@@ -77,20 +71,17 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
 
             foreach ($sticker as $rowIndex => $row) {
                 if ($rowIndex == 0) {
-                    // Header (Костюм для девочки)
                     $styles["A{$currentRow}:B{$currentRow}"] = [
                         'font' => ['bold' => true, 'size' => 14],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THICK]],
                     ];
                 } elseif (in_array($rowIndex, [2, 3])) {
-                    // Арт va Цвет qatorlari
                     $styles["A{$currentRow}:B{$currentRow}"] = [
                         'font' => ['bold' => true, 'size' => 12],
                         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_MEDIUM]],
                     ];
                 } elseif ($rowIndex == 4) {
-                    // Size header (Размер, Количество)
                     $styles["A{$currentRow}:B{$currentRow}"] = [
                         'font' => ['bold' => true, 'size' => 11],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
@@ -101,14 +92,12 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                         ]
                     ];
                 } elseif (!empty($row[0]) && !empty($row[1]) && is_numeric($row[1])) {
-                    // Size data rows
                     $styles["A{$currentRow}:B{$currentRow}"] = [
                         'font' => ['size' => 10],
                         'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                     ];
                 } elseif (isset($row[0]) && ($row[0] == 'Нетто(кг)' || strpos($row[0], 'Нетто') !== false)) {
-                    // Weight header
                     $styles["A{$currentRow}:B{$currentRow}"] = [
                         'font' => ['bold' => true, 'size' => 10],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
@@ -119,7 +108,6 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                         ]
                     ];
                 } elseif (!empty($row[0]) && is_numeric($row[0])) {
-                    // Weight values
                     $styles["A{$currentRow}:B{$currentRow}"] = [
                         'font' => ['bold' => true, 'size' => 12],
                         'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
@@ -130,15 +118,39 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                 $currentRow++;
             }
 
-            // Har bir sticker uchun umumiy border
             $stickerEndRow = $currentRow - 1;
-            $styles["A{$stickerStartRow}:B{$stickerEndRow}"] = [
-                'borders' => [
-                    'outline' => ['borderStyle' => Border::BORDER_THICK]
-                ]
-            ];
+            $styles["A{$stickerStartRow}:B{$stickerEndRow}"]['borders']['outline'] = ['borderStyle' => Border::BORDER_THICK];
         }
 
         return $styles;
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            \Maatwebsite\Excel\Events\AfterSheet::class => function (\Maatwebsite\Excel\Events\AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $rowOffset = 0;
+
+                foreach ($this->stickers as $index => $sticker) {
+                    if ($index > 0) {
+                        $rowOffset++;
+                    }
+
+                    if ($this->imagePath && file_exists($this->imagePath)) {
+                        $drawing = new Drawing();
+                        $drawing->setPath($this->imagePath);
+                        $drawing->setHeight(90);
+                        $drawing->setCoordinates('A' . ($rowOffset + 1));
+                        $drawing->setWorksheet($sheet);
+
+                        $sheet->insertNewRowBefore($rowOffset + 1, 5);
+                        $rowOffset += 5;
+                    }
+
+                    $rowOffset += count($sticker);
+                }
+            }
+        ];
     }
 }
