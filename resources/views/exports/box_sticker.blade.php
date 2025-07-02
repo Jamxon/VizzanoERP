@@ -3,11 +3,13 @@
         {{-- 1-4 qator: Logo va № --}}
         <tr>
             <td colspan="5" rowspan="4" style="text-align: center;">
-                {{-- @if(file_exists($imagePath)) --}}
-                {{--     <img src="{{ $imagePath }}" alt="Logo" style="width: 100px; height: 100px;"> --}}
-                {{-- @else --}}
-                {{--     <strong>Logo yo'q</strong> --}}
-                {{-- @endif --}}
+                @if(file_exists($imagePath))
+                    <img src="{{ public_path(str_replace('/storage/', '/app/public/', $imagePath)) }}"
+                         alt="Logo"
+                         style="width: 140px; height: auto;" />
+                @else
+                    <strong>Logo yo'q</strong>
+                @endif
             </td>
             <td colspan="2" rowspan="4" style="text-align: center; font-weight: bold; font-size: 55px;">{{ $index + 1 }}</td>
         </tr>
