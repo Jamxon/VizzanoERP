@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\PackingListExport;
+use App\Jobs\PackageExportJob;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\Order;
@@ -183,6 +184,42 @@ class PackageMasterController extends Controller
             round($totalNetto, 2),
             round($totalBrutto, 2),
         ];
+
+        $stickers = [];
+
+        foreach ($colorMap as $color => $items) {
+            $rows = [];
+            $totalQty = [];
+            $brutto = 0;
+            $netto = 0;
+
+            foreach ($items as $item) {
+                $size = $item['size_name'];
+                $qty = $item['qty'];
+                $totalQty[$size] = ($totalQty[$size] ?? 0) + $qty;
+                $brutto += $item['brutto'];
+                $netto += $item['netto'];
+            }
+
+            $sizeRows = [];
+            foreach ($totalQty as $size => $qty) {
+                $sizeRows[] = [$size, $qty];
+            }
+
+            $stickers[] = [
+                ['Костюм для девочки'],
+                [''],
+                ['Арт:', $modelName],
+                ['Цвет:', $color],
+                ['Размер', 'Количество'],
+                ...$sizeRows,
+                [''],
+                ['Нетто(кг)', 'Брутто(кг)'],
+                [round($netto, 2), round($brutto, 2)],
+                [''],
+            ];
+        }
+
 //
 //        $summaryList[] = [
 //            '', '', '',
@@ -192,6 +229,24 @@ class PackageMasterController extends Controller
 //            array_sum(array_column($summaryList, 6)),
 //        ];
 
-        return Excel::download(new PackingListExport($data, $summaryList), 'packing_list.xlsx');
+//        return Excel::download(new PackingListExport($data, $summaryList), 'packing_list.xlsx');
+
+        $timestamp = now()->timestamp;
+        $unique = \Illuminate\Support\Str::random(6);
+        $fileName = "packing_result_{$timestamp}_{$unique}.zip";
+
+// Bu nom asosida job ichida zip saqlanadi
+        $jobPath = "exports/temp_{$timestamp}_{$unique}"; // jobga parameter sifatida kerak bo‘ladi
+
+        dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName));
+
+        $url = asset("storage/exports/{$fileName}");
+
+        return response()->json([
+            'status' => 'processing',
+            'message' => 'Fayllar tayyorlanmoqda. Tez orada yuklab olish mumkin.',
+            'url' => $url
+        ]);
     }
+
 }
