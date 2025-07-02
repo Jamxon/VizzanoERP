@@ -4,7 +4,9 @@
     <table>
         <tr>
             <td colspan="5" rowspan="4" style="text-align:center;">
-                <img src="{{ public_path($imagePath) }}" width="100" height="100" alt="Logo">
+                @if(!file_exists($imagePath))
+                    <p style="color:red;">Rasm topilmadi: {{ $imagePath }}</p>
+                @endif
             </td>
             <td colspan="2" rowspan="4" style="text-align:center; font-size: 24px;">
                 {{ $index + 1 }}
