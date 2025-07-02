@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add PDF export route for tarifications in TechnologController">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: swap brutto and netto weight positions in PackageMasterController data array" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -387,23 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="2252000" />
-    </task>
-    <task id="LOCAL-00534" summary="feat: enhance border styling and alignment in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751095337256</created>
-      <option name="number" value="00534" />
-      <option name="presentableId" value="LOCAL-00534" />
-      <option name="project" value="LOCAL" />
-      <updated>1751095337256</updated>
-    </task>
-    <task id="LOCAL-00535" summary="feat: optimize border styling and alignment in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751095427629</created>
-      <option name="number" value="00535" />
-      <option name="presentableId" value="LOCAL-00535" />
-      <option name="project" value="LOCAL" />
-      <updated>1751095427629</updated>
+      <workItem from="1751432833774" duration="2587000" />
     </task>
     <task id="LOCAL-00536" summary="feat: refine border styling and alignment in PackingListExport">
       <option name="closed" value="true" />
@@ -781,7 +762,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751433757863</updated>
     </task>
-    <option name="localTasksCounter" value="583" />
+    <task id="LOCAL-00583" summary="feat: add brutto and netto weight calculations in PackageMasterController">
+      <option name="closed" value="true" />
+      <created>1751435121779</created>
+      <option name="number" value="00583" />
+      <option name="presentableId" value="LOCAL-00583" />
+      <option name="project" value="LOCAL" />
+      <updated>1751435121779</updated>
+    </task>
+    <task id="LOCAL-00584" summary="feat: swap brutto and netto weight positions in PackageMasterController data array">
+      <option name="closed" value="true" />
+      <created>1751435253456</created>
+      <option name="number" value="00584" />
+      <option name="presentableId" value="LOCAL-00584" />
+      <option name="project" value="LOCAL" />
+      <updated>1751435253456</updated>
+    </task>
+    <option name="localTasksCounter" value="585" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -811,8 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update total work seconds calculation in GroupController" />
-    <MESSAGE value="feat: debug total work seconds calculation in GroupController" />
     <MESSAGE value="feat: remove debug statement for spend seconds calculation in GroupController" />
     <MESSAGE value="feat: remove debug statement for average plan calculation in GroupController" />
     <MESSAGE value="feat: add region, total work seconds, and spend seconds to submodel in GroupController" />
@@ -836,7 +831,9 @@
     <MESSAGE value="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
     <MESSAGE value="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController" />
     <MESSAGE value="feat: add PDF export route for tarifications in TechnologController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add PDF export route for tarifications in TechnologController" />
+    <MESSAGE value="feat: add brutto and netto weight calculations in PackageMasterController" />
+    <MESSAGE value="feat: swap brutto and netto weight positions in PackageMasterController data array" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: swap brutto and netto weight positions in PackageMasterController data array" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

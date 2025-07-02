@@ -96,6 +96,11 @@ class PackageMasterController extends Controller
             ['№', 'Артикул', 'Коллекция зима Комбинезон', 'Коробка (шт)', 'Обший (шт)', 'Нетто (кг)', 'Брутто (кг)']
         ];
 
+        $totalPacks = 0;
+        $totalQtyAll = 0;
+        $totalNetto = 0;
+        $totalBrutto = 0;
+
         foreach ($colorMap as $color => $items) {
             $leftovers = [];
             $packCount = 0;
@@ -120,8 +125,8 @@ class PackageMasterController extends Controller
 
                     $packCount++;
                     $totalQty += $capacity;
-                    $netto += $capacity * 1.45;
-                    $brutto += $capacity * 1.62;
+                    $netto += $item['netto'];
+                    $brutto += $item['brutto'];
                 }
 
                 if ($qty > 0) {
@@ -155,21 +160,29 @@ class PackageMasterController extends Controller
                 ];
                 $index++;
                 $packCount++;
-                $totalQty += ($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0);
-                $netto += (($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0)) * 1.45;
-                $brutto += (($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0)) * 1.62;
+                $qtySum = ($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0);
+                $totalQty += $qtySum;
+                $netto += $qtySum * 1.45;
+                $brutto += $qtySum * 1.62;
             }
 
-            $summaryList[] = [
-                count($summaryList),
-                $modelName,
-                'Комбенизон для девочки',
-                $packCount,
-                $totalQty,
-                round($netto, 2),
-                round($brutto, 2),
-            ];
+            // Umumiy yig‘ish
+            $totalPacks += $packCount;
+            $totalQtyAll += $totalQty;
+            $totalNetto += $netto;
+            $totalBrutto += $brutto;
         }
+
+// Faqat bitta yakuniy qator
+        $summaryList[] = [
+            1,
+            $modelName,
+            'Комбенизон для девочки',
+            $totalPacks,
+            $totalQtyAll,
+            round($totalNetto, 2),
+            round($totalBrutto, 2),
+        ];
 
         $summaryList[] = [
             '', '', '',
