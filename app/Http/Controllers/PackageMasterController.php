@@ -163,12 +163,11 @@ class PackageMasterController extends Controller
 // 1. Size'lar bo'yicha qty map tuzib olamiz
                 $qtyBySize = collect($leftovers)->mapWithKeys(fn($left) => [
                     $left['size_name'] => $left['qty']
-                ]);
+                ])->toArray();
 
-// 2. Har bir sizeMap bo'yicha bor yoki yo'qligiga qarab qty qo'shamiz
                 foreach ($sizesMap as $sizeName) {
                     $qty = $qtyBySize[$sizeName] ?? '';
-                    $sizes[] = [$sizeName, $qtyBySize[$sizeName] ?? ''];
+                    $sizes[] = [$sizeName, $qty];
                     $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                 }
 
