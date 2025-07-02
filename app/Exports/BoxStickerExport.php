@@ -58,12 +58,12 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
     {
         return [
             'A' => 13,
-            'B' => 10,
-            'C' => 10,
-            'D' => 10,
-            'E' => 10,
-            'F' => 10,
-            'G' => 10,
+            'B' => 8,
+            'C' => 8,
+            'D' => 8,
+            'E' => 8,
+            'F' => 8,
+            'G' => 8,
         ];
     }
 
