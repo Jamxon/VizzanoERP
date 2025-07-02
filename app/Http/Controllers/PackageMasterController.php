@@ -70,6 +70,7 @@ class PackageMasterController extends Controller
         $submodelName = $orders->first()?->orderModel?->submodels->first()?->submodel?->name ?? 'Submodel nomi yo‘q';
 
         $colorMap = [];
+        $sizesMap = [];
 
         foreach ($validated['sizes'] as $sizeItem) {
             $sizeId = $sizeItem['size_id'];
@@ -78,7 +79,7 @@ class PackageMasterController extends Controller
             $nettoKg = round($bruttoKg - 1.4, 2);
 
             $sizeName = OrderSize::find($sizeId)?->size->name ?? '---';
-
+            $sizesMap[] += $sizeName;
             foreach ($sizeItem['colors'] as $colorItem) {
                 foreach ($colorItem as $colorName => $qty) {
                     $colorMap[$colorName][] = [
@@ -157,6 +158,8 @@ class PackageMasterController extends Controller
 
                 foreach ($leftovers as $left) {
                     $sizes[] = [$left['size_name'], $left['qty']];
+                    //hamma sizelarni qo'shish
+                    $sizes[] += [$sizesMap, ''];
                     $totalQtyLeft += $left['qty'];
                     $totalNettoLeft += $left['netto'];
                     $totalBruttoLeft += $left['brutto'];
