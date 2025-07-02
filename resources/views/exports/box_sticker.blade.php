@@ -58,8 +58,8 @@
             <td colspan="3" style="text-align: center; font-weight: bold;">Брутто (кг)</td>
         </tr>
         <tr>
-            <td colspan="4" style="text-align: center;">{{ $last[0] }}</td>
-            <td colspan="4" style="text-align: center;">{{ $last[1] }}</td>
+            <td colspan="3" style="text-align: center;">{{ $last[0] }}</td>
+            <td colspan="3" style="text-align: center;">{{ $last[1] }}</td>
         </tr>
     @endif
 </table>
