@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: remove WithRowHeight from BoxStickerExport for streamlined export functionality" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add image upload functionality to Contragent model and update OrderController for image handling" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="6497000" />
-    </task>
-    <task id="LOCAL-00544" summary="feat: expand color assignment options and improve color naming in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751097570168</created>
-      <option name="number" value="00544" />
-      <option name="presentableId" value="LOCAL-00544" />
-      <option name="project" value="LOCAL" />
-      <updated>1751097570168</updated>
-    </task>
-    <task id="LOCAL-00545" summary="feat: enhance packing list export with summary data and improved structure">
-      <option name="closed" value="true" />
-      <created>1751097941800</created>
-      <option name="number" value="00545" />
-      <option name="presentableId" value="LOCAL-00545" />
-      <option name="project" value="LOCAL" />
-      <updated>1751097941800</updated>
+      <workItem from="1751432833774" duration="7007000" />
     </task>
     <task id="LOCAL-00546" summary="feat: add title support for sheets in PackingListExport">
       <option name="closed" value="true" />
@@ -778,7 +762,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751439851183</updated>
     </task>
-    <option name="localTasksCounter" value="593" />
+    <task id="LOCAL-00593" summary="feat: refine packing list export logic and enhance sticker generation for improved clarity">
+      <option name="closed" value="true" />
+      <created>1751439972910</created>
+      <option name="number" value="00593" />
+      <option name="presentableId" value="LOCAL-00593" />
+      <option name="project" value="LOCAL" />
+      <updated>1751439972910</updated>
+    </task>
+    <task id="LOCAL-00594" summary="feat: add image upload functionality to Contragent model and update OrderController for image handling">
+      <option name="closed" value="true" />
+      <created>1751440365918</created>
+      <option name="number" value="00594" />
+      <option name="presentableId" value="LOCAL-00594" />
+      <option name="project" value="LOCAL" />
+      <updated>1751440365918</updated>
+    </task>
+    <option name="localTasksCounter" value="595" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: enhance deletion process in TechnologController with logging and response handling" />
-    <MESSAGE value="feat: optimize sequential code generation in Tarification and Technolog controllers" />
     <MESSAGE value="feat: filter monthly expenses by branch and include branch_id in expense creation" />
     <MESSAGE value="refactor: remove unused import in CasherController" />
     <MESSAGE value="feat: filter attendances by status in SuperHRController" />
@@ -833,7 +831,9 @@
     <MESSAGE value="feat: update packing list export to use zip file and return processing status" />
     <MESSAGE value="feat: enhance BoxStickerExport with column widths, row heights, and improved styling for better presentation" />
     <MESSAGE value="feat: remove WithRowHeight from BoxStickerExport for streamlined export functionality" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: remove WithRowHeight from BoxStickerExport for streamlined export functionality" />
+    <MESSAGE value="feat: refine packing list export logic and enhance sticker generation for improved clarity" />
+    <MESSAGE value="feat: add image upload functionality to Contragent model and update OrderController for image handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add image upload functionality to Contragent model and update OrderController for image handling" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

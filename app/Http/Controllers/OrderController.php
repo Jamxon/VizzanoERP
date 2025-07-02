@@ -166,12 +166,6 @@ class OrderController extends Controller
 
     public function updateContragents(Request $request, Contragent $contragent): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
-            'name' => 'required|string',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|max:20480', // Maksimal fayl o'lchami 20MB
-        ]);
-
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $fileName = time() . '_' . $image->getClientOriginalName();
