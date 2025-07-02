@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct sizesMap update logic in packageStore method to properly append size names" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor size handling logic in PackageMasterController to improve quantity mapping and preparation for stickers" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="30100000" />
-    </task>
-    <task id="LOCAL-00664" summary="feat: remove background color from Size and Quantity headers in BoxStickerExport for cleaner layout">
-      <option name="closed" value="true" />
-      <created>1751456517274</created>
-      <option name="number" value="00664" />
-      <option name="presentableId" value="LOCAL-00664" />
-      <option name="project" value="LOCAL" />
-      <updated>1751456517274</updated>
-    </task>
-    <task id="LOCAL-00665" summary="feat: remove unnecessary fields and improve layout in PackageMasterController for cleaner output">
-      <option name="closed" value="true" />
-      <created>1751456818701</created>
-      <option name="number" value="00665" />
-      <option name="presentableId" value="LOCAL-00665" />
-      <option name="project" value="LOCAL" />
-      <updated>1751456818701</updated>
+      <workItem from="1751432833774" duration="30413000" />
     </task>
     <task id="LOCAL-00666" summary="feat: remove unnecessary fields in PackageMasterController for cleaner output">
       <option name="closed" value="true" />
@@ -778,7 +762,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751465250136</updated>
     </task>
-    <option name="localTasksCounter" value="713" />
+    <task id="LOCAL-00713" summary="fix: update return logic in PackageMasterController to ensure sizes are properly returned">
+      <option name="closed" value="true" />
+      <created>1751465343637</created>
+      <option name="number" value="00713" />
+      <option name="presentableId" value="LOCAL-00713" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465343638</updated>
+    </task>
+    <task id="LOCAL-00714" summary="fix: refactor size handling logic in PackageMasterController to improve quantity mapping and preparation for stickers">
+      <option name="closed" value="true" />
+      <created>1751465562365</created>
+      <option name="number" value="00714" />
+      <option name="presentableId" value="LOCAL-00714" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465562365</updated>
+    </task>
+    <option name="localTasksCounter" value="715" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: correct column alignment for net and gross weight display in box sticker" />
-    <MESSAGE value="fix: adjust colspan for net and gross weight display in box sticker" />
     <MESSAGE value="fix: adjust colspan for brutto weight display in box sticker" />
     <MESSAGE value="fix: add header row for size and quantity in box sticker" />
     <MESSAGE value="fix: update colspan and styling for size and quantity in box sticker" />
@@ -833,7 +831,9 @@
     <MESSAGE value="fix: update size handling logic in PackageMasterController to prevent duplicate entries in sizesMap" />
     <MESSAGE value="fix: correct sizesMap update logic in PackageMasterController to properly append size names" />
     <MESSAGE value="fix: correct sizesMap update logic in packageStore method to properly append size names" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct sizesMap update logic in packageStore method to properly append size names" />
+    <MESSAGE value="fix: update return logic in PackageMasterController to ensure sizes are properly returned" />
+    <MESSAGE value="fix: refactor size handling logic in PackageMasterController to improve quantity mapping and preparation for stickers" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor size handling logic in PackageMasterController to improve quantity mapping and preparation for stickers" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

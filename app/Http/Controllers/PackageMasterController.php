@@ -169,6 +169,8 @@ class PackageMasterController extends Controller
                     $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                 }
 
+                return $sizes;
+
                 // Netto va Brutto yig'ish
                 $totalNettoLeft = collect($leftovers)->sum('netto');
                 $totalBruttoLeft = collect($leftovers)->sum('brutto');
