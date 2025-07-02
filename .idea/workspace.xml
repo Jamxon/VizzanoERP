@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: adjust font size for color label in box_sticker view">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: improve box sticker generation to include detailed leftovers with quantities and net/brutto values">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -387,23 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="24947000" />
-    </task>
-    <task id="LOCAL-00635" summary="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching">
-      <option name="closed" value="true" />
-      <created>1751453298822</created>
-      <option name="number" value="00635" />
-      <option name="presentableId" value="LOCAL-00635" />
-      <option name="project" value="LOCAL" />
-      <updated>1751453298822</updated>
-    </task>
-    <task id="LOCAL-00636" summary="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching">
-      <option name="closed" value="true" />
-      <created>1751453419910</created>
-      <option name="number" value="00636" />
-      <option name="presentableId" value="LOCAL-00636" />
-      <option name="project" value="LOCAL" />
-      <updated>1751453419910</updated>
+      <workItem from="1751432833774" duration="25732000" />
     </task>
     <task id="LOCAL-00637" summary="feat: enhance BoxStickerExport to include image drawing functionality and add error handling for missing images">
       <option name="closed" value="true" />
@@ -781,7 +764,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751459930985</updated>
     </task>
-    <option name="localTasksCounter" value="684" />
+    <task id="LOCAL-00684" summary="feat: enhance box sticker export to include all sizes with quantities for improved clarity">
+      <option name="closed" value="true" />
+      <created>1751460183815</created>
+      <option name="number" value="00684" />
+      <option name="presentableId" value="LOCAL-00684" />
+      <option name="project" value="LOCAL" />
+      <updated>1751460183815</updated>
+    </task>
+    <task id="LOCAL-00685" summary="feat: improve box sticker generation to include detailed leftovers with quantities and net/brutto values">
+      <option name="closed" value="true" />
+      <created>1751460367255</created>
+      <option name="number" value="00685" />
+      <option name="presentableId" value="LOCAL-00685" />
+      <option name="project" value="LOCAL" />
+      <updated>1751460367255</updated>
+    </task>
+    <option name="localTasksCounter" value="686" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -811,8 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: decrease font size for index display and increase font size for submodel in BoxStickerExport for improved layout" />
-    <MESSAGE value="feat: adjust rowspan for submodel display in BoxStickerExport for improved layout" />
     <MESSAGE value="feat: increase font size for Artikul display in BoxStickerExport for better visibility" />
     <MESSAGE value="feat: adjust font sizes and colspan for Artikul and Color displays in BoxStickerExport for improved layout" />
     <MESSAGE value="feat: adjust rowspan for Artikul and Color displays in BoxStickerExport for improved layout" />
@@ -836,7 +833,9 @@
     <MESSAGE value="feat: update table cell content for improved clarity in box_sticker view" />
     <MESSAGE value="fix: update table cell content to correctly display color in box_sticker view" />
     <MESSAGE value="fix: adjust font size for color label in box_sticker view" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: adjust font size for color label in box_sticker view" />
+    <MESSAGE value="feat: enhance box sticker export to include all sizes with quantities for improved clarity" />
+    <MESSAGE value="feat: improve box sticker generation to include detailed leftovers with quantities and net/brutto values" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: improve box sticker generation to include detailed leftovers with quantities and net/brutto values" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

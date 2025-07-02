@@ -49,7 +49,8 @@
     <tr><td colspan="7">&nbsp;</td></tr>
 
     @php
-        $last = end($sticker);
+        $indexedItems = array_filter($sticker, fn($key) => is_int($key), ARRAY_FILTER_USE_KEY);
+        $last = end($indexedItems);
     @endphp
     @if(is_array($last) && count($last) == 2 && is_numeric($last[0]) && is_numeric($last[1]))
         <tr>
