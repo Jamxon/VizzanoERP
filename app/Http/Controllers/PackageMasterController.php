@@ -118,7 +118,7 @@ class PackageMasterController extends Controller
             foreach ($items as $item) {
                 $qty =(int) $item['qty'];
                 $sizeName = $item['size_name'];
-                $capacity = $item['capacity'];
+                $capacity =(int) $item['capacity'];
 
                 while ($qty >= $capacity) {
                     // Packing faylga qo'shish
