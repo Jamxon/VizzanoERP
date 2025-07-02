@@ -126,6 +126,14 @@ class PackageMasterController extends Controller
                     $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packCount + 1, 1, $capacity, $item['netto'],  $item['brutto']];
                     $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
 
+                    foreach ($sizesMap as $sizeName) {
+                        $qty = $qtyBySize[$sizeName] ?? '';
+                        $sizes[] = [$sizeName, $qty];
+                        $totalQtyLeft += is_numeric($qty) ? $qty : 0;
+                    }
+
+                    return $sizes;
+
                     // Box sticker uchun shu paketdagi faqat bitta o'lcham va miqdor
                     $stickers[] = [
                         [$sizeName, $capacity],
@@ -168,8 +176,6 @@ class PackageMasterController extends Controller
                     $sizes[] = [$sizeName, $qty];
                     $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                 }
-
-                return $sizes;
 
                 // Netto va Brutto yig'ish
                 $totalNettoLeft = collect($leftovers)->sum('netto');
