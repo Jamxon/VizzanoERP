@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,31 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="13682000" />
-    </task>
-    <task id="LOCAL-00579" summary="feat: update excluded order statuses in GroupController and OrderController">
-      <option name="closed" value="true" />
-      <created>1751355164459</created>
-      <option name="number" value="00579" />
-      <option name="presentableId" value="LOCAL-00579" />
-      <option name="project" value="LOCAL" />
-      <updated>1751355164459</updated>
-    </task>
-    <task id="LOCAL-00580" summary="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController">
-      <option name="closed" value="true" />
-      <created>1751355191131</created>
-      <option name="number" value="00580" />
-      <option name="presentableId" value="LOCAL-00580" />
-      <option name="project" value="LOCAL" />
-      <updated>1751355191131</updated>
-    </task>
-    <task id="LOCAL-00581" summary="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController">
-      <option name="closed" value="true" />
-      <created>1751359517104</created>
-      <option name="number" value="00581" />
-      <option name="presentableId" value="LOCAL-00581" />
-      <option name="project" value="LOCAL" />
-      <updated>1751359517104</updated>
+      <workItem from="1751432833774" duration="14370000" />
     </task>
     <task id="LOCAL-00582" summary="feat: add PDF export route for tarifications in TechnologController">
       <option name="closed" value="true" />
@@ -778,7 +756,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751446964651</updated>
     </task>
-    <option name="localTasksCounter" value="628" />
+    <task id="LOCAL-00628" summary="feat: update BoxStickerExport to remove redundant empty rows for improved layout">
+      <option name="closed" value="true" />
+      <created>1751447086971</created>
+      <option name="number" value="00628" />
+      <option name="presentableId" value="LOCAL-00628" />
+      <option name="project" value="LOCAL" />
+      <updated>1751447086971</updated>
+    </task>
+    <task id="LOCAL-00629" summary="feat: update BoxStickerExport to remove redundant empty rows for improved layout">
+      <option name="closed" value="true" />
+      <created>1751447242034</created>
+      <option name="number" value="00629" />
+      <option name="presentableId" value="LOCAL-00629" />
+      <option name="project" value="LOCAL" />
+      <updated>1751447242034</updated>
+    </task>
+    <task id="LOCAL-00630" summary="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout">
+      <option name="closed" value="true" />
+      <created>1751447413329</created>
+      <option name="number" value="00630" />
+      <option name="presentableId" value="LOCAL-00630" />
+      <option name="project" value="LOCAL" />
+      <updated>1751447413329</updated>
+    </task>
+    <option name="localTasksCounter" value="631" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update BoxStickerExport to use absolute path for exports and improve file handling" />
-    <MESSAGE value="feat: update PackageMasterController to use public path for image handling" />
     <MESSAGE value="feat: update PackageMasterController to use contragent's image for path handling" />
     <MESSAGE value="feat: update BoxStickerExport to adjust image dimensions for better layout" />
     <MESSAGE value="feat: update BoxStickerExport to adjust image width for improved layout" />
@@ -833,7 +833,9 @@
     <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity" />
     <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for logo and submodel for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout" />
+    <MESSAGE value="feat: update BoxStickerExport to remove redundant empty rows for improved layout" />
+    <MESSAGE value="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
