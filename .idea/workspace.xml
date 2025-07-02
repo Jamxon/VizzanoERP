@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update logo display in BoxStickerExport for fixed dimensions" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: adjust rowspan in BoxStickerExport for improved logo index display" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,39 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="20161000" />
-    </task>
-    <task id="LOCAL-00602" summary="feat: update PackageMasterController to use contragent's image for path handling">
-      <option name="closed" value="true" />
-      <created>1751441893662</created>
-      <option name="number" value="00602" />
-      <option name="presentableId" value="LOCAL-00602" />
-      <option name="project" value="LOCAL" />
-      <updated>1751441893663</updated>
-    </task>
-    <task id="LOCAL-00603" summary="feat: update BoxStickerExport to adjust image dimensions for better layout">
-      <option name="closed" value="true" />
-      <created>1751442031467</created>
-      <option name="number" value="00603" />
-      <option name="presentableId" value="LOCAL-00603" />
-      <option name="project" value="LOCAL" />
-      <updated>1751442031467</updated>
-    </task>
-    <task id="LOCAL-00604" summary="feat: update BoxStickerExport to adjust image width for improved layout">
-      <option name="closed" value="true" />
-      <created>1751442104512</created>
-      <option name="number" value="00604" />
-      <option name="presentableId" value="LOCAL-00604" />
-      <option name="project" value="LOCAL" />
-      <updated>1751442104512</updated>
-    </task>
-    <task id="LOCAL-00605" summary="feat: update BoxStickerExport to include submodel and upakovka in export layout">
-      <option name="closed" value="true" />
-      <created>1751442619006</created>
-      <option name="number" value="00605" />
-      <option name="presentableId" value="LOCAL-00605" />
-      <option name="project" value="LOCAL" />
-      <updated>1751442619006</updated>
+      <workItem from="1751432833774" duration="20500000" />
     </task>
     <task id="LOCAL-00606" summary="feat: update BoxStickerExport to enhance layout and styling for stickers">
       <option name="closed" value="true" />
@@ -778,7 +746,39 @@
       <option name="project" value="LOCAL" />
       <updated>1751455264094</updated>
     </task>
-    <option name="localTasksCounter" value="651" />
+    <task id="LOCAL-00651" summary="feat: enhance logo handling in BoxStickerExport with conditional drawing and updated dimensions">
+      <option name="closed" value="true" />
+      <created>1751455382213</created>
+      <option name="number" value="00651" />
+      <option name="presentableId" value="LOCAL-00651" />
+      <option name="project" value="LOCAL" />
+      <updated>1751455382213</updated>
+    </task>
+    <task id="LOCAL-00652" summary="feat: update logo width in BoxStickerExport for improved display">
+      <option name="closed" value="true" />
+      <created>1751455451270</created>
+      <option name="number" value="00652" />
+      <option name="presentableId" value="LOCAL-00652" />
+      <option name="project" value="LOCAL" />
+      <updated>1751455451270</updated>
+    </task>
+    <task id="LOCAL-00653" summary="feat: adjust logo display in BoxStickerExport by reducing rowspan for improved layout">
+      <option name="closed" value="true" />
+      <created>1751455533666</created>
+      <option name="number" value="00653" />
+      <option name="presentableId" value="LOCAL-00653" />
+      <option name="project" value="LOCAL" />
+      <updated>1751455533666</updated>
+    </task>
+    <task id="LOCAL-00654" summary="feat: adjust rowspan in BoxStickerExport for improved logo index display">
+      <option name="closed" value="true" />
+      <created>1751455604391</created>
+      <option name="number" value="00654" />
+      <option name="presentableId" value="LOCAL-00654" />
+      <option name="project" value="LOCAL" />
+      <updated>1751455604391</updated>
+    </task>
+    <option name="localTasksCounter" value="655" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,10 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update logo dimensions in BoxStickerExport to improve display size" />
-    <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for improved layout and clarity" />
-    <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity" />
-    <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for logo and submodel for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to remove redundant empty rows for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout" />
@@ -833,7 +829,11 @@
     <MESSAGE value="feat: enhance logo display in BoxStickerExport with responsive styling" />
     <MESSAGE value="feat: adjust logo size in BoxStickerExport for better display" />
     <MESSAGE value="feat: update logo display in BoxStickerExport for fixed dimensions" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update logo display in BoxStickerExport for fixed dimensions" />
+    <MESSAGE value="feat: enhance logo handling in BoxStickerExport with conditional drawing and updated dimensions" />
+    <MESSAGE value="feat: update logo width in BoxStickerExport for improved display" />
+    <MESSAGE value="feat: adjust logo display in BoxStickerExport by reducing rowspan for improved layout" />
+    <MESSAGE value="feat: adjust rowspan in BoxStickerExport for improved logo index display" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: adjust rowspan in BoxStickerExport for improved logo index display" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
