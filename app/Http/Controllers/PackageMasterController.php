@@ -96,7 +96,6 @@ class PackageMasterController extends Controller
                 }
             }
         }
-        return $sizesMap;
 
         $data = [];
         $summaryList = [
@@ -171,6 +170,8 @@ class PackageMasterController extends Controller
                     $sizes[] = [$sizeName, $qty];
                     $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                 }
+
+                return $sizes;
 
 // 3. Netto va Brutto to‘plash
                 $totalNettoLeft = collect($leftovers)->sum('netto');

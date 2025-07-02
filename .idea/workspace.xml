@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: prevent duplicate size entries in sizesMap for improved size handling in PackageMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct sizesMap update logic in packageStore method to properly append size names" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,31 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="29702000" />
-    </task>
-    <task id="LOCAL-00661" summary="feat: adjust font sizes and colspan for Artikul and Color displays in BoxStickerExport for improved layout">
-      <option name="closed" value="true" />
-      <created>1751456283727</created>
-      <option name="number" value="00661" />
-      <option name="presentableId" value="LOCAL-00661" />
-      <option name="project" value="LOCAL" />
-      <updated>1751456283727</updated>
-    </task>
-    <task id="LOCAL-00662" summary="feat: adjust rowspan for Artikul and Color displays in BoxStickerExport for improved layout">
-      <option name="closed" value="true" />
-      <created>1751456377544</created>
-      <option name="number" value="00662" />
-      <option name="presentableId" value="LOCAL-00662" />
-      <option name="project" value="LOCAL" />
-      <updated>1751456377544</updated>
-    </task>
-    <task id="LOCAL-00663" summary="feat: adjust rowspan for Artikul and Color displays in BoxStickerExport for improved layout">
-      <option name="closed" value="true" />
-      <created>1751456450359</created>
-      <option name="number" value="00663" />
-      <option name="presentableId" value="LOCAL-00663" />
-      <option name="project" value="LOCAL" />
-      <updated>1751456450359</updated>
+      <workItem from="1751432833774" duration="30100000" />
     </task>
     <task id="LOCAL-00664" summary="feat: remove background color from Size and Quantity headers in BoxStickerExport for cleaner layout">
       <option name="closed" value="true" />
@@ -778,7 +754,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751464721288</updated>
     </task>
-    <option name="localTasksCounter" value="710" />
+    <task id="LOCAL-00710" summary="fix: update size handling logic in PackageMasterController to prevent duplicate entries in sizesMap">
+      <option name="closed" value="true" />
+      <created>1751464941952</created>
+      <option name="number" value="00710" />
+      <option name="presentableId" value="LOCAL-00710" />
+      <option name="project" value="LOCAL" />
+      <updated>1751464941952</updated>
+    </task>
+    <task id="LOCAL-00711" summary="fix: correct sizesMap update logic in PackageMasterController to properly append size names">
+      <option name="closed" value="true" />
+      <created>1751465098582</created>
+      <option name="number" value="00711" />
+      <option name="presentableId" value="LOCAL-00711" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465098582</updated>
+    </task>
+    <task id="LOCAL-00712" summary="fix: correct sizesMap update logic in packageStore method to properly append size names">
+      <option name="closed" value="true" />
+      <created>1751465250136</created>
+      <option name="number" value="00712" />
+      <option name="presentableId" value="LOCAL-00712" />
+      <option name="project" value="LOCAL" />
+      <updated>1751465250136</updated>
+    </task>
+    <option name="localTasksCounter" value="713" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: enhance box sticker export to include all sizes with quantities for improved clarity" />
-    <MESSAGE value="feat: improve box sticker generation to include detailed leftovers with quantities and net/brutto values" />
-    <MESSAGE value="fix: update box sticker generation logic to correctly handle indexed items" />
     <MESSAGE value="fix: correct column alignment for net and gross weight display in box sticker" />
     <MESSAGE value="fix: adjust colspan for net and gross weight display in box sticker" />
     <MESSAGE value="fix: adjust colspan for brutto weight display in box sticker" />
@@ -833,7 +830,10 @@
     <MESSAGE value="fix: enhance size handling in PackageMasterController with improved sizesMap logic" />
     <MESSAGE value="fix: streamline size handling logic in PackageMasterController by simplifying sizesMap updates" />
     <MESSAGE value="fix: prevent duplicate size entries in sizesMap for improved size handling in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: prevent duplicate size entries in sizesMap for improved size handling in PackageMasterController" />
+    <MESSAGE value="fix: update size handling logic in PackageMasterController to prevent duplicate entries in sizesMap" />
+    <MESSAGE value="fix: correct sizesMap update logic in PackageMasterController to properly append size names" />
+    <MESSAGE value="fix: correct sizesMap update logic in packageStore method to properly append size names" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: correct sizesMap update logic in packageStore method to properly append size names" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
