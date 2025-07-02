@@ -1,65 +1,64 @@
-@php use PhpOffice\PhpSpreadsheet\Worksheet\Drawing; @endphp
-@foreach($stickers as $index => $sticker)
-    {{-- LOGO & INDEX --}}
-    <table>
+<table>
+    {{-- 1-4 qator: logo --}}
+    <tr><td colspan="5" rowspan="4">
+            @if(file_exists($imagePath))
+                <img src="{{ $imagePath }}" alt="Logo" height="90">
+            @else
+                <strong>Rasm topilmadi</strong>
+            @endif
+        </td>
+        <td colspan="2" style="text-align: center; font-weight: bold;">№ {{ $loop->iteration ?? 1 }}</td></tr>
+    <tr></tr><tr></tr><tr></tr>
+
+    {{-- 5-6 qator: Submodel --}}
+    <tr><td colspan="7" style="text-align: center; font-weight: bold;">{{ $submodel }}</td></tr>
+    <tr><td colspan="7">&nbsp;</td></tr>
+
+    {{-- 7-qator: Artikul --}}
+    <tr>
+        <td><strong>Арт:</strong></td>
+        <td colspan="6">{{ $sticker[2][1] ?? '---' }}</td>
+    </tr>
+
+    {{-- 8-qator: Color --}}
+    <tr>
+        <td><strong>Цвет:</strong></td>
+        <td colspan="6">{{ $sticker[3][1] ?? '---' }}</td>
+    </tr>
+
+    {{-- 9-qator: Sarlavhalar --}}
+    <tr>
+        <td colspan="3" style="text-align:center; font-weight: bold;">Размер</td>
+        <td colspan="4" style="text-align:center; font-weight: bold;">Количество</td>
+    </tr>
+
+    {{-- Size list --}}
+    @php
+        $sizes = array_filter($sticker, fn($row) => isset($row[0]) && $row[0] !== '' && $row[0] !== 'Размер');
+        $netto = $sticker[array_key_last($sticker)-1] ?? ['',''];
+        $brutto = $sticker[array_key_last($sticker)] ?? ['',''];
+    @endphp
+
+    @foreach($sizes as $row)
+        @continue($loop->iteration < 6 || $loop->iteration > count($sticker) - 3) {{-- Skip static rows --}}
         <tr>
-            <td colspan="5" rowspan="4" style="text-align:center;">
-                @if(!file_exists($imagePath))
-                    <p style="color:red;">Rasm topilmadi: {{ $imagePath }}</p>
-                @endif
+            <td colspan="3" style="text-align:center;">{{ $row[0] }}</td>
+            <td colspan="4" style="text-align:center;">
+                {{ $row[1] != 0 ? $row[1] : '' }}
             </td>
-            <td colspan="2" rowspan="4" style="text-align:center; font-size: 24px;">
-                {{ $index + 1 }}
-            </td>
         </tr>
-        <tr></tr><tr></tr><tr></tr>
+    @endforeach
 
-        {{-- SUBMODEL --}}
-        <tr>
-            <td colspan="7" style="text-align:center; font-weight:bold; font-size:18px;">
-                {{ $submodel }}
-            </td>
-        </tr>
+    {{-- Separator --}}
+    <tr><td colspan="7">&nbsp;</td></tr>
 
-        {{-- ARTIKUL & RANG --}}
-        <tr>
-            <td style="font-weight:bold;">Арт:</td>
-            <td colspan="6">{{ $sticker[2][1] ?? '' }}</td>
-        </tr>
-        <tr>
-            <td style="font-weight:bold;">Цвет:</td>
-            <td colspan="6">{{ $sticker[3][1] ?? '' }}</td>
-        </tr>
-
-        {{-- HEADER --}}
-        <tr>
-            <td>Размер</td>
-            <td>Количество</td>
-            <td colspan="5"></td>
-        </tr>
-
-        {{-- SIZES --}}
-        @foreach(array_slice($sticker, 5, count($sticker)-8) as $row)
-            <tr>
-                <td>{{ $row[0] }}</td>
-                <td>{{ $row[1] ?? '' }}</td>
-                <td colspan="5"></td>
-            </tr>
-        @endforeach
-
-        {{-- NETTO & BRUTTO --}}
-        <tr>
-            <td>Нетто(кг)</td>
-            <td>Брутто(кг)</td>
-            <td colspan="5"></td>
-        </tr>
-        <tr>
-            <td>{{ $sticker[count($sticker)-2][0] }}</td>
-            <td>{{ $sticker[count($sticker)-2][1] }}</td>
-            <td colspan="5"></td>
-        </tr>
-
-        {{-- SEPARATOR --}}
-        <tr><td colspan="7" style="height:20px;"></td></tr>
-    </table>
-@endforeach
+    {{-- Netto / Brutto --}}
+    <tr>
+        <td colspan="3" style="text-align:center; font-weight: bold;">Нетто(кг)</td>
+        <td colspan="4" style="text-align:center;">{{ $netto[0] ?? '' }}</td>
+    </tr>
+    <tr>
+        <td colspan="3" style="text-align:center; font-weight: bold;">Брутто(кг)</td>
+        <td colspan="4" style="text-align:center;">{{ $brutto[1] ?? '' }}</td>
+    </tr>
+</table>

@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance BoxStickerExport to include image drawing functionality and add error handling for missing images" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: restore image drawing functionality in BoxStickerExport">
+      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="18506000" />
-    </task>
-    <task id="LOCAL-00589" summary="feat: restore packing list export functionality in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751439207872</created>
-      <option name="number" value="00589" />
-      <option name="presentableId" value="LOCAL-00589" />
-      <option name="project" value="LOCAL" />
-      <updated>1751439207872</updated>
-    </task>
-    <task id="LOCAL-00590" summary="feat: update packing list export to use zip file and return processing status">
-      <option name="closed" value="true" />
-      <created>1751439376504</created>
-      <option name="number" value="00590" />
-      <option name="presentableId" value="LOCAL-00590" />
-      <option name="project" value="LOCAL" />
-      <updated>1751439376504</updated>
+      <workItem from="1751432833774" duration="18810000" />
     </task>
     <task id="LOCAL-00591" summary="feat: enhance BoxStickerExport with column widths, row heights, and improved styling for better presentation">
       <option name="closed" value="true" />
@@ -778,7 +764,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751453606588</updated>
     </task>
-    <option name="localTasksCounter" value="638" />
+    <task id="LOCAL-00638" summary="feat: enhance BoxStickerExport by commenting out image drawing functionality and updating workspace configuration">
+      <option name="closed" value="true" />
+      <created>1751453750739</created>
+      <option name="number" value="00638" />
+      <option name="presentableId" value="LOCAL-00638" />
+      <option name="project" value="LOCAL" />
+      <updated>1751453750739</updated>
+    </task>
+    <task id="LOCAL-00639" summary="feat: restore image drawing functionality in BoxStickerExport">
+      <option name="closed" value="true" />
+      <created>1751453824097</created>
+      <option name="number" value="00639" />
+      <option name="presentableId" value="LOCAL-00639" />
+      <option name="project" value="LOCAL" />
+      <updated>1751453824097</updated>
+    </task>
+    <option name="localTasksCounter" value="640" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update BoxStickerExport to simplify output format for Upakovka and Submodel" />
-    <MESSAGE value="feat: update BoxStickerExport to modify submodel output format" />
     <MESSAGE value="feat: update BoxStickerExport to enhance output format and styling for submodel and stickers" />
     <MESSAGE value="feat: remove unused columnWidths method from BoxStickerExport" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout" />
@@ -833,7 +833,9 @@
     <MESSAGE value="feat: update BoxStickerExport to include submodel in export layout for improved styling" />
     <MESSAGE value="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching" />
     <MESSAGE value="feat: enhance BoxStickerExport to include image drawing functionality and add error handling for missing images" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance BoxStickerExport to include image drawing functionality and add error handling for missing images" />
+    <MESSAGE value="feat: enhance BoxStickerExport by commenting out image drawing functionality and updating workspace configuration" />
+    <MESSAGE value="feat: restore image drawing functionality in BoxStickerExport" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: restore image drawing functionality in BoxStickerExport" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
