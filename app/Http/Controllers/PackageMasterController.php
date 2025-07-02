@@ -116,7 +116,7 @@ class PackageMasterController extends Controller
             $index = 1; // Har rang uchun index boshlanadi
 
             foreach ($items as $item) {
-                $qty = $item['qty'];
+                $qty =(int) $item['qty'];
                 $sizeName = $item['size_name'];
                 $capacity = $item['capacity'];
 
