@@ -154,10 +154,6 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                 $row = 1;
 
                 foreach ($this->stickers as $index => $sticker) {
-                    if ($index > 0) {
-                        $row += 2; // Har bir sticker orasida 2 ta bo‘sh qator
-                    }
-
                     // 1️⃣ Logo uchun 4 qator (qator 1–4)
                     for ($i = 0; $i < 4; $i++) {
                         $sheet->getRowDimension($row + $i)->setRowHeight(15); // 4 × 15 = 60px
