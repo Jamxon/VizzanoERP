@@ -1,15 +1,16 @@
 <table>
     {{-- 1-4 qator: Logo va № --}}
     <tr>
-        <td colspan="5" rowspan="3" style="text-align: center;">
+        <td colspan="5" rowspan="4" style="text-align: center;">
 {{--            @if(file_exists($imagePath))--}}
 {{--                <img src="{{ $imagePath }}" alt="Logo" style="width: 100px; height: 100px;">--}}
 {{--            @else--}}
 {{--                <strong>Logo yo'q</strong>--}}
 {{--            @endif--}}
         </td>
-        <td colspan="2" rowspan="3" style="text-align: center; font-weight: bold; font-size: 55px;">{{ $index }}</td>
+        <td colspan="2" rowspan="4" style="text-align: center; font-weight: bold; font-size: 55px;">{{ $index }}</td>
     </tr>
+    <tr></tr>
     <tr></tr>
     <tr></tr>
 
@@ -23,19 +24,16 @@
     <tr></tr>
 
     <tr>
-        <td rowspan="2" style="font-size: 25px" ><p>Арт:</p></td>
-        <td colspan="6" rowspan="2" style="font-weight: bold; text-align: center; font-size: 40px;">{{ $model ?? '---' }}</td>
+        <td rowspan="2" style="font-size: 25px; height: 60px;" ><p>Арт:</p></td>
+        <td colspan="6" rowspan="2" style="font-weight: bold; text-align: center; font-size: 40px; height: 60px;">{{ $model ?? '---' }}</td>
     </tr>
 
-    <tr></tr>
 
     <tr>
 {{--        <td rowspan="2" style="font-size: 25px" ><p>Цвет:</p></td>--}}
-        <td rowspan="2" style="font-size: 20px" ><p>Цвет:</p></td>
-        <td colspan="6" rowspan="2" style="font-weight: bold; text-align: center; font-size: 34px;">{{ $sticker['color'] ?? '---' }}</td>
+        <td rowspan="2" style="font-size: 20px; height: 60px;" ><p>Цвет:</p></td>
+        <td colspan="6" rowspan="2" style="font-weight: bold; text-align: center; font-size: 34px; height: 60px;">{{ $sticker['color'] ?? '---' }}</td>
     </tr>
-
-    <tr></tr>
 
     <tr>
         <td colspan="3" style="text-align: center;"><p>Размер</p></td>
@@ -61,8 +59,8 @@
             <td colspan="4" style="text-align: center; font-weight: bold;">Брутто (кг)</td>
         </tr>
         <tr>
-            <td colspan="3" style="text-align: center;">{{ $last[0] }}</td>
-            <td colspan="4" style="text-align: center;">{{ $last[1] }}</td>
+            <td colspan="3" style="text-align: center; font-size: 35px; font-weight: bold; height: 50px;">{{ $last[0] }}</td>
+            <td colspan="4" style="text-align: center; font-size: 35px; font-weight: bold; height: 50px;">{{ $last[1] }}</td>
         </tr>
     @endif
 </table>
