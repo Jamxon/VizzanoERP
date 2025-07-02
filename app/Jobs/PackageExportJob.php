@@ -38,36 +38,21 @@ class PackageExportJob implements ShouldQueue
 
     public function handle()
     {
-        // Temp papka yaratish (ixtiyoriy, lekin ishlatilsin)
-        $tempDirName = 'temp_' . now()->timestamp . '_' . uniqid();
-        $tempDir = storage_path('app/exports/' . $tempDirName);
+        $tempDir = storage_path('app/exports/temp_' . now()->timestamp . '_' . uniqid());
         if (!file_exists($tempDir)) {
             mkdir($tempDir, 0777, true);
         }
 
-        // Excel fayllarni shu temp papkaga saqlaymiz
-        $packingFileRel = $tempDirName . '/packing_list.xlsx'; // nisbiy yo'l
-        $boxFileRel = $tempDirName . '/box_stickers.xlsx';
-
-        Excel::store(new PackingListExport($this->data, $this->summaryList), $packingFileRel);
         $boxExport = new BoxStickerExport($this->stickers, $this->imagePath, $this->submodelName, $this->modelName);
-        Excel::store($boxExport, $boxFileRel);
+        Excel::store(new PackingListExport($this->data, $this->summaryList), 'exports/packing_list.xlsx');
+        Excel::store($boxExport, 'exports/box_stickers.xlsx');
 
-        // To'liq yo'llar:
-        $packingFile = storage_path('app/exports/' . $packingFileRel);
-        $boxFile = storage_path('app/exports/' . $boxFileRel);
+        $packingFile = storage_path('app/exports/packing_list.xlsx');
+        $boxFile = storage_path('app/exports/box_stickers.xlsx');
+        Excel::store($boxExport, $boxFile);
+
+        // 3. Zip fayl yaratish
         $zipPath = storage_path('app/exports/' . $this->fileName);
-
-        // Fayl mavjudligini tekshirish
-        if (!file_exists($packingFile)) {
-            return;
-        }
-
-        if (!file_exists($boxFile)) {
-            return;
-        }
-
-        // Zip yaratish
         $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
             $zip->addFile($packingFile, 'packing_list.xlsx');
@@ -75,12 +60,9 @@ class PackageExportJob implements ShouldQueue
             $zip->close();
         }
 
-        // Temp fayllarni o'chirish
-        if (file_exists($packingFile)) unlink($packingFile);
-        if (file_exists($boxFile)) unlink($boxFile);
-
-        // Temp papkani o'chirish (faqat bo'sh bo'lsa)
-        if (is_dir($tempDir)) rmdir($tempDir);
+        // 4. Temp fayllarni o'chirish
+        unlink($packingFile);
+        unlink($boxFile);
+        rmdir($tempDir);
     }
-
 }
