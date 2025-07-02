@@ -81,7 +81,7 @@ class PackageMasterController extends Controller
             $sizeName = OrderSize::find($sizeId)?->size->name ?? '---';
 
             if (!in_array($sizeName, $sizesMap)) {
-                $sizesMap[] = $sizeName;
+                $sizesMap[] .= $sizeName;
             }
 
             foreach ($sizeItem['colors'] as $colorItem) {
