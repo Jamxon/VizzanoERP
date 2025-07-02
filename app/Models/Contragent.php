@@ -18,7 +18,8 @@ class Contragent extends Model
         'name',
         'description',
         'is_market',
-        'branch_id'
+        'branch_id',
+        'image'
     ];
 
     protected $hidden = [

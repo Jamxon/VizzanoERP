@@ -145,12 +145,20 @@ class OrderController extends Controller
         $request->validate([
             'name' => 'required|string',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|max:20480', // Maksimal fayl o'lchami 2MB
         ]);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('images');
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            $image->storeAs('/public/contragent/', $fileName);
+        }
 
         $contragent = Contragent::create([
             'name' => $request->name,
             'description' => $request->description,
             'branch_id' => auth()->user()->employee->branch_id,
+            'image' => isset($fileName) ? '/storage/contragent/' . $fileName : null,
         ]);
 
         return response()->json($contragent, 201);
@@ -161,11 +169,19 @@ class OrderController extends Controller
         $request->validate([
             'name' => 'required|string',
             'description' => 'nullable|string',
+            'image' => 'nullable|image|max:20480', // Maksimal fayl o'lchami 20MB
         ]);
+
+        if ($request->hasFile('image')) {
+            $image = $request->file('image');
+            $fileName = time() . '_' . $image->getClientOriginalName();
+            $image->storeAs('/public/contragent/', $fileName);
+        }
 
         $contragent->update([
             'name' => $request->name,
             'description' => $request->description,
+            'image' => isset($fileName) ? '/storage/contragent/' . $fileName : $contragent->image,
         ]);
 
         return response()->json($contragent);
