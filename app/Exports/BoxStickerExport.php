@@ -42,6 +42,8 @@ class BoxStickerExport implements WithMultipleSheets
                     $this->index = $index;
                 }
 
+
+
                 public function view(): View
                 {
                     return view('exports.box_sticker', [
@@ -61,6 +63,17 @@ class BoxStickerExport implements WithMultipleSheets
                 {
                     $sheet->getDefaultRowDimension()->setRowHeight(20);
                     $sheet->getStyle('A:G')->getFont()->setSize(12);
+
+                    // 👉 A ustunini kichikroq qilish:
+                    $sheet->getColumnDimension('A')->setWidth(14); // yoki 10, 12 — qanday bo'lishini istasang
+
+                    // Optional: boshqa ustunlar ham sozlansa yaxshi bo'ladi
+                    $sheet->getColumnDimension('B')->setWidth(18);
+                    $sheet->getColumnDimension('C')->setWidth(18);
+                    $sheet->getColumnDimension('D')->setWidth(18);
+                    $sheet->getColumnDimension('E')->setWidth(18);
+                    $sheet->getColumnDimension('F')->setWidth(18);
+                    $sheet->getColumnDimension('G')->setWidth(18);
                 }
 
                 public function drawings(): array
