@@ -229,24 +229,24 @@ class PackageMasterController extends Controller
 //            array_sum(array_column($summaryList, 6)),
 //        ];
 
-//        return Excel::download(new PackingListExport($data, $summaryList), 'packing_list.xlsx');
+        return Excel::download(new PackingListExport($data, $summaryList), 'packing_list.xlsx');
 
-        $timestamp = now()->timestamp;
-        $unique = \Illuminate\Support\Str::random(6);
-        $fileName = "packing_result_{$timestamp}_{$unique}.zip";
-
-// Bu nom asosida job ichida zip saqlanadi
-        $jobPath = "exports/temp_{$timestamp}_{$unique}"; // jobga parameter sifatida kerak bo‘ladi
-
-        dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName));
-
-        $url = asset("storage/exports/{$fileName}");
-
-        return response()->json([
-            'status' => 'processing',
-            'message' => 'Fayllar tayyorlanmoqda. Tez orada yuklab olish mumkin.',
-            'url' => $url
-        ]);
+//        $timestamp = now()->timestamp;
+//        $unique = \Illuminate\Support\Str::random(6);
+//        $fileName = "packing_result_{$timestamp}_{$unique}.zip";
+//
+//// Bu nom asosida job ichida zip saqlanadi
+//        $jobPath = "exports/temp_{$timestamp}_{$unique}"; // jobga parameter sifatida kerak bo‘ladi
+//
+//        dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName));
+//
+//        $url = asset("storage/exports/{$fileName}");
+//
+//        return response()->json([
+//            'status' => 'processing',
+//            'message' => 'Fayllar tayyorlanmoqda. Tez orada yuklab olish mumkin.',
+//            'url' => $url
+//        ]);
     }
 
 }
