@@ -68,7 +68,7 @@ class PackageMasterController extends Controller
         $imagePath = $orders->first()?->contragent->image ?? null;
         $absolutePath = public_path($imagePath);
         $submodelName = $orders->first()?->orderModel?->submodels->first()?->submodel?->name ?? 'Submodel nomi yo‘q';
-        $orderSizes = $orders->first()?->orderModel?->sizes->size->pluck('name')->toArray() ?? [];
+        $orderSizes = $orders->first()?->orderModel?->sizes->map(fn($item) => $item->size->name)->toArray() ?? [];
         $colorMap = [];
         $sizesMap = [];
 

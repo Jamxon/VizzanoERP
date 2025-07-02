@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove unnecessary casting of qty and capacity in PackageMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update size handling logic in PackageMasterController to include order sizes" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,15 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="31082000" />
-    </task>
-    <task id="LOCAL-00673" summary="feat: update file path handling for packing and box sticker exports in PackageExportJob">
-      <option name="closed" value="true" />
-      <created>1751458425171</created>
-      <option name="number" value="00673" />
-      <option name="presentableId" value="LOCAL-00673" />
-      <option name="project" value="LOCAL" />
-      <updated>1751458425171</updated>
+      <workItem from="1751432833774" duration="31386000" />
     </task>
     <task id="LOCAL-00674" summary="feat: simplify temporary directory and file handling in PackageExportJob">
       <option name="closed" value="true" />
@@ -778,7 +770,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751466228398</updated>
     </task>
-    <option name="localTasksCounter" value="722" />
+    <task id="LOCAL-00722" summary="fix: update size handling logic in PackageMasterController to include order sizes">
+      <option name="closed" value="true" />
+      <created>1751466537634</created>
+      <option name="number" value="00722" />
+      <option name="presentableId" value="LOCAL-00722" />
+      <option name="project" value="LOCAL" />
+      <updated>1751466537634</updated>
+    </task>
+    <option name="localTasksCounter" value="723" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,7 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: adjust rowspan and height styling for table cells in box sticker" />
     <MESSAGE value="fix: remove rowspan from table cells in box sticker for improved layout" />
     <MESSAGE value="fix: update font size for header cells in box sticker for better visibility" />
     <MESSAGE value="fix: refactor box sticker export to use FromView and improve styling" />
@@ -833,7 +832,8 @@
     <MESSAGE value="fix: cast quantity to integer in PackageMasterController for consistency" />
     <MESSAGE value="fix: cast capacity to integer in PackageMasterController for consistency" />
     <MESSAGE value="fix: remove unnecessary casting of qty and capacity in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: remove unnecessary casting of qty and capacity in PackageMasterController" />
+    <MESSAGE value="fix: update size handling logic in PackageMasterController to include order sizes" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update size handling logic in PackageMasterController to include order sizes" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
