@@ -6,8 +6,9 @@ use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithDrawings;
 
-class BoxStickerExport implements FromView, WithStyles
+class BoxStickerExport implements FromView, WithStyles,  WithDrawings
 {
     protected array $stickers;
     protected string $imagePath;
@@ -45,17 +46,27 @@ class BoxStickerExport implements FromView, WithStyles
         $sheet->getColumnDimension('G')->setWidth(9);
     }
 
-//    public function drawings(): array
-//    {
-//        if (!file_exists($this->imagePath)) return [];
-//
-//        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
-//        $drawing->setName('Logo');
-//        $drawing->setDescription('Contragent Logo');
-//        $drawing->setPath($this->imagePath);
-//        $drawing->setHeight(70);
-//        $drawing->setCoordinates('A1');
-//
-//        return [$drawing];
-//    }
+    public function drawings(): array
+    {
+        $drawings = [];
+        $startRow = 1;
+
+        foreach ($this->stickers as $index => $sticker) {
+            if (!file_exists($this->imagePath)) continue;
+
+            $drawing = new Drawing();
+            $drawing->setName("Logo $index");
+            $drawing->setDescription("Logo for sticker $index");
+            $drawing->setPath($this->imagePath);
+            $drawing->setHeight(70);
+            $drawing->setCoordinates('A' . $startRow);
+            $drawing->setOffsetY(5);
+            $drawings[] = $drawing;
+
+            // Har bir quti orasida taxminan 15 qator bo‘shliq bo‘lsin
+            $startRow += 15;
+        }
+
+        return $drawings;
+    }
 }
