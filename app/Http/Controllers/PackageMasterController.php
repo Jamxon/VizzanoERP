@@ -154,30 +154,26 @@ class PackageMasterController extends Controller
                 $data[] = [$index, "Цвет: $color", $leftovers[0]['size_name'] ?? '', $customerName, $packCount + 1, 1, $leftovers[0]['qty'] ?? '', '', ''];
                 $data[] = ['', "Юбка для девочки", $leftovers[1]['size_name'] ?? '', '', '', '', $leftovers[1]['qty'] ?? '', '', ''];
 
-                // Box sticker leftovers uchun faqat o'lcham va qiymatlari bilan
-                $sizes = [];
-                $totalQtyLeft = 0;
-                $totalNettoLeft = 0;
-                $totalBruttoLeft = 0;
-
-// 1. Size'lar bo'yicha qty map tuzib olamiz
+                // Size'lar bo'yicha qty map tuzib olamiz
                 $qtyBySize = collect($leftovers)->mapWithKeys(fn($left) => [
                     $left['size_name'] => $left['qty']
                 ])->toArray();
 
+                $sizes = [];
+                $totalQtyLeft = 0;
+
+                // Har bir sizesMap elementiga qarab qty ni olamiz yoki '' beramiz
                 foreach ($sizesMap as $sizeName) {
                     $qty = $qtyBySize[$sizeName] ?? '';
                     $sizes[] = [$sizeName, $qty];
                     $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                 }
 
-                return $sizes;
-
-// 3. Netto va Brutto to‘plash
+                // Netto va Brutto yig'ish
                 $totalNettoLeft = collect($leftovers)->sum('netto');
                 $totalBruttoLeft = collect($leftovers)->sum('brutto');
 
-// 4. Stickerga tayyor qilish
+                // Sticker massivini tayyorlash
                 $sizesRows = [['Размер', 'Количество'], ...$sizes, [round($totalNettoLeft, 2), round($totalBruttoLeft, 2)]];
 
                 $stickers[] = [
