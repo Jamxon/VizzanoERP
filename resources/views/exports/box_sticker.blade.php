@@ -20,10 +20,12 @@
         </td>
     </tr>
 
+    <tr></tr>
+
     {{-- 7-qator: Artikul --}}
     <tr>
-        <td><strong>Арт:</strong></td>
-        <td colspan="6">{{ $sticker[2][1] ?? '---' }}</td>
+        <td style="font-size: 25px"><strong>Арт:</strong></td>
+        <td colspan="6" style="font-weight: bold; font-size: 40px">{{ $sticker[2][1] ?? '---' }}</td>
     </tr>
 
     {{-- 8-qator: Color --}}
