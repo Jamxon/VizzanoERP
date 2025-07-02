@@ -37,12 +37,12 @@ class BoxStickerExport implements FromView, WithStyles, WithDrawings
     {
         $sheet->getDefaultRowDimension()->setRowHeight(25);
         $sheet->getColumnDimension('A')->setWidth(12);
-        $sheet->getColumnDimension('B')->setWidth(12);
-        $sheet->getColumnDimension('C')->setWidth(12);
-        $sheet->getColumnDimension('D')->setWidth(12);
-        $sheet->getColumnDimension('E')->setWidth(12);
-        $sheet->getColumnDimension('F')->setWidth(12);
-        $sheet->getColumnDimension('G')->setWidth(12);
+        $sheet->getColumnDimension('B')->setWidth(9);
+        $sheet->getColumnDimension('C')->setWidth(9);
+        $sheet->getColumnDimension('D')->setWidth(9);
+        $sheet->getColumnDimension('E')->setWidth(9);
+        $sheet->getColumnDimension('F')->setWidth(9);
+        $sheet->getColumnDimension('G')->setWidth(9);
     }
 
     public function drawings(): array
