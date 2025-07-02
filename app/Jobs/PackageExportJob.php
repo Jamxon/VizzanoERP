@@ -55,21 +55,29 @@ class PackageExportJob implements ShouldQueue
         Excel::store($boxExport, $boxFileRel);
 
         // To'liq yo'llar:
-        $packingFile = storage_path('app/exports/' . $packingFileRel);
-        $boxFile = storage_path('app/exports/' . $boxFileRel);
-
-        // Zip fayl yaratish
+        $packingFile = storage_path('app/exports/temp_xyz/packing_list.xlsx');
+        $boxFile = storage_path('app/exports/temp_xyz/box_stickers.xlsx');
         $zipPath = storage_path('app/exports/' . $this->fileName);
-        $zip = new ZipArchive();
 
+// Fayl mavjudligini tekshirish
+        if (!file_exists($packingFile)) {
+            \Log::error("Packing file not found: $packingFile");
+            return;
+        }
+
+        if (!file_exists($boxFile)) {
+            \Log::error("Box file not found: $boxFile");
+            return;
+        }
+
+// Zip yaratish
+        $zip = new ZipArchive();
         if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
             $zip->addFile($packingFile, 'packing_list.xlsx');
             $zip->addFile($boxFile, 'box_stickers.xlsx');
             $zip->close();
         } else {
-            // Zip ochishda muammo bo'lsa, log yozing
-            \Log::error("Zip ochishda xatolik: $zipPath");
-            return;
+            \Log::error("Zip yaratishda xatolik: $zipPath");
         }
 
         // Temp fayllarni o'chirish
