@@ -32,6 +32,7 @@ class BoxStickerExport implements FromView, WithStyles
         ]);
     }
 
+
     public function styles(Worksheet $sheet)
     {
         $sheet->getDefaultRowDimension()->setRowHeight(25);
