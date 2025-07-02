@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: improve temporary directory handling and file storage in PackageExportJob" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: refactor file handling and improve directory management in PackageExportJob">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,39 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="23133000" />
-    </task>
-    <task id="LOCAL-00623" summary="feat: update logo dimensions in BoxStickerExport to improve display size">
-      <option name="closed" value="true" />
-      <created>1751445570767</created>
-      <option name="number" value="00623" />
-      <option name="presentableId" value="LOCAL-00623" />
-      <option name="project" value="LOCAL" />
-      <updated>1751445570767</updated>
-    </task>
-    <task id="LOCAL-00624" summary="feat: enhance BoxStickerExport to adjust row heights for improved layout and clarity">
-      <option name="closed" value="true" />
-      <created>1751445795084</created>
-      <option name="number" value="00624" />
-      <option name="presentableId" value="LOCAL-00624" />
-      <option name="project" value="LOCAL" />
-      <updated>1751445795084</updated>
-    </task>
-    <task id="LOCAL-00625" summary="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity">
-      <option name="closed" value="true" />
-      <created>1751446542686</created>
-      <option name="number" value="00625" />
-      <option name="presentableId" value="LOCAL-00625" />
-      <option name="project" value="LOCAL" />
-      <updated>1751446542687</updated>
-    </task>
-    <task id="LOCAL-00626" summary="feat: enhance BoxStickerExport to adjust row heights for logo and submodel for improved layout">
-      <option name="closed" value="true" />
-      <created>1751446801893</created>
-      <option name="number" value="00626" />
-      <option name="presentableId" value="LOCAL-00626" />
-      <option name="project" value="LOCAL" />
-      <updated>1751446801893</updated>
+      <workItem from="1751432833774" duration="23909000" />
     </task>
     <task id="LOCAL-00627" summary="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout">
       <option name="closed" value="true" />
@@ -778,7 +748,39 @@
       <option name="project" value="LOCAL" />
       <updated>1751458197582</updated>
     </task>
-    <option name="localTasksCounter" value="672" />
+    <task id="LOCAL-00672" summary="feat: enhance error handling for packing and box sticker file creation in PackageExportJob">
+      <option name="closed" value="true" />
+      <created>1751458297413</created>
+      <option name="number" value="00672" />
+      <option name="presentableId" value="LOCAL-00672" />
+      <option name="project" value="LOCAL" />
+      <updated>1751458297413</updated>
+    </task>
+    <task id="LOCAL-00673" summary="feat: update file path handling for packing and box sticker exports in PackageExportJob">
+      <option name="closed" value="true" />
+      <created>1751458425171</created>
+      <option name="number" value="00673" />
+      <option name="presentableId" value="LOCAL-00673" />
+      <option name="project" value="LOCAL" />
+      <updated>1751458425171</updated>
+    </task>
+    <task id="LOCAL-00674" summary="feat: simplify temporary directory and file handling in PackageExportJob">
+      <option name="closed" value="true" />
+      <created>1751458495817</created>
+      <option name="number" value="00674" />
+      <option name="presentableId" value="LOCAL-00674" />
+      <option name="project" value="LOCAL" />
+      <updated>1751458495817</updated>
+    </task>
+    <task id="LOCAL-00675" summary="feat: refactor file handling and improve directory management in PackageExportJob">
+      <option name="closed" value="true" />
+      <created>1751458629023</created>
+      <option name="number" value="00675" />
+      <option name="presentableId" value="LOCAL-00675" />
+      <option name="project" value="LOCAL" />
+      <updated>1751458629023</updated>
+    </task>
+    <option name="localTasksCounter" value="676" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,10 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: comment out font size setting in BoxStickerExport for layout adjustments" />
-    <MESSAGE value="feat: adjust logo dimensions in BoxStickerExport and box_sticker view for improved layout" />
-    <MESSAGE value="feat: remove image drawing functionality in BoxStickerExport for layout simplification" />
-    <MESSAGE value="feat: enhance logo display in BoxStickerExport with responsive styling" />
     <MESSAGE value="feat: adjust logo size in BoxStickerExport for better display" />
     <MESSAGE value="feat: update logo display in BoxStickerExport for fixed dimensions" />
     <MESSAGE value="feat: enhance logo handling in BoxStickerExport with conditional drawing and updated dimensions" />
@@ -833,7 +831,11 @@
     <MESSAGE value="feat: streamline packing and box sticker export processes for improved file handling" />
     <MESSAGE value="feat: update return type for packageStore method to ensure consistent response handling" />
     <MESSAGE value="feat: improve temporary directory handling and file storage in PackageExportJob" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: improve temporary directory handling and file storage in PackageExportJob" />
+    <MESSAGE value="feat: enhance error handling for packing and box sticker file creation in PackageExportJob" />
+    <MESSAGE value="feat: update file path handling for packing and box sticker exports in PackageExportJob" />
+    <MESSAGE value="feat: simplify temporary directory and file handling in PackageExportJob" />
+    <MESSAGE value="feat: refactor file handling and improve directory management in PackageExportJob" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor file handling and improve directory management in PackageExportJob" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
