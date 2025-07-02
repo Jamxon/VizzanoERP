@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update columnWidths method in BoxStickerExport to decrease width values for better layout">
+      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,39 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="11250000" />
-    </task>
-    <task id="LOCAL-00564" summary="feat: replace spendSeconds calculation with debug output in GroupController">
-      <option name="closed" value="true" />
-      <created>1751261656541</created>
-      <option name="number" value="00564" />
-      <option name="presentableId" value="LOCAL-00564" />
-      <option name="project" value="LOCAL" />
-      <updated>1751261656541</updated>
-    </task>
-    <task id="LOCAL-00565" summary="feat: update spendSeconds calculation in GroupController to use submodel's rasxod">
-      <option name="closed" value="true" />
-      <created>1751261869485</created>
-      <option name="number" value="00565" />
-      <option name="presentableId" value="LOCAL-00565" />
-      <option name="project" value="LOCAL" />
-      <updated>1751261869485</updated>
-    </task>
-    <task id="LOCAL-00566" summary="feat: add employee holidays and absences loading to UserController">
-      <option name="closed" value="true" />
-      <created>1751262034053</created>
-      <option name="number" value="00566" />
-      <option name="presentableId" value="LOCAL-00566" />
-      <option name="project" value="LOCAL" />
-      <updated>1751262034053</updated>
-    </task>
-    <task id="LOCAL-00567" summary="feat: add holidays and absences to user resource response">
-      <option name="closed" value="true" />
-      <created>1751262142957</created>
-      <option name="number" value="00567" />
-      <option name="presentableId" value="LOCAL-00567" />
-      <option name="project" value="LOCAL" />
-      <updated>1751262142957</updated>
+      <workItem from="1751432833774" duration="11570000" />
     </task>
     <task id="LOCAL-00568" summary="feat: enhance deletion process in TechnologController with logging and response handling">
       <option name="closed" value="true" />
@@ -778,7 +748,39 @@
       <option name="project" value="LOCAL" />
       <updated>1751444620425</updated>
     </task>
-    <option name="localTasksCounter" value="613" />
+    <task id="LOCAL-00613" summary="feat: update columnWidths method in BoxStickerExport to increase width values for better layout">
+      <option name="closed" value="true" />
+      <created>1751444700432</created>
+      <option name="number" value="00613" />
+      <option name="presentableId" value="LOCAL-00613" />
+      <option name="project" value="LOCAL" />
+      <updated>1751444700432</updated>
+    </task>
+    <task id="LOCAL-00614" summary="feat: update columnWidths method in BoxStickerExport to increase width values for improved layout">
+      <option name="closed" value="true" />
+      <created>1751444774185</created>
+      <option name="number" value="00614" />
+      <option name="presentableId" value="LOCAL-00614" />
+      <option name="project" value="LOCAL" />
+      <updated>1751444774185</updated>
+    </task>
+    <task id="LOCAL-00615" summary="feat: update columnWidths method in BoxStickerExport to increase width values for better layout">
+      <option name="closed" value="true" />
+      <created>1751444867524</created>
+      <option name="number" value="00615" />
+      <option name="presentableId" value="LOCAL-00615" />
+      <option name="project" value="LOCAL" />
+      <updated>1751444867524</updated>
+    </task>
+    <task id="LOCAL-00616" summary="feat: update columnWidths method in BoxStickerExport to decrease width values for better layout">
+      <option name="closed" value="true" />
+      <created>1751444941714</created>
+      <option name="number" value="00616" />
+      <option name="presentableId" value="LOCAL-00616" />
+      <option name="project" value="LOCAL" />
+      <updated>1751444941715</updated>
+    </task>
+    <option name="localTasksCounter" value="617" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,9 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: implement BoxStickerExport and PackageExportJob for packaging functionality" />
-    <MESSAGE value="feat: update error message in InternalAccountantController for better clarity" />
-    <MESSAGE value="feat: restore packing list export functionality in PackageMasterController" />
     <MESSAGE value="feat: update packing list export to use zip file and return processing status" />
     <MESSAGE value="feat: enhance BoxStickerExport with column widths, row heights, and improved styling for better presentation" />
     <MESSAGE value="feat: remove WithRowHeight from BoxStickerExport for streamlined export functionality" />
@@ -833,7 +832,10 @@
     <MESSAGE value="feat: update BoxStickerExport to enhance output format and styling for submodel and stickers" />
     <MESSAGE value="feat: remove unused columnWidths method from BoxStickerExport" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout" />
+    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for improved layout" />
+    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for better layout" />
+    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width values for better layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update columnWidths method in BoxStickerExport to decrease width values for better layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
