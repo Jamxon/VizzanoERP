@@ -84,7 +84,8 @@ class BoxStickerExport implements WithMultipleSheets
                     $drawing->setName('Contragent Logo');
                     $drawing->setDescription('Logo');
                     $drawing->setPath($this->imagePath);
-                    $drawing->setHeight(90);
+                    $drawing->setHeight(70);
+                    $drawing->setWidth(300);
                     $drawing->setCoordinates('A1');
                     $drawing->setOffsetX(10);
                     $drawing->setOffsetY(5);
