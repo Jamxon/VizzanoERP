@@ -55,11 +55,11 @@
     @if(is_array($last) && count($last) == 2 && is_numeric($last[0]) && is_numeric($last[1]))
         <tr>
             <td colspan="3" style="text-align: center; font-weight: bold;">Нетто (кг)</td>
-            <td colspan="3" style="text-align: center; font-weight: bold;">Брутто (кг)</td>
+            <td colspan="4" style="text-align: center; font-weight: bold;">Брутто (кг)</td>
         </tr>
         <tr>
             <td colspan="3" style="text-align: center;">{{ $last[0] }}</td>
-            <td colspan="3" style="text-align: center;">{{ $last[1] }}</td>
+            <td colspan="4" style="text-align: center;">{{ $last[1] }}</td>
         </tr>
     @endif
 </table>
