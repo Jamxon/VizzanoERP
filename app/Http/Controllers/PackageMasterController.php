@@ -116,20 +116,15 @@ class PackageMasterController extends Controller
             $index = 1; // Har rang uchun index boshlanadi
 
             foreach ($items as $item) {
-                $qty =(int) $item['qty'];
+                $qty = $item['qty'];
                 $sizeName = $item['size_name'];
-                $capacity =(int) $item['capacity'];
+                $capacity = $item['capacity'];
 
                 while ($qty >= $capacity) {
                     // Packing faylga qo'shish
                     $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
                     $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packCount + 1, 1, $capacity, $item['netto'],  $item['brutto']];
                     $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
-
-                    foreach ($sizesMap as $sizeName) {
-                        $qty = $qtyBySize[$sizeName] ?? '';
-                        $sizes[] = [$sizeName, $qty];
-                    }
 
                     // Box sticker uchun shu paketdagi faqat bitta o'lcham va miqdor
                     $stickers[] = [
@@ -164,7 +159,15 @@ class PackageMasterController extends Controller
                     $left['size_name'] => $left['qty']
                 ])->toArray();
 
+                $sizes = [];
                 $totalQtyLeft = 0;
+
+                // Har bir sizesMap elementiga qarab qty ni olamiz yoki '' beramiz
+                foreach ($sizesMap as $sizeName) {
+                    $qty = $qtyBySize[$sizeName] ?? '';
+                    $sizes[] = [$sizeName, $qty];
+                    $totalQtyLeft += is_numeric($qty) ? $qty : 0;
+                }
 
                 // Netto va Brutto yig'ish
                 $totalNettoLeft = collect($leftovers)->sum('netto');
