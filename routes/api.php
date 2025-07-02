@@ -115,6 +115,8 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('groups', [InternalAccountantController::class, 'getGroups']);
     Route::get('employees/{id}', [SuperHRController::class, 'showEmployee']);
     Route::patch('employeeTarificationLog/{id}', [InternalAccountantController::class, 'updateEmployeeTarificationLog']);
+    Route::get('tarifications/pdf', [TechnologController::class, 'exportTarificationsPdf']);
+
 });
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {

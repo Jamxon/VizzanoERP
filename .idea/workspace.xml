@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -383,15 +385,8 @@
       <workItem from="1751087818667" duration="13824000" />
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
-      <workItem from="1751343592281" duration="6998000" />
-    </task>
-    <task id="LOCAL-00532" summary="feat: streamline data structure and enhance header setup in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751095065935</created>
-      <option name="number" value="00532" />
-      <option name="presentableId" value="LOCAL-00532" />
-      <option name="project" value="LOCAL" />
-      <updated>1751095065935</updated>
+      <workItem from="1751343592281" duration="12588000" />
+      <workItem from="1751432833774" duration="894000" />
     </task>
     <task id="LOCAL-00533" summary="feat: enhance row styling and grouping in PackingListExport">
       <option name="closed" value="true" />
@@ -777,7 +772,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751355191131</updated>
     </task>
-    <option name="localTasksCounter" value="581" />
+    <task id="LOCAL-00581" summary="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController">
+      <option name="closed" value="true" />
+      <created>1751359517104</created>
+      <option name="number" value="00581" />
+      <option name="presentableId" value="LOCAL-00581" />
+      <option name="project" value="LOCAL" />
+      <updated>1751359517104</updated>
+    </task>
+    <option name="localTasksCounter" value="582" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -807,7 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update Telegram message handling with hardcoded chat ID and bot token" />
     <MESSAGE value="feat: update Telegram message handling with new chat ID and adjust StateNumber" />
     <MESSAGE value="feat: update total work seconds calculation in GroupController" />
     <MESSAGE value="feat: debug total work seconds calculation in GroupController" />
@@ -832,7 +834,8 @@
     <MESSAGE value="feat: add 'tailored' status to excluded order statuses in OrderController" />
     <MESSAGE value="feat: update excluded order statuses in GroupController and OrderController" />
     <MESSAGE value="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add return type declarations to orderGroupStore and getGroupsWithPlan methods in GroupController" />
+    <MESSAGE value="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: refactor generateSequentialCode and incrementLetter methods for improved logic in TarificationCategoryImport and TechnologController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
