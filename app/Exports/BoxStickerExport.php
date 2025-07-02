@@ -62,7 +62,7 @@ class BoxStickerExport implements WithMultipleSheets
                 public function styles(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet)
                 {
                     $sheet->getDefaultRowDimension()->setRowHeight(20);
-                    $sheet->getStyle('A:G')->getFont()->setSize(12);
+//                    $sheet->getStyle('A:G')->getFont()->setSize(12);
 
                     // 👉 A ustunini kichikroq qilish:
                     $sheet->getColumnDimension('A')->setWidth(12); // yoki 10, 12 — qanday bo'lishini istasang
