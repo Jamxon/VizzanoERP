@@ -43,11 +43,10 @@ class PackageExportJob implements ShouldQueue
 
         $packingPath = "$folder/packing_list.xlsx";
         $stickerPath = "$folder/box_sticker.xlsx";
-        $absolutePath = $this->absolutePath . '/' . $folder;
 
         // Excel fayllarni saqlash (public diskda)
         Excel::store(new PackingListExport($this->data, $this->summary), $packingPath, 'public');
-        Excel::store(new BoxStickerExport($this->stickers), $stickerPath, $absolutePath, 'public');
+        Excel::store(new BoxStickerExport($this->stickers, $this->absolutePath), $stickerPath, 'public');
 
         // ZIP faylni yaratamiz
         $zipFileName = "exports/{$this->fileName}";
