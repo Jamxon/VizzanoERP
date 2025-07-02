@@ -12,7 +12,6 @@
     </tr>
     <tr></tr>
     <tr></tr>
-    <tr></tr>
 
     {{-- 5-6 qator: Submodel --}}
     <tr>
