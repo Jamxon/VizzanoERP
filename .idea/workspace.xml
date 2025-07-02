@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add whitespace for improved code readability in BoxStickerExport" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add sizesMap for improved size handling in PackageMasterController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,31 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="28293000" />
-    </task>
-    <task id="LOCAL-00655" summary="feat: adjust rowspan in BoxStickerExport for improved logo index display">
-      <option name="closed" value="true" />
-      <created>1751455627033</created>
-      <option name="number" value="00655" />
-      <option name="presentableId" value="LOCAL-00655" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455627033</updated>
-    </task>
-    <task id="LOCAL-00656" summary="feat: remove unnecessary empty row in BoxStickerExport for cleaner layout">
-      <option name="closed" value="true" />
-      <created>1751455704838</created>
-      <option name="number" value="00656" />
-      <option name="presentableId" value="LOCAL-00656" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455704838</updated>
-    </task>
-    <task id="LOCAL-00657" summary="feat: increase font size for index display in BoxStickerExport for better visibility">
-      <option name="closed" value="true" />
-      <created>1751455825222</created>
-      <option name="number" value="00657" />
-      <option name="presentableId" value="LOCAL-00657" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455825222</updated>
+      <workItem from="1751432833774" duration="29052000" />
     </task>
     <task id="LOCAL-00658" summary="feat: decrease font size for index display and increase font size for submodel in BoxStickerExport for improved layout">
       <option name="closed" value="true" />
@@ -778,7 +754,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751463340580</updated>
     </task>
-    <option name="localTasksCounter" value="704" />
+    <task id="LOCAL-00704" summary="fix: implement drawings method in BoxStickerExport for dynamic logo placement">
+      <option name="closed" value="true" />
+      <created>1751463551300</created>
+      <option name="number" value="00704" />
+      <option name="presentableId" value="LOCAL-00704" />
+      <option name="project" value="LOCAL" />
+      <updated>1751463551300</updated>
+    </task>
+    <task id="LOCAL-00705" summary="fix: add Drawing import to BoxStickerExport for enhanced functionality">
+      <option name="closed" value="true" />
+      <created>1751463573153</created>
+      <option name="number" value="00705" />
+      <option name="presentableId" value="LOCAL-00705" />
+      <option name="project" value="LOCAL" />
+      <updated>1751463573153</updated>
+    </task>
+    <task id="LOCAL-00706" summary="fix: add sizesMap for improved size handling in PackageMasterController">
+      <option name="closed" value="true" />
+      <created>1751464201059</created>
+      <option name="number" value="00706" />
+      <option name="presentableId" value="LOCAL-00706" />
+      <option name="project" value="LOCAL" />
+      <updated>1751464201059</updated>
+    </task>
+    <option name="localTasksCounter" value="707" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: adjust table layout for improved display of art and color in box_sticker view" />
-    <MESSAGE value="feat: update table layout and styling for improved display of art and color in box_sticker view" />
-    <MESSAGE value="fix: adjust table cell formatting for improved color display in box_sticker view" />
     <MESSAGE value="feat: update table cell content for improved clarity in box_sticker view" />
     <MESSAGE value="fix: update table cell content to correctly display color in box_sticker view" />
     <MESSAGE value="fix: adjust font size for color label in box_sticker view" />
@@ -833,7 +830,10 @@
     <MESSAGE value="fix: update column widths in box sticker export for improved layout" />
     <MESSAGE value="fix: update logo display logic in box sticker export for improved visibility" />
     <MESSAGE value="fix: add whitespace for improved code readability in BoxStickerExport" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add whitespace for improved code readability in BoxStickerExport" />
+    <MESSAGE value="fix: implement drawings method in BoxStickerExport for dynamic logo placement" />
+    <MESSAGE value="fix: add Drawing import to BoxStickerExport for enhanced functionality" />
+    <MESSAGE value="fix: add sizesMap for improved size handling in PackageMasterController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add sizesMap for improved size handling in PackageMasterController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

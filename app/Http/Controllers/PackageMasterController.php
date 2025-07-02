@@ -79,7 +79,10 @@ class PackageMasterController extends Controller
             $nettoKg = round($bruttoKg - 1.4, 2);
 
             $sizeName = OrderSize::find($sizeId)?->size->name ?? '---';
-            $sizesMap[] += $sizeName;
+            if (!in_array($sizeName, $sizesMap)) {
+                $sizesMap[] = $sizeName;
+            }
+
             foreach ($sizeItem['colors'] as $colorItem) {
                 foreach ($colorItem as $colorName => $qty) {
                     $colorMap[$colorName][] = [
@@ -156,15 +159,23 @@ class PackageMasterController extends Controller
                 $totalNettoLeft = 0;
                 $totalBruttoLeft = 0;
 
-                foreach ($leftovers as $left) {
-                    $sizes[] = [$left['size_name'], $left['qty']];
-                    //hamma sizelarni qo'shish
-                    $sizes[] += [$sizesMap, ''];
-                    $totalQtyLeft += $left['qty'];
-                    $totalNettoLeft += $left['netto'];
-                    $totalBruttoLeft += $left['brutto'];
+// 1. Size'lar bo'yicha qty map tuzib olamiz
+                $qtyBySize = collect($leftovers)->mapWithKeys(fn($left) => [
+                    $left['size_name'] => $left['qty']
+                ]);
+
+// 2. Har bir sizeMap bo'yicha bor yoki yo'qligiga qarab qty qo'shamiz
+                foreach ($sizesMap as $sizeName) {
+                    $qty = $qtyBySize[$sizeName] ?? '';
+                    $sizes[] = [$sizeName, $qty];
+                    $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                 }
 
+// 3. Netto va Brutto to‘plash
+                $totalNettoLeft = collect($leftovers)->sum('netto');
+                $totalBruttoLeft = collect($leftovers)->sum('brutto');
+
+// 4. Stickerga tayyor qilish
                 $sizesRows = [['Размер', 'Количество'], ...$sizes, [round($totalNettoLeft, 2), round($totalBruttoLeft, 2)]];
 
                 $stickers[] = [
