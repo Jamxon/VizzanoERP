@@ -39,14 +39,14 @@
 
     <tr>
         <td colspan="3" style="text-align: center;"><p>Размер</p></td>
-        <td colspan="3" style="text-align: center;"><p>Количество</p></td>
+        <td colspan="4" style="text-align: center;"><p>Количество</p></td>
     </tr>
 
     @foreach($sticker as $key => $row)
         @if(is_int($key) && is_array($row) && count($row) == 2 && is_string($row[0]))
             <tr>
-                <td colspan="3" style="text-align: center;">{{ $row[0] }}</td>
-                <td colspan="4" style="text-align: center;">{{ $row[1] }}</td>
+                <td colspan="3" style="text-align: center; font-size: 35px; font-weight: bold">{{ $row[0] }}</td>
+                <td colspan="4" style="text-align: center; font-size: 35px; font-weight: bold">{{ $row[1] }}</td>
             </tr>
         @endif
     @endforeach

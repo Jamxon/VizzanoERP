@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct column alignment for net and gross weight display in box sticker" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add header row for size and quantity in box sticker" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,31 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="26089000" />
-    </task>
-    <task id="LOCAL-00639" summary="feat: restore image drawing functionality in BoxStickerExport">
-      <option name="closed" value="true" />
-      <created>1751453824097</created>
-      <option name="number" value="00639" />
-      <option name="presentableId" value="LOCAL-00639" />
-      <option name="project" value="LOCAL" />
-      <updated>1751453824097</updated>
-    </task>
-    <task id="LOCAL-00640" summary="feat: enhance BoxStickerExport to improve image handling and layout presentation">
-      <option name="closed" value="true" />
-      <created>1751453964992</created>
-      <option name="number" value="00640" />
-      <option name="presentableId" value="LOCAL-00640" />
-      <option name="project" value="LOCAL" />
-      <updated>1751453964992</updated>
-    </task>
-    <task id="LOCAL-00641" summary="feat: update BoxStickerExport and box_sticker view for improved layout and error handling">
-      <option name="closed" value="true" />
-      <created>1751454252340</created>
-      <option name="number" value="00641" />
-      <option name="presentableId" value="LOCAL-00641" />
-      <option name="project" value="LOCAL" />
-      <updated>1751454252340</updated>
+      <workItem from="1751432833774" duration="26401000" />
     </task>
     <task id="LOCAL-00642" summary="feat: update BoxStickerExport view and workspace configuration for improved layout">
       <option name="closed" value="true" />
@@ -778,7 +754,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751461227399</updated>
     </task>
-    <option name="localTasksCounter" value="688" />
+    <task id="LOCAL-00688" summary="fix: adjust colspan for net and gross weight display in box sticker">
+      <option name="closed" value="true" />
+      <created>1751461293020</created>
+      <option name="number" value="00688" />
+      <option name="presentableId" value="LOCAL-00688" />
+      <option name="project" value="LOCAL" />
+      <updated>1751461293020</updated>
+    </task>
+    <task id="LOCAL-00689" summary="fix: adjust colspan for brutto weight display in box sticker">
+      <option name="closed" value="true" />
+      <created>1751461375956</created>
+      <option name="number" value="00689" />
+      <option name="presentableId" value="LOCAL-00689" />
+      <option name="project" value="LOCAL" />
+      <updated>1751461375956</updated>
+    </task>
+    <task id="LOCAL-00690" summary="fix: add header row for size and quantity in box sticker">
+      <option name="closed" value="true" />
+      <created>1751461542114</created>
+      <option name="number" value="00690" />
+      <option name="presentableId" value="LOCAL-00690" />
+      <option name="project" value="LOCAL" />
+      <updated>1751461542114</updated>
+    </task>
+    <option name="localTasksCounter" value="691" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: adjust rowspan for Artikul and Color displays in BoxStickerExport for improved layout" />
-    <MESSAGE value="feat: remove background color from Size and Quantity headers in BoxStickerExport for cleaner layout" />
-    <MESSAGE value="feat: remove unnecessary fields and improve layout in PackageMasterController for cleaner output" />
     <MESSAGE value="feat: remove unnecessary fields in PackageMasterController for cleaner output" />
     <MESSAGE value="feat: add model name to sticker output for enhanced detail" />
     <MESSAGE value="feat: enhance box sticker output by adding model name and improving layout" />
@@ -833,7 +830,10 @@
     <MESSAGE value="feat: improve box sticker generation to include detailed leftovers with quantities and net/brutto values" />
     <MESSAGE value="fix: update box sticker generation logic to correctly handle indexed items" />
     <MESSAGE value="fix: correct column alignment for net and gross weight display in box sticker" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct column alignment for net and gross weight display in box sticker" />
+    <MESSAGE value="fix: adjust colspan for net and gross weight display in box sticker" />
+    <MESSAGE value="fix: adjust colspan for brutto weight display in box sticker" />
+    <MESSAGE value="fix: add header row for size and quantity in box sticker" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add header row for size and quantity in box sticker" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
