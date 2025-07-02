@@ -67,7 +67,7 @@ class PackageMasterController extends Controller
         $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yo‘q';
         $imagePath = $orders->first()?->contragent->image ?? null;
         $absolutePath = public_path($imagePath);
-        $submodelName = $orders->first()?->orderModel->first()?->submodels?->submodel?->name ?? 'Submodel nomi yo‘q';
+        $submodelName = $orders->first()?->orderModel?->submodels->first()?->submodel?->name ?? 'Submodel nomi yo‘q';
 
 
         $colorMap = [];

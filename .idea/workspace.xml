@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to implement view-based export for improved layout and styling">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,23 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="17834000" />
-    </task>
-    <task id="LOCAL-00585" summary="feat: update total weight calculations and summary output in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751435475382</created>
-      <option name="number" value="00585" />
-      <option name="presentableId" value="LOCAL-00585" />
-      <option name="project" value="LOCAL" />
-      <updated>1751435475382</updated>
-    </task>
-    <task id="LOCAL-00586" summary="feat: comment out summary list calculation in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751435555719</created>
-      <option name="number" value="00586" />
-      <option name="presentableId" value="LOCAL-00586" />
-      <option name="project" value="LOCAL" />
-      <updated>1751435555719</updated>
+      <workItem from="1751432833774" duration="18203000" />
     </task>
     <task id="LOCAL-00587" summary="feat: implement BoxStickerExport and PackageExportJob for packaging functionality">
       <option name="closed" value="true" />
@@ -780,7 +762,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751451777116</updated>
     </task>
-    <option name="localTasksCounter" value="634" />
+    <task id="LOCAL-00634" summary="feat: update BoxStickerExport to include submodel in export layout for improved styling">
+      <option name="closed" value="true" />
+      <created>1751453143982</created>
+      <option name="number" value="00634" />
+      <option name="presentableId" value="LOCAL-00634" />
+      <option name="project" value="LOCAL" />
+      <updated>1751453143982</updated>
+    </task>
+    <task id="LOCAL-00635" summary="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching">
+      <option name="closed" value="true" />
+      <created>1751453298822</created>
+      <option name="number" value="00635" />
+      <option name="presentableId" value="LOCAL-00635" />
+      <option name="project" value="LOCAL" />
+      <updated>1751453298822</updated>
+    </task>
+    <option name="localTasksCounter" value="636" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,8 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update BoxStickerExport to include submodel and upakovka in export layout" />
-    <MESSAGE value="feat: update BoxStickerExport to enhance layout and styling for stickers" />
     <MESSAGE value="feat: update BoxStickerExport to include submodel and adjust layout for improved styling" />
     <MESSAGE value="feat: update BoxStickerExport to simplify output format for Upakovka and Submodel" />
     <MESSAGE value="feat: update BoxStickerExport to modify submodel output format" />
@@ -835,7 +831,9 @@
     <MESSAGE value="feat: update BoxStickerExport to streamline empty row handling for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to enhance cell merging and styling for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to implement view-based export for improved layout and styling" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to implement view-based export for improved layout and styling" />
+    <MESSAGE value="feat: update BoxStickerExport to include submodel in export layout for improved styling" />
+    <MESSAGE value="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update submodel name retrieval logic in PackageMasterController for accurate data fetching" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
