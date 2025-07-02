@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-class BoxStickerExport implements FromView, WithTitle, WithStyles, WithDrawings
+class BoxStickerExport implements FromView, WithTitle, WithStyles//, WithDrawings
 {
     protected $stickers;
     protected $imagePath;
@@ -22,19 +22,19 @@ class BoxStickerExport implements FromView, WithTitle, WithStyles, WithDrawings
         $this->submodel = $submodel;
     }
 
-    public function drawings()
-    {
-        $drawing = new Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Contragent logotipi');
-        $drawing->setPath($this->imagePath); // absolute path bo'lishi kerak
-        $drawing->setHeight(90);
-        $drawing->setCoordinates('A1');
-        $drawing->setOffsetX(10);
-        $drawing->setOffsetY(5);
-
-        return [$drawing];
-    }
+//    public function drawings()
+//    {
+//        $drawing = new Drawing();
+//        $drawing->setName('Logo');
+//        $drawing->setDescription('Contragent logotipi');
+//        $drawing->setPath($this->imagePath); // absolute path bo'lishi kerak
+//        $drawing->setHeight(90);
+//        $drawing->setCoordinates('A1');
+//        $drawing->setOffsetX(10);
+//        $drawing->setOffsetY(5);
+//
+//        return [$drawing];
+//    }
 
     public function view(): \Illuminate\View\View
     {
