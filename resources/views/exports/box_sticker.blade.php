@@ -8,7 +8,7 @@
 {{--                <strong>Logo yo'q</strong>--}}
 {{--            @endif--}}
         </td>
-        <td colspan="2" rowspan="3" style="text-align: center; font-weight: bold; font-size: 16px;">{{ $index }}</td>
+        <td colspan="2" rowspan="3" style="text-align: center; font-weight: bold; font-size: 66px;">{{ $index }}</td>
     </tr>
     <tr></tr>
     <tr></tr>
@@ -19,7 +19,6 @@
             {{ $submodel ?? 'Submodel nomi yo‘q' }}
         </td>
     </tr>
-    <tr><td colspan="7">&nbsp;</td></tr>
 
     {{-- 7-qator: Artikul --}}
     <tr>
