@@ -212,6 +212,7 @@ class PackageMasterController extends Controller
 
             $stickers[] = [
                 ...$sizeRows,
+                $modelName,
                 [round($netto, 2), round($brutto, 2)],
             ];
         }
