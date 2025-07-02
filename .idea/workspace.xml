@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update PackageExportJob to handle absolute paths for exports and improve zip file creation" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update PackageMasterController to use contragent's image for path handling" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,31 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="8249000" />
-    </task>
-    <task id="LOCAL-00551" summary="feat: update Telegram message handling with hardcoded chat ID and bot token">
-      <option name="closed" value="true" />
-      <created>1751108849641</created>
-      <option name="number" value="00551" />
-      <option name="presentableId" value="LOCAL-00551" />
-      <option name="project" value="LOCAL" />
-      <updated>1751108849641</updated>
-    </task>
-    <task id="LOCAL-00552" summary="feat: update Telegram message handling with new chat ID and adjust StateNumber">
-      <option name="closed" value="true" />
-      <created>1751109179328</created>
-      <option name="number" value="00552" />
-      <option name="presentableId" value="LOCAL-00552" />
-      <option name="project" value="LOCAL" />
-      <updated>1751109179328</updated>
-    </task>
-    <task id="LOCAL-00553" summary="feat: update total work seconds calculation in GroupController">
-      <option name="closed" value="true" />
-      <created>1751260034230</created>
-      <option name="number" value="00553" />
-      <option name="presentableId" value="LOCAL-00553" />
-      <option name="project" value="LOCAL" />
-      <updated>1751260034230</updated>
+      <workItem from="1751432833774" duration="8625000" />
     </task>
     <task id="LOCAL-00554" summary="feat: debug total work seconds calculation in GroupController">
       <option name="closed" value="true" />
@@ -778,7 +754,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751441614413</updated>
     </task>
-    <option name="localTasksCounter" value="600" />
+    <task id="LOCAL-00600" summary="feat: update BoxStickerExport to use absolute path for exports and improve file handling">
+      <option name="closed" value="true" />
+      <created>1751441660977</created>
+      <option name="number" value="00600" />
+      <option name="presentableId" value="LOCAL-00600" />
+      <option name="project" value="LOCAL" />
+      <updated>1751441660977</updated>
+    </task>
+    <task id="LOCAL-00601" summary="feat: update PackageMasterController to use public path for image handling">
+      <option name="closed" value="true" />
+      <created>1751441823130</created>
+      <option name="number" value="00601" />
+      <option name="presentableId" value="LOCAL-00601" />
+      <option name="project" value="LOCAL" />
+      <updated>1751441823131</updated>
+    </task>
+    <task id="LOCAL-00602" summary="feat: update PackageMasterController to use contragent's image for path handling">
+      <option name="closed" value="true" />
+      <created>1751441893662</created>
+      <option name="number" value="00602" />
+      <option name="presentableId" value="LOCAL-00602" />
+      <option name="project" value="LOCAL" />
+      <updated>1751441893663</updated>
+    </task>
+    <option name="localTasksCounter" value="603" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,9 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: refine attendance filtering logic in SuperHRController to include present and absent counts" />
-    <MESSAGE value="feat: optimize absent attendance filtering logic in SuperHRController" />
-    <MESSAGE value="feat: add group and responsible user details to attendance notifications in SuperHRController" />
     <MESSAGE value="feat: update responsible user details in attendance notifications in SuperHRController" />
     <MESSAGE value="feat: add 'tailored' status to excluded order statuses in OrderController" />
     <MESSAGE value="feat: update excluded order statuses in GroupController and OrderController" />
@@ -833,7 +830,10 @@
     <MESSAGE value="feat: remove debugging output from updateContragents method in OrderController" />
     <MESSAGE value="feat: enhance BoxStickerExport to support image insertion and update PackageExportJob for absolute path handling" />
     <MESSAGE value="feat: update PackageExportJob to handle absolute paths for exports and improve zip file creation" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update PackageExportJob to handle absolute paths for exports and improve zip file creation" />
+    <MESSAGE value="feat: update BoxStickerExport to use absolute path for exports and improve file handling" />
+    <MESSAGE value="feat: update PackageMasterController to use public path for image handling" />
+    <MESSAGE value="feat: update PackageMasterController to use contragent's image for path handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update PackageMasterController to use contragent's image for path handling" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
