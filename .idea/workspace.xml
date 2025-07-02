@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport and box_sticker view for improved layout and error handling">
-      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: adjust logo dimensions in BoxStickerExport and box_sticker view for improved layout" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,39 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="19456000" />
-    </task>
-    <task id="LOCAL-00594" summary="feat: add image upload functionality to Contragent model and update OrderController for image handling">
-      <option name="closed" value="true" />
-      <created>1751440365918</created>
-      <option name="number" value="00594" />
-      <option name="presentableId" value="LOCAL-00594" />
-      <option name="project" value="LOCAL" />
-      <updated>1751440365918</updated>
-    </task>
-    <task id="LOCAL-00595" summary="feat: add image upload functionality to Contragent model and update OrderController for image handling">
-      <option name="closed" value="true" />
-      <created>1751440643365</created>
-      <option name="number" value="00595" />
-      <option name="presentableId" value="LOCAL-00595" />
-      <option name="project" value="LOCAL" />
-      <updated>1751440643365</updated>
-    </task>
-    <task id="LOCAL-00596" summary="feat: add debugging output for image upload handling in OrderController">
-      <option name="closed" value="true" />
-      <created>1751440734514</created>
-      <option name="number" value="00596" />
-      <option name="presentableId" value="LOCAL-00596" />
-      <option name="project" value="LOCAL" />
-      <updated>1751440734514</updated>
-    </task>
-    <task id="LOCAL-00597" summary="feat: remove debugging output from updateContragents method in OrderController">
-      <option name="closed" value="true" />
-      <created>1751440927695</created>
-      <option name="number" value="00597" />
-      <option name="presentableId" value="LOCAL-00597" />
-      <option name="project" value="LOCAL" />
-      <updated>1751440927695</updated>
+      <workItem from="1751432833774" duration="19819000" />
     </task>
     <task id="LOCAL-00598" summary="feat: enhance BoxStickerExport to support image insertion and update PackageExportJob for absolute path handling">
       <option name="closed" value="true" />
@@ -780,7 +746,39 @@
       <option name="project" value="LOCAL" />
       <updated>1751454297509</updated>
     </task>
-    <option name="localTasksCounter" value="643" />
+    <task id="LOCAL-00643" summary="feat: update BoxStickerExport layout and workspace configuration for improved column widths">
+      <option name="closed" value="true" />
+      <created>1751454623474</created>
+      <option name="number" value="00643" />
+      <option name="presentableId" value="LOCAL-00643" />
+      <option name="project" value="LOCAL" />
+      <updated>1751454623474</updated>
+    </task>
+    <task id="LOCAL-00644" summary="feat: adjust column widths in BoxStickerExport for improved layout consistency">
+      <option name="closed" value="true" />
+      <created>1751454727603</created>
+      <option name="number" value="00644" />
+      <option name="presentableId" value="LOCAL-00644" />
+      <option name="project" value="LOCAL" />
+      <updated>1751454727603</updated>
+    </task>
+    <task id="LOCAL-00645" summary="feat: comment out font size setting in BoxStickerExport for layout adjustments">
+      <option name="closed" value="true" />
+      <created>1751454749058</created>
+      <option name="number" value="00645" />
+      <option name="presentableId" value="LOCAL-00645" />
+      <option name="project" value="LOCAL" />
+      <updated>1751454749058</updated>
+    </task>
+    <task id="LOCAL-00646" summary="feat: adjust logo dimensions in BoxStickerExport and box_sticker view for improved layout">
+      <option name="closed" value="true" />
+      <created>1751454847198</created>
+      <option name="number" value="00646" />
+      <option name="presentableId" value="LOCAL-00646" />
+      <option name="project" value="LOCAL" />
+      <updated>1751454847198</updated>
+    </task>
+    <option name="localTasksCounter" value="647" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,10 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to adjust width values for improved layout" />
-    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for improved layout" />
-    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for better layout" />
-    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width values for better layout" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width value for column A" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width values for columns B to G" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G" />
@@ -835,7 +829,11 @@
     <MESSAGE value="feat: restore image drawing functionality in BoxStickerExport" />
     <MESSAGE value="feat: enhance BoxStickerExport to improve image handling and layout presentation" />
     <MESSAGE value="feat: update BoxStickerExport and box_sticker view for improved layout and error handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport and box_sticker view for improved layout and error handling" />
+    <MESSAGE value="feat: update BoxStickerExport layout and workspace configuration for improved column widths" />
+    <MESSAGE value="feat: adjust column widths in BoxStickerExport for improved layout consistency" />
+    <MESSAGE value="feat: comment out font size setting in BoxStickerExport for layout adjustments" />
+    <MESSAGE value="feat: adjust logo dimensions in BoxStickerExport and box_sticker view for improved layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: adjust logo dimensions in BoxStickerExport and box_sticker view for improved layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
