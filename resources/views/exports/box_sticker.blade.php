@@ -39,8 +39,8 @@
 
     {{-- 9-qator: Размер / Количество sarlavha --}}
     <tr>
-        <td colspan="3" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Размер</td>
-        <td colspan="4" style="text-align: center; font-weight: bold; background-color: #f2f2f2;">Количество</td>
+        <td colspan="3" style="text-align: center; font-weight: bold;">Размер</td>
+        <td colspan="4" style="text-align: center; font-weight: bold;">Количество</td>
     </tr>
 
     {{-- 10+ qatorlar: Size and Qty --}}
