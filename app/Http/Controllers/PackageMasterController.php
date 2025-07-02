@@ -79,9 +79,8 @@ class PackageMasterController extends Controller
             $nettoKg = round($bruttoKg - 1.4, 2);
 
             $sizeName = OrderSize::find($sizeId)?->size->name ?? '---';
-            if (!in_array($sizeName, $sizesMap)) {
+
                 $sizesMap[] = $sizeName;
-            }
 
             foreach ($sizeItem['colors'] as $colorItem) {
                 foreach ($colorItem as $colorName => $qty) {
