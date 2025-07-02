@@ -43,14 +43,12 @@ class PackageExportJob implements ShouldQueue
             mkdir($tempDir, 0777, true);
         }
 
-        // 1. Packing list faylini yaratish
-        $packingFile = $tempDir . '/packing_list.xlsx';
-        Excel::store(new PackingListExport($this->data, $this->summaryList), 'exports/packing_list.xlsx');
-        Excel::store(new PackingListExport($this->data, $this->summaryList), $packingFile);
-
-        // 2. Har bir karobka uchun alohida varaqli Excel yaratish
         $boxExport = new BoxStickerExport($this->stickers, $this->imagePath, $this->submodelName, $this->modelName);
-        $boxFile = $tempDir . '/box_stickers.xlsx';
+        Excel::store(new PackingListExport($this->data, $this->summaryList), 'exports/packing_list.xlsx');
+        Excel::store($boxExport, 'exports/box_stickers.xlsx');
+
+        $packingFile = storage_path('app/exports/packing_list.xlsx');
+        $boxFile = storage_path('app/exports/box_stickers.xlsx');
         Excel::store($boxExport, $boxFile);
 
         // 3. Zip fayl yaratish

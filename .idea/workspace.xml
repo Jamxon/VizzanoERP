@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add model name to sticker output for enhanced detail">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Jobs/PackageExportJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Jobs/PackageExportJob.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance box sticker output by adding model name and improving layout" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -390,15 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="22511000" />
-    </task>
-    <task id="LOCAL-00619" summary="feat: update columnWidths method in BoxStickerExport to decrease width values for columns B to G">
-      <option name="closed" value="true" />
-      <created>1751445214767</created>
-      <option name="number" value="00619" />
-      <option name="presentableId" value="LOCAL-00619" />
-      <option name="project" value="LOCAL" />
-      <updated>1751445214767</updated>
+      <workItem from="1751432833774" duration="22830000" />
     </task>
     <task id="LOCAL-00620" summary="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G">
       <option name="closed" value="true" />
@@ -784,7 +770,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751457128938</updated>
     </task>
-    <option name="localTasksCounter" value="668" />
+    <task id="LOCAL-00668" summary="feat: enhance box sticker output by adding model name and improving layout">
+      <option name="closed" value="true" />
+      <created>1751457830942</created>
+      <option name="number" value="00668" />
+      <option name="presentableId" value="LOCAL-00668" />
+      <option name="project" value="LOCAL" />
+      <updated>1751457830942</updated>
+    </task>
+    <option name="localTasksCounter" value="669" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -814,7 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: enhance BoxStickerExport to improve image handling and layout presentation" />
     <MESSAGE value="feat: update BoxStickerExport and box_sticker view for improved layout and error handling" />
     <MESSAGE value="feat: update BoxStickerExport layout and workspace configuration for improved column widths" />
     <MESSAGE value="feat: adjust column widths in BoxStickerExport for improved layout consistency" />
@@ -839,7 +832,8 @@
     <MESSAGE value="feat: remove unnecessary fields and improve layout in PackageMasterController for cleaner output" />
     <MESSAGE value="feat: remove unnecessary fields in PackageMasterController for cleaner output" />
     <MESSAGE value="feat: add model name to sticker output for enhanced detail" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add model name to sticker output for enhanced detail" />
+    <MESSAGE value="feat: enhance box sticker output by adding model name and improving layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance box sticker output by adding model name and improving layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
