@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="13372000" />
-    </task>
-    <task id="LOCAL-00577" summary="feat: update responsible user details in attendance notifications in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751350021133</created>
-      <option name="number" value="00577" />
-      <option name="presentableId" value="LOCAL-00577" />
-      <option name="project" value="LOCAL" />
-      <updated>1751350021133</updated>
-    </task>
-    <task id="LOCAL-00578" summary="feat: add 'tailored' status to excluded order statuses in OrderController">
-      <option name="closed" value="true" />
-      <created>1751355045476</created>
-      <option name="number" value="00578" />
-      <option name="presentableId" value="LOCAL-00578" />
-      <option name="project" value="LOCAL" />
-      <updated>1751355045476</updated>
+      <workItem from="1751432833774" duration="13682000" />
     </task>
     <task id="LOCAL-00579" summary="feat: update excluded order statuses in GroupController and OrderController">
       <option name="closed" value="true" />
@@ -778,7 +762,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751446542687</updated>
     </task>
-    <option name="localTasksCounter" value="626" />
+    <task id="LOCAL-00626" summary="feat: enhance BoxStickerExport to adjust row heights for logo and submodel for improved layout">
+      <option name="closed" value="true" />
+      <created>1751446801893</created>
+      <option name="number" value="00626" />
+      <option name="presentableId" value="LOCAL-00626" />
+      <option name="project" value="LOCAL" />
+      <updated>1751446801893</updated>
+    </task>
+    <task id="LOCAL-00627" summary="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout">
+      <option name="closed" value="true" />
+      <created>1751446964651</created>
+      <option name="number" value="00627" />
+      <option name="presentableId" value="LOCAL-00627" />
+      <option name="project" value="LOCAL" />
+      <updated>1751446964651</updated>
+    </task>
+    <option name="localTasksCounter" value="628" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: enhance BoxStickerExport to support image insertion and update PackageExportJob for absolute path handling" />
-    <MESSAGE value="feat: update PackageExportJob to handle absolute paths for exports and improve zip file creation" />
     <MESSAGE value="feat: update BoxStickerExport to use absolute path for exports and improve file handling" />
     <MESSAGE value="feat: update PackageMasterController to use public path for image handling" />
     <MESSAGE value="feat: update PackageMasterController to use contragent's image for path handling" />
@@ -833,7 +831,9 @@
     <MESSAGE value="feat: update logo dimensions in BoxStickerExport to improve display size" />
     <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for improved layout and clarity" />
     <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity" />
+    <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for logo and submodel for improved layout" />
+    <MESSAGE value="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to add empty rows for logo and submodel for improved layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -33,11 +33,6 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         $result = [];
 
         foreach ($this->stickers as $index => $sticker) {
-            if ($index > 0) {
-                $result[] = [''];
-                $result[] = [''];
-            }
-
             // ⚠️ 1–4 qatorlar: LOGO uchun bo‘sh
             $result[] = [''];
             $result[] = [''];
