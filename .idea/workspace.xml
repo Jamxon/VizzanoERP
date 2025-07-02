@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance BoxStickerExport to adjust row heights for improved layout and clarity">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,15 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="13053000" />
-    </task>
-    <task id="LOCAL-00576" summary="feat: add group and responsible user details to attendance notifications in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751349785786</created>
-      <option name="number" value="00576" />
-      <option name="presentableId" value="LOCAL-00576" />
-      <option name="project" value="LOCAL" />
-      <updated>1751349785786</updated>
+      <workItem from="1751432833774" duration="13372000" />
     </task>
     <task id="LOCAL-00577" summary="feat: update responsible user details in attendance notifications in SuperHRController">
       <option name="closed" value="true" />
@@ -780,7 +770,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751445795084</updated>
     </task>
-    <option name="localTasksCounter" value="625" />
+    <task id="LOCAL-00625" summary="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity">
+      <option name="closed" value="true" />
+      <created>1751446542686</created>
+      <option name="number" value="00625" />
+      <option name="presentableId" value="LOCAL-00625" />
+      <option name="project" value="LOCAL" />
+      <updated>1751446542687</updated>
+    </task>
+    <option name="localTasksCounter" value="626" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,7 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: remove debugging output from updateContragents method in OrderController" />
     <MESSAGE value="feat: enhance BoxStickerExport to support image insertion and update PackageExportJob for absolute path handling" />
     <MESSAGE value="feat: update PackageExportJob to handle absolute paths for exports and improve zip file creation" />
     <MESSAGE value="feat: update BoxStickerExport to use absolute path for exports and improve file handling" />
@@ -835,7 +832,8 @@
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width value for logo" />
     <MESSAGE value="feat: update logo dimensions in BoxStickerExport to improve display size" />
     <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for improved layout and clarity" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance BoxStickerExport to adjust row heights for improved layout and clarity" />
+    <MESSAGE value="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance BoxStickerExport to adjust row heights for better layout and clarity" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -150,11 +150,16 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                 $row = 1;
 
                 foreach ($this->stickers as $index => $sticker) {
-                    if ($index > 0) $row += 2;
+                    if ($index > 0) {
+                        $row += 2; // Oraliq bo‘sh qator
+                    }
 
-                    // Logo qatori
-                    $sheet->getRowDimension($row)->setRowHeight(60);
+                    // 1. Logo uchun 4 qator
+                    for ($i = 0; $i < 4; $i++) {
+                        $sheet->getRowDimension($row + $i)->setRowHeight(15); // 15x4 = 60px
+                    }
 
+                    // Logo joylashuvi
                     if ($this->imagePath && file_exists($this->imagePath)) {
                         $drawing = new Drawing();
                         $drawing->setName('Logo');
@@ -163,33 +168,35 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                         $drawing->setWidth(320);
                         $drawing->setCoordinates('A' . $row);
                         $drawing->setOffsetX(5);
-                        $drawing->setOffsetY(2);
+                        $drawing->setOffsetY(0); // 0 yoki 2 bo‘lishi mumkin
                         $drawing->setWorksheet($sheet);
                     }
 
-                    // Logo 4 qatordan iborat deb qaraladi
                     $row += 4;
 
-                    // Submodel
-                    $sheet->getRowDimension($row)->setRowHeight(30);
-                    $row++;
+                    // 2. Submodel: 2 qator
+                    for ($i = 0; $i < 2; $i++) {
+                        $sheet->getRowDimension($row)->setRowHeight(15);
+                        $row++;
+                    }
 
-                    // Костюм
+                    // 3. Костюм (product name)
                     $sheet->getRowDimension($row)->setRowHeight(25);
                     $row++;
 
-                    // Арт:
+                    // 4. Art
                     $sheet->getRowDimension($row)->setRowHeight(18);
                     $row++;
 
-                    // Цвет:
+                    // 5. Rang
                     $sheet->getRowDimension($row)->setRowHeight(18);
                     $row++;
 
-                    // Размер/Количество header
+                    // 6. Razmer header
                     $sheet->getRowDimension($row)->setRowHeight(20);
                     $row++;
 
+                    // 7. Razmerlar (N qator)
                     foreach ($sticker as $r) {
                         if (isset($r[0]) && strpos($r[0], '-') !== false) {
                             $sheet->getRowDimension($row)->setRowHeight(20);
@@ -202,10 +209,12 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                             $row++;
                         }
                     }
+
+                    // ✅ Endi shu yerda sikl tugaydi va keyingi stickerga o‘tadi,
+                    // yangi `row` qiymati allaqachon logoga tayyor holatda
                 }
             }
         ];
     }
-
 
 }
