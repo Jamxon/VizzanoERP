@@ -50,7 +50,7 @@ class PackageMasterController extends Controller
         return response()->json($order);
     }
 
-    public function packageStore(Request $request): BinaryFileResponse|JsonResponse
+    public function packageStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
             'orders' => 'required|array',
