@@ -141,7 +141,7 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                         $drawing = new Drawing();
                         $drawing->setPath($this->imagePath);
                         $drawing->setHeight(40);
-                        $drawing->setWidth(140);
+                        $drawing->setWidth(135);
                         $drawing->setCoordinates('A' . ($rowOffset + 1));
                         $drawing->setWorksheet($sheet);
 
