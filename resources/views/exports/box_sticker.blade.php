@@ -62,10 +62,13 @@
         @endphp
 
         @foreach ($sizes as $size)
-            <tr>
-                <td>{{ $size[0] }}</td> {{-- O'lcham nomi --}}
-                <td>{{ $size[1] }}</td> {{-- Miqdor --}}
-            </tr>
+            @foreach($size as $row)
+                    <tr>
+                        <td colspan="3" style="text-align: center; font-size: 35px; font-weight: bold; height: 50px;">{{ $row }}</td>
+                        <td colspan="4" style="text-align: center; font-size: 35px; font-weight: bold; height: 50px;"></td>
+                    </tr>
+
+            @endforeach
         @endforeach
 
         @php
