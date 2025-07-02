@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: comment out summary list calculation in PackageMasterController">
-      <change afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/Jobs/PackageExportJob.php" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: implement BoxStickerExport and PackageExportJob for packaging functionality">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -389,15 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="3646000" />
-    </task>
-    <task id="LOCAL-00538" summary="feat: enhance cell styling and color assignment in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751095882419</created>
-      <option name="number" value="00538" />
-      <option name="presentableId" value="LOCAL-00538" />
-      <option name="project" value="LOCAL" />
-      <updated>1751095882419</updated>
+      <workItem from="1751432833774" duration="5034000" />
     </task>
     <task id="LOCAL-00539" summary="feat: improve border styling and color assignment in PackingListExport">
       <option name="closed" value="true" />
@@ -783,7 +772,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751435555719</updated>
     </task>
-    <option name="localTasksCounter" value="587" />
+    <task id="LOCAL-00587" summary="feat: implement BoxStickerExport and PackageExportJob for packaging functionality">
+      <option name="closed" value="true" />
+      <created>1751436678723</created>
+      <option name="number" value="00587" />
+      <option name="presentableId" value="LOCAL-00587" />
+      <option name="project" value="LOCAL" />
+      <updated>1751436678723</updated>
+    </task>
+    <option name="localTasksCounter" value="588" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -813,7 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add region, total work seconds, and spend seconds to submodel in GroupController" />
     <MESSAGE value="feat: update spend seconds calculation in GroupController and adjust workspace.xml" />
     <MESSAGE value="feat: replace spendSeconds calculation with debug output in GroupController" />
     <MESSAGE value="feat: update spendSeconds calculation in GroupController to use submodel's rasxod" />
@@ -838,7 +834,8 @@
     <MESSAGE value="feat: swap brutto and netto weight positions in PackageMasterController data array" />
     <MESSAGE value="feat: update total weight calculations and summary output in PackageMasterController" />
     <MESSAGE value="feat: comment out summary list calculation in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: comment out summary list calculation in PackageMasterController" />
+    <MESSAGE value="feat: implement BoxStickerExport and PackageExportJob for packaging functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: implement BoxStickerExport and PackageExportJob for packaging functionality" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
