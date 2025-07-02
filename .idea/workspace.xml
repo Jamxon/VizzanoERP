@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update logo dimensions in BoxStickerExport to improve display size" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,31 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="11917000" />
-    </task>
-    <task id="LOCAL-00572" summary="feat: filter attendances by status in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751344608247</created>
-      <option name="number" value="00572" />
-      <option name="presentableId" value="LOCAL-00572" />
-      <option name="project" value="LOCAL" />
-      <updated>1751344608247</updated>
-    </task>
-    <task id="LOCAL-00573" summary="feat: add whereBetween method to Attendance model and refine attendance filtering logic in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751345117152</created>
-      <option name="number" value="00573" />
-      <option name="presentableId" value="LOCAL-00573" />
-      <option name="project" value="LOCAL" />
-      <updated>1751345117152</updated>
-    </task>
-    <task id="LOCAL-00574" summary="feat: refine attendance filtering logic in SuperHRController to include present and absent counts">
-      <option name="closed" value="true" />
-      <created>1751345207310</created>
-      <option name="number" value="00574" />
-      <option name="presentableId" value="LOCAL-00574" />
-      <option name="project" value="LOCAL" />
-      <updated>1751345207310</updated>
+      <workItem from="1751432833774" duration="12248000" />
     </task>
     <task id="LOCAL-00575" summary="feat: optimize absent attendance filtering logic in SuperHRController">
       <option name="closed" value="true" />
@@ -778,7 +754,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751445288395</updated>
     </task>
-    <option name="localTasksCounter" value="621" />
+    <task id="LOCAL-00621" summary="feat: update columnWidths method in BoxStickerExport to increase width value for logo">
+      <option name="closed" value="true" />
+      <created>1751445410344</created>
+      <option name="number" value="00621" />
+      <option name="presentableId" value="LOCAL-00621" />
+      <option name="project" value="LOCAL" />
+      <updated>1751445410344</updated>
+    </task>
+    <task id="LOCAL-00622" summary="feat: update columnWidths method in BoxStickerExport to increase width value for logo">
+      <option name="closed" value="true" />
+      <created>1751445489503</created>
+      <option name="number" value="00622" />
+      <option name="presentableId" value="LOCAL-00622" />
+      <option name="project" value="LOCAL" />
+      <updated>1751445489503</updated>
+    </task>
+    <task id="LOCAL-00623" summary="feat: update logo dimensions in BoxStickerExport to improve display size">
+      <option name="closed" value="true" />
+      <created>1751445570767</created>
+      <option name="number" value="00623" />
+      <option name="presentableId" value="LOCAL-00623" />
+      <option name="project" value="LOCAL" />
+      <updated>1751445570767</updated>
+    </task>
+    <option name="localTasksCounter" value="624" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: refine packing list export logic and enhance sticker generation for improved clarity" />
-    <MESSAGE value="feat: add image upload functionality to Contragent model and update OrderController for image handling" />
     <MESSAGE value="feat: add debugging output for image upload handling in OrderController" />
     <MESSAGE value="feat: remove debugging output from updateContragents method in OrderController" />
     <MESSAGE value="feat: enhance BoxStickerExport to support image insertion and update PackageExportJob for absolute path handling" />
@@ -833,7 +831,9 @@
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width value for column A" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to decrease width values for columns B to G" />
     <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update columnWidths method in BoxStickerExport to increase width values for columns B to G" />
+    <MESSAGE value="feat: update columnWidths method in BoxStickerExport to increase width value for logo" />
+    <MESSAGE value="feat: update logo dimensions in BoxStickerExport to improve display size" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update logo dimensions in BoxStickerExport to improve display size" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

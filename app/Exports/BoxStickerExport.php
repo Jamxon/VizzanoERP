@@ -152,21 +152,53 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                 foreach ($this->stickers as $index => $sticker) {
                     if ($index > 0) $row += 2;
 
+                    // Logo qatori: balandligi 60px
+                    $sheet->getRowDimension($row)->setRowHeight(60);
+
+                    // Logo rasmi
                     if ($this->imagePath && file_exists($this->imagePath)) {
                         $drawing = new Drawing();
                         $drawing->setName('Logo');
                         $drawing->setPath($this->imagePath);
-                        $drawing->setHeight(60);
-                        $drawing->setWidth(320);
+                        $drawing->setHeight(60); // 4 qatorga teng
+                        $drawing->setWidth(320); // A-E ustunlarni egallaydi
                         $drawing->setCoordinates('A' . $row);
                         $drawing->setOffsetX(5);
                         $drawing->setOffsetY(2);
                         $drawing->setWorksheet($sheet);
                     }
 
-                    $row += count($sticker) + 2;
+                    $row++; // Submodel
+                    $sheet->getRowDimension($row)->setRowHeight(30); // 2 qator balandlik
+
+                    $row++; // Костюм / mahsulot nomi
+                    $sheet->getRowDimension($row)->setRowHeight(25);
+
+                    $row++; // Арт:
+                    $sheet->getRowDimension($row)->setRowHeight(18);
+
+                    $row++; // Цвет:
+                    $sheet->getRowDimension($row)->setRowHeight(18);
+
+                    $row++; // Размер / Кол-во sarlavha
+                    $sheet->getRowDimension($row)->setRowHeight(20);
+
+                    // Razmerlar
+                    foreach ($sticker as $r) {
+                        if (isset($r[0]) && strpos($r[0], '-') !== false) {
+                            $sheet->getRowDimension($row)->setRowHeight(20);
+                            $row++;
+                        } elseif (isset($r[0]) && str_contains($r[0], 'Нетто')) {
+                            $sheet->getRowDimension($row)->setRowHeight(22);
+                            $row++;
+                        } elseif (!empty($r[0]) && is_numeric($r[0])) {
+                            $sheet->getRowDimension($row)->setRowHeight(24);
+                            $row++;
+                        }
+                    }
                 }
             }
         ];
     }
+
 }
