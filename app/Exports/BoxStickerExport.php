@@ -5,10 +5,9 @@ namespace App\Exports;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithDrawings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class BoxStickerExport implements FromView, WithStyles, WithDrawings
+class BoxStickerExport implements FromView, WithStyles
 {
     protected array $stickers;
     protected string $imagePath;
@@ -45,17 +44,17 @@ class BoxStickerExport implements FromView, WithStyles, WithDrawings
         $sheet->getColumnDimension('G')->setWidth(9);
     }
 
-    public function drawings(): array
-    {
-        if (!file_exists($this->imagePath)) return [];
-
-        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
-        $drawing->setName('Logo');
-        $drawing->setDescription('Contragent Logo');
-        $drawing->setPath($this->imagePath);
-        $drawing->setHeight(70);
-        $drawing->setCoordinates('A1');
-
-        return [$drawing];
-    }
+//    public function drawings(): array
+//    {
+//        if (!file_exists($this->imagePath)) return [];
+//
+//        $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\Drawing();
+//        $drawing->setName('Logo');
+//        $drawing->setDescription('Contragent Logo');
+//        $drawing->setPath($this->imagePath);
+//        $drawing->setHeight(70);
+//        $drawing->setCoordinates('A1');
+//
+//        return [$drawing];
+//    }
 }

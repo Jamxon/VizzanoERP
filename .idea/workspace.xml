@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor box sticker export to use FromView and improve styling" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update logo display logic in box sticker export for improved visibility" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="27629000" />
-    </task>
-    <task id="LOCAL-00651" summary="feat: enhance logo handling in BoxStickerExport with conditional drawing and updated dimensions">
-      <option name="closed" value="true" />
-      <created>1751455382213</created>
-      <option name="number" value="00651" />
-      <option name="presentableId" value="LOCAL-00651" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455382213</updated>
-    </task>
-    <task id="LOCAL-00652" summary="feat: update logo width in BoxStickerExport for improved display">
-      <option name="closed" value="true" />
-      <created>1751455451270</created>
-      <option name="number" value="00652" />
-      <option name="presentableId" value="LOCAL-00652" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455451270</updated>
+      <workItem from="1751432833774" duration="27991000" />
     </task>
     <task id="LOCAL-00653" summary="feat: adjust logo display in BoxStickerExport by reducing rowspan for improved layout">
       <option name="closed" value="true" />
@@ -778,7 +762,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751462716457</updated>
     </task>
-    <option name="localTasksCounter" value="700" />
+    <task id="LOCAL-00700" summary="fix: update column widths in box sticker export for improved layout">
+      <option name="closed" value="true" />
+      <created>1751462823385</created>
+      <option name="number" value="00700" />
+      <option name="presentableId" value="LOCAL-00700" />
+      <option name="project" value="LOCAL" />
+      <updated>1751462823385</updated>
+    </task>
+    <task id="LOCAL-00701" summary="fix: update logo display logic in box sticker export for improved visibility">
+      <option name="closed" value="true" />
+      <created>1751463031201</created>
+      <option name="number" value="00701" />
+      <option name="presentableId" value="LOCAL-00701" />
+      <option name="project" value="LOCAL" />
+      <updated>1751463031201</updated>
+    </task>
+    <option name="localTasksCounter" value="702" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: refactor file handling and improve directory management in PackageExportJob" />
-    <MESSAGE value="feat: comment out unused table rows in box_sticker view for layout clarity" />
     <MESSAGE value="feat: enhance layout and styling for art and color display in box_sticker view" />
     <MESSAGE value="feat: adjust table layout for improved display of art and color in box_sticker view" />
     <MESSAGE value="feat: update table layout and styling for improved display of art and color in box_sticker view" />
@@ -833,7 +831,9 @@
     <MESSAGE value="fix: remove rowspan from table cells in box sticker for improved layout" />
     <MESSAGE value="fix: update font size for header cells in box sticker for better visibility" />
     <MESSAGE value="fix: refactor box sticker export to use FromView and improve styling" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor box sticker export to use FromView and improve styling" />
+    <MESSAGE value="fix: update column widths in box sticker export for improved layout" />
+    <MESSAGE value="fix: update logo display logic in box sticker export for improved visibility" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update logo display logic in box sticker export for improved visibility" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
