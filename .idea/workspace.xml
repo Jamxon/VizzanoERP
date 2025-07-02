@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to enhance cell merging and styling for improved layout">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: update BoxStickerExport to implement view-based export for improved layout and styling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -387,15 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="16679000" />
-    </task>
-    <task id="LOCAL-00584" summary="feat: swap brutto and netto weight positions in PackageMasterController data array">
-      <option name="closed" value="true" />
-      <created>1751435253456</created>
-      <option name="number" value="00584" />
-      <option name="presentableId" value="LOCAL-00584" />
-      <option name="project" value="LOCAL" />
-      <updated>1751435253456</updated>
+      <workItem from="1751432833774" duration="17834000" />
     </task>
     <task id="LOCAL-00585" summary="feat: update total weight calculations and summary output in PackageMasterController">
       <option name="closed" value="true" />
@@ -781,7 +772,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751450368918</updated>
     </task>
-    <option name="localTasksCounter" value="633" />
+    <task id="LOCAL-00633" summary="feat: update BoxStickerExport to implement view-based export for improved layout and styling">
+      <option name="closed" value="true" />
+      <created>1751451777116</created>
+      <option name="number" value="00633" />
+      <option name="presentableId" value="LOCAL-00633" />
+      <option name="project" value="LOCAL" />
+      <updated>1751451777116</updated>
+    </task>
+    <option name="localTasksCounter" value="634" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -811,7 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update BoxStickerExport to adjust image width for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to include submodel and upakovka in export layout" />
     <MESSAGE value="feat: update BoxStickerExport to enhance layout and styling for stickers" />
     <MESSAGE value="feat: update BoxStickerExport to include submodel and adjust layout for improved styling" />
@@ -836,7 +834,8 @@
     <MESSAGE value="feat: update BoxStickerExport to remove unnecessary empty rows for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to streamline empty row handling for improved layout" />
     <MESSAGE value="feat: update BoxStickerExport to enhance cell merging and styling for improved layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to enhance cell merging and styling for improved layout" />
+    <MESSAGE value="feat: update BoxStickerExport to implement view-based export for improved layout and styling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: update BoxStickerExport to implement view-based export for improved layout and styling" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -1,62 +1,63 @@
-<table>
-    @foreach ($stickers as $index => $sticker)
-        {{-- Logo & Number --}}
+@php use PhpOffice\PhpSpreadsheet\Worksheet\Drawing; @endphp
+@foreach($stickers as $index => $sticker)
+    {{-- LOGO & INDEX --}}
+    <table>
         <tr>
-            <td colspan="5" rowspan="4">
-                <img src="{{ public_path($imagePath) }}" height="60px">
+            <td colspan="5" rowspan="4" style="text-align:center;">
+                <img src="{{ public_path($imagePath) }}" width="100" height="100" alt="Logo">
             </td>
-            <td colspan="2" rowspan="4" style="font-weight: bold; font-size: 22px; text-align: center; border: 2px solid #000;">
+            <td colspan="2" rowspan="4" style="text-align:center; font-size: 24px;">
                 {{ $index + 1 }}
             </td>
         </tr>
-        <tr></tr>
-        <tr></tr>
-        <tr></tr>
+        <tr></tr><tr></tr><tr></tr>
 
-        {{-- Submodel --}}
+        {{-- SUBMODEL --}}
         <tr>
-            <td colspan="7" style="font-style: italic; text-align: center;">{{ $submodel }}</td>
+            <td colspan="7" style="text-align:center; font-weight:bold; font-size:18px;">
+                {{ $submodel }}
+            </td>
         </tr>
 
-        {{-- Art / Rang --}}
+        {{-- ARTIKUL & RANG --}}
         <tr>
-            <td style="font-weight: bold;">Арт:</td>
+            <td style="font-weight:bold;">Арт:</td>
             <td colspan="6">{{ $sticker[2][1] ?? '' }}</td>
         </tr>
         <tr>
-            <td style="font-weight: bold;">Цвет:</td>
+            <td style="font-weight:bold;">Цвет:</td>
             <td colspan="6">{{ $sticker[3][1] ?? '' }}</td>
         </tr>
 
-        {{-- Размер / Количество --}}
+        {{-- HEADER --}}
         <tr>
-            <td colspan="3" style="background-color: #e0e0e0; font-weight: bold; text-align: center;">Размер / Количество</td>
-            <td colspan="1"></td>
-            <td colspan="3" style="background-color: #f0f0f0; font-weight: bold; text-align: center;">Нетто / Брутто</td>
+            <td>Размер</td>
+            <td>Количество</td>
+            <td colspan="5"></td>
         </tr>
 
-        {{-- Razmerlar --}}
-        @foreach ($sticker as $row)
-            @if (isset($row[0]) && str_contains($row[0], '-'))
-                <tr>
-                    <td colspan="3" style="text-align: center;">{{ $row[0] }}</td>
-                    <td></td>
-                    <td colspan="3" style="text-align: center;"></td>
-                </tr>
-            @elseif (isset($row[0]) && str_contains($row[0], 'Нетто'))
-                <tr>
-                    <td colspan="4"></td>
-                    <td colspan="3" style="font-weight: bold; text-align: center;">{{ $row[0] }}</td>
-                </tr>
-            @elseif (isset($row[0]) && is_numeric($row[0]))
-                <tr>
-                    <td colspan="4"></td>
-                    <td colspan="3" style="font-weight: bold; text-align: center;">{{ $row[0] }}</td>
-                </tr>
-            @endif
+        {{-- SIZES --}}
+        @foreach(array_slice($sticker, 5, count($sticker)-8) as $row)
+            <tr>
+                <td>{{ $row[0] }}</td>
+                <td>{{ $row[1] ?? '' }}</td>
+                <td colspan="5"></td>
+            </tr>
         @endforeach
 
-        {{-- Separator --}}
-        <tr><td colspan="7"></td></tr>
-    @endforeach
-</table>
+        {{-- NETTO & BRUTTO --}}
+        <tr>
+            <td>Нетто(кг)</td>
+            <td>Брутто(кг)</td>
+            <td colspan="5"></td>
+        </tr>
+        <tr>
+            <td>{{ $sticker[count($sticker)-2][0] }}</td>
+            <td>{{ $sticker[count($sticker)-2][1] }}</td>
+            <td colspan="5"></td>
+        </tr>
+
+        {{-- SEPARATOR --}}
+        <tr><td colspan="7" style="height:20px;"></td></tr>
+    </table>
+@endforeach

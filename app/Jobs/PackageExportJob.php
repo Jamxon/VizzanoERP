@@ -24,14 +24,16 @@ class PackageExportJob implements ShouldQueue
     protected array $stickers;
     protected string $fileName;
     protected string $absolutePath;
+    protected string $submodel;
 
-    public function __construct(array $data, array $summary, array $stickers, string $fileName, string $absolutePath)
+    public function __construct(array $data, array $summary, array $stickers, string $fileName, string $absolutePath,  string $submodel)
     {
         $this->data = $data;
         $this->summary = $summary;
         $this->stickers = $stickers;
         $this->fileName = $fileName;
         $this->absolutePath = $absolutePath;
+        $this->submodel = $submodel;
     }
 
 // App\Jobs\PackageExportJob.php ichida
@@ -46,7 +48,7 @@ class PackageExportJob implements ShouldQueue
 
         // Excel fayllarni saqlash (public diskda)
         Excel::store(new PackingListExport($this->data, $this->summary), $packingPath, 'public');
-        Excel::store(new BoxStickerExport($this->stickers, $this->absolutePath), $stickerPath, 'public');
+        Excel::store(new BoxStickerExport($this->stickers, $this->absolutePath, $this->submodel), $stickerPath, 'public');
 
         // ZIP faylni yaratamiz
         $zipFileName = "exports/{$this->fileName}";
