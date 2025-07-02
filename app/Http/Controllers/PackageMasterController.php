@@ -80,7 +80,9 @@ class PackageMasterController extends Controller
 
             $sizeName = OrderSize::find($sizeId)?->size->name ?? '---';
 
+            if (!in_array($sizeName, $sizesMap)) {
                 $sizesMap[] = $sizeName;
+            }
 
             foreach ($sizeItem['colors'] as $colorItem) {
                 foreach ($colorItem as $colorName => $qty) {
@@ -166,7 +168,7 @@ class PackageMasterController extends Controller
 // 2. Har bir sizeMap bo'yicha bor yoki yo'qligiga qarab qty qo'shamiz
                 foreach ($sizesMap as $sizeName) {
                     $qty = $qtyBySize[$sizeName] ?? '';
-                    $sizes[] = [$sizeName, $qty];
+                    $sizes[] = [$sizeName, $qtyBySize[$sizeName] ?? ''];
                     $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                 }
 

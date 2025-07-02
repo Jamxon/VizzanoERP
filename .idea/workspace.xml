@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add sizesMap for improved size handling in PackageMasterController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: streamline size handling logic in PackageMasterController by simplifying sizesMap updates" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -384,23 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="29052000" />
-    </task>
-    <task id="LOCAL-00658" summary="feat: decrease font size for index display and increase font size for submodel in BoxStickerExport for improved layout">
-      <option name="closed" value="true" />
-      <created>1751455917596</created>
-      <option name="number" value="00658" />
-      <option name="presentableId" value="LOCAL-00658" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455917596</updated>
-    </task>
-    <task id="LOCAL-00659" summary="feat: adjust rowspan for submodel display in BoxStickerExport for improved layout">
-      <option name="closed" value="true" />
-      <created>1751455985449</created>
-      <option name="number" value="00659" />
-      <option name="presentableId" value="LOCAL-00659" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455985449</updated>
+      <workItem from="1751432833774" duration="29376000" />
     </task>
     <task id="LOCAL-00660" summary="feat: increase font size for Artikul display in BoxStickerExport for better visibility">
       <option name="closed" value="true" />
@@ -778,7 +762,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751464201059</updated>
     </task>
-    <option name="localTasksCounter" value="707" />
+    <task id="LOCAL-00707" summary="fix: enhance size handling in PackageMasterController with improved sizesMap logic">
+      <option name="closed" value="true" />
+      <created>1751464424671</created>
+      <option name="number" value="00707" />
+      <option name="presentableId" value="LOCAL-00707" />
+      <option name="project" value="LOCAL" />
+      <updated>1751464424671</updated>
+    </task>
+    <task id="LOCAL-00708" summary="fix: streamline size handling logic in PackageMasterController by simplifying sizesMap updates">
+      <option name="closed" value="true" />
+      <created>1751464524911</created>
+      <option name="number" value="00708" />
+      <option name="presentableId" value="LOCAL-00708" />
+      <option name="project" value="LOCAL" />
+      <updated>1751464524911</updated>
+    </task>
+    <option name="localTasksCounter" value="709" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -808,8 +808,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: update table cell content for improved clarity in box_sticker view" />
-    <MESSAGE value="fix: update table cell content to correctly display color in box_sticker view" />
     <MESSAGE value="fix: adjust font size for color label in box_sticker view" />
     <MESSAGE value="feat: enhance box sticker export to include all sizes with quantities for improved clarity" />
     <MESSAGE value="feat: improve box sticker generation to include detailed leftovers with quantities and net/brutto values" />
@@ -833,7 +831,9 @@
     <MESSAGE value="fix: implement drawings method in BoxStickerExport for dynamic logo placement" />
     <MESSAGE value="fix: add Drawing import to BoxStickerExport for enhanced functionality" />
     <MESSAGE value="fix: add sizesMap for improved size handling in PackageMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add sizesMap for improved size handling in PackageMasterController" />
+    <MESSAGE value="fix: enhance size handling in PackageMasterController with improved sizesMap logic" />
+    <MESSAGE value="fix: streamline size handling logic in PackageMasterController by simplifying sizesMap updates" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: streamline size handling logic in PackageMasterController by simplifying sizesMap updates" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
