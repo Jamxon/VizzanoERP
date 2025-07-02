@@ -2,67 +2,69 @@
 
 namespace App\Jobs;
 
-use App\Exports\PackingListExport;
 use App\Exports\BoxStickerExport;
+use App\Exports\PackingListExport;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Maatwebsite\Excel\Facades\Excel;
 use ZipArchive;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class PackageExportJob implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    use InteractsWithQueue, Queueable, SerializesModels;
     protected array $data;
-    protected array $summary;
-
+    protected array $summaryList;
     protected array $stickers;
     protected string $fileName;
-    protected string $absolutePath;
-    protected string $submodel;
+    protected string $imagePath;
+    protected string $submodelName;
+    protected string $modelName;
 
-    public function __construct(array $data, array $summary, array $stickers, string $fileName, string $absolutePath,  string $submodel)
+    public function __construct(array $data, array $summaryList, array $stickers, string $fileName, string $imagePath, string $submodelName, string $modelName)
     {
         $this->data = $data;
-        $this->summary = $summary;
+        $this->summaryList = $summaryList;
         $this->stickers = $stickers;
         $this->fileName = $fileName;
-        $this->absolutePath = $absolutePath;
-        $this->submodel = $submodel;
+        $this->imagePath = $imagePath;
+        $this->submodelName = $submodelName;
+        $this->modelName = $modelName;
     }
 
-// App\Jobs\PackageExportJob.php ichida
-
-    public function handle(): void
+    public function handle()
     {
-        $folder = 'exports/temp_' . now()->timestamp . '_' . Str::random(6);
-        Storage::disk('public')->makeDirectory($folder);
-
-        $packingPath = "$folder/packing_list.xlsx";
-        $stickerPath = "$folder/box_sticker.xlsx";
-
-        // Excel fayllarni saqlash (public diskda)
-        Excel::store(new PackingListExport($this->data, $this->summary), $packingPath, 'public');
-        Excel::store(new BoxStickerExport($this->stickers, $this->absolutePath, $this->submodel), $stickerPath, 'public');
-
-        // ZIP faylni yaratamiz
-        $zipFileName = "exports/{$this->fileName}";
-        $zipFullPath = storage_path("app/public/{$zipFileName}");
-
-        $zip = new ZipArchive;
-        if ($zip->open($zipFullPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
-            $zip->addFile(storage_path("app/public/{$packingPath}"), 'packing_list.xlsx');
-            $zip->addFile(storage_path("app/public/{$stickerPath}"), 'box_sticker.xlsx');
-            $zip->close();
-        } else {
-            Log::error("Zip fayl ochilmadi: $zipFullPath");
+        $tempDir = storage_path('app/exports/temp_' . now()->timestamp . '_' . uniqid());
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0777, true);
         }
+
+        // 1. Packing list faylini yaratish
+        $packingFile = $tempDir . '/packing_list.xlsx';
+        Excel::store(new PackingListExport($this->data, $this->summaryList), 'exports/packing_list.xlsx');
+        Excel::store(new PackingListExport($this->data, $this->summaryList), $packingFile);
+
+        // 2. Har bir karobka uchun alohida varaqli Excel yaratish
+        $boxExport = new BoxStickerExport($this->stickers, $this->imagePath, $this->submodelName, $this->modelName);
+        $boxFile = $tempDir . '/box_stickers.xlsx';
+        Excel::store($boxExport, $boxFile);
+
+        // 3. Zip fayl yaratish
+        $zipPath = storage_path('app/exports/' . $this->fileName);
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+            $zip->addFile($packingFile, 'packing_list.xlsx');
+            $zip->addFile($boxFile, 'box_stickers.xlsx');
+            $zip->close();
+        }
+
+        // 4. Temp fayllarni o'chirish
+        unlink($packingFile);
+        unlink($boxFile);
+        rmdir($tempDir);
     }
-
-
 }

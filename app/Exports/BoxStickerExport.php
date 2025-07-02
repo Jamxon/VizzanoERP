@@ -10,12 +10,14 @@ class BoxStickerExport implements WithMultipleSheets
     protected array $stickers;
     protected string $imagePath;
     protected string $submodel;
+    protected string $model;
 
-    public function __construct(array $stickers, string $imagePath, string $submodel)
+    public function __construct(array $stickers, string $imagePath, string $submodel, string $model)
     {
         $this->stickers = $stickers;
         $this->imagePath = $imagePath;
         $this->submodel = $submodel;
+        $this->model = $model;
     }
 
     public function sheets(): array
@@ -23,7 +25,7 @@ class BoxStickerExport implements WithMultipleSheets
         $sheets = [];
 
         foreach ($this->stickers as $index => $sticker) {
-            $sheets[] = new class($sticker, $this->imagePath, $this->submodel, $index + 1)
+            $sheets[] = new class($sticker, $this->imagePath, $this->submodel, $this->model, $index + 1)
                 implements \Maatwebsite\Excel\Concerns\FromView,
                 \Maatwebsite\Excel\Concerns\WithTitle,
                 \Maatwebsite\Excel\Concerns\WithStyles,
@@ -32,17 +34,17 @@ class BoxStickerExport implements WithMultipleSheets
                 protected $sticker;
                 protected $imagePath;
                 protected $submodel;
+                protected $model;
                 protected $index;
 
-                public function __construct($sticker, $imagePath, $submodel, $index)
+                public function __construct($sticker, $imagePath, $submodel, $model, $index)
                 {
                     $this->sticker = $sticker;
                     $this->imagePath = $imagePath;
                     $this->submodel = $submodel;
+                    $this->model = $model;
                     $this->index = $index;
                 }
-
-
 
                 public function view(): View
                 {
@@ -50,6 +52,7 @@ class BoxStickerExport implements WithMultipleSheets
                         'sticker' => $this->sticker,
                         'imagePath' => $this->imagePath,
                         'submodel' => $this->submodel,
+                        'model' => $this->model,
                         'index' => $this->index,
                     ]);
                 }
@@ -62,12 +65,7 @@ class BoxStickerExport implements WithMultipleSheets
                 public function styles(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet)
                 {
                     $sheet->getDefaultRowDimension()->setRowHeight(20);
-//                    $sheet->getStyle('A:G')->getFont()->setSize(12);
-
-                    // 👉 A ustunini kichikroq qilish:
-                    $sheet->getColumnDimension('A')->setWidth(12); // yoki 10, 12 — qanday bo'lishini istasang
-
-                    // Optional: boshqa ustunlar ham sozlansa yaxshi bo'ladi
+                    $sheet->getColumnDimension('A')->setWidth(12);
                     $sheet->getColumnDimension('B')->setWidth(9);
                     $sheet->getColumnDimension('C')->setWidth(9);
                     $sheet->getColumnDimension('D')->setWidth(9);
@@ -84,18 +82,14 @@ class BoxStickerExport implements WithMultipleSheets
                     $drawing->setName('Contragent Logo');
                     $drawing->setDescription('Logo');
                     $drawing->setPath($this->imagePath);
-
-                    // 🔧 Rasm hajmini shu yerda belgilaysiz:
-                    $drawing->setHeight(90);  // px bo‘yicha bo‘ladi
-                    $drawing->setWidth(300);  // optional
-
-                    $drawing->setCoordinates('A1'); // Qayerga qo‘yilishi
+                    $drawing->setHeight(70);
+                    $drawing->setWidth(300);
+                    $drawing->setCoordinates('A1');
                     $drawing->setOffsetX(10);
                     $drawing->setOffsetY(5);
 
                     return [$drawing];
                 }
-
             };
         }
 

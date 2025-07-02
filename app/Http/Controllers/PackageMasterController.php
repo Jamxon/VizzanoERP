@@ -50,7 +50,7 @@ class PackageMasterController extends Controller
         return response()->json($order);
     }
 
-    public function packageStore(Request $request): \Symfony\Component\HttpFoundation\BinaryFileResponse|\Illuminate\Http\JsonResponse
+    public function packageStore(Request $request): BinaryFileResponse|JsonResponse
     {
         $validated = $request->validate([
             'orders' => 'required|array',
@@ -69,42 +69,37 @@ class PackageMasterController extends Controller
         $absolutePath = public_path($imagePath);
         $submodelName = $orders->first()?->orderModel?->submodels->first()?->submodel?->name ?? 'Submodel nomi yo‘q';
 
-
         $colorMap = [];
-        $summaryMap = [];
 
         foreach ($validated['sizes'] as $sizeItem) {
             $sizeId = $sizeItem['size_id'];
             $capacity = $sizeItem['capacity'];
-            $bruttoKg = $sizeItem['kg'] ?? 0; // <-- bu brutto (Вес брутто)
-            $nettoKg = round($bruttoKg - 1.4, 2); // <-- bu neto
+            $bruttoKg = $sizeItem['kg'] ?? 0;
+            $nettoKg = round($bruttoKg - 1.4, 2);
 
-            $colors = $sizeItem['colors'];
-            $sizeName = OrderSize::find($sizeId)?->size->name ?? 'Размер топилмади';
+            $sizeName = OrderSize::find($sizeId)?->size->name ?? '---';
 
-            foreach ($colors as $colorItem) {
+            foreach ($sizeItem['colors'] as $colorItem) {
                 foreach ($colorItem as $colorName => $qty) {
                     $colorMap[$colorName][] = [
                         'size_name' => $sizeName,
                         'qty' => $qty,
                         'capacity' => $capacity,
-                        'brutto' => $bruttoKg,
                         'netto' => $nettoKg,
+                        'brutto' => $bruttoKg,
                     ];
                 }
             }
         }
 
         $data = [];
-        $index = 1;
         $summaryList = [
-            ['№', 'Артикул', 'Коллекция зима Комбинезон', 'Коробка (шт)', 'Обший (шт)', 'Нетто (кг)', 'Брутто (кг)']
+            ['№', 'Артикул', 'Комбинезон', 'Коробка (шт)', 'Обший (шт)', 'Нетто (кг)', 'Брутто (кг)']
         ];
 
-        $totalPacks = 0;
-        $totalQtyAll = 0;
-        $totalNetto = 0;
-        $totalBrutto = 0;
+        $totalPacks = $totalQtyAll = $totalNetto = $totalBrutto = 0;
+        $index = 1;
+        $stickers = [];
 
         foreach ($colorMap as $color => $items) {
             $leftovers = [];
@@ -120,9 +115,19 @@ class PackageMasterController extends Controller
                 $packNo = 1;
 
                 while ($qty >= $capacity) {
+                    // Packing fayl
                     $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
                     $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, $item['netto'],  $item['brutto']];
                     $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
+
+                    // Box sticker fayl
+                    $stickers[] = [
+                        ['Размер', 'Количество'],
+                        [$sizeName, $capacity],
+                        [$item['netto'], $item['brutto']],
+                        'color' => $color,
+                        'model' => $modelName,
+                    ];
 
                     $qty -= $capacity;
                     $packNo++;
@@ -141,100 +146,55 @@ class PackageMasterController extends Controller
 
             if (count($leftovers)) {
                 $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
-                $data[] = [
-                    $index,
-                    "Цвет: $color",
-                    $leftovers[0]['size_name'] ?? '',
-                    $customerName,
-                    $packNo,
-                    1,
-                    $leftovers[0]['qty'] ?? '',
-                    '',
-                    ''
+                $data[] = [$index, "Цвет: $color", $leftovers[0]['size_name'] ?? '', $customerName, $packNo, 1, $leftovers[0]['qty'] ?? '', '', ''];
+                $data[] = ['', "Юбка для девочки", $leftovers[1]['size_name'] ?? '', '', '', '', $leftovers[1]['qty'] ?? '', '', ''];
+
+                $sizes = [];
+
+                if (isset($leftovers[0])) $sizes[] = [$leftovers[0]['size_name'], $leftovers[0]['qty']];
+                if (isset($leftovers[1])) $sizes[] = [$leftovers[1]['size_name'], $leftovers[1]['qty']];
+
+                $qtySum = array_sum(array_column($sizes, 1));
+
+                $stickers[] = [
+                    ['Размер', 'Количество'],
+                    ...$sizes,
+                    [round($qtySum * 1.45, 2), round($qtySum * 1.62, 2)],
+                    'color' => $color,
+                    'model' => $modelName,
                 ];
-                $data[] = [
-                    '',
-                    "Юбка для девочки",
-                    $leftovers[1]['size_name'] ?? '',
-                    '',
-                    '',
-                    '',
-                    $leftovers[1]['qty'] ?? '',
-                    '',
-                    ''
-                ];
+
                 $index++;
                 $packCount++;
-                $qtySum = ($leftovers[0]['qty'] ?? 0) + ($leftovers[1]['qty'] ?? 0);
                 $totalQty += $qtySum;
-                $netto += $qtySum * 1.45;
-                $brutto += $qtySum * 1.62;
+                $netto += round($qtySum * 1.45, 2);
+                $brutto += round($qtySum * 1.62, 2);
             }
 
-            // Umumiy yig‘ish
+            // Summary hisob
             $totalPacks += $packCount;
             $totalQtyAll += $totalQty;
             $totalNetto += $netto;
             $totalBrutto += $brutto;
         }
 
-// Faqat bitta yakuniy qator
         $summaryList[] = [
             1,
             $modelName,
-            'Комбенизон для девочки',
+            'Комбинезон для девочки',
             $totalPacks,
             $totalQtyAll,
             round($totalNetto, 2),
             round($totalBrutto, 2),
         ];
 
-        $stickers = [];
-
-        foreach ($colorMap as $color => $items) {
-            $rows = [];
-            $totalQty = [];
-            $brutto = 0;
-            $netto = 0;
-
-            foreach ($items as $item) {
-                $size = $item['size_name'];
-                $qty = $item['qty'];
-                $totalQty[$size] = ($totalQty[$size] ?? 0) + $qty;
-                $brutto += $item['brutto'];
-                $netto += $item['netto'];
-            }
-
-            $sizeRows = [];
-            foreach ($totalQty as $size => $qty) {
-                $sizeRows[] = [$size, $qty];
-            }
-
-            $stickers[] = [
-                ...$sizeRows,
-                $modelName,
-                [round($netto, 2), round($brutto, 2)],
-            ];
-        }
-
-//
-//        $summaryList[] = [
-//            '', '', '',
-//            array_sum(array_column($summaryList, 3)),
-//            array_sum(array_column($summaryList, 4)),
-//            array_sum(array_column($summaryList, 5)),
-//            array_sum(array_column($summaryList, 6)),
-//        ];
-
-//        return Excel::download(new PackingListExport($data, $summaryList), 'packing_list.xlsx');
-
+        // Fayl yaratish
         $timestamp = now()->timestamp;
         $unique = \Illuminate\Support\Str::random(6);
         $fileName = "packing_result_{$timestamp}_{$unique}.zip";
-
         $jobPath = "exports/temp_{$timestamp}_{$unique}";
 
-        dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName, $absolutePath, $submodelName));
+        dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName, $absolutePath, $submodelName, $modelName));
 
         $url = asset("storage/exports/{$fileName}");
 
