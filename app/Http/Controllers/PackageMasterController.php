@@ -108,78 +108,77 @@ class PackageMasterController extends Controller
             $netto = 0;
             $brutto = 0;
 
-            // Box uchun barcha o'lchamlarni yig'amiz, qiymatlari bo'lsa ko'rsatamiz, aks holda ''
-            $allSizes = [];
-
-            foreach ($items as $item) {
-                $allSizes[$item['size_name']] = '';  // Hamma o'lchamlar bo'sh qiymat bilan
-            }
+            $index = 1; // Har rang uchun index boshlanadi
 
             foreach ($items as $item) {
                 $qty = $item['qty'];
                 $sizeName = $item['size_name'];
                 $capacity = $item['capacity'];
-                $packNo = 1;
-
-                // Qo'shish - qiymati bor bo'lsa yozamiz
-                $allSizes[$sizeName] = $qty > 0 ? $qty : '';
 
                 while ($qty >= $capacity) {
-                    // Packing fayl
+                    // Packing faylga qo'shish
                     $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
-                    $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, $item['netto'],  $item['brutto']];
+                    $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packCount + 1, 1, $capacity, $item['netto'],  $item['brutto']];
                     $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
 
+                    // Box sticker uchun shu paketdagi faqat bitta o'lcham va miqdor
+                    $stickers[] = [
+                        ['Размер', 'Количество'],
+                        [$sizeName, $capacity],
+                        [round($item['netto'], 2), round($item['brutto'], 2)],
+                        'color' => $color,
+                        'model' => $modelName,
+                    ];
+
                     $qty -= $capacity;
-                    $packNo++;
+                    $packCount++;
                     $index++;
 
-                    $packCount++;
                     $totalQty += $capacity;
                     $netto += $item['netto'];
                     $brutto += $item['brutto'];
                 }
 
                 if ($qty > 0) {
-                    $leftovers[] = ['size_name' => $sizeName, 'qty' => $qty];
+                    $leftovers[] = ['size_name' => $sizeName, 'qty' => $qty, 'netto' => $item['netto'], 'brutto' => $item['brutto']];
                 }
             }
 
             if (count($leftovers)) {
+                // Packing faylga leftovers qo'shish
                 $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
-                $data[] = [$index, "Цвет: $color", $leftovers[0]['size_name'] ?? '', $customerName, $packNo, 1, $leftovers[0]['qty'] ?? '', '', ''];
+                $data[] = [$index, "Цвет: $color", $leftovers[0]['size_name'] ?? '', $customerName, $packCount + 1, 1, $leftovers[0]['qty'] ?? '', '', ''];
                 $data[] = ['', "Юбка для девочки", $leftovers[1]['size_name'] ?? '', '', '', '', $leftovers[1]['qty'] ?? '', '', ''];
 
-                if (isset($leftovers[0])) {
-                    $allSizes[$leftovers[0]['size_name']] = $leftovers[0]['qty'];
-                }
-                if (isset($leftovers[1])) {
-                    $allSizes[$leftovers[1]['size_name']] = $leftovers[1]['qty'];
+                // Box sticker leftovers uchun faqat o'lcham va qiymatlari bilan
+                $sizes = [];
+                $totalQtyLeft = 0;
+                $totalNettoLeft = 0;
+                $totalBruttoLeft = 0;
+
+                foreach ($leftovers as $left) {
+                    $sizes[] = [$left['size_name'], $left['qty']];
+                    $totalQtyLeft += $left['qty'];
+                    $totalNettoLeft += $left['netto'];
+                    $totalBruttoLeft += $left['brutto'];
                 }
 
-                $qtySum = array_sum(array_filter($allSizes));
+                $sizesRows = [['Размер', 'Количество'], ...$sizes, [round($totalNettoLeft, 2), round($totalBruttoLeft, 2)]];
+
+                $stickers[] = [
+                    ...$sizesRows,
+                    'color' => $color,
+                    'model' => $modelName,
+                ];
 
                 $index++;
                 $packCount++;
-                $totalQty += $qtySum;
-                $netto += round($qtySum * 1.45, 2);
-                $brutto += round($qtySum * 1.62, 2);
+                $totalQty += $totalQtyLeft;
+                $netto += $totalNettoLeft;
+                $brutto += $totalBruttoLeft;
             }
 
-            // Box stickerga barcha o'lchamlar, qiymatlari bilan (bo'sh qiymatlari ham bor)
-            $sizesRows = [['Размер', 'Количество']];
-            foreach ($allSizes as $sizeName => $qty) {
-                $sizesRows[] = [$sizeName, $qty];
-            }
-            $sizesRows[] = [round($netto, 2), round($brutto, 2)];
-
-            $stickers[] = [
-                ...$sizesRows,
-                'color' => $color,
-                'model' => $modelName,
-            ];
-
-            // Summary hisob
+            // Umumiy yig'ish
             $totalPacks += $packCount;
             $totalQtyAll += $totalQty;
             $totalNetto += $netto;
