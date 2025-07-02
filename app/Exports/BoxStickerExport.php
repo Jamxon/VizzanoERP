@@ -38,9 +38,17 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                 $result[] = [''];
             }
 
-            $result[] = ['', '', '', '', '', ($index + 1), '']; // Row 1
-            $result[] = [$this->submodel]; // Row 2
+            // ⚠️ 1–4 qatorlar: LOGO uchun bo‘sh
+            $result[] = [''];
+            $result[] = [''];
+            $result[] = [''];
+            $result[] = [''];
 
+            // ⚠️ 5–6 qatorlar: Submodel
+            $result[] = [$this->submodel];
+            $result[] = [''];
+
+            // 7+ qatorlar: sticker ma’lumotlari
             foreach ($sticker as $row) {
                 $result[] = $row;
             }
@@ -48,6 +56,7 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
 
         return $result;
     }
+
 
     public function title(): string
     {
@@ -209,9 +218,6 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
                             $row++;
                         }
                     }
-
-                    // ✅ Endi shu yerda sikl tugaydi va keyingi stickerga o‘tadi,
-                    // yangi `row` qiymati allaqachon logoga tayyor holatda
                 }
             }
         ];
