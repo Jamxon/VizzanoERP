@@ -55,8 +55,8 @@
     @endphp
     @if(is_array($last) && count($last) == 2 && is_numeric($last[0]) && is_numeric($last[1]))
         <tr>
-            <td colspan="3" style="text-align: center; font-weight: bold;">Нетто (кг)</td>
-            <td colspan="4" style="text-align: center; font-weight: bold;">Брутто (кг)</td>
+            <td colspan="3" style="text-align: center; font-weight: bold; font-size: 15px;">Нетто (кг)</td>
+            <td colspan="4" style="text-align: center; font-weight: bold; font-size: 15px;">Брутто (кг)</td>
         </tr>
         <tr>
             <td colspan="3" style="text-align: center; font-size: 35px; font-weight: bold; height: 50px;">{{ $last[0] }}</td>

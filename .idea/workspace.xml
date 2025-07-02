@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: increase height styling for table cells in box sticker">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove rowspan from table cells in box sticker for improved layout">
       <change beforePath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -386,23 +386,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="27005000" />
-    </task>
-    <task id="LOCAL-00647" summary="feat: remove image drawing functionality in BoxStickerExport for layout simplification">
-      <option name="closed" value="true" />
-      <created>1751455021410</created>
-      <option name="number" value="00647" />
-      <option name="presentableId" value="LOCAL-00647" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455021410</updated>
-    </task>
-    <task id="LOCAL-00648" summary="feat: enhance logo display in BoxStickerExport with responsive styling">
-      <option name="closed" value="true" />
-      <created>1751455095270</created>
-      <option name="number" value="00648" />
-      <option name="presentableId" value="LOCAL-00648" />
-      <option name="project" value="LOCAL" />
-      <updated>1751455095270</updated>
+      <workItem from="1751432833774" duration="27311000" />
     </task>
     <task id="LOCAL-00649" summary="feat: adjust logo size in BoxStickerExport for better display">
       <option name="closed" value="true" />
@@ -780,7 +764,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751462000498</updated>
     </task>
-    <option name="localTasksCounter" value="696" />
+    <task id="LOCAL-00696" summary="fix: adjust rowspan and height styling for table cells in box sticker">
+      <option name="closed" value="true" />
+      <created>1751462267395</created>
+      <option name="number" value="00696" />
+      <option name="presentableId" value="LOCAL-00696" />
+      <option name="project" value="LOCAL" />
+      <updated>1751462267395</updated>
+    </task>
+    <task id="LOCAL-00697" summary="fix: remove rowspan from table cells in box sticker for improved layout">
+      <option name="closed" value="true" />
+      <created>1751462353206</created>
+      <option name="number" value="00697" />
+      <option name="presentableId" value="LOCAL-00697" />
+      <option name="project" value="LOCAL" />
+      <updated>1751462353206</updated>
+    </task>
+    <option name="localTasksCounter" value="698" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,8 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: improve temporary directory handling and file storage in PackageExportJob" />
-    <MESSAGE value="feat: enhance error handling for packing and box sticker file creation in PackageExportJob" />
     <MESSAGE value="feat: update file path handling for packing and box sticker exports in PackageExportJob" />
     <MESSAGE value="feat: simplify temporary directory and file handling in PackageExportJob" />
     <MESSAGE value="feat: refactor file handling and improve directory management in PackageExportJob" />
@@ -835,7 +833,9 @@
     <MESSAGE value="fix: add height styling to rows in box sticker" />
     <MESSAGE value="fix: move height styling to table cells in box sticker" />
     <MESSAGE value="fix: increase height styling for table cells in box sticker" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: increase height styling for table cells in box sticker" />
+    <MESSAGE value="fix: adjust rowspan and height styling for table cells in box sticker" />
+    <MESSAGE value="fix: remove rowspan from table cells in box sticker for improved layout" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: remove rowspan from table cells in box sticker for improved layout" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
