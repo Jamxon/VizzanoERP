@@ -166,6 +166,7 @@ class OrderController extends Controller
 
     public function updateContragents(Request $request, Contragent $contragent): \Illuminate\Http\JsonResponse
     {
+        dd($request->all());
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $fileName = time() . '_' . $image->getClientOriginalName();

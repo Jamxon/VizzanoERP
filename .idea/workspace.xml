@@ -384,15 +384,7 @@
       <workItem from="1751255793996" duration="9457000" />
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="7007000" />
-    </task>
-    <task id="LOCAL-00546" summary="feat: add title support for sheets in PackingListExport">
-      <option name="closed" value="true" />
-      <created>1751098156157</created>
-      <option name="number" value="00546" />
-      <option name="presentableId" value="LOCAL-00546" />
-      <option name="project" value="LOCAL" />
-      <updated>1751098156157</updated>
+      <workItem from="1751432833774" duration="7340000" />
     </task>
     <task id="LOCAL-00547" summary="feat: update sheet titles to localized versions in PackingListExport">
       <option name="closed" value="true" />
@@ -778,7 +770,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751440365918</updated>
     </task>
-    <option name="localTasksCounter" value="595" />
+    <task id="LOCAL-00595" summary="feat: add image upload functionality to Contragent model and update OrderController for image handling">
+      <option name="closed" value="true" />
+      <created>1751440643365</created>
+      <option name="number" value="00595" />
+      <option name="presentableId" value="LOCAL-00595" />
+      <option name="project" value="LOCAL" />
+      <updated>1751440643365</updated>
+    </task>
+    <option name="localTasksCounter" value="596" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
