@@ -111,7 +111,7 @@ class PackageMasterController extends Controller
 
                 while ($qty >= $capacity) {
                     $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
-                    $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, $item['brutto'],  $item['netto']];
+                    $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packNo, 1, $capacity, $item['netto'],  $item['brutto']];
                     $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
 
                     $qty -= $capacity;
