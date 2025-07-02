@@ -131,8 +131,6 @@ class PackageMasterController extends Controller
                         $sizes[] = [$sizeName, $qty];
                     }
 
-                    return $sizes;
-
                     // Box sticker uchun shu paketdagi faqat bitta o'lcham va miqdor
                     $stickers[] = [
                         [$sizeName, $capacity],
@@ -166,15 +164,7 @@ class PackageMasterController extends Controller
                     $left['size_name'] => $left['qty']
                 ])->toArray();
 
-                $sizes = [];
                 $totalQtyLeft = 0;
-
-                // Har bir sizesMap elementiga qarab qty ni olamiz yoki '' beramiz
-                foreach ($sizesMap as $sizeName) {
-                    $qty = $qtyBySize[$sizeName] ?? '';
-                    $sizes[] = [$sizeName, $qty];
-                    $totalQtyLeft += is_numeric($qty) ? $qty : 0;
-                }
 
                 // Netto va Brutto yig'ish
                 $totalNettoLeft = collect($leftovers)->sum('netto');
