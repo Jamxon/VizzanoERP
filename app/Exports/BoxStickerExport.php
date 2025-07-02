@@ -54,18 +54,18 @@ class BoxStickerExport implements FromArray, WithTitle, WithStyles, WithColumnWi
         return 'Box Stickers';
     }
 
-    public function columnWidths(): array
-    {
-        return [
-            'A' => 15,
-            'B' => 15,
-            'C' => 15,
-            'D' => 15,
-            'E' => 15,
-            'F' => 15,
-            'G' => 15,
-        ];
-    }
+//    public function columnWidths(): array
+//    {
+//        return [
+//            'A' => 15,
+//            'B' => 15,
+//            'C' => 15,
+//            'D' => 15,
+//            'E' => 15,
+//            'F' => 15,
+//            'G' => 15,
+//        ];
+//    }
 
     public function styles(Worksheet $sheet): array
     {
