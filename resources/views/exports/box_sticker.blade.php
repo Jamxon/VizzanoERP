@@ -114,24 +114,29 @@
                 @endif
             @endforeach
 
-            {{-- Extra sizes from orderSizes --}}
             @php
-                $sizes = [];
-                foreach ($sticker as $key => $value) {
-                    if ($key === 'orderSizes') {
-                        $sizes[] = $value;
-                    }
-                }
+                // 1. Chiqarilgan sizelar ro‘yxatini tuzamiz (faqat string bo‘lganlarni olamiz)
+                $printedSizes = collect($sticker)
+                    ->filter(fn($val, $key) => is_int($key) && is_array($val) && count($val) == 2 && is_string($val[0]))
+                    ->map(fn($val) => $val[0])
+                    ->values()
+                    ->all();
+
+                // 2. orderSizes dan kelgan barcha size'lar
+                $allOrderSizes = collect($sticker['orderSizes'] ?? [])->unique()->values();
+
+                // 3. Faqat chiqarilmagan sizelarni olish
+                $remainingSizes = $allOrderSizes->filter(fn($size) => !in_array($size, $printedSizes));
             @endphp
 
-            @foreach ($sizes as $size)
-                @foreach($size as $row)
-                    <tr>
-                        <td colspan="3" class="center bold big-text">{{ $row }}</td>
-                        <td colspan="4" class="center bold big-text"></td>
-                    </tr>
-                @endforeach
+            {{-- 4. Faqat chiqarilmagan sizelarni chiqarish --}}
+            @foreach($remainingSizes as $row)
+                <tr>
+                    <td colspan="3" class="center bold big-text">{{ $row }}</td>
+                    <td colspan="4" class="center bold big-text"></td>
+                </tr>
             @endforeach
+
 
             {{-- Net & Brutto --}}
             @php
