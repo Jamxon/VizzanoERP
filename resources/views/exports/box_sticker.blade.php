@@ -48,7 +48,7 @@
         }
 
         .logo {
-            width: 140px;
+            width: 70mm;
             height: auto;
         }
     </style>
