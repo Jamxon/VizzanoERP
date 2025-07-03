@@ -430,7 +430,7 @@ class SuperHRController extends Controller
 
             // 🟢 Telegramga yuborish
             $employee = \App\Models\Employee::find($request->employee_id);
-            $messageText = "🚫 *Sababsiz:*\n\n"
+            $messageText = "🌴 ️*Sababli:*\n\n"
                 . "*Ismi:* {$employee->name}\n"
                 . "*Telefon:* {$employee->phone}\n"
                 . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
