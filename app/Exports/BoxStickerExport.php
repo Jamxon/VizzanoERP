@@ -28,7 +28,7 @@ class BoxStickerExport
 
     public function store(string $path): void
     {
-        $pdf = Pdf::loadView('exports.box_sticker_pdf', [
+        $pdf = Pdf::loadView('exports.box_sticker', [
             'stickers' => $this->stickers,
             'imagePath' => $this->imagePath,
             'submodel' => $this->submodel,
