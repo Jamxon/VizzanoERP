@@ -9,7 +9,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithDrawings;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 
-class BoxStickerExport implements FromView, WithStyles,  WithDrawings
+class BoxStickerExport
 {
     protected array $stickers;
     protected string $imagePath;
@@ -24,50 +24,15 @@ class BoxStickerExport implements FromView, WithStyles,  WithDrawings
         $this->model = $model;
     }
 
-    public function view(): View
+    public function store(string $path): void
     {
-        return view('exports.box_sticker', [
+        $pdf = Pdf::loadView('exports.box_sticker_pdf', [
             'stickers' => $this->stickers,
             'imagePath' => $this->imagePath,
             'submodel' => $this->submodel,
             'model' => $this->model,
-        ]);
-    }
+        ])->setPaper('a4');
 
-
-    public function styles(Worksheet $sheet)
-    {
-        $sheet->getDefaultRowDimension()->setRowHeight(25);
-        $sheet->getColumnDimension('A')->setWidth(12);
-        $sheet->getColumnDimension('B')->setWidth(9);
-        $sheet->getColumnDimension('C')->setWidth(9);
-        $sheet->getColumnDimension('D')->setWidth(9);
-        $sheet->getColumnDimension('E')->setWidth(9);
-        $sheet->getColumnDimension('F')->setWidth(9);
-        $sheet->getColumnDimension('G')->setWidth(9);
-    }
-
-    public function drawings(): array
-    {
-        $drawings = [];
-        $startRow = 1;
-
-        foreach ($this->stickers as $index => $sticker) {
-            if (!file_exists($this->imagePath)) continue;
-
-            $drawing = new Drawing();
-            $drawing->setName("Logo $index");
-            $drawing->setDescription("Logo for sticker $index");
-            $drawing->setPath($this->imagePath);
-            $drawing->setHeight(70);
-            $drawing->setCoordinates('A' . $startRow);
-            $drawing->setOffsetY(5);
-            $drawings[] = $drawing;
-
-            // Har bir quti orasida taxminan 15 qator bo‘shliq bo‘lsin
-            $startRow += 15;
-        }
-
-        return $drawings;
+        Storage::disk('public')->put($path, $pdf->output());
     }
 }

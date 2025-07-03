@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update table border styles in box_sticker.blade.php for improved consistency">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -387,15 +385,7 @@
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
-      <workItem from="1751517131245" duration="2143000" />
-    </task>
-    <task id="LOCAL-00682" summary="fix: update table cell content to correctly display color in box_sticker view">
-      <option name="closed" value="true" />
-      <created>1751459873498</created>
-      <option name="number" value="00682" />
-      <option name="presentableId" value="LOCAL-00682" />
-      <option name="project" value="LOCAL" />
-      <updated>1751459873498</updated>
+      <workItem from="1751517131245" duration="2600000" />
     </task>
     <task id="LOCAL-00683" summary="fix: adjust font size for color label in box_sticker view">
       <option name="closed" value="true" />
@@ -781,7 +771,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751519157612</updated>
     </task>
-    <option name="localTasksCounter" value="731" />
+    <task id="LOCAL-00731" summary="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics">
+      <option name="closed" value="true" />
+      <created>1751519318821</created>
+      <option name="number" value="00731" />
+      <option name="presentableId" value="LOCAL-00731" />
+      <option name="project" value="LOCAL" />
+      <updated>1751519318821</updated>
+    </task>
+    <option name="localTasksCounter" value="732" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -811,7 +809,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: add Drawing import to BoxStickerExport for enhanced functionality" />
     <MESSAGE value="fix: add sizesMap for improved size handling in PackageMasterController" />
     <MESSAGE value="fix: enhance size handling in PackageMasterController with improved sizesMap logic" />
     <MESSAGE value="fix: streamline size handling logic in PackageMasterController by simplifying sizesMap updates" />
@@ -836,7 +833,8 @@
     <MESSAGE value="fix: enhance table styling in box_sticker.blade.php for improved visibility" />
     <MESSAGE value="fix: enhance table borders in box_sticker.blade.php for improved readability" />
     <MESSAGE value="fix: update table border styles in box_sticker.blade.php for improved consistency" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update table border styles in box_sticker.blade.php for improved consistency" />
+    <MESSAGE value="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

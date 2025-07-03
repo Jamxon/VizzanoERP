@@ -42,27 +42,40 @@ class PackageExportJob implements ShouldQueue
 
     public function handle(): void
     {
-        $folder = 'exports/temp_' . now()->timestamp . '_' . Str::random(6);
+        $timestamp = now()->timestamp;
+        $random = Str::random(6);
+        $folder = "exports/temp_{$timestamp}_{$random}";
         Storage::disk('public')->makeDirectory($folder);
 
         $packingPath = "$folder/packing_list.xlsx";
-        $stickerPath = "$folder/box_sticker.xlsx";
+        $stickerPdfPath = "$folder/box_sticker.pdf";
 
-        // Excel fayllarni saqlash (public diskda)
-        Excel::store(new PackingListExport($this->data, $this->summary), $packingPath, 'public');
-        Excel::store(new BoxStickerExport($this->stickers, $this->absolutePath, $this->submodel, $this->model), $stickerPath, 'public');
+        // Excel: Packing List
+        Excel::store(
+            new \App\Exports\PackingListExport($this->data, $this->summary),
+            $packingPath,
+            'public'
+        );
 
-        // ZIP faylni yaratamiz
+        // PDF: Box Sticker
+        (new \App\Exports\BoxStickerExport(
+            $this->stickers,
+            $this->absolutePath,
+            $this->submodel,
+            $this->model
+        ))->store($stickerPdfPath);
+
+        // ZIP fayl yaratish
         $zipFileName = "exports/{$this->fileName}";
         $zipFullPath = storage_path("app/public/{$zipFileName}");
 
-        $zip = new ZipArchive;
-        if ($zip->open($zipFullPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) === TRUE) {
+        $zip = new \ZipArchive;
+        if ($zip->open($zipFullPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
             $zip->addFile(storage_path("app/public/{$packingPath}"), 'packing_list.xlsx');
-            $zip->addFile(storage_path("app/public/{$stickerPath}"), 'box_sticker.xlsx');
+            $zip->addFile(storage_path("app/public/{$stickerPdfPath}"), 'box_sticker.pdf');
             $zip->close();
         } else {
-            Log::error("Zip fayl ochilmadi: $zipFullPath");
+            \Log::error("Zip fayl ochilmadi: $zipFullPath");
         }
     }
 
