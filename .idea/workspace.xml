@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: adjust page margin and enhance table height in box_sticker.blade.php for improved layout">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: increase logo width in box_sticker.blade.php for better visibility" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -388,39 +385,7 @@
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
-      <workItem from="1751517131245" duration="7561000" />
-    </task>
-    <task id="LOCAL-00701" summary="fix: update logo display logic in box sticker export for improved visibility">
-      <option name="closed" value="true" />
-      <created>1751463031201</created>
-      <option name="number" value="00701" />
-      <option name="presentableId" value="LOCAL-00701" />
-      <option name="project" value="LOCAL" />
-      <updated>1751463031201</updated>
-    </task>
-    <task id="LOCAL-00702" summary="fix: update logo display logic in box sticker export for improved visibility">
-      <option name="closed" value="true" />
-      <created>1751463219002</created>
-      <option name="number" value="00702" />
-      <option name="presentableId" value="LOCAL-00702" />
-      <option name="project" value="LOCAL" />
-      <updated>1751463219002</updated>
-    </task>
-    <task id="LOCAL-00703" summary="fix: add whitespace for improved code readability in BoxStickerExport">
-      <option name="closed" value="true" />
-      <created>1751463340580</created>
-      <option name="number" value="00703" />
-      <option name="presentableId" value="LOCAL-00703" />
-      <option name="project" value="LOCAL" />
-      <updated>1751463340580</updated>
-    </task>
-    <task id="LOCAL-00704" summary="fix: implement drawings method in BoxStickerExport for dynamic logo placement">
-      <option name="closed" value="true" />
-      <created>1751463551300</created>
-      <option name="number" value="00704" />
-      <option name="presentableId" value="LOCAL-00704" />
-      <option name="project" value="LOCAL" />
-      <updated>1751463551300</updated>
+      <workItem from="1751517131245" duration="7951000" />
     </task>
     <task id="LOCAL-00705" summary="fix: add Drawing import to BoxStickerExport for enhanced functionality">
       <option name="closed" value="true" />
@@ -782,7 +747,39 @@
       <option name="project" value="LOCAL" />
       <updated>1751523773619</updated>
     </task>
-    <option name="localTasksCounter" value="750" />
+    <task id="LOCAL-00750" summary="fix: update font sizes and table dimensions in box_sticker.blade.php for improved readability and layout">
+      <option name="closed" value="true" />
+      <created>1751525497798</created>
+      <option name="number" value="00750" />
+      <option name="presentableId" value="LOCAL-00750" />
+      <option name="project" value="LOCAL" />
+      <updated>1751525497798</updated>
+    </task>
+    <task id="LOCAL-00751" summary="fix: update logo width in box_sticker.blade.php for improved layout">
+      <option name="closed" value="true" />
+      <created>1751525594394</created>
+      <option name="number" value="00751" />
+      <option name="presentableId" value="LOCAL-00751" />
+      <option name="project" value="LOCAL" />
+      <updated>1751525594394</updated>
+    </task>
+    <task id="LOCAL-00752" summary="fix: update logo width in box_sticker.blade.php for better visibility">
+      <option name="closed" value="true" />
+      <created>1751525677366</created>
+      <option name="number" value="00752" />
+      <option name="presentableId" value="LOCAL-00752" />
+      <option name="project" value="LOCAL" />
+      <updated>1751525677366</updated>
+    </task>
+    <task id="LOCAL-00753" summary="fix: increase logo width in box_sticker.blade.php for better visibility">
+      <option name="closed" value="true" />
+      <created>1751525770386</created>
+      <option name="number" value="00753" />
+      <option name="presentableId" value="LOCAL-00753" />
+      <option name="project" value="LOCAL" />
+      <updated>1751525770386</updated>
+    </task>
+    <option name="localTasksCounter" value="754" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -812,10 +809,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update size handling logic in PackageMasterController to use map for order sizes" />
-    <MESSAGE value="fix: extract size-quantity pairs from sticker data in box_sticker.blade.php" />
-    <MESSAGE value="fix: update size extraction logic in box_sticker.blade.php to focus on 'orderSizes'" />
-    <MESSAGE value="fix: update table rendering in box_sticker.blade.php to display size rows with enhanced formatting" />
     <MESSAGE value="fix: enhance table styling in box_sticker.blade.php for improved visibility" />
     <MESSAGE value="fix: enhance table borders in box_sticker.blade.php for improved readability" />
     <MESSAGE value="fix: update table border styles in box_sticker.blade.php for improved consistency" />
@@ -837,7 +830,11 @@
     <MESSAGE value="fix: enhance table structure and styling in box_sticker.blade.php for improved layout and readability" />
     <MESSAGE value="fix: refactor size handling logic in box_sticker.blade.php for improved clarity and efficiency" />
     <MESSAGE value="fix: adjust page margin and enhance table height in box_sticker.blade.php for improved layout" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: adjust page margin and enhance table height in box_sticker.blade.php for improved layout" />
+    <MESSAGE value="fix: update font sizes and table dimensions in box_sticker.blade.php for improved readability and layout" />
+    <MESSAGE value="fix: update logo width in box_sticker.blade.php for improved layout" />
+    <MESSAGE value="fix: update logo width in box_sticker.blade.php for better visibility" />
+    <MESSAGE value="fix: increase logo width in box_sticker.blade.php for better visibility" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: increase logo width in box_sticker.blade.php for better visibility" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
