@@ -1,5 +1,5 @@
 @foreach ($stickers as $index => $sticker)
-    <table style="margin-bottom: 40px; border-collapse: collapse; width: 100%; border: 2px solid black; font-family: Arial, sans-serif;">
+    <table style="margin-bottom: 40px; border-collapse: collapse; width: 100%; border: 2px solid black;  font-family: DejaVu Sans, sans-serif;">
         {{-- 1-4 qator: Logo va № --}}
         <tr>
             <td colspan="5" rowspan="4" style="text-align: center; border: 2px solid black;">
