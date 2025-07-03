@@ -4,11 +4,13 @@
         <tr>
             <td colspan="5" rowspan="4" style="text-align: center; border: 2px solid black;">
                 @php
-                    // 1. Agar image path `/storage/...` bo‘lsa
-                    $cleanPath = str_replace('/storage/', '', $imagePath);
-
-                    // 2. Absolyut fizik yo‘l
-                    $absoluteImagePath = storage_path("app/public/{$cleanPath}");
+                    // Agar absolute path bo‘lsa, to‘g‘ridan-to‘g‘ri ishlatamiz
+                    if (str_starts_with($imagePath, '/home')) {
+                        $absoluteImagePath = $imagePath;
+                    } else {
+                        // Nisbiy path bo‘lsa
+                        $absoluteImagePath = storage_path('app/public/' . ltrim(str_replace('/storage/', '', $imagePath), '/'));
+                    }
                 @endphp
 
                 @if(file_exists($absoluteImagePath))
@@ -16,6 +18,7 @@
                 @else
                     <strong>Logo yo‘q: {{ $absoluteImagePath }}</strong>
                 @endif
+
 
 
             </td>
