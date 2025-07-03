@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance image path handling in box_sticker.blade.php for better absolute path support" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update table styles in box_sticker.blade.php for improved layout and consistency">
+      <change beforePath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/exports/box_sticker.blade.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -385,15 +387,7 @@
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
-      <workItem from="1751517131245" duration="3890000" />
-    </task>
-    <task id="LOCAL-00693" summary="fix: add height styling to rows in box sticker">
-      <option name="closed" value="true" />
-      <created>1751461844854</created>
-      <option name="number" value="00693" />
-      <option name="presentableId" value="LOCAL-00693" />
-      <option name="project" value="LOCAL" />
-      <updated>1751461844854</updated>
+      <workItem from="1751517131245" duration="4195000" />
     </task>
     <task id="LOCAL-00694" summary="fix: move height styling to table cells in box sticker">
       <option name="closed" value="true" />
@@ -779,7 +773,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751520957361</updated>
     </task>
-    <option name="localTasksCounter" value="742" />
+    <task id="LOCAL-00742" summary="fix: adjust table width in box_sticker.blade.php for improved layout consistency">
+      <option name="closed" value="true" />
+      <created>1751521075855</created>
+      <option name="number" value="00742" />
+      <option name="presentableId" value="LOCAL-00742" />
+      <option name="project" value="LOCAL" />
+      <updated>1751521075855</updated>
+    </task>
+    <option name="localTasksCounter" value="743" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -809,8 +811,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update return logic in PackageMasterController to return sizes array" />
-    <MESSAGE value="fix: update size handling logic in PackageMasterController to return sizes array with quantities" />
     <MESSAGE value="fix: remove total quantity calculation from size handling logic in PackageMasterController" />
     <MESSAGE value="fix: remove unnecessary size mapping logic in PackageMasterController" />
     <MESSAGE value="fix: cast quantity to integer in PackageMasterController for consistency" />
@@ -834,7 +834,9 @@
     <MESSAGE value="fix: correct fallback message in box_sticker.blade.php to use Blade syntax for image path" />
     <MESSAGE value="fix: update image path handling in box_sticker.blade.php for correct absolute path resolution" />
     <MESSAGE value="fix: enhance image path handling in box_sticker.blade.php for better absolute path support" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance image path handling in box_sticker.blade.php for better absolute path support" />
+    <MESSAGE value="fix: adjust table width in box_sticker.blade.php for improved layout consistency" />
+    <MESSAGE value="fix: update table styles in box_sticker.blade.php for improved layout and consistency" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update table styles in box_sticker.blade.php for improved layout and consistency" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
