@@ -4,7 +4,11 @@
         <tr>
             <td colspan="5" rowspan="4" style="text-align: center; border: 2px solid black;">
                 @php
-                    $absoluteImagePath = public_path(str_replace('/storage/', 'storage/', $imagePath));
+                    // 1. Agar image path `/storage/...` bo‘lsa
+                    $cleanPath = str_replace('/storage/', '', $imagePath);
+
+                    // 2. Absolyut fizik yo‘l
+                    $absoluteImagePath = storage_path("app/public/{$cleanPath}");
                 @endphp
 
                 @if(file_exists($absoluteImagePath))
@@ -12,6 +16,7 @@
                 @else
                     <strong>Logo yo‘q: {{ $absoluteImagePath }}</strong>
                 @endif
+
 
             </td>
             <td colspan="2" rowspan="4" style="text-align: center; font-weight: bold; font-size: 55px; border: 2px solid black;">{{ $index + 1 }}</td>
