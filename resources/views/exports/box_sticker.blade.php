@@ -106,38 +106,42 @@
                 <td colspan="4" class="center bold">Количество</td>
             </tr>
 
-            {{-- Body: Asosiy o'lchamlar va sonlar --}}
-            @foreach($sticker as $key => $row)
-                @if(is_int($key) && is_array($row) && count($row) == 2 && is_string($row[0]))
-                    <tr>
-                        <td colspan="3" class="center bold big-text">{{ $row[0] }}</td>
-                        <td colspan="4" class="center bold big-text">{{ $row[1] }}</td>
-                    </tr>
-                @endif
-            @endforeach
-
             @php
-                // 1. Chiqarilgan sizelar ro‘yxatini tuzamiz (faqat string bo‘lganlarni olamiz)
+                // 1. Miqdori bilan chiqarilgan sizelarni yig‘amiz
                 $printedSizes = collect($sticker)
-                    ->filter(fn($val, $key) => is_int($key) && is_array($val) && count($val) == 2 && is_string($val[0]))
-                    ->map(fn($val) => $val[0])
-                    ->values()
+                    ->filter(fn($val, $key) => is_int($key) && is_array($val) && count($val) === 2 && is_string($val[0]))
+                    ->pluck(0) // faqat size nomlari
                     ->all();
 
-                // 2. orderSizes dan kelgan barcha size'lar
-                $allOrderSizes = collect($sticker['orderSizes'] ?? [])->unique()->values();
+                // 2. orderSizes ni yig‘amiz va sort qilamiz (masalan: 36, 38, 40...)
+                $allOrderSizes = collect($sticker['orderSizes'] ?? [])->sort()->unique()->values();
 
-                // 3. Faqat chiqarilmagan sizelarni olish
-                $remainingSizes = $allOrderSizes->filter(fn($size) => !in_array($size, $printedSizes));
+                // 3. Faqat chiqarilmagan sizelarni olamiz
+                $remainingSizes = $allOrderSizes->filter(fn($size) => !in_array($size, $printedSizes))->values();
+
+                // 4. Qancha qator borligini aniqlaymiz
+                $rowsCount = $remainingSizes->count();
+
+                // 5. 7 taga to‘ldirish uchun nechta bo‘sh qator kerakligini hisoblaymiz
+                $emptyRowCount = max(0, 7 - $rowsCount);
             @endphp
 
-            {{-- 4. Faqat chiqarilmagan sizelarni chiqarish --}}
+            {{-- 6. Chiqmagan, sortlangan sizelarni chiqaramiz --}}
             @foreach($remainingSizes as $row)
                 <tr>
                     <td colspan="3" class="center bold big-text">{{ $row }}</td>
                     <td colspan="4" class="center bold big-text"></td>
                 </tr>
             @endforeach
+
+            {{-- 7. Yetti qatorga to‘ldirish uchun bo‘sh qatorlar --}}
+            @for($i = 0; $i < $emptyRowCount; $i++)
+                <tr>
+                    <td colspan="3" class="center bold big-text">&nbsp;</td>
+                    <td colspan="4" class="center bold big-text"></td>
+                </tr>
+            @endfor
+
 
 
             {{-- Net & Brutto --}}
