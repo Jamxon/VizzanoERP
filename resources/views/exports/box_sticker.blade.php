@@ -14,15 +14,16 @@
 
         .page-break {
             page-break-after: always;
+            height: 150mm;
         }
 
         table {
             border-collapse: separate;
             border-spacing: 0;
             width: 100%;
-            height: 100%;
             border: 2px solid black;
             box-sizing: border-box;
+            height: 150mm;
         }
 
         td {
@@ -39,7 +40,7 @@
         }
 
         .big-text {
-            font-size: 35px;
+            font-size: 45px;
         }
 
         .xl-text {
@@ -82,7 +83,7 @@
 
             {{-- Submodel --}}
             <tr>
-                <td colspan="7" class="center bold" style="font-size: 30px;">
+                <td colspan="7" class="center bold" style="font-size: 40px;">
                     {{ $submodel ?? 'Submodel nomi yo‘q' }}
                 </td>
             </tr>
@@ -90,13 +91,13 @@
             {{-- Art --}}
             <tr>
                 <td style="font-size: 25px;">Арт:</td>
-                <td colspan="6" class="center bold" style="font-size: 40px;">{{ $model ?? '---' }}</td>
+                <td colspan="6" class="center bold" style="font-size: 50px;">{{ $model ?? '---' }}</td>
             </tr>
 
             {{-- Color --}}
             <tr>
                 <td style="font-size: 20px;">Цвет:</td>
-                <td colspan="6" class="center bold" style="font-size: 34px;">{{ $sticker['color'] ?? '---' }}</td>
+                <td colspan="6" class="center bold" style="font-size: 40px;">{{ $sticker['color'] ?? '---' }}</td>
             </tr>
 
             {{-- Header: Размер / Количество --}}
@@ -147,8 +148,8 @@
 
             @if(is_array($last) && count($last) === 2 && is_numeric($last[0]) && is_numeric($last[1]))
                 <tr>
-                    <td colspan="3" class="center bold">Нетто (кг)</td>
-                    <td colspan="4" class="center bold">Брутто (кг)</td>
+                    <td colspan="3" class="center bold" style="font-size: 35px">Нетто (кг)</td>
+                    <td colspan="4" class="center bold" style="font-size: 35px">Брутто (кг)</td>
                 </tr>
                 <tr>
                     <td colspan="3" class="center bold big-text">{{ $last[0] }}</td>
