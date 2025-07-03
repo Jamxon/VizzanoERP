@@ -28,7 +28,7 @@
         {{-- Submodel --}}
         <tr>
             <td colspan="7" rowspan="2" style="text-align: center; font-weight: bold; font-size: 30px; border-bottom: 2px solid black; box-sizing: border-box;">
-                {{ $submodel ?? 'Submodel nomi yo'q' }}
+                {{ $submodel ?? 'Submodel nomi yoq' }}
             </td>
         </tr>
         <tr></tr>
