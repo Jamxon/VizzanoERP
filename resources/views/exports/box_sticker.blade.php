@@ -40,7 +40,7 @@
         }
 
         .big-text {
-            font-size: 45px;
+            font-size: 40px;
         }
 
         .xl-text {
@@ -107,40 +107,48 @@
             </tr>
 
             @php
-                // 1. Miqdori bilan chiqarilgan sizelarni yig‘amiz
-                $printedSizes = collect($sticker)
+                // 1. Miqdor bilan chiqarilgan sizelarni va ularning qiymatini to‘playmiz
+                $printedMap = collect($sticker)
                     ->filter(fn($val, $key) => is_int($key) && is_array($val) && count($val) === 2 && is_string($val[0]))
-                    ->pluck(0) // faqat size nomlari
-                    ->all();
+                    ->mapWithKeys(fn($val) => [$val[0] => $val[1]]); // ['36' => 10, '38' => 12, ...]
 
-                // 2. orderSizes ni yig‘amiz va sort qilamiz (masalan: 36, 38, 40...)
-                $allOrderSizes = collect($sticker['orderSizes'] ?? [])->sort()->unique()->values();
+                // 2. orderSizes ni sort qilamiz va unikal qilamiz
+                $allSizes = collect($sticker['orderSizes'] ?? [])->sort()->unique()->values();
 
-                // 3. Faqat chiqarilmagan sizelarni olamiz
-                $remainingSizes = $allOrderSizes->filter(fn($size) => !in_array($size, $printedSizes))->values();
+                // 3. Chiqarilmagan (ya'ni qty ko‘rsatilmagan) sizelarni ajratamiz
+                $remainingSizes = $allSizes->filter(fn($size) => !$printedMap->has($size))->values();
 
-                // 4. Qancha qator borligini aniqlaymiz
-                $rowsCount = $remainingSizes->count();
+                // 4. Total rows = chiqarilgan + chiqmagan
+                $totalRows = $printedMap->count() + $remainingSizes->count();
 
-                // 5. 7 taga to‘ldirish uchun nechta bo‘sh qator kerakligini hisoblaymiz
-                $emptyRowCount = max(0, 7 - $rowsCount);
+                // 5. 7 ga to‘ldirish uchun nechta bo‘sh qator kerak
+                $emptyRowCount = max(0, 7 - $totalRows);
             @endphp
 
-            {{-- 6. Chiqmagan, sortlangan sizelarni chiqaramiz --}}
-            @foreach($remainingSizes as $row)
+            {{-- 6. Chiqarilgan (qty bor) sizelarni chiqaramiz --}}
+            @foreach($printedMap as $size => $qty)
                 <tr>
-                    <td colspan="3" class="center bold big-text">{{ $row }}</td>
+                    <td colspan="3" class="center bold big-text">{{ $size }}</td>
+                    <td colspan="4" class="center bold big-text">{{ $qty }}</td>
+                </tr>
+            @endforeach
+
+            {{-- 7. Faqat chiqmagan sizelar (qty yo‘q) --}}
+            @foreach($remainingSizes as $size)
+                <tr>
+                    <td colspan="3" class="center bold big-text">{{ $size }}</td>
                     <td colspan="4" class="center bold big-text"></td>
                 </tr>
             @endforeach
 
-            {{-- 7. Yetti qatorga to‘ldirish uchun bo‘sh qatorlar --}}
+            {{-- 8. Bo‘sh qatordan 7 taga to‘ldirish --}}
             @for($i = 0; $i < $emptyRowCount; $i++)
                 <tr>
                     <td colspan="3" class="center bold big-text">&nbsp;</td>
                     <td colspan="4" class="center bold big-text"></td>
                 </tr>
             @endfor
+
 
 
 

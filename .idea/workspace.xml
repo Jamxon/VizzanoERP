@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: increase logo width in box_sticker.blade.php for better visibility" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="refactor: improve logic for handling printed and remaining sizes in box_sticker.blade.php" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -385,39 +385,7 @@
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
-      <workItem from="1751517131245" duration="7951000" />
-    </task>
-    <task id="LOCAL-00705" summary="fix: add Drawing import to BoxStickerExport for enhanced functionality">
-      <option name="closed" value="true" />
-      <created>1751463573153</created>
-      <option name="number" value="00705" />
-      <option name="presentableId" value="LOCAL-00705" />
-      <option name="project" value="LOCAL" />
-      <updated>1751463573153</updated>
-    </task>
-    <task id="LOCAL-00706" summary="fix: add sizesMap for improved size handling in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751464201059</created>
-      <option name="number" value="00706" />
-      <option name="presentableId" value="LOCAL-00706" />
-      <option name="project" value="LOCAL" />
-      <updated>1751464201059</updated>
-    </task>
-    <task id="LOCAL-00707" summary="fix: enhance size handling in PackageMasterController with improved sizesMap logic">
-      <option name="closed" value="true" />
-      <created>1751464424671</created>
-      <option name="number" value="00707" />
-      <option name="presentableId" value="LOCAL-00707" />
-      <option name="project" value="LOCAL" />
-      <updated>1751464424671</updated>
-    </task>
-    <task id="LOCAL-00708" summary="fix: streamline size handling logic in PackageMasterController by simplifying sizesMap updates">
-      <option name="closed" value="true" />
-      <created>1751464524911</created>
-      <option name="number" value="00708" />
-      <option name="presentableId" value="LOCAL-00708" />
-      <option name="project" value="LOCAL" />
-      <updated>1751464524911</updated>
+      <workItem from="1751517131245" duration="8320000" />
     </task>
     <task id="LOCAL-00709" summary="fix: prevent duplicate size entries in sizesMap for improved size handling in PackageMasterController">
       <option name="closed" value="true" />
@@ -779,7 +747,39 @@
       <option name="project" value="LOCAL" />
       <updated>1751525770386</updated>
     </task>
-    <option name="localTasksCounter" value="754" />
+    <task id="LOCAL-00754" summary="fix: decrease logo width in box_sticker.blade.php for improved layout">
+      <option name="closed" value="true" />
+      <created>1751525839063</created>
+      <option name="number" value="00754" />
+      <option name="presentableId" value="LOCAL-00754" />
+      <option name="project" value="LOCAL" />
+      <updated>1751525839063</updated>
+    </task>
+    <task id="LOCAL-00755" summary="fix: update logo width in box_sticker.blade.php for improved responsiveness">
+      <option name="closed" value="true" />
+      <created>1751525908646</created>
+      <option name="number" value="00755" />
+      <option name="presentableId" value="LOCAL-00755" />
+      <option name="project" value="LOCAL" />
+      <updated>1751525908646</updated>
+    </task>
+    <task id="LOCAL-00756" summary="fix: update logo width in box_sticker.blade.php for consistent sizing">
+      <option name="closed" value="true" />
+      <created>1751525975743</created>
+      <option name="number" value="00756" />
+      <option name="presentableId" value="LOCAL-00756" />
+      <option name="project" value="LOCAL" />
+      <updated>1751525975743</updated>
+    </task>
+    <task id="LOCAL-00757" summary="refactor: improve logic for handling printed and remaining sizes in box_sticker.blade.php">
+      <option name="closed" value="true" />
+      <created>1751526140228</created>
+      <option name="number" value="00757" />
+      <option name="presentableId" value="LOCAL-00757" />
+      <option name="project" value="LOCAL" />
+      <updated>1751526140228</updated>
+    </task>
+    <option name="localTasksCounter" value="758" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -809,9 +809,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: enhance table styling in box_sticker.blade.php for improved visibility" />
-    <MESSAGE value="fix: enhance table borders in box_sticker.blade.php for improved readability" />
-    <MESSAGE value="fix: update table border styles in box_sticker.blade.php for improved consistency" />
     <MESSAGE value="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics" />
     <MESSAGE value="fix: refactor BoxStickerExport to store PDF output and simplify methods" />
     <MESSAGE value="fix: refactor BoxStickerExport to include PDF storage and simplify methods" />
@@ -834,7 +831,10 @@
     <MESSAGE value="fix: update logo width in box_sticker.blade.php for improved layout" />
     <MESSAGE value="fix: update logo width in box_sticker.blade.php for better visibility" />
     <MESSAGE value="fix: increase logo width in box_sticker.blade.php for better visibility" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: increase logo width in box_sticker.blade.php for better visibility" />
+    <MESSAGE value="fix: decrease logo width in box_sticker.blade.php for improved layout" />
+    <MESSAGE value="fix: update logo width in box_sticker.blade.php for improved responsiveness" />
+    <MESSAGE value="refactor: improve logic for handling printed and remaining sizes in box_sticker.blade.php" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: improve logic for handling printed and remaining sizes in box_sticker.blade.php" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
