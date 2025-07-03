@@ -8,9 +8,9 @@
                 @endphp
 
                 @if(file_exists($absoluteImagePath))
-                    <img src="{{ $absoluteImagePath }}" alt="Logo" style="width: 140px; height: auto;" />
+                    <img src="file://{{ $absoluteImagePath }}" alt="Logo" style="width: 140px; height: auto;" />
                 @else
-                    <strong>{{ $imagePath }}</strong>
+                    <strong>Logo yo‘q: {{ $absoluteImagePath }}</strong>
                 @endif
 
             </td>
