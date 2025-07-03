@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <style>
         @page {
-            margin: 20mm;
+            margin: 5mm;
         }
 
         body {
@@ -20,6 +20,7 @@
             border-collapse: separate;
             border-spacing: 0;
             width: 100%;
+            height: 100%;
             border: 2px solid black;
             box-sizing: border-box;
         }

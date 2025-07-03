@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct submodel placeholder text in box_sticker.blade.php for improved clarity" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor size handling logic in box_sticker.blade.php for improved clarity and efficiency">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -385,23 +387,7 @@
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
-      <workItem from="1751517131245" duration="5291000" />
-    </task>
-    <task id="LOCAL-00698" summary="fix: update font size for header cells in box sticker for better visibility">
-      <option name="closed" value="true" />
-      <created>1751462478600</created>
-      <option name="number" value="00698" />
-      <option name="presentableId" value="LOCAL-00698" />
-      <option name="project" value="LOCAL" />
-      <updated>1751462478600</updated>
-    </task>
-    <task id="LOCAL-00699" summary="fix: refactor box sticker export to use FromView and improve styling">
-      <option name="closed" value="true" />
-      <created>1751462716457</created>
-      <option name="number" value="00699" />
-      <option name="presentableId" value="LOCAL-00699" />
-      <option name="project" value="LOCAL" />
-      <updated>1751462716457</updated>
+      <workItem from="1751517131245" duration="6202000" />
     </task>
     <task id="LOCAL-00700" summary="fix: update column widths in box sticker export for improved layout">
       <option name="closed" value="true" />
@@ -779,7 +765,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751522188956</updated>
     </task>
-    <option name="localTasksCounter" value="747" />
+    <task id="LOCAL-00747" summary="fix: enhance table structure and styling in box_sticker.blade.php for improved layout and readability">
+      <option name="closed" value="true" />
+      <created>1751522509857</created>
+      <option name="number" value="00747" />
+      <option name="presentableId" value="LOCAL-00747" />
+      <option name="project" value="LOCAL" />
+      <updated>1751522509857</updated>
+    </task>
+    <task id="LOCAL-00748" summary="fix: refactor size handling logic in box_sticker.blade.php for improved clarity and efficiency">
+      <option name="closed" value="true" />
+      <created>1751522734784</created>
+      <option name="number" value="00748" />
+      <option name="presentableId" value="LOCAL-00748" />
+      <option name="project" value="LOCAL" />
+      <updated>1751522734784</updated>
+    </task>
+    <option name="localTasksCounter" value="749" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -809,8 +811,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: cast capacity to integer in PackageMasterController for consistency" />
-    <MESSAGE value="fix: remove unnecessary casting of qty and capacity in PackageMasterController" />
     <MESSAGE value="fix: update size handling logic in PackageMasterController to include order sizes" />
     <MESSAGE value="fix: update size handling logic in PackageMasterController to use map for order sizes" />
     <MESSAGE value="fix: extract size-quantity pairs from sticker data in box_sticker.blade.php" />
@@ -834,7 +834,9 @@
     <MESSAGE value="fix: improve table styling and structure in box_sticker.blade.php for better rendering and layout" />
     <MESSAGE value="fix: enhance table styling and structure in box_sticker.blade.php for improved rendering and layout" />
     <MESSAGE value="fix: correct submodel placeholder text in box_sticker.blade.php for improved clarity" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct submodel placeholder text in box_sticker.blade.php for improved clarity" />
+    <MESSAGE value="fix: enhance table structure and styling in box_sticker.blade.php for improved layout and readability" />
+    <MESSAGE value="fix: refactor size handling logic in box_sticker.blade.php for improved clarity and efficiency" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor size handling logic in box_sticker.blade.php for improved clarity and efficiency" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
