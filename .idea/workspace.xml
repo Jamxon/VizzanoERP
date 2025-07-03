@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor BoxStickerExport to store PDF output and simplify methods">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Exports/BoxStickerExport.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Jobs/PackageExportJob.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Jobs/PackageExportJob.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -385,15 +389,7 @@
       <workItem from="1751277219377" duration="3088000" />
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
-      <workItem from="1751517131245" duration="2600000" />
-    </task>
-    <task id="LOCAL-00683" summary="fix: adjust font size for color label in box_sticker view">
-      <option name="closed" value="true" />
-      <created>1751459930985</created>
-      <option name="number" value="00683" />
-      <option name="presentableId" value="LOCAL-00683" />
-      <option name="project" value="LOCAL" />
-      <updated>1751459930985</updated>
+      <workItem from="1751517131245" duration="2900000" />
     </task>
     <task id="LOCAL-00684" summary="feat: enhance box sticker export to include all sizes with quantities for improved clarity">
       <option name="closed" value="true" />
@@ -779,7 +775,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751519318821</updated>
     </task>
-    <option name="localTasksCounter" value="732" />
+    <task id="LOCAL-00732" summary="fix: refactor BoxStickerExport to store PDF output and simplify methods">
+      <option name="closed" value="true" />
+      <created>1751520033149</created>
+      <option name="number" value="00732" />
+      <option name="presentableId" value="LOCAL-00732" />
+      <option name="project" value="LOCAL" />
+      <updated>1751520033149</updated>
+    </task>
+    <option name="localTasksCounter" value="733" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -809,7 +813,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: add sizesMap for improved size handling in PackageMasterController" />
     <MESSAGE value="fix: enhance size handling in PackageMasterController with improved sizesMap logic" />
     <MESSAGE value="fix: streamline size handling logic in PackageMasterController by simplifying sizesMap updates" />
     <MESSAGE value="fix: prevent duplicate size entries in sizesMap for improved size handling in PackageMasterController" />
@@ -834,7 +837,8 @@
     <MESSAGE value="fix: enhance table borders in box_sticker.blade.php for improved readability" />
     <MESSAGE value="fix: update table border styles in box_sticker.blade.php for improved consistency" />
     <MESSAGE value="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics" />
+    <MESSAGE value="fix: refactor BoxStickerExport to store PDF output and simplify methods" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor BoxStickerExport to store PDF output and simplify methods" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
