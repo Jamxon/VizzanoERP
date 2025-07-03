@@ -10,7 +10,7 @@
                 @if(file_exists($absoluteImagePath))
                     <img src="{{ $absoluteImagePath }}" alt="Logo" style="width: 140px; height: auto;" />
                 @else
-                    <strong>$imagePath</strong>
+                    <strong>{{ $imagePath }}</strong>
                 @endif
 
             </td>
