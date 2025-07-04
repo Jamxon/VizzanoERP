@@ -4,9 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove redundant birth_day search condition in getLids method of SuperHRController">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct summary message format in GroupMasterController for clarity">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Console/Commands/MarkAttendanceAsLeft.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Commands/MarkAttendanceAsLeft.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -389,23 +389,7 @@
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
       <workItem from="1751517131245" duration="13508000" />
-      <workItem from="1751602589172" duration="9828000" />
-    </task>
-    <task id="LOCAL-00720" summary="fix: cast capacity to integer in PackageMasterController for consistency">
-      <option name="closed" value="true" />
-      <created>1751466147835</created>
-      <option name="number" value="00720" />
-      <option name="presentableId" value="LOCAL-00720" />
-      <option name="project" value="LOCAL" />
-      <updated>1751466147835</updated>
-    </task>
-    <task id="LOCAL-00721" summary="fix: remove unnecessary casting of qty and capacity in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751466228398</created>
-      <option name="number" value="00721" />
-      <option name="presentableId" value="LOCAL-00721" />
-      <option name="project" value="LOCAL" />
-      <updated>1751466228398</updated>
+      <workItem from="1751602589172" duration="14142000" />
     </task>
     <task id="LOCAL-00722" summary="fix: update size handling logic in PackageMasterController to include order sizes">
       <option name="closed" value="true" />
@@ -783,7 +767,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751624433454</updated>
     </task>
-    <option name="localTasksCounter" value="769" />
+    <task id="LOCAL-00769" summary="fix: update summary message format in GroupMasterController for better readability">
+      <option name="closed" value="true" />
+      <created>1751626006223</created>
+      <option name="number" value="00769" />
+      <option name="presentableId" value="LOCAL-00769" />
+      <option name="project" value="LOCAL" />
+      <updated>1751626006223</updated>
+    </task>
+    <task id="LOCAL-00770" summary="fix: correct summary message format in GroupMasterController for clarity">
+      <option name="closed" value="true" />
+      <created>1751626129641</created>
+      <option name="number" value="00770" />
+      <option name="presentableId" value="LOCAL-00770" />
+      <option name="project" value="LOCAL" />
+      <updated>1751626129641</updated>
+    </task>
+    <option name="localTasksCounter" value="771" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -813,8 +813,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update table styles in box_sticker.blade.php for improved layout and consistency" />
-    <MESSAGE value="fix: improve table styling and structure in box_sticker.blade.php for better rendering and layout" />
     <MESSAGE value="fix: enhance table styling and structure in box_sticker.blade.php for improved rendering and layout" />
     <MESSAGE value="fix: correct submodel placeholder text in box_sticker.blade.php for improved clarity" />
     <MESSAGE value="fix: enhance table structure and styling in box_sticker.blade.php for improved layout and readability" />
@@ -838,7 +836,9 @@
     <MESSAGE value="feat: enhance getLids method to support search and status filtering in SuperHRController" />
     <MESSAGE value="fix: correct image file reference in SuperHRController for image upload handling" />
     <MESSAGE value="fix: remove redundant birth_day search condition in getLids method of SuperHRController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: remove redundant birth_day search condition in getLids method of SuperHRController" />
+    <MESSAGE value="fix: update summary message format in GroupMasterController for better readability" />
+    <MESSAGE value="fix: correct summary message format in GroupMasterController for clarity" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: correct summary message format in GroupMasterController for clarity" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
