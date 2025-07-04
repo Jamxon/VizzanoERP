@@ -1386,7 +1386,7 @@ class SuperHRController extends Controller
             $lid->branch_id = auth()->user()->employee->branch_id;
 
             if ($request->hasFile('image')) {
-                $image = $request->file('images');
+                $image = $request->file('image');
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('/public/images/', $fileName);
                 $lid->image = 'images/' . $fileName;
