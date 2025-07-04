@@ -1449,7 +1449,7 @@ class SuperHRController extends Controller
             $oldData = $lid->toArray();
 
             if ($request->hasFile('image')) {
-                $image = $request->file('images');
+                $image = $request->file('image');
                 $fileName = time() . '_' . $image->getClientOriginalName();
                 $image->storeAs('/public/images/', $fileName);
                 $lid->image = 'images/' . $fileName;
