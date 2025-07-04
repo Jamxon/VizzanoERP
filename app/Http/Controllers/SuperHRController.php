@@ -1381,6 +1381,7 @@ class SuperHRController extends Controller
             $lid->address = $request->address;
             $lid->comment = $request->comment;
             $lid->birth_day = $request->birth_day;
+            $lid->status = 'active';
             $lid->branch_id = auth()->user()->employee->branch_id;
 
             if ($request->hasFile('image')) {

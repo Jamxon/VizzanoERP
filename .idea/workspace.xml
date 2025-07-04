@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update message text in SuperHRController for improved clarity">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SuperHRController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add CRUD operations for Lids in SuperHRController and update Lid model" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -389,15 +386,7 @@
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
       <workItem from="1751517131245" duration="13508000" />
-      <workItem from="1751602589172" duration="664000" />
-    </task>
-    <task id="LOCAL-00711" summary="fix: correct sizesMap update logic in PackageMasterController to properly append size names">
-      <option name="closed" value="true" />
-      <created>1751465098582</created>
-      <option name="number" value="00711" />
-      <option name="presentableId" value="LOCAL-00711" />
-      <option name="project" value="LOCAL" />
-      <updated>1751465098582</updated>
+      <workItem from="1751602589172" duration="1240000" />
     </task>
     <task id="LOCAL-00712" summary="fix: correct sizesMap update logic in packageStore method to properly append size names">
       <option name="closed" value="true" />
@@ -783,7 +772,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751532130470</updated>
     </task>
-    <option name="localTasksCounter" value="760" />
+    <task id="LOCAL-00760" summary="feat: add CRUD operations for Lids in SuperHRController and update Lid model">
+      <option name="closed" value="true" />
+      <created>1751604233480</created>
+      <option name="number" value="00760" />
+      <option name="presentableId" value="LOCAL-00760" />
+      <option name="project" value="LOCAL" />
+      <updated>1751604233480</updated>
+    </task>
+    <option name="localTasksCounter" value="761" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -813,7 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: refactor BoxStickerExport to include PDF storage and simplify methods" />
     <MESSAGE value="fix: update PDF view reference in BoxStickerExport for correct export" />
     <MESSAGE value="fix: update font family in box_sticker.blade.php for improved readability" />
     <MESSAGE value="fix: update image path handling in box_sticker.blade.php for correct logo display" />
@@ -838,7 +834,8 @@
     <MESSAGE value="refactor: improve logic for handling printed and remaining sizes in box_sticker.blade.php" />
     <MESSAGE value="refactor: enhance logic for handling printed and remaining sizes in box_sticker.blade.php" />
     <MESSAGE value="fix: update message text in SuperHRController for improved clarity" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update message text in SuperHRController for improved clarity" />
+    <MESSAGE value="feat: add CRUD operations for Lids in SuperHRController and update Lid model" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add CRUD operations for Lids in SuperHRController and update Lid model" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
