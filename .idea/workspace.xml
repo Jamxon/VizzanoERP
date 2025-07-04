@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct image file reference in SuperHRController for proper upload handling" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update pagination for active Lids retrieval in SuperHRController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,15 +388,7 @@
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
       <workItem from="1751517131245" duration="13508000" />
-      <workItem from="1751602589172" duration="3566000" />
-    </task>
-    <task id="LOCAL-00715" summary="fix: update return logic in PackageMasterController to return sizes array">
-      <option name="closed" value="true" />
-      <created>1751465634392</created>
-      <option name="number" value="00715" />
-      <option name="presentableId" value="LOCAL-00715" />
-      <option name="project" value="LOCAL" />
-      <updated>1751465634392</updated>
+      <workItem from="1751602589172" duration="5665000" />
     </task>
     <task id="LOCAL-00716" summary="fix: update size handling logic in PackageMasterController to return sizes array with quantities">
       <option name="closed" value="true" />
@@ -780,7 +774,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751605660659</updated>
     </task>
-    <option name="localTasksCounter" value="764" />
+    <task id="LOCAL-00764" summary="fix: update pagination for active Lids retrieval in SuperHRController">
+      <option name="closed" value="true" />
+      <created>1751606963199</created>
+      <option name="number" value="00764" />
+      <option name="presentableId" value="LOCAL-00764" />
+      <option name="project" value="LOCAL" />
+      <updated>1751606963199</updated>
+    </task>
+    <option name="localTasksCounter" value="765" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,7 +812,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update fallback message in box_sticker.blade.php to display image path when logo is missing" />
     <MESSAGE value="fix: correct fallback message in box_sticker.blade.php to use Blade syntax for image path" />
     <MESSAGE value="fix: update image path handling in box_sticker.blade.php for correct absolute path resolution" />
     <MESSAGE value="fix: enhance image path handling in box_sticker.blade.php for better absolute path support" />
@@ -835,7 +836,8 @@
     <MESSAGE value="feat: set default status to 'active' for new Lids in SuperHRController" />
     <MESSAGE value="fix: update image upload handling in SuperHRController for consistency" />
     <MESSAGE value="fix: correct image file reference in SuperHRController for proper upload handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct image file reference in SuperHRController for proper upload handling" />
+    <MESSAGE value="fix: update pagination for active Lids retrieval in SuperHRController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update pagination for active Lids retrieval in SuperHRController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

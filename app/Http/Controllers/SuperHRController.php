@@ -1468,4 +1468,9 @@ class SuperHRController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Lidni yangilashda xatolik: ' . $e->getMessage()], 500);
         }
     }
+
+    public function showLid(Lid $lid): \Illuminate\Http\JsonResponse
+    {
+        return response()->json($lid);
+    }
 }

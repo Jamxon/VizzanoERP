@@ -359,6 +359,7 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('lids', [SuperHRController::class, 'getLids']);
     Route::post('lids', [SuperHRController::class, 'storeLid']);
     Route::patch('lids/{lid}', [SuperHRController::class, 'updateLid']);
+    Route::get('lids/{lid}', [SuperHRController::class, 'showLid']);
 });
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {
