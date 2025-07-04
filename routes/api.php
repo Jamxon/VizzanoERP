@@ -356,6 +356,9 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::get('yesterdayAbsent',[SuperHRController::class, 'getYesterdayAbsent']);
     Route::get('todayAbsent',[SuperHRController::class, 'getPotentialAbsents']);
     Route::post('employeeAbsence', [SuperHRController::class, 'storeEmployeeAbsence']);
+    Route::get('lids', [SuperHRController::class, 'getLids']);
+    Route::post('lids', [SuperHRController::class, 'storeLid']);
+    Route::patch('lids/{lid}', [SuperHRController::class, 'updateLid']);
 });
 
 Route::prefix('technologist')->middleware('role:technologist')->group(function () {

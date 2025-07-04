@@ -8,6 +8,7 @@ use App\Models\Department;
 use App\Models\Employee;
 use App\Models\EmployeeAbsence;
 use App\Models\EmployeeHolidays;
+use App\Models\Lid;
 use App\Models\Log;
 use App\Models\MainDepartment;
 use App\Models\Region;
@@ -1347,6 +1348,122 @@ class SuperHRController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Parol tiklandi'], 200);
         } catch (\Exception $e) {
             return response()->json(['status' => 'error', 'message' => 'Parolni tiklashda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function getLids(): \Illuminate\Http\JsonResponse
+    {
+        $lids = Lid::where('branch_id', auth()->user()->employee->branch_id)
+            ->where('status', 'active')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($lids, 200);
+    }
+
+    public function storeLid(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'comment' => 'nullable|string|max:500',
+            'birth_day' => 'nullable|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $lid = new Lid();
+            $lid->name = $request->name;
+            $lid->phone = $request->phone;
+            $lid->address = $request->address;
+            $lid->comment = $request->comment;
+            $lid->birth_day = $request->birth_day;
+            $lid->branch_id = auth()->user()->employee->branch_id;
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('/images/', $filename);
+                $lid->image = 'images/' . $filename;
+            }
+
+            $lid->save();
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Yangi lid qo‘shildi',
+                'create',
+                null,
+                $lid
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Lid muvaffaqiyatli qo‘shildi', 'lid' => $lid], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Lidni qo‘shishda xatolik: ' . $e->getMessage()], 500);
+        }
+    }
+
+    public function updateLid(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        //PATH bo'lishi kerak
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'phone' => 'sometimes|string|max:20',
+            'address' => 'nullable|string|max:255',
+            'comment' => 'nullable|string|max:500',
+            'birth_day' => 'nullable|date',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $lid = Lid::findOrFail($id);
+            $oldData = $lid->toArray();
+
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('/images/', $filename);
+                $lid->image = 'images/' . $filename;
+            }
+
+            $lid->name = $request->name ?? $lid->name;
+            $lid->phone = $request->phone ?? $lid->phone;
+            $lid->address = $request->address ?? $lid->address;
+            $lid->comment = $request->comment ?? $lid->comment;
+            $lid->birth_day = $request->birth_day ?? $lid->birth_day;
+
+            if ($request->has('status')) {
+                if ($request->status === 'active') {
+                    $lid->status = 'active';
+                } elseif ($request->status === 'inactive') {
+                    $lid->status = 'inactive';
+                }
+            }
+
+            $lid->save();
+
+            DB::commit();
+
+            Log::add(
+                auth()->user()->id,
+                'Lid yangilandi',
+                'edit',
+                $oldData,
+                $lid
+            );
+
+            return response()->json(['status' => 'success', 'message' => 'Lid muvaffaqiyatli yangilandi', 'lid' => $lid], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Lidni yangilashda xatolik: ' . $e->getMessage()], 500);
         }
     }
 }
