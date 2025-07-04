@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add CRUD operations for Lids in SuperHRController and update Lid model" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: set default status to 'active' for new Lids in SuperHRController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,15 +386,7 @@
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
       <workItem from="1751517131245" duration="13508000" />
-      <workItem from="1751602589172" duration="1240000" />
-    </task>
-    <task id="LOCAL-00712" summary="fix: correct sizesMap update logic in packageStore method to properly append size names">
-      <option name="closed" value="true" />
-      <created>1751465250136</created>
-      <option name="number" value="00712" />
-      <option name="presentableId" value="LOCAL-00712" />
-      <option name="project" value="LOCAL" />
-      <updated>1751465250136</updated>
+      <workItem from="1751602589172" duration="1958000" />
     </task>
     <task id="LOCAL-00713" summary="fix: update return logic in PackageMasterController to ensure sizes are properly returned">
       <option name="closed" value="true" />
@@ -780,7 +772,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751604233480</updated>
     </task>
-    <option name="localTasksCounter" value="761" />
+    <task id="LOCAL-00761" summary="feat: set default status to 'active' for new Lids in SuperHRController">
+      <option name="closed" value="true" />
+      <created>1751604351760</created>
+      <option name="number" value="00761" />
+      <option name="presentableId" value="LOCAL-00761" />
+      <option name="project" value="LOCAL" />
+      <updated>1751604351760</updated>
+    </task>
+    <option name="localTasksCounter" value="762" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,7 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update PDF view reference in BoxStickerExport for correct export" />
     <MESSAGE value="fix: update font family in box_sticker.blade.php for improved readability" />
     <MESSAGE value="fix: update image path handling in box_sticker.blade.php for correct logo display" />
     <MESSAGE value="fix: update fallback message in box_sticker.blade.php to display image path when logo is missing" />
@@ -835,7 +834,8 @@
     <MESSAGE value="refactor: enhance logic for handling printed and remaining sizes in box_sticker.blade.php" />
     <MESSAGE value="fix: update message text in SuperHRController for improved clarity" />
     <MESSAGE value="feat: add CRUD operations for Lids in SuperHRController and update Lid model" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add CRUD operations for Lids in SuperHRController and update Lid model" />
+    <MESSAGE value="feat: set default status to 'active' for new Lids in SuperHRController" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: set default status to 'active' for new Lids in SuperHRController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

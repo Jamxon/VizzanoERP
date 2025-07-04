@@ -1372,6 +1372,7 @@ class SuperHRController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
         ]);
 
+
         try {
             DB::beginTransaction();
 
@@ -1385,10 +1386,10 @@ class SuperHRController extends Controller
             $lid->branch_id = auth()->user()->employee->branch_id;
 
             if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/images/', $filename);
-                $lid->image = 'images/' . $filename;
+                $image = $request->file('images');
+                $fileName = time() . '_' . $image->getClientOriginalName();
+                $image->storeAs('/public/images/', $fileName);
+                $lid->image = 'images/' . $fileName;
             }
 
             $lid->save();
@@ -1429,10 +1430,10 @@ class SuperHRController extends Controller
             $oldData = $lid->toArray();
 
             if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/images/', $filename);
-                $lid->image = 'images/' . $filename;
+                $image = $request->file('images');
+                $fileName = time() . '_' . $image->getClientOriginalName();
+                $image->storeAs('/public/images/', $fileName);
+                $lid->image = 'images/' . $fileName;
             }
 
             $lid->name = $request->name ?? $lid->name;
