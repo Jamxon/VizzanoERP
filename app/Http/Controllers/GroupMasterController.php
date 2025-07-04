@@ -390,7 +390,7 @@ class GroupMasterController extends Controller
             $summaryMessage .= "🔹 {$model} — {$group}\n";
             $summaryMessage .= "👤 {$responsible} | ✅ {$sum} dona\n\n";
         }
-        $summaryMessage .= "⏰ <b><i>Jami natijalar: {$totalSumForTime}</i></b> dona ⚡️\n";
+        $summaryMessage .= "⏰ <b><i>Jami natijalar: {$totalSumForTime} dona </i></b> ⚡️\n";
 
         $this->sendTelegramMessageWithEditSupport(
             $newEntryMessage . $summaryMessage,
