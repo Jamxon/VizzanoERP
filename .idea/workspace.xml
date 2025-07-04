@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct summary message format in GroupMasterController for clarity">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: implement Telegram notification for attendance check-out summary and errors">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Console/Commands/MarkAttendanceAsLeft.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Commands/MarkAttendanceAsLeft.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -389,15 +388,7 @@
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
       <workItem from="1751517131245" duration="13508000" />
-      <workItem from="1751602589172" duration="14142000" />
-    </task>
-    <task id="LOCAL-00722" summary="fix: update size handling logic in PackageMasterController to include order sizes">
-      <option name="closed" value="true" />
-      <created>1751466537634</created>
-      <option name="number" value="00722" />
-      <option name="presentableId" value="LOCAL-00722" />
-      <option name="project" value="LOCAL" />
-      <updated>1751466537634</updated>
+      <workItem from="1751602589172" duration="15442000" />
     </task>
     <task id="LOCAL-00723" summary="fix: update size handling logic in PackageMasterController to use map for order sizes">
       <option name="closed" value="true" />
@@ -783,7 +774,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751626129641</updated>
     </task>
-    <option name="localTasksCounter" value="771" />
+    <task id="LOCAL-00771" summary="feat: implement Telegram notification for attendance check-out summary and errors">
+      <option name="closed" value="true" />
+      <created>1751634683688</created>
+      <option name="number" value="00771" />
+      <option name="presentableId" value="LOCAL-00771" />
+      <option name="project" value="LOCAL" />
+      <updated>1751634683688</updated>
+    </task>
+    <option name="localTasksCounter" value="772" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -813,7 +812,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: enhance table styling and structure in box_sticker.blade.php for improved rendering and layout" />
     <MESSAGE value="fix: correct submodel placeholder text in box_sticker.blade.php for improved clarity" />
     <MESSAGE value="fix: enhance table structure and styling in box_sticker.blade.php for improved layout and readability" />
     <MESSAGE value="fix: refactor size handling logic in box_sticker.blade.php for improved clarity and efficiency" />
@@ -838,7 +836,8 @@
     <MESSAGE value="fix: remove redundant birth_day search condition in getLids method of SuperHRController" />
     <MESSAGE value="fix: update summary message format in GroupMasterController for better readability" />
     <MESSAGE value="fix: correct summary message format in GroupMasterController for clarity" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct summary message format in GroupMasterController for clarity" />
+    <MESSAGE value="feat: implement Telegram notification for attendance check-out summary and errors" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: implement Telegram notification for attendance check-out summary and errors" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
