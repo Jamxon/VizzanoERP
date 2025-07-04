@@ -1351,12 +1351,31 @@ class SuperHRController extends Controller
         }
     }
 
-    public function getLids(): \Illuminate\Http\JsonResponse
+    public function getLids(Request $request): \Illuminate\Http\JsonResponse
     {
-        $lids = Lid::where('branch_id', auth()->user()->employee->branch_id)
-            ->where('status', 'active')
-            ->orderBy('created_at', 'desc')
-            ->paginate(10);
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+            'status' => 'nullable|string|in:active,inactive',
+        ]);
+
+        $query = Lid::where('branch_id', auth()->user()->employee->branch_id);
+
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"])
+                    ->orWhereRaw('LOWER(phone) LIKE ?', ["%$search%"])
+                    ->orWhereRaw('LOWER(address) LIKE ?', ["%$search%"])
+                    ->orWhereRaw('LOWER(comment) LIKE ?', ["%$search%"])
+                    ->orWhereDate('birth_day', 'LIKE', "%$search%");
+            });
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $lids = $query->orderByDesc('id')->paginate(10);
 
         return response()->json($lids, 200);
     }
