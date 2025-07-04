@@ -1356,7 +1356,7 @@ class SuperHRController extends Controller
         $lids = Lid::where('branch_id', auth()->user()->employee->branch_id)
             ->where('status', 'active')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(10);
 
         return response()->json($lids, 200);
     }
