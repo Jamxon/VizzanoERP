@@ -1366,8 +1366,7 @@ class SuperHRController extends Controller
                 $q->whereRaw('LOWER(name) LIKE ?', ["%$search%"])
                     ->orWhereRaw('LOWER(phone) LIKE ?', ["%$search%"])
                     ->orWhereRaw('LOWER(address) LIKE ?', ["%$search%"])
-                    ->orWhereRaw('LOWER(comment) LIKE ?', ["%$search%"])
-                    ->orWhereDate('birth_day', 'LIKE', "%$search%");
+                    ->orWhereRaw('LOWER(comment) LIKE ?', ["%$search%"]);
             });
         }
 

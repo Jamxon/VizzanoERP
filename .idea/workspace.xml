@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add showLid method and route for retrieving a single Lid in SuperHRController">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct image file reference in SuperHRController for image upload handling" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -388,23 +386,7 @@
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
       <workItem from="1751517131245" duration="13508000" />
-      <workItem from="1751602589172" duration="7535000" />
-    </task>
-    <task id="LOCAL-00717" summary="fix: remove total quantity calculation from size handling logic in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751465876374</created>
-      <option name="number" value="00717" />
-      <option name="presentableId" value="LOCAL-00717" />
-      <option name="project" value="LOCAL" />
-      <updated>1751465876374</updated>
-    </task>
-    <task id="LOCAL-00718" summary="fix: remove unnecessary size mapping logic in PackageMasterController">
-      <option name="closed" value="true" />
-      <created>1751465946683</created>
-      <option name="number" value="00718" />
-      <option name="presentableId" value="LOCAL-00718" />
-      <option name="project" value="LOCAL" />
-      <updated>1751465946683</updated>
+      <workItem from="1751602589172" duration="8742000" />
     </task>
     <task id="LOCAL-00719" summary="fix: cast quantity to integer in PackageMasterController for consistency">
       <option name="closed" value="true" />
@@ -782,7 +764,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751621724914</updated>
     </task>
-    <option name="localTasksCounter" value="766" />
+    <task id="LOCAL-00766" summary="feat: enhance getLids method to support search and status filtering in SuperHRController">
+      <option name="closed" value="true" />
+      <created>1751623276263</created>
+      <option name="number" value="00766" />
+      <option name="presentableId" value="LOCAL-00766" />
+      <option name="project" value="LOCAL" />
+      <updated>1751623276263</updated>
+    </task>
+    <task id="LOCAL-00767" summary="fix: correct image file reference in SuperHRController for image upload handling">
+      <option name="closed" value="true" />
+      <created>1751623329464</created>
+      <option name="number" value="00767" />
+      <option name="presentableId" value="LOCAL-00767" />
+      <option name="project" value="LOCAL" />
+      <updated>1751623329465</updated>
+    </task>
+    <option name="localTasksCounter" value="768" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -812,8 +810,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update image path handling in box_sticker.blade.php for correct absolute path resolution" />
-    <MESSAGE value="fix: enhance image path handling in box_sticker.blade.php for better absolute path support" />
     <MESSAGE value="fix: adjust table width in box_sticker.blade.php for improved layout consistency" />
     <MESSAGE value="fix: update table styles in box_sticker.blade.php for improved layout and consistency" />
     <MESSAGE value="fix: improve table styling and structure in box_sticker.blade.php for better rendering and layout" />
@@ -837,7 +833,9 @@
     <MESSAGE value="fix: correct image file reference in SuperHRController for proper upload handling" />
     <MESSAGE value="fix: update pagination for active Lids retrieval in SuperHRController" />
     <MESSAGE value="feat: add showLid method and route for retrieving a single Lid in SuperHRController" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add showLid method and route for retrieving a single Lid in SuperHRController" />
+    <MESSAGE value="feat: enhance getLids method to support search and status filtering in SuperHRController" />
+    <MESSAGE value="fix: correct image file reference in SuperHRController for image upload handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: correct image file reference in SuperHRController for image upload handling" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
