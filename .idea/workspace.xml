@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct image file reference in SuperHRController for image upload handling" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove redundant birth_day search condition in getLids method of SuperHRController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/GroupMasterController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -386,15 +389,7 @@
       <workItem from="1751343592281" duration="12588000" />
       <workItem from="1751432833774" duration="32026000" />
       <workItem from="1751517131245" duration="13508000" />
-      <workItem from="1751602589172" duration="8742000" />
-    </task>
-    <task id="LOCAL-00719" summary="fix: cast quantity to integer in PackageMasterController for consistency">
-      <option name="closed" value="true" />
-      <created>1751466098100</created>
-      <option name="number" value="00719" />
-      <option name="presentableId" value="LOCAL-00719" />
-      <option name="project" value="LOCAL" />
-      <updated>1751466098100</updated>
+      <workItem from="1751602589172" duration="9828000" />
     </task>
     <task id="LOCAL-00720" summary="fix: cast capacity to integer in PackageMasterController for consistency">
       <option name="closed" value="true" />
@@ -780,7 +775,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751623329465</updated>
     </task>
-    <option name="localTasksCounter" value="768" />
+    <task id="LOCAL-00768" summary="fix: remove redundant birth_day search condition in getLids method of SuperHRController">
+      <option name="closed" value="true" />
+      <created>1751624433453</created>
+      <option name="number" value="00768" />
+      <option name="presentableId" value="LOCAL-00768" />
+      <option name="project" value="LOCAL" />
+      <updated>1751624433454</updated>
+    </task>
+    <option name="localTasksCounter" value="769" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -810,7 +813,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: adjust table width in box_sticker.blade.php for improved layout consistency" />
     <MESSAGE value="fix: update table styles in box_sticker.blade.php for improved layout and consistency" />
     <MESSAGE value="fix: improve table styling and structure in box_sticker.blade.php for better rendering and layout" />
     <MESSAGE value="fix: enhance table styling and structure in box_sticker.blade.php for improved rendering and layout" />
@@ -835,7 +837,8 @@
     <MESSAGE value="feat: add showLid method and route for retrieving a single Lid in SuperHRController" />
     <MESSAGE value="feat: enhance getLids method to support search and status filtering in SuperHRController" />
     <MESSAGE value="fix: correct image file reference in SuperHRController for image upload handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct image file reference in SuperHRController for image upload handling" />
+    <MESSAGE value="fix: remove redundant birth_day search condition in getLids method of SuperHRController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: remove redundant birth_day search condition in getLids method of SuperHRController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
