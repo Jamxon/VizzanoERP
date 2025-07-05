@@ -1049,4 +1049,68 @@ class CasherController extends Controller
             'to' => $requestForms->lastItem(),
         ]);
     }
+
+    public function storeGroupPlan(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'group_id' => 'required|exists:groups,id',
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:2100',
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $groupPlan = \App\Models\GroupPlan::updateOrCreate(
+            [
+                'group_id' => $validated['group_id'],
+                'month' => $validated['month'],
+                'year' => $validated['year'],
+            ],
+            ['quantity' => $validated['quantity']]
+        );
+
+        return response()->json([
+            'message' => '✅ Guruh rejasi muvaffaqiyatli saqlandi.',
+            'data' => $groupPlan,
+        ]);
+    }
+
+    public function getGroupPlans(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $query = \App\Models\GroupPlan::with('group')
+            ->whereHas('group.department.mainDepartment', function ($q) {
+                $q->where('branch_id', auth()->user()->employee->branch_id);
+            });
+
+        if ($request->filled('group_id')) {
+            $query->where('group_id', $request->group_id);
+        }
+
+        if ($request->filled('month') && $request->filled('year')) {
+            $query->where('month', $request->month)
+                ->where('year', $request->year);
+        }
+
+        $plans = $query->get();
+
+        return response()->json($plans);
+    }
+
+    public function editGroupPlan(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $groupPlan = \App\Models\GroupPlan::findOrFail($id);
+
+        $validated = $request->validate([
+            'group_id' => 'sometimes|exists:groups,id',
+            'month' => 'sometimes|integer|min:1|max:12',
+            'year' => 'sometimes|integer|min:2000|max:2100',
+            'quantity' => 'sometimes|integer|min:1',
+        ]);
+
+        $groupPlan->update($validated);
+
+        return response()->json([
+            'message' => '✅ Guruh rejasi muvaffaqiyatli yangilandi.',
+            'data' => $groupPlan,
+        ]);
+    }
 }
