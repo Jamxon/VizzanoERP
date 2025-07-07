@@ -11,7 +11,7 @@ use App\Models\Log;
 class MonthlySewingReport extends Command
 {
     protected $signature = 'kpi:calculate';
-    protected $description = 'Har oyning oxirida KPI hisoblab, bonuslarni qo‘shadi';
+    protected $description = 'Har oyning oxirida KPI hisoblab, bonuslarni qo\'shadi';
 
     public function handle(): void
     {
@@ -29,7 +29,7 @@ class MonthlySewingReport extends Command
             }
         ])->where('month', $month)->where('year', $year)->get();
 
-        // Umumiy plan va actual
+        // Umumiy plan va actual ni hisoblaymiz
         $totalPlan = $plans->sum('quantity');
         $totalActual = 0;
 
@@ -41,10 +41,11 @@ class MonthlySewingReport extends Command
             }
         }
 
+        // Umumiy foizni hisoblaymiz
         $overallPercent = $totalPlan > 0 ? round(($totalActual / $totalPlan) * 100, 2) : 0;
 
         foreach ($plans as $plan) {
-            // Shu plan uchun bajarilgan ishlarni hisoblaymiz
+            // Har bir group uchun alohida plan va actual hisoblaymiz
             $planActual = 0;
             foreach ($plan->group->orders as $groupOrder) {
                 foreach ($groupOrder->order->orderModel->submodels as $submodel) {
@@ -52,17 +53,30 @@ class MonthlySewingReport extends Command
                 }
             }
 
+            // Shu group uchun foizni hisoblaymiz
             $planPercent = $plan->quantity > 0 ? round(($planActual / $plan->quantity) * 100, 2) : 0;
 
+            // Shu groupdagi employeelar uchun bonus hisoblaymiz
             foreach ($plan->group->employees as $employee) {
+                // Faqat KPI bilan ishlaydiganlar uchun
                 if (!in_array($employee->payment_type, ['fixed_percentage_bonus', 'fixed_percentage_bonus_group'])) {
                     continue;
                 }
 
-                $percent = $employee->payment_type === 'fixed_percentage_bonus_group'
-                    ? $planPercent
-                    : $overallPercent;
+                // Qaysi foizdan foydalanish kerakligini aniqlaymiz
+                if ($employee->payment_type === 'fixed_percentage_bonus_group') {
+                    // Group natijasidan foydalanish
+                    $percent = $planPercent;
+                    $planValue = $plan->quantity;
+                    $actualValue = $planActual;
+                } else {
+                    // Umumiy natijadan foydalanish
+                    $percent = $overallPercent;
+                    $planValue = $totalPlan;
+                    $actualValue = $totalActual;
+                }
 
+                // 80% dan kam bo'lsa bonus bermaymiz
                 if ($percent < 80) {
                     continue;
                 }
@@ -70,11 +84,13 @@ class MonthlySewingReport extends Command
                 $bonusPercent = 0;
 
                 if ($percent >= 100) {
+                    // 100% va undan yuqori: asosiy bonus + qo'shimcha
                     $bonusPercent = $employee->bonus + ($percent - 100);
                 } else {
-                    $baseBonus = 10;
+                    // 80% dan 100% gacha: proporsional hisoblash
+                    $baseBonus = 10; // minimal bonus
                     $additional = $employee->bonus - $baseBonus;
-                    $scale = ($percent - 80) / 20;
+                    $scale = ($percent - 80) / 20; // 80% dan 100% gacha masshtab
                     $bonusPercent = $baseBonus + ($additional * $scale);
                 }
 
@@ -84,13 +100,26 @@ class MonthlySewingReport extends Command
                     continue;
                 }
 
-                EmployeeSalary::create([
-                    'employee_id' => $employee->id,
-                    'month' => $month,
-                    'year' => $year,
-                    'type' => 'kpi',
-                    'amount' => $amount,
-                ]);
+                // Oldingi KPI yozuvini tekshiramiz (takrorlanmaslik uchun)
+                $existingSalary = EmployeeSalary::where('employee_id', $employee->id)
+                    ->where('month', $month)
+                    ->where('year', $year)
+                    ->where('type', 'kpi')
+                    ->first();
+
+                if ($existingSalary) {
+                    // Agar mavjud bo'lsa, yangilaymiz
+                    $existingSalary->update(['amount' => $amount]);
+                } else {
+                    // Yangi yozuv yaratamiz
+                    EmployeeSalary::create([
+                        'employee_id' => $employee->id,
+                        'month' => $month,
+                        'year' => $year,
+                        'type' => 'kpi',
+                        'amount' => $amount,
+                    ]);
+                }
 
                 Log::add(
                     $employee->user_id,
@@ -98,8 +127,9 @@ class MonthlySewingReport extends Command
                     'salary_bonus',
                     null,
                     [
-                        'plan' => $employee->payment_type === 'fixed_percentage_bonus_group' ? $plan->quantity : $totalPlan,
-                        'bajarilgan' => $employee->payment_type === 'fixed_percentage_bonus_group' ? $planActual : $totalActual,
+                        'payment_type' => $employee->payment_type,
+                        'plan' => $planValue,
+                        'bajarilgan' => $actualValue,
                         'foiz' => $percent,
                         'bonus_foiz' => round($bonusPercent, 2),
                         'summasi' => $amount,
@@ -110,6 +140,7 @@ class MonthlySewingReport extends Command
             }
         }
 
-        $this->info("KPI hisoblandi va bonuslar qo‘shildi: {$month}/{$year}");
+        $this->info("KPI hisoblandi va bonuslar qo'shildi: {$month}/{$year}");
+        $this->info("Umumiy plan: {$totalPlan}, Bajarilgan: {$totalActual}, Foiz: {$overallPercent}%");
     }
 }
