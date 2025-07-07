@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/GroupPlan.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/GroupPlan.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -390,15 +391,7 @@
       <workItem from="1751517131245" duration="13508000" />
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
-      <workItem from="1751863286087" duration="2712000" />
-    </task>
-    <task id="LOCAL-00732" summary="fix: refactor BoxStickerExport to store PDF output and simplify methods">
-      <option name="closed" value="true" />
-      <created>1751520033149</created>
-      <option name="number" value="00732" />
-      <option name="presentableId" value="LOCAL-00732" />
-      <option name="project" value="LOCAL" />
-      <updated>1751520033149</updated>
+      <workItem from="1751863286087" duration="2950000" />
     </task>
     <task id="LOCAL-00733" summary="fix: refactor BoxStickerExport to include PDF storage and simplify methods">
       <option name="closed" value="true" />
@@ -784,7 +777,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751866503208</updated>
     </task>
-    <option name="localTasksCounter" value="781" />
+    <task id="LOCAL-00781" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751866628329</created>
+      <option name="number" value="00781" />
+      <option name="presentableId" value="LOCAL-00781" />
+      <option name="project" value="LOCAL" />
+      <updated>1751866628329</updated>
+    </task>
+    <option name="localTasksCounter" value="782" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

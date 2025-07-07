@@ -1091,13 +1091,13 @@ class CasherController extends Controller
         if ($request->filled('month') && $request->filled('year')) {
             $query->where('month', $request->month)
                 ->where('year', $request->year);
-            $query->whereHas('group.orders.order.orderModel.submodels.sewingOutPuts', function ($q) use ($request) {
+            $query->with('group.orders.order.orderModel.submodels.sewingOutPuts', function ($q) use ($request) {
                 $q->where('created_at', '>=', Carbon::createFromDate($request->year, $request->month, 1)->startOfMonth())
                     ->where('created_at', '<=', Carbon::createFromDate($request->year, $request->month, 1)->endOfMonth());
             });
         }
 
-        $query->with('group','group.orders.order.orderModel.submodels.sewingOutPuts');
+        $query->with('group');
 
         $plans = $query->get();
 
