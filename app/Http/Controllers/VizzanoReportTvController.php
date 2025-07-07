@@ -263,8 +263,8 @@ class VizzanoReportTvController extends Controller
         $month = $request->input('month');
         $year = $request->input('year');
 
-        $groupPlans = \App\Models\GroupPlan::whereMonth('month', $month)
-            ->whereYear('year', $year)
+        $groupPlans = \App\Models\GroupPlan::where('month', $month)
+            ->where('year', $year)
             ->whereHas('group.department.mainDepartment', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             })
