@@ -251,4 +251,38 @@ class VizzanoReportTvController extends Controller
 
         return response()->json($resource);
     }
+
+    public function getGroupPlans(Request $request)
+    {
+        $request->validate([
+            'month' => 'required|integer|min:1|max:12',
+            'year' => 'required|integer|min:2000|max:2100',
+        ]);
+
+        $branchId = auth()->user()?->employee?->branch_id;
+
+        if (!$branchId) {
+            return response()->json(['message' => '❌ Foydalanuvchining filial (branch) aniqlanmadi.'], 422);
+        }
+
+        $month = $request->input('month');
+        $year = $request->input('year');
+
+        $groupPlans = \App\Models\GroupPlan::whereMonth('month', $month)
+            ->whereYear('year', $year)
+            ->whereHas('group.department.mainDepartment', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
+            })
+            ->with(['group', 'group.department'])
+            ->get()
+            ->map(function ($plan) {
+                return [
+                    'id' => $plan->id,
+                    'group_id' => $plan->group_id,
+                    'group_name' => optional($plan->group)->name,
+                    'quantity' => $plan->quantity,
+                ];
+            });
+
+    }
 }

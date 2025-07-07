@@ -1056,7 +1056,7 @@ class CasherController extends Controller
             'group_id' => 'required|exists:groups,id',
             'month' => 'required|integer|min:1|max:12',
             'year' => 'required|integer|min:2000|max:2100',
-            'quantity' => 'required|integer|min:1',
+            'quantity' => 'required|integer|min:0',
         ]);
 
         $groupPlan = \App\Models\GroupPlan::updateOrCreate(
@@ -1103,7 +1103,7 @@ class CasherController extends Controller
             'group_id' => 'sometimes|exists:groups,id',
             'month' => 'sometimes|integer|min:1|max:12',
             'year' => 'sometimes|integer|min:2000|max:2100',
-            'quantity' => 'sometimes|integer|min:1',
+            'quantity' => 'sometimes|integer|min:0',
         ]);
 
         $groupPlan->update($validated);

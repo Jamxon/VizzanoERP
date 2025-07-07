@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static updateOrCreate(array $array, array $array1)
  * @method static findOrFail($id)
+ * @method static whereMonth(string $string, mixed $month)
  */
 class GroupPlan extends Model
 {

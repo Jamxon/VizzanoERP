@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: refactor salary calculation logic in MarkAttendanceAsLeft for improved clarity and error handling">
-      <change afterPath="$PROJECT_DIR$/app/Models/GroupPlan.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add GroupPlan model and API endpoints for managing group plans">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/VizzanoReportTvController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/VizzanoReportTvController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/GroupPlan.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/GroupPlan.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -394,15 +392,8 @@
       <workItem from="1751432833774" duration="32026000" />
       <workItem from="1751517131245" duration="13508000" />
       <workItem from="1751602589172" duration="16369000" />
-      <workItem from="1751688620067" duration="2429000" />
-    </task>
-    <task id="LOCAL-00724" summary="fix: extract size-quantity pairs from sticker data in box_sticker.blade.php">
-      <option name="closed" value="true" />
-      <created>1751466883455</created>
-      <option name="number" value="00724" />
-      <option name="presentableId" value="LOCAL-00724" />
-      <option name="project" value="LOCAL" />
-      <updated>1751466883455</updated>
+      <workItem from="1751688620067" duration="17670000" />
+      <workItem from="1751863286087" duration="1656000" />
     </task>
     <task id="LOCAL-00725" summary="fix: update size extraction logic in box_sticker.blade.php to focus on 'orderSizes'">
       <option name="closed" value="true" />
@@ -788,7 +779,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751636091059</updated>
     </task>
-    <option name="localTasksCounter" value="773" />
+    <task id="LOCAL-00773" summary="feat: add GroupPlan model and API endpoints for managing group plans">
+      <option name="closed" value="true" />
+      <created>1751692746220</created>
+      <option name="number" value="00773" />
+      <option name="presentableId" value="LOCAL-00773" />
+      <option name="project" value="LOCAL" />
+      <updated>1751692746221</updated>
+    </task>
+    <option name="localTasksCounter" value="774" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -818,7 +817,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: enhance table structure and styling in box_sticker.blade.php for improved layout and readability" />
     <MESSAGE value="fix: refactor size handling logic in box_sticker.blade.php for improved clarity and efficiency" />
     <MESSAGE value="fix: adjust page margin and enhance table height in box_sticker.blade.php for improved layout" />
     <MESSAGE value="fix: update font sizes and table dimensions in box_sticker.blade.php for improved readability and layout" />
@@ -843,7 +841,8 @@
     <MESSAGE value="fix: correct summary message format in GroupMasterController for clarity" />
     <MESSAGE value="feat: implement Telegram notification for attendance check-out summary and errors" />
     <MESSAGE value="fix: refactor salary calculation logic in MarkAttendanceAsLeft for improved clarity and error handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: refactor salary calculation logic in MarkAttendanceAsLeft for improved clarity and error handling" />
+    <MESSAGE value="feat: add GroupPlan model and API endpoints for managing group plans" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add GroupPlan model and API endpoints for managing group plans" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
