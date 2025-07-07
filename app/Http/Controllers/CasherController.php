@@ -1081,6 +1081,10 @@ class CasherController extends Controller
                 $q->where('branch_id', auth()->user()->employee->branch_id);
             });
 
+        $query->whereHas('group.orders.order', function ($q){
+            $q->whereIn('status', ['tailored', 'tailoring']);
+        });
+
         if ($request->filled('group_id')) {
             $query->where('group_id', $request->group_id);
         }
@@ -1088,6 +1092,10 @@ class CasherController extends Controller
         if ($request->filled('month') && $request->filled('year')) {
             $query->where('month', $request->month)
                 ->where('year', $request->year);
+            $query->whereHas('group.orders.order.orderModel.submodels.sewingOutPuts', function ($q) use ($request) {
+                $q->where('created_at', '>=', Carbon::createFromDate($request->year, $request->month, 1)->startOfMonth())
+                    ->where('created_at', '<=', Carbon::createFromDate($request->year, $request->month, 1)->endOfMonth());
+            });
         }
 
         $plans = $query->get();
