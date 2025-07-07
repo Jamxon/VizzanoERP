@@ -234,12 +234,20 @@ class UserController extends Controller
 
         $relations = ['department', 'position', 'group'];
 
+        // 🔹 KPI, avans va boshqa maosh ma'lumotlari uchun employeeSalaries
+        $relations['employeeSalaries'] = function ($query) use ($start_date, $end_date) {
+            if ($start_date && $end_date) {
+                $query->whereBetween('created_at', [$start_date, $end_date]);
+            }
+        };
+
         if ($employee->payment_type === 'piece_work') {
             $relations['attendances'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $query->whereBetween('date', [$start_date, $end_date]);
                 }
             };
+
             $relations['employeeTarificationLogs'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $query->whereBetween('date', [$start_date, $end_date]);
@@ -257,6 +265,7 @@ class UserController extends Controller
                     $query->whereBetween('date', [$start_date, $end_date]);
                 }
             };
+
             $relations['employeeTarificationLogs'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $query->whereBetween('date', [$start_date, $end_date]);
@@ -267,6 +276,7 @@ class UserController extends Controller
                         $q->select('id', 'name', 'code', 'second', 'summa');
                     }]);
             };
+
             $relations['attendances'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $query->whereBetween('date', [$start_date, $end_date]);
@@ -276,7 +286,7 @@ class UserController extends Controller
 
         $employee->load($relations);
 
-        // 🟨 Yangi qo‘shilayotgan qismlar (ta'til va yo‘qliklar):
+        // 🟨 Tatillar va yo‘qliklar:
         $absenceQuery = $employee->employeeAbsences();
         $holidayQuery = $employee->employeeHolidays();
 
