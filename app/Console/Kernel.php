@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Models\Log;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -15,6 +17,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('database:backup')->dailyAt('02:00');
         $schedule->command('attendance:mark-absent')->dailyAt('23:50');
         $schedule->command('attendance:mark-left')->dailyAt('17:30');
+        $schedule->command('kpi:calculate')->monthlyOn(Carbon::now()->endOfMonth()->day, '23:55');
     }
 
     /**
