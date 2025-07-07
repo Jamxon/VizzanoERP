@@ -388,23 +388,7 @@
       <workItem from="1751517131245" duration="13508000" />
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
-      <workItem from="1751863286087" duration="11401000" />
-    </task>
-    <task id="LOCAL-00745" summary="fix: enhance table styling and structure in box_sticker.blade.php for improved rendering and layout">
-      <option name="closed" value="true" />
-      <created>1751522126832</created>
-      <option name="number" value="00745" />
-      <option name="presentableId" value="LOCAL-00745" />
-      <option name="project" value="LOCAL" />
-      <updated>1751522126833</updated>
-    </task>
-    <task id="LOCAL-00746" summary="fix: correct submodel placeholder text in box_sticker.blade.php for improved clarity">
-      <option name="closed" value="true" />
-      <created>1751522188956</created>
-      <option name="number" value="00746" />
-      <option name="presentableId" value="LOCAL-00746" />
-      <option name="project" value="LOCAL" />
-      <updated>1751522188956</updated>
+      <workItem from="1751863286087" duration="11703000" />
     </task>
     <task id="LOCAL-00747" summary="fix: enhance table structure and styling in box_sticker.blade.php for improved layout and readability">
       <option name="closed" value="true" />
@@ -782,7 +766,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751883094777</updated>
     </task>
-    <option name="localTasksCounter" value="794" />
+    <task id="LOCAL-00794" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751883435861</created>
+      <option name="number" value="00794" />
+      <option name="presentableId" value="LOCAL-00794" />
+      <option name="project" value="LOCAL" />
+      <updated>1751883435861</updated>
+    </task>
+    <task id="LOCAL-00795" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751883637639</created>
+      <option name="number" value="00795" />
+      <option name="presentableId" value="LOCAL-00795" />
+      <option name="project" value="LOCAL" />
+      <updated>1751883637639</updated>
+    </task>
+    <option name="localTasksCounter" value="796" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

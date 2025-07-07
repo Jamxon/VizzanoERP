@@ -121,6 +121,8 @@ class MonthlySewingReport extends Command
                     ]);
                 }
 
+                $employee->increment('balance', $amount);
+
                 Log::add(
                     $employee->user_id,
                     'KPI hisoblandi',
