@@ -100,18 +100,6 @@ class MonthlySewingReport extends Command
                     continue;
                 }
 
-                // Oldingi KPI yozuvini tekshiramiz (takrorlanmaslik uchun)
-                $existingSalary = EmployeeSalary::where('employee_id', $employee->id)
-                    ->where('month', $month)
-                    ->where('year', $year)
-                    ->where('type', 'kpi')
-                    ->first();
-
-                if ($existingSalary) {
-                    // Agar mavjud bo'lsa, yangilaymiz
-                    $existingSalary->update(['amount' => $amount]);
-                } else {
-                    // Yangi yozuv yaratamiz
                     EmployeeSalary::create([
                         'employee_id' => $employee->id,
                         'month' => $month,
@@ -119,7 +107,6 @@ class MonthlySewingReport extends Command
                         'type' => 'kpi',
                         'amount' => $amount,
                     ]);
-                }
 
                 $employee->increment('balance', $amount);
 
