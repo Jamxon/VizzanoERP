@@ -254,31 +254,22 @@ class VizzanoReportTvController extends Controller
 
     public function getGroupPlans(Request $request)
     {
-        $branchId = auth()->user()?->employee?->branch_id;
-
-        if (!$branchId) {
-            return response()->json(['message' => '❌ Foydalanuvchining filial (branch) aniqlanmadi.'], 422);
-        }
-
-        $month = $request->input('month');
-        $year = $request->input('year');
-
-        $groupPlans = \App\Models\GroupPlan::where('month', $month)
-            ->where('year', $year)
-            ->whereHas('group.department.mainDepartment', function ($query) use ($branchId) {
-                $query->where('branch_id', $branchId);
-            })
-            ->with(['group', 'group.department'])
-            ->get()
-            ->map(function ($plan) {
-                return [
-                    'id' => $plan->id,
-                    'group_id' => $plan->group_id,
-                    'group_name' => optional($plan->group)->name,
-                    'quantity' => $plan->quantity,
-                ];
+        $query = \App\Models\GroupPlan::with('group')
+            ->whereHas('group.department.mainDepartment', function ($q) {
+                $q->where('branch_id', auth()->user()->employee->branch_id);
             });
 
-        return response()->json($groupPlans);
+        if ($request->filled('group_id')) {
+            $query->where('group_id', $request->group_id);
+        }
+
+        if ($request->filled('month') && $request->filled('year')) {
+            $query->where('month', $request->month)
+                ->where('year', $request->year);
+        }
+
+        $plans = $query->get();
+
+        return response()->json($plans);
     }
 }
