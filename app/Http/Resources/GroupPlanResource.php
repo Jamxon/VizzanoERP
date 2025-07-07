@@ -38,7 +38,7 @@ class GroupPlanResource extends JsonResource
         return [
             'group_id' => $this->group_id,
             'group_name' => $this->group->name,
-            'plan' => $this->quantity,
+            'quantity' => $this->quantity,
             'month' => $this->month,
             'year' => $this->year,
             'daily_outputs' => $days,
