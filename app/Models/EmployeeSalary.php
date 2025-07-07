@@ -10,10 +10,10 @@ class EmployeeSalary extends Model
 
     protected $fillable = [
         'employee_id',
-        'salary',
+        'amount',
         'month',
         'year',
-        'status',
+        'type'
     ];
 
     protected $hidden = [
