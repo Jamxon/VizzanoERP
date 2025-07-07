@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static findOrFail($id)
  * @method static whereMonth(string $string, mixed $month)
  * @method static where(string $string, mixed $month)
+ * @method static whereHas(string $string, \Closure $param)
  */
 class GroupPlan extends Model
 {

@@ -1076,8 +1076,7 @@ class CasherController extends Controller
 
     public function getGroupPlans(Request $request): \Illuminate\Http\JsonResponse
     {
-        $query = \App\Models\GroupPlan::with('group','group.orders.order.orderModel.submodels.sewingOutPuts')
-            ->whereHas('group.department.mainDepartment', function ($q) {
+        $query = \App\Models\GroupPlan::whereHas('group.department.mainDepartment', function ($q) {
                 $q->where('branch_id', auth()->user()->employee->branch_id);
             });
 
@@ -1097,6 +1096,8 @@ class CasherController extends Controller
                     ->where('created_at', '<=', Carbon::createFromDate($request->year, $request->month, 1)->endOfMonth());
             });
         }
+
+        $query->with('group','group.orders.order.orderModel.submodels.sewingOutPuts');
 
         $plans = $query->get();
 
