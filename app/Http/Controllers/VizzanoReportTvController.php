@@ -279,5 +279,6 @@ class VizzanoReportTvController extends Controller
                 ];
             });
 
+        return response()->json($groupPlans);
     }
 }

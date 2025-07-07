@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add GroupPlan model and API endpoints for managing group plans">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/VizzanoReportTvController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/VizzanoReportTvController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/GroupPlan.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/GroupPlan.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -393,31 +388,7 @@
       <workItem from="1751517131245" duration="13508000" />
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
-      <workItem from="1751863286087" duration="1656000" />
-    </task>
-    <task id="LOCAL-00725" summary="fix: update size extraction logic in box_sticker.blade.php to focus on 'orderSizes'">
-      <option name="closed" value="true" />
-      <created>1751467035689</created>
-      <option name="number" value="00725" />
-      <option name="presentableId" value="LOCAL-00725" />
-      <option name="project" value="LOCAL" />
-      <updated>1751467035689</updated>
-    </task>
-    <task id="LOCAL-00726" summary="fix: update table rendering in box_sticker.blade.php to display size rows with enhanced formatting">
-      <option name="closed" value="true" />
-      <created>1751467177594</created>
-      <option name="number" value="00726" />
-      <option name="presentableId" value="LOCAL-00726" />
-      <option name="project" value="LOCAL" />
-      <updated>1751467177594</updated>
-    </task>
-    <task id="LOCAL-00727" summary="fix: enhance table styling in box_sticker.blade.php for improved visibility">
-      <option name="closed" value="true" />
-      <created>1751517919406</created>
-      <option name="number" value="00727" />
-      <option name="presentableId" value="LOCAL-00727" />
-      <option name="project" value="LOCAL" />
-      <updated>1751517919407</updated>
+      <workItem from="1751863286087" duration="2000000" />
     </task>
     <task id="LOCAL-00728" summary="fix: enhance table borders in box_sticker.blade.php for improved readability">
       <option name="closed" value="true" />
@@ -787,7 +758,31 @@
       <option name="project" value="LOCAL" />
       <updated>1751692746221</updated>
     </task>
-    <option name="localTasksCounter" value="774" />
+    <task id="LOCAL-00774" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751865495425</created>
+      <option name="number" value="00774" />
+      <option name="presentableId" value="LOCAL-00774" />
+      <option name="project" value="LOCAL" />
+      <updated>1751865495426</updated>
+    </task>
+    <task id="LOCAL-00775" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751865655812</created>
+      <option name="number" value="00775" />
+      <option name="presentableId" value="LOCAL-00775" />
+      <option name="project" value="LOCAL" />
+      <updated>1751865655812</updated>
+    </task>
+    <task id="LOCAL-00776" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751865771804</created>
+      <option name="number" value="00776" />
+      <option name="presentableId" value="LOCAL-00776" />
+      <option name="project" value="LOCAL" />
+      <updated>1751865771804</updated>
+    </task>
+    <option name="localTasksCounter" value="777" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -817,7 +812,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: refactor size handling logic in box_sticker.blade.php for improved clarity and efficiency" />
     <MESSAGE value="fix: adjust page margin and enhance table height in box_sticker.blade.php for improved layout" />
     <MESSAGE value="fix: update font sizes and table dimensions in box_sticker.blade.php for improved readability and layout" />
     <MESSAGE value="fix: update logo width in box_sticker.blade.php for improved layout" />
@@ -842,7 +836,8 @@
     <MESSAGE value="feat: implement Telegram notification for attendance check-out summary and errors" />
     <MESSAGE value="fix: refactor salary calculation logic in MarkAttendanceAsLeft for improved clarity and error handling" />
     <MESSAGE value="feat: add GroupPlan model and API endpoints for managing group plans" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add GroupPlan model and API endpoints for managing group plans" />
+    <MESSAGE value="feat: add API endpoint to retrieve group plans with validation for month and year" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add API endpoint to retrieve group plans with validation for month and year" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
