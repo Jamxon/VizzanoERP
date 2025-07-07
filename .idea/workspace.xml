@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -388,15 +390,7 @@
       <workItem from="1751517131245" duration="13508000" />
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
-      <workItem from="1751863286087" duration="12456000" />
-    </task>
-    <task id="LOCAL-00749" summary="fix: adjust page margin and enhance table height in box_sticker.blade.php for improved layout">
-      <option name="closed" value="true" />
-      <created>1751523773619</created>
-      <option name="number" value="00749" />
-      <option name="presentableId" value="LOCAL-00749" />
-      <option name="project" value="LOCAL" />
-      <updated>1751523773619</updated>
+      <workItem from="1751863286087" duration="13874000" />
     </task>
     <task id="LOCAL-00750" summary="fix: update font sizes and table dimensions in box_sticker.blade.php for improved readability and layout">
       <option name="closed" value="true" />
@@ -782,7 +776,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751883866980</updated>
     </task>
-    <option name="localTasksCounter" value="798" />
+    <task id="LOCAL-00798" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751884652285</created>
+      <option name="number" value="00798" />
+      <option name="presentableId" value="LOCAL-00798" />
+      <option name="project" value="LOCAL" />
+      <updated>1751884652285</updated>
+    </task>
+    <option name="localTasksCounter" value="799" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

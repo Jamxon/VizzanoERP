@@ -471,6 +471,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('issue', [UserController::class, 'storeIssue']);
     Route::get('/test-eskiz-report', [EskizTestController::class, 'reportByRange']);
     Route::post('sendSMS', [EskizTestController::class, 'sendSMS']);
+    Route::get('departments', [SuperHRController::class, 'getDepartments']);
+
 });
 
 Route::post('register', [AuthController::class, 'register']);
