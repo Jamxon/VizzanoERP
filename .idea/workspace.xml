@@ -390,15 +390,7 @@
       <workItem from="1751517131245" duration="13508000" />
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
-      <workItem from="1751863286087" duration="10296000" />
-    </task>
-    <task id="LOCAL-00743" summary="fix: update table styles in box_sticker.blade.php for improved layout and consistency">
-      <option name="closed" value="true" />
-      <created>1751521375533</created>
-      <option name="number" value="00743" />
-      <option name="presentableId" value="LOCAL-00743" />
-      <option name="project" value="LOCAL" />
-      <updated>1751521375533</updated>
+      <workItem from="1751863286087" duration="10908000" />
     </task>
     <task id="LOCAL-00744" summary="fix: improve table styling and structure in box_sticker.blade.php for better rendering and layout">
       <option name="closed" value="true" />
@@ -784,7 +776,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751881718369</updated>
     </task>
-    <option name="localTasksCounter" value="792" />
+    <task id="LOCAL-00792" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751882577122</created>
+      <option name="number" value="00792" />
+      <option name="presentableId" value="LOCAL-00792" />
+      <option name="project" value="LOCAL" />
+      <updated>1751882577122</updated>
+    </task>
+    <option name="localTasksCounter" value="793" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

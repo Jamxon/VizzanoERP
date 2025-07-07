@@ -27,32 +27,41 @@ class MonthlySewingReport extends Command
                     Carbon::create($year, $month, 1)->endOfMonth(),
                 ]);
             }
-        ])
-            ->where('month', $month)
-            ->where('year', $year)
-            ->get();
+        ])->where('month', $month)->where('year', $year)->get();
+
+        // Umumiy plan va actual
+        $totalPlan = $plans->sum('quantity');
+        $totalActual = 0;
 
         foreach ($plans as $plan) {
-            $expected = $plan->quantity;
-            $actual = 0;
-
             foreach ($plan->group->orders as $groupOrder) {
                 foreach ($groupOrder->order->orderModel->submodels as $submodel) {
-                    $actual += $submodel->sewingOutputs->sum('quantity');
+                    $totalActual += $submodel->sewingOutputs->sum('quantity');
+                }
+            }
+        }
+
+        $overallPercent = $totalPlan > 0 ? round(($totalActual / $totalPlan) * 100, 2) : 0;
+
+        foreach ($plans as $plan) {
+            // Shu plan uchun bajarilgan ishlarni hisoblaymiz
+            $planActual = 0;
+            foreach ($plan->group->orders as $groupOrder) {
+                foreach ($groupOrder->order->orderModel->submodels as $submodel) {
+                    $planActual += $submodel->sewingOutputs->sum('quantity');
                 }
             }
 
-            // Plan 0 bo‘lsa division error chiqmasligi uchun
-            if ($expected <= 0) {
-                continue;
-            }
-
-            $percent = round(($actual / $expected) * 100, 2);
+            $planPercent = $plan->quantity > 0 ? round(($planActual / $plan->quantity) * 100, 2) : 0;
 
             foreach ($plan->group->employees as $employee) {
                 if (!in_array($employee->payment_type, ['fixed_percentage_bonus', 'fixed_percentage_bonus_group'])) {
                     continue;
                 }
+
+                $percent = $employee->payment_type === 'fixed_percentage_bonus_group'
+                    ? $planPercent
+                    : $overallPercent;
 
                 if ($percent < 80) {
                     continue;
@@ -61,7 +70,7 @@ class MonthlySewingReport extends Command
                 $bonusPercent = 0;
 
                 if ($percent >= 100) {
-                    $bonusPercent = $employee->bonus + ($percent - 100); // ortiqcha % ham bonusga qo‘shiladi
+                    $bonusPercent = $employee->bonus + ($percent - 100);
                 } else {
                     $baseBonus = 10;
                     $additional = $employee->bonus - $baseBonus;
@@ -70,6 +79,10 @@ class MonthlySewingReport extends Command
                 }
 
                 $amount = round($employee->salary * ($bonusPercent / 100), 2);
+
+                if ($amount <= 0) {
+                    continue;
+                }
 
                 EmployeeSalary::create([
                     'employee_id' => $employee->id,
@@ -85,8 +98,8 @@ class MonthlySewingReport extends Command
                     'salary_bonus',
                     null,
                     [
-                        'plan' => $expected,
-                        'bajarilgan' => $actual,
+                        'plan' => $employee->payment_type === 'fixed_percentage_bonus_group' ? $plan->quantity : $totalPlan,
+                        'bajarilgan' => $employee->payment_type === 'fixed_percentage_bonus_group' ? $planActual : $totalActual,
                         'foiz' => $percent,
                         'bonus_foiz' => round($bonusPercent, 2),
                         'summasi' => $amount,
