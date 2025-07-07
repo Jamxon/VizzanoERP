@@ -2,17 +2,16 @@
 
 namespace App\Console\Commands;
 
-use App\Models\GroupPlan;
-use App\Models\Log;
-use App\Models\EmployeeSalary;
-use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Models\GroupPlan;
+use App\Models\EmployeeSalary;
+use App\Models\Log;
 
 class MonthlySewingReport extends Command
 {
     protected $signature = 'kpi:calculate';
-    protected $description = 'Har oyning oxirida KPI ni hisoblab bonuslarni qoshadi';
+    protected $description = 'Har oyning oxirida KPI hisoblab, bonuslarni qo‘shadi';
 
     public function handle(): void
     {
@@ -22,56 +21,56 @@ class MonthlySewingReport extends Command
 
         $plans = GroupPlan::with([
             'group.employees',
-            'group.orders.order.orderModel.submodels.sewingOutputs' => function ($q) use ($month, $year) {
-                $q->whereBetween('created_at', [
+            'group.orders.order.orderModel.submodels.sewingOutputs' => function ($query) use ($month, $year) {
+                $query->whereBetween('created_at', [
                     Carbon::create($year, $month, 1)->startOfMonth(),
                     Carbon::create($year, $month, 1)->endOfMonth(),
                 ]);
             }
-        ])->where('month', $month)->where('year', $year)->get();
+        ])
+            ->where('month', $month)
+            ->where('year', $year)
+            ->get();
 
         foreach ($plans as $plan) {
-            $group = $plan->group;
-            $expected = $plan->total;
-
+            $expected = $plan->quantity;
             $actual = 0;
-            foreach ($group->orders as $groupOrder) {
+
+            foreach ($plan->group->orders as $groupOrder) {
                 foreach ($groupOrder->order->orderModel->submodels as $submodel) {
-                    $actual += $submodel->sewingOutputs->sum('actual');
+                    $actual += $submodel->sewingOutputs->sum('quantity');
                 }
             }
 
+            // Plan 0 bo‘lsa division error chiqmasligi uchun
             if ($expected <= 0) {
-                continue; // bo‘sh planlar o‘tkazib yuboriladi
+                continue;
             }
 
-            $percent = round($actual / $expected * 100, 2); // Bajarilgan foiz
+            $percent = round(($actual / $expected) * 100, 2);
 
-            // Har bir employee uchun KPI hisoblaymiz
-            foreach ($group->employees as $employee) {
-                if ($employee->payment_type !== 'fixed_percentage_bonus' &&
-                    $employee->payment_type !== 'fixed_percentage_bonus_group') {
-                    continue; // bu tipda bo‘lmaganlarni o‘tkazib yuboramiz
+            foreach ($plan->group->employees as $employee) {
+                if (!in_array($employee->payment_type, ['fixed_percentage_bonus', 'fixed_percentage_bonus_group'])) {
+                    continue;
                 }
 
                 if ($percent < 80) {
-                    continue; // 80% dan kam bajarganlarga bonus yo‘q
+                    continue;
                 }
 
                 $bonusPercent = 0;
 
                 if ($percent >= 100) {
-                    $bonusPercent = $employee->bonus;
+                    $bonusPercent = $employee->bonus + ($percent - 100); // ortiqcha % ham bonusga qo‘shiladi
                 } else {
-                    $baseBonus = 10; // minimum 80% uchun
-                    $additionalBonus = $employee->bonus - $baseBonus;
+                    $baseBonus = 10;
+                    $additional = $employee->bonus - $baseBonus;
                     $scale = ($percent - 80) / 20;
-                    $bonusPercent = $baseBonus + ($additionalBonus * $scale);
+                    $bonusPercent = $baseBonus + ($additional * $scale);
                 }
 
                 $amount = round($employee->salary * ($bonusPercent / 100), 2);
 
-                // Bonus ma'lumotlarini employee_salaries jadvaliga yozamiz
                 EmployeeSalary::create([
                     'employee_id' => $employee->id,
                     'month' => $month,
@@ -80,7 +79,6 @@ class MonthlySewingReport extends Command
                     'amount' => $amount,
                 ]);
 
-                // Log yozish
                 Log::add(
                     $employee->user_id,
                     'KPI hisoblandi',
@@ -99,6 +97,6 @@ class MonthlySewingReport extends Command
             }
         }
 
-        $this->info("KPI hisoblandi va bonuslar qo'shildi ($month/$year)");
+        $this->info("KPI hisoblandi va bonuslar qo‘shildi: {$month}/{$year}");
     }
 }
