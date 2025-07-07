@@ -36,6 +36,7 @@ class GroupPlanResource extends JsonResource
         })->values();
 
         return [
+            'id' => $this->id,
             'group_id' => $this->group_id,
             'group_name' => $this->group->name,
             'quantity' => $this->quantity,
