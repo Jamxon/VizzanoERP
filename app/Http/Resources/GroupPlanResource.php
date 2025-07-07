@@ -39,6 +39,7 @@ class GroupPlanResource extends JsonResource
             'id' => $this->id,
             'group_id' => $this->group_id,
             'group_name' => $this->group->name,
+            'responsibleUser' => $this->group->responsibleUser,
             'quantity' => $this->quantity,
             'month' => $this->month,
             'year' => $this->year,
