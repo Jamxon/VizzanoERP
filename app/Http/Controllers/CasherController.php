@@ -1076,7 +1076,7 @@ class CasherController extends Controller
 
     public function getGroupPlans(Request $request): \Illuminate\Http\JsonResponse
     {
-        $query = \App\Models\GroupPlan::with('group')
+        $query = \App\Models\GroupPlan::with('group','group.orders.order.orderModel.submodels.sewingOutPuts')
             ->whereHas('group.department.mainDepartment', function ($q) {
                 $q->where('branch_id', auth()->user()->employee->branch_id);
             });

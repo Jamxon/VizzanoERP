@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -388,39 +390,7 @@
       <workItem from="1751517131245" duration="13508000" />
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
-      <workItem from="1751863286087" duration="2000000" />
-    </task>
-    <task id="LOCAL-00728" summary="fix: enhance table borders in box_sticker.blade.php for improved readability">
-      <option name="closed" value="true" />
-      <created>1751518469240</created>
-      <option name="number" value="00728" />
-      <option name="presentableId" value="LOCAL-00728" />
-      <option name="project" value="LOCAL" />
-      <updated>1751518469240</updated>
-    </task>
-    <task id="LOCAL-00729" summary="fix: update table border styles in box_sticker.blade.php for improved consistency">
-      <option name="closed" value="true" />
-      <created>1751518578710</created>
-      <option name="number" value="00729" />
-      <option name="presentableId" value="LOCAL-00729" />
-      <option name="project" value="LOCAL" />
-      <updated>1751518578710</updated>
-    </task>
-    <task id="LOCAL-00730" summary="fix: update table border styles in box_sticker.blade.php for improved consistency">
-      <option name="closed" value="true" />
-      <created>1751519157612</created>
-      <option name="number" value="00730" />
-      <option name="presentableId" value="LOCAL-00730" />
-      <option name="project" value="LOCAL" />
-      <updated>1751519157612</updated>
-    </task>
-    <task id="LOCAL-00731" summary="fix: reduce table border thickness in box_sticker.blade.php for improved aesthetics">
-      <option name="closed" value="true" />
-      <created>1751519318821</created>
-      <option name="number" value="00731" />
-      <option name="presentableId" value="LOCAL-00731" />
-      <option name="project" value="LOCAL" />
-      <updated>1751519318821</updated>
+      <workItem from="1751863286087" duration="2712000" />
     </task>
     <task id="LOCAL-00732" summary="fix: refactor BoxStickerExport to store PDF output and simplify methods">
       <option name="closed" value="true" />
@@ -782,7 +752,39 @@
       <option name="project" value="LOCAL" />
       <updated>1751865771804</updated>
     </task>
-    <option name="localTasksCounter" value="777" />
+    <task id="LOCAL-00777" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751865859338</created>
+      <option name="number" value="00777" />
+      <option name="presentableId" value="LOCAL-00777" />
+      <option name="project" value="LOCAL" />
+      <updated>1751865859338</updated>
+    </task>
+    <task id="LOCAL-00778" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751865936516</created>
+      <option name="number" value="00778" />
+      <option name="presentableId" value="LOCAL-00778" />
+      <option name="project" value="LOCAL" />
+      <updated>1751865936516</updated>
+    </task>
+    <task id="LOCAL-00779" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751865988909</created>
+      <option name="number" value="00779" />
+      <option name="presentableId" value="LOCAL-00779" />
+      <option name="project" value="LOCAL" />
+      <updated>1751865988909</updated>
+    </task>
+    <task id="LOCAL-00780" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751866503208</created>
+      <option name="number" value="00780" />
+      <option name="presentableId" value="LOCAL-00780" />
+      <option name="project" value="LOCAL" />
+      <updated>1751866503208</updated>
+    </task>
+    <option name="localTasksCounter" value="781" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
