@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\GroupPlanResource;
 use App\Models\Attendance;
 use App\Models\Cashbox;
 use App\Models\Employee;
@@ -1077,8 +1078,8 @@ class CasherController extends Controller
     public function getGroupPlans(Request $request): \Illuminate\Http\JsonResponse
     {
         $query = \App\Models\GroupPlan::whereHas('group.department.mainDepartment', function ($q) {
-                $q->where('branch_id', auth()->user()->employee->branch_id);
-            });
+            $q->where('branch_id', auth()->user()->employee->branch_id);
+        });
 
         $query->whereHas('group.orders.order', function ($q){
             $q->whereIn('status', ['tailored', 'tailoring']);
@@ -1090,19 +1091,22 @@ class CasherController extends Controller
 
         if ($request->filled('month') && $request->filled('year')) {
             $query->where('month', $request->month)
-                ->where('year', $request->year);
-            $query->with('group.orders.order.orderModel.submodels.sewingOutPuts', function ($q) use ($request) {
-                $q->where('created_at', '>=', Carbon::createFromDate($request->year, $request->month, 1)->startOfMonth())
-                    ->where('created_at', '<=', Carbon::createFromDate($request->year, $request->month, 1)->endOfMonth());
-            });
+                ->where('year', $request->year)
+                ->with('group.orders.order.orderModel.submodels.sewingOutPuts', function ($q) use ($request) {
+                    $q->whereBetween('created_at', [
+                        Carbon::create($request->year, $request->month, 1)->startOfMonth(),
+                        Carbon::create($request->year, $request->month, 1)->endOfMonth()
+                    ]);
+                });
         }
 
-        $query->with('group');
+        $query->with('group.orders.order.orderModel.submodels');
 
         $plans = $query->get();
 
-        return response()->json($plans);
+        return response()->json(GroupPlanResource::collection($plans));
     }
+
 
     public function editGroupPlan(Request $request, $id): \Illuminate\Http\JsonResponse
     {
