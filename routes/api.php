@@ -467,7 +467,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('profile', [UserController::class, 'getProfile']);
     Route::patch('profile/{employee}', [UserController::class, 'updateProfile']);
     Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
-    Route::get('groupPlans', [VizzanoReportTvController::class, 'getGroupPlans']);
+    Route::get('groupPlans', [CasherController::class, 'getGroupPlans']);
     Route::post('issue', [UserController::class, 'storeIssue']);
     Route::get('/test-eskiz-report', [EskizTestController::class, 'reportByRange']);
     Route::post('sendSMS', [EskizTestController::class, 'sendSMS']);

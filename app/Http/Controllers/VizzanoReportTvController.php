@@ -252,24 +252,4 @@ class VizzanoReportTvController extends Controller
         return response()->json($resource);
     }
 
-    public function getGroupPlans(Request $request)
-    {
-        $query = \App\Models\GroupPlan::with('group')
-            ->whereHas('group.department.mainDepartment', function ($q) {
-                $q->where('branch_id', auth()->user()->employee->branch_id);
-            });
-
-        if ($request->filled('group_id')) {
-            $query->where('group_id', $request->group_id);
-        }
-
-        if ($request->filled('month') && $request->filled('year')) {
-            $query->where('month', $request->month)
-                ->where('year', $request->year);
-        }
-
-        $plans = $query->get();
-
-        return response()->json($plans);
-    }
 }
