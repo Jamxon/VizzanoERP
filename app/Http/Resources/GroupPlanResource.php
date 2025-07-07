@@ -31,7 +31,7 @@ class GroupPlanResource extends JsonResource
         $days = $groupedByDay->map(function ($outputs, $day) {
             return [
                 'date' => $day,
-                'total_count' => $outputs->sum('count'),
+                'total_count' => $outputs->sum('quantity'),
             ];
         })->values();
 
