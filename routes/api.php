@@ -457,6 +457,8 @@ Route::prefix('orderManager')->middleware('role:orderManager')->group(function (
     Route::post('/import-orders', [OrderImportController::class, 'import']);
 
     Route::post('orderStore',[OrderImportController::class,'store']);
+    Route::get('colors', [ColorController::class, 'index']);
+
 });
 
 Route::get('/validate', function () {

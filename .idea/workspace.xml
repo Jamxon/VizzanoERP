@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -389,23 +392,7 @@
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
       <workItem from="1751863286087" duration="14260000" />
-      <workItem from="1751952279529" duration="491000" />
-    </task>
-    <task id="LOCAL-00753" summary="fix: increase logo width in box_sticker.blade.php for better visibility">
-      <option name="closed" value="true" />
-      <created>1751525770386</created>
-      <option name="number" value="00753" />
-      <option name="presentableId" value="LOCAL-00753" />
-      <option name="project" value="LOCAL" />
-      <updated>1751525770386</updated>
-    </task>
-    <task id="LOCAL-00754" summary="fix: decrease logo width in box_sticker.blade.php for improved layout">
-      <option name="closed" value="true" />
-      <created>1751525839063</created>
-      <option name="number" value="00754" />
-      <option name="presentableId" value="LOCAL-00754" />
-      <option name="project" value="LOCAL" />
-      <updated>1751525839063</updated>
+      <workItem from="1751952279529" duration="3484000" />
     </task>
     <task id="LOCAL-00755" summary="fix: update logo width in box_sticker.blade.php for improved responsiveness">
       <option name="closed" value="true" />
@@ -783,7 +770,23 @@
       <option name="project" value="LOCAL" />
       <updated>1751952749566</updated>
     </task>
-    <option name="localTasksCounter" value="802" />
+    <task id="LOCAL-00802" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751953014265</created>
+      <option name="number" value="00802" />
+      <option name="presentableId" value="LOCAL-00802" />
+      <option name="project" value="LOCAL" />
+      <updated>1751953014265</updated>
+    </task>
+    <task id="LOCAL-00803" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751953512696</created>
+      <option name="number" value="00803" />
+      <option name="presentableId" value="LOCAL-00803" />
+      <option name="project" value="LOCAL" />
+      <updated>1751953512696</updated>
+    </task>
+    <option name="localTasksCounter" value="804" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

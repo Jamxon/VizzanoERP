@@ -6064,7 +6064,7 @@ gas</Labels>
     </table>
     <table id="420" parent="263" name="order_sizes">
       <ObjectId>19922</ObjectId>
-      <StateNumber>246783</StateNumber>
+      <StateNumber>452174</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -10275,13 +10275,7 @@ group_id</ColNames>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="1012" parent="417" name="color_id">
-      <Position>10</Position>
-      <StateNumber>452140</StateNumber>
-      <StoredType>integer|0s</StoredType>
-      <TypeId>23</TypeId>
-    </column>
-    <index id="1013" parent="417" name="order_models_pkey">
+    <index id="1012" parent="417" name="order_models_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18422</ObjectId>
@@ -10290,14 +10284,14 @@ group_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="1014" parent="417" name="order_models_pkey">
+    <key id="1013" parent="417" name="order_models_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18423</ObjectId>
       <Primary>1</Primary>
       <StateNumber>3687</StateNumber>
       <UnderlyingIndexId>18422</UnderlyingIndexId>
     </key>
-    <column id="1015" parent="418" name="id">
+    <column id="1014" parent="418" name="id">
       <DefaultExpression>nextval(&apos;order_printing_times_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10306,27 +10300,27 @@ group_id</ColNames>
       <SequenceId>19876</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="1016" parent="418" name="order_id">
+    <column id="1015" parent="418" name="order_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>7037</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1017" parent="418" name="planned_time">
+    <column id="1016" parent="418" name="planned_time">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>5884</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1018" parent="418" name="actual_time">
+    <column id="1017" parent="418" name="actual_time">
       <Position>4</Position>
       <StateNumber>5884</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1019" parent="418" name="status">
+    <column id="1018" parent="418" name="status">
       <DefaultExpression>&apos;printing&apos;::character varying</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>5</Position>
@@ -10334,31 +10328,31 @@ group_id</ColNames>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
-    <column id="1020" parent="418" name="comment">
+    <column id="1019" parent="418" name="comment">
       <Position>6</Position>
       <StateNumber>5884</StateNumber>
       <StoredType>text|0s</StoredType>
       <TypeId>25</TypeId>
     </column>
-    <column id="1021" parent="418" name="user_id">
+    <column id="1020" parent="418" name="user_id">
       <Position>7</Position>
       <StateNumber>5884</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1022" parent="418" name="created_at">
+    <column id="1021" parent="418" name="created_at">
       <Position>8</Position>
       <StateNumber>5884</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1023" parent="418" name="updated_at">
+    <column id="1022" parent="418" name="updated_at">
       <Position>9</Position>
       <StateNumber>5884</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <index id="1024" parent="418" name="order_printing_times_pkey">
+    <index id="1023" parent="418" name="order_printing_times_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>19884</ObjectId>
@@ -10367,14 +10361,14 @@ group_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="1025" parent="418" name="order_printing_times_pkey">
+    <key id="1024" parent="418" name="order_printing_times_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>19885</ObjectId>
       <Primary>1</Primary>
       <StateNumber>5884</StateNumber>
       <UnderlyingIndexId>19884</UnderlyingIndexId>
     </key>
-    <column id="1026" parent="419" name="id">
+    <column id="1025" parent="419" name="id">
       <DefaultExpression>nextval(&apos;order_recipes_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10383,46 +10377,46 @@ group_id</ColNames>
       <SequenceId>18126</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="1027" parent="419" name="order_id">
+    <column id="1026" parent="419" name="order_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>3328</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1028" parent="419" name="item_id">
+    <column id="1027" parent="419" name="item_id">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>3328</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1029" parent="419" name="quantity">
+    <column id="1028" parent="419" name="quantity">
       <NotNull>1</NotNull>
       <Position>5</Position>
       <StateNumber>3328</StateNumber>
       <StoredType>double precision|0s</StoredType>
       <TypeId>701</TypeId>
     </column>
-    <column id="1030" parent="419" name="created_at">
+    <column id="1029" parent="419" name="created_at">
       <Position>7</Position>
       <StateNumber>3328</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1031" parent="419" name="updated_at">
+    <column id="1030" parent="419" name="updated_at">
       <Position>8</Position>
       <StateNumber>3328</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1032" parent="419" name="submodel_id">
+    <column id="1031" parent="419" name="submodel_id">
       <Position>9</Position>
       <StateNumber>6396</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <index id="1033" parent="419" name="order_recipes_pkey">
+    <index id="1032" parent="419" name="order_recipes_pkey">
       <ColNames>id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18426</ObjectId>
@@ -10431,14 +10425,14 @@ group_id</ColNames>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
-    <key id="1034" parent="419" name="order_recipes_pkey">
+    <key id="1033" parent="419" name="order_recipes_pkey">
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18427</ObjectId>
       <Primary>1</Primary>
       <StateNumber>3689</StateNumber>
       <UnderlyingIndexId>18426</UnderlyingIndexId>
     </key>
-    <column id="1035" parent="420" name="id">
+    <column id="1034" parent="420" name="id">
       <DefaultExpression>nextval(&apos;order_sizes_id_seq&apos;::regclass)</DefaultExpression>
       <NotNull>1</NotNull>
       <Position>1</Position>
@@ -10447,36 +10441,42 @@ group_id</ColNames>
       <SequenceId>19921</SequenceId>
       <TypeId>20</TypeId>
     </column>
-    <column id="1036" parent="420" name="size_id">
+    <column id="1035" parent="420" name="size_id">
       <NotNull>1</NotNull>
       <Position>2</Position>
       <StateNumber>6588</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1037" parent="420" name="quantity">
+    <column id="1036" parent="420" name="quantity">
       <NotNull>1</NotNull>
       <Position>3</Position>
       <StateNumber>6588</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
-    <column id="1038" parent="420" name="created_at">
+    <column id="1037" parent="420" name="created_at">
       <Position>4</Position>
       <StateNumber>6588</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1039" parent="420" name="updated_at">
+    <column id="1038" parent="420" name="updated_at">
       <Position>5</Position>
       <StateNumber>6588</StateNumber>
       <StoredType>timestamp(0)|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
-    <column id="1040" parent="420" name="order_model_id">
+    <column id="1039" parent="420" name="order_model_id">
       <NotNull>1</NotNull>
       <Position>6</Position>
       <StateNumber>6594</StateNumber>
+      <StoredType>integer|0s</StoredType>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="1040" parent="420" name="color_id">
+      <Position>7</Position>
+      <StateNumber>452174</StateNumber>
       <StoredType>integer|0s</StoredType>
       <TypeId>23</TypeId>
     </column>
