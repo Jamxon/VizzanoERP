@@ -21,10 +21,11 @@ class OrderModel extends Model
         'rasxod',
         'material_id',
         'status',
-        'minute'
+        'minute',
+        'color_id'
     ];
 
-    protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id','material_id'];
+    protected $hidden = ['created_at', 'updated_at', 'order_id', 'model_id','material_id','color_id'];
 
     public function order(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -51,8 +52,8 @@ class OrderModel extends Model
         return $this->hasMany(OrderSubModel::class, 'order_model_id');
     }
 
-    public function outcomeItemModelDistributions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function color(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->hasMany(OutcomeItemModelDistrubition::class, 'model_id');
+        return $this->belongsTo(Color::class, 'color_id', 'id');
     }
 }
