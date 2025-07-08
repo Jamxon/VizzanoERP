@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -392,15 +391,7 @@
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
       <workItem from="1751863286087" duration="14260000" />
-      <workItem from="1751952279529" duration="3484000" />
-    </task>
-    <task id="LOCAL-00755" summary="fix: update logo width in box_sticker.blade.php for improved responsiveness">
-      <option name="closed" value="true" />
-      <created>1751525908646</created>
-      <option name="number" value="00755" />
-      <option name="presentableId" value="LOCAL-00755" />
-      <option name="project" value="LOCAL" />
-      <updated>1751525908646</updated>
+      <workItem from="1751952279529" duration="5039000" />
     </task>
     <task id="LOCAL-00756" summary="fix: update logo width in box_sticker.blade.php for consistent sizing">
       <option name="closed" value="true" />
@@ -786,7 +777,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751953512696</updated>
     </task>
-    <option name="localTasksCounter" value="804" />
+    <task id="LOCAL-00804" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751962662596</created>
+      <option name="number" value="00804" />
+      <option name="presentableId" value="LOCAL-00804" />
+      <option name="project" value="LOCAL" />
+      <updated>1751962662596</updated>
+    </task>
+    <option name="localTasksCounter" value="805" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

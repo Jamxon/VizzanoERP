@@ -200,6 +200,8 @@ class OrderController extends Controller
                 'model.sizes' => 'required|array',
                 'model.*.sizes.*.id' => 'required|integer',
                 'model.*.sizes.*.quantity' => 'required|integer',
+                'model.sizes.*.color_id' => 'sometimes|integer|exists:colors,id',
+                'model.sizes.*.color_name' => 'sometimes|string',
                 'instructions' => 'nullable|array',
                 'instructions.*.title' => 'required|string',
                 'instructions.*.description' => 'required|string',
@@ -293,10 +295,19 @@ class OrderController extends Controller
 
             $sizes = [];
             foreach ($request->model['sizes'] as $size) {
+
+                if (!isset($size['color_id']) && isset($size['color_name'])) {
+                    $color = \App\Models\Color::firstOrCreate(
+                        ['name' => $size['color_name']]
+                    );
+                    $size['color_id'] = $color->id;
+                }
+
                 $created = OrderSize::create([
                     'order_model_id' => $orderModel->id,
                     'size_id' => $size['id'],
                     'quantity' => $size['quantity'],
+                    'color_id' => $size['color_id'] ?? null,
                 ]);
                 $sizes[] = $created->toArray();
             }
