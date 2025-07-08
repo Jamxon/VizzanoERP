@@ -353,6 +353,10 @@ class OrderController extends Controller
                 'model.material_id' => 'sometimes|integer|exists:items,id',
                 'model.submodels' => 'sometimes|array',
                 'model.sizes' => 'sometimes|array',
+                'model.sizes.*.id' => 'sometimes|integer|exists:sizes,id',
+                'model.sizes.*.quantity' => 'sometimes|integer',
+                'model.sizes.*.color_id' => 'sometimes|integer|exists:colors,id',
+                'model.sizes.*.color_name' => 'sometimes|string',
                 'model.minute' => 'sometimes|integer',
                 'instructions' => 'sometimes|array',
                 'recipes' => 'sometimes|array',
@@ -403,17 +407,29 @@ class OrderController extends Controller
 
                 if (isset($modelData['sizes'])) {
                     foreach ($modelData['sizes'] as $sizeData) {
+                        if (!isset($sizeData['color_id']) && isset($sizeData['color_name'])) {
+                            $color = \App\Models\Color::firstOrCreate(
+                                ['name' => $sizeData['color_name'],]
+                            );
+                            $sizeData['color_id'] = $color->id;
+                        }
+
                         $orderSize = OrderSize::where('size_id', $sizeData['id'])
                             ->where('order_model_id', $orderModel->id)
+                            ->where('color_id', $sizeData['color_id'] ?? null)
                             ->first();
 
                         if ($orderSize) {
-                            $orderSize->update(['quantity' => $sizeData['quantity']]);
+                            $orderSize->update([
+                                'quantity' => $sizeData['quantity'],
+                                'color_id' => $sizeData['color_id'] ?? $orderSize->color_id,
+                            ]);
                         } else {
                             OrderSize::create([
                                 'order_model_id' => $orderModel->id,
                                 'size_id'        => $sizeData['id'],
                                 'quantity'       => $sizeData['quantity'],
+                                'color_id'      => $sizeData['color_id'] ?? null,
                             ]);
                         }
                     }

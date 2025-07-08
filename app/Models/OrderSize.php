@@ -21,9 +21,10 @@ class OrderSize extends Model
         'order_model_id',
         'size_id',
         'quantity',
+        'color_id'
     ];
 
-    protected $hidden = ['created_at', 'updated_at', 'order_model_id', 'size_id'];
+    protected $hidden = ['created_at', 'updated_at', 'order_model_id', 'size_id', 'color_id'];
 
     public function orderModel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
@@ -33,5 +34,10 @@ class OrderSize extends Model
     public function size(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Size::class, 'size_id');
+    }
+
+    public function color(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Color::class, 'color_id');
     }
 }
