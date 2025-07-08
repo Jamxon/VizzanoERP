@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ShowOrderResource;
+use App\Models\Color;
 use App\Models\Contragent;
 use App\Models\Log;
 use App\Models\Models;
@@ -354,6 +355,8 @@ class OrderController extends Controller
                 'model.submodels' => 'sometimes|array',
                 'model.sizes' => 'sometimes|array',
                 'model.minute' => 'sometimes|integer',
+                'model.color_id' => 'sometimes|integer|exists:colors,id',
+                'model.color_name' => 'sometimes|string',
                 'instructions' => 'sometimes|array',
                 'recipes' => 'sometimes|array',
             ]);
@@ -391,6 +394,13 @@ class OrderController extends Controller
             if ($request->has('model')) {
                 $modelData = $request->input('model');
 
+                if (!isset($modelData['color_id']) && isset($modelData['color_name'])) {
+                    $modelData['color_id'] = Color::create([
+                        'name' => $modelData['color_name'] ?? 'No Color',
+                        'hex' => '#000000',
+                    ])->id;
+                }
+
                 $orderModel = OrderModel::updateOrCreate(
                     ['order_id' => $order->id],
                     [
@@ -398,6 +408,7 @@ class OrderController extends Controller
                         'material_id' => $modelData['material_id'] ?? optional($order->orderModel)->material_id,
                         'rasxod'      => isset($modelData['id']) ? Models::find($modelData['id'])->rasxod : optional($order->orderModel)->rasxod,
                         'minute'      => $modelData['minute'] ?? optional($order->orderModel)->minute,
+                        'color_id'    => $modelData['color_id'] ?? optional($order->orderModel)->color_id,
                     ]
                 );
 
