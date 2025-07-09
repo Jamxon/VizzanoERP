@@ -67,6 +67,7 @@ class GetUserResource extends JsonResource
             'absences' => $this->employeeAbsences,
             'salary' => $this->salary,
             'bonus' => $this->bonus,
+            'employeeSalaries' => $this->employeeSalaries,
         ];
     }
 }

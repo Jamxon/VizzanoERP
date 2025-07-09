@@ -48,7 +48,13 @@ class UserController extends Controller
                     });
                 },
                 'employeeSalaries' => function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                    $query->where(function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate])
+                            ->orWhere(function ($q2) use ($startDate, $endDate) {
+                                $q2->where('created_at', '<=', $startDate)
+                                    ->where('created_at', '>=', $endDate);
+                            });
+                    });
                 },
                 'employeeAbsences' => function ($query) use ($startDate, $endDate) {
                     $query->where(function ($q) use ($startDate, $endDate) {

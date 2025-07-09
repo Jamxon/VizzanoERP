@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -392,15 +393,7 @@
       <workItem from="1751688620067" duration="17670000" />
       <workItem from="1751863286087" duration="14260000" />
       <workItem from="1751952279529" duration="8382000" />
-      <workItem from="1752032799117" duration="14285000" />
-    </task>
-    <task id="LOCAL-00761" summary="feat: set default status to 'active' for new Lids in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751604351760</created>
-      <option name="number" value="00761" />
-      <option name="presentableId" value="LOCAL-00761" />
-      <option name="project" value="LOCAL" />
-      <updated>1751604351760</updated>
+      <workItem from="1752032799117" duration="14753000" />
     </task>
     <task id="LOCAL-00762" summary="fix: update image upload handling in SuperHRController for consistency">
       <option name="closed" value="true" />
@@ -786,7 +779,15 @@
       <option name="project" value="LOCAL" />
       <updated>1752055793876</updated>
     </task>
-    <option name="localTasksCounter" value="810" />
+    <task id="LOCAL-00810" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752057839692</created>
+      <option name="number" value="00810" />
+      <option name="presentableId" value="LOCAL-00810" />
+      <option name="project" value="LOCAL" />
+      <updated>1752057839692</updated>
+    </task>
+    <option name="localTasksCounter" value="811" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
