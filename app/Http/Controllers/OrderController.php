@@ -426,15 +426,14 @@ class OrderController extends Controller
                             $sizeData['color_id'] = $color->id;
                         }
 
-                        $orderSize = OrderSize::findOrFail($sizeData['id'] ?? null);
-
-                        if ($orderSize) {
+                        if (isset($sizeData['id'])){
+                            $orderSize = OrderSize::findOrFail($sizeData['id']);
                             $orderSize->update([
                                 'quantity' => $sizeData['quantity'],
                                 'color_id' => $sizeData['color_id'] ?? $orderSize->color_id,
                                 'size_id' => $sizeData['size_id'],
                             ]);
-                        } else {
+                        }else{
                             OrderSize::create([
                                 'order_model_id' => $orderModel->id,
                                 'size_id'        => $sizeData['size_id'],
