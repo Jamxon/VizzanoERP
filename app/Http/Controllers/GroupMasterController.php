@@ -116,6 +116,7 @@ class GroupMasterController extends Controller
                 'orderModel.model',
                 'orderModel.material',
                 'orderModel.sizes.size',
+                'orderModel.sizes.color',
                 'orderModel.submodels.submodel',
                 'orderModel.submodels.group.group',
                 'orderModel.submodels.group.group.responsibleUser',
@@ -143,6 +144,7 @@ class GroupMasterController extends Controller
                 'order.orderModel.model',
                 'order.orderModel.material',
                 'order.orderModel.sizes.size',
+                'order.orderModel.sizes.color',
                 'order.instructions',
             ])
             ->selectRaw('DISTINCT ON (order_id, submodel_id) *');
