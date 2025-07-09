@@ -364,7 +364,8 @@ class OrderController extends Controller
                 'model.material_id' => 'sometimes|integer|exists:items,id',
                 'model.submodels' => 'sometimes|array',
                 'model.sizes' => 'sometimes|array',
-                'model.sizes.*.id' => 'sometimes|integer|exists:sizes,id',
+                'model.sizes.*.id' => 'sometimes|integer|exists:order_sizes,id',
+                'model.sizes.*.size_id' => 'sometimes|integer|exists:sizes,id',
                 'model.sizes.*.quantity' => 'sometimes|integer',
                 'model.sizes.*.color_id' => 'sometimes|integer|exists:colors,id',
                 'model.sizes.*.color_name' => 'sometimes|string',
@@ -425,20 +426,18 @@ class OrderController extends Controller
                             $sizeData['color_id'] = $color->id;
                         }
 
-                        $orderSize = OrderSize::where('size_id', $sizeData['id'])
-                            ->where('order_model_id', $orderModel->id)
-                            ->where('color_id', $sizeData['color_id'] ?? null)
-                            ->first();
+                        $orderSize = OrderSize::findOrFail($sizeData['id'] ?? null);
 
                         if ($orderSize) {
                             $orderSize->update([
                                 'quantity' => $sizeData['quantity'],
                                 'color_id' => $sizeData['color_id'] ?? $orderSize->color_id,
+                                'size_id' => $sizeData['size_id'],
                             ]);
                         } else {
                             OrderSize::create([
                                 'order_model_id' => $orderModel->id,
-                                'size_id'        => $sizeData['id'],
+                                'size_id'        => $sizeData['size_id'],
                                 'quantity'       => $sizeData['quantity'],
                                 'color_id'      => $sizeData['color_id'] ?? null,
                             ]);
