@@ -59,6 +59,7 @@ class ShowOrderResource extends JsonResource
                         'id' => $size->id,
                         'size' => $size->size,
                         'quantity' => $size->quantity,
+                        'color' => $size->color ?? null
                     ];
                 }),
                 'submodels' => $this->orderModel->submodels->map(function ($submodel) {

@@ -391,15 +391,8 @@
       <workItem from="1751602589172" duration="16369000" />
       <workItem from="1751688620067" duration="17670000" />
       <workItem from="1751863286087" duration="14260000" />
-      <workItem from="1751952279529" duration="5039000" />
-    </task>
-    <task id="LOCAL-00756" summary="fix: update logo width in box_sticker.blade.php for consistent sizing">
-      <option name="closed" value="true" />
-      <created>1751525975743</created>
-      <option name="number" value="00756" />
-      <option name="presentableId" value="LOCAL-00756" />
-      <option name="project" value="LOCAL" />
-      <updated>1751525975743</updated>
+      <workItem from="1751952279529" duration="8382000" />
+      <workItem from="1752032799117" duration="3052000" />
     </task>
     <task id="LOCAL-00757" summary="refactor: improve logic for handling printed and remaining sizes in box_sticker.blade.php">
       <option name="closed" value="true" />
@@ -785,7 +778,15 @@
       <option name="project" value="LOCAL" />
       <updated>1751962662596</updated>
     </task>
-    <option name="localTasksCounter" value="805" />
+    <task id="LOCAL-00805" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1751966002512</created>
+      <option name="number" value="00805" />
+      <option name="presentableId" value="LOCAL-00805" />
+      <option name="project" value="LOCAL" />
+      <updated>1751966002512</updated>
+    </task>
+    <option name="localTasksCounter" value="806" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
