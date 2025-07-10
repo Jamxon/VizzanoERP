@@ -44,6 +44,7 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::get('tarifications/search', [TailorController::class, 'searchTarifications']);
     Route::get('balance', [TailorController::class, 'getDailyBalanceEmployee']);
     Route::post('tarificationLog', [TailorController::class, 'storeTarificationLog']);
+
 });
 
 Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
