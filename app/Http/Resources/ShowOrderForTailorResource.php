@@ -19,7 +19,7 @@ class ShowOrderForTailorResource extends JsonResource
             'model' => $this->order->orderModel->model,
             'submodel' => $this->orderSubmodel->submodel,
             'group' => $this->group,
-            'tarification' => $this->orderSubmodel->submodel->tarificationCategory->tarification ?? null,
+            'tarification' => $this->orderSubmodel->tarificationCategories->tarification ?? null,
         ];
     }
 }
