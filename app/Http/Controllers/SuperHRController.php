@@ -955,6 +955,7 @@ class SuperHRController extends Controller
             'status' => 'nullable|string|in:working,kicked,reserv',
             'salary' => 'nullable|numeric',
             'gender'=> 'nullable|string',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
         ]);
 
         try {
