@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\EmployeeTarificationLog;
+use App\Models\Log;
 use App\Models\Tarification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TailorController extends Controller
 {
@@ -39,47 +42,84 @@ class TailorController extends Controller
         return response()->json($employeeTarificationLogs);
     }
 
+    use App\Models\Employee;
+    use App\Models\Tarification;
+    use App\Models\EmployeeTarificationLog;
+    use App\Models\Log;
+    use Illuminate\Support\Facades\DB;
+    use Illuminate\Http\Request;
+
     public function storeTarificationLog(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
             'tarification_id' => 'required|exists:tarifications,id',
         ]);
 
-        $employeeId = auth()->user()->employee->id;
+        $employee = auth()->user()->employee;
+        $employeeId = $employee->id;
         $today = now()->toDateString();
 
         $tarification = Tarification::find($validated['tarification_id']);
-
-        $isOwn = $tarification->employee_id === $employeeId;
         $amount = $tarification->summa;
+        $isOwn = $tarification->employee_id === $employeeId;
 
-        $logData = [
-            'employee_id'     => $employeeId,
-            'tarification_id' => $tarification->id,
-            'date'            => $today,
-            'quantity'        => 1,
-            'is_own'          => $isOwn,
-            'amount_earned'   => $amount,
-        ];
+        DB::beginTransaction();
 
-        // logni saqlaymiz
-        $log = EmployeeTarificationLog::updateOrCreate(
-            [
-                'employee_id'     => $employeeId,
-                'tarification_id' => $tarification->id,
-                'date'            => $today,
-            ],
-            $logData
-        );
+        try {
+            // Avval mavjud logni tekshiramiz
+            $log = EmployeeTarificationLog::where('employee_id', $employeeId)
+                ->where('tarification_id', $tarification->id)
+                ->where('date', $today)
+                ->first();
 
-        // Faqat yangi log bo‘lsa, balansni oshiramiz
-        if ($log->wasRecentlyCreated) {
-            \App\Models\Employee::where('id', $employeeId)->increment('balance', $amount);
+            if ($log) {
+                // Old ma'lumotlar log uchun
+                $oldData = $log->toArray();
+
+                // Mavjud logni yangilaymiz (qo‘shamiz)
+                $log->quantity += 1;
+                $log->amount_earned += $amount;
+                $log->save();
+
+                // Employee balansini ham oshiramiz
+                Employee::where('id', $employeeId)->increment('balance', $amount);
+
+                // Yangi holat log uchun
+                $newData = $log->toArray();
+
+                // Umumiy logga yozamiz
+                Log::add(auth()->id(), 'TarificationLog yangilandi', 'tarification_log', $oldData, $newData);
+            } else {
+                // Yangi log yoziladi
+                $log = EmployeeTarificationLog::create([
+                    'employee_id'     => $employeeId,
+                    'tarification_id' => $tarification->id,
+                    'date'            => $today,
+                    'quantity'        => 1,
+                    'is_own'          => $isOwn,
+                    'amount_earned'   => $amount,
+                ]);
+
+                // Balansni oshirish
+                Employee::where('id', $employeeId)->increment('balance', $amount);
+
+                // Logga yozamiz
+                Log::add(auth()->id(), 'TarificationLog qo\'shildi', 'tarification_log', null, $log->toArray());
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tarification log processed successfully.',
+                'log' => $log,
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        return response()->json([
-            'message' => 'Tarification log created successfully, balance updated',
-            'log' => $log,
-        ]);
     }
+
 }

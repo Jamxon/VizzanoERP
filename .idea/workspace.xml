@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/TailorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/TailorController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -393,23 +393,7 @@
       <workItem from="1751863286087" duration="14260000" />
       <workItem from="1751952279529" duration="8382000" />
       <workItem from="1752032799117" duration="16055000" />
-      <workItem from="1752121381931" duration="6951000" />
-    </task>
-    <task id="LOCAL-00767" summary="fix: correct image file reference in SuperHRController for image upload handling">
-      <option name="closed" value="true" />
-      <created>1751623329464</created>
-      <option name="number" value="00767" />
-      <option name="presentableId" value="LOCAL-00767" />
-      <option name="project" value="LOCAL" />
-      <updated>1751623329465</updated>
-    </task>
-    <task id="LOCAL-00768" summary="fix: remove redundant birth_day search condition in getLids method of SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751624433453</created>
-      <option name="number" value="00768" />
-      <option name="presentableId" value="LOCAL-00768" />
-      <option name="project" value="LOCAL" />
-      <updated>1751624433454</updated>
+      <workItem from="1752121381931" duration="7951000" />
     </task>
     <task id="LOCAL-00769" summary="fix: update summary message format in GroupMasterController for better readability">
       <option name="closed" value="true" />
@@ -787,7 +771,23 @@
       <option name="project" value="LOCAL" />
       <updated>1752132467882</updated>
     </task>
-    <option name="localTasksCounter" value="816" />
+    <task id="LOCAL-00816" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752134124633</created>
+      <option name="number" value="00816" />
+      <option name="presentableId" value="LOCAL-00816" />
+      <option name="project" value="LOCAL" />
+      <updated>1752134124633</updated>
+    </task>
+    <task id="LOCAL-00817" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752134265787</created>
+      <option name="number" value="00817" />
+      <option name="presentableId" value="LOCAL-00817" />
+      <option name="project" value="LOCAL" />
+      <updated>1752134265787</updated>
+    </task>
+    <option name="localTasksCounter" value="818" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
