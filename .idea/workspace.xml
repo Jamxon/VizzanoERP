@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -393,15 +391,7 @@
       <workItem from="1751863286087" duration="14260000" />
       <workItem from="1751952279529" duration="8382000" />
       <workItem from="1752032799117" duration="16055000" />
-      <workItem from="1752121381931" duration="3644000" />
-    </task>
-    <task id="LOCAL-00764" summary="fix: update pagination for active Lids retrieval in SuperHRController">
-      <option name="closed" value="true" />
-      <created>1751606963199</created>
-      <option name="number" value="00764" />
-      <option name="presentableId" value="LOCAL-00764" />
-      <option name="project" value="LOCAL" />
-      <updated>1751606963199</updated>
+      <workItem from="1752121381931" duration="4105000" />
     </task>
     <task id="LOCAL-00765" summary="feat: add showLid method and route for retrieving a single Lid in SuperHRController">
       <option name="closed" value="true" />
@@ -787,7 +777,15 @@
       <option name="project" value="LOCAL" />
       <updated>1752125888857</updated>
     </task>
-    <option name="localTasksCounter" value="813" />
+    <task id="LOCAL-00813" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752127312414</created>
+      <option name="number" value="00813" />
+      <option name="presentableId" value="LOCAL-00813" />
+      <option name="project" value="LOCAL" />
+      <updated>1752127312414</updated>
+    </task>
+    <option name="localTasksCounter" value="814" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
