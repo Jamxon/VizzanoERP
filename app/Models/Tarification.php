@@ -66,7 +66,7 @@ class Tarification extends Model
     }
 
     // Tarification.php
-    public function tarificationLogs()
+    public function tarificationLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(EmployeeTarificationLog::class);
     }

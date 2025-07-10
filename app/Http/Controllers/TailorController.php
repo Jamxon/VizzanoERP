@@ -11,12 +11,16 @@ class TailorController extends Controller
     public function searchTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         $code = $request->input('code');
-        $tarifications = Tarification::where('code', "$code")
-            ->with(
+
+        $tarifications = Tarification::where('code', $code)
+            ->with([
                 'employee',
                 'razryad',
                 'typewriter',
-            )
+                'tarificationLogs' => function ($query) {
+                    $query->whereDate('date', now()->format('Y-m-d'));
+                }
+            ])
             ->orderBy('id', 'desc')
             ->first();
 
