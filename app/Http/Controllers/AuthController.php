@@ -79,6 +79,22 @@ class AuthController extends Controller
             return response()->json(['error' => $errorMessage], 401);
         }
 
+        $attendanceToday = \App\Models\Attendance::where('employee_id', $user->employee->id)
+            ->whereDate('date', now()->toDateString())
+            ->first();
+
+        if (!$attendanceToday) {
+            Log::add(
+                $user->id,
+                'Bugungi davomat yo‘q – tizimga kirish rad etildi',
+                'attendance_check',
+                null,
+                null
+            );
+
+            return response()->json(['error' => 'Siz bugun ishga kelmagan deb hisoblanasiz. Kirish mumkin emas.'], 401);
+        }
+
         $token = JWTAuth::fromUser($user);
 
         Log::add(
