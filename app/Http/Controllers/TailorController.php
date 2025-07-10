@@ -42,13 +42,6 @@ class TailorController extends Controller
         return response()->json($employeeTarificationLogs);
     }
 
-    use App\Models\Employee;
-    use App\Models\Tarification;
-    use App\Models\EmployeeTarificationLog;
-    use App\Models\Log;
-    use Illuminate\Support\Facades\DB;
-    use Illuminate\Http\Request;
-
     public function storeTarificationLog(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
