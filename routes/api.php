@@ -28,6 +28,7 @@ use App\Http\Controllers\SourceController;
 use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\SuperHRController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TailorController;
 use App\Http\Controllers\TechnologController;
 use App\Http\Controllers\TransportAttendanceController;
 use App\Http\Controllers\TransportController;
@@ -40,7 +41,8 @@ use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
-
+    Route::get('tarifications/search', [TailorController::class, 'searchTarifications']);
+    Route::get('balance', [TailorController::class, 'getDailyBalanceEmployee']);
 });
 
 Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
