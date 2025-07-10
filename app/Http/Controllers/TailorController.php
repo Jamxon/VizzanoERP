@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\ShowOrderForTailorResource;
-use App\Http\Resources\ShowOrderResource;
 use App\Models\Employee;
 use App\Models\EmployeeTarificationLog;
 use App\Models\Log;
