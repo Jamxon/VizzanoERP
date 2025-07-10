@@ -644,25 +644,28 @@ class TechnologController extends Controller
     {
         $lastTarification = Tarification::latest('id')->first();
 
-        if (!$lastTarification || !preg_match('/^[A-Z]+\d+$/', $lastTarification->code)) {
-            return 'A1';
+        $letter = 'A';
+        $number = 0;
+
+        if ($lastTarification && preg_match('/^([A-Z]+)(\d+)$/', $lastTarification->code, $matches)) {
+            $letter = $matches[1];
+            $number = (int)$matches[2];
         }
 
-        $lastCode = $lastTarification->code;
+        // Loop: takrorlanuvchi code bo'lsa, keyingisiga o't
+        do {
+            $number++;
 
-        preg_match('/^([A-Z]+)(\d+)$/', $lastCode, $matches);
+            if ($number > 999) {
+                $number = 1;
+                $letter = $this->incrementLetter($letter);
+            }
 
-        $letter = $matches[1]; // Harf qismi
-        $number = (int)$matches[2]; // Raqam qismi
+            $code = $letter . $number;
 
-        $number++;
+        } while (Tarification::where('code', $code)->exists());
 
-        if ($number > 999) {
-            $number = 1;
-            $letter = $this->incrementLetter($letter);
-        }
-
-        return $letter . $number;
+        return $code;
     }
 
     private function incrementLetter(string $letter): string
