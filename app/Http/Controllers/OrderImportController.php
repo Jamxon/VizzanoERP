@@ -25,51 +25,44 @@ class OrderImportController extends Controller
             DB::beginTransaction();
 
             $data = is_array($request->data) ? $request->data : json_decode($request->data, true);
+            $branchId = auth()->user()->employee->branch_id;
 
-            $issetModel = Models::where('name', $data['model'])
-                ->where('branch_id', auth()->user()->employee->branch_id)
+            // MODEL — mavjud bo‘lsa olib kelamiz, bo‘lmasa yaratamiz
+            $model = Models::where('name', $data['model'])
+                ->where('branch_id', $branchId)
                 ->first();
 
-            if ($issetModel) {
-                $model = $issetModel;
-            }else{
+            if (!$model) {
+                // minute va rasxod hisoblanadi (agar 0 bo‘lsa)
+                $minute = $data['minute'] ?? 0;
+                $rasxod = $data['model_summa'] ?? 0;
+
+                if ($minute == 0 || $rasxod == 0) {
+                    $minute = $minute ?: ($data['price'] / 0.065);
+                    $rasxod = $rasxod ?: ($minute * 250);
+                }
+
                 $model = Models::create([
                     'name' => $data['model'],
-                    'rasxod' => $data['model_summa'],
-                    'branch_id' => auth()->user()->employee->branch_id,
-                    'minute' => $data['minute'] ?? 0,
+                    'rasxod' => $rasxod,
+                    'branch_id' => $branchId,
+                    'minute' => $minute,
                 ]);
             }
 
-            $model = Models::where('name', $data['model'])
-                ->where('branch_id', auth()->user()->employee->branch_id)
-                ->first();
-
-            if (!$model){
-                return response()->json(['error' => 'Model topilmadi'], 404);
-            }
-
-            $issetSubModel = SubModel::where('name', $data['submodel'])
+            // SUBMODEL — mavjud bo‘lsa olib kelamiz, bo‘lmasa yaratamiz
+            $submodel = SubModel::where('name', $data['submodel'])
                 ->where('model_id', $model->id)
                 ->first();
 
-            if ($issetSubModel) {
-                $submodel = $issetSubModel;
-            }else{
+            if (!$submodel) {
                 $submodel = SubModel::create([
                     'name' => $data['submodel'],
                     'model_id' => $model->id,
                 ]);
             }
 
-            $submodel = SubModel::where('name', $data['submodel'])
-                ->where('model_id', $model->id)
-                ->first();
-
-            if (!$submodel) {
-                return response()->json(['error' => 'Submodel topilmadi'], 404);
-            }
-
+            // ORDER
             $order = Order::create([
                 'name' => $data['model'] . ' ' . $data['quantity'],
                 'rasxod' => $data['rasxod'] ?? 0,
@@ -78,40 +71,39 @@ class OrderImportController extends Controller
                 'status' => 'inactive',
                 'start_date' => now()->format('Y-m-d'),
                 'end_date' => null,
-                'branch_id' => auth()->user()->employee->branch_id,
+                'branch_id' => $branchId,
                 'contragent_id' => $data['contragent_id'] ?? null,
             ]);
+
+            // ORDER MODEL — rasxod yoki minute 0 bo‘lsa modeldan oladi, bo‘lmasa hisoblaydi
+            $orderMinute = $data['minute'] ?? 0;
+            $orderRasxod = $data['model_summa'] ?? 0;
+
+            if ($orderMinute == 0 || $orderRasxod == 0) {
+                $orderMinute = $model->minute ?: ($data['price'] / 0.065);
+                $orderRasxod = $model->rasxod ?: ($orderMinute * 250);
+            }
 
             $orderModel = OrderModel::create([
                 'order_id' => $order->id,
                 'model_id' => $model->id,
                 'material_id' => null,
                 'status' => false,
-                'rasxod' => $data['model_summa'],
-                'minute' => $data['minute'] ?? 0,
+                'rasxod' => $orderRasxod,
+                'minute' => $orderMinute,
             ]);
 
-            $orderSubModel = OrderSubModel::create([
+            // ORDER SUBMODEL
+            OrderSubModel::create([
                 'order_model_id' => $orderModel->id,
                 'submodel_id' => $submodel->id,
             ]);
 
+            // ORDER SIZES
             foreach ($data['sizes'] as $size) {
-
-                $sizeModel = Size::where('name', $size)
-                    ->where('model_id', $model->id)
-                    ->first();
-
-                if (!$sizeModel) {
-                    $sizeModel = Size::create([
-                        'name' => $size,
-                        'model_id' => $model->id,
-                    ]);
-                }
-
-                $sizeModel = Size::where('name', $size)
-                    ->where('model_id', $model->id)
-                    ->first();
+                $sizeModel = Size::firstOrCreate(
+                    ['name' => $size, 'model_id' => $model->id]
+                );
 
                 OrderSize::create([
                     'order_model_id' => $orderModel->id,
@@ -120,7 +112,7 @@ class OrderImportController extends Controller
                 ]);
             }
 
-            // Rasmlarni saqlash
+            // RASMLARNI SAQLASH
             if (!empty($data['images']) && is_array($data['images'])) {
                 foreach ($data['images'] as $image) {
                     $sourcePath = storage_path('app/public/models/' . $image);
@@ -139,7 +131,6 @@ class OrderImportController extends Controller
                         'image' => $newPath,
                     ]);
                 }
-
             }
 
             DB::commit();
