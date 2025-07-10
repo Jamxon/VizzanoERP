@@ -38,4 +38,48 @@ class TailorController extends Controller
 
         return response()->json($employeeTarificationLogs);
     }
+
+    public function storeTarificationLog(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'tarification_id' => 'required|exists:tarifications,id',
+        ]);
+
+        $employeeId = auth()->user()->employee->id;
+        $today = now()->toDateString();
+
+        $tarification = Tarification::find($validated['tarification_id']);
+
+        $isOwn = $tarification->employee_id === $employeeId;
+        $amount = $tarification->summa;
+
+        $logData = [
+            'employee_id'     => $employeeId,
+            'tarification_id' => $tarification->id,
+            'date'            => $today,
+            'quantity'        => 1,
+            'is_own'          => $isOwn,
+            'amount_earned'   => $amount,
+        ];
+
+        // logni saqlaymiz
+        $log = EmployeeTarificationLog::updateOrCreate(
+            [
+                'employee_id'     => $employeeId,
+                'tarification_id' => $tarification->id,
+                'date'            => $today,
+            ],
+            $logData
+        );
+
+        // Faqat yangi log bo‘lsa, balansni oshiramiz
+        if ($log->wasRecentlyCreated) {
+            \App\Models\Employee::where('id', $employeeId)->increment('balance', $amount);
+        }
+
+        return response()->json([
+            'message' => 'Tarification log created successfully, balance updated',
+            'log' => $log,
+        ]);
+    }
 }
