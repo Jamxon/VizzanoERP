@@ -39,6 +39,10 @@ use App\Http\Controllers\TailorMasterController;
 use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('tailor')->middleware('role:tailor')->group(function () {
+
+});
+
 Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
     Route::get('groups', [ResultCheckerController::class, 'getGroups']);
     Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
