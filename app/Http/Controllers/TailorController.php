@@ -123,7 +123,7 @@ class TailorController extends Controller
         $group = auth()->user()->employee->group;
 
         $order = OrderGroup::where('group_id', $group->id)
-            ->whereHas('orders', function ($query) {
+            ->whereHas('order', function ($query) {
                 $query->where('status', 'tailoring');
             })
             ->with(['orders.orderModel.model', 'orders.orderModel.material', 'orders.orderModel.sizes', 'orders.orderModel.submodels.submodel'])
