@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ShowOrderForTailorResource;
+use App\Http\Resources\ShowOrderResource;
 use App\Models\Employee;
 use App\Models\EmployeeTarificationLog;
 use App\Models\Log;
+use App\Models\OrderGroup;
 use App\Models\Tarification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -115,4 +118,19 @@ class TailorController extends Controller
         }
     }
 
+    public function getModelWithTarification(): \Illuminate\Http\JsonResponse
+    {
+        $group = auth()->user()->employee->group;
+
+        $order = OrderGroup::where('group_id', $group->id)
+            ->whereHas('orders', function ($query) {
+                $query->where('status', 'tailoring');
+            })
+            ->with(['orders.orderModel.model', 'orders.orderModel.material', 'orders.orderModel.sizes', 'orders.orderModel.submodels.submodel'])
+            ->get();
+
+        $resource = ShowOrderForTailorResource::collection($order);
+
+        return response()->json($resource);
+    }
 }
