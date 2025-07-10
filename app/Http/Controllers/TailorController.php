@@ -26,7 +26,7 @@ class TailorController extends Controller
                     $query->whereDate('date', now()->format('Y-m-d'));
                 }
             ])
-            ->first();
+            ->get();
 
         return response()->json($tarifications);
     }
