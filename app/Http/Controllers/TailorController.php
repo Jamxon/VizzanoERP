@@ -126,7 +126,7 @@ class TailorController extends Controller
             ->whereHas('order', function ($query) {
                 $query->where('status', 'tailoring');
             })
-            ->with(['orders.orderModel.model', 'orders.orderModel.material', 'orders.orderModel.sizes', 'orders.orderModel.submodels.submodel'])
+            ->with(['order.orderModel.model', 'order.orderModel.submodels.submodel'])
             ->get();
 
         $resource = ShowOrderForTailorResource::collection($order);
