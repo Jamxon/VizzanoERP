@@ -776,7 +776,7 @@ class SuperHRController extends Controller
             'birthday' => 'nullable|date',
             'role_id' => 'nullable|integer|exists:roles,id',
             'status' => 'nullable|string|in:working,kicked,reserv',
-            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'salary' => 'nullable|numeric',
             'gender'=> 'required|string',
         ]);
