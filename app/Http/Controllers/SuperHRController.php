@@ -741,7 +741,7 @@ class SuperHRController extends Controller
                 $q->whereHas('user', fn($q) => $q->where('role_id', $filters['role_id']));
             });
 
-        $employees = $query->orderByDesc('id')->paginate(10);
+        $employees = $query->orderByDesc('updated_at')->paginate(10);
 
         return (new GetEmployeeResourceCollection($employees))->response();
     }
