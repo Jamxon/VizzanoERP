@@ -37,8 +37,7 @@ class TailorController extends Controller
 
         $employeeTarificationLogs = EmployeeTarificationLog::where('date', $today)
             ->where('employee_id', auth()->user()->employee->id)
-            ->sum('amount_earned')
-            ?? 0;
+            ->get();
 
         return response()->json($employeeTarificationLogs);
     }
@@ -131,4 +130,5 @@ class TailorController extends Controller
 
         return response()->json($resource);
     }
+
 }
