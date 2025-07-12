@@ -42,7 +42,20 @@ class TailorController extends Controller
             ])
             ->get();
 
-        return response()->json($employeeTarificationLogs);
+        $resource = $employeeTarificationLogs->map(function ($log) {
+            return [
+                'id' => $log->id,
+                'tarification' => $log->tarification,
+                'employee' => $log->employee,
+                'date' => $log->date,
+                'is_own' => $log->is_own,
+                'amount_earned' => $log->amount_earned,
+                'quantity' => $log->quantity,
+                'model' => $log->tarification->tarificationCategory->submodel->orderModel->model,
+            ];
+        });
+
+        return response()->json($resource);
     }
 
     public function storeTarificationLog(Request $request): \Illuminate\Http\JsonResponse
