@@ -37,6 +37,7 @@ class TailorController extends Controller
 
         $employeeTarificationLogs = EmployeeTarificationLog::where('date', $today)
             ->where('employee_id', auth()->user()->employee->id)
+            ->without(['tarification.tarificationCategory'])
             ->get();
 
         $resource = $employeeTarificationLogs->map(function ($log) {
