@@ -393,31 +393,7 @@
       <workItem from="1752032799117" duration="16055000" />
       <workItem from="1752121381931" duration="19264000" />
       <workItem from="1752207734715" duration="9325000" />
-      <workItem from="1752294056668" duration="3610000" />
-    </task>
-    <task id="LOCAL-00794" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1751883435861</created>
-      <option name="number" value="00794" />
-      <option name="presentableId" value="LOCAL-00794" />
-      <option name="project" value="LOCAL" />
-      <updated>1751883435861</updated>
-    </task>
-    <task id="LOCAL-00795" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1751883637639</created>
-      <option name="number" value="00795" />
-      <option name="presentableId" value="LOCAL-00795" />
-      <option name="project" value="LOCAL" />
-      <updated>1751883637639</updated>
-    </task>
-    <task id="LOCAL-00796" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1751883762090</created>
-      <option name="number" value="00796" />
-      <option name="presentableId" value="LOCAL-00796" />
-      <option name="project" value="LOCAL" />
-      <updated>1751883762090</updated>
+      <workItem from="1752294056668" duration="3941000" />
     </task>
     <task id="LOCAL-00797" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -787,7 +763,31 @@
       <option name="project" value="LOCAL" />
       <updated>1752309583235</updated>
     </task>
-    <option name="localTasksCounter" value="843" />
+    <task id="LOCAL-00843" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752309769383</created>
+      <option name="number" value="00843" />
+      <option name="presentableId" value="LOCAL-00843" />
+      <option name="project" value="LOCAL" />
+      <updated>1752309769383</updated>
+    </task>
+    <task id="LOCAL-00844" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752309802004</created>
+      <option name="number" value="00844" />
+      <option name="presentableId" value="LOCAL-00844" />
+      <option name="project" value="LOCAL" />
+      <updated>1752309802004</updated>
+    </task>
+    <task id="LOCAL-00845" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752309903277</created>
+      <option name="number" value="00845" />
+      <option name="presentableId" value="LOCAL-00845" />
+      <option name="project" value="LOCAL" />
+      <updated>1752309903277</updated>
+    </task>
+    <option name="localTasksCounter" value="846" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

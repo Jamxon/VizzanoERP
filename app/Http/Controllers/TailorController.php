@@ -43,7 +43,15 @@ class TailorController extends Controller
         $resource = $employeeTarificationLogs->map(function ($log) {
             return [
                 'id' => $log->id,
-                'tarification' => $log->tarification,
+                'tarification' => [
+                    'id' => $log->tarification->id,
+                    'name' => $log->tarification->name,
+                    'second' => $log->tarification->second,
+                    'summa' => $log->tarification->summa,
+                    'code' => $log->tarification->code,
+                    'razryad' => $log->tarification->razryad ?? null,
+                    'typewriter' => $log->tarification->typewriter ?? null,
+                ],
                 'employee' => $log->employee,
                 'date' => $log->date,
                 'is_own' => $log->is_own,
