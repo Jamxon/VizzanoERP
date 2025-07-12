@@ -57,7 +57,7 @@ class TailorController extends Controller
                 'is_own' => $log->is_own,
                 'amount_earned' => $log->amount_earned,
                 'quantity' => $log->quantity,
-                'model' => $log->tarification->tarificationCategory->submodel->orderModel->model,
+                'model' => $log->tarification->tarificationCategory->submodel->orderModel->model ?? null,
             ];
         });
 
