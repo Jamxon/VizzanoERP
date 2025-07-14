@@ -38,6 +38,12 @@ class CasherController extends Controller
         $daysInMonth = $carbon->daysInMonth;
         $branchId = auth()->user()->employee->branch_id;
 
+        $aup = DB::table('attendance_salary')
+            ->whereMonth('date', $carbon->month)
+            ->whereYear('date', $carbon->year)
+            ->whereIn('employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
+            ->sum('amount');
+
         $orderSummaries = [];
 
         for ($i = 0; $i < $daysInMonth; $i++) {
@@ -116,6 +122,7 @@ class CasherController extends Controller
         $summary = [
             'month' => $month,
             'dollar_rate' => $dollarRate,
+            'aup' => $aup,
             'days_in_month' => $daysInMonth,
             'total_orders' => count($orderSummaries),
             'total_quantity' => array_sum(array_column($orderSummaries, 'total_quantity')),
