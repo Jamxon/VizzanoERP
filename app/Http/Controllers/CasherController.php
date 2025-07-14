@@ -50,6 +50,24 @@ class CasherController extends Controller
             ->whereIn('employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
             ->sum('amount');
 
+        $transport = DB::table('transport_attendance')
+            ->join('transport', 'transport_attendance.transport_id', '=', 'transport.id')
+            ->whereMonth('transport_attendance.date', $carbon->month)
+            ->whereYear('transport_attendance.date', $carbon->year)
+            ->where('transport.branch_id', $branchId)
+            ->sum(DB::raw('(transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type'));
+
+        $tarification = DB::table('employee_tarification_logs')
+            ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+            ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+            ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+            ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+            ->join('orders', 'order_models.order_id', '=', 'orders.id')
+            ->whereMonth('employee_tarification_logs.date', $carbon->month)
+            ->whereYear('employee_tarification_logs.date', $carbon->year)
+            ->whereIn('employee_tarification_logs.employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
+            ->sum('employee_tarification_logs.amount_earned');
+
         $orderSummaries = [];
 
         for ($i = 0; $i < $daysInMonth; $i++) {
@@ -130,6 +148,8 @@ class CasherController extends Controller
             'dollar_rate' => $dollarRate,
             'aup' => $aup,
             'kpi' => $kpi,
+            'transport_attendance' => $transport,
+            'tarification' => $tarification,
             'days_in_month' => $daysInMonth,
             'total_orders' => count($orderSummaries),
             'total_quantity' => array_sum(array_column($orderSummaries, 'total_quantity')),
