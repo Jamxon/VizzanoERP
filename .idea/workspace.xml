@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve group plans with validation for month and year">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -397,15 +396,7 @@
       <workItem from="1752121381931" duration="19264000" />
       <workItem from="1752207734715" duration="9325000" />
       <workItem from="1752294056668" duration="7108000" />
-      <workItem from="1752467143431" duration="11901000" />
-    </task>
-    <task id="LOCAL-00804" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1751962662596</created>
-      <option name="number" value="00804" />
-      <option name="presentableId" value="LOCAL-00804" />
-      <option name="project" value="LOCAL" />
-      <updated>1751962662596</updated>
+      <workItem from="1752467143431" duration="13473000" />
     </task>
     <task id="LOCAL-00805" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -791,7 +782,15 @@
       <option name="project" value="LOCAL" />
       <updated>1752491196537</updated>
     </task>
-    <option name="localTasksCounter" value="853" />
+    <task id="LOCAL-00853" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752491291972</created>
+      <option name="number" value="00853" />
+      <option name="presentableId" value="LOCAL-00853" />
+      <option name="project" value="LOCAL" />
+      <updated>1752491291972</updated>
+    </task>
+    <option name="localTasksCounter" value="854" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
