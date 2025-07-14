@@ -153,7 +153,7 @@ class PackageMasterController extends Controller
                 // Packing faylga leftovers qo'shish
                 $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
                 $data[] = [$index, "Цвет: $color", $leftovers[0]['size_name'] ?? '', $customerName, $packCount + 1, 1, $leftovers[0]['qty'] ?? '', '', ''];
-                $data[] = ['', "Юбка для девочки", $leftovers[1]['size_name'] ?? '', '', '', '', $leftovers[1]['qty'] ?? '', '', ''];
+                $data[] = ['', $submodelName, $leftovers[1]['size_name'] ?? '', '', '', '', $leftovers[1]['qty'] ?? '', '', ''];
 
                 // Size'lar bo'yicha qty map tuzib olamiz
                 $qtyBySize = collect($leftovers)->mapWithKeys(fn($left) => [
