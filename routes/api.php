@@ -91,6 +91,7 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::post('groupPlans', [CasherController::class, 'storeGroupPlan']);
     Route::get('groupPlans', [CasherController::class, 'getGroupPlans']);
     Route::patch('groupPlans/{id}', [CasherController::class, 'editGroupPlan']);
+    Route::get('monthlyCost', [CasherController::class, 'getMonthlyCost']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {

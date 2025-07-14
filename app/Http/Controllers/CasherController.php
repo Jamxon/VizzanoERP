@@ -21,6 +21,56 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class CasherController extends Controller
 {
 
+    public function getMonthlyCost(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $month = $request->month ?? Carbon::now()->format('Y-m');
+        $dollarRate = $request->dollar_rate ?? 12900;
+
+        $carbon = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $daysInMonth = $carbon->daysInMonth;
+        $branchId = auth()->user()->employee->branch_id;
+
+        $monthlyReport = collect();
+
+        for ($i = 0; $i < $daysInMonth; $i++) {
+            $date = $carbon->copy()->addDays($i)->toDateString();
+            $requestForDay = new Request([
+                'date' => $date,
+                'dollar_rate' => $dollarRate
+            ]);
+
+            // Kunlik hisobotni chaqiramiz (shu fayl ichidagi yoki alohida Service classdan)
+            $daily = $this->getDailyCost($requestForDay)->getData(true);
+
+            // Faqat kerakli qismlarini yig'amiz
+            $monthlyReport->push([
+                'date' => $daily['date'],
+                'net_profit_uzs' => $daily['net_profit_uzs'],
+                'total_earned_uzs' => $daily['total_earned_uzs'],
+                'total_fixed_cost_uzs' => $daily['total_fixed_cost_uzs'],
+                'employee_count' => $daily['employee_count'],
+                'kpi' => $daily['kpi'],
+                'tarification' => $daily['tarification'],
+            ]);
+        }
+
+        // Endi umumlashtirilgan oylik hisob-kitoblarni tayyorlaymiz
+        $summary = [
+            'month' => $month,
+            'dollar_rate' => $dollarRate,
+            'total_days' => $daysInMonth,
+            'total_earned_uzs' => $monthlyReport->sum('total_earned_uzs'),
+            'total_fixed_cost_uzs' => $monthlyReport->sum('total_fixed_cost_uzs'),
+            'net_profit_uzs' => $monthlyReport->sum('net_profit_uzs'),
+            'avg_employee_count' => round($monthlyReport->avg('employee_count')),
+            'total_kpi' => $monthlyReport->sum('kpi'),
+            'total_tarification' => $monthlyReport->sum('tarification'),
+            'days' => $monthlyReport,
+        ];
+
+        return response()->json($summary);
+    }
+
     public function getDailyCost(Request $request): \Illuminate\Http\JsonResponse
     {
         $date = $request->date ?? Carbon::today()->toDateString();
