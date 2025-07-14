@@ -25,47 +25,100 @@ class CasherController extends Controller
     {
         $month = $request->month ?? Carbon::now()->format('Y-m');
         $dollarRate = $request->dollar_rate ?? 12900;
-
         $carbon = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $daysInMonth = $carbon->daysInMonth;
         $branchId = auth()->user()->employee->branch_id;
 
-        $monthlyReport = collect();
+        $orderSummaries = collect();
 
         for ($i = 0; $i < $daysInMonth; $i++) {
             $date = $carbon->copy()->addDays($i)->toDateString();
             $requestForDay = new Request([
                 'date' => $date,
-                'dollar_rate' => $dollarRate
+                'dollar_rate' => $dollarRate,
             ]);
 
-            // Kunlik hisobotni chaqiramiz (shu fayl ichidagi yoki alohida Service classdan)
             $daily = $this->getDailyCost($requestForDay)->getData(true);
 
-            // Faqat kerakli qismlarini yig'amiz
-            $monthlyReport->push([
-                'date' => $daily['date'],
-                'net_profit_uzs' => $daily['net_profit_uzs'],
-                'total_earned_uzs' => $daily['total_earned_uzs'],
-                'total_fixed_cost_uzs' => $daily['total_fixed_cost_uzs'],
-                'employee_count' => $daily['employee_count'],
-                'kpi' => $daily['kpi'],
-                'tarification' => $daily['tarification'],
-            ]);
+            foreach ($daily['orders'] as $order) {
+                $orderId = $order['order']['id'] ?? null;
+                if (!$orderId) continue;
+
+                // Unikal model/submodel asosida yig'amiz
+                $key = $orderId;
+
+                if (!isset($orderSummaries[$key])) {
+                    $orderSummaries[$key] = [
+                        'order' => $order['order'],
+                        'model' => $order['model'],
+                        'submodels' => $order['submodels'],
+                        'responsibleUser' => $order['responsibleUser'],
+                        'price_usd' => $order['price_usd'],
+                        'price_uzs' => $order['price_uzs'],
+                        'total_quantity' => 0,
+                        'rasxod_limit_uzs' => 0,
+                        'bonus' => 0,
+                        'tarification' => 0,
+                        'total_output_cost_uzs' => 0,
+                        'costs_uzs' => [
+                            'bonus' => 0,
+                            'tarification' => 0,
+                            'remainder' => 0,
+                            'allocatedTransport' => 0,
+                            'allocatedAup' => 0,
+                            'allocatedDailyExpenseMonthly' => 0,
+                            'incomePercentageExpense' => 0,
+                            'amortizationExpense' => 0,
+                        ],
+                        'total_fixed_cost_uzs' => 0,
+                        'net_profit_uzs' => 0,
+                    ];
+                }
+
+                // Mavjud qiymatlarni qo‘shib boramiz
+                $current = &$orderSummaries[$key];
+
+                $current['total_quantity'] += $order['total_quantity'];
+                $current['rasxod_limit_uzs'] += $order['rasxod_limit_uzs'];
+                $current['bonus'] += $order['bonus'];
+                $current['tarification'] += $order['tarification'];
+                $current['total_output_cost_uzs'] += $order['total_output_cost_uzs'];
+                $current['net_profit_uzs'] += $order['net_profit_uzs'];
+                $current['total_fixed_cost_uzs'] += $order['total_fixed_cost_uzs'];
+
+                foreach ($order['costs_uzs'] as $costKey => $val) {
+                    $current['costs_uzs'][$costKey] += $val;
+                }
+            }
         }
 
-        // Endi umumlashtirilgan oylik hisob-kitoblarni tayyorlaymiz
+        // Har bir order uchun per-unit qiymatlarini hisoblab chiqamiz
+        $orders = $orderSummaries->map(function ($item) {
+            $totalQty = max($item['total_quantity'], 1);
+            $totalCost = $item['total_fixed_cost_uzs'];
+
+            $perUnitCost = $totalCost / $totalQty;
+            $profitPerUnit = $item['price_uzs'] - $perUnitCost;
+
+            $item['cost_per_unit_uzs'] = round($perUnitCost);
+            $item['profit_per_unit_uzs'] = round($profitPerUnit);
+            $item['profitability_percent'] = $totalCost > 0
+                ? round(($item['net_profit_uzs'] / $totalCost) * 100, 2)
+                : null;
+
+            return $item;
+        })->values();
+
         $summary = [
             'month' => $month,
             'dollar_rate' => $dollarRate,
-            'total_days' => $daysInMonth,
-            'total_earned_uzs' => $monthlyReport->sum('total_earned_uzs'),
-            'total_fixed_cost_uzs' => $monthlyReport->sum('total_fixed_cost_uzs'),
-            'net_profit_uzs' => $monthlyReport->sum('net_profit_uzs'),
-            'avg_employee_count' => round($monthlyReport->avg('employee_count')),
-            'total_kpi' => $monthlyReport->sum('kpi'),
-            'total_tarification' => $monthlyReport->sum('tarification'),
-            'days' => $monthlyReport,
+            'days_in_month' => $daysInMonth,
+            'total_orders' => $orders->count(),
+            'total_quantity' => $orders->sum('total_quantity'),
+            'total_output_cost_uzs' => $orders->sum('total_output_cost_uzs'),
+            'total_fixed_cost_uzs' => $orders->sum('total_fixed_cost_uzs'),
+            'net_profit_uzs' => $orders->sum('net_profit_uzs'),
+            'orders' => $orders,
         ];
 
         return response()->json($summary);
