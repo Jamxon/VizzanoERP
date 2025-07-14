@@ -128,6 +128,7 @@ class CasherController extends Controller
         return response()->json($summary);
     }
 
+
     public function getDailyCost(Request $request): \Illuminate\Http\JsonResponse
     {
         $date = $request->date ?? Carbon::today()->toDateString();
