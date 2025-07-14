@@ -44,6 +44,12 @@ class CasherController extends Controller
             ->whereIn('employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
             ->sum('amount');
 
+        $kpi = DB::table('bonuses')
+            ->whereMonth('created_at', $carbon->month)
+            ->whereYear('created_at', $carbon->year)
+            ->whereIn('employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
+            ->sum('amount');
+
         $orderSummaries = [];
 
         for ($i = 0; $i < $daysInMonth; $i++) {
@@ -123,6 +129,7 @@ class CasherController extends Controller
             'month' => $month,
             'dollar_rate' => $dollarRate,
             'aup' => $aup,
+            'kpi' => $kpi,
             'days_in_month' => $daysInMonth,
             'total_orders' => count($orderSummaries),
             'total_quantity' => array_sum(array_column($orderSummaries, 'total_quantity')),
@@ -134,7 +141,6 @@ class CasherController extends Controller
 
         return response()->json($summary);
     }
-
 
     public function getDailyCost(Request $request): \Illuminate\Http\JsonResponse
     {
