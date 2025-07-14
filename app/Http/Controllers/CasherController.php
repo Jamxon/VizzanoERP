@@ -65,8 +65,8 @@ class CasherController extends Controller
             $monthlyStats['transport_attendance'] += $daily['transport_attendance'] ?? 0;
             $monthlyStats['tarification'] += $daily['tarification'] ?? 0;
             $monthlyStats['daily_expenses'] += $daily['daily_expenses'] ?? 0;
-            $monthlyStats['total_earned_uzs'] += $daily['total_earned_uzs'] ?? 0;          // <-- TO‘G‘RI YERGA
-            $monthlyStats['total_output_cost_uzs'] += $daily['orders']->sum('total_output_cost_uzs') ?? 0;
+            $monthlyStats['total_earned_uzs'] += $daily['total_earned_uzs'] ?? 0;          // <-- TO‘G‘RI
+            $monthlyStats['total_output_cost_uzs'] += array_sum(array_column($daily['orders'], 'total_output_cost_uzs')) ?? 0;
             $monthlyStats['total_fixed_cost_uzs'] += $daily['total_fixed_cost_uzs'] ?? 0;
             $monthlyStats['net_profit_uzs'] += $daily['net_profit_uzs'] ?? 0;
             $monthlyStats['employee_count_sum'] += $daily['employee_count'] ?? 0;
