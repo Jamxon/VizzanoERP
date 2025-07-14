@@ -24,9 +24,8 @@ class CasherController extends Controller
     public function getMonthlyCost(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            // Foydalanuvchi yuborgan oy yoki joriy oy
-            $month = $request->month
-                ? Carbon::parse($request->month)->format('Y-m')  // 2025-07-01 bo‘lsa ham 2025-07 ga aylantiradi
+            $month = $request->date
+                ? Carbon::parse($request->date)->format('Y-m')
                 : Carbon::now()->format('Y-m');
 
             $carbon = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
@@ -38,37 +37,18 @@ class CasherController extends Controller
         $daysInMonth = $carbon->daysInMonth;
         $branchId = auth()->user()->employee->branch_id;
 
-        $aup = DB::table('attendance_salary')
-            ->whereMonth('date', $carbon->month)
-            ->whereYear('date', $carbon->year)
-            ->whereIn('employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
-            ->sum('amount');
-
-        $kpi = DB::table('bonuses')
-            ->whereMonth('created_at', $carbon->month)
-            ->whereYear('created_at', $carbon->year)
-            ->whereIn('employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
-            ->sum('amount');
-
-        $transport = DB::table('transport_attendance')
-            ->join('transport', 'transport_attendance.transport_id', '=', 'transport.id')
-            ->whereMonth('transport_attendance.date', $carbon->month)
-            ->whereYear('transport_attendance.date', $carbon->year)
-            ->where('transport.branch_id', $branchId)
-            ->sum(DB::raw('(transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type'));
-
-        $tarification = DB::table('employee_tarification_logs')
-            ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
-            ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
-            ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
-            ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
-            ->join('orders', 'order_models.order_id', '=', 'orders.id')
-            ->whereMonth('employee_tarification_logs.date', $carbon->month)
-            ->whereYear('employee_tarification_logs.date', $carbon->year)
-            ->whereIn('employee_tarification_logs.employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
-            ->sum('employee_tarification_logs.amount_earned');
-
         $orderSummaries = [];
+        $monthlyStats = [
+            'aup' => 0,
+            'kpi' => 0,
+            'transport_attendance' => 0,
+            'tarification' => 0,
+            'daily_expenses' => 0,
+            'total_output_cost_uzs' => 0,
+            'total_fixed_cost_uzs' => 0,
+            'net_profit_uzs' => 0,
+            'employee_count_sum' => 0,
+        ];
 
         for ($i = 0; $i < $daysInMonth; $i++) {
             $date = $carbon->copy()->addDays($i)->toDateString();
@@ -79,58 +59,44 @@ class CasherController extends Controller
 
             $daily = $this->getDailyCost($requestForDay)->getData(true);
 
+            // Statistika yig‘ish
+            $monthlyStats['aup'] += $daily['aup'] ?? 0;
+            $monthlyStats['kpi'] += $daily['kpi'] ?? 0;
+            $monthlyStats['transport_attendance'] += $daily['transport_attendance'] ?? 0;
+            $monthlyStats['tarification'] += $daily['tarification'] ?? 0;
+            $monthlyStats['daily_expenses'] += $daily['daily_expenses'] ?? 0;
+            $monthlyStats['total_output_cost_uzs'] += $daily['total_earned_uzs'] ?? 0;
+            $monthlyStats['total_fixed_cost_uzs'] += $daily['total_fixed_cost_uzs'] ?? 0;
+            $monthlyStats['net_profit_uzs'] += $daily['net_profit_uzs'] ?? 0;
+            $monthlyStats['employee_count_sum'] += $daily['employee_count'] ?? 0;
+
             if (!isset($daily['orders'])) continue;
 
             foreach ($daily['orders'] as $order) {
                 $orderId = $order['order']['id'] ?? null;
                 if (!$orderId) continue;
 
-                $key = $orderId;
-
-                if (!isset($orderSummaries[$key])) {
-                    $orderSummaries[$key] = [
-                        'order' => $order['order'],
-                        'model' => $order['model'],
-                        'submodels' => $order['submodels'],
-                        'responsibleUser' => $order['responsibleUser'],
-                        'price_usd' => $order['price_usd'],
-                        'price_uzs' => $order['price_uzs'],
-                        'total_quantity' => 0,
-                        'rasxod_limit_uzs' => 0,
-                        'bonus' => 0,
-                        'tarification' => 0,
-                        'total_output_cost_uzs' => 0,
-                        'costs_uzs' => [
-                            'bonus' => 0,
-                            'tarification' => 0,
-                            'remainder' => 0,
-                            'allocatedTransport' => 0,
-                            'allocatedAup' => 0,
-                            'allocatedDailyExpenseMonthly' => 0,
-                            'incomePercentageExpense' => 0,
-                            'amortizationExpense' => 0,
-                        ],
-                        'total_fixed_cost_uzs' => 0,
-                        'net_profit_uzs' => 0,
-                    ];
+                if (!isset($orderSummaries[$orderId])) {
+                    $orderSummaries[$orderId] = $order;
+                    continue;
                 }
 
-                // Hisoblashlarni yig‘ish
-                $orderSummaries[$key]['total_quantity'] += $order['total_quantity'];
-                $orderSummaries[$key]['rasxod_limit_uzs'] += $order['rasxod_limit_uzs'];
-                $orderSummaries[$key]['bonus'] += $order['bonus'];
-                $orderSummaries[$key]['tarification'] += $order['tarification'];
-                $orderSummaries[$key]['total_output_cost_uzs'] += $order['total_output_cost_uzs'];
-                $orderSummaries[$key]['net_profit_uzs'] += $order['net_profit_uzs'];
-                $orderSummaries[$key]['total_fixed_cost_uzs'] += $order['total_fixed_cost_uzs'];
+                // Aggregation (jamg‘arish)
+                $orderSummaries[$orderId]['total_quantity'] += $order['total_quantity'];
+                $orderSummaries[$orderId]['rasxod_limit_uzs'] += $order['rasxod_limit_uzs'];
+                $orderSummaries[$orderId]['bonus'] += $order['bonus'];
+                $orderSummaries[$orderId]['tarification'] += $order['tarification'];
+                $orderSummaries[$orderId]['total_output_cost_uzs'] += $order['total_output_cost_uzs'];
+                $orderSummaries[$orderId]['total_fixed_cost_uzs'] += $order['total_fixed_cost_uzs'];
+                $orderSummaries[$orderId]['net_profit_uzs'] += $order['net_profit_uzs'];
 
-                foreach ($order['costs_uzs'] as $costKey => $value) {
-                    $orderSummaries[$key]['costs_uzs'][$costKey] += $value;
+                foreach ($order['costs_uzs'] as $key => $val) {
+                    $orderSummaries[$orderId]['costs_uzs'][$key] += $val;
                 }
             }
         }
 
-        // Har bir order uchun bir birlikka to‘g‘ri keladigan qiymatlarni hisoblash
+        // Per-unit hisoblash
         foreach ($orderSummaries as &$order) {
             $qty = max($order['total_quantity'], 1);
             $totalCost = $order['total_fixed_cost_uzs'];
@@ -142,24 +108,22 @@ class CasherController extends Controller
                 : null;
         }
 
-        // Umumiy hisobot
-        $summary = [
+        return response()->json([
             'month' => $month,
             'dollar_rate' => $dollarRate,
-            'aup' => $aup,
-            'kpi' => $kpi,
-            'transport_attendance' => $transport,
-            'tarification' => $tarification,
             'days_in_month' => $daysInMonth,
-            'total_orders' => count($orderSummaries),
-            'total_quantity' => array_sum(array_column($orderSummaries, 'total_quantity')),
-            'total_output_cost_uzs' => array_sum(array_column($orderSummaries, 'total_output_cost_uzs')),
-            'total_fixed_cost_uzs' => array_sum(array_column($orderSummaries, 'total_fixed_cost_uzs')),
-            'net_profit_uzs' => array_sum(array_column($orderSummaries, 'net_profit_uzs')),
+            'aup' => $monthlyStats['aup'],
+            'kpi' => $monthlyStats['kpi'],
+            'transport_attendance' => $monthlyStats['transport_attendance'],
+            'tarification' => $monthlyStats['tarification'],
+            'daily_expenses' => $monthlyStats['daily_expenses'],
+            'total_output_cost_uzs' => $monthlyStats['total_output_cost_uzs'],
+            'total_fixed_cost_uzs' => $monthlyStats['total_fixed_cost_uzs'],
+            'net_profit_uzs' => $monthlyStats['net_profit_uzs'],
+            'average_employee_count' => round($monthlyStats['employee_count_sum'] / $daysInMonth),
+            'per_employee_cost_uzs' => $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']),
             'orders' => array_values($orderSummaries),
-        ];
-
-        return response()->json($summary);
+        ]);
     }
 
     public function getDailyCost(Request $request): \Illuminate\Http\JsonResponse
