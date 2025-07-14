@@ -143,7 +143,7 @@ class TailorController extends Controller
 
         $order = OrderGroup::where('group_id', $group->id)
             ->whereHas('order', function ($query) {
-                $query->where('status', 'tailoring');
+                $query->whereIn('status', ['tailoring', 'tailored']);
             })
             ->with(['order.orderModel.model', 'order.orderModel.submodels.submodel'])
             ->get();
