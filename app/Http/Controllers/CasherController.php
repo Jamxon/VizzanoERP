@@ -23,13 +23,21 @@ class CasherController extends Controller
 
     public function getMonthlyCost(Request $request): \Illuminate\Http\JsonResponse
     {
-        $month = $request->month ?? Carbon::now()->format('Y-m');
+        try {
+            // Foydalanuvchi yuborgan oy yoki joriy oy
+            $month = $request->month
+                ? Carbon::parse($request->month)->format('Y-m')  // 2025-07-01 bo‘lsa ham 2025-07 ga aylantiradi
+                : Carbon::now()->format('Y-m');
+
+            $carbon = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Invalid month format. Please use YYYY-MM'], 400);
+        }
+
         $dollarRate = $request->dollar_rate ?? 12900;
-        $carbon = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
         $daysInMonth = $carbon->daysInMonth;
         $branchId = auth()->user()->employee->branch_id;
 
-        // Oddiy massiv ishlatamiz Collection emas
         $orderSummaries = [];
 
         for ($i = 0; $i < $daysInMonth; $i++) {
@@ -40,6 +48,8 @@ class CasherController extends Controller
             ]);
 
             $daily = $this->getDailyCost($requestForDay)->getData(true);
+
+            if (!isset($daily['orders'])) continue;
 
             foreach ($daily['orders'] as $order) {
                 $orderId = $order['order']['id'] ?? null;
@@ -75,7 +85,7 @@ class CasherController extends Controller
                     ];
                 }
 
-                // Qiymatlarni yig‘ib boramiz
+                // Hisoblashlarni yig‘ish
                 $orderSummaries[$key]['total_quantity'] += $order['total_quantity'];
                 $orderSummaries[$key]['rasxod_limit_uzs'] += $order['rasxod_limit_uzs'];
                 $orderSummaries[$key]['bonus'] += $order['bonus'];
@@ -90,7 +100,7 @@ class CasherController extends Controller
             }
         }
 
-        // Per-unit qiymatlarni hisoblab qo‘shamiz
+        // Har bir order uchun bir birlikka to‘g‘ri keladigan qiymatlarni hisoblash
         foreach ($orderSummaries as &$order) {
             $qty = max($order['total_quantity'], 1);
             $totalCost = $order['total_fixed_cost_uzs'];
@@ -102,7 +112,7 @@ class CasherController extends Controller
                 : null;
         }
 
-        // Umumiy yig‘indi
+        // Umumiy hisobot
         $summary = [
             'month' => $month,
             'dollar_rate' => $dollarRate,
