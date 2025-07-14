@@ -35,7 +35,6 @@ class CasherController extends Controller
 
         $dollarRate = $request->dollar_rate ?? 12900;
         $daysInMonth = $carbon->daysInMonth;
-        $branchId = auth()->user()->employee->branch_id;
 
         $orderSummaries = [];
         $monthlyStats = [
@@ -44,6 +43,7 @@ class CasherController extends Controller
             'transport_attendance' => 0,
             'tarification' => 0,
             'daily_expenses' => 0,
+            'total_earned_uzs' => 0,          // <-- YANGI QO‘SHILDI
             'total_output_cost_uzs' => 0,
             'total_fixed_cost_uzs' => 0,
             'net_profit_uzs' => 0,
@@ -65,7 +65,8 @@ class CasherController extends Controller
             $monthlyStats['transport_attendance'] += $daily['transport_attendance'] ?? 0;
             $monthlyStats['tarification'] += $daily['tarification'] ?? 0;
             $monthlyStats['daily_expenses'] += $daily['daily_expenses'] ?? 0;
-            $monthlyStats['total_output_cost_uzs'] += $daily['total_earned_uzs'] ?? 0;
+            $monthlyStats['total_earned_uzs'] += $daily['total_earned_uzs'] ?? 0;          // <-- TO‘G‘RI YERGA
+            $monthlyStats['total_output_cost_uzs'] += $daily['orders']->sum('total_output_cost_uzs') ?? 0;
             $monthlyStats['total_fixed_cost_uzs'] += $daily['total_fixed_cost_uzs'] ?? 0;
             $monthlyStats['net_profit_uzs'] += $daily['net_profit_uzs'] ?? 0;
             $monthlyStats['employee_count_sum'] += $daily['employee_count'] ?? 0;
@@ -86,6 +87,7 @@ class CasherController extends Controller
                 $orderSummaries[$orderId]['rasxod_limit_uzs'] += $order['rasxod_limit_uzs'];
                 $orderSummaries[$orderId]['bonus'] += $order['bonus'];
                 $orderSummaries[$orderId]['tarification'] += $order['tarification'];
+                $orderSummaries[$orderId]['total_earned_uzs'] += $order['total_output_cost_uzs']; // bu = price * qty
                 $orderSummaries[$orderId]['total_output_cost_uzs'] += $order['total_output_cost_uzs'];
                 $orderSummaries[$orderId]['total_fixed_cost_uzs'] += $order['total_fixed_cost_uzs'];
                 $orderSummaries[$orderId]['net_profit_uzs'] += $order['net_profit_uzs'];
@@ -100,9 +102,10 @@ class CasherController extends Controller
         foreach ($orderSummaries as &$order) {
             $qty = max($order['total_quantity'], 1);
             $totalCost = $order['total_fixed_cost_uzs'];
+            $earned = $order['total_earned_uzs'];
 
             $order['cost_per_unit_uzs'] = round($totalCost / $qty);
-            $order['profit_per_unit_uzs'] = round($order['price_uzs'] - $order['cost_per_unit_uzs']);
+            $order['profit_per_unit_uzs'] = round(($earned / $qty) - $order['cost_per_unit_uzs']);
             $order['profitability_percent'] = $totalCost > 0
                 ? round(($order['net_profit_uzs'] / $totalCost) * 100, 2)
                 : null;
@@ -117,6 +120,7 @@ class CasherController extends Controller
             'transport_attendance' => $monthlyStats['transport_attendance'],
             'tarification' => $monthlyStats['tarification'],
             'daily_expenses' => $monthlyStats['daily_expenses'],
+            'total_earned_uzs' => $monthlyStats['total_earned_uzs'],               // <-- YANGI
             'total_output_cost_uzs' => $monthlyStats['total_output_cost_uzs'],
             'total_fixed_cost_uzs' => $monthlyStats['total_fixed_cost_uzs'],
             'net_profit_uzs' => $monthlyStats['net_profit_uzs'],
