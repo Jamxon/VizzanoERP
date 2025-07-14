@@ -124,7 +124,7 @@ class PackageMasterController extends Controller
                     // Packing faylga qo'shish
                     $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
                     $data[] = [$index, "Цвет: $color", $sizeName, $customerName, $packCount + 1, 1, $capacity, $item['netto'],  $item['brutto']];
-                    $data[] = ['', "Юбка для девочки", '', '', '', '', '', '', ''];
+                    $data[] = ['', $submodelName, '', '', '', '', '', '', ''];
 
                     // Box sticker uchun shu paketdagi faqat bitta o'lcham va miqdor
                     $stickers[] = [
