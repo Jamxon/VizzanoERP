@@ -107,50 +107,38 @@
             </tr>
 
             @php
-                // 1. Miqdor bilan chiqarilgan sizelarni va ularning qiymatini to‘playmiz
+                // 1. Chiqarilgan sizelar
                 $printedMap = collect($sticker)
                     ->filter(fn($val, $key) => is_int($key) && is_array($val) && count($val) === 2 && is_string($val[0]))
                     ->mapWithKeys(fn($val) => [$val[0] => $val[1]]); // ['36' => 10, '38' => 12, ...]
 
-                // 2. orderSizes ni sort qilamiz va unikal qilamiz
-                $allSizes = collect($sticker['orderSizes'] ?? [])->sort()->unique()->values();
+                // 2. orderSizes
+                $allSizes = collect($sticker['orderSizes'] ?? [])->unique();
 
-                // 3. Chiqarilmagan (ya'ni qty ko‘rsatilmagan) sizelarni ajratamiz
-                $remainingSizes = $allSizes->filter(fn($size) => !$printedMap->has($size))->values();
+                // 3. Hammasini birlashtirib: qty bo‘lmaganlarga 0
+                $fullSizes = $allSizes->mapWithKeys(function($size) use ($printedMap) {
+                    return [$size => $printedMap->get($size, '')];
+                })->sortKeys(); // sort numerically if sizes are numbers
 
-                // 4. Total rows = chiqarilgan + chiqmagan
-                $totalRows = $printedMap->count() + $remainingSizes->count();
-
-                // 5. 7 ga to‘ldirish uchun nechta bo‘sh qator kerak
-                $emptyRowCount = max(0, 7 - $totalRows);
+                // 4. 7 ta qatorga to‘ldirish
+                $emptyRowCount = max(0, 7 - $fullSizes->count());
             @endphp
 
-            {{-- 6. Chiqarilgan (qty bor) sizelarni chiqaramiz --}}
-            @foreach($printedMap as $size => $qty)
+            {{-- 5. Tartiblangan barcha sizelarni chiqarish --}}
+            @foreach($fullSizes as $size => $qty)
                 <tr>
                     <td colspan="3" class="center bold big-text">{{ $size }}</td>
                     <td colspan="4" class="center bold big-text">{{ $qty }}</td>
                 </tr>
             @endforeach
 
-            {{-- 7. Faqat chiqmagan sizelar (qty yo‘q) --}}
-            @foreach($remainingSizes as $size)
-                <tr>
-                    <td colspan="3" class="center bold big-text">{{ $size }}</td>
-                    <td colspan="4" class="center bold big-text"></td>
-                </tr>
-            @endforeach
-
-            {{-- 8. Bo‘sh qatordan 7 taga to‘ldirish --}}
+            {{-- 6. Bo‘sh qatordan 7 taga to‘ldirish --}}
             @for($i = 0; $i < $emptyRowCount; $i++)
                 <tr>
                     <td colspan="3" class="center bold big-text">&nbsp;</td>
                     <td colspan="4" class="center bold big-text"></td>
                 </tr>
             @endfor
-
-
-
 
             {{-- Net & Brutto --}}
             @php
