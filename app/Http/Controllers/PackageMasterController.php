@@ -186,6 +186,7 @@ class PackageMasterController extends Controller
                     $data[] = ['', $submodelName, '', '', '', '', '', '', ''];
                 }
 
+                // Har bir size bo‘yicha qty
                 $qtyBySize = collect($pkg)->mapWithKeys(fn($i) => [$i['size_name'] => $i['qty']]);
                 $sizes = [];
                 $totalQtyLeft = 0;
@@ -195,19 +196,22 @@ class PackageMasterController extends Controller
                     $totalQtyLeft += is_numeric($qty) ? $qty : 0;
                 }
 
+                // Netto va brutto
                 $netto = collect($pkg)->sum('netto');
                 $brutto = collect($pkg)->sum('brutto');
 
                 $grouped = $this->groupSizesInRows($sizes);
                 $grouped[] = [round($netto, 2), round($brutto, 2)];
 
+                // TO‘G‘RILANGAN sticker formati
                 $stickers[] = [
-                    ...$grouped,
+                    'sizes' => $grouped,
                     'color' => $colors,
                     'model' => $modelName,
                     'orderSizes' => $orderSizes,
                 ];
 
+                // Umumiy statistikaga qo‘shish
                 $totalQtyAll += $totalQtyLeft;
                 $totalNetto += $netto;
                 $totalBrutto += $brutto;
