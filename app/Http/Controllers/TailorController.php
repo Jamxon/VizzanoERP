@@ -193,6 +193,7 @@ class TailorController extends Controller
                 'employee_id' => $employeeId,
                 'employee_name' => $employee->name ?? '---',
                 'image' => $employee->img ?? null,
+                'group' => $employee->group->name ?? '---',
                 'total_earned' => $totalEarned,
                 'works' => $details,
             ];
