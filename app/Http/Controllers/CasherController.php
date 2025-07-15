@@ -128,7 +128,7 @@ class CasherController extends Controller
             'total_output_cost_uzs' => $monthlyStats['total_output_cost_uzs'],
             'total_fixed_cost_uzs' => $monthlyStats['total_fixed_cost_uzs'],
             'net_profit_uzs' => $monthlyStats['net_profit_uzs'],
-            'average_employee_count' => $averageEmployeeCount,
+            'employee_count' => $averageEmployeeCount,
             'per_employee_cost_uzs' => $perEmployeeCost,
             'orders' => array_values($orderSummaries),
         ]);
