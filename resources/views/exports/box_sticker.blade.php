@@ -117,18 +117,12 @@
                     ->unique()
                     ->values()
                     ->sort(function ($a, $b) {
-                        // Kompleks size format uchun (masalan: "140/68", "128/64")
-                        // Birinchi raqamni ajratib olib, uni bo'yicha sort qilish
-                        $getFirstNumber = function($size) {
-                            if (strpos($size, '/') !== false) {
-                                return (float) explode('/', $size)[0];
-                            }
-                            return (float) $size;
-                        };
 
-                        $numA = $getFirstNumber($a);
-                        $numB = $getFirstNumber($b);
-                        return $numA <=> $numB;
+                        // Sizelarni raqamiy tartibda solishtirish
+                        $aNum = is_numeric($a) ? (int)$a : PHP_INT_MAX;
+                        $bNum = is_numeric($b) ? (int)$b : PHP_INT_MAX;
+
+                        return $aNum <=> $bNum;
                     })
                     ->values(); // Indekslarni qayta tiklash
 
