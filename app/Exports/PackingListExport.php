@@ -94,50 +94,90 @@ class PackingListExport implements WithMultipleSheets
                 public function styles(Worksheet $sheet): array {
                     $startRow = 3;
                     $totalRows = count($this->data);
-                    $groupCount = (int)($totalRows / 3);
                     $cols = ['A','B','C','D','E','F','G','H','I'];
 
-                    for ($i = 0; $i < $groupCount; $i++) {
-                        $r1 = $startRow + ($i * 3);
-                        $r2 = $r1 + 1;
-                        $r3 = $r1 + 2;
+                    // Guruhlarni topish
+                    $groups = [];
+                    $currentGroup = [];
 
+                    for ($i = 0; $i < $totalRows; $i++) {
+                        $row = $this->data[$i];
+
+                        // Agar qator bo'sh bo'lsa va "Артикул:" bilan boshlansa - yangi guruh
+                        if (empty($row[0]) && !empty($row[1]) && strpos($row[1], 'Артикул:') !== false) {
+                            if (!empty($currentGroup)) {
+                                $groups[] = $currentGroup;
+                            }
+                            $currentGroup = [$i];
+                        } else {
+                            $currentGroup[] = $i;
+                        }
+                    }
+
+                    // Oxirgi guruhni qo'shish
+                    if (!empty($currentGroup)) {
+                        $groups[] = $currentGroup;
+                    }
+
+                    // Har bir guruh uchun styling
+                    foreach ($groups as $group) {
+                        $firstRow = $startRow + $group[0];
+                        $lastRow = $startRow + $group[count($group) - 1];
+
+                        // Guruh chegarasi
                         foreach ($cols as $col) {
-                            $sheet->getStyle("{$col}{$r1}")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THIN);
-                            $sheet->getStyle("{$col}{$r3}")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+                            $sheet->getStyle("{$col}{$firstRow}")->getBorders()->getTop()->setBorderStyle(Border::BORDER_THIN);
+                            $sheet->getStyle("{$col}{$lastRow}")->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
                         }
 
-                        for ($r = $r1; $r <= $r3; $r++) {
+                        // Guruh ichidagi barcha qatorlar uchun
+                        for ($r = $firstRow; $r <= $lastRow; $r++) {
                             $sheet->getStyle("A{$r}")->getBorders()->getLeft()->setBorderStyle(Border::BORDER_THIN);
                             $sheet->getStyle("I{$r}")->getBorders()->getRight()->setBorderStyle(Border::BORDER_THIN);
+
                             foreach ($cols as $col) {
                                 $sheet->getStyle("{$col}{$r}")->getAlignment()->setHorizontal('center');
                                 $sheet->getStyle("{$col}{$r}")->getAlignment()->setVertical('center');
                             }
                         }
 
-                        $sheet->getStyle("D{$r2}")->getFont()->setBold(true);
+                        // Rang qatorini topish va rang berish
+                        foreach ($group as $rowIndex) {
+                            $actualRow = $startRow + $rowIndex;
+                            $rowData = $this->data[$rowIndex];
 
-                        $colorCell = $sheet->getCell("B{$r2}")->getValue();
-                        if (preg_match('/Цвет:\s*(.+)/u', $colorCell, $matches)) {
-                            $colorName = $matches[1];
-                            $colors = [
-                                'Неви' => '000080', 'Синий' => '0000FF', 'Синый' => '0000FF', 'Светло-синий' => '87CEFA',
-                                'Темно-синий' => '00008B', 'Серый' => '808080', 'Светло-серый' => 'D3D3D3', 'Темно-серый' => 'A9A9A9',
-                                'Черный' => '000000', 'Кэмел' => 'C19A6B', 'Кэмел чёрный' => '5C4033', 'Хаки' => '78866B',
-                                'Хаки черный' => '3B3C36', 'Белый' => 'FFFFFF', 'Бежевый' => 'F5F5DC', 'Красный' => 'FF0000',
-                                'Темно-красный' => '8B0000', 'Розовый' => 'FFC0CB', 'Желтый' => 'FFFF00', 'Оранжевый' => 'FFA500',
-                                'Зеленый' => '008000', 'Салатовый' => '7CFC00', 'Темно-зеленый' => '006400', 'Фиолетовый' => '800080',
-                                'Бордовый' => '800000', 'Бирюзовый' => '40E0D0', 'Голубой' => 'ADD8E6', 'Шоколадный' => '7B3F00',
-                                'Кофейный' => '6F4E37', 'Золотой' => 'FFD700', 'Серебряный' => 'C0C0C0', 'default' => 'D3D3D3',
-                            ];
-                            $color = $colors[$colorName] ?? $colors['default'];
-                            $sheet->getStyle("B{$r2}")->getFill()->applyFromArray([
-                                'fillType' => Fill::FILL_SOLID,
-                                'startColor' => ['rgb' => $color],
-                            ]);
+                            // Agar B ustunida "Цвет:" bo'lsa
+                            if (!empty($rowData[1]) && strpos($rowData[1], 'Цвет:') !== false) {
+                                $sheet->getStyle("D{$actualRow}")->getFont()->setBold(true);
+
+                                $colorCell = $rowData[1];
+                                if (preg_match('/Цвет:\s*(.+)/u', $colorCell, $matches)) {
+                                    $colorName = trim($matches[1]);
+                                    $colors = [
+                                        'Неви' => '000080', 'Синий' => '0000FF', 'Синый' => '0000FF', 'Светло-синий' => '87CEFA',
+                                        'Темно-синий' => '00008B', 'Серый' => '808080', 'Светло-серый' => 'D3D3D3', 'Темно-серый' => 'A9A9A9',
+                                        'Черный' => '000000', 'Кэмел' => 'C19A6B', 'Кэмел чёрный' => '5C4033', 'Хаки' => '78866B',
+                                        'Хаки черный' => '3B3C36', 'Белый' => 'FFFFFF', 'Бежевый' => 'F5F5DC', 'Красный' => 'FF0000',
+                                        'Темно-красный' => '8B0000', 'Розовый' => 'FFC0CB', 'Желтый' => 'FFFF00', 'Оранжевый' => 'FFA500',
+                                        'Зеленый' => '008000', 'Салатовый' => '7CFC00', 'Темно-зеленый' => '006400', 'Фиолетовый' => '800080',
+                                        'Бордовый' => '800000', 'Бирюзовый' => '40E0D0', 'Голубой' => 'ADD8E6', 'Шоколадный' => '7B3F00',
+                                        'Кофейный' => '6F4E37', 'Золотой' => 'FFD700', 'Серебряный' => 'C0C0C0', 'default' => 'D3D3D3',
+                                    ];
+
+                                    // Bir nechta rang bo'lsa, vergul bilan ajratilgan
+                                    $colorNames = explode(',', $colorName);
+                                    $firstColor = trim($colorNames[0]);
+                                    $color = $colors[$firstColor] ?? $colors['default'];
+
+                                    $sheet->getStyle("B{$actualRow}")->getFill()->applyFromArray([
+                                        'fillType' => Fill::FILL_SOLID,
+                                        'startColor' => ['rgb' => $color],
+                                    ]);
+                                }
+                            }
                         }
                     }
+
                     return [];
                 }
             },
