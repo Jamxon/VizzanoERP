@@ -117,12 +117,23 @@
                     ->unique()
                     ->values()
                     ->sort(function ($a, $b) {
+                        // Kompleks size format uchun (masalan: "140/68", "128/64")
+                        $parseSize = function($size) {
+                            if (strpos($size, '/') !== false) {
+                                $parts = explode('/', $size);
+                                return [(float) $parts[0], (float) ($parts[1] ?? 0)];
+                            }
+                            return [(float) $size, 0];
+                        };
 
-                        // Sizelarni raqamiy tartibda solishtirish
-                        $aNum = is_numeric($a) ? (int)$a : PHP_INT_MAX;
-                        $bNum = is_numeric($b) ? (int)$b : PHP_INT_MAX;
+                        $sizeA = $parseSize($a);
+                        $sizeB = $parseSize($b);
 
-                        return $aNum <=> $bNum;
+                        // Avval birinchi raqam bo'yicha, keyin ikkinchi raqam bo'yicha
+                        if ($sizeA[0] !== $sizeB[0]) {
+                            return $sizeA[0] <=> $sizeB[0];
+                        }
+                        return $sizeA[1] <=> $sizeB[1];
                     })
                     ->values(); // Indekslarni qayta tiklash
 
