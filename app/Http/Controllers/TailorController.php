@@ -191,7 +191,7 @@ class TailorController extends Controller
 
             return [
                 'employee_id' => $employeeId,
-                'employee_name' => $employee->full_name ?? '---',
+                'employee_name' => $employee->name ?? '---',
                 'total_earned' => $totalEarned,
                 'works' => $details,
             ];
