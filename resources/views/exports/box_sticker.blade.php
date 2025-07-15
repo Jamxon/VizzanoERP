@@ -117,9 +117,17 @@
                     ->unique()
                     ->values()
                     ->sort(function ($a, $b) {
-                        // Raqamiy qiymatlar bo'yicha solishtirish
-                        $numA = (float) $a;
-                        $numB = (float) $b;
+                        // Kompleks size format uchun (masalan: "140/68", "128/64")
+                        // Birinchi raqamni ajratib olib, uni bo'yicha sort qilish
+                        $getFirstNumber = function($size) {
+                            if (strpos($size, '/') !== false) {
+                                return (float) explode('/', $size)[0];
+                            }
+                            return (float) $size;
+                        };
+
+                        $numA = $getFirstNumber($a);
+                        $numB = $getFirstNumber($b);
                         return $numA <=> $numB;
                     })
                     ->values(); // Indekslarni qayta tiklash
@@ -127,6 +135,10 @@
                 // 3. Sizelarga mos qty biriktirish (agar yo'q bo'lsa `''`)
                 $fullSizes = $orderedSizes->mapWithKeys(function ($size) use ($printedMap) {
                     return [$size => $printedMap->get($size, '')];
+                })
+                ->filter(function ($qty) {
+                    // Faqat qiymatli size'larni qoldirish
+                    return $qty !== '' && $qty > 0;
                 });
 
                 // 4. To'ldirish uchun bo'sh qatorlar
