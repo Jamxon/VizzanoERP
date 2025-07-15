@@ -188,6 +188,7 @@ class CasherController extends Controller
             ->sum('amount');
 
         $employees = Attendance::whereDate('date', $date)
+            ->where('status', 'present')
             ->whereHas('employee', function ($q) use ($branchId)  {
                 $q->where('status', '!=', 'kicked');
                 $q->where('branch_id', $branchId);
