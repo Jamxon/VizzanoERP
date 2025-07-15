@@ -263,7 +263,7 @@ class UserController extends Controller
                     $query->whereBetween('date', [$start_date, $end_date]);
                 }
 
-                $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity')
+                $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'amount_earned', 'is_own')
                     ->with(['tarification' => function ($q) {
                         $q->select('id', 'name', 'code', 'second', 'summa');
                     }]);
