@@ -11,6 +11,7 @@ use App\Models\OrderSize;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Bonus;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 
 class PackageMasterController extends Controller
