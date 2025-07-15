@@ -123,7 +123,7 @@ class CasherController extends Controller
             'kpi' => $monthlyStats['kpi'],
             'transport_attendance' => $monthlyStats['transport_attendance'],
             'tarification' => $monthlyStats['tarification'],
-            'daily_expenses' => $monthlyStats['daily_expenses'],
+            'monthly_expenses' => $monthlyStats['daily_expenses'],
             'total_earned_uzs' => $monthlyStats['total_earned_uzs'],
             'total_output_cost_uzs' => $monthlyStats['total_output_cost_uzs'],
             'total_fixed_cost_uzs' => $monthlyStats['total_fixed_cost_uzs'],
