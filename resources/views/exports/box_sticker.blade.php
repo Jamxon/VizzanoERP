@@ -116,35 +116,22 @@
                 $orderedSizes = collect($sticker['orderSizes'] ?? [])
                     ->unique()
                     ->values()
-                    ->sort(function ($a, $b) {
+                    ->sortBy(function ($size) {
                         // Kompleks size format uchun (masalan: "140/68", "128/64")
-                        $parseSize = function($size) {
-                            if (strpos($size, '/') !== false) {
-                                $parts = explode('/', $size);
-                                return [(float) $parts[0], (float) ($parts[1] ?? 0)];
-                            }
-                            return [(float) $size, 0];
-                        };
-
-                        $sizeA = $parseSize($a);
-                        $sizeB = $parseSize($b);
-
-                        // Avval birinchi raqam bo'yicha, keyin ikkinchi raqam bo'yicha
-                        if ($sizeA[0] !== $sizeB[0]) {
-                            return $sizeA[0] <=> $sizeB[0];
+                        if (strpos($size, '/') !== false) {
+                            $parts = explode('/', $size);
+                            // Birinchi raqamni 1000 ga ko'paytirib, ikkinchi raqamni qo'shamiz
+                            return ((float) $parts[0]) * 1000 + ((float) ($parts[1] ?? 0));
                         }
-                        return $sizeA[1] <=> $sizeB[1];
+                        return (float) $size;
                     })
                     ->values(); // Indekslarni qayta tiklash
 
                 // 3. Sizelarga mos qty biriktirish (agar yo'q bo'lsa `''`)
                 $fullSizes = $orderedSizes->mapWithKeys(function ($size) use ($printedMap) {
                     return [$size => $printedMap->get($size, '')];
-                })
-                ->filter(function ($qty) {
-                    // Faqat qiymatli size'larni qoldirish
-                    return $qty !== '' && $qty > 0;
                 });
+                // Filter olib tashlandi - barcha size'lar chiqadi
 
                 // 4. To'ldirish uchun bo'sh qatorlar
                 $emptyRowCount = max(0, 7 - $fullSizes->count());
