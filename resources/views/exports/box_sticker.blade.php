@@ -107,20 +107,20 @@
             </tr>
 
             @php
-                // 1. Chiqarilgan sizelar
+                // 1. Chiqarilgan sizelar: ['36' => 10, '38' => 12, ...]
                 $printedMap = collect($sticker)
                     ->filter(fn($val, $key) => is_int($key) && is_array($val) && count($val) === 2 && is_string($val[0]))
-                    ->mapWithKeys(fn($val) => [$val[0] => $val[1]]); // ['36' => 10, '38' => 12, ...]
+                    ->mapWithKeys(fn($val) => [$val[0] => $val[1]]);
 
-                // 2. orderSizes
-                $allSizes = collect($sticker['orderSizes'] ?? [])->unique();
+                // 2. orderSizes bo‘yicha haqiqiy tartibda barcha sizelar
+                $orderedSizes = collect($sticker['orderSizes'] ?? [])->unique()->values();
 
-                // 3. Hammasini birlashtirib: qty bo‘lmaganlarga 0
-                $fullSizes = $allSizes->mapWithKeys(function($size) use ($printedMap) {
+                // 3. Sizelarga mos qty biriktirish (agar yo‘q bo‘lsa `''`)
+                $fullSizes = $orderedSizes->mapWithKeys(function ($size) use ($printedMap) {
                     return [$size => $printedMap->get($size, '')];
-                })->sortKeys(); // sort numerically if sizes are numbers
+                });
 
-                // 4. 7 ta qatorga to‘ldirish
+                // 4. To‘ldirish uchun bo‘sh qatorlar
                 $emptyRowCount = max(0, 7 - $fullSizes->count());
             @endphp
 
