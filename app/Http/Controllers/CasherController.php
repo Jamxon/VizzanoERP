@@ -13,6 +13,7 @@ use App\Models\Currency;
 use App\Models\MonthlyExpense;
 use App\Models\SalaryPayment;
 use App\Models\SewingOutputs;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -112,7 +113,16 @@ class CasherController extends Controller
                 : null;
         }
 
-        $averageEmployeeCount = round($monthlyStats['employee_count_sum'] / $daysInMonth);
+        $startOfMonth = Carbon::now()->copy()->startOfMonth();
+        $today = Carbon::now()->copy();
+
+        $period = CarbonPeriod::create($startOfMonth, $today);
+
+        $workingDays = collect($period)->filter(function ($date) {
+            return !$date->isSunday();
+        })->count();
+
+        $averageEmployeeCount = round($monthlyStats['employee_count_sum'] / max($workingDays, 1));
         $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
 
         return response()->json([
