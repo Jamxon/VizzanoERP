@@ -112,15 +112,24 @@
                     ->filter(fn($val, $key) => is_int($key) && is_array($val) && count($val) === 2 && is_string($val[0]))
                     ->mapWithKeys(fn($val) => [$val[0] => $val[1]]);
 
-                // 2. orderSizes bo‘yicha haqiqiy tartibda barcha sizelar
-                $orderedSizes = collect($sticker['orderSizes'] ?? [])->unique()->values();
+                // 2. orderSizes bo'yicha haqiqiy tartibda barcha sizelar
+                $orderedSizes = collect($sticker['orderSizes'] ?? [])
+                    ->unique()
+                    ->values()
+                    ->sort(function ($a, $b) {
+                        // Raqamiy qiymatlar bo'yicha solishtirish
+                        $numA = (float) $a;
+                        $numB = (float) $b;
+                        return $numA <=> $numB;
+                    })
+                    ->values(); // Indekslarni qayta tiklash
 
-                // 3. Sizelarga mos qty biriktirish (agar yo‘q bo‘lsa `''`)
+                // 3. Sizelarga mos qty biriktirish (agar yo'q bo'lsa `''`)
                 $fullSizes = $orderedSizes->mapWithKeys(function ($size) use ($printedMap) {
                     return [$size => $printedMap->get($size, '')];
                 });
 
-                // 4. To‘ldirish uchun bo‘sh qatorlar
+                // 4. To'ldirish uchun bo'sh qatorlar
                 $emptyRowCount = max(0, 7 - $fullSizes->count());
             @endphp
 
@@ -132,7 +141,7 @@
                 </tr>
             @endforeach
 
-            {{-- 6. Bo‘sh qatordan 7 taga to‘ldirish --}}
+            {{-- 6. Bo'sh qatordan 7 taga to'ldirish --}}
             @for($i = 0; $i < $emptyRowCount; $i++)
                 <tr>
                     <td colspan="3" class="center bold big-text">&nbsp;</td>
