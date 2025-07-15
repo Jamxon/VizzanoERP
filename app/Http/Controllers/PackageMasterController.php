@@ -50,7 +50,8 @@ class PackageMasterController extends Controller
         return response()->json($order);
     }
 
-    public function packageStore(Request $request)
+
+    public function packageStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
             'orders' => 'required|array',
@@ -63,11 +64,11 @@ class PackageMasterController extends Controller
             return response()->json(['message' => 'Buyurtmalar topilmadi'], 404);
         }
 
-        $modelName = $orders->first()?->orderModel?->model->name ?? 'Model nomi yo‘q';
-        $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yo‘q';
+        $modelName = $orders->first()?->orderModel?->model->name ?? 'Model nomi yoq';
+        $customerName = $orders->first()?->contragent->name ?? 'Buyurtmachi yoq';
         $imagePath = $orders->first()?->contragent->image ?? null;
         $absolutePath = public_path($imagePath);
-        $submodelName = $orders->first()?->orderModel?->submodels->first()?->submodel?->name ?? 'Submodel nomi yo‘q';
+        $submodelName = $orders->first()?->orderModel?->submodels->first()?->submodel?->name ?? 'Submodel nomi yoq';
         $orderSizes = $orders->first()?->orderModel?->sizes->map(fn($item) => $item->size->name)->toArray() ?? [];
         $colorMap = [];
         $sizesMap = [];
@@ -105,6 +106,7 @@ class PackageMasterController extends Controller
         $totalPacks = $totalQtyAll = $totalNetto = $totalBrutto = 0;
         $index = 1;
         $stickers = [];
+        $allLeftovers = []; // Barcha qoldiqlarni saqlash uchun
 
         foreach ($colorMap as $color => $items) {
             $leftovers = [];
@@ -144,51 +146,21 @@ class PackageMasterController extends Controller
                     $brutto += $item['brutto'];
                 }
 
-                if ($qty > 0) {
-                    $leftovers[] = ['size_name' => $sizeName, 'qty' => $qty, 'netto' => $item['netto'], 'brutto' => $item['brutto']];
-                }
+            if ($qty > 0) {
+            $leftovers[] = [
+            'size_name' => $sizeName,
+            'qty' => $qty,
+            'netto' => $item['netto'],
+            'brutto' => $item['brutto'],
+            'capacity' => $capacity, // Sig'imni qo'shamiz
+            'color' => $color
+            ];
+            }
             }
 
-            if (count($leftovers)) {
-                // Packing faylga leftovers qo'shish
-                $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
-                $data[] = [$index, "Цвет: $color", $leftovers[0]['size_name'] ?? '', $customerName, $packCount + 1, 1, $leftovers[0]['qty'] ?? '', '', ''];
-                $data[] = ['', $submodelName, $leftovers[1]['size_name'] ?? '', '', '', '', $leftovers[1]['qty'] ?? '', '', ''];
-
-                // Size'lar bo'yicha qty map tuzib olamiz
-                $qtyBySize = collect($leftovers)->mapWithKeys(fn($left) => [
-                    $left['size_name'] => $left['qty']
-                ])->toArray();
-
-                $sizes = [];
-                $totalQtyLeft = 0;
-
-                // Har bir sizesMap elementiga qarab qty ni olamiz yoki '' beramiz
-                foreach ($sizesMap as $sizeName) {
-                    $qty = $qtyBySize[$sizeName] ?? '';
-                    $sizes[] = [$sizeName, $qty];
-                    $totalQtyLeft += is_numeric($qty) ? $qty : 0;
-                }
-
-                // Netto va Brutto yig'ish
-                $totalNettoLeft = collect($leftovers)->sum('netto');
-                $totalBruttoLeft = collect($leftovers)->sum('brutto');
-
-                // Sticker massivini tayyorlash
-                $sizesRows = [['Размер', 'Количество'], ...$sizes, [round($totalNettoLeft, 2), round($totalBruttoLeft, 2)]];
-
-                $stickers[] = [
-                    ...$sizesRows,
-                    'color' => $color,
-                    'model' => $modelName,
-                    'orderSizes' => $orderSizes,
-                ];
-
-                $index++;
-                $packCount++;
-                $totalQty += $totalQtyLeft;
-                $netto += $totalNettoLeft;
-                $brutto += $totalBruttoLeft;
+            // Qoldiqlarni allLeftovers ga qo'shish
+            foreach ($leftovers as $leftover) {
+                $allLeftovers[] = $leftover;
             }
 
             // Umumiy yig'ish
@@ -196,33 +168,116 @@ class PackageMasterController extends Controller
             $totalQtyAll += $totalQty;
             $totalNetto += $netto;
             $totalBrutto += $brutto;
-        }
+            }
 
-        $summaryList[] = [
-            1,
-            $modelName,
-            'Комбинезон для девочки',
-            $totalPacks,
-            $totalQtyAll,
-            round($totalNetto, 2),
-            round($totalBrutto, 2),
-        ];
+            // Qoldiqlarni sig'im bo'yicha guruhlash va birlashtirishni tekshirish
+            $groupedByCapacity = collect($allLeftovers)->groupBy('capacity');
 
-        // Fayl yaratish
-        $timestamp = now()->timestamp;
-        $unique = \Illuminate\Support\Str::random(6);
-        $fileName = "packing_result_{$timestamp}_{$unique}.zip";
-        $jobPath = "exports/temp_{$timestamp}_{$unique}";
+            foreach ($groupedByCapacity as $capacity => $leftoversGroup) {
+                $leftoverPackages = []; // Har bir sig'im uchun paketlar
+                $currentPackage = [];
+                $currentQty = 0;
 
-        dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName, $absolutePath, $submodelName, $modelName));
+                foreach ($leftoversGroup as $leftover) {
+                    // Agar joriy paket + yangi qoldiq sig'imdan oshmasa
+                    if ($currentQty + $leftover['qty'] <= $capacity) {
+                        $currentPackage[] = $leftover;
+                        $currentQty += $leftover['qty'];
+                    } else {
+                        // Joriy paketni saqlash va yangi paket boshlash
+                        if (!empty($currentPackage)) {
+                            $leftoverPackages[] = $currentPackage;
+                        }
+                        $currentPackage = [$leftover];
+                        $currentQty = $leftover['qty'];
+                    }
+                }
 
-        $url = asset("storage/exports/{$fileName}");
+                // Oxirgi paketni qo'shish
+                if (!empty($currentPackage)) {
+                    $leftoverPackages[] = $currentPackage;
+                }
 
-        return response()->json([
-            'status' => 'processing',
-            'message' => 'Fayllar tayyorlanmoqda. Tez orada yuklab olish mumkin.',
-            'url' => $url
-        ]);
+                // Har bir paket uchun sticker yaratish
+                foreach ($leftoverPackages as $packageIndex => $package) {
+                    $totalPacks++;
+                    $packIndex = $totalPacks;
+
+                    // Ranglarni birlashtirish
+                    $colors = collect($package)->pluck('color')->unique()->implode(', ');
+
+                    // Packing faylga qo'shish
+                    $data[] = ['', "Артикул: $modelName", '', '', '', '', '', '', ''];
+                    $data[] = [$packIndex, "Цвет: $colors", $package[0]['size_name'], $customerName, $packIndex, 1, $package[0]['qty'], '', ''];
+
+                    if (count($package) > 1) {
+                        for ($i = 1; $i < count($package); $i++) {
+                            $data[] = ['', $submodelName, $package[$i]['size_name'], '', '', '', $package[$i]['qty'], '', ''];
+                        }
+                    } else {
+                        $data[] = ['', $submodelName, '', '', '', '', '', '', ''];
+                    }
+
+                    // Size'lar bo'yicha qty map tuzib olamiz
+                    $qtyBySize = collect($package)->mapWithKeys(fn($item) => [
+                        $item['size_name'] => $item['qty']
+                    ])->toArray();
+
+                    $sizes = [];
+                    $totalQtyLeft = 0;
+
+                    // Har bir sizesMap elementiga qarab qty ni olamiz yoki '' beramiz
+                    foreach ($sizesMap as $sizeName) {
+                        $qty = $qtyBySize[$sizeName] ?? '';
+                        $sizes[] = [$sizeName, $qty];
+                        $totalQtyLeft += is_numeric($qty) ? $qty : 0;
+                    }
+
+                    // Netto va Brutto yig'ish
+                    $totalNettoLeft = collect($package)->sum('netto');
+                    $totalBruttoLeft = collect($package)->sum('brutto');
+
+                    // Sticker massivini tayyorlash
+                    $sizesRows = [['Размер', 'Количество'], ...$sizes, [round($totalNettoLeft, 2), round($totalBruttoLeft, 2)]];
+
+                    $stickers[] = [
+                        ...$sizesRows,
+                        'color' => $colors,
+                        'model' => $modelName,
+                        'orderSizes' => $orderSizes,
+                    ];
+
+                    $totalQtyAll += $totalQtyLeft;
+                    $totalNetto += $totalNettoLeft;
+                    $totalBrutto += $totalBruttoLeft;
+                }
+            }
+
+            $summaryList[] = [
+                1,
+                $modelName,
+                'Комбинезон для девочки',
+                $totalPacks,
+                $totalQtyAll,
+                round($totalNetto, 2),
+                round($totalBrutto, 2),
+            ];
+
+            // Fayl yaratish
+            $timestamp = now()->timestamp;
+            $unique = \Illuminate\Support\Str::random(6);
+            $fileName = "packing_result_{$timestamp}_{$unique}.zip";
+            $jobPath = "exports/temp_{$timestamp}_{$unique}";
+
+            dispatch(new PackageExportJob($data, $summaryList, $stickers, $fileName, $absolutePath, $submodelName, $modelName));
+
+            $url = asset("storage/exports/{$fileName}");
+
+            return response()->json([
+                'status' => 'processing',
+                'message' => 'Fayllar tayyorlanmoqda. Tez orada yuklab olish mumkin.',
+                'url' => $url
+            ]);
     }
 
 }
