@@ -140,8 +140,8 @@
             {{-- 5. Tartiblangan barcha sizelarni chiqarish --}}
             @foreach($fullSizes as $size => $qty)
                 <tr>
-                    <td colspan="3" class="center bold big-text">{{ $size }}</td>
-                    <td colspan="4" class="center bold big-text">{{ $qty }}</td>
+                    <td colspan="3" class="center bold big-text" style="font-size: 50px">{{ $size }}</td>
+                    <td colspan="4" class="center bold big-text" style="font-size: 50px">{{ $qty }}</td>
                 </tr>
             @endforeach
 
