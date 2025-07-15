@@ -230,7 +230,7 @@ class CasherController extends Controller
             $orderShareRatio = $totalOutputQty > 0 ? $totalQty / $totalOutputQty : 0;
 
             // Monthly type xarajat
-            $allocatedDailyExpenseMonthly = $dailyExpenseMonthly * $orderShareRatio;
+            $allocatedMonthlyExpenseMonthly = $dailyExpenseMonthly * $orderShareRatio;
 
             // Income percentage type xarajat
             $incomePercentageExpense = 0;
@@ -252,7 +252,7 @@ class CasherController extends Controller
             $allocatedTransport = $transport * $orderShareRatio;
             $allocatedAup = $aup * $orderShareRatio;
 
-            $totalExtra = $allocatedTransport + $allocatedAup + $allocatedDailyExpenseMonthly + $incomePercentageExpense + $amortizationExpense;
+            $totalExtra = $allocatedTransport + $allocatedAup + $allocatedMonthlyExpenseMonthly + $incomePercentageExpense + $amortizationExpense;
 
             $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
             $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
@@ -278,7 +278,7 @@ class CasherController extends Controller
                 'bonus' => $bonus,
                 'tarification' => $tarification,
                 'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
-                'costs_uzs' => compact('bonus', 'tarification', 'remainder', 'allocatedTransport', 'allocatedAup', 'allocatedDailyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
+                'costs_uzs' => compact('bonus', 'tarification', 'remainder', 'allocatedTransport', 'allocatedAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
                 'total_fixed_cost_uzs' => $fixedCost + $totalExtra,
                 'net_profit_uzs' => $profitUZS,
                 'cost_per_unit_uzs' => round($perUnitCost),
