@@ -231,7 +231,7 @@ class GroupMasterController extends Controller
                 'orderModel.submodels.tarificationCategories.tarifications',
                 'instructions',
             ])
-            ->get();
+            ->first();
 
         return response()->json($orders);
     }

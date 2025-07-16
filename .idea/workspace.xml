@@ -396,23 +396,7 @@
       <workItem from="1752294056668" duration="7108000" />
       <workItem from="1752467143431" duration="17066000" />
       <workItem from="1752554554901" duration="14949000" />
-      <workItem from="1752639015923" duration="7072000" />
-    </task>
-    <task id="LOCAL-00848" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752477967596</created>
-      <option name="number" value="00848" />
-      <option name="presentableId" value="LOCAL-00848" />
-      <option name="project" value="LOCAL" />
-      <updated>1752477967596</updated>
-    </task>
-    <task id="LOCAL-00849" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752483284474</created>
-      <option name="number" value="00849" />
-      <option name="presentableId" value="LOCAL-00849" />
-      <option name="project" value="LOCAL" />
-      <updated>1752483284474</updated>
+      <workItem from="1752639015923" duration="7910000" />
     </task>
     <task id="LOCAL-00850" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -790,7 +774,23 @@
       <option name="project" value="LOCAL" />
       <updated>1752658686615</updated>
     </task>
-    <option name="localTasksCounter" value="897" />
+    <task id="LOCAL-00897" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752658857332</created>
+      <option name="number" value="00897" />
+      <option name="presentableId" value="LOCAL-00897" />
+      <option name="project" value="LOCAL" />
+      <updated>1752658857332</updated>
+    </task>
+    <task id="LOCAL-00898" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
+      <option name="closed" value="true" />
+      <created>1752659554117</created>
+      <option name="number" value="00898" />
+      <option name="presentableId" value="LOCAL-00898" />
+      <option name="project" value="LOCAL" />
+      <updated>1752659554117</updated>
+    </task>
+    <option name="localTasksCounter" value="899" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
