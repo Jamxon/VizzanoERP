@@ -186,53 +186,28 @@ class GroupMasterController extends Controller
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-        $query = OrderGroup::where('group_id', $user->group->id)
-            ->whereHas('order', function ($q) {
-                $q->whereIn('status', [
-                    'pending',
-                    'tailoring',
-                    'tailored',
-                    'active',
-                    'cutting',
-                ]);
-            })
+        $orders = Order::whereIn('status', [
+            'pending',
+            'tailoring',
+            'active',
+            'tailored',
+            'cutting',
+        ])
+            ->where('branch_id', $user->employee->branch_id)
             ->with([
-                'order.orderModel',
-                'order.orderModel.model',
-                'order.orderModel.material',
-                'order.orderModel.sizes.size',
-                'order.orderModel.sizes.color',
-                'order.instructions',
+                'orderModel',
+                'orderModel.model',
+                'orderModel.material',
+                'orderModel.sizes.size',
+                'orderModel.sizes.color',
+                'orderModel.submodels.submodel',
+                'orderModel.submodels.group.group',
+                'orderModel.submodels.tarificationCategories.tarifications',
+                'instructions',
             ])
-            ->selectRaw('DISTINCT ON (order_id, submodel_id) *');
+            ->get();
 
-        $orders = $query->get();
-
-        $orders = $orders->groupBy('order_id')->map(function ($orderGroups) {
-            $firstOrderGroup = $orderGroups->first();
-            $order = $firstOrderGroup->order;
-
-            if ($order && $order->orderModel) {
-                $linkedSubmodelIds = $orderGroups->pluck('submodel_id')->unique();
-
-                $order->orderModel->submodels = $order->orderModel->submodels
-                    ->whereIn('id', $linkedSubmodelIds)
-                    ->values();
-
-                // Tikilgan umumiy sonni hisoblash
-                $totalSewn = $order->orderModel->submodels->flatMap(function ($submodel) {
-                    return $submodel->sewingOutputs;
-                })->sum('quantity');
-
-                // Dinamik property qo‘shish yoki resource ichida ishlatish
-                $order->total_sewn_quantity = $totalSewn;
-            }
-
-            return $firstOrderGroup;
-        })->values();
-
-
-        return response()->json(GetOrderGroupMasterResource::collection($orders));
+        return response()->json($orders);
     }
 
     public function showOrder($id): \Illuminate\Http\JsonResponse
