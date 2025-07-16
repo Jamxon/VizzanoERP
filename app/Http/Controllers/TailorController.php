@@ -200,7 +200,7 @@ class TailorController extends Controller
         });
 
         // 3. Eng ko‘p topgan 10 nafar xodimni olish
-        $topEarners = $grouped->sortByDesc('total_earned')->values()->take(10);
+        $topEarners = $grouped->sortByDesc('total_earned')->values();
 
         return response()->json([
             'date' => $date,
