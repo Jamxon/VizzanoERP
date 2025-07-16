@@ -127,7 +127,7 @@ class GroupMasterController extends Controller
         return response()->json($orders);
     }
 
-    public function getOrders(Request $request): \Illuminate\Http\JsonResponse
+    public function getOrders(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
 
@@ -138,6 +138,63 @@ class GroupMasterController extends Controller
         $query = OrderGroup::where('group_id', $user->group->id)
             ->whereHas('order', function ($q) {
                 $q->whereIn('status', ['pending', 'tailoring']);
+            })
+            ->with([
+                'order.orderModel',
+                'order.orderModel.model',
+                'order.orderModel.material',
+                'order.orderModel.sizes.size',
+                'order.orderModel.sizes.color',
+                'order.instructions',
+            ])
+            ->selectRaw('DISTINCT ON (order_id, submodel_id) *');
+
+        $orders = $query->get();
+
+        $orders = $orders->groupBy('order_id')->map(function ($orderGroups) {
+            $firstOrderGroup = $orderGroups->first();
+            $order = $firstOrderGroup->order;
+
+            if ($order && $order->orderModel) {
+                $linkedSubmodelIds = $orderGroups->pluck('submodel_id')->unique();
+
+                $order->orderModel->submodels = $order->orderModel->submodels
+                    ->whereIn('id', $linkedSubmodelIds)
+                    ->values();
+
+                // Tikilgan umumiy sonni hisoblash
+                $totalSewn = $order->orderModel->submodels->flatMap(function ($submodel) {
+                    return $submodel->sewingOutputs;
+                })->sum('quantity');
+
+                // Dinamik property qo‘shish yoki resource ichida ishlatish
+                $order->total_sewn_quantity = $totalSewn;
+            }
+
+            return $firstOrderGroup;
+        })->values();
+
+
+        return response()->json(GetOrderGroupMasterResource::collection($orders));
+    }
+
+    public function getOrdersAll(): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+
+        if (!$user->group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        $query = OrderGroup::where('group_id', $user->group->id)
+            ->whereHas('order', function ($q) {
+                $q->whereIn('status', [
+                    'pending',
+                    'tailoring',
+                    'tailored',
+                    'active',
+                    'cutting',
+                ]);
             })
             ->with([
                 'order.orderModel',
