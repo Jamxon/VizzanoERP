@@ -181,6 +181,7 @@ class TailorController extends Controller
                 return [
                     'tarification_id' => $item->tarification_id,
                     'operation' => $tarification?->name,
+                    'second' => $tarification?->second,
                     'submodel' => $tarification?->tarificationCategory?->submodel?->name,
                     'quantity' => $item->total_quantity,
                     'earned' => $item->total_earned,
