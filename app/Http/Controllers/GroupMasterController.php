@@ -210,6 +210,32 @@ class GroupMasterController extends Controller
         return response()->json($orders);
     }
 
+    public function showOrdersAll($id): \Illuminate\Http\JsonResponse
+    {
+        $orders = Order::where('id', $id)
+            ->whereIn('status', [
+                'pending',
+                'tailoring',
+                'active',
+                'tailored',
+                'cutting',
+            ])
+            ->with([
+                'orderModel',
+                'orderModel.model',
+                'orderModel.material',
+                'orderModel.sizes.size',
+                'orderModel.sizes.color',
+                'orderModel.submodels.submodel',
+                'orderModel.submodels.group.group',
+                'orderModel.submodels.tarificationCategories.tarifications',
+                'instructions',
+            ])
+            ->get();
+
+        return response()->json($orders);
+    }
+
     public function showOrder($id): \Illuminate\Http\JsonResponse
     {
         $order = Order::where('id', $id)
