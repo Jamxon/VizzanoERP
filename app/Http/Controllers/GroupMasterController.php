@@ -17,6 +17,7 @@ use App\Models\Tarification;
 use App\Models\TelegramSewingMessage;
 use App\Models\Time;
 use App\Models\Log;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -659,6 +660,66 @@ class GroupMasterController extends Controller
         ];
 
         return response()->json($resultData);
+    }
+
+    public function getTopEarners(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $date = $request->date ?? Carbon::today()->toDateString();
+        $branchId = auth()->user()->employee->branch_id;
+        $groupId = auth()->user()->group->id ?? null;
+
+        if ($groupId === null){
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        // 1. Har bir employee va tarification bo‘yicha grouping
+        $logs = DB::table('employee_tarification_logs')
+            ->select(
+                'employee_id',
+                'tarification_id',
+                DB::raw('SUM(quantity) as total_quantity'),
+                DB::raw('SUM(amount_earned) as total_earned')
+            )
+            ->whereDate('date', $date)
+            ->whereIn('employee_id', Employee::where('group_id', $groupId)->pluck('id'))
+            ->groupBy('employee_id', 'tarification_id')
+            ->get();
+
+        // 2. Daromad bo‘yicha employee-larni guruhlab umumiy topganini hisoblash
+        $grouped = $logs->groupBy('employee_id')->map(function ($items, $employeeId) {
+            $totalEarned = $items->sum('total_earned');
+
+            $details = $items->map(function ($item) {
+                $tarification = Tarification::with('tarificationCategory.submodel')->find($item->tarification_id);
+                return [
+                    'tarification_id' => $item->tarification_id,
+                    'operation' => $tarification?->name,
+                    'second' => $tarification?->second,
+                    'code' => $tarification?->code,
+                    'quantity' => $item->total_quantity,
+                    'earned' => $item->total_earned,
+                ];
+            });
+
+            $employee = Employee::find($employeeId);
+
+            return [
+                'employee_id' => $employeeId,
+                'employee_name' => $employee->name ?? '---',
+                'image' => $employee->img ?? null,
+                'group' => $employee->group->name ?? '---',
+                'total_earned' => $totalEarned,
+                'works' => $details,
+            ];
+        });
+
+        // 3. Eng ko‘p topgan 10 nafar xodimni olish
+        $topEarners = $grouped->sortByDesc('total_earned')->values();
+
+        return response()->json([
+            'date' => $date,
+            'top_earners' => $topEarners,
+        ]);
     }
 
 }
