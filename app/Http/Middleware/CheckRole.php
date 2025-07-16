@@ -16,15 +16,35 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, $role)
     {
-        // Foydalanuvchi tizimga kirganini tekshiramiz
         if (!Auth::check()) {
-            return response('Unauthorized', 401); // Foydalanuvchi tizimga kirgan bo'lishi kerak
+            return response('Unauthorized', 401);
         }
 
-        // Foydalanuvchi rolini tekshiramiz
         $user = Auth::user();
+
+        // Rol tekshiruvi
         if ($user->role->name !== $role) {
-            return response('Not allowed'." bu rol $role uchun, san esa ".$user->role->name." bo'lib kirmoqchi bo'lyapsan", 403); // Foydalanuvchi berilgan rolni bajarishi kerak
+            return response('Not allowed. Bu rol ' . $role . ' uchun, sen esa ' . $user->role->name . ' bo‘lib kirmoqchi bo‘lyapsan', 403);
+        }
+
+        // Qo‘shimcha shartlar: agar rol 'tailor' bo‘lsa
+        if ($role === 'tailor') {
+            $employee = $user->employee;
+
+            // 1. Soat 20:00 dan keyin bo‘lsa
+            $now = now(); // Carbon instance
+            if ($now->hour >= 20) {
+                return response('Kech bo‘ldi! Soat 20:00 dan keyin tizimga kira olmaysiz.', 403);
+            }
+
+            // 2. Bugungi davomat mavjud emasmi?
+            $hasAttendance = \App\Models\Attendance::where('employee_id', $employee->id)
+                ->whereDate('date', $now->toDateString())
+                ->exists();
+
+            if (!$hasAttendance) {
+                return response('Bugungi davomatingiz yo‘q. Iltimos, tizimga faqat davomat bo‘lsa kiring.', 403);
+            }
         }
 
         return $next($request);
