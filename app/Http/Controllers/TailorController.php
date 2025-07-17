@@ -14,9 +14,11 @@ use Illuminate\Support\Facades\DB;
 
 class TailorController extends Controller
 {
-    public function searchTarifications(Request $request): \Illuminate\Http\JsonResponse
+    public function searchTarifications(Request $request)
     {
         $code = $request->input('code');
+
+        return $code;
 
         $tarifications = Tarification::where('code', $code)
             ->with([
