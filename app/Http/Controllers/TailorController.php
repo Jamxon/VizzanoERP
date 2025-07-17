@@ -32,9 +32,9 @@ class TailorController extends Controller
         return response()->json($tarifications);
     }
 
-    public function getDailyBalanceEmployee(): \Illuminate\Http\JsonResponse
+    public function getDailyBalanceEmployee(Request $request): \Illuminate\Http\JsonResponse
     {
-        $today = now()->format('Y-m-d');
+        $today = $request->date ?? now()->format('Y-m-d');
 
         $employeeTarificationLogs = EmployeeTarificationLog::where('date', $today)
             ->where('employee_id', auth()->user()->employee->id)
