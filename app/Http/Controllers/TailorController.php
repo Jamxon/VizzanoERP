@@ -279,6 +279,7 @@ class TailorController extends Controller
 
         $packet = TarificationPacket::findOrFail($id);
 
+        // ✅ Avval duplikat tarification_id larni tekshiramiz
         $tarificationIds = [];
 
         foreach ($request->items as $item) {
@@ -298,7 +299,6 @@ class TailorController extends Controller
         try {
             foreach ($request->items as $item) {
                 if (!empty($item['id'])) {
-                    // Mavjud itemni yangilaymiz
                     $packetItem = $packet->tarificationPacketsItems()->find($item['id']);
                     if ($packetItem) {
                         $packetItem->update([
@@ -306,7 +306,18 @@ class TailorController extends Controller
                         ]);
                     }
                 } else {
-                    // Yangi item yaratamiz
+                    // 🔒 Yangi item yaratishdan oldin tekshiramiz: shu tarification_id allaqachon packetda bormi?
+                    $exists = $packet->tarificationPacketsItems()
+                        ->where('tarification_id', $item['tarification_id'])
+                        ->exists();
+
+                    if ($exists) {
+                        return response()->json([
+                            'message' => 'Yangi yozuv yaratilmaydi: bu tarification_id allaqachon mavjud.',
+                            'error_tarification_id' => $item['tarification_id'],
+                        ], 422);
+                    }
+
                     $packet->tarificationPacketsItems()->create([
                         'tarification_id' => $item['tarification_id'],
                     ]);
@@ -327,6 +338,7 @@ class TailorController extends Controller
             ], 500);
         }
     }
+
 
 
 }
