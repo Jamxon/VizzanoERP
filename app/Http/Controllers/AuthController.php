@@ -47,7 +47,7 @@ class AuthController extends Controller
     public function login(Request $request): \Illuminate\Http\JsonResponse
     {
         Log::add(
-            null,  // Foydalanuvchi tizimga kira olmayapti, shuning uchun null ID
+            null,
             'Tizimga kirishga urinish',
             'attempt',
             null,
@@ -65,18 +65,34 @@ class AuthController extends Controller
         $user = User::where('username', $request->username)->first();
 
         if (!$user) {
-            $errorMessage = 'Foydalanuvchi topilmadi';
-        } elseif (!$this->checkDjangoPassword($request->password, $user->password)) {
-            $errorMessage = 'Parol noto‘g‘ri';
-        } elseif ($user->employee->status == 'kicked') {
-            $errorMessage = 'Foydalanuvchi ishdan chiqarilgan';
-        } else {
-            $errorMessage = 'Boshqa noma’lum xato';
+            return response()->json(['error' => 'Foydalanuvchi topilmadi'], 401);
         }
 
-        if ($user === null || !$this->checkDjangoPassword($request->password, $user->password) || ($user->employee->status == 'kicked')) {
+        // Parolni tekshirish
+        if (!$this->checkDjangoPassword($request->password, $user->password)) {
+            return response()->json(['error' => 'Parol noto‘g‘ri'], 401);
+        }
 
-            return response()->json(['error' => $errorMessage], 401);
+        // Ishdan bo‘shatilganmi?
+        if ($user->employee->status == 'kicked') {
+            return response()->json(['error' => 'Foydalanuvchi ishdan chiqarilgan'], 401);
+        }
+
+        // 🔒 Qo‘shimcha shartlar: agar role 'tailor' bo‘lsa
+        if ($user->role->name === 'tailor') {
+            $now = now();
+
+            if ($now->hour >= 20) {
+                return response()->json(['error' => 'Kech bo‘ldi! Soat 20:00 dan keyin tizimga kira olmaysiz.'], 403);
+            }
+
+            $hasAttendance = \App\Models\Attendance::where('employee_id', $user->employee->id)
+                ->whereDate('date', $now->toDateString())
+                ->exists();
+
+            if (!$hasAttendance) {
+                return response()->json(['error' => 'Bugungi davomatingiz yo‘q. Iltimos, tizimga faqat davomat bo‘lsa kiring.'], 403);
+            }
         }
 
         $token = JWTAuth::fromUser($user);
