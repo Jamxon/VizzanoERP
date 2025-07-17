@@ -18,8 +18,6 @@ class TailorController extends Controller
     {
         $code = $request->input('code');
 
-        return $code;
-
         $tarifications = Tarification::where('code', $code)
             ->with([
                 'employee',
