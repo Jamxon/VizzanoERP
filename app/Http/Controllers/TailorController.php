@@ -8,6 +8,7 @@ use App\Models\EmployeeTarificationLog;
 use App\Models\Log;
 use App\Models\OrderGroup;
 use App\Models\Tarification;
+use App\Models\TarificationPacket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -207,6 +208,109 @@ class TailorController extends Controller
             'date' => $date,
             'top_earners' => $topEarners,
         ]);
+    }
+
+    public function getTarificationPackets(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $date = $request->date ?? Carbon::today()->toDateString();
+        $employeeId = auth()->user()->employee->id;
+
+        $tarificationPackets = TarificationPacket::where('employee_id', $employeeId)
+            ->where('date', $date)
+            ->with([
+                'tarificationPacketsItems.tarification',
+                'tarificationPacketsItems.tarification.razryad',
+            ])
+            ->get();
+
+       return response()->json($tarificationPackets);
+    }
+
+    public function storeTarificationPackets(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'items' => 'required|array',
+            'items.*.tarification_id' => 'required|exists:tarifications,id',
+        ]);
+
+        $employeeId = $request->employee_id;
+
+        $date = now()->toDateString();
+
+        DB::beginTransaction();
+        try {
+            // TarificationPacket yaratamiz
+            $tarificationPacket = TarificationPacket::create([
+                'employee_id' => $employeeId,
+                'date' => $date,
+            ]);
+
+            // Har bir item uchun TarificationPacketItem yaratamiz
+            foreach ($request->items as $item) {
+                $tarificationPacket->tarificationPacketsItems()->create([
+                    'tarification_id' => $item['tarification_id'],
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tarification packet created successfully.',
+                'packet' => $tarificationPacket->load('tarificationPacketsItems.tarification'),
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+    }
+
+    public function updateTarificationPacket(Request $request, $id): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.tarification_id' => 'required|exists:tarifications,id',
+            'items.*.id' => 'nullable|integer|exists:tarification_packet_items,id',
+        ]);
+
+        $packet = TarificationPacket::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            foreach ($request->items as $item) {
+                if (!empty($item['id'])) {
+                    // Mavjud itemni yangilaymiz
+                    $packetItem = $packet->tarificationPacketsItems()->find($item['id']);
+                    if ($packetItem) {
+                        $packetItem->update([
+                            'tarification_id' => $item['tarification_id'],
+                        ]);
+                    }
+                } else {
+                    // Yangi item yaratamiz
+                    $packet->tarificationPacketsItems()->create([
+                        'tarification_id' => $item['tarification_id'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tarification packet updated successfully.',
+                'packet' => $packet->load('tarificationPacketsItems.tarification'),
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 

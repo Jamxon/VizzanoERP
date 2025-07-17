@@ -46,6 +46,10 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::post('tarificationLog', [TailorController::class, 'storeTarificationLog']);
     Route::get('models', [TailorController::class, 'getModelWithTarification']);
     Route::get('topEarners', [TailorController::class, 'getTopEarners']);
+    Route::get('packets', [TailorController::class, 'getTarificationPackets']);
+    Route::post('packets', [TailorController::class, 'storeTarificationPackets']);
+    Route::patch('packets', [TailorController::class, 'updateTarificationPacket']);
+
 });
 
 Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
