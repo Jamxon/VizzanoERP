@@ -279,6 +279,21 @@ class TailorController extends Controller
 
         $packet = TarificationPacket::findOrFail($id);
 
+        $tarificationIds = [];
+
+        foreach ($request->items as $item) {
+            $tid = $item['tarification_id'];
+
+            if (in_array($tid, $tarificationIds)) {
+                return response()->json([
+                    'message' => 'Har bir tarification_id faqat bir marta bo‘lishi kerak.',
+                    'error_tarification_id' => $tid,
+                ], 422);
+            }
+
+            $tarificationIds[] = $tid;
+        }
+
         DB::beginTransaction();
         try {
             foreach ($request->items as $item) {
