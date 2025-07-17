@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class TailorController extends Controller
 {
-    public function searchTarifications(Request $request)
+    public function searchTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         $code = $request->input('code');
 
