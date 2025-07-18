@@ -23,7 +23,7 @@ class ShowOrderForTailorResource extends JsonResource
                 return [
                     'id' => $category->id,
                     'name' => $category->name,
-                    'tarification' => $category->tarification ?? null,
+                    'tarification' => $category->tarifications ?? null,
                 ];
             }) ?? [],
         ];
