@@ -78,6 +78,25 @@ class AuthController extends Controller
             return response()->json(['error' => 'Foydalanuvchi ishdan chiqarilgan'], 401);
         }
 
+        if($user->role->name === null){
+            $token = JWTAuth::fromUser($user);
+
+            Log::add(
+                $user->id,
+                'Muvaffaqiyatli tizimga kirish',
+                'login',
+                null,
+                [
+                    'user' => $user,
+                ]
+            );
+
+            return response()->json([
+                'token' => $token,
+                'user' => $user
+            ]);
+        }
+
         // 🔒 Qo‘shimcha shartlar: agar role 'tailor' bo‘lsa
         if ($user->role->name === 'tailor') {
             $now = now();
