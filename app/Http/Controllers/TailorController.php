@@ -9,6 +9,7 @@ use App\Models\Log;
 use App\Models\OrderGroup;
 use App\Models\Tarification;
 use App\Models\TarificationPacket;
+use App\Models\TarificationPacketItem;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -354,6 +355,29 @@ class TailorController extends Controller
 
             return response()->json([
                 'message' => 'Tarification packet deleted successfully.',
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function deleteTarificationPacketItem($id): \Illuminate\Http\JsonResponse
+    {
+        $item = TarificationPacketItem::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            // TarificationPacketItem ni o'chiramiz
+            $item->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tarification packet item deleted successfully.',
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();

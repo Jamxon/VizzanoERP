@@ -50,6 +50,7 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::post('packets', [TailorController::class, 'storeTarificationPackets']);
     Route::patch('packets/{id}', [TailorController::class, 'updateTarificationPacket']);
     Route::delete('packets/{id}', [TailorController::class, 'deleteTarificationPacket']);
+    Route::delete('packets/item/{id}', [TailorController::class, 'deleteTarificationPacketItem']);
 
 });
 
