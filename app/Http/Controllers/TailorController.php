@@ -338,6 +338,32 @@ class TailorController extends Controller
         }
     }
 
+    public function deleteTarificationPacket($id): \Illuminate\Http\JsonResponse
+    {
+        $packet = TarificationPacket::findOrFail($id);
+
+        DB::beginTransaction();
+        try {
+            // TarificationPacketItems ni o'chiramiz
+            $packet->tarificationPacketsItems()->delete();
+
+            // TarificationPacket ni o'chiramiz
+            $packet->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Tarification packet deleted successfully.',
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error occurred',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
 
 }

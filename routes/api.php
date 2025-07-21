@@ -49,6 +49,7 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::get('packets', [TailorController::class, 'getTarificationPackets']);
     Route::post('packets', [TailorController::class, 'storeTarificationPackets']);
     Route::patch('packets/{id}', [TailorController::class, 'updateTarificationPacket']);
+    Route::delete('packets/{id}', [TailorController::class, 'deleteTarificationPacket']);
 
 });
 
