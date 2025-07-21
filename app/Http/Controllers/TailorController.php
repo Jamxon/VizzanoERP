@@ -229,12 +229,11 @@ class TailorController extends Controller
     public function storeTarificationPackets(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
-            'employee_id' => 'required|exists:employees,id',
             'items' => 'required|array',
             'items.*.tarification_id' => 'required|exists:tarifications,id',
         ]);
 
-        $employeeId = $request->employee_id;
+        $employeeId = auth()->user()->employee->id;
 
         $date = now()->toDateString();
 
