@@ -43,9 +43,7 @@ class UserController extends Controller
                                                                 $q4->select('id', 'model_id')
                                                                     ->with('model:id,name'); // faqat kerakli maydon
                                                             },
-                                                            'submodel' => function ($q5) {
-                                                                $q5->select('id', 'name');
-                                                            }
+                                                            'submodel'
                                                         ]);
                                                 }
                                             ]);
@@ -105,9 +103,7 @@ class UserController extends Controller
                                                                 $q4->select('id', 'model_id')
                                                                     ->with('model:id,name'); // faqat kerakli maydon
                                                             },
-                                                            'submodel' => function ($q5) {
-                                                                $q5->select('id', 'name');
-                                                            }
+                                                            'submodel'
                                                         ]);
                                                 }
                                             ]);
