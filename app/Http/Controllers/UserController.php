@@ -402,7 +402,7 @@ class UserController extends Controller
                 'birthday' => $employee->birthday,
                 'payment_type' => $employee->payment_type,
                 'status' => $employee->status,
-                'img' => $employee->img ? url('storage/' . $employee->img) : null,
+                'img' => $employee->img,
                 'hiring_date' => $employee->hiring_date,
                 'kicked_date' => $employee->kicked_date,
                 'passport_number' => $employee->passport_number,
