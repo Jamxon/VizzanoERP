@@ -68,7 +68,7 @@ class GetUserResource extends JsonResource
             'salary' => $this->salary,
             'bonus' => $this->bonus,
             'employeeSalaries' => $this->employeeSalaries,
-            'model' => $this->employeeTarificationLogs->tarification->tarificationCategory->submodel->orderModel->name ?? null,
+            'model' => $this->employeeTarificationLogs->first()?->tarification?->tarificationCategory?->submodel?->orderModel?->name ?? null,
         ];
     }
 }
