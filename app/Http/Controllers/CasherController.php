@@ -258,7 +258,7 @@ class CasherController extends Controller
                 $amortizationExpense = $totalQty * 0.10 * $dollarRate;
             }
 
-            $fixedCost = $bonus + $remainder + $tarification;
+            $fixedCost = $bonus + $remainder;
 
             $allocatedTransport = $transport * $orderShareRatio;
             $allocatedAup = $aup * $orderShareRatio;
@@ -289,7 +289,7 @@ class CasherController extends Controller
                 'bonus' => $bonus,
                 'tarification' => $tarification,
                 'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
-                'costs_uzs' => compact('bonus', 'tarification', 'remainder', 'allocatedTransport', 'allocatedAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
+                'costs_uzs' => compact('bonus', 'remainder', 'allocatedTransport', 'allocatedAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
                 'total_fixed_cost_uzs' => $fixedCost + $totalExtra,
                 'net_profit_uzs' => $profitUZS,
                 'cost_per_unit_uzs' => round($perUnitCost),
