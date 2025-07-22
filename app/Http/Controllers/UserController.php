@@ -436,8 +436,8 @@ class UserController extends Controller
                         'quantity' => $log->quantity,
                         'amount_earned' => $log->amount_earned,
                         'is_own' => $log->is_own,
-                        'model' => $log->tarification?->tarificationCategory?->submodel?->orderModel?->model?->name ?? null,
-                        'submodel' => $log->tarification?->tarificationCategory?->submodel?->name ?? null,
+                        'model' => $log->tarification?->tarificationCategory?->submodel?->orderModel?->model ?? null,
+                        'submodel' => $log->tarification?->tarificationCategory?->submodel ?? null,
                         'tarification' => [
                             'id' => $log->tarification?->id,
                             'name' => $log->tarification?->name,
