@@ -73,7 +73,10 @@ class UserController extends Controller
                 'employeeTarificationLogs' => function ($query) {
                     $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity')
                         ->with(['tarification' => function ($q) {
-                            $q->select('id', 'name', 'code', 'second', 'summa');
+                            $q->select('id', 'name', 'code', 'second', 'summa')
+                                ->with([
+                                    'tarificationCategory.submodel.orderModel.model'
+                                ]);
                         }]);
                 },
                 'attendances',
