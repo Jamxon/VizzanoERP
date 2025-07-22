@@ -393,7 +393,61 @@ class UserController extends Controller
         $holidays = $holidayQuery->get(['id', 'start_date', 'end_date', 'comment', 'image']);
 
         return response()->json([
-            'employee' => $employee,
+            'employee' => [
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'gender' => $employee->gender,
+                'phone' => $employee->phone,
+                'address' => $employee->address,
+                'birthday' => $employee->birthday,
+                'payment_type' => $employee->payment_type,
+                'status' => $employee->status,
+                'img' => $employee->img ? url('storage/' . $employee->img) : null,
+                'hiring_date' => $employee->hiring_date,
+                'kicked_date' => $employee->kicked_date,
+                'passport_number' => $employee->passport_number,
+                'passport_code' => $employee->passport_code,
+                'comment' => $employee->comment,
+                'salary' => $employee->salary,
+                'bonus' => $employee->bonus,
+                'balance' => $employee->balance,
+                'type' => $employee->type,
+                'created_at' => $employee->created_at,
+                'updated_at' => $employee->updated_at,
+                'user_id' => $employee->user_id,
+                'branch_id' => $employee->branch_id,
+                'position_id' => $employee->position_id,
+                'department_id' => $employee->department_id,
+                'group_id' => $employee->group_id,
+
+                // Relations
+                'position' => $employee->position,
+                'department' => $employee->department,
+                'group' => $employee->group,
+                'attendances' => $employee->attendances,
+                'attendance_salaries' => $employee->attendanceSalaries,
+                'employee_salaries' => $employee->employeeSalaries,
+                'employee_tarification_logs' => $employee->employeeTarificationLogs->map(function ($log) {
+                    return [
+                        'id' => $log->id,
+                        'employee_id' => $log->employee_id,
+                        'date' => $log->date,
+                        'tarification_id' => $log->tarification_id,
+                        'quantity' => $log->quantity,
+                        'amount_earned' => $log->amount_earned,
+                        'is_own' => $log->is_own,
+                        'model' => $log->tarification?->tarificationCategory?->submodel?->orderModel?->model?->name ?? null,
+                        'submodel' => $log->tarification?->tarificationCategory?->submodel?->name ?? null,
+                        'tarification' => [
+                            'id' => $log->tarification?->id,
+                            'name' => $log->tarification?->name,
+                            'code' => $log->tarification?->code,
+                            'second' => $log->tarification?->second,
+                            'summa' => $log->tarification?->summa,
+                        ]
+                    ];
+                }),
+            ],
             'absences' => $absences->map(function ($absence) {
                 return [
                     'id' => $absence->id,
