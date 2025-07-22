@@ -81,6 +81,27 @@ class TailorController extends Controller
         $amount = $tarification->summa;
         $isOwn = $tarification->employee_id === $employeeId;
 
+        $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
+
+        $employeeIds = EmployeeTarificationLog::where('tarification_id', $tarification->id)
+            ->whereDate('date', $today)
+            ->pluck('employee_id')
+            ->unique();
+
+        if ($employeeIds->count() > 1 || ($employeeIds->count() === 1 && $employeeIds->first() !== $employee->id)) {
+
+            // Umumiy bajarilgan miqdor
+            $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarification->id)
+                ->whereDate('date', $today)
+                ->sum('quantity');
+
+            if (($alreadyDone + 1) > $orderQuantity) {
+                return response()->json([
+                    'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: 1"
+                ], 422);
+            }
+        }
+
         DB::beginTransaction();
 
         try {
