@@ -68,7 +68,7 @@ class GetUserResource extends JsonResource
                     'date' => Carbon::parse($log->date)->format('Y-m-d'),
                     'quantity' => $log->quantity,
                     'is_own' => $log->is_own,
-                    'summa' => $log->amount_earned,
+                    'amount_earned' => $log->amount_earned,
                     'box_tarification_id' => $log->box_tarification_id,
                     'model' => $log->tarification->tarificationCategory->submodel->orderModel->model->name ?? null,
                 ];
