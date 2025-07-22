@@ -61,14 +61,24 @@ class GetUserResource extends JsonResource
             'gender' => $this->gender,
             'balance' => $this->balance,
             'attendance_salaries' => $this->attendanceSalaries,
-            'employee_tarification_logs' => $this->employeeTarificationLogs,
+            'employee_tarification_logs' => $this->employeeTarificationLogs->map(function (EmployeeTarificationLog $log) {
+                return [
+                    'id' => $log->id,
+                    'tarification_id' => $log->tarification_id,
+                    'date' => Carbon::parse($log->date)->format('Y-m-d'),
+                    'quantity' => $log->quantity,
+                    'is_own' => $log->is_own,
+                    'amount_earned' => $log->amount_earned,
+                    'box_tarification_id' => $log->box_tarification_id,
+                    'model' => $log->tarification->tarificationCategory->submodel->orderModel->model->name ?? null,
+                ];
+            }),
             'attendances' => $this->attendances,
             'holidays' => $this->employeeHolidays,
             'absences' => $this->employeeAbsences,
             'salary' => $this->salary,
             'bonus' => $this->bonus,
             'employeeSalaries' => $this->employeeSalaries,
-            'model' => $this->employeeTarificationLogs->first()?->tarification?->tarificationCategory?->submodel?->orderModel?->name ?? null,
         ];
     }
 }
