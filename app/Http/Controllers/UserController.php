@@ -42,6 +42,9 @@ class UserController extends Controller
                                                             'orderModel' => function ($q4) {
                                                                 $q4->select('id', 'model_id')
                                                                     ->with('model:id,name'); // faqat kerakli maydon
+                                                            },
+                                                            'submodel' => function ($q5) {
+                                                                $q5->select('id', 'name');
                                                             }
                                                         ]);
                                                 }
@@ -101,6 +104,9 @@ class UserController extends Controller
                                                             'orderModel' => function ($q4) {
                                                                 $q4->select('id', 'model_id')
                                                                     ->with('model:id,name'); // faqat kerakli maydon
+                                                            },
+                                                            'submodel' => function ($q5) {
+                                                                $q5->select('id', 'name');
                                                             }
                                                         ]);
                                                 }
