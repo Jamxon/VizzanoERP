@@ -71,6 +71,7 @@ class GetUserResource extends JsonResource
                     'amount_earned' => $log->amount_earned,
                     'box_tarification_id' => $log->box_tarification_id,
                     'model' => $log->tarification->tarificationCategory->submodel->orderModel->model->name ?? null,
+                    'tarification' => $log->tarification,
                 ];
             }),
             'attendances' => $this->attendances,
