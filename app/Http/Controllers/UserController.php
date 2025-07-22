@@ -304,7 +304,26 @@ class UserController extends Controller
 
                 $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'amount_earned', 'is_own')
                     ->with(['tarification' => function ($q) {
-                        $q->select('id', 'name', 'code', 'second', 'summa');
+                        $q->select('id', 'name', 'code', 'second', 'summa', 'tarification_category_id')
+                            ->with([
+                                'tarificationCategory' => function ($q2) {
+                                    $q2->select('id', 'submodel_id')
+                                        ->with([
+                                            'submodel' => function ($q3) {
+                                                $q3->select('id', 'order_model_id', 'submodel_id')
+                                                    ->with([
+                                                        'orderModel' => function ($q4) {
+                                                            $q4->select('id', 'model_id')
+                                                                ->with('model:id,name');
+                                                        },
+                                                        'submodel' => function ($q5) {
+                                                            $q5->select('id', 'name');
+                                                        }
+                                                    ]);
+                                            }
+                                        ]);
+                                }
+                            ]);
                     }]);
             };
 
@@ -322,7 +341,26 @@ class UserController extends Controller
 
                 $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity')
                     ->with(['tarification' => function ($q) {
-                        $q->select('id', 'name', 'code', 'second', 'summa');
+                        $q->select('id', 'name', 'code', 'second', 'summa', 'tarification_category_id')
+                            ->with([
+                                'tarificationCategory' => function ($q2) {
+                                    $q2->select('id', 'submodel_id')
+                                        ->with([
+                                            'submodel' => function ($q3) {
+                                                $q3->select('id', 'order_model_id', 'submodel_id')
+                                                    ->with([
+                                                        'orderModel' => function ($q4) {
+                                                            $q4->select('id', 'model_id')
+                                                                ->with('model:id,name');
+                                                        },
+                                                        'submodel' => function ($q5) {
+                                                            $q5->select('id', 'name');
+                                                        }
+                                                    ]);
+                                            }
+                                        ]);
+                                }
+                            ]);
                     }]);
             };
 
