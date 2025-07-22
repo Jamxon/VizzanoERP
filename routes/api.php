@@ -132,9 +132,10 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('tarificationLogs', [InternalAccountantController::class, 'getEmployeeTarificationLog']);
     Route::get('nakladnoy', [InternalAccountantController::class, 'generateAttendanceNakladnoy']);
     Route::get('groups', [InternalAccountantController::class, 'getGroups']);
-    Route::get('employees/{id}', [SuperHRController::class, 'showEmployee']);
     Route::patch('employeeTarificationLog/{id}', [InternalAccountantController::class, 'updateEmployeeTarificationLog']);
     Route::get('tarifications/pdf', [TechnologController::class, 'exportTarificationsPdf']);
+    Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
+
 
 });
 
