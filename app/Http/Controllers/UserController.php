@@ -37,13 +37,15 @@ class UserController extends Controller
                                         $q2->select('id', 'submodel_id')
                                             ->with([
                                                 'submodel' => function ($q3) {
-                                                    $q3->select('id', 'order_model_id')
+                                                    $q3->select('id', 'order_model_id', 'submodel_id')
                                                         ->with([
                                                             'orderModel' => function ($q4) {
                                                                 $q4->select('id', 'model_id')
                                                                     ->with('model:id,name'); // faqat kerakli maydon
                                                             },
-                                                            'submodel'
+                                                            'submodel' => function ($q5) {
+                                                                $q5->select('id', 'name');
+                                                            }
                                                         ]);
                                                 }
                                             ]);
@@ -97,13 +99,15 @@ class UserController extends Controller
                                         $q2->select('id', 'submodel_id')
                                             ->with([
                                                 'submodel' => function ($q3) {
-                                                    $q3->select('id', 'order_model_id')
+                                                    $q3->select('id', 'order_model_id', 'submodel_id')
                                                         ->with([
                                                             'orderModel' => function ($q4) {
                                                                 $q4->select('id', 'model_id')
                                                                     ->with('model:id,name'); // faqat kerakli maydon
                                                             },
-                                                            'submodel'
+                                                            'submodel' => function ($q5) {
+                                                                $q5->select('id', 'name');
+                                                            }
                                                         ]);
                                                 }
                                             ]);
