@@ -45,7 +45,6 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::get('balance', [TailorController::class, 'getDailyBalanceEmployee']);
     Route::post('tarificationLog', [TailorController::class, 'storeTarificationLog']);
     Route::get('models', [TailorController::class, 'getModelWithTarification']);
-    Route::get('topEarners', [TailorController::class, 'getTopEarners']);
     Route::get('packets', [TailorController::class, 'getTarificationPackets']);
     Route::post('packets', [TailorController::class, 'storeTarificationPackets']);
     Route::patch('packets/{id}', [TailorController::class, 'updateTarificationPacket']);
@@ -99,7 +98,6 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('groupPlans', [CasherController::class, 'getGroupPlans']);
     Route::patch('groupPlans/{id}', [CasherController::class, 'editGroupPlan']);
     Route::get('monthlyReport', [CasherController::class, 'getMonthlyCost']);
-    Route::get('topEarners', [TailorController::class, 'getTopEarners']);
 
 });
 
@@ -239,7 +237,6 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::get('dailyPlan/employee', [InternalAccountantController::class, 'generateDailyPlanForOneEmployee']);
        Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
        Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
-       Route::get('topEarners', [GroupMasterController::class, 'getTopEarners']);
 
 });
 
@@ -495,6 +492,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/test-eskiz-report', [EskizTestController::class, 'reportByRange']);
     Route::post('sendSMS', [EskizTestController::class, 'sendSMS']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
+    Route::get('topEarners', [TailorController::class, 'getTopEarners']);
 
 });
 
