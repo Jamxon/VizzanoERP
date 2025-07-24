@@ -1099,7 +1099,7 @@ class TechnologController extends Controller
         }
     }
 
-    public function importTarifications(Request $request)
+    public function importTarifications(Request $request): \Illuminate\Http\JsonResponse
     {
         ini_set('memory_limit', '512M');
 
