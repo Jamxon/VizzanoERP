@@ -877,6 +877,7 @@ class TechnologController extends Controller
             ->with([
                 'orderModel',
                 'orderModel.model',
+                'orderModel.submodels.submodel',
                 'orderModel.submodels.tarificationCategories.tarifications',
             ])
             ->get();

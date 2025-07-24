@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="chore: update workspace configuration and clean up unused task entries">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/TechnologController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/TechnologController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add return type declaration for importTarifications method" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -407,23 +404,7 @@
       <workItem from="1753158637202" duration="15599000" />
       <workItem from="1753244517827" duration="11702000" />
       <workItem from="1753332777470" duration="1084000" />
-      <workItem from="1753344880394" duration="414000" />
-    </task>
-    <task id="LOCAL-00895" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752656761432</created>
-      <option name="number" value="00895" />
-      <option name="presentableId" value="LOCAL-00895" />
-      <option name="project" value="LOCAL" />
-      <updated>1752656761432</updated>
-    </task>
-    <task id="LOCAL-00896" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752658686615</created>
-      <option name="number" value="00896" />
-      <option name="presentableId" value="LOCAL-00896" />
-      <option name="project" value="LOCAL" />
-      <updated>1752658686615</updated>
+      <workItem from="1753344880394" duration="736000" />
     </task>
     <task id="LOCAL-00897" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -801,7 +782,23 @@
       <option name="project" value="LOCAL" />
       <updated>1753245457085</updated>
     </task>
-    <option name="localTasksCounter" value="944" />
+    <task id="LOCAL-00944" summary="feat: enhance order retrieval with tarification categories and submodel data">
+      <option name="closed" value="true" />
+      <created>1753345358932</created>
+      <option name="number" value="00944" />
+      <option name="presentableId" value="LOCAL-00944" />
+      <option name="project" value="LOCAL" />
+      <updated>1753345358932</updated>
+    </task>
+    <task id="LOCAL-00945" summary="feat: add return type declaration for importTarifications method">
+      <option name="closed" value="true" />
+      <created>1753345620034</created>
+      <option name="number" value="00945" />
+      <option name="presentableId" value="LOCAL-00945" />
+      <option name="project" value="LOCAL" />
+      <updated>1753345620034</updated>
+    </task>
+    <option name="localTasksCounter" value="946" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -831,8 +828,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update font sizes and table dimensions in box_sticker.blade.php for improved readability and layout" />
-    <MESSAGE value="fix: update logo width in box_sticker.blade.php for improved layout" />
     <MESSAGE value="fix: update logo width in box_sticker.blade.php for better visibility" />
     <MESSAGE value="fix: increase logo width in box_sticker.blade.php for better visibility" />
     <MESSAGE value="fix: decrease logo width in box_sticker.blade.php for improved layout" />
@@ -856,7 +851,9 @@
     <MESSAGE value="feat: add GroupPlan model and API endpoints for managing group plans" />
     <MESSAGE value="feat: add API endpoint to retrieve group plans with validation for month and year" />
     <MESSAGE value="chore: update workspace configuration and clean up unused task entries" />
-    <option name="LAST_COMMIT_MESSAGE" value="chore: update workspace configuration and clean up unused task entries" />
+    <MESSAGE value="feat: enhance order retrieval with tarification categories and submodel data" />
+    <MESSAGE value="feat: add return type declaration for importTarifications method" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add return type declaration for importTarifications method" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
