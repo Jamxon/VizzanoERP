@@ -874,8 +874,34 @@ class TechnologController extends Controller
         $user = auth()->user();
 
         $orders = Order::where('branch_id', $user->employee->branch_id)
-            ->with('orderModel', 'orderModel.model','orderModel.submodels.submodel')
+            ->with([
+                'orderModel',
+                'orderModel.model',
+                'orderModel.submodels.tarificationCategories.tarifications',
+            ])
             ->get();
+
+        // Transformatsiya qilamiz
+        $orders = $orders->map(function ($order) {
+            $orderData = $order->toArray();
+
+            foreach ($orderData['order_model']['submodels'] as &$submodelItem) {
+                $hasTarifications = false;
+
+                if (!empty($submodelItem['tarification_categories'])) {
+                    foreach ($submodelItem['tarification_categories'] as $category) {
+                        if (!empty($category['tarifications'])) {
+                            $hasTarifications = true;
+                            break;
+                        }
+                    }
+                }
+
+                $submodelItem['has_tarifications'] = $hasTarifications;
+            }
+
+            return $orderData;
+        });
 
         return response()->json($orders, 200);
     }
