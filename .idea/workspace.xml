@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add return type declaration for importTarifications method" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance order retrieval to include submodel data" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -404,15 +404,7 @@
       <workItem from="1753158637202" duration="15599000" />
       <workItem from="1753244517827" duration="11702000" />
       <workItem from="1753332777470" duration="1084000" />
-      <workItem from="1753344880394" duration="736000" />
-    </task>
-    <task id="LOCAL-00897" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752658857332</created>
-      <option name="number" value="00897" />
-      <option name="presentableId" value="LOCAL-00897" />
-      <option name="project" value="LOCAL" />
-      <updated>1752658857332</updated>
+      <workItem from="1753344880394" duration="1651000" />
     </task>
     <task id="LOCAL-00898" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -798,7 +790,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753345620034</updated>
     </task>
-    <option name="localTasksCounter" value="946" />
+    <task id="LOCAL-00946" summary="feat: enhance order retrieval to include submodel data">
+      <option name="closed" value="true" />
+      <created>1753345808500</created>
+      <option name="number" value="00946" />
+      <option name="presentableId" value="LOCAL-00946" />
+      <option name="project" value="LOCAL" />
+      <updated>1753345808500</updated>
+    </task>
+    <option name="localTasksCounter" value="947" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -828,7 +828,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update logo width in box_sticker.blade.php for better visibility" />
     <MESSAGE value="fix: increase logo width in box_sticker.blade.php for better visibility" />
     <MESSAGE value="fix: decrease logo width in box_sticker.blade.php for improved layout" />
     <MESSAGE value="fix: update logo width in box_sticker.blade.php for improved responsiveness" />
@@ -853,7 +852,8 @@
     <MESSAGE value="chore: update workspace configuration and clean up unused task entries" />
     <MESSAGE value="feat: enhance order retrieval with tarification categories and submodel data" />
     <MESSAGE value="feat: add return type declaration for importTarifications method" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add return type declaration for importTarifications method" />
+    <MESSAGE value="feat: enhance order retrieval to include submodel data" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance order retrieval to include submodel data" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
