@@ -237,7 +237,7 @@ class UserController extends Controller
             . "📝 Tavsif: {$request->description}";
 
         $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
-        $chatId = "-1002523704322";
+        $chatId = "-1002877502358";
 
         if ($filename) {
             $photoPath = storage_path("app/public/issues/" . $filename);
