@@ -166,15 +166,18 @@ class InternalAccountantController extends Controller
         $employeeTarifications = [];
         $date = now()->format('d-m-Y');
 
-        // Tarifikatsiya ma'lumotlarini bitta tsiklda to'plash
+        $dateYmd = Carbon::createFromFormat('d-m-Y', $date)->format('Y-m-d');
+
         foreach ($submodel->tarificationCategories as $category) {
             foreach ($category->tarifications as $tarification) {
-                if ($tarification->employee) {
-                    $employeeId = $tarification->employee->id;
+                $employee = $tarification->employee;
+
+                if ($employee && !$employee->employeeTarificationLogs()->whereDate('date', $dateYmd)->exists()) {
+                    $employeeId = $employee->id;
 
                     if (!isset($employeeTarifications[$employeeId])) {
                         $employeeTarifications[$employeeId] = [
-                            'name' => $tarification->employee->name,
+                            'name' => $employee->name,
                             'tasks' => []
                         ];
                     }
