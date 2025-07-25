@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add database backup functionality with zip compression and Telegram notification">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: optimize employee tarification log check and improve date handling">
+      <change afterPath="$PROJECT_DIR$/app/Models/ShipmentPlan.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -407,23 +410,7 @@
       <workItem from="1753244517827" duration="11702000" />
       <workItem from="1753332777470" duration="1084000" />
       <workItem from="1753344880394" duration="5225000" />
-      <workItem from="1753415745966" duration="2210000" />
-    </task>
-    <task id="LOCAL-00899" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752659603435</created>
-      <option name="number" value="00899" />
-      <option name="presentableId" value="LOCAL-00899" />
-      <option name="project" value="LOCAL" />
-      <updated>1752659603435</updated>
-    </task>
-    <task id="LOCAL-00900" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752659931490</created>
-      <option name="number" value="00900" />
-      <option name="presentableId" value="LOCAL-00900" />
-      <option name="project" value="LOCAL" />
-      <updated>1752659931490</updated>
+      <workItem from="1753415745966" duration="8411000" />
     </task>
     <task id="LOCAL-00901" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -801,7 +788,23 @@
       <option name="project" value="LOCAL" />
       <updated>1753349594514</updated>
     </task>
-    <option name="localTasksCounter" value="948" />
+    <task id="LOCAL-00948" summary="feat: add database backup functionality with zip compression and Telegram notification">
+      <option name="closed" value="true" />
+      <created>1753424484715</created>
+      <option name="number" value="00948" />
+      <option name="presentableId" value="LOCAL-00948" />
+      <option name="project" value="LOCAL" />
+      <updated>1753424484715</updated>
+    </task>
+    <task id="LOCAL-00949" summary="feat: optimize employee tarification log check and improve date handling">
+      <option name="closed" value="true" />
+      <created>1753424596022</created>
+      <option name="number" value="00949" />
+      <option name="presentableId" value="LOCAL-00949" />
+      <option name="project" value="LOCAL" />
+      <updated>1753424596022</updated>
+    </task>
+    <option name="localTasksCounter" value="950" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -831,7 +834,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: decrease logo width in box_sticker.blade.php for improved layout" />
     <MESSAGE value="fix: update logo width in box_sticker.blade.php for improved responsiveness" />
     <MESSAGE value="refactor: improve logic for handling printed and remaining sizes in box_sticker.blade.php" />
     <MESSAGE value="refactor: enhance logic for handling printed and remaining sizes in box_sticker.blade.php" />
@@ -856,7 +858,8 @@
     <MESSAGE value="feat: add return type declaration for importTarifications method" />
     <MESSAGE value="feat: enhance order retrieval to include submodel data" />
     <MESSAGE value="feat: add database backup functionality with zip compression and Telegram notification" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add database backup functionality with zip compression and Telegram notification" />
+    <MESSAGE value="feat: optimize employee tarification log check and improve date handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: optimize employee tarification log check and improve date handling" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
