@@ -339,6 +339,9 @@ class InternalAccountantController extends Controller
             ->whereHas('attendances', function ($q) use ($date) {
                 $q->where('date', $date)->where('status', 'present');
             })
+            ->whereDoesntHave('employeeTarificationLogs', function ($q) use ($date) {
+                $q->whereDate('date', $date);
+            })
             ->with(['attendances' => fn($q) => $q->where('date', $date)])
             ->get();
 

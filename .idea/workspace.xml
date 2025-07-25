@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance order retrieval to include submodel data" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add database backup functionality with zip compression and Telegram notification">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -404,15 +406,8 @@
       <workItem from="1753158637202" duration="15599000" />
       <workItem from="1753244517827" duration="11702000" />
       <workItem from="1753332777470" duration="1084000" />
-      <workItem from="1753344880394" duration="1651000" />
-    </task>
-    <task id="LOCAL-00898" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752659554117</created>
-      <option name="number" value="00898" />
-      <option name="presentableId" value="LOCAL-00898" />
-      <option name="project" value="LOCAL" />
-      <updated>1752659554117</updated>
+      <workItem from="1753344880394" duration="5225000" />
+      <workItem from="1753415745966" duration="2210000" />
     </task>
     <task id="LOCAL-00899" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -798,7 +793,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753345808500</updated>
     </task>
-    <option name="localTasksCounter" value="947" />
+    <task id="LOCAL-00947" summary="feat: add database backup functionality with zip compression and Telegram notification">
+      <option name="closed" value="true" />
+      <created>1753349594514</created>
+      <option name="number" value="00947" />
+      <option name="presentableId" value="LOCAL-00947" />
+      <option name="project" value="LOCAL" />
+      <updated>1753349594514</updated>
+    </task>
+    <option name="localTasksCounter" value="948" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -828,7 +831,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: increase logo width in box_sticker.blade.php for better visibility" />
     <MESSAGE value="fix: decrease logo width in box_sticker.blade.php for improved layout" />
     <MESSAGE value="fix: update logo width in box_sticker.blade.php for improved responsiveness" />
     <MESSAGE value="refactor: improve logic for handling printed and remaining sizes in box_sticker.blade.php" />
@@ -853,7 +855,8 @@
     <MESSAGE value="feat: enhance order retrieval with tarification categories and submodel data" />
     <MESSAGE value="feat: add return type declaration for importTarifications method" />
     <MESSAGE value="feat: enhance order retrieval to include submodel data" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance order retrieval to include submodel data" />
+    <MESSAGE value="feat: add database backup functionality with zip compression and Telegram notification" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add database backup functionality with zip compression and Telegram notification" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
