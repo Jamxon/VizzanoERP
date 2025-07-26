@@ -711,9 +711,17 @@ class SuperHRController extends Controller
 
         $filters = $request->only(['search', 'department_id', 'group_id', 'status', 'role_id', 'type']);
         $user = auth()->user();
+        $oneMonthAgo = Carbon::now()->subMonth();
 
         $query = Employee::with('user.role', 'position')
-            ->where('branch_id', $user->employee->branch_id);
+            ->where('branch_id', $user->employee->branch_id)
+            ->withCount(['employeeAbsences as absence_count' => function ($q) use ($oneMonthAgo) {
+                $q->where(function ($q2) use ($oneMonthAgo) {
+                    $q2->whereDate('start_date', '>=', $oneMonthAgo)
+                        ->orWhereDate('end_date', '>=', $oneMonthAgo);
+                });
+            }])
+            ->orderByDesc('absence_count');
 
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);

@@ -408,15 +408,7 @@
       <workItem from="1753332777470" duration="1084000" />
       <workItem from="1753344880394" duration="5225000" />
       <workItem from="1753415745966" duration="10668000" />
-      <workItem from="1753504160140" duration="2476000" />
-    </task>
-    <task id="LOCAL-00905" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752741070280</created>
-      <option name="number" value="00905" />
-      <option name="presentableId" value="LOCAL-00905" />
-      <option name="project" value="LOCAL" />
-      <updated>1752741070280</updated>
+      <workItem from="1753504160140" duration="5350000" />
     </task>
     <task id="LOCAL-00906" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -802,7 +794,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753506879588</updated>
     </task>
-    <option name="localTasksCounter" value="954" />
+    <task id="LOCAL-00954" summary="feat: enhance employee retrieval by including related group information">
+      <option name="closed" value="true" />
+      <created>1753514407327</created>
+      <option name="number" value="00954" />
+      <option name="presentableId" value="LOCAL-00954" />
+      <option name="project" value="LOCAL" />
+      <updated>1753514407327</updated>
+    </task>
+    <option name="localTasksCounter" value="955" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
