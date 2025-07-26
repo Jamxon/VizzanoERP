@@ -705,6 +705,7 @@ class TechnologController extends Controller
 
         $employees = Employee::where('status', 'working')
             ->where('branch_id', auth()->user()->employee->branch_id)
+            ->with('group')
             ->get();
 
         return response()->json($employees, 200);
