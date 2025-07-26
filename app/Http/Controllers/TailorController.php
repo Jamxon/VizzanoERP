@@ -163,9 +163,9 @@ class TailorController extends Controller
 
     public function getModelWithTarification(): \Illuminate\Http\JsonResponse
     {
-        $group = auth()->user()->employee->group;
+        $group = auth()->user()->employee->group ?? null;
 
-        $order = OrderGroup::where('group_id', $group->id)
+        $order = OrderGroup::where('group_id', $group->id ?? 0)
             ->whereHas('order', function ($query) {
                 $query->whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting']);
             })
