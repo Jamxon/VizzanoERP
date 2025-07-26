@@ -698,7 +698,7 @@ class SuperHRController extends Controller
         return response()->json($employees);
     }
 
-    public function getEmployees(Request $request): \Illuminate\Http\JsonResponse
+    public function getEmployees(Request $request)
     {
         $request->validate([
             'search' => 'nullable|string',
@@ -712,6 +712,7 @@ class SuperHRController extends Controller
         $filters = $request->only(['search', 'department_id', 'group_id', 'status', 'role_id', 'type']);
         $user = auth()->user();
         $oneMonthAgo = Carbon::now()->subMonth();
+        return $oneMonthAgo;
 
         $query = Employee::with('user.role', 'position')
             ->where('branch_id', $user->employee->branch_id)
