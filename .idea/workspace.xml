@@ -407,15 +407,8 @@
       <workItem from="1753244517827" duration="11702000" />
       <workItem from="1753332777470" duration="1084000" />
       <workItem from="1753344880394" duration="5225000" />
-      <workItem from="1753415745966" duration="9863000" />
-    </task>
-    <task id="LOCAL-00902" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752730800603</created>
-      <option name="number" value="00902" />
-      <option name="presentableId" value="LOCAL-00902" />
-      <option name="project" value="LOCAL" />
-      <updated>1752730800603</updated>
+      <workItem from="1753415745966" duration="10668000" />
+      <workItem from="1753504160140" duration="856000" />
     </task>
     <task id="LOCAL-00903" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -801,7 +794,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753443049370</updated>
     </task>
-    <option name="localTasksCounter" value="951" />
+    <task id="LOCAL-00951" summary="feat: implement shipment planning and item management with relationships">
+      <option name="closed" value="true" />
+      <created>1753447777406</created>
+      <option name="number" value="00951" />
+      <option name="presentableId" value="LOCAL-00951" />
+      <option name="project" value="LOCAL" />
+      <updated>1753447777406</updated>
+    </task>
+    <option name="localTasksCounter" value="952" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

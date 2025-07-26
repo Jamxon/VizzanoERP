@@ -700,14 +700,11 @@ class TechnologController extends Controller
         return response()->json($tarificationCategories, 200);
     }
 
-    public function getEmployerByDepartment(Request $request): \Illuminate\Http\JsonResponse
+    public function getEmployerByDepartment(): \Illuminate\Http\JsonResponse
     {
-        $submodelId = $request->query('id');
-        $groupIds = OrderGroup::where('submodel_id', $submodelId)
-            ->pluck('group_id');
 
-        $employees = Employee::whereIn('group_id', $groupIds)
-            ->where('status', 'working')
+        $employees = Employee::where('status', 'working')
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->get();
 
         return response()->json($employees, 200);
