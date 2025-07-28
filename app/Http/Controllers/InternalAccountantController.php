@@ -1010,11 +1010,14 @@ class InternalAccountantController extends Controller
 
         $allowedQuantity = $orderQuantity - $otherEmployeesDone;
 
-        if ($newQuantity > $allowedQuantity) {
+        $oldQuantity = $log->quantity;
+
+        if ($newQuantity > $allowedQuantity && $newQuantity > $oldQuantity) {
             return response()->json([
                 'message' => "❌ Limitdan oshib ketdi. Buyurtma soni: $orderQuantity, boshqa xodimlar bajargani: $otherEmployeesDone, siz uchun limit: $allowedQuantity"
             ], 422);
         }
+
 
         // Balansni yangilash uchun farqni hisobla
         $oldAmount = $log->amount_earned;
