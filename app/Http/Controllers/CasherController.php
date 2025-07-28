@@ -24,19 +24,27 @@ class CasherController extends Controller
 
     public function getMonthlyCost(Request $request): \Illuminate\Http\JsonResponse
     {
-        try {
-            $month = $request->date
-                ? Carbon::parse($request->date)->format('Y-m')
-                : Carbon::now()->format('Y-m');
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'dollar_rate' => 'nullable|numeric',
+        ]);
 
-            $carbon = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        try {
+            $start = $request->start_date
+                ? Carbon::parse($request->start_date)->startOfDay()
+                : Carbon::now()->startOfMonth();
+
+            $end = $request->end_date
+                ? Carbon::parse($request->end_date)->endOfDay()
+                : Carbon::now()->endOfMonth();
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Invalid month format. Please use YYYY-MM'], 400);
+            return response()->json(['error' => 'Invalid date format. Please use YYYY-MM-DD'], 400);
         }
 
         $dollarRate = $request->dollar_rate ?? 12900;
-        $daysInMonth = $carbon->daysInMonth;
 
+        $period = CarbonPeriod::create($start, $end);
         $orderSummaries = [];
         $monthlyStats = [
             'aup' => 0,
@@ -51,8 +59,9 @@ class CasherController extends Controller
             'employee_count_sum' => 0,
         ];
 
-        for ($i = 0; $i < $daysInMonth; $i++) {
-            $date = $carbon->copy()->addDays($i)->toDateString();
+        foreach ($period as $dateObj) {
+            $date = $dateObj->toDateString();
+
             $requestForDay = new Request([
                 'date' => $date,
                 'dollar_rate' => $dollarRate,
@@ -113,22 +122,15 @@ class CasherController extends Controller
                 : null;
         }
 
-        $startOfMonth = Carbon::now()->copy()->startOfMonth();
-        $today = Carbon::now()->copy();
-
-        $period = CarbonPeriod::create($startOfMonth, $today);
-
-        $workingDays = collect($period)->filter(function ($date) {
-            return !$date->isSunday();
-        })->count();
-
+        $workingDays = collect($period)->filter(fn($date) => !$date->isSunday())->count();
         $averageEmployeeCount = round($monthlyStats['employee_count_sum'] / max($workingDays, 1));
         $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
 
         return response()->json([
-            'month' => $month,
+            'start_date' => $start->toDateString(),
+            'end_date' => $end->toDateString(),
+            'days_in_period' => count($period),
             'dollar_rate' => $dollarRate,
-            'days_in_month' => $daysInMonth,
             'aup' => $monthlyStats['aup'],
             'kpi' => $monthlyStats['kpi'],
             'transport_attendance' => $monthlyStats['transport_attendance'],
