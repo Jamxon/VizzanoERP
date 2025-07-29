@@ -241,7 +241,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::get('dailyPlan/employee', [InternalAccountantController::class, 'generateDailyPlanForOneEmployee']);
        Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
        Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
-
+       Route::get('topEarners', [GroupMasterController::class, 'getTopEarners']);
 });
 
 Route::prefix('groupHelper')->middleware('role:groupHelper')->group(function () {
