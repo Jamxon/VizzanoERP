@@ -436,7 +436,6 @@ class TailorController extends Controller
             foreach ($order->orderModel->submodels as $submodel) {
                 foreach ($submodel->tarificationCategories as $category) {
                     foreach ($category->tarifications as $tarification) {
-                        // Tarification bo‘yicha employee qancha ish bajarganini hisoblaymiz
                         $done = DB::table('employee_tarification_logs')
                             ->where('employee_id', $employee->id)
                             ->where('tarification_id', $tarification->id)
