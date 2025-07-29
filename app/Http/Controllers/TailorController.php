@@ -419,7 +419,7 @@ class TailorController extends Controller
                 $query->where('group_id', $employee->group_id);
             })
             ->with(['orderModel.submodels.tarificationCategories.tarifications' => function ($query) use ($employee) {
-                $query->where('employee_id', $employee->id);
+                $query->where('user_id', $employee->id);
             }])
             ->get();
 
