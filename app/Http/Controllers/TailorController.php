@@ -6,6 +6,7 @@ use App\Http\Resources\ShowOrderForTailorResource;
 use App\Models\Employee;
 use App\Models\EmployeeTarificationLog;
 use App\Models\Log;
+use App\Models\Order;
 use App\Models\OrderGroup;
 use App\Models\Tarification;
 use App\Models\TarificationPacket;
@@ -408,6 +409,44 @@ class TailorController extends Controller
             ], 500);
         }
     }
+
+    public function getMyWorks(): \Illuminate\Http\JsonResponse
+    {
+        $employee = auth()->user()->employee;
+
+        $orders = Order::whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting'])
+            ->whereHas('orderModel.submodels.group', function ($query) use ($employee) {
+                $query->where('group_id', $employee->group_id);
+            })
+            ->with(['orderModel.submodels.tarificationCategories.tarifications' => function ($query) use ($employee) {
+                $query->where('employee_id', $employee->id);
+            }])
+            ->get();
+
+        $orders = $orders->map(function ($order) use ($employee) {
+            $orderQuantity = $order->quantity; // orderdagi umumiy reja
+
+            $order->orderModel->submodels->each(function ($submodel) use ($employee, $orderQuantity) {
+                $submodel->tarificationCategories->each(function ($category) use ($employee, $orderQuantity) {
+                    $category->tarifications = $category->tarifications->filter(function ($tarification) use ($employee, $orderQuantity) {
+                        // Ushbu tarification bo‘yicha employee qancha ish qilganini topamiz
+                        $done = DB::table('employee_tarification_logs')
+                            ->where('employee_id', $employee->id)
+                            ->where('tarification_id', $tarification->id)
+                            ->sum('actual');
+
+                        // Bu tarification hali orderning umumiy quantitysidan oshmagan bo‘lsa qoldiramiz
+                        return $done < $orderQuantity;
+                    });
+                });
+            });
+
+            return $order;
+        });
+
+        return response()->json($orders);
+    }
+
 
 
 

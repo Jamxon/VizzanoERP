@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance employee retrieval by including related group information">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/TailorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/TailorController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -409,15 +411,8 @@
       <workItem from="1753344880394" duration="5225000" />
       <workItem from="1753415745966" duration="10668000" />
       <workItem from="1753504160140" duration="7808000" />
-      <workItem from="1753677291569" duration="9331000" />
-    </task>
-    <task id="LOCAL-00911" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752816690880</created>
-      <option name="number" value="00911" />
-      <option name="presentableId" value="LOCAL-00911" />
-      <option name="project" value="LOCAL" />
-      <updated>1752816690881</updated>
+      <workItem from="1753677291569" duration="12264000" />
+      <workItem from="1753763833309" duration="2020000" />
     </task>
     <task id="LOCAL-00912" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -803,7 +798,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753686703977</updated>
     </task>
-    <option name="localTasksCounter" value="960" />
+    <task id="LOCAL-00960" summary="feat: enhance employee retrieval by including related group information">
+      <option name="closed" value="true" />
+      <created>1753695865362</created>
+      <option name="number" value="00960" />
+      <option name="presentableId" value="LOCAL-00960" />
+      <option name="project" value="LOCAL" />
+      <updated>1753695865362</updated>
+    </task>
+    <option name="localTasksCounter" value="961" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
