@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add CRUD operations for cutting plans with related department details">
-      <change beforePath="$PROJECT_DIR$/app/Console/Commands/MonthlySewingReport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Commands/MonthlySewingReport.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add CRUD operations for cutting plans with related department details" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -410,15 +408,7 @@
       <workItem from="1753415745966" duration="10668000" />
       <workItem from="1753504160140" duration="7808000" />
       <workItem from="1753677291569" duration="12264000" />
-      <workItem from="1753763833309" duration="7648000" />
-    </task>
-    <task id="LOCAL-00919" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753105920461</created>
-      <option name="number" value="00919" />
-      <option name="presentableId" value="LOCAL-00919" />
-      <option name="project" value="LOCAL" />
-      <updated>1753105920461</updated>
+      <workItem from="1753763833309" duration="7972000" />
     </task>
     <task id="LOCAL-00920" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -804,7 +794,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753778438482</updated>
     </task>
-    <option name="localTasksCounter" value="968" />
+    <task id="LOCAL-00968" summary="feat: add CRUD operations for cutting plans with related department details">
+      <option name="closed" value="true" />
+      <created>1753778679980</created>
+      <option name="number" value="00968" />
+      <option name="presentableId" value="LOCAL-00968" />
+      <option name="project" value="LOCAL" />
+      <updated>1753778679980</updated>
+    </task>
+    <option name="localTasksCounter" value="969" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

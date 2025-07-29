@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Models\CuttingPlan;
+use App\Models\OrderCut;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
 use App\Models\GroupPlan;
@@ -19,6 +21,14 @@ class MonthlySewingReport extends Command
         $month = $now->month;
         $year = $now->year;
 
+        $this->calculateSewingKPI($month, $year);
+        $this->calculateCuttingKPI($month, $year);
+
+        $this->info("KPI hisoblandi va bonuslar qo'shildi: {$month}/{$year}");
+    }
+
+    protected function calculateSewingKPI($month, $year): void
+    {
         $plans = GroupPlan::with([
             'group.employees',
             'group.orders.order.orderModel.submodels.sewingOutputs' => function ($query) use ($month, $year) {
@@ -29,7 +39,6 @@ class MonthlySewingReport extends Command
             }
         ])->where('month', $month)->where('year', $year)->get();
 
-        // Umumiy plan va actual ni hisoblaymiz
         $totalPlan = $plans->sum('quantity');
         $totalActual = 0;
 
@@ -41,11 +50,9 @@ class MonthlySewingReport extends Command
             }
         }
 
-        // Umumiy foizni hisoblaymiz
         $overallPercent = $totalPlan > 0 ? round(($totalActual / $totalPlan) * 100, 2) : 0;
 
         foreach ($plans as $plan) {
-            // Har bir group uchun alohida plan va actual hisoblaymiz
             $planActual = 0;
             foreach ($plan->group->orders as $groupOrder) {
                 foreach ($groupOrder->order->orderModel->submodels as $submodel) {
@@ -53,83 +60,118 @@ class MonthlySewingReport extends Command
                 }
             }
 
-            // Shu group uchun foizni hisoblaymiz
             $planPercent = $plan->quantity > 0 ? round(($planActual / $plan->quantity) * 100, 2) : 0;
 
-            // Shu groupdagi employeelar uchun bonus hisoblaymiz
             foreach ($plan->group->employees as $employee) {
-                // Faqat KPI bilan ishlaydiganlar uchun
-                if (!in_array($employee->payment_type, ['fixed_percentage_bonus', 'fixed_percentage_bonus_group'])) {
-                    continue;
-                }
+                if (!in_array($employee->payment_type, ['fixed_percentage_bonus', 'fixed_percentage_bonus_group'])) continue;
 
-                // Qaysi foizdan foydalanish kerakligini aniqlaymiz
-                if ($employee->payment_type === 'fixed_percentage_bonus_group') {
-                    // Group natijasidan foydalanish
-                    $percent = $planPercent;
-                    $planValue = $plan->quantity;
-                    $actualValue = $planActual;
-                } else {
-                    // Umumiy natijadan foydalanish
-                    $percent = $overallPercent;
-                    $planValue = $totalPlan;
-                    $actualValue = $totalActual;
-                }
+                $percent = $employee->payment_type === 'fixed_percentage_bonus_group'
+                    ? $planPercent : $overallPercent;
 
-                // 80% dan kam bo'lsa bonus bermaymiz
-                if ($percent < 80) {
-                    continue;
-                }
+                $planValue = $employee->payment_type === 'fixed_percentage_bonus_group'
+                    ? $plan->quantity : $totalPlan;
 
-                $bonusPercent = 0;
+                $actualValue = $employee->payment_type === 'fixed_percentage_bonus_group'
+                    ? $planActual : $totalActual;
 
-                if ($percent >= 100) {
-                    // 100% va undan yuqori: asosiy bonus + qo'shimcha
-                    $bonusPercent = $employee->bonus + ($percent - 100);
-                } else {
-                    // 80% dan 100% gacha: proporsional hisoblash
-                    $baseBonus = 10; // minimal bonus
-                    $additional = $employee->bonus - $baseBonus;
-                    $scale = ($percent - 80) / 20; // 80% dan 100% gacha masshtab
-                    $bonusPercent = $baseBonus + ($additional * $scale);
-                }
+                if ($percent < 80) continue;
+
+                $bonusPercent = $percent >= 100
+                    ? $employee->bonus + ($percent - 100)
+                    : 10 + (($employee->bonus - 10) * (($percent - 80) / 20));
 
                 $amount = round($employee->salary * ($bonusPercent / 100), 2);
+                if ($amount <= 0) continue;
 
-                if ($amount <= 0) {
-                    continue;
-                }
-
-                    EmployeeSalary::create([
-                        'employee_id' => $employee->id,
-                        'month' => $month,
-                        'year' => $year,
-                        'type' => 'kpi',
-                        'amount' => $amount,
-                    ]);
+                EmployeeSalary::create([
+                    'employee_id' => $employee->id,
+                    'month' => $month,
+                    'year' => $year,
+                    'type' => 'kpi_sewing',
+                    'amount' => $amount,
+                ]);
 
                 $employee->increment('balance', $amount);
 
-                Log::add(
-                    $employee->user_id,
-                    'KPI hisoblandi',
-                    'salary_bonus',
-                    null,
-                    [
-                        'payment_type' => $employee->payment_type,
-                        'plan' => $planValue,
-                        'bajarilgan' => $actualValue,
-                        'foiz' => $percent,
-                        'bonus_foiz' => round($bonusPercent, 2),
-                        'summasi' => $amount,
-                        'oy' => $month,
-                        'yil' => $year,
-                    ]
-                );
+                Log::add($employee->user_id, 'Tikuv KPI hisoblandi', 'salary_bonus', null, [
+                    'payment_type' => $employee->payment_type,
+                    'plan' => $planValue,
+                    'bajarilgan' => $actualValue,
+                    'foiz' => $percent,
+                    'bonus_foiz' => round($bonusPercent, 2),
+                    'summasi' => $amount,
+                    'oy' => $month,
+                    'yil' => $year,
+                ]);
             }
         }
 
-        $this->info("KPI hisoblandi va bonuslar qo'shildi: {$month}/{$year}");
-        $this->info("Umumiy plan: {$totalPlan}, Bajarilgan: {$totalActual}, Foiz: {$overallPercent}%");
+        $this->info("Tikuv KPI: Plan {$totalPlan}, Bajarilgan {$totalActual}");
     }
+
+    protected function calculateCuttingKPI($month, $year): void
+    {
+        $plans = CuttingPlan::with(['department.employees'])->where('month', $month)->where('year', $year)->get();
+
+        $totalPlan = $plans->sum('quantity');
+
+        $totalActual = OrderCut::whereMonth('created_at', $month)
+            ->whereYear('created_at', $year)
+            ->sum('quantity');
+
+        $overallPercent = $totalPlan > 0 ? round(($totalActual / $totalPlan) * 100, 2) : 0;
+
+        foreach ($plans as $plan) {
+            $planActual = OrderCut::whereHas('employee', function ($q) use ($plan) {
+                $q->where('department_id', $plan->department_id);
+            })
+                ->whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->sum('quantity');
+
+            $planPercent = $plan->quantity > 0 ? round(($planActual / $plan->quantity) * 100, 2) : 0;
+
+            foreach ($plan->department->employees as $employee) {
+                // Cutting KPI uchun alohida type tekshirish (misol uchun: cutting_bonus)
+                if ($employee->payment_type !== 'cutting_bonus') continue;
+
+                $percent = $planPercent;
+                $planValue = $plan->quantity;
+                $actualValue = $planActual;
+
+                if ($percent < 80) continue;
+
+                $bonusPercent = $percent >= 100
+                    ? $employee->bonus + ($percent - 100)
+                    : 10 + (($employee->bonus - 10) * (($percent - 80) / 20));
+
+                $amount = round($employee->salary * ($bonusPercent / 100), 2);
+                if ($amount <= 0) continue;
+
+                EmployeeSalary::create([
+                    'employee_id' => $employee->id,
+                    'month' => $month,
+                    'year' => $year,
+                    'type' => 'kpi_cutting',
+                    'amount' => $amount,
+                ]);
+
+                $employee->increment('balance', $amount);
+
+                Log::add($employee->user_id, 'Kesish KPI hisoblandi', 'salary_bonus', null, [
+                    'payment_type' => $employee->payment_type,
+                    'plan' => $planValue,
+                    'bajarilgan' => $actualValue,
+                    'foiz' => $percent,
+                    'bonus_foiz' => round($bonusPercent, 2),
+                    'summasi' => $amount,
+                    'oy' => $month,
+                    'yil' => $year,
+                ]);
+            }
+        }
+
+        $this->info("Kesish KPI: Plan {$totalPlan}, Bajarilgan {$totalActual}");
+    }
+
 }

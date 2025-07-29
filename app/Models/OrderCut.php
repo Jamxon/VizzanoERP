@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static create(array $array)
  * @method static where(string $string, int|string|null $id)
  * @method static find($id)
+ * @method static whereMonth(string $string, $month)
+ * @method static whereHas(string $string, \Closure $param)
  */
 class OrderCut extends Model
 {
