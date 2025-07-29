@@ -7,6 +7,7 @@ use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ConstructorController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CuttingMasterController;
+use App\Http\Controllers\CuttingPlanController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupHelperController;
@@ -98,6 +99,10 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('groupPlans', [CasherController::class, 'getGroupPlans']);
     Route::patch('groupPlans/{id}', [CasherController::class, 'editGroupPlan']);
     Route::get('monthlyReport', [CasherController::class, 'getMonthlyCost']);
+    Route::get('cuttingPlans', [CuttingPlanController::class, 'index']);
+    Route::post('cuttingPlans', [CuttingPlanController::class, 'store']);
+    Route::patch('cuttingPlans/{id}', [CuttingPlanController::class, 'update']);
+    Route::delete('cuttingPlans/{id}', [CuttingPlanController::class, 'destroy']);
 
 });
 
@@ -443,6 +448,8 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::get('cuts/{id}', [CuttingMasterController::class, 'getCuts']);
     Route::get('finishCutting/{id}', [CuttingMasterController::class, 'finishCutting']);
     Route::get('markAsCut/{boxTarification}', [CuttingMasterController::class, 'updateBoxTarification']);
+    Route::get('cuttingPlans', [CuttingPlanController::class, 'index']);
+
 });
 
 Route::prefix('tv')->middleware('role:tv')->group(function () {
