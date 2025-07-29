@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static find($id)
  * @method static whereMonth(string $string, $month)
  * @method static whereHas(string $string, \Closure $param)
+ * @method static whereDate(string $string, $date)
  */
 class OrderCut extends Model
 {

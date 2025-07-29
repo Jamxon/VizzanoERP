@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @method static findOrFail($id)
  * @method static create(array $data)
+ * @method static whereHas(string $string, \Closure $param)
  */
 class CuttingPlan extends Model
 {

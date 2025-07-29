@@ -2,11 +2,63 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+
+
 class CuttingPlanController extends Controller
 {
-    public function index(): \Illuminate\Http\JsonResponse
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
-        $plans = \App\Models\CuttingPlan::with('department.responsibleUser.employee')->get();
+        $query = \App\Models\CuttingPlan::whereHas('department.mainDepartment', function ($q) {
+            $q->where('branch_id', auth()->user()->employee->branch_id);
+        });
+
+        $month = $request->input('month', now()->month);
+        $year = $request->input('year', now()->year);
+
+        $query->where('month', $month)->where('year', $year)
+            ->with(['department.responsibleUser.employee']);
+
+        $plans = $query->get();
+
+        $branchId = auth()->user()->employee->branch_id;
+
+        $plans->map(function ($plan) use ($month, $year, $branchId) {
+
+            // Butun oy bo'yicha quantity summasi
+            $monthlyDone = \App\Models\OrderCut::whereMonth('created_at', $month)
+                ->whereYear('created_at', $year)
+                ->whereHas('order', function ($q) use ($branchId) {
+                    $q->where('branch_id', $branchId);
+                })
+                ->sum('quantity');
+
+            $plan->monthly_total = $monthlyDone;
+
+            // Har kunlik natijalar
+            $startDate = Carbon::createFromDate($year, $month, 1)->startOfMonth();
+            $endDate = $startDate->copy()->endOfMonth();
+
+            $days = [];
+            for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+                $dailyDone = \App\Models\OrderCut::whereDate('created_at', $date)
+                    ->whereHas('order', function ($q) use ($branchId) {
+                        $q->where('branch_id', $branchId);
+                    })
+                    ->sum('quantity');
+
+                $days[] = [
+                    'date' => $date->toDateString(),
+                    'quantity' => $dailyDone,
+                ];
+            }
+
+            $plan->days = $days;
+
+            return $plan;
+        });
 
         return response()->json($plans);
     }

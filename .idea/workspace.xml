@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add CRUD operations for cutting plans with related department details" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update KPI calculation to retrieve cutting plans without employee details">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CuttingPlanController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CuttingPlanController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/CuttingPlan.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/CuttingPlan.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -408,23 +412,7 @@
       <workItem from="1753415745966" duration="10668000" />
       <workItem from="1753504160140" duration="7808000" />
       <workItem from="1753677291569" duration="12264000" />
-      <workItem from="1753763833309" duration="7972000" />
-    </task>
-    <task id="LOCAL-00920" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753174340135</created>
-      <option name="number" value="00920" />
-      <option name="presentableId" value="LOCAL-00920" />
-      <option name="project" value="LOCAL" />
-      <updated>1753174340135</updated>
-    </task>
-    <task id="LOCAL-00921" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753175254187</created>
-      <option name="number" value="00921" />
-      <option name="presentableId" value="LOCAL-00921" />
-      <option name="project" value="LOCAL" />
-      <updated>1753175254187</updated>
+      <workItem from="1753763833309" duration="9273000" />
     </task>
     <task id="LOCAL-00922" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -802,7 +790,23 @@
       <option name="project" value="LOCAL" />
       <updated>1753778679980</updated>
     </task>
-    <option name="localTasksCounter" value="969" />
+    <task id="LOCAL-00969" summary="feat: implement KPI calculations for sewing and cutting plans with bonus distribution">
+      <option name="closed" value="true" />
+      <created>1753779016750</created>
+      <option name="number" value="00969" />
+      <option name="presentableId" value="LOCAL-00969" />
+      <option name="project" value="LOCAL" />
+      <updated>1753779016750</updated>
+    </task>
+    <task id="LOCAL-00970" summary="fix: update KPI calculation to retrieve cutting plans without employee details">
+      <option name="closed" value="true" />
+      <created>1753779131575</created>
+      <option name="number" value="00970" />
+      <option name="presentableId" value="LOCAL-00970" />
+      <option name="project" value="LOCAL" />
+      <updated>1753779131575</updated>
+    </task>
+    <option name="localTasksCounter" value="971" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -832,8 +836,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: set default status to 'active' for new Lids in SuperHRController" />
-    <MESSAGE value="fix: update image upload handling in SuperHRController for consistency" />
     <MESSAGE value="fix: correct image file reference in SuperHRController for proper upload handling" />
     <MESSAGE value="fix: update pagination for active Lids retrieval in SuperHRController" />
     <MESSAGE value="feat: add showLid method and route for retrieving a single Lid in SuperHRController" />
@@ -857,7 +859,9 @@
     <MESSAGE value="feat: add API endpoint to retrieve employee's works with related order details" />
     <MESSAGE value="fix: correct sum calculation from 'actual' to 'quantity' in employee tarification logs" />
     <MESSAGE value="feat: add CRUD operations for cutting plans with related department details" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add CRUD operations for cutting plans with related department details" />
+    <MESSAGE value="feat: implement KPI calculations for sewing and cutting plans with bonus distribution" />
+    <MESSAGE value="fix: update KPI calculation to retrieve cutting plans without employee details" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update KPI calculation to retrieve cutting plans without employee details" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
