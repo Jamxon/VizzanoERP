@@ -418,36 +418,41 @@ class TailorController extends Controller
             ->whereHas('orderModel.submodels.group', function ($query) use ($employee) {
                 $query->where('group_id', $employee->group_id);
             })
-            ->with(['orderModel.submodels.tarificationCategories.tarifications' => function ($query) use ($employee) {
-                $query->where('user_id', $employee->id);
-            }])
+            ->with([
+                'orderModel.submodels.tarificationCategories.tarifications' => function ($query) use ($employee) {
+                    $query->where('user_id', $employee->id);
+                },
+                'orderModel.model', // modelni olish uchun
+            ])
             ->get();
 
-        $orders = $orders->map(function ($order) use ($employee) {
-            $orderQuantity = $order->quantity; // orderdagi umumiy reja
+        // Natijaviy tarificationlar ro‘yxati
+        $result = [];
 
-            $order->orderModel->submodels->each(function ($submodel) use ($employee, $orderQuantity) {
-                $submodel->tarificationCategories->each(function ($category) use ($employee, $orderQuantity) {
-                    $category->tarifications = $category->tarifications->filter(function ($tarification) use ($employee, $orderQuantity) {
-                        // Ushbu tarification bo‘yicha employee qancha ish qilganini topamiz
+        foreach ($orders as $order) {
+            $orderQuantity = $order->quantity;
+            $model = $order->orderModel->model;
+
+            foreach ($order->orderModel->submodels as $submodel) {
+                foreach ($submodel->tarificationCategories as $category) {
+                    foreach ($category->tarifications as $tarification) {
+                        // Tarification bo‘yicha employee qancha ish bajarganini hisoblaymiz
                         $done = DB::table('employee_tarification_logs')
                             ->where('employee_id', $employee->id)
                             ->where('tarification_id', $tarification->id)
                             ->sum('actual');
 
-                        // Bu tarification hali orderning umumiy quantitysidan oshmagan bo‘lsa qoldiramiz
-                        return $done < $orderQuantity;
-                    });
-                });
-            });
+                        if ($done < $orderQuantity) {
+                            // Tarificationga modelni ulab qo‘yamiz
+                            $tarification->model = $model;
+                            $result[] = $tarification;
+                        }
+                    }
+                }
+            }
+        }
 
-            return $order;
-        });
-
-        return response()->json($orders);
+        return response()->json($result);
     }
-
-
-
 
 }

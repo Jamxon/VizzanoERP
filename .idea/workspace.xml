@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: enhance employee retrieval by including related group information">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/TailorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/TailorController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add API endpoint to retrieve employee's works with related order details" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -412,23 +408,7 @@
       <workItem from="1753415745966" duration="10668000" />
       <workItem from="1753504160140" duration="7808000" />
       <workItem from="1753677291569" duration="12264000" />
-      <workItem from="1753763833309" duration="2020000" />
-    </task>
-    <task id="LOCAL-00912" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752816932734</created>
-      <option name="number" value="00912" />
-      <option name="presentableId" value="LOCAL-00912" />
-      <option name="project" value="LOCAL" />
-      <updated>1752816932734</updated>
-    </task>
-    <task id="LOCAL-00913" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1752830393071</created>
-      <option name="number" value="00913" />
-      <option name="presentableId" value="LOCAL-00913" />
-      <option name="project" value="LOCAL" />
-      <updated>1752830393071</updated>
+      <workItem from="1753763833309" duration="2416000" />
     </task>
     <task id="LOCAL-00914" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -806,7 +786,23 @@
       <option name="project" value="LOCAL" />
       <updated>1753695865362</updated>
     </task>
-    <option name="localTasksCounter" value="961" />
+    <task id="LOCAL-00961" summary="feat: add API endpoint to retrieve employee's works with related order details">
+      <option name="closed" value="true" />
+      <created>1753765878867</created>
+      <option name="number" value="00961" />
+      <option name="presentableId" value="LOCAL-00961" />
+      <option name="project" value="LOCAL" />
+      <updated>1753765878869</updated>
+    </task>
+    <task id="LOCAL-00962" summary="feat: add API endpoint to retrieve employee's works with related order details">
+      <option name="closed" value="true" />
+      <created>1753765982981</created>
+      <option name="number" value="00962" />
+      <option name="presentableId" value="LOCAL-00962" />
+      <option name="project" value="LOCAL" />
+      <updated>1753765982981</updated>
+    </task>
+    <option name="localTasksCounter" value="963" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -836,7 +832,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactor: enhance logic for handling printed and remaining sizes in box_sticker.blade.php" />
     <MESSAGE value="fix: update message text in SuperHRController for improved clarity" />
     <MESSAGE value="feat: add CRUD operations for Lids in SuperHRController and update Lid model" />
     <MESSAGE value="feat: set default status to 'active' for new Lids in SuperHRController" />
@@ -861,7 +856,8 @@
     <MESSAGE value="feat: optimize employee tarification log check and improve date handling" />
     <MESSAGE value="feat: implement shipment planning and item management with relationships" />
     <MESSAGE value="feat: enhance employee retrieval by including related group information" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: enhance employee retrieval by including related group information" />
+    <MESSAGE value="feat: add API endpoint to retrieve employee's works with related order details" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add API endpoint to retrieve employee's works with related order details" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
