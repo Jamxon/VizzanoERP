@@ -440,7 +440,7 @@ class TailorController extends Controller
                         $done = DB::table('employee_tarification_logs')
                             ->where('employee_id', $employee->id)
                             ->where('tarification_id', $tarification->id)
-                            ->sum('actual');
+                            ->sum('quantity');
 
                         if ($done < $orderQuantity) {
                             // Tarificationga modelni ulab qo‘yamiz
