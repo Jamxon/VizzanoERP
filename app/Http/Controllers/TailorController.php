@@ -85,7 +85,6 @@ class TailorController extends Controller
         $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
 
         $employeeIds = EmployeeTarificationLog::where('tarification_id', $tarification->id)
-            ->whereDate('date', $today)
             ->pluck('employee_id')
             ->unique();
 
@@ -93,7 +92,6 @@ class TailorController extends Controller
 
             // Umumiy bajarilgan miqdor
             $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarification->id)
-                ->whereDate('date', $today)
                 ->sum('quantity');
 
             if (($alreadyDone + 1) > $orderQuantity) {

@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct sum calculation from 'actual' to 'quantity' in employee tarification logs">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add CRUD operations for cutting plans with related department details">
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee/storage_v2/_src_/database/vizzano.z0s8HA/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -410,15 +413,7 @@
       <workItem from="1753415745966" duration="10668000" />
       <workItem from="1753504160140" duration="7808000" />
       <workItem from="1753677291569" duration="12264000" />
-      <workItem from="1753763833309" duration="5904000" />
-    </task>
-    <task id="LOCAL-00917" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753093907632</created>
-      <option name="number" value="00917" />
-      <option name="presentableId" value="LOCAL-00917" />
-      <option name="project" value="LOCAL" />
-      <updated>1753093907632</updated>
+      <workItem from="1753763833309" duration="7347000" />
     </task>
     <task id="LOCAL-00918" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -804,7 +799,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753767842987</updated>
     </task>
-    <option name="localTasksCounter" value="966" />
+    <task id="LOCAL-00966" summary="feat: add CRUD operations for cutting plans with related department details">
+      <option name="closed" value="true" />
+      <created>1753777759326</created>
+      <option name="number" value="00966" />
+      <option name="presentableId" value="LOCAL-00966" />
+      <option name="project" value="LOCAL" />
+      <updated>1753777759326</updated>
+    </task>
+    <option name="localTasksCounter" value="967" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -834,7 +837,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add CRUD operations for Lids in SuperHRController and update Lid model" />
     <MESSAGE value="feat: set default status to 'active' for new Lids in SuperHRController" />
     <MESSAGE value="fix: update image upload handling in SuperHRController for consistency" />
     <MESSAGE value="fix: correct image file reference in SuperHRController for proper upload handling" />
@@ -859,7 +861,8 @@
     <MESSAGE value="feat: enhance employee retrieval by including related group information" />
     <MESSAGE value="feat: add API endpoint to retrieve employee's works with related order details" />
     <MESSAGE value="fix: correct sum calculation from 'actual' to 'quantity' in employee tarification logs" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct sum calculation from 'actual' to 'quantity' in employee tarification logs" />
+    <MESSAGE value="feat: add CRUD operations for cutting plans with related department details" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add CRUD operations for cutting plans with related department details" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

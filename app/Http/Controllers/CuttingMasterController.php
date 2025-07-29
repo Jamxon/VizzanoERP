@@ -195,7 +195,7 @@ class CuttingMasterController extends Controller
         }
     }
 
-    public function markAsCutAndExportMultiplePdfs(Request $request)
+    public function markAsCutAndExportMultiplePdfs(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
