@@ -164,17 +164,46 @@ class CuttingMasterController extends Controller
         DB::beginTransaction();
         try {
             $order = Order::find($id);
+            if (!$order) {
+                return response()->json(['error' => 'Order not found'], 404);
+            }
+
             $oldStatus = $order->status;
 
+            // Kesilgan umumiy quantity ni hisoblash
+            $totalCutQuantity = DB::table('order_cuts')
+                ->where('order_id', $id)
+                ->sum('quantity');
+
+            $orderQuantity = $order->quantity;
+
+            // Agar hali kesilmagan quantity mavjud bo‘lsa
+            $remaining = $orderQuantity - $totalCutQuantity;
+
+            if ($remaining > 0) {
+                // qolganini saqlash uchun OrderCut yozuvi qo‘shish
+                DB::table('order_cuts')->insert([
+                    'order_id' => $order->id,
+                    'user_id' => auth()->id(),
+                    'cut_at' => now(),
+                    'quantity' => $remaining,
+                    'status' => false, // yoki boshqa maqbul status
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+            }
+
+            // Order statusini yangilash
             $order->update([
                 'status' => 'pending'
             ]);
 
+            // Printing time statusini yangilash
             $order->orderPrintingTime->update([
                 'status' => 'completed'
             ]);
 
-            // Add log entry
+            // Log yozish
             Log::add(
                 auth()->user()->id,
                 "Buyurtmani kesish yakunlandi (Order ID: $id)",
@@ -185,7 +214,8 @@ class CuttingMasterController extends Controller
 
             DB::commit();
             return response()->json([
-                'message' => 'Order cutting finished'
+                'message' => 'Order cutting finished',
+                'remaining_cut_added' => $remaining > 0 ? $remaining : 0
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
