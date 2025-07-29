@@ -29,8 +29,6 @@ class OrderCut extends Model
     ];
 
     protected $hidden = [
-        'created_at',
-        'updated_at',
         'order_id',
         'user_id',
         'submodel_id',
