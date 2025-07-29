@@ -111,7 +111,7 @@ class MonthlySewingReport extends Command
 
     protected function calculateCuttingKPI($month, $year): void
     {
-        $plans = CuttingPlan::with(['department.employees'])->where('month', $month)->where('year', $year)->get();
+        $plans = CuttingPlan::with(['department'])->where('month', $month)->where('year', $year)->get();
 
         $totalPlan = $plans->sum('quantity');
 
