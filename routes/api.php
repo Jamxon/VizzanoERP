@@ -54,6 +54,7 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::get('myWorks', [TailorController::class, 'getMyWorks']);
 });
 
+
 Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
     Route::get('groups', [ResultCheckerController::class, 'getGroups']);
     Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
