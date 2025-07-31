@@ -1005,7 +1005,6 @@ class InternalAccountantController extends Controller
         $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
 
         $otherEmployeesDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)
-            ->where('employee_id', '!=', $employeeId)
             ->sum('quantity');
 
         $allowedQuantity = $orderQuantity - $otherEmployeesDone;

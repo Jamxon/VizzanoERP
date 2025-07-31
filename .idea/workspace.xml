@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove redundant attendance check in AttendanceController">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AttendanceController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AttendanceController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Attendance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Attendance.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/AttendanceSalary.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/AttendanceSalary.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -418,15 +413,7 @@
       <workItem from="1753780797536" duration="381000" />
       <workItem from="1753854491530" duration="958000" />
       <workItem from="1753855561347" duration="8419000" />
-      <workItem from="1753934960659" duration="7365000" />
-    </task>
-    <task id="LOCAL-00926" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753180091446</created>
-      <option name="number" value="00926" />
-      <option name="presentableId" value="LOCAL-00926" />
-      <option name="project" value="LOCAL" />
-      <updated>1753180091446</updated>
+      <workItem from="1753934960659" duration="7680000" />
     </task>
     <task id="LOCAL-00927" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -812,7 +799,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753945709082</updated>
     </task>
-    <option name="localTasksCounter" value="975" />
+    <task id="LOCAL-00975" summary="fix: add attendanceSalary relationship in Attendance model and update method signatures">
+      <option name="closed" value="true" />
+      <created>1753946633000</created>
+      <option name="number" value="00975" />
+      <option name="presentableId" value="LOCAL-00975" />
+      <option name="project" value="LOCAL" />
+      <updated>1753946633000</updated>
+    </task>
+    <option name="localTasksCounter" value="976" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -842,7 +837,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: correct image file reference in SuperHRController for image upload handling" />
     <MESSAGE value="fix: remove redundant birth_day search condition in getLids method of SuperHRController" />
     <MESSAGE value="fix: update summary message format in GroupMasterController for better readability" />
     <MESSAGE value="fix: correct summary message format in GroupMasterController for clarity" />
@@ -867,7 +861,8 @@
     <MESSAGE value="fix: update MonthlySewingReport to use user.employee relationship and exclude unnecessary storage folders" />
     <MESSAGE value="fix: allow optional date input in AttendanceController for attendance records" />
     <MESSAGE value="fix: remove redundant attendance check in AttendanceController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: remove redundant attendance check in AttendanceController" />
+    <MESSAGE value="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
