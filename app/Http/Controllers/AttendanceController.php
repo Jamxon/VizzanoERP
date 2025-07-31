@@ -125,21 +125,35 @@ class AttendanceController extends Controller
             // Endi balansga qo‘shamiz
             $employee->increment('balance', $salaryToAdd);
 
-            $attendanceSalary = AttendanceSalary::where('attendance_id', $attendance->id)->first();
-            if ($attendanceSalary) {
-                $attendanceSalary->update([
-                    'amount' => $salaryToAdd,
-                ]);
-            } else {
-                AttendanceSalary::create([
-                    'employee_id' => $attendance->employee_id,
-                    'attendance_id' => $attendance->id,
-                    'amount' => $salaryToAdd,
-                    'date' => $attendance->date,
-                ]);
+        $attendanceSalary = AttendanceSalary::where('attendance_id', $attendance->id)->first();
+
+        if ($attendanceSalary) {
+            $oldAmount = $attendanceSalary->amount;
+            $difference = $salaryToAdd - $oldAmount;
+
+            // Balansni faqat farqga qarab yangilaymiz
+            if ($difference != 0) {
+                $employee->increment('balance', $difference);
             }
 
-            Log::add(
+            $attendanceSalary->update([
+                'amount' => $salaryToAdd,
+            ]);
+        } else {
+            // Yangi salary log
+            AttendanceSalary::create([
+                'employee_id' => $attendance->employee_id,
+                'attendance_id' => $attendance->id,
+                'amount' => $salaryToAdd,
+                'date' => $attendance->date,
+            ]);
+
+            // Faqat yangi bo‘lsa balansga qo‘shamiz
+            $employee->increment('balance', $salaryToAdd);
+        }
+
+
+        Log::add(
                 auth()->id(),
                 'Hodim ishdan chiqdi',
                 'Check Out',

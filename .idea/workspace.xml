@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add attendanceSalary relationship in Attendance model and update method signatures">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update attendance salary handling in AttendanceController to use update or create logic">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AttendanceController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AttendanceController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -416,15 +415,7 @@
       <workItem from="1753780797536" duration="381000" />
       <workItem from="1753854491530" duration="958000" />
       <workItem from="1753855561347" duration="8419000" />
-      <workItem from="1753934960659" duration="8401000" />
-    </task>
-    <task id="LOCAL-00928" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753180181726</created>
-      <option name="number" value="00928" />
-      <option name="presentableId" value="LOCAL-00928" />
-      <option name="project" value="LOCAL" />
-      <updated>1753180181726</updated>
+      <workItem from="1753934960659" duration="10137000" />
     </task>
     <task id="LOCAL-00929" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -810,7 +801,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753946807986</updated>
     </task>
-    <option name="localTasksCounter" value="977" />
+    <task id="LOCAL-00977" summary="fix: update attendance salary handling in AttendanceController to use update or create logic">
+      <option name="closed" value="true" />
+      <created>1753947473240</created>
+      <option name="number" value="00977" />
+      <option name="presentableId" value="LOCAL-00977" />
+      <option name="project" value="LOCAL" />
+      <updated>1753947473240</updated>
+    </task>
+    <option name="localTasksCounter" value="978" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -840,7 +839,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: remove redundant birth_day search condition in getLids method of SuperHRController" />
     <MESSAGE value="fix: update summary message format in GroupMasterController for better readability" />
     <MESSAGE value="fix: correct summary message format in GroupMasterController for clarity" />
     <MESSAGE value="feat: implement Telegram notification for attendance check-out summary and errors" />
@@ -865,7 +863,8 @@
     <MESSAGE value="fix: allow optional date input in AttendanceController for attendance records" />
     <MESSAGE value="fix: remove redundant attendance check in AttendanceController" />
     <MESSAGE value="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
+    <MESSAGE value="fix: update attendance salary handling in AttendanceController to use update or create logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update attendance salary handling in AttendanceController to use update or create logic" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
