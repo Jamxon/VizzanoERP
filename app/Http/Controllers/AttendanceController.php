@@ -41,9 +41,10 @@ class AttendanceController extends Controller
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'check_in' => 'required|date',
+            'date' => 'nullable|date',
         ]);
 
-        $today = now()->toDateString();
+        $today = $request->date ?? now()->toDateString();
         // Shu kunga allaqachon kelganmi?
         $existing = Attendance::where('employee_id', $request->employee_id)
             ->whereDate('date', $today)
