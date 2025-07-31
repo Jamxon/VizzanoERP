@@ -122,7 +122,7 @@ class MonthlySewingReport extends Command
         $overallPercent = $totalPlan > 0 ? round(($totalActual / $totalPlan) * 100, 2) : 0;
 
         foreach ($plans as $plan) {
-            $planActual = OrderCut::whereHas('employee', function ($q) use ($plan) {
+            $planActual = OrderCut::whereHas('user.employee', function ($q) use ($plan) {
                 $q->where('department_id', $plan->department_id);
             })
                 ->whereMonth('created_at', $month)
