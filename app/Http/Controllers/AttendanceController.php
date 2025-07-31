@@ -115,8 +115,13 @@ class AttendanceController extends Controller
                 try {
                     $checkIn = \Carbon\Carbon::parse($attendance->check_in);
                     $checkOut = \Carbon\Carbon::parse($attendance->check_out);
-                    $workedHours = $checkOut->diffInHours($checkIn);
+
+                    $workedSeconds = $checkOut->diffInSeconds($checkIn);
+
+                    $workedHours = $workedSeconds / 3600;
+
                     $salaryToAdd = $employee->salary * $workedHours;
+
                 } catch (\Exception $e) {
                     return response()->json(['error' => 'Check-in yoki check-out noto‘g‘ri formatda.'], 422);
                 }
