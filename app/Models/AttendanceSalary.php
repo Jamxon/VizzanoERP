@@ -20,12 +20,12 @@ class AttendanceSalary extends Authenticatable
         'date',
     ];
 
-    public function employee()
+    public function employee(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Employee::class);
     }
 
-    public function attendance()
+    public function attendance(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Attendance::class);
     }

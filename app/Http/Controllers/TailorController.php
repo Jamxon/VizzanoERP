@@ -88,7 +88,6 @@ class TailorController extends Controller
             ->pluck('employee_id')
             ->unique();
 
-        if ($employeeIds->count() > 1 || ($employeeIds->count() === 1 && $employeeIds->first() !== $employee->id)) {
 
             // Umumiy bajarilgan miqdor
             $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarification->id)
@@ -99,7 +98,6 @@ class TailorController extends Controller
                     'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: 1"
                 ], 422);
             }
-        }
 
         DB::beginTransaction();
 

@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update MonthlySewingReport to use user.employee relationship and exclude unnecessary storage folders">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove redundant attendance check in AttendanceController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AttendanceController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AttendanceController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Attendance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Attendance.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/AttendanceSalary.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/AttendanceSalary.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -415,23 +418,7 @@
       <workItem from="1753780797536" duration="381000" />
       <workItem from="1753854491530" duration="958000" />
       <workItem from="1753855561347" duration="8419000" />
-      <workItem from="1753934960659" duration="5351000" />
-    </task>
-    <task id="LOCAL-00924" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753179790942</created>
-      <option name="number" value="00924" />
-      <option name="presentableId" value="LOCAL-00924" />
-      <option name="project" value="LOCAL" />
-      <updated>1753179790942</updated>
-    </task>
-    <task id="LOCAL-00925" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753179925469</created>
-      <option name="number" value="00925" />
-      <option name="presentableId" value="LOCAL-00925" />
-      <option name="project" value="LOCAL" />
-      <updated>1753179925469</updated>
+      <workItem from="1753934960659" duration="7365000" />
     </task>
     <task id="LOCAL-00926" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -809,7 +796,23 @@
       <option name="project" value="LOCAL" />
       <updated>1753939109605</updated>
     </task>
-    <option name="localTasksCounter" value="973" />
+    <task id="LOCAL-00973" summary="fix: allow optional date input in AttendanceController for attendance records">
+      <option name="closed" value="true" />
+      <created>1753945509634</created>
+      <option name="number" value="00973" />
+      <option name="presentableId" value="LOCAL-00973" />
+      <option name="project" value="LOCAL" />
+      <updated>1753945509634</updated>
+    </task>
+    <task id="LOCAL-00974" summary="fix: remove redundant attendance check in AttendanceController">
+      <option name="closed" value="true" />
+      <created>1753945709082</created>
+      <option name="number" value="00974" />
+      <option name="presentableId" value="LOCAL-00974" />
+      <option name="project" value="LOCAL" />
+      <updated>1753945709082</updated>
+    </task>
+    <option name="localTasksCounter" value="975" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -839,8 +842,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add showLid method and route for retrieving a single Lid in SuperHRController" />
-    <MESSAGE value="feat: enhance getLids method to support search and status filtering in SuperHRController" />
     <MESSAGE value="fix: correct image file reference in SuperHRController for image upload handling" />
     <MESSAGE value="fix: remove redundant birth_day search condition in getLids method of SuperHRController" />
     <MESSAGE value="fix: update summary message format in GroupMasterController for better readability" />
@@ -864,7 +865,9 @@
     <MESSAGE value="fix: update KPI calculation to retrieve cutting plans without employee details" />
     <MESSAGE value="fix: update workspace and data source configurations for compatibility" />
     <MESSAGE value="fix: update MonthlySewingReport to use user.employee relationship and exclude unnecessary storage folders" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update MonthlySewingReport to use user.employee relationship and exclude unnecessary storage folders" />
+    <MESSAGE value="fix: allow optional date input in AttendanceController for attendance records" />
+    <MESSAGE value="fix: remove redundant attendance check in AttendanceController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: remove redundant attendance check in AttendanceController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

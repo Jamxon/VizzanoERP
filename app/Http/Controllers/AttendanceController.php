@@ -70,6 +70,10 @@ class AttendanceController extends Controller
             ]
         );
 
+        if ($attendance->attendanceSalary){
+
+        }
+
         Log::add(
             auth()->user()->id,
             'Hodim ishga keldi',
