@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add attendanceSalary relationship in Attendance model and update method signatures">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AttendanceController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AttendanceController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -413,15 +416,7 @@
       <workItem from="1753780797536" duration="381000" />
       <workItem from="1753854491530" duration="958000" />
       <workItem from="1753855561347" duration="8419000" />
-      <workItem from="1753934960659" duration="7680000" />
-    </task>
-    <task id="LOCAL-00927" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753180145913</created>
-      <option name="number" value="00927" />
-      <option name="presentableId" value="LOCAL-00927" />
-      <option name="project" value="LOCAL" />
-      <updated>1753180145913</updated>
+      <workItem from="1753934960659" duration="8401000" />
     </task>
     <task id="LOCAL-00928" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -807,7 +802,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753946633000</updated>
     </task>
-    <option name="localTasksCounter" value="976" />
+    <task id="LOCAL-00976" summary="fix: add attendanceSalary relationship in Attendance model and update method signatures">
+      <option name="closed" value="true" />
+      <created>1753946807986</created>
+      <option name="number" value="00976" />
+      <option name="presentableId" value="LOCAL-00976" />
+      <option name="project" value="LOCAL" />
+      <updated>1753946807986</updated>
+    </task>
+    <option name="localTasksCounter" value="977" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

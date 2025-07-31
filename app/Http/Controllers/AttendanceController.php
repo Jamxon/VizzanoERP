@@ -70,10 +70,6 @@ class AttendanceController extends Controller
             ]
         );
 
-        if ($attendance->attendanceSalary){
-
-        }
-
         Log::add(
             auth()->user()->id,
             'Hodim ishga keldi',
@@ -108,7 +104,10 @@ class AttendanceController extends Controller
             $employee = $attendance->employee; // faqat 1 marta DB dan olinadi
             $salaryToAdd = 0;
 
-            if ($employee->payment_type === 'monthly' || $employee->payment_type === 'fixed_tailored_bonus' || $employee->payment_type === 'fixed_cutted_bonus' || $employee->payment_type === 'fixed_tailored_bonus_group') {
+            if ($employee->payment_type === 'monthly' || $employee->payment_type === 'fixed_tailored_bonus' || $employee->payment_type === 'fixed_cutted_bonus' || $employee->payment_type === 'fixed_tailored_bonus_group' || $employee->payment_type === 'fixed_packaged_bonus'
+            || $employee->payment_type === 'fixed_completed_bonus' || $employee->payment_type === 'fixed_percentage_bonus_group'
+                || $employee->payment_type === 'fixed_percentage_bonus' || $employee->payment_type === 'cutting_bonus' )
+            {
                 $salaryToAdd = $employee->salary / 26;
             } elseif ($employee->payment_type === 'daily') {
                 $salaryToAdd = $employee->salary;
@@ -126,12 +125,19 @@ class AttendanceController extends Controller
             // Endi balansga qo‘shamiz
             $employee->increment('balance', $salaryToAdd);
 
-            AttendanceSalary::create([
-                'employee_id' => $attendance->employee_id,
-                'attendance_id' => $attendance->id,
-                'amount' => $salaryToAdd,
-                'date' => now()->toDateString(),
-            ]);
+            $attendanceSalary = AttendanceSalary::where('attendance_id', $attendance->id)->first();
+            if ($attendanceSalary) {
+                $attendanceSalary->update([
+                    'amount' => $salaryToAdd,
+                ]);
+            } else {
+                AttendanceSalary::create([
+                    'employee_id' => $attendance->employee_id,
+                    'attendance_id' => $attendance->id,
+                    'amount' => $salaryToAdd,
+                    'date' => $attendance->date,
+                ]);
+            }
 
             Log::add(
                 auth()->id(),
