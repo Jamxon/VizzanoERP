@@ -122,9 +122,6 @@ class AttendanceController extends Controller
                 }
             }
 
-            // Endi balansga qo‘shamiz
-            $employee->increment('balance', $salaryToAdd);
-
         $attendanceSalary = AttendanceSalary::where('attendance_id', $attendance->id)->first();
 
         if ($attendanceSalary) {
