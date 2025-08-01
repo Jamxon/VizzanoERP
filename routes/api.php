@@ -25,6 +25,7 @@ use App\Http\Controllers\QualityControllerMasterController;
 use App\Http\Controllers\RazryadController;
 use App\Http\Controllers\RecipeController;
 use App\Http\Controllers\ResultCheckerController;
+use App\Http\Controllers\ShipmentPlanController;
 use App\Http\Controllers\SourceController;
 use App\Http\Controllers\SubModelController;
 use App\Http\Controllers\SuperHRController;
@@ -198,6 +199,9 @@ Route::prefix('packageMaster')->middleware('role:packageMaster')->group(function
     Route::get('orders', [PackageMasterController::class, 'getOrders']);
     Route::get('orders/{order}', [PackageMasterController::class, 'showOrder']);
     Route::post('packageStore', [PackageMasterController::class, 'packageStore']);
+    Route::get('shipmentPlans', [ShipmentPlanController::class, 'index']);
+    Route::post('shipmentPlans', [ShipmentPlanController::class, 'store']);
+    Route::patch('shipmentPlans/{shipmentPlan}', [ShipmentPlanController::class, 'update']);
 });
 
 Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMaster')->group(function () {
