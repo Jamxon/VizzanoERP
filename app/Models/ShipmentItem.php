@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @method static whereHas(string $string, \Closure $param)
+ */
 class ShipmentItem extends Model
 {
     protected $fillable = ['shipment_plan_id', 'model_id', 'quantity', 'completed', 'comment'];

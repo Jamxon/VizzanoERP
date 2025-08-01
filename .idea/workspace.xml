@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: set default status to 'draft' in shipment plan creation">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update employee salary query to use parsed start and end dates for filtering">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -416,23 +416,7 @@
       <workItem from="1753854491530" duration="958000" />
       <workItem from="1753855561347" duration="8419000" />
       <workItem from="1753934960659" duration="16743000" />
-      <workItem from="1754022224415" duration="4730000" />
-    </task>
-    <task id="LOCAL-00935" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753181912448</created>
-      <option name="number" value="00935" />
-      <option name="presentableId" value="LOCAL-00935" />
-      <option name="project" value="LOCAL" />
-      <updated>1753181912448</updated>
-    </task>
-    <task id="LOCAL-00936" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753181966934</created>
-      <option name="number" value="00936" />
-      <option name="presentableId" value="LOCAL-00936" />
-      <option name="project" value="LOCAL" />
-      <updated>1753181966934</updated>
+      <workItem from="1754022224415" duration="10758000" />
     </task>
     <task id="LOCAL-00937" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -810,7 +794,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754027807295</updated>
     </task>
-    <option name="localTasksCounter" value="984" />
+    <task id="LOCAL-00984" summary="fix: remove 'created_at' from hidden attributes in EmployeeSalary model">
+      <option name="closed" value="true" />
+      <created>1754029618952</created>
+      <option name="number" value="00984" />
+      <option name="presentableId" value="LOCAL-00984" />
+      <option name="project" value="LOCAL" />
+      <updated>1754029618952</updated>
+    </task>
+    <task id="LOCAL-00985" summary="fix: update employee salary query to use parsed start and end dates for filtering">
+      <option name="closed" value="true" />
+      <created>1754029820297</created>
+      <option name="number" value="00985" />
+      <option name="presentableId" value="LOCAL-00985" />
+      <option name="project" value="LOCAL" />
+      <updated>1754029820297</updated>
+    </task>
+    <option name="localTasksCounter" value="986" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -840,8 +840,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="chore: update workspace configuration and clean up unused task entries" />
-    <MESSAGE value="feat: enhance order retrieval with tarification categories and submodel data" />
     <MESSAGE value="feat: add return type declaration for importTarifications method" />
     <MESSAGE value="feat: enhance order retrieval to include submodel data" />
     <MESSAGE value="feat: add database backup functionality with zip compression and Telegram notification" />
@@ -865,7 +863,9 @@
     <MESSAGE value="fix: update attendance salary calculation to use worked seconds for accuracy" />
     <MESSAGE value="fix: add shipment plan API endpoints for managing shipment plans" />
     <MESSAGE value="fix: set default status to 'draft' in shipment plan creation" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: set default status to 'draft' in shipment plan creation" />
+    <MESSAGE value="fix: remove 'created_at' from hidden attributes in EmployeeSalary model" />
+    <MESSAGE value="fix: update employee salary query to use parsed start and end dates for filtering" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update employee salary query to use parsed start and end dates for filtering" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

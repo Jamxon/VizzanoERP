@@ -13,6 +13,7 @@ use App\Models\OrderGroup;
 use App\Models\OrderModel;
 use App\Models\OrderSubModel;
 use App\Models\SewingOutputs;
+use App\Models\ShipmentItem;
 use App\Models\Tarification;
 use App\Models\TelegramSewingMessage;
 use App\Models\Time;
@@ -391,6 +392,8 @@ class GroupMasterController extends Controller
 
         $sewingOutput = SewingOutputs::create($validatedData);
 
+        $this->recalculateShipmentPlanItemsForOrderSubModel($orderSubModel);
+
         if ($combinedQuantity === $orderQuantity) {
             $order->update(['status' => 'tailored']);
         }
@@ -472,6 +475,42 @@ class GroupMasterController extends Controller
             'message' => "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity)
         ]);
     }
+
+    private function recalculateShipmentPlanItemsForOrderSubModel(OrderSubModel $orderSubModel): void
+    {
+        // Tegishli buyurtma va submodel
+        $orderModel = $orderSubModel->orderModel;
+        $order = $orderModel->order;
+        $submodelId = $orderSubModel->submodel_id;
+
+        // Shu order va submodel asosida detailda ishtirok etgan shipment plan itemlarni topamiz
+        $planItems = ShipmentItem::whereHas('details', function ($q) use ($order, $submodelId) {
+            $q->where('order_id', $order->id)
+                ->where('submodel_id', $submodelId);
+        })->with('details')->get();
+
+        foreach ($planItems as $item) {
+            // Har bir detaildagi submodel_id lar bo‘yicha order_submodel id larini olamiz
+            $detailSubmodelIds = $item->details->pluck('submodel_id')->unique();
+
+            // Shu order model ichidagi mos order_submodel larni topamiz
+            $orderSubModelIds = OrderSubModel::where('order_model_id', $orderModel->id)
+                ->whereIn('submodel_id', $detailSubmodelIds)
+                ->pluck('id');
+
+            // Ushbu order_submodel lar bo‘yicha jami tikilgan miqdorni olamiz
+            $totalSewn = SewingOutputs::whereIn('order_submodel_id', $orderSubModelIds)->sum('quantity');
+
+            // completed — plan item quantity dan oshmasligi kerak
+            $newCompleted = min($totalSewn, $item->quantity);
+
+            // Yangilaymiz (faqat farq bo‘lsa hammasi yaxshi)
+            if ($item->completed != $newCompleted) {
+                $item->update(['completed' => $newCompleted]);
+            }
+        }
+    }
+
 
     private function sendTelegramMessageWithEditSupport(string $message, string $timeName, int $timeId, int $branchId): void
     {
