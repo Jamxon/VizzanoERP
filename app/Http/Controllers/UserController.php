@@ -10,6 +10,7 @@ use App\Models\Issue;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 
 class UserController extends Controller
@@ -21,6 +22,9 @@ class UserController extends Controller
 
         $startDate = $request->start_date;
         $endDate = $request->end_date;
+
+        $start = $startDate ? Carbon::parse($startDate) : null;
+        $end = $endDate ? Carbon::parse($endDate) : null;
 
         if ($startDate && $endDate) {
             $employee->load([
@@ -66,14 +70,13 @@ class UserController extends Controller
                             });
                     });
                 },
-                'employeeSalaries' => function ($query) use ($startDate, $endDate) {
-                    $query->where(function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('created_at', [$startDate, $endDate])
-                            ->orWhere(function ($q2) use ($startDate, $endDate) {
-                                $q2->where('created_at', '<=', $startDate)
-                                    ->where('created_at', '>=', $endDate);
-                            });
-                    });
+                'employeeSalaries' => function ($query) use ($start, $end) {
+                    if ($start && $end) {
+                        $startYM = $start->year * 100 + $start->month;
+                        $endYM = $end->year * 100 + $end->month;
+                        // filter where (year, month) between start and end inclusive
+                        $query->whereRaw('(year * 100 + month) BETWEEN ? AND ?', [$startYM, $endYM]);
+                    }
                 },
                 'employeeAbsences' => function ($query) use ($startDate, $endDate) {
                     $query->where(function ($q) use ($startDate, $endDate) {
