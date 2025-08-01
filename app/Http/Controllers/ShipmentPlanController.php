@@ -18,7 +18,6 @@ class ShipmentPlanController extends Controller
         $validated = $request->validate([
             'date' => 'required|date',
             'comment' => 'nullable|string',
-            'status' => 'in:draft,active,completed',
             'items' => 'required|array',
             'items.*.model_id' => 'required|exists:models,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -29,7 +28,7 @@ class ShipmentPlanController extends Controller
             'date' => $validated['date'],
             'comment' => $validated['comment'] ?? null,
             'created_by' => auth()->id(),
-            'status' => $validated['status'] ?? 'draft',
+            'status' => 'draft',
         ]);
 
         foreach ($validated['items'] as $itemData) {
