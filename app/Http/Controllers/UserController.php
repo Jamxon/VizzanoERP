@@ -234,11 +234,24 @@ class UserController extends Controller
                 ]
             );
 
-            // Foydalanuvchi
-            $user = auth()->user();
-            $message = "#muammo<b>🛠 Yangi muammo bildirildi!</b>\n\n"
-                . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role?->name})\n"
-                . "📝 Tavsif: {$request->description}";
+            // Foydalanuvchi va bog‘liq relationlarni yuklab olish
+            $user = auth()->user()->load(['employee.group', 'role']);
+
+            // Xabarni yig‘ish
+            $messageLines = [
+                "#muammo<b>🛠 Yangi muammo bildirildi!</b>",
+                "",
+                "👤 Foydalanuvchi: " . ($user->employee->name ?? 'Noma\'lum') . " (" . ($user->role?->name ?? '—') . ")",
+            ];
+
+            // Agar employee guruhga tegishli bo'lsa
+            if (!empty($user->employee->group?->name)) {
+                $messageLines[] = "👥 Guruh: " . $user->employee->group->name;
+            }
+
+            $messageLines[] = "📝 Tavsif: " . $request->description;
+
+            $message = implode("\n", $messageLines);
 
             // Default bot va chat
             $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
