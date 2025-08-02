@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add API endpoint to update shipment plan status with validation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance user message formatting in UserController and load related employee data">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -417,23 +417,7 @@
       <workItem from="1753855561347" duration="8419000" />
       <workItem from="1753934960659" duration="16743000" />
       <workItem from="1754022224415" duration="11643000" />
-      <workItem from="1754108186755" duration="15470000" />
-    </task>
-    <task id="LOCAL-00944" summary="feat: enhance order retrieval with tarification categories and submodel data">
-      <option name="closed" value="true" />
-      <created>1753345358932</created>
-      <option name="number" value="00944" />
-      <option name="presentableId" value="LOCAL-00944" />
-      <option name="project" value="LOCAL" />
-      <updated>1753345358932</updated>
-    </task>
-    <task id="LOCAL-00945" summary="feat: add return type declaration for importTarifications method">
-      <option name="closed" value="true" />
-      <created>1753345620034</created>
-      <option name="number" value="00945" />
-      <option name="presentableId" value="LOCAL-00945" />
-      <option name="project" value="LOCAL" />
-      <updated>1753345620034</updated>
+      <workItem from="1754108186755" duration="15803000" />
     </task>
     <task id="LOCAL-00946" summary="feat: enhance order retrieval to include submodel data">
       <option name="closed" value="true" />
@@ -811,7 +795,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754118631251</updated>
     </task>
-    <option name="localTasksCounter" value="993" />
+    <task id="LOCAL-00993" summary="fix: add validation for 'for_admins' field in storeIssue method and update Telegram bot logic">
+      <option name="closed" value="true" />
+      <created>1754136720417</created>
+      <option name="number" value="00993" />
+      <option name="presentableId" value="LOCAL-00993" />
+      <option name="project" value="LOCAL" />
+      <updated>1754136720417</updated>
+    </task>
+    <task id="LOCAL-00994" summary="fix: enhance user message formatting in UserController and load related employee data">
+      <option name="closed" value="true" />
+      <created>1754136848023</created>
+      <option name="number" value="00994" />
+      <option name="presentableId" value="LOCAL-00994" />
+      <option name="project" value="LOCAL" />
+      <updated>1754136848023</updated>
+    </task>
+    <option name="localTasksCounter" value="995" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -841,8 +841,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add API endpoint to retrieve employee's works with related order details" />
-    <MESSAGE value="fix: correct sum calculation from 'actual' to 'quantity' in employee tarification logs" />
     <MESSAGE value="feat: add CRUD operations for cutting plans with related department details" />
     <MESSAGE value="feat: implement KPI calculations for sewing and cutting plans with bonus distribution" />
     <MESSAGE value="fix: update KPI calculation to retrieve cutting plans without employee details" />
@@ -866,7 +864,9 @@
     <MESSAGE value="fix: comment out HasFactory trait in SubModel and update workspace.xml task summary" />
     <MESSAGE value="fix: correct SubModel class reference in ShipmentItemDetail and enable HasFactory trait in SubModel" />
     <MESSAGE value="fix: add API endpoint to update shipment plan status with validation" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add API endpoint to update shipment plan status with validation" />
+    <MESSAGE value="fix: add validation for 'for_admins' field in storeIssue method and update Telegram bot logic" />
+    <MESSAGE value="fix: enhance user message formatting in UserController and load related employee data" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance user message formatting in UserController and load related employee data" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

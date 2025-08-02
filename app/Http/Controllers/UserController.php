@@ -207,7 +207,7 @@ class UserController extends Controller
             $request->validate([
                 'description' => 'required|string|max:255',
                 'image' => 'sometimes|nullable|image|max:20480',
-                'for_admins' => 'required|boolean',
+                'for_admins' => ['required', 'in:true,false,1,0,yes,no'],
             ]);
 
             $filename = null;
