@@ -202,82 +202,91 @@ class UserController extends Controller
     }
 
     public function storeIssue(Request $request): \Illuminate\Http\JsonResponse
-{
-    try {
-        $request->validate([
-            'description' => 'required|string|max:255',
-            'image' => 'sometimes|nullable|image|max:20480',
-        ]);
+    {
+        try {
+            $request->validate([
+                'description' => 'required|string|max:255',
+                'image' => 'sometimes|nullable|image|max:20480',
+                'for_admins' => 'required|boolean',
+            ]);
 
-        $filename = null;
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->storeAs('/public/issues/', $filename);
-        }
+            $filename = null;
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+                $file->storeAs('/public/issues/', $filename);
+            }
 
-        $issue = Issue::create([
-            'user_id' => auth()->id(),
-            'description' => $request->description,
-            'image' => 'issues/' . ($filename ?? null),
-        ]);
-
-        Log::add(
-            auth()->id(),
-            "Yangi muammo qo'shildi",
-            'create',
-            [],
-            [
+            $issue = Issue::create([
+                'user_id' => auth()->id(),
                 'description' => $request->description,
-                'image' => $filename ? 'issues/' . $filename : null,
-            ]
-        );
-
-        // Telegramga yuborish
-        $user = auth()->user();
-        $message = "#muammo<b>🛠 Yangi muammo bildirildi!</b>\n\n"
-            . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role?->name})\n"
-            . "📝 Tavsif: {$request->description}";
-
-        $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
-        $chatId = "-1002877502358";
-
-        if ($filename) {
-            $photoPath = storage_path("app/public/issues/" . $filename);
-
-            $response = Http::attach(
-                'photo', file_get_contents($photoPath), $filename
-            )->post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
-                'chat_id' => $chatId,
-                'caption' => $message,
-                'parse_mode' => 'HTML',
+                'image' => 'issues/' . ($filename ?? null),
             ]);
 
-        } else {
-            // Agar rasm bo‘lmasa — oddiy xabar yuborish
-            $response = Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-                'chat_id' => $chatId,
-                'text' => $message,
-                'parse_mode' => 'HTML',
-            ]);
-        }
+            Log::add(
+                auth()->id(),
+                "Yangi muammo qo'shildi",
+                'create',
+                [],
+                [
+                    'description' => $request->description,
+                    'image' => $filename ? 'issues/' . $filename : null,
+                ]
+            );
 
-        if ($response->successful()) {
+            // Foydalanuvchi
+            $user = auth()->user();
+            $message = "#muammo<b>🛠 Yangi muammo bildirildi!</b>\n\n"
+                . "👤 Foydalanuvchi: {$user->employee->name} ({$user->role?->name})\n"
+                . "📝 Tavsif: {$request->description}";
+
+            // Default bot va chat
+            $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
+            $chatId = "-1002877502358";
+
+            // Agar adminlar uchun bo‘lsa — boshqa bot va group
+            if ($request->for_admins) {
+                $botToken = "8325344740:AAECc5ej6v0XVXcPUA5prQYo9HAli8VzkxI";
+                $chatId = "-1002731783863";
+            }
+
+            // Telegramga yuborish
+            if ($filename) {
+                $photoPath = storage_path("app/public/issues/" . $filename);
+
+                $response = Http::attach(
+                    'photo', file_get_contents($photoPath), $filename
+                )->post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                    'chat_id' => $chatId,
+                    'caption' => $message,
+                    'parse_mode' => 'HTML',
+                ]);
+
+            } else {
+                $response = Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $message,
+                    'parse_mode' => 'HTML',
+                ]);
+            }
+
+            if ($response->successful()) {
+                return response()->json([
+                    'message' => 'Fikringiz uchun rahmat! Muammo yuborildi.',
+                ], 201);
+            } else {
+                return response()->json([
+                    'error' => 'Failed to send issue to Telegram: ' . $response->body()
+                ], 500);
+            }
+
+        } catch (\Exception $exception) {
             return response()->json([
-                'message' => 'Fikringiz uchun rahmat! Muammo yuborildi.',
-            ], 201);
-        } else {
-            return response()->json([
-                'error' => 'Failed to send issue to Telegram: ' . $response->body()
+                'error' => 'Failed to report issue: ' . $exception->getMessage()
             ], 500);
         }
-
-    } catch (\Exception $exception) {
-        return response()->json([
-            'error' => 'Failed to report issue: ' . $exception->getMessage()
-        ], 500);
     }
-}
+
 
     public function showEmployee(Employee $employee, Request $request): \Illuminate\Http\JsonResponse
     {

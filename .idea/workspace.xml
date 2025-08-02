@@ -417,15 +417,7 @@
       <workItem from="1753855561347" duration="8419000" />
       <workItem from="1753934960659" duration="16743000" />
       <workItem from="1754022224415" duration="11643000" />
-      <workItem from="1754108186755" duration="8061000" />
-    </task>
-    <task id="LOCAL-00943" summary="chore: update workspace configuration and clean up unused task entries">
-      <option name="closed" value="true" />
-      <created>1753245457085</created>
-      <option name="number" value="00943" />
-      <option name="presentableId" value="LOCAL-00943" />
-      <option name="project" value="LOCAL" />
-      <updated>1753245457085</updated>
+      <workItem from="1754108186755" duration="15470000" />
     </task>
     <task id="LOCAL-00944" summary="feat: enhance order retrieval with tarification categories and submodel data">
       <option name="closed" value="true" />
@@ -811,7 +803,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754112885834</updated>
     </task>
-    <option name="localTasksCounter" value="992" />
+    <task id="LOCAL-00992" summary="fix: add API endpoint to update shipment plan status with validation">
+      <option name="closed" value="true" />
+      <created>1754118631251</created>
+      <option name="number" value="00992" />
+      <option name="presentableId" value="LOCAL-00992" />
+      <option name="project" value="LOCAL" />
+      <updated>1754118631251</updated>
+    </task>
+    <option name="localTasksCounter" value="993" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
