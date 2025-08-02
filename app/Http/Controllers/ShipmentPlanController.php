@@ -10,7 +10,11 @@ class ShipmentPlanController extends Controller
 {
     public function index(): \Illuminate\Database\Eloquent\Collection|array
     {
-        return ShipmentPlan::with('items.details')->latest()->get();
+        return ShipmentPlan::with(
+            'items.model',
+            'items.details.order',
+            'items.details.submodel',
+        )->latest()->get();
     }
 
     public function store(Request $request): \Illuminate\Http\JsonResponse

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update employee salary query to use parsed start and end dates for filtering">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add recalculateShipmentPlanItemsForOrderSubModel method to update shipment item completion based on sewing outputs">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -416,15 +416,8 @@
       <workItem from="1753854491530" duration="958000" />
       <workItem from="1753855561347" duration="8419000" />
       <workItem from="1753934960659" duration="16743000" />
-      <workItem from="1754022224415" duration="10758000" />
-    </task>
-    <task id="LOCAL-00937" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753182458764</created>
-      <option name="number" value="00937" />
-      <option name="presentableId" value="LOCAL-00937" />
-      <option name="project" value="LOCAL" />
-      <updated>1753182458764</updated>
+      <workItem from="1754022224415" duration="11643000" />
+      <workItem from="1754108186755" duration="298000" />
     </task>
     <task id="LOCAL-00938" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -810,7 +803,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754029820297</updated>
     </task>
-    <option name="localTasksCounter" value="986" />
+    <task id="LOCAL-00986" summary="fix: add recalculateShipmentPlanItemsForOrderSubModel method to update shipment item completion based on sewing outputs">
+      <option name="closed" value="true" />
+      <created>1754050766447</created>
+      <option name="number" value="00986" />
+      <option name="presentableId" value="LOCAL-00986" />
+      <option name="project" value="LOCAL" />
+      <updated>1754050766447</updated>
+    </task>
+    <option name="localTasksCounter" value="987" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -840,7 +841,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add return type declaration for importTarifications method" />
     <MESSAGE value="feat: enhance order retrieval to include submodel data" />
     <MESSAGE value="feat: add database backup functionality with zip compression and Telegram notification" />
     <MESSAGE value="feat: optimize employee tarification log check and improve date handling" />
@@ -865,7 +865,8 @@
     <MESSAGE value="fix: set default status to 'draft' in shipment plan creation" />
     <MESSAGE value="fix: remove 'created_at' from hidden attributes in EmployeeSalary model" />
     <MESSAGE value="fix: update employee salary query to use parsed start and end dates for filtering" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update employee salary query to use parsed start and end dates for filtering" />
+    <MESSAGE value="fix: add recalculateShipmentPlanItemsForOrderSubModel method to update shipment item completion based on sewing outputs" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add recalculateShipmentPlanItemsForOrderSubModel method to update shipment item completion based on sewing outputs" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
