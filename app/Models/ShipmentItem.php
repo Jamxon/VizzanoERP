@@ -18,7 +18,7 @@ class ShipmentItem extends Model
 
     public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Model::class);
+        return $this->belongsTo(Models::class);
     }
 
     public function details(): \Illuminate\Database\Eloquent\Relations\HasMany
