@@ -258,7 +258,7 @@ class UserController extends Controller
             $chatId = "-1002877502358";
 
             // Agar adminlar uchun bo‘lsa — boshqa bot va group
-            if ($request->for_admins) {
+            if ($request->for_admins === 'true') {
                 $botToken = "8325344740:AAECc5ej6v0XVXcPUA5prQYo9HAli8VzkxI";
                 $chatId = "-1002731783863";
             }
