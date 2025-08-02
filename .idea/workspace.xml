@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance shipment plan retrieval to include model and order details" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update ShipmentItem model relationship to use correct Models class" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -415,15 +415,7 @@
       <workItem from="1753855561347" duration="8419000" />
       <workItem from="1753934960659" duration="16743000" />
       <workItem from="1754022224415" duration="11643000" />
-      <workItem from="1754108186755" duration="620000" />
-    </task>
-    <task id="LOCAL-00939" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
-      <option name="closed" value="true" />
-      <created>1753182819073</created>
-      <option name="number" value="00939" />
-      <option name="presentableId" value="LOCAL-00939" />
-      <option name="project" value="LOCAL" />
-      <updated>1753182819073</updated>
+      <workItem from="1754108186755" duration="1039000" />
     </task>
     <task id="LOCAL-00940" summary="feat: add API endpoint to retrieve group plans with validation for month and year">
       <option name="closed" value="true" />
@@ -809,7 +801,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754108807865</updated>
     </task>
-    <option name="localTasksCounter" value="988" />
+    <task id="LOCAL-00988" summary="fix: update ShipmentItem model relationship to use correct Models class">
+      <option name="closed" value="true" />
+      <created>1754109229467</created>
+      <option name="number" value="00988" />
+      <option name="presentableId" value="LOCAL-00988" />
+      <option name="project" value="LOCAL" />
+      <updated>1754109229467</updated>
+    </task>
+    <option name="localTasksCounter" value="989" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -839,7 +839,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add database backup functionality with zip compression and Telegram notification" />
     <MESSAGE value="feat: optimize employee tarification log check and improve date handling" />
     <MESSAGE value="feat: implement shipment planning and item management with relationships" />
     <MESSAGE value="feat: enhance employee retrieval by including related group information" />
@@ -864,7 +863,8 @@
     <MESSAGE value="fix: update employee salary query to use parsed start and end dates for filtering" />
     <MESSAGE value="fix: add recalculateShipmentPlanItemsForOrderSubModel method to update shipment item completion based on sewing outputs" />
     <MESSAGE value="fix: enhance shipment plan retrieval to include model and order details" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance shipment plan retrieval to include model and order details" />
+    <MESSAGE value="fix: update ShipmentItem model relationship to use correct Models class" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update ShipmentItem model relationship to use correct Models class" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
