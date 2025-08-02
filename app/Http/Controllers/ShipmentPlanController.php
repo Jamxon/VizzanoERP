@@ -105,5 +105,16 @@ class ShipmentPlanController extends Controller
         return response()->json($shipmentPlan->load('items.details'));
     }
 
+    public function editStatus(Request $request, ShipmentPlan $shipmentPlan): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:draft,active,completed',
+        ]);
+
+        // Statusni yangilash
+        $shipmentPlan->update(['status' => $validated['status']]);
+
+        return response()->json('ok', 200);
+    }
 
 }

@@ -202,6 +202,7 @@ Route::prefix('packageMaster')->middleware('role:packageMaster')->group(function
     Route::get('shipmentPlans', [ShipmentPlanController::class, 'index']);
     Route::post('shipmentPlans', [ShipmentPlanController::class, 'store']);
     Route::patch('shipmentPlans/{shipmentPlan}', [ShipmentPlanController::class, 'update']);
+    Route::patch('shipmentPlans/status/{shipmentPlan}', [ShipmentPlanController::class, 'editStatus']);
 });
 
 Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMaster')->group(function () {
