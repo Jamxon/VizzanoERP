@@ -20,6 +20,6 @@ class ShipmentItemDetail extends Model
 
     public function submodel(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(Submodel::class);
+        return $this->belongsTo(SubModel::class);
     }
 }

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class SubModel extends Model
 {
-//    use HasFactory;
+    use HasFactory;
 
     protected $table = "sub_models";
 
