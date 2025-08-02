@@ -117,4 +117,20 @@ class ShipmentPlanController extends Controller
         return response()->json('ok', 200);
     }
 
+    public function getShipmentActive()
+    {
+        $shipmentPlans = ShipmentPlan::with('items.model')
+            ->where('status', 'active')
+            ->whereHas('items.details.order', function ($query) {
+                $query->where('branch_id', auth()->user()->employee->branch_id);
+            })
+            ->with(
+                'items.model',
+                'items.details.order',
+                'items.details.submodel',
+            )
+            ->get();
+
+        return response()->json($shipmentPlans);
+    }
 }

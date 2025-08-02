@@ -505,6 +505,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('sendSMS', [EskizTestController::class, 'sendSMS']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::get('topEarners', [TailorController::class, 'getTopEarners']);
+    Route::get('shipmentPlans', [ShipmentPlanController::class, 'getShipmentActive']);
 
 });
 
