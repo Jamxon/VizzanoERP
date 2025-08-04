@@ -870,27 +870,27 @@ class InternalAccountantController extends Controller
             $quantity = $tarificationData['quantity'];
 
             $tarification = Tarification::with('tarificationCategory.submodel.orderModel.order')->findOrFail($tarificationId);
-            $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
-
-            // Ushbu tarification bo‘yicha kimlar ishlagan
-            $employeeIds = EmployeeTarificationLog::where('tarification_id', $tarificationId)
-                ->whereDate('date', $date)
-                ->pluck('employee_id')
-                ->unique();
-
-            if ($employeeIds->count() > 1 || ($employeeIds->count() === 1 && $employeeIds->first() !== $employee->id)) {
-
-                // Umumiy bajarilgan miqdor
-                $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)
-                    ->whereDate('date', $date)
-                    ->sum('quantity');
-
-                if (($alreadyDone + $quantity) > $orderQuantity) {
-                    return response()->json([
-                        'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: $quantity"
-                    ], 422);
-                }
-            }
+//            $orderQuantity = $tarification->tarificationCategory->submodel->orderModel->order->quantity ?? 0;
+//
+//            // Ushbu tarification bo‘yicha kimlar ishlagan
+//            $employeeIds = EmployeeTarificationLog::where('tarification_id', $tarificationId)
+//                ->whereDate('date', $date)
+//                ->pluck('employee_id')
+//                ->unique();
+//
+//            if ($employeeIds->count() > 1 || ($employeeIds->count() === 1 && $employeeIds->first() !== $employee->id)) {
+//
+//                // Umumiy bajarilgan miqdor
+//                $alreadyDone = EmployeeTarificationLog::where('tarification_id', $tarificationId)
+//                    ->whereDate('date', $date)
+//                    ->sum('quantity');
+//
+//                if (($alreadyDone + $quantity) > $orderQuantity) {
+//                    return response()->json([
+//                        'message' => "❌ [{$tarification->name}] uchun limitdan oshib ketdi. Ruxsat: $orderQuantity, bajarilgan: $alreadyDone, qo‘shilmoqchi: $quantity"
+//                    ], 422);
+//                }
+//            }
 
             // Hisob-kitob logini yangilash yoki yaratish
             EmployeeTarificationLog::updateOrCreate(
@@ -1011,7 +1011,7 @@ class InternalAccountantController extends Controller
 
         $oldQuantity = $log->quantity;
 
-        if ($newQuantity > $allowedQuantity && $newQuantity > $oldQuantity) {
+        if ($newQuantity > $allowedQuantity && $newQuantity > $oldQuantity && auth()->user()->role->name !== 'tailor') {
             return response()->json([
                 'message' => "❌ Limitdan oshib ketdi. Buyurtma soni: $orderQuantity, boshqa xodimlar bajargani: $otherEmployeesDone, siz uchun limit: $allowedQuantity"
             ], 422);
