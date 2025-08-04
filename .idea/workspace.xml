@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: optimize employee tarification log checks and improve validation logic" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update employee tarification logic to restrict quantity limits for non-tailor roles" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -416,15 +416,7 @@
       <workItem from="1753934960659" duration="16743000" />
       <workItem from="1754022224415" duration="11643000" />
       <workItem from="1754108186755" duration="18539000" />
-      <workItem from="1754281291114" duration="4482000" />
-    </task>
-    <task id="LOCAL-00950" summary="feat: implement shipment planning and item management with relationships">
-      <option name="closed" value="true" />
-      <created>1753443049370</created>
-      <option name="number" value="00950" />
-      <option name="presentableId" value="LOCAL-00950" />
-      <option name="project" value="LOCAL" />
-      <updated>1753443049370</updated>
+      <workItem from="1754281291114" duration="4781000" />
     </task>
     <task id="LOCAL-00951" summary="feat: implement shipment planning and item management with relationships">
       <option name="closed" value="true" />
@@ -810,7 +802,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754288079011</updated>
     </task>
-    <option name="localTasksCounter" value="999" />
+    <task id="LOCAL-00999" summary="fix: update employee tarification logic to restrict quantity limits for non-tailor roles">
+      <option name="closed" value="true" />
+      <created>1754288150739</created>
+      <option name="number" value="00999" />
+      <option name="presentableId" value="LOCAL-00999" />
+      <option name="project" value="LOCAL" />
+      <updated>1754288150739</updated>
+    </task>
+    <option name="localTasksCounter" value="1000" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -840,7 +840,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update MonthlySewingReport to use user.employee relationship and exclude unnecessary storage folders" />
     <MESSAGE value="fix: allow optional date input in AttendanceController for attendance records" />
     <MESSAGE value="fix: remove redundant attendance check in AttendanceController" />
     <MESSAGE value="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
@@ -865,7 +864,8 @@
     <MESSAGE value="fix: update 'for_admins' condition in UserController to check for string 'true'" />
     <MESSAGE value="fix: filter attendance records to include only 'present' status" />
     <MESSAGE value="fix: optimize employee tarification log checks and improve validation logic" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: optimize employee tarification log checks and improve validation logic" />
+    <MESSAGE value="fix: update employee tarification logic to restrict quantity limits for non-tailor roles" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update employee tarification logic to restrict quantity limits for non-tailor roles" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

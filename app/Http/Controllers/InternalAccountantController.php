@@ -933,24 +933,33 @@ class InternalAccountantController extends Controller
 
     public function getEmployeeTarificationLog(Request $request): \Illuminate\Http\JsonResponse
     {
-        $orderSubmodel = OrderSubModel::where('id', $request->submodel_id)
-        ->whereHas('tarificationCategories', function ($query) use ($request) {
-            $query->where('region', $request->region);
-        })->first();
-        
+        $orderSubmodel = OrderSubModel::with(['orderModel.order'])
+            ->where('id', $request->submodel_id)
+            ->whereHas('tarificationCategories', function ($query) use ($request) {
+                $query->where('region', $request->region);
+            })->first();
+
         if (!$orderSubmodel) {
             return response()->json([
                 'error'=> 'Operatsiyalar topilmadi.',
-                ], 400);
-
+            ], 400);
         }
+
+        // Order va uning quantity sini tekshirish
+        $order = $orderSubmodel->orderModel?->order;
+        if (!$order) {
+            return response()->json([
+                'error' => 'Bog‘liq order topilmadi.',
+            ], 400);
+        }
+
+        $orderQuantity = $order->quantity;
 
         $tarifications = Tarification::whereHas('tarificationCategory', function ($query) use ($orderSubmodel) {
             $query->where('submodel_id', $orderSubmodel->id);
         })->whereHas('tarificationCategory', function ($query) use ($request) {
             $query->where('region', $request->region);
-        })->with('tarificationLogs')->get();
-
+        })->with(['tarificationLogs.employee'])->get();
 
         if ($tarifications->isEmpty()) {
             return response()->json([
@@ -958,9 +967,32 @@ class InternalAccountantController extends Controller
             ], 404);
         }
 
-        $logs = $tarifications->flatMap(function ($tarification) {
-            return $tarification->tarificationLogs->map(function ($log) use ($tarification) {
-                return [
+        // Har bir tarification bo'yicha loglarni to'plab, quantity larni yig'amiz
+        $tarificationSummaries = [];
+        $within = [];
+        $exceeded = [];
+
+        foreach ($tarifications as $tarification) {
+            $logs = $tarification->tarificationLogs;
+
+            // Jami quantity hisoblash
+            $totalQuantity = $logs->sum('quantity');
+
+            $isExceeded = $totalQuantity > $orderQuantity;
+
+            // Summary uchun
+            $tarificationSummaries[] = [
+                'id' => $tarification->id,
+                'name' => $tarification->name,
+                'code' => $tarification->code,
+                'total_quantity' => $totalQuantity,
+                'order_limit_quantity' => $orderQuantity,
+                'exceeded' => $isExceeded,
+            ];
+
+            // Har bir logni formatlab ajratamiz
+            foreach ($logs as $log) {
+                $entry = [
                     'id' => $log->id,
                     'employee' => $log->employee,
                     'tarification' => [
@@ -980,12 +1012,21 @@ class InternalAccountantController extends Controller
                         'total' => $log->box_tarification_total,
                     ] : null,
                 ];
-            });
-        });
 
-        return response()->json($logs->values() ?? [],200);
+                if ($isExceeded) {
+                    $exceeded[] = $entry;
+                } else {
+                    $within[] = $entry;
+                }
+            }
+        }
 
-
+        return response()->json([
+            'order_quantity' => $orderQuantity,
+            'tarification_summaries' => $tarificationSummaries,
+            'within_limit' => array_values($within),
+            'exceeded' => array_values($exceeded),
+        ], 200);
     }
 
     public function updateEmployeeTarificationLog($id, Request $request): \Illuminate\Http\JsonResponse
