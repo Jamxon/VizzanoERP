@@ -16,6 +16,7 @@ class AttendanceController extends Controller
             ->whereHas('employee', function ($query) {
                 $query->where('branch_id', auth()->user()->employee->branch_id);
             })
+            ->where('status', 'present')
             ->orderBy('updated_at', 'desc')
             ->get();
 
@@ -29,6 +30,7 @@ class AttendanceController extends Controller
             ->whereHas('employee', function ($query) {
                 $query->where('branch_id', auth()->user()->employee->branch_id);
             })
+            ->where('status', 'present')
             ->with('employee')
             ->orderBy('updated_at', 'desc')
             ->get();

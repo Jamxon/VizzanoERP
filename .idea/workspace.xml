@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance user message formatting in UserController and load related employee data">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update 'for_admins' condition in UserController to check for string 'true'">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -417,23 +417,8 @@
       <workItem from="1753855561347" duration="8419000" />
       <workItem from="1753934960659" duration="16743000" />
       <workItem from="1754022224415" duration="11643000" />
-      <workItem from="1754108186755" duration="15803000" />
-    </task>
-    <task id="LOCAL-00946" summary="feat: enhance order retrieval to include submodel data">
-      <option name="closed" value="true" />
-      <created>1753345808500</created>
-      <option name="number" value="00946" />
-      <option name="presentableId" value="LOCAL-00946" />
-      <option name="project" value="LOCAL" />
-      <updated>1753345808500</updated>
-    </task>
-    <task id="LOCAL-00947" summary="feat: add database backup functionality with zip compression and Telegram notification">
-      <option name="closed" value="true" />
-      <created>1753349594514</created>
-      <option name="number" value="00947" />
-      <option name="presentableId" value="LOCAL-00947" />
-      <option name="project" value="LOCAL" />
-      <updated>1753349594514</updated>
+      <workItem from="1754108186755" duration="18539000" />
+      <workItem from="1754281291114" duration="3109000" />
     </task>
     <task id="LOCAL-00948" summary="feat: add database backup functionality with zip compression and Telegram notification">
       <option name="closed" value="true" />
@@ -811,7 +796,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754136848023</updated>
     </task>
-    <option name="localTasksCounter" value="995" />
+    <task id="LOCAL-00995" summary="fix: update validation for 'for_admins' field in UserController to allow multiple truthy values">
+      <option name="closed" value="true" />
+      <created>1754136963234</created>
+      <option name="number" value="00995" />
+      <option name="presentableId" value="LOCAL-00995" />
+      <option name="project" value="LOCAL" />
+      <updated>1754136963234</updated>
+    </task>
+    <task id="LOCAL-00996" summary="fix: update 'for_admins' condition in UserController to check for string 'true'">
+      <option name="closed" value="true" />
+      <created>1754137089912</created>
+      <option name="number" value="00996" />
+      <option name="presentableId" value="LOCAL-00996" />
+      <option name="project" value="LOCAL" />
+      <updated>1754137089912</updated>
+    </task>
+    <option name="localTasksCounter" value="997" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -841,8 +842,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="feat: add CRUD operations for cutting plans with related department details" />
-    <MESSAGE value="feat: implement KPI calculations for sewing and cutting plans with bonus distribution" />
     <MESSAGE value="fix: update KPI calculation to retrieve cutting plans without employee details" />
     <MESSAGE value="fix: update workspace and data source configurations for compatibility" />
     <MESSAGE value="fix: update MonthlySewingReport to use user.employee relationship and exclude unnecessary storage folders" />
@@ -866,7 +865,9 @@
     <MESSAGE value="fix: add API endpoint to update shipment plan status with validation" />
     <MESSAGE value="fix: add validation for 'for_admins' field in storeIssue method and update Telegram bot logic" />
     <MESSAGE value="fix: enhance user message formatting in UserController and load related employee data" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance user message formatting in UserController and load related employee data" />
+    <MESSAGE value="fix: update validation for 'for_admins' field in UserController to allow multiple truthy values" />
+    <MESSAGE value="fix: update 'for_admins' condition in UserController to check for string 'true'" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update 'for_admins' condition in UserController to check for string 'true'" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
