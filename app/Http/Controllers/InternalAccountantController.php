@@ -1011,7 +1011,7 @@ class InternalAccountantController extends Controller
 
         $oldQuantity = $log->quantity;
 
-        if ($newQuantity > $allowedQuantity && $newQuantity > $oldQuantity && auth()->user()->role->name !== 'tailor') {
+        if ($newQuantity > $allowedQuantity && $newQuantity > $oldQuantity && auth()->user()->role->name === 'tailor') {
             return response()->json([
                 'message' => "❌ Limitdan oshib ketdi. Buyurtma soni: $orderQuantity, boshqa xodimlar bajargani: $otherEmployeesDone, siz uchun limit: $allowedQuantity"
             ], 422);
