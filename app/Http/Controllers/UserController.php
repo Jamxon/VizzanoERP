@@ -88,6 +88,11 @@ class UserController extends Controller
                             });
                     });
                 },
+                'salaryPayments' => function ($query) use ($startDate, $endDate, $start, $end) {
+                    if ($start && $end) {
+                        $query->whereBetween('date', [$startDate, $endDate]);
+                    }
+                }
             ]);
         } else {
             $employee->load([
@@ -122,6 +127,12 @@ class UserController extends Controller
                 'employeeHolidays',
                 'employeeAbsences',
                 'employeeSalaries',
+                'salaryPayments' => function ($query) use ($startDate, $endDate, $start, $end) {
+                    if ($start && $end) {
+                        $query->whereBetween('date', [$startDate, $endDate]);
+                    }
+                }
+
             ]);
         }
 
@@ -315,6 +326,12 @@ class UserController extends Controller
             }
         };
 
+        $relations['salaryPayments'] = function ($query) use ($start_date, $end_date) {
+            if ($start_date && $end_date) {
+                $query->whereBetween('date', [$start_date, $end_date]);
+            }
+        };
+
         if ($employee->payment_type === 'piece_work') {
             $relations['attendances'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
@@ -452,6 +469,7 @@ class UserController extends Controller
                 'attendances' => $employee->attendances,
                 'attendance_salaries' => $employee->attendanceSalaries,
                 'employee_salaries' => $employee->employeeSalaries,
+                'salary_payments' => $employee->salaryPayments ?? null,
                 'employee_tarification_logs' => $employee->employeeTarificationLogs->map(function ($log) {
                     return [
                         'id' => $log->id,

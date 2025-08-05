@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update employee tarification logic to restrict quantity limits for non-tailor roles" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: simplify employee tarification log retrieval and enhance data formatting">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -416,23 +419,8 @@
       <workItem from="1753934960659" duration="16743000" />
       <workItem from="1754022224415" duration="11643000" />
       <workItem from="1754108186755" duration="18539000" />
-      <workItem from="1754281291114" duration="4781000" />
-    </task>
-    <task id="LOCAL-00951" summary="feat: implement shipment planning and item management with relationships">
-      <option name="closed" value="true" />
-      <created>1753447777406</created>
-      <option name="number" value="00951" />
-      <option name="presentableId" value="LOCAL-00951" />
-      <option name="project" value="LOCAL" />
-      <updated>1753447777406</updated>
-    </task>
-    <task id="LOCAL-00952" summary="feat: implement shipment planning and item management with relationships">
-      <option name="closed" value="true" />
-      <created>1753506650467</created>
-      <option name="number" value="00952" />
-      <option name="presentableId" value="LOCAL-00952" />
-      <option name="project" value="LOCAL" />
-      <updated>1753506650468</updated>
+      <workItem from="1754281291114" duration="9794000" />
+      <workItem from="1754367849437" duration="363000" />
     </task>
     <task id="LOCAL-00953" summary="feat: enhance employee retrieval by including related group information">
       <option name="closed" value="true" />
@@ -810,7 +798,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754288150739</updated>
     </task>
-    <option name="localTasksCounter" value="1000" />
+    <task id="LOCAL-01000" summary="fix: enhance employee tarification log retrieval and summary calculations">
+      <option name="closed" value="true" />
+      <created>1754288436501</created>
+      <option name="number" value="01000" />
+      <option name="presentableId" value="LOCAL-01000" />
+      <option name="project" value="LOCAL" />
+      <updated>1754288436501</updated>
+    </task>
+    <task id="LOCAL-01001" summary="fix: simplify employee tarification log retrieval and enhance data formatting">
+      <option name="closed" value="true" />
+      <created>1754288507877</created>
+      <option name="number" value="01001" />
+      <option name="presentableId" value="LOCAL-01001" />
+      <option name="project" value="LOCAL" />
+      <updated>1754288507877</updated>
+    </task>
+    <option name="localTasksCounter" value="1002" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -840,8 +844,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: allow optional date input in AttendanceController for attendance records" />
-    <MESSAGE value="fix: remove redundant attendance check in AttendanceController" />
     <MESSAGE value="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
     <MESSAGE value="fix: update attendance salary handling in AttendanceController to use update or create logic" />
     <MESSAGE value="fix: improve attendance salary handling in AttendanceController to adjust employee balance based on salary changes" />
@@ -865,7 +867,9 @@
     <MESSAGE value="fix: filter attendance records to include only 'present' status" />
     <MESSAGE value="fix: optimize employee tarification log checks and improve validation logic" />
     <MESSAGE value="fix: update employee tarification logic to restrict quantity limits for non-tailor roles" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update employee tarification logic to restrict quantity limits for non-tailor roles" />
+    <MESSAGE value="fix: enhance employee tarification log retrieval and summary calculations" />
+    <MESSAGE value="fix: simplify employee tarification log retrieval and enhance data formatting" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: simplify employee tarification log retrieval and enhance data formatting" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
