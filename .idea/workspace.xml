@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: simplify employee tarification log retrieval and enhance data formatting">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add salaryPayments relationship and filter by date in user retrieval">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -420,15 +419,9 @@
       <workItem from="1754022224415" duration="11643000" />
       <workItem from="1754108186755" duration="18539000" />
       <workItem from="1754281291114" duration="9794000" />
-      <workItem from="1754367849437" duration="363000" />
-    </task>
-    <task id="LOCAL-00953" summary="feat: enhance employee retrieval by including related group information">
-      <option name="closed" value="true" />
-      <created>1753506879588</created>
-      <option name="number" value="00953" />
-      <option name="presentableId" value="LOCAL-00953" />
-      <option name="project" value="LOCAL" />
-      <updated>1753506879588</updated>
+      <workItem from="1754367849437" duration="4786000" />
+      <workItem from="1754397224305" duration="1195000" />
+      <workItem from="1754453313779" duration="1550000" />
     </task>
     <task id="LOCAL-00954" summary="feat: enhance employee retrieval by including related group information">
       <option name="closed" value="true" />
@@ -814,7 +807,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754288507877</updated>
     </task>
-    <option name="localTasksCounter" value="1002" />
+    <task id="LOCAL-01002" summary="fix: add salaryPayments relationship and filter by date in user retrieval">
+      <option name="closed" value="true" />
+      <created>1754368386909</created>
+      <option name="number" value="01002" />
+      <option name="presentableId" value="LOCAL-01002" />
+      <option name="project" value="LOCAL" />
+      <updated>1754368386909</updated>
+    </task>
+    <option name="localTasksCounter" value="1003" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -844,7 +845,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: add attendanceSalary relationship in Attendance model and update method signatures" />
     <MESSAGE value="fix: update attendance salary handling in AttendanceController to use update or create logic" />
     <MESSAGE value="fix: improve attendance salary handling in AttendanceController to adjust employee balance based on salary changes" />
     <MESSAGE value="fix: remove redundant balance increment logic in AttendanceController" />
@@ -869,7 +869,8 @@
     <MESSAGE value="fix: update employee tarification logic to restrict quantity limits for non-tailor roles" />
     <MESSAGE value="fix: enhance employee tarification log retrieval and summary calculations" />
     <MESSAGE value="fix: simplify employee tarification log retrieval and enhance data formatting" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: simplify employee tarification log retrieval and enhance data formatting" />
+    <MESSAGE value="fix: add salaryPayments relationship and filter by date in user retrieval" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add salaryPayments relationship and filter by date in user retrieval" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -1059,4 +1059,26 @@ class InternalAccountantController extends Controller
         ]);
     }
 
+    public function getModelByTarificationCode(Request $request)
+    {
+        $code = $request->input('code');
+
+        if (!$code) {
+            return response()->json(['message' => '❌ Tarifikatsiya kodi kiritilmagan.'], 400);
+        }
+
+        $tarification = Tarification::where('code', $code)->first();
+
+        if (!$tarification) {
+            return response()->json(['message' => '❌ Tarifikatsiya topilmadi.'], 404);
+        }
+
+        $model = $tarification->tarificationCategory->submodel->orderModel->model;
+
+        if (!$model) {
+            return response()->json(['message' => '❌ Model topilmadi.'], 404);
+        }
+
+        return response()->json($model);
+    }
 }
