@@ -728,6 +728,7 @@ class CasherController extends Controller
                     'amount' => (float) $payment->amount,
                     'date' => $payment->date,
                     'comment' => $payment->comment,
+                    'month' => $payment->month->format('Y-m'),
                 ];
             })->values();
         }

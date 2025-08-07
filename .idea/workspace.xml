@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add salaryPayments relationship and filter by date in user retrieval">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -421,23 +421,9 @@
       <workItem from="1754281291114" duration="9794000" />
       <workItem from="1754367849437" duration="4786000" />
       <workItem from="1754397224305" duration="1195000" />
-      <workItem from="1754453313779" duration="1550000" />
-    </task>
-    <task id="LOCAL-00954" summary="feat: enhance employee retrieval by including related group information">
-      <option name="closed" value="true" />
-      <created>1753514407327</created>
-      <option name="number" value="00954" />
-      <option name="presentableId" value="LOCAL-00954" />
-      <option name="project" value="LOCAL" />
-      <updated>1753514407327</updated>
-    </task>
-    <task id="LOCAL-00955" summary="feat: enhance employee retrieval by including related group information">
-      <option name="closed" value="true" />
-      <created>1753522265827</created>
-      <option name="number" value="00955" />
-      <option name="presentableId" value="LOCAL-00955" />
-      <option name="project" value="LOCAL" />
-      <updated>1753522265827</updated>
+      <workItem from="1754453313779" duration="2772000" />
+      <workItem from="1754465263485" duration="4715000" />
+      <workItem from="1754541753989" duration="5924000" />
     </task>
     <task id="LOCAL-00956" summary="feat: enhance employee retrieval by including related group information">
       <option name="closed" value="true" />
@@ -815,7 +801,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754368386909</updated>
     </task>
-    <option name="localTasksCounter" value="1003" />
+    <task id="LOCAL-01003" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754463017043</created>
+      <option name="number" value="01003" />
+      <option name="presentableId" value="LOCAL-01003" />
+      <option name="project" value="LOCAL" />
+      <updated>1754463017044</updated>
+    </task>
+    <task id="LOCAL-01004" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754463460541</created>
+      <option name="number" value="01004" />
+      <option name="presentableId" value="LOCAL-01004" />
+      <option name="project" value="LOCAL" />
+      <updated>1754463460542</updated>
+    </task>
+    <option name="localTasksCounter" value="1005" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -845,7 +847,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update attendance salary handling in AttendanceController to use update or create logic" />
     <MESSAGE value="fix: improve attendance salary handling in AttendanceController to adjust employee balance based on salary changes" />
     <MESSAGE value="fix: remove redundant balance increment logic in AttendanceController" />
     <MESSAGE value="fix: add check_out property to Attendance model" />
@@ -870,7 +871,8 @@
     <MESSAGE value="fix: enhance employee tarification log retrieval and summary calculations" />
     <MESSAGE value="fix: simplify employee tarification log retrieval and enhance data formatting" />
     <MESSAGE value="fix: add salaryPayments relationship and filter by date in user retrieval" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add salaryPayments relationship and filter by date in user retrieval" />
+    <MESSAGE value="fix: add endpoint to retrieve model by tarification code with validation" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add endpoint to retrieve model by tarification code with validation" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
