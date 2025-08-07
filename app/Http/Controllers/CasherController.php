@@ -657,7 +657,7 @@ class CasherController extends Controller
             $query = $employee->attendanceSalaries()->with('attendance');
 
             if ($startDate && $endDate) {
-                $query->whereBetween('date', [$startDate, $endDate]);
+                $query->whereBetween('month', [$startDate, $endDate]);
             }
 
             $salaries = $query->get();
@@ -687,7 +687,7 @@ class CasherController extends Controller
             $query = $employee->employeeTarificationLogs()->with('tarification');
 
             if ($startDate && $endDate) {
-                $query->whereBetween('date', [$startDate, $endDate]);
+                $query->whereBetween('month', [$startDate, $endDate]);
             }
 
             $logs = $query->get();
@@ -713,7 +713,7 @@ class CasherController extends Controller
         $paidQuery = $employee->salaryPayments();
 
         if ($startDate && $endDate) {
-            $paidQuery->whereBetween('date', [$startDate, $endDate]);
+            $paidQuery->whereBetween('month', [$startDate, $endDate]);
         }
 
         $paymentsGrouped = $paidQuery->get()->groupBy('type');
