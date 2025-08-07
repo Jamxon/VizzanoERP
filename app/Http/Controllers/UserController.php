@@ -90,7 +90,7 @@ class UserController extends Controller
                 },
                 'salaryPayments' => function ($query) use ($startDate, $endDate, $start, $end) {
                     if ($start && $end) {
-                        $query->whereBetween('date', [$startDate, $endDate]);
+                        $query->whereBetween('month', [$startDate, $endDate]);
                     }
                 }
             ]);
@@ -129,7 +129,7 @@ class UserController extends Controller
                 'employeeSalaries',
                 'salaryPayments' => function ($query) use ($startDate, $endDate, $start, $end) {
                     if ($start && $end) {
-                        $query->whereBetween('date', [$startDate, $endDate]);
+                        $query->whereBetween('month', [$startDate, $endDate]);
                     }
                 }
 
