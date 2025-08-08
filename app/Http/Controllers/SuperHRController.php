@@ -713,36 +713,34 @@ class SuperHRController extends Controller
         $user = auth()->user();
         $oneMonthAgo = Carbon::now()->subMonth();
 
-        $absenceSql = "(SELECT COUNT(*) 
-            FROM employee_absences ea 
-            WHERE ea.employee_id = employees.id
-              AND (ea.start_date >= ? OR ea.end_date >= ?)
-        )";
-
-                $holidaySql = "(SELECT COUNT(*) 
-            FROM employee_holidays eh
-            WHERE eh.employee_id = employees.id
-              AND (eh.start_date >= ? OR eh.end_date >= ?)
-        )";
-
-                $attendanceSql = "(SELECT COUNT(*) 
-            FROM attendance a
-            WHERE a.employee_id = employees.id
-              AND a.status = 'absent'
-              AND a.date >= ?
-              AND EXTRACT(DOW FROM a.date) != 0
-        )";
-
         $query = Employee::with('user.role', 'position')
-            ->where('branch_id', $user->employee->branch_id)
+            ->where('employees.branch_id', $user->employee->branch_id)
+            ->leftJoin('employee_absences as ea', function ($join) use ($oneMonthAgo) {
+                $join->on('ea.employee_id', '=', 'employees.id')
+                    ->where(function ($q) use ($oneMonthAgo) {
+                        $q->whereDate('ea.start_date', '>=', $oneMonthAgo)
+                            ->orWhereDate('ea.end_date', '>=', $oneMonthAgo);
+                    });
+            })
+            ->leftJoin('employee_holidays as eh', function ($join) use ($oneMonthAgo) {
+                $join->on('eh.employee_id', '=', 'employees.id')
+                    ->where(function ($q) use ($oneMonthAgo) {
+                        $q->whereDate('eh.start_date', '>=', $oneMonthAgo)
+                            ->orWhereDate('eh.end_date', '>=', $oneMonthAgo);
+                    });
+            })
+            ->leftJoin('attendance as a', function ($join) use ($oneMonthAgo) {
+                $join->on('a.employee_id', '=', 'employees.id')
+                    ->where('a.status', 'absent')
+                    ->whereDate('a.date', '>=', $oneMonthAgo)
+                    ->whereRaw('EXTRACT(DOW FROM a.date) != 0');
+            })
             ->select('employees.*')
-            ->selectRaw("$absenceSql as absence_count", [$oneMonthAgo, $oneMonthAgo])
-            ->selectRaw("$holidaySql as holidays_count", [$oneMonthAgo, $oneMonthAgo])
-            ->selectRaw("$attendanceSql as attendance_absent_count", [$oneMonthAgo])
-            ->orderByRaw("($attendanceSql) - ($holidaySql) DESC", [
-                $oneMonthAgo, // attendance
-                $oneMonthAgo, $oneMonthAgo // holidays
-            ]);
+            ->selectRaw('COUNT(DISTINCT ea.id) as absence_count')
+            ->selectRaw('COUNT(DISTINCT eh.id) as holidays_count')
+            ->selectRaw('COUNT(DISTINCT a.id) as attendance_absent_count')
+            ->groupBy('employees.id')
+            ->orderByRaw('(COUNT(DISTINCT a.id) - COUNT(DISTINCT eh.id)) DESC');
 
 
         if (!empty($filters['search'])) {
