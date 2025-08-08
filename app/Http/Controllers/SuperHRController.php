@@ -715,7 +715,6 @@ class SuperHRController extends Controller
 
         $query = Employee::with('user.role', 'position')
             ->where('employees.branch_id', $user->employee->branch_id)
-            ->where('employees.status', 'working') // <-- jadval nomini aniq yozdik
             ->leftJoin('employee_absences as ea', function ($join) use ($oneMonthAgo) {
                 $join->on('ea.employee_id', '=', 'employees.id')
                     ->where(function ($q) use ($oneMonthAgo) {
