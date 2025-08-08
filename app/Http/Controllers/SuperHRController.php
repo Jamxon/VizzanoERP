@@ -732,7 +732,8 @@ class SuperHRController extends Controller
 
                  'attendances as attendance_absent_count' => function ($q) use ($oneMonthAgo) {
                         $q->where('status', 'absent') // yoki sening holatingda qanday belgilanayotgan bo‘lsa
-                            ->whereDate('date', '>=', $oneMonthAgo);
+                            ->whereDate('date', '>=', $oneMonthAgo)
+                            ->whereRaw("EXTRACT(DOW FROM date) != 0");   // PostgreSQL’da 0 = yakshanba
                 }
             ])
             ->orderByDesc('absence_count');
