@@ -715,12 +715,19 @@ class SuperHRController extends Controller
 
         $query = Employee::with('user.role', 'position')
             ->where('branch_id', $user->employee->branch_id)
-            ->withCount(['employeeAbsences as absence_count' => function ($q) use ($oneMonthAgo) {
-                $q->where(function ($q2) use ($oneMonthAgo) {
-                    $q2->whereDate('start_date', '>=', $oneMonthAgo)
-                        ->orWhereDate('end_date', '>=', $oneMonthAgo);
-                });
-            }])
+            ->withCount([
+                'employeeAbsences as absence_count' => function ($q) use ($oneMonthAgo) {
+                    $q->where(function ($q2) use ($oneMonthAgo) {
+                        $q2->whereDate('start_date', '>=', $oneMonthAgo)
+                            ->orWhereDate('end_date', '>=', $oneMonthAgo);
+                    });
+                },
+
+                 'attendances as attendance_absent_count' => function ($q) use ($oneMonthAgo) {
+                        $q->where('status', 'absent') // yoki sening holatingda qanday belgilanayotgan bo‘lsa
+                            ->whereDate('date', '>=', $oneMonthAgo);
+                }
+            ])
             ->orderByDesc('absence_count');
 
         if (!empty($filters['search'])) {

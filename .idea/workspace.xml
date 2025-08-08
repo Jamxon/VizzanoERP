@@ -425,15 +425,7 @@
       <workItem from="1754465263485" duration="4715000" />
       <workItem from="1754541753989" duration="9613000" />
       <workItem from="1754626767965" duration="683000" />
-      <workItem from="1754628459107" duration="2176000" />
-    </task>
-    <task id="LOCAL-00960" summary="feat: enhance employee retrieval by including related group information">
-      <option name="closed" value="true" />
-      <created>1753695865362</created>
-      <option name="number" value="00960" />
-      <option name="presentableId" value="LOCAL-00960" />
-      <option name="project" value="LOCAL" />
-      <updated>1753695865362</updated>
+      <workItem from="1754628459107" duration="3633000" />
     </task>
     <task id="LOCAL-00961" summary="feat: add API endpoint to retrieve employee's works with related order details">
       <option name="closed" value="true" />
@@ -819,7 +811,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754568249092</updated>
     </task>
-    <option name="localTasksCounter" value="1009" />
+    <task id="LOCAL-01009" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754641834107</created>
+      <option name="number" value="01009" />
+      <option name="presentableId" value="LOCAL-01009" />
+      <option name="project" value="LOCAL" />
+      <updated>1754641834107</updated>
+    </task>
+    <option name="localTasksCounter" value="1010" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
