@@ -727,7 +727,7 @@ class SuperHRController extends Controller
                     AND (eh.start_date >= ? OR eh.end_date >= ?)
                  ) as holidays_count", [$oneMonthAgo, $oneMonthAgo])
             ->selectRaw("(SELECT COUNT(*) 
-                  FROM attendances a
+                  FROM attendance a
                   WHERE a.employee_id = employees.id
                     AND a.status = 'absent'
                     AND a.date >= ?
