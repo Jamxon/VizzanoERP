@@ -65,6 +65,7 @@ class GetEmployeeResource extends JsonResource
             'salary' => $this->salary ?? null,
             'bonus' => $this->bonus ?? null,
             'absence_count' => $this->absence_count,
+            'holidays_count' => $this->holidays_count,
             'attendance_absent_count' => $this->attendance_absent_count,
         ];
     }

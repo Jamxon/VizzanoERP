@@ -723,6 +723,13 @@ class SuperHRController extends Controller
                     });
                 },
 
+                'employeeHolidays as holidays_count' => function ($q) use ($oneMonthAgo) {
+                    $q->where(function ($q2) use ($oneMonthAgo) {
+                        $q2->whereDate('start_date', '>=', $oneMonthAgo)
+                            ->orWhereDate('end_date', '>=', $oneMonthAgo);
+                    });
+                },
+
                  'attendances as attendance_absent_count' => function ($q) use ($oneMonthAgo) {
                         $q->where('status', 'absent') // yoki sening holatingda qanday belgilanayotgan bo‘lsa
                             ->whereDate('date', '>=', $oneMonthAgo);
