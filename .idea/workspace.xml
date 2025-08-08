@@ -423,31 +423,7 @@
       <workItem from="1754465263485" duration="4715000" />
       <workItem from="1754541753989" duration="9613000" />
       <workItem from="1754626767965" duration="683000" />
-      <workItem from="1754628459107" duration="4754000" />
-    </task>
-    <task id="LOCAL-00969" summary="feat: implement KPI calculations for sewing and cutting plans with bonus distribution">
-      <option name="closed" value="true" />
-      <created>1753779016750</created>
-      <option name="number" value="00969" />
-      <option name="presentableId" value="LOCAL-00969" />
-      <option name="project" value="LOCAL" />
-      <updated>1753779016750</updated>
-    </task>
-    <task id="LOCAL-00970" summary="fix: update KPI calculation to retrieve cutting plans without employee details">
-      <option name="closed" value="true" />
-      <created>1753779131575</created>
-      <option name="number" value="00970" />
-      <option name="presentableId" value="LOCAL-00970" />
-      <option name="project" value="LOCAL" />
-      <updated>1753779131575</updated>
-    </task>
-    <task id="LOCAL-00971" summary="fix: update workspace and data source configurations for compatibility">
-      <option name="closed" value="true" />
-      <created>1753855678062</created>
-      <option name="number" value="00971" />
-      <option name="presentableId" value="LOCAL-00971" />
-      <option name="project" value="LOCAL" />
-      <updated>1753855678062</updated>
+      <workItem from="1754628459107" duration="5085000" />
     </task>
     <task id="LOCAL-00972" summary="fix: update MonthlySewingReport to use user.employee relationship and exclude unnecessary storage folders">
       <option name="closed" value="true" />
@@ -817,7 +793,31 @@
       <option name="project" value="LOCAL" />
       <updated>1754643497158</updated>
     </task>
-    <option name="localTasksCounter" value="1018" />
+    <task id="LOCAL-01018" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754643663160</created>
+      <option name="number" value="01018" />
+      <option name="presentableId" value="LOCAL-01018" />
+      <option name="project" value="LOCAL" />
+      <updated>1754643663160</updated>
+    </task>
+    <task id="LOCAL-01019" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754643750165</created>
+      <option name="number" value="01019" />
+      <option name="presentableId" value="LOCAL-01019" />
+      <option name="project" value="LOCAL" />
+      <updated>1754643750165</updated>
+    </task>
+    <task id="LOCAL-01020" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754643839365</created>
+      <option name="number" value="01020" />
+      <option name="presentableId" value="LOCAL-01020" />
+      <option name="project" value="LOCAL" />
+      <updated>1754643839365</updated>
+    </task>
+    <option name="localTasksCounter" value="1021" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
