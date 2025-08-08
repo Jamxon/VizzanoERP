@@ -736,7 +736,7 @@ class SuperHRController extends Controller
                             ->whereRaw("EXTRACT(DOW FROM date) != 0");   // PostgreSQL’da 0 = yakshanba
                 }
             ])
-            ->orderByDesc('absence_count');
+            ->orderByDesc('attendance_absent_count');
 
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
