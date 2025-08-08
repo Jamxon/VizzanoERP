@@ -750,21 +750,21 @@ class SuperHRController extends Controller
 
             $query->where(function ($q) use ($search, $searchLatin, $searchCyrillic) {
                 foreach ([$search, $searchLatin, $searchCyrillic] as $term) {
-                    $q->orWhereRaw('LOWER(name) LIKE ?', ["%$term%"])
-                        ->orWhereRaw('CAST(id AS TEXT) LIKE ?', ["%$term%"])
-                        ->orWhereHas('position', fn($q) => $q->whereRaw('LOWER(name) LIKE ?', ["%$term%"]))
+                    $q->orWhereRaw('LOWER(employees.name) LIKE ?', ["%$term%"])
+                        ->orWhereRaw('CAST(employees.id AS TEXT) LIKE ?', ["%$term%"])
+                        ->orWhereHas('position', fn($q) => $q->whereRaw('LOWER(position.name) LIKE ?', ["%$term%"]))
                         ->orWhereHas('user', function ($q) use ($term) {
-                            $q->whereRaw('LOWER(username) LIKE ?', ["%$term%"])
-                                ->orWhereHas('role', fn($q) => $q->whereRaw('LOWER(description) LIKE ?', ["%$term%"]));
+                            $q->whereRaw('LOWER(user.username) LIKE ?', ["%$term%"])
+                                ->orWhereHas('role', fn($q) => $q->whereRaw('LOWER(role.description) LIKE ?', ["%$term%"]));
                         });
                 }
             });
         }
 
-        $query->when($filters['department_id'] ?? false, fn($q) => $q->where('department_id', $filters['department_id']))
+        $query->when($filters['department_id'] ?? false, fn($q) => $q->where('employees.department_id', $filters['department_id']))
             ->when($filters['group_id'] ?? false, fn($q) => $q->where('group_id', $filters['group_id']))
             ->when($filters['status'] ?? false, fn($q) => $q->where('employees.status', $filters['status']))
-            ->when($filters['type'] ?? false, fn($q) => $q->where('type', $filters['type']))
+            ->when($filters['type'] ?? false, fn($q) => $q->where('employees.type', $filters['type']))
             ->when($filters['role_id'] ?? false, function ($q) use ($filters) {
                 $q->whereHas('user', fn($q) => $q->where('role_id', $filters['role_id']));
             });
