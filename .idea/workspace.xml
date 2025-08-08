@@ -423,23 +423,7 @@
       <workItem from="1754465263485" duration="4715000" />
       <workItem from="1754541753989" duration="9613000" />
       <workItem from="1754626767965" duration="683000" />
-      <workItem from="1754628459107" duration="5830000" />
-    </task>
-    <task id="LOCAL-00974" summary="fix: remove redundant attendance check in AttendanceController">
-      <option name="closed" value="true" />
-      <created>1753945709082</created>
-      <option name="number" value="00974" />
-      <option name="presentableId" value="LOCAL-00974" />
-      <option name="project" value="LOCAL" />
-      <updated>1753945709082</updated>
-    </task>
-    <task id="LOCAL-00975" summary="fix: add attendanceSalary relationship in Attendance model and update method signatures">
-      <option name="closed" value="true" />
-      <created>1753946633000</created>
-      <option name="number" value="00975" />
-      <option name="presentableId" value="LOCAL-00975" />
-      <option name="project" value="LOCAL" />
-      <updated>1753946633000</updated>
+      <workItem from="1754628459107" duration="6627000" />
     </task>
     <task id="LOCAL-00976" summary="fix: add attendanceSalary relationship in Attendance model and update method signatures">
       <option name="closed" value="true" />
@@ -817,7 +801,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754647287702</updated>
     </task>
-    <option name="localTasksCounter" value="1023" />
+    <task id="LOCAL-01023" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754647367625</created>
+      <option name="number" value="01023" />
+      <option name="presentableId" value="LOCAL-01023" />
+      <option name="project" value="LOCAL" />
+      <updated>1754647367625</updated>
+    </task>
+    <task id="LOCAL-01024" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754647431550</created>
+      <option name="number" value="01024" />
+      <option name="presentableId" value="LOCAL-01024" />
+      <option name="project" value="LOCAL" />
+      <updated>1754647431550</updated>
+    </task>
+    <option name="localTasksCounter" value="1025" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
