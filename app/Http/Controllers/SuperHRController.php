@@ -715,28 +715,25 @@ class SuperHRController extends Controller
 
         $query = Employee::with('user.role', 'position')
             ->where('branch_id', $user->employee->branch_id)
-            ->withCount([
-                'employeeAbsences as absence_count' => function ($q) use ($oneMonthAgo) {
-                    $q->where(function ($q2) use ($oneMonthAgo) {
-                        $q2->whereDate('start_date', '>=', $oneMonthAgo)
-                            ->orWhereDate('end_date', '>=', $oneMonthAgo);
-                    });
-                },
-
-                'employeeHolidays as holidays_count' => function ($q) use ($oneMonthAgo) {
-                    $q->where(function ($q2) use ($oneMonthAgo) {
-                        $q2->whereDate('start_date', '>=', $oneMonthAgo)
-                            ->orWhereDate('end_date', '>=', $oneMonthAgo);
-                    });
-                },
-
-                 'attendances as attendance_absent_count' => function ($q) use ($oneMonthAgo) {
-                        $q->where('status', 'absent') // yoki sening holatingda qanday belgilanayotgan bo‘lsa
-                            ->whereDate('date', '>=', $oneMonthAgo)
-                            ->whereRaw("EXTRACT(DOW FROM date) != 0");   // PostgreSQL’da 0 = yakshanba
-                }
-            ])
-            ->orderByDesc('attendance_absent_count - holidays_count');
+            ->select('employees.*')
+            ->selectRaw("(SELECT COUNT(*) 
+                  FROM employee_absences ea 
+                  WHERE ea.employee_id = employees.id
+                    AND (ea.start_date >= ? OR ea.end_date >= ?)
+                 ) as absence_count", [$oneMonthAgo, $oneMonthAgo])
+            ->selectRaw("(SELECT COUNT(*) 
+                  FROM employee_holidays eh
+                  WHERE eh.employee_id = employees.id
+                    AND (eh.start_date >= ? OR eh.end_date >= ?)
+                 ) as holidays_count", [$oneMonthAgo, $oneMonthAgo])
+            ->selectRaw("(SELECT COUNT(*) 
+                  FROM attendances a
+                  WHERE a.employee_id = employees.id
+                    AND a.status = 'absent'
+                    AND a.date >= ?
+                    AND EXTRACT(DOW FROM a.date) != 0
+                 ) as attendance_absent_count", [$oneMonthAgo])
+            ->orderByRaw("attendance_absent_count - holidays_count DESC");
 
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
