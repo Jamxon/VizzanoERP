@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -423,23 +425,8 @@
       <workItem from="1754465263485" duration="4715000" />
       <workItem from="1754541753989" duration="9613000" />
       <workItem from="1754626767965" duration="683000" />
-      <workItem from="1754628459107" duration="6627000" />
-    </task>
-    <task id="LOCAL-00976" summary="fix: add attendanceSalary relationship in Attendance model and update method signatures">
-      <option name="closed" value="true" />
-      <created>1753946807986</created>
-      <option name="number" value="00976" />
-      <option name="presentableId" value="LOCAL-00976" />
-      <option name="project" value="LOCAL" />
-      <updated>1753946807986</updated>
-    </task>
-    <task id="LOCAL-00977" summary="fix: update attendance salary handling in AttendanceController to use update or create logic">
-      <option name="closed" value="true" />
-      <created>1753947473240</created>
-      <option name="number" value="00977" />
-      <option name="presentableId" value="LOCAL-00977" />
-      <option name="project" value="LOCAL" />
-      <updated>1753947473240</updated>
+      <workItem from="1754628459107" duration="9475000" />
+      <workItem from="1754721911145" duration="1456000" />
     </task>
     <task id="LOCAL-00978" summary="fix: improve attendance salary handling in AttendanceController to adjust employee balance based on salary changes">
       <option name="closed" value="true" />
@@ -817,7 +804,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754647431550</updated>
     </task>
-    <option name="localTasksCounter" value="1025" />
+    <task id="LOCAL-01025" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754654022180</created>
+      <option name="number" value="01025" />
+      <option name="presentableId" value="LOCAL-01025" />
+      <option name="project" value="LOCAL" />
+      <updated>1754654022180</updated>
+    </task>
+    <task id="LOCAL-01026" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754654117739</created>
+      <option name="number" value="01026" />
+      <option name="presentableId" value="LOCAL-01026" />
+      <option name="project" value="LOCAL" />
+      <updated>1754654117739</updated>
+    </task>
+    <option name="localTasksCounter" value="1027" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -1079,9 +1079,16 @@ class InternalAccountantController extends Controller
             return response()->json(['message' => '❌ Model topilmadi.'], 404);
         }
 
+        $submodel = $tarification->tarificationCategory->submodel->submodel;
+
+        if (!$submodel) {
+            return response()->json(['message' => '❌ Submodel topilmadi.'], 404);
+        }
+
         return response()->json([
             'model' => $model,
-            'tarification' => $tarification
+            'tarification' => $tarification,
+            'submodel' => $submodel,
         ]);
     }
 }
