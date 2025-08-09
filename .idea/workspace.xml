@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -426,31 +424,7 @@
       <workItem from="1754541753989" duration="9613000" />
       <workItem from="1754626767965" duration="683000" />
       <workItem from="1754628459107" duration="9475000" />
-      <workItem from="1754721911145" duration="5909000" />
-    </task>
-    <task id="LOCAL-00979" summary="fix: remove redundant balance increment logic in AttendanceController">
-      <option name="closed" value="true" />
-      <created>1753949648189</created>
-      <option name="number" value="00979" />
-      <option name="presentableId" value="LOCAL-00979" />
-      <option name="project" value="LOCAL" />
-      <updated>1753949648189</updated>
-    </task>
-    <task id="LOCAL-00980" summary="fix: add check_out property to Attendance model">
-      <option name="closed" value="true" />
-      <created>1753949668763</created>
-      <option name="number" value="00980" />
-      <option name="presentableId" value="LOCAL-00980" />
-      <option name="project" value="LOCAL" />
-      <updated>1753949668763</updated>
-    </task>
-    <task id="LOCAL-00981" summary="fix: update attendance salary calculation to use worked seconds for accuracy">
-      <option name="closed" value="true" />
-      <created>1753950496966</created>
-      <option name="number" value="00981" />
-      <option name="presentableId" value="LOCAL-00981" />
-      <option name="project" value="LOCAL" />
-      <updated>1753950496966</updated>
+      <workItem from="1754721911145" duration="6308000" />
     </task>
     <task id="LOCAL-00982" summary="fix: add shipment plan API endpoints for managing shipment plans">
       <option name="closed" value="true" />
@@ -820,7 +794,31 @@
       <option name="project" value="LOCAL" />
       <updated>1754723655691</updated>
     </task>
-    <option name="localTasksCounter" value="1028" />
+    <task id="LOCAL-01028" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754730231193</created>
+      <option name="number" value="01028" />
+      <option name="presentableId" value="LOCAL-01028" />
+      <option name="project" value="LOCAL" />
+      <updated>1754730231193</updated>
+    </task>
+    <task id="LOCAL-01029" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754730390470</created>
+      <option name="number" value="01029" />
+      <option name="presentableId" value="LOCAL-01029" />
+      <option name="project" value="LOCAL" />
+      <updated>1754730390470</updated>
+    </task>
+    <task id="LOCAL-01030" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754730532001</created>
+      <option name="number" value="01030" />
+      <option name="presentableId" value="LOCAL-01030" />
+      <option name="project" value="LOCAL" />
+      <updated>1754730532001</updated>
+    </task>
+    <option name="localTasksCounter" value="1031" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
