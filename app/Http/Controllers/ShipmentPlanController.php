@@ -12,7 +12,7 @@ class ShipmentPlanController extends Controller
     {
         return ShipmentPlan::with(
             'items.model',
-            'items.details.order',
+            'items.details.order.orderModel.submodels.sewingOutputs',
             'items.details.submodel',
         )->latest()->get();
     }
