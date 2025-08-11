@@ -260,6 +260,7 @@ class UserController extends Controller
                 $messageLines[] = "👥 Guruh: " . $user->employee->group->name;
             }
 
+            $messageLines[] = "📝 Filial: " . ($user->employee->branch?->name ?? 'Noma\'lum');
             $messageLines[] = "📝 Tavsif: " . $request->description;
 
             $message = implode("\n", $messageLines);
