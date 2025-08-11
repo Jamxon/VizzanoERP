@@ -126,6 +126,8 @@ class ShipmentPlanController extends Controller
                 'items.model',
                 'items.details.order',
                 'items.details.submodel',
+                'items.details.order.orderModel.submodels.sewingOutputs',
+
             )
             ->get();
 

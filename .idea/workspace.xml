@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -427,23 +425,7 @@
       <workItem from="1754626767965" duration="683000" />
       <workItem from="1754628459107" duration="9475000" />
       <workItem from="1754721911145" duration="9404000" />
-      <workItem from="1754808086247" duration="14106000" />
-    </task>
-    <task id="LOCAL-00988" summary="fix: update ShipmentItem model relationship to use correct Models class">
-      <option name="closed" value="true" />
-      <created>1754109229467</created>
-      <option name="number" value="00988" />
-      <option name="presentableId" value="LOCAL-00988" />
-      <option name="project" value="LOCAL" />
-      <updated>1754109229467</updated>
-    </task>
-    <task id="LOCAL-00989" summary="fix: comment out HasFactory trait in SubModel and update workspace.xml task summary">
-      <option name="closed" value="true" />
-      <created>1754109402786</created>
-      <option name="number" value="00989" />
-      <option name="presentableId" value="LOCAL-00989" />
-      <option name="project" value="LOCAL" />
-      <updated>1754109402786</updated>
+      <workItem from="1754808086247" duration="14450000" />
     </task>
     <task id="LOCAL-00990" summary="fix: correct SubModel class reference in ShipmentItemDetail and enable HasFactory trait in SubModel">
       <option name="closed" value="true" />
@@ -821,7 +803,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754896147173</updated>
     </task>
-    <option name="localTasksCounter" value="1037" />
+    <task id="LOCAL-01037" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754897546543</created>
+      <option name="number" value="01037" />
+      <option name="presentableId" value="LOCAL-01037" />
+      <option name="project" value="LOCAL" />
+      <updated>1754897546543</updated>
+    </task>
+    <task id="LOCAL-01038" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754897704791</created>
+      <option name="number" value="01038" />
+      <option name="presentableId" value="LOCAL-01038" />
+      <option name="project" value="LOCAL" />
+      <updated>1754897704791</updated>
+    </task>
+    <option name="localTasksCounter" value="1039" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
