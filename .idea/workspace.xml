@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -425,15 +427,7 @@
       <workItem from="1754626767965" duration="683000" />
       <workItem from="1754628459107" duration="9475000" />
       <workItem from="1754721911145" duration="9404000" />
-      <workItem from="1754808086247" duration="20759000" />
-    </task>
-    <task id="LOCAL-00993" summary="fix: add validation for 'for_admins' field in storeIssue method and update Telegram bot logic">
-      <option name="closed" value="true" />
-      <created>1754136720417</created>
-      <option name="number" value="00993" />
-      <option name="presentableId" value="LOCAL-00993" />
-      <option name="project" value="LOCAL" />
-      <updated>1754136720417</updated>
+      <workItem from="1754808086247" duration="22209000" />
     </task>
     <task id="LOCAL-00994" summary="fix: enhance user message formatting in UserController and load related employee data">
       <option name="closed" value="true" />
@@ -819,7 +813,15 @@
       <option name="project" value="LOCAL" />
       <updated>1754913396266</updated>
     </task>
-    <option name="localTasksCounter" value="1042" />
+    <task id="LOCAL-01042" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754914424980</created>
+      <option name="number" value="01042" />
+      <option name="presentableId" value="LOCAL-01042" />
+      <option name="project" value="LOCAL" />
+      <updated>1754914424980</updated>
+    </task>
+    <option name="localTasksCounter" value="1043" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

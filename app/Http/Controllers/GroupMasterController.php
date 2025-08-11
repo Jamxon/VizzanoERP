@@ -392,8 +392,6 @@ class GroupMasterController extends Controller
 
         $sewingOutput = SewingOutputs::create($validatedData);
 
-        $this->recalculateShipmentPlanItemsForOrderSubModel($orderSubModel);
-
         if ($combinedQuantity === $orderQuantity) {
             $order->update(['status' => 'tailored']);
         }
