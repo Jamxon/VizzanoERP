@@ -131,7 +131,7 @@ class PackageMasterController extends Controller
                     // Box sticker uchun shu paketdagi faqat bitta o'lcham va miqdor
                     $stickers[] = [
                         [$sizeName, $capacity],
-                        [round($item['netto'], 2), round($item['brutto'], 2)],
+                        [round((float)($item['netto'] ?? 0), 2), round((float)($item['brutto'] ?? 0), 2)],
                         'color' => $color,
                         'model' => $modelName,
                         'orderSizes' => $orderSizes,
@@ -142,8 +142,9 @@ class PackageMasterController extends Controller
                     $index++;
 
                     $totalQty += $capacity;
-                    $netto += $item['netto'];
-                    $brutto += $item['brutto'];
+                    $netto += (float)($item['netto'] ?? 0);
+                    $brutto += (float)($item['brutto'] ?? 0);
+
                 }
 
             if ($qty > 0) {
@@ -234,8 +235,8 @@ class PackageMasterController extends Controller
                     }
 
                     // Netto va Brutto yig'ish
-                    $totalNettoLeft = collect($package)->sum('netto');
-                    $totalBruttoLeft = collect($package)->sum('brutto');
+                    $totalNettoLeft = collect($package)->sum(fn($x) => (float)($x['netto'] ?? 0));
+                    $totalBruttoLeft = collect($package)->sum(fn($x) => (float)($x['brutto'] ?? 0));
 
                     // Sticker massivini tayyorlash
                     $sizesRows = [['Размер', 'Количество'], ...$sizes, [round($totalNettoLeft, 2), round($totalBruttoLeft, 2)]];
