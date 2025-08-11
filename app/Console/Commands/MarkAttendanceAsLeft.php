@@ -35,7 +35,7 @@ class MarkAttendanceAsLeft extends Command
             $attendance->save();
 
             try {
-                if (in_array($employee->payment_type, ['monthly', 'fixed_tailored_bonus', 'fixed_cutted_bonus', 'fixed_tailored_bonus_group'])) {
+                if (in_array($employee->payment_type, ['monthly', 'fixed_tailored_bonus', 'fixed_cutted_bonus', 'fixed_tailored_bonus_group', 'fixed_percentage_bonus_group'])) {
                     $salaryToAdd = $employee->salary / 26;
                 } elseif ($employee->payment_type === 'daily') {
                     $salaryToAdd = $employee->salary;
