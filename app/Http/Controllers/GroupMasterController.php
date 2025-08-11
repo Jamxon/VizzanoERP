@@ -454,12 +454,16 @@ class GroupMasterController extends Controller
         }
         $summaryMessage .= "⏰ <b><i>Jami natijalar: {$totalSumForTime} dona </i></b> ⚡️\n";
 
-        $this->sendTelegramMessageWithEditSupport(
+        $telegramResult = $this->sendTelegramMessageWithEditSupport(
             $newEntryMessage . $summaryMessage,
             $time->time,
             $timeId,
             $branchId
         );
+
+        if ($telegramResult['status'] === 'error') {
+            return response()->json($telegramResult, 500);
+        }
 
         Log::add(
             auth()->id(),
@@ -474,31 +478,54 @@ class GroupMasterController extends Controller
         ]);
     }
 
-    private function sendTelegramMessageWithEditSupport(string $message, string $timeName, int $timeId, int $branchId): void
+    private function sendTelegramMessageWithEditSupport(string $message, string $timeName, int $timeId, int $branchId)
     {
-        $chatId = -1001883536528; // Replace with your actual chat ID
-        $today = now()->toDateString();
+        try {
+            $chatId = -1001883536528; // Replace with your actual chat ID
+            $today = now()->toDateString();
 
-        $existing = TelegramSewingMessage::where([
-            'time_id' => $timeId,
-            'date' => $today,
-            'branch_id' => $branchId,
-        ])->first();
+            $existing = TelegramSewingMessage::where([
+                'time_id' => $timeId,
+                'date' => $today,
+                'branch_id' => $branchId,
+            ])->first();
 
-        if ($existing) {
-            $this->editTelegramMessage($chatId, $existing->message_id, $message);
-        } else {
-            $response = $this->sendTelegramMessage($message);
+            if ($existing) {
+                $this->editTelegramMessage($chatId, $existing->message_id, $message);
+                return [
+                    'status' => 'success',
+                    'message' => 'Telegram message edited successfully',
+                ];
+            } else {
+                $response = $this->sendTelegramMessage($message);
 
-            if ($response && isset($response['result']['message_id'])) {
-                TelegramSewingMessage::create([
-                    'time_id' => $timeId,
-                    'date' => $today,
-                    'branch_id' => $branchId,
-                    'chat_id' => $chatId,
-                    'message_id' => $response['result']['message_id'],
-                ]);
+                if ($response && isset($response['result']['message_id'])) {
+                    TelegramSewingMessage::create([
+                        'time_id' => $timeId,
+                        'date' => $today,
+                        'branch_id' => $branchId,
+                        'chat_id' => $chatId,
+                        'message_id' => $response['result']['message_id'],
+                    ]);
+                    return [
+                        'status' => 'success',
+                        'message' => 'Telegram message sent successfully',
+                    ];
+                } else {
+                    return [
+                        'status' => 'error',
+                        'message' => 'Failed to send Telegram message',
+                        'error' => $response['description'] ?? 'Unknown error'
+                    ];
+                }
             }
+        } catch (\Throwable $e) {
+
+            return [
+                'status' => 'error',
+                'message' => 'Telegramga yuborishda xato',
+                'error' => $e->getMessage()
+            ];
         }
     }
 
