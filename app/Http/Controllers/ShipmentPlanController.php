@@ -39,7 +39,6 @@ class ShipmentPlanController extends Controller
             $item = $plan->items()->create([
                 'model_id' => $itemData['model_id'],
                 'quantity' => $itemData['quantity'],
-                'completed' => 0,
             ]);
 
             if (!empty($itemData['details'])) {
@@ -87,7 +86,6 @@ class ShipmentPlanController extends Controller
             $item = $shipmentPlan->items()->create([
                 'model_id' => $itemData['model_id'],
                 'quantity' => $itemData['quantity'],
-                'completed' => 0,
             ]);
 
             if (!empty($itemData['details'])) {

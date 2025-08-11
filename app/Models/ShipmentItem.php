@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class ShipmentItem extends Model
 {
-    protected $fillable = ['shipment_plan_id', 'model_id', 'quantity', 'completed', 'comment'];
+    protected $fillable = ['shipment_plan_id', 'model_id', 'quantity', 'comment'];
 
     public function plan(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
