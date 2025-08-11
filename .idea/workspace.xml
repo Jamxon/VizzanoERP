@@ -5,8 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/PackageMasterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -428,23 +427,7 @@
       <workItem from="1754626767965" duration="683000" />
       <workItem from="1754628459107" duration="9475000" />
       <workItem from="1754721911145" duration="9404000" />
-      <workItem from="1754808086247" duration="8535000" />
-    </task>
-    <task id="LOCAL-00985" summary="fix: update employee salary query to use parsed start and end dates for filtering">
-      <option name="closed" value="true" />
-      <created>1754029820297</created>
-      <option name="number" value="00985" />
-      <option name="presentableId" value="LOCAL-00985" />
-      <option name="project" value="LOCAL" />
-      <updated>1754029820297</updated>
-    </task>
-    <task id="LOCAL-00986" summary="fix: add recalculateShipmentPlanItemsForOrderSubModel method to update shipment item completion based on sewing outputs">
-      <option name="closed" value="true" />
-      <created>1754050766447</created>
-      <option name="number" value="00986" />
-      <option name="presentableId" value="LOCAL-00986" />
-      <option name="project" value="LOCAL" />
-      <updated>1754050766447</updated>
+      <workItem from="1754808086247" duration="12853000" />
     </task>
     <task id="LOCAL-00987" summary="fix: enhance shipment plan retrieval to include model and order details">
       <option name="closed" value="true" />
@@ -822,7 +805,23 @@
       <option name="project" value="LOCAL" />
       <updated>1754887079330</updated>
     </task>
-    <option name="localTasksCounter" value="1034" />
+    <task id="LOCAL-01034" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754887400356</created>
+      <option name="number" value="01034" />
+      <option name="presentableId" value="LOCAL-01034" />
+      <option name="project" value="LOCAL" />
+      <updated>1754887400356</updated>
+    </task>
+    <task id="LOCAL-01035" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1754887549664</created>
+      <option name="number" value="01035" />
+      <option name="presentableId" value="LOCAL-01035" />
+      <option name="project" value="LOCAL" />
+      <updated>1754887549664</updated>
+    </task>
+    <option name="localTasksCounter" value="1036" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -20,7 +20,6 @@ class PackageMasterController extends Controller
         $search = $request->input('search', '');
 
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
-            ->whereIn('status', ['tailoring', 'tailored', 'checking', 'checked'])
             ->where(function ($query) use ($search) {
                 $query->whereHas('orderModel.model', function ($q) use ($search) {
                         $q->where('name', 'like', "%{$search}%");
