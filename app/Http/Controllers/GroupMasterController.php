@@ -531,17 +531,44 @@ class GroupMasterController extends Controller
 
     private function sendTelegramMessage(string $message)
     {
-        $botToken = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
-        $chatId = -1001883536528;
-        $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
+        try {
+            $botToken = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
+            $chatId = -1001883536528;
+            $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
 
-        $response = Http::post($url, [
-            'chat_id' => $chatId,
-            'text' => $message,
-            'parse_mode' => 'HTML'
-        ]);
+            $response = Http::post($url, [
+                'chat_id'    => $chatId,
+                'text'       => $message,
+                'parse_mode' => 'HTML'
+            ]);
 
-        return $response->json();
+            // Agar API javobi muvaffaqiyatsiz bo‘lsa
+            if ($response->failed()) {
+                return [
+                    'status'  => 'error',
+                    'message' => 'Telegram API xato javob qaytardi',
+                    'code'    => $response->status(),
+                    'body'    => $response->body()
+                ];
+            }
+
+            return [
+                'status'  => 'success',
+                'data'    => $response->json()
+            ];
+
+        } catch (\Throwable $e) {
+            // Logga yozib qo‘yish
+            \Log::error('Telegram sendMessage error', [
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'status'  => 'error',
+                'message' => 'Telegramga yuborishda xato',
+                'error'   => $e->getMessage()
+            ];
+        }
     }
 
     private function editTelegramMessage(string $chatId, string $messageId, string $message): void
