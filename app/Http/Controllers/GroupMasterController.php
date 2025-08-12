@@ -454,15 +454,17 @@ class GroupMasterController extends Controller
         }
         $summaryMessage .= "⏰ <b><i>Jami natijalar: {$totalSumForTime} dona </i></b> ⚡️\n";
 
-        $telegramResult = $this->sendTelegramMessageWithEditSupport(
-            $newEntryMessage . $summaryMessage,
-            $time->time,
-            $timeId,
-            $branchId
-        );
+        if ($user->employee()->branch_id === 5){
+            $telegramResult = $this->sendTelegramMessageWithEditSupport(
+                $newEntryMessage . $summaryMessage,
+                $time->time,
+                $timeId,
+                $branchId
+            );
 
-        if ($telegramResult['status'] === 'error') {
-            return response()->json($telegramResult, 500);
+            if ($telegramResult['status'] === 'error') {
+                return response()->json($telegramResult, 500);
+            }
         }
 
         Log::add(
