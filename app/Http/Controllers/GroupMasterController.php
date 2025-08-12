@@ -499,13 +499,13 @@ class GroupMasterController extends Controller
             } else {
                 $response = $this->sendTelegramMessage($message);
 
-                if ($response['status'] === 'success' && isset($response['result']['message_id'])) {
+                if ($response['status'] === 'success' && isset($response['data']['result']['message_id'])) {
                     TelegramSewingMessage::create([
                         'time_id' => $timeId,
                         'date' => $today,
                         'branch_id' => $branchId,
                         'chat_id' => $chatId,
-                        'message_id' => $response['result']['message_id'],
+                        'message_id' => $response['data']['result']['message_id'],
                     ]);
                     return [
                         'status' => 'success',
