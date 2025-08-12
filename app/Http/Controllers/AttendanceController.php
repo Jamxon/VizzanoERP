@@ -40,7 +40,7 @@ class AttendanceController extends Controller
     {
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'check_in' => 'required|date',
+            'check_in' => 'nullable|date',
             'date' => 'nullable|date',
             'status' => 'nullable|string|in:present,absent',
         ]);
@@ -65,7 +65,7 @@ class AttendanceController extends Controller
                 'date' => $today,
             ],
             [
-                'check_in' => $request->check_in,
+                'check_in' => $request->check_in ?? null,
                 'check_out' => null,
                 'status' => $request->status ?? 'present',
             ]
