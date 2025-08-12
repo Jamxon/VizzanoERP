@@ -46,19 +46,33 @@ class AttendanceController extends Controller
         ]);
 
         $today = $request->date ?? now()->toDateString();
-        // Shu kunga allaqachon kelganmi?
-//        $existing = Attendance::where('employee_id', $request->employee_id)
-//            ->whereDate('date', $today)
-//            ->with('employee')
-//            ->first();
-//
-//        if ($existing && $existing->check_in) {
-//            return response()->json([
-//                'message' => "Bu xodim allaqachon davomatdan o'tgan",
-//                'data' => $existing,
-//            ], 200);
-//        }
 
+        // Eski yozuvni olish (keyin status o'zgarganini tekshirish uchun)
+        $existing = Attendance::where('employee_id', $request->employee_id)
+            ->whereDate('date', $today)
+            ->first();
+
+        // Agar eski yozuv "present" bo'lib, yangi status "absent" bo'lsa
+        if ($existing && $existing->status === 'present' && $request->status === 'absent') {
+            // AttendanceSalary topamiz
+            $salaryRecord = AttendanceSalary::where('employee_id', $request->employee_id)
+                ->whereDate('date', $today)
+                ->first();
+
+            if ($salaryRecord) {
+                // Hodim balansidan ayirish
+                $employee = Employee::find($request->employee_id);
+                if ($employee) {
+                    $employee->balance -= $salaryRecord->amount; // yoki boshqa balans maydoni bo'lsa shuni ishlating
+                    $employee->save();
+                }
+
+                // Salary yozuvini o'chirish
+                $salaryRecord->delete();
+            }
+        }
+
+        // Attendance yozuvini yangilash yoki yaratish
         $attendance = Attendance::updateOrCreate(
             [
                 'employee_id' => $request->employee_id,
@@ -73,13 +87,14 @@ class AttendanceController extends Controller
 
         Log::add(
             auth()->user()->id,
-            'Hodim ishga keldi',
-            'Check In',
+            'Davomat yozildi',
+            'Attendance',
             null,
             [
                 'employee_id' => $attendance->employee_id,
                 'check_in' => $attendance->check_in,
                 'check_out' => $attendance->check_out,
+                'status' => $attendance->status
             ]
         );
 
