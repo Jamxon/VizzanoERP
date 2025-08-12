@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\AttendanceSalary;
+use App\Models\Employee;
 use App\Models\Log;
 use Illuminate\Http\Request;
 
