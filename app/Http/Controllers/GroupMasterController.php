@@ -574,17 +574,22 @@ class GroupMasterController extends Controller
         }
     }
 
-    private function editTelegramMessage(string $chatId, string $messageId, string $message): void
+    private function editTelegramMessage(string $chatId, string $messageId, string $message): array
     {
-        $botToken = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
+        $botToken = "...";
         $url = "https://api.telegram.org/bot{$botToken}/editMessageText";
 
-        Http::post($url, [
+        $response = Http::post($url, [
             'chat_id' => $chatId,
             'message_id' => $messageId,
             'text' => $message,
             'parse_mode' => 'HTML'
         ]);
+
+        $json = $response->json();
+        \Log::info('Telegram edit response', $json);
+
+        return $json;
     }
 
     public function showOrderCuts(Request $request): \Illuminate\Http\JsonResponse
