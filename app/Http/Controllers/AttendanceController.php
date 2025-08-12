@@ -42,6 +42,7 @@ class AttendanceController extends Controller
             'employee_id' => 'required|exists:employees,id',
             'check_in' => 'required|date',
             'date' => 'nullable|date',
+            'status' => 'nullable|string|in:present,absent',
         ]);
 
         $today = $request->date ?? now()->toDateString();
@@ -66,7 +67,7 @@ class AttendanceController extends Controller
             [
                 'check_in' => $request->check_in,
                 'check_out' => null,
-                'status' => "present",
+                'status' => $request->status ?? 'present',
             ]
         );
 
