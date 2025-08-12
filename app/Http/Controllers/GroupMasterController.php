@@ -484,11 +484,10 @@ class GroupMasterController extends Controller
             $chatId = -1001883536528; // Replace with your actual chat ID
             $today = now()->toDateString();
 
-            $existing = TelegramSewingMessage::where([
-                'time_id' => $timeId,
-                'date' => $today,
-                'branch_id' => $branchId,
-            ])->first();
+            $existing = TelegramSewingMessage::whereDate('date', $today)
+                ->where('time_id', $timeId)
+                ->where('branch_id', $branchId)
+                ->first();
 
             if ($existing) {
                 $this->editTelegramMessage($chatId, $existing->message_id, $message);
@@ -499,7 +498,11 @@ class GroupMasterController extends Controller
             } else {
                 $response = $this->sendTelegramMessage($message);
 
-                if ($response['status'] === 'success' && isset($response['data']['result']['message_id'])) {
+                if (
+                    $response['status'] === 'success' &&
+                    isset($response['data']['result']['message_id']) &&
+                    !empty($response['data']['result']['message_id'])
+                ) {
                     TelegramSewingMessage::create([
                         'time_id' => $timeId,
                         'date' => $today,
