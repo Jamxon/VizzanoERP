@@ -14,16 +14,11 @@ class HikvisionEventController extends Controller
     {
         $contentType = $request->header('Content-Type');
 
-//        Log::add(
-//            null,
-//            'Hikvision event received',
-//            'info',
-//            null,
-//            [
-//                'content_type' => $contentType,
-//                'request_data' => $request->all(),
-//            ]
-//        );
+        // Qurilma → filial mapping
+        $deviceBranchMap = [
+            255 => 4, // Branch 4
+            105 => 5, // Branch 5
+        ];
 
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
@@ -38,7 +33,6 @@ class HikvisionEventController extends Controller
                 $outerEvent = json_decode($request->input('AccessControllerEvent'), true);
                 $accessData = $outerEvent['AccessControllerEvent'] ?? [];
             } else {
-                // Hech qaysi formatga tushmaydi
                 Log::add(null, 'Hikvision event: format aniqlanmadi', 'error', null, [
                     'request_data' => $request->all(),
                 ]);
@@ -46,29 +40,48 @@ class HikvisionEventController extends Controller
             }
 
             $employeeNo = $accessData['employeeNoString'] ?? null;
-            $deviceId = $outerEvent['deviceID'] ?? null;
+            $deviceId = isset($outerEvent['deviceID']) ? (int)$outerEvent['deviceID'] : null;
             $eventTime = $outerEvent['dateTime'] ?? now()->toDateTimeString();
+
+            // Device ID mapping bo‘yicha branchni topamiz
+            $branchFromDevice = $deviceBranchMap[$deviceId] ?? null;
+            if (!$branchFromDevice) {
+                return response()->json(['status' => 'unknown_device']);
+            }
 
             $image = $request->file('Picture');
             $imagePath = null;
             if ($image && $image->isValid()) {
-                $filename = time() . '.' . $image->getClientOriginalExtension();
+                $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
                 $image->storeAs('/public/hikvision/', $filename);
                 $imagePath = 'hikvision/' . $filename;
             }
 
             $employee = Employee::find($employeeNo);
 
-            if ($employee) {
-                $eventCarbon = Carbon::parse($eventTime);
-                $today = $eventCarbon->toDateString();
+            // Hodim topilmasa yoki branch mos kelmasa
+            if (!$employee || (int)$employee->branch_id !== (int)$branchFromDevice) {
+                Log::add($employee->user_id ?? null, 'Branch mos kelmadi yoki employee topilmadi', 'branch_mismatch', null, [
+                    'employee_id' => $employeeNo,
+                    'employee_branch' => $employee->branch_id ?? null,
+                    'device_branch' => $branchFromDevice,
+                    'device_id' => $deviceId,
+                ]);
+                return response()->json(['status' => 'branch_mismatch']);
+            }
 
-                $attendance = Attendance::firstOrCreate(
-                    ['employee_id' => $employee->id, 'date' => $today],
-                    ['source_type' => 'device']
-                );
+            // Attendance logika
+            $eventCarbon = Carbon::parse($eventTime);
+            $today = $eventCarbon->toDateString();
 
-                if ((int)$deviceId === 255 && !$attendance->check_in) {
+            $attendance = Attendance::firstOrCreate(
+                ['employee_id' => $employee->id, 'date' => $today],
+                ['source_type' => 'device']
+            );
+
+            if ($deviceId === 255 || $deviceId === 105) {
+                // Check In
+                if (!$attendance->check_in) {
                     $attendance->check_in = $eventCarbon;
                     $attendance->check_in_image = $imagePath;
                     $attendance->status = 'present';
@@ -80,7 +93,17 @@ class HikvisionEventController extends Controller
                         'device_id' => $deviceId,
                         'time' => $eventTime,
                     ]);
-                } elseif ((int)$deviceId === 256 && !$attendance->check_out) {
+                } else {
+                    Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already_checkin', null, [
+                        'employee_id' => $employee->id,
+                        'device_id' => $deviceId,
+                        'time' => $eventTime,
+                        'image_path' => $imagePath,
+                    ]);
+                }
+            } elseif ($deviceId === 256) {
+                // Check Out
+                if (!$attendance->check_out) {
                     $attendance->check_out = $eventCarbon;
                     $attendance->check_out_image = $imagePath;
                     $attendance->save();
@@ -92,7 +115,7 @@ class HikvisionEventController extends Controller
                         'time' => $eventTime,
                     ]);
                 } else {
-                    Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already', null, [
+                    Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already_checkout', null, [
                         'employee_id' => $employee->id,
                         'device_id' => $deviceId,
                         'time' => $eventTime,
