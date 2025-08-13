@@ -375,7 +375,7 @@ class OrderController extends Controller
                 'contragent_description' => 'sometimes|string',
                 'model' => 'sometimes|array',
                 'model.id' => 'sometimes|integer|exists:models,id',
-                'model.material_id' => 'sometimes|integer|exists:,id',
+                'model.material_id' => 'sometimes|integer|exists:items,id',
                 'model.submodels' => 'sometimes|array',
                 'model.sizes' => 'sometimes|array',
                 'model.sizes.*.id' => 'sometimes|integer|exists:order_sizes,id',
