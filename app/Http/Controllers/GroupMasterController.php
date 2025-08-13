@@ -578,7 +578,7 @@ class GroupMasterController extends Controller
 
     private function editTelegramMessage(string $chatId, string $messageId, string $message): array
     {
-        $botToken = "...";
+        $botToken = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
         $url = "https://api.telegram.org/bot{$botToken}/editMessageText";
 
         $response = Http::post($url, [
