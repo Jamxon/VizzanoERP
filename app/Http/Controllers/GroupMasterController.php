@@ -454,7 +454,7 @@ class GroupMasterController extends Controller
         }
         $summaryMessage .= "⏰ <b><i>Jami natijalar: {$totalSumForTime} dona </i></b> ⚡️\n";
 
-        if ($user->employee()->branch_id === 5){
+        if ($user->employee->branch_id === 5){
             $telegramResult = $this->sendTelegramMessageWithEditSupport(
                 $newEntryMessage . $summaryMessage,
                 $time->time,
