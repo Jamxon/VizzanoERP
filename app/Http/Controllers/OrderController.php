@@ -16,7 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Items; 
+use App\Models\Item; 
 
 class OrderController extends Controller
 {
@@ -256,7 +256,7 @@ class OrderController extends Controller
             $materialId = $request->model['material_id'] ?? null;
 
             if (!$materialId && !empty($request->model['material_name'])) {
-                $material = Items::create([
+                $material = Item::create([
                     'name'      => $request->model['material_name'],
                     'branch_id' => $user->employee->branch_id
                 ]);
@@ -373,7 +373,7 @@ class OrderController extends Controller
                 'contragent_description' => 'sometimes|string',
                 'model' => 'sometimes|array',
                 'model.id' => 'sometimes|integer|exists:models,id',
-                'model.material_id' => 'sometimes|integer|exists:items,id',
+                'model.material_id' => 'sometimes|integer|exists:,id',
                 'model.submodels' => 'sometimes|array',
                 'model.sizes' => 'sometimes|array',
                 'model.sizes.*.id' => 'sometimes|integer|exists:order_sizes,id',
