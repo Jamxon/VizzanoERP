@@ -195,7 +195,8 @@ class OrderController extends Controller
                 'comment' => 'nullable|string',
                 'model' => 'required|array',
                 'model.id' => 'required|integer',
-                'model.material_id' => 'required|integer|exists:items,id',
+                'model.material_id' => 'nullable|integer|exists:items,id',
+                'model.material_name' => 'nullable|string',
                 'model.submodels' => 'required|array',
                 'model.sizes' => 'required|array',
                 'model.*.sizes.*.id' => 'required|integer',
@@ -251,11 +252,15 @@ class OrderController extends Controller
             $modelRasxod = Models::find($request->model['id'])->rasxod;
             $minute = Models::find($request->model['id'])->minute ?? 0;
 
+            if(!$request->model['material_id']){
+                $marerial = Items::create(['name' => $request->model['material_name']]);
+            }
+
             $orderModel = OrderModel::create([
                 'order_id' => $order->id,
                 'model_id' => $request->model['id'],
                 'rasxod' => $modelRasxod ?? 0,
-                'material_id' => $request->model['material_id'],
+                'material_id' => $request->model['material_id'] ?? $material->id,
                 'minute' => $minute,
             ]);
 
