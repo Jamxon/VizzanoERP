@@ -16,6 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Items; 
 
 class OrderController extends Controller
 {
@@ -252,19 +253,21 @@ class OrderController extends Controller
             $modelRasxod = Models::find($request->model['id'])->rasxod;
             $minute = Models::find($request->model['id'])->minute ?? 0;
 
-            if(!$request->model['material_id']){
-                $marerial = Items::create([
-                                          'name' => $request->model['material_name'],
-                                          'branch_id' => auth()->user()->employee->branch_id
-                                         ]
-                                         );
+            $materialId = $request->model['material_id'] ?? null;
+
+            if (!$materialId && !empty($request->model['material_name'])) {
+                $material = Items::create([
+                    'name'      => $request->model['material_name'],
+                    'branch_id' => $user->employee->branch_id
+                ]);
+                $materialId = $material->id;
             }
 
             $orderModel = OrderModel::create([
                 'order_id' => $order->id,
                 'model_id' => $request->model['id'],
                 'rasxod' => $modelRasxod ?? 0,
-                'material_id' => $request->model['material_id'] ?? $material->id,
+                'material_id' => $materialId,
                 'minute' => $minute,
             ]);
 
