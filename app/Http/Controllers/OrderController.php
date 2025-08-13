@@ -259,7 +259,8 @@ class OrderController extends Controller
                 $material = Item::create([
                     'name'      => $request->model['material_name'],
                     'branch_id' => $user->employee->branch_id,
-                    'type' => 13
+                    'type' => 13,
+                    'color_id' => 48
                 ]);
                 $materialId = $material->id;
             }
