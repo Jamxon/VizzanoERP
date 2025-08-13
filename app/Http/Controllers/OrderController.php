@@ -253,7 +253,11 @@ class OrderController extends Controller
             $minute = Models::find($request->model['id'])->minute ?? 0;
 
             if(!$request->model['material_id']){
-                $marerial = Items::create(['name' => $request->model['material_name']]);
+                $marerial = Items::create([
+                                          'name' => $request->model['material_name'],
+                                          'branch_id' => auth()->user()->employee->branch_id]
+                                         ]
+                                         );
             }
 
             $orderModel = OrderModel::create([
