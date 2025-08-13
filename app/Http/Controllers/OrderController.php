@@ -255,7 +255,7 @@ class OrderController extends Controller
             if(!$request->model['material_id']){
                 $marerial = Items::create([
                                           'name' => $request->model['material_name'],
-                                          'branch_id' => auth()->user()->employee->branch_id]
+                                          'branch_id' => auth()->user()->employee->branch_id
                                          ]
                                          );
             }
