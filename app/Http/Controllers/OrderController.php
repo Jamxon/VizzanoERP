@@ -258,7 +258,8 @@ class OrderController extends Controller
             if (!$materialId && !empty($request->model['material_name'])) {
                 $material = Item::create([
                     'name'      => $request->model['material_name'],
-                    'branch_id' => $user->employee->branch_id
+                    'branch_id' => $user->employee->branch_id,
+                    'type' => 13
                 ]);
                 $materialId = $material->id;
             }
