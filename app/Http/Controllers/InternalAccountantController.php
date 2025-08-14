@@ -1092,13 +1092,13 @@ class InternalAccountantController extends Controller
         ]);
     }
 
-    public function getOrderAttendanceSalary($orderId)
+    public function getOrderAttendanceSalary($id)
     {
         // Orderni yuklaymiz
         $order = Order::with([
             'submodels.sewingOutputs',
             'submodels.group.group.employees.attendanceSalaries'
-        ])->findOrFail($orderId);
+        ])->findOrFail($id);
 
         // 1. sewingOutputsdagi eng birinchi va oxirgi vaqtni topamiz
         $firstDate = null;
