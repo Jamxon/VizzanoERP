@@ -660,21 +660,28 @@ class CasherController extends Controller
 
         $employeeSalaryQuery = $employee->employeeSalaries();
         if ($startDate && $endDate) {
-            $start = Carbon::parse($startDate);
-            $end = Carbon::parse($endDate);
+
+            $start = \Carbon\Carbon::parse($startDate);
+            $end = \Carbon\Carbon::parse($endDate);
 
             $employeeSalaryQuery->where(function ($q) use ($start, $end) {
-                $q->whereYear('year', '>', $start->year)
-                    ->whereYear('year', '<', $end->year)
-                    ->orWhere(function ($q) use ($start, $end) {
-                        $q->whereYear('year', $start->year)
-                            ->whereMonth('month', '>=', $start->month);
-                    })
-                    ->orWhere(function ($q) use ($start, $end) {
-                        $q->whereYear('year', $end->year)
-                            ->whereMonth('month', '<=', $end->month);
+                // Orta yillar
+                $q->whereBetween('year', [$start->year, $end->year])
+                    ->where(function ($q) use ($start, $end) {
+                        $q->where(function ($q) use ($start) {
+                            $q->where('year', $start->year)
+                                ->where('month', '>=', $start->month);
+                        })
+                            ->orWhere(function ($q) use ($end) {
+                                $q->where('year', $end->year)
+                                    ->where('month', '<=', $end->month);
+                            })
+                            ->orWhere(function ($q) use ($start, $end) {
+                                $q->whereBetween('year', [$start->year + 1, $end->year - 1]);
+                            });
                     });
             });
+
         }
         $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
 
