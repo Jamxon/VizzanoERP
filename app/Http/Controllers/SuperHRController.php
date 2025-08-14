@@ -977,7 +977,7 @@ class SuperHRController extends Controller
         $request->validate([
             'name' => 'nullable|string',
             'phone' => 'nullable|string',
-            'group_id' => 'nullable',
+            'group_id' => 'nullable|integer|exists:groups,id',
             'position_id' => 'nullable|integer|exists:positions,id',
             'department_id' => 'nullable|integer|exists:departments,id',
             'hiring_date' => 'nullable|date',
@@ -1041,7 +1041,7 @@ class SuperHRController extends Controller
                 $employee->update([
                     'name' => $request->name ?? $employee->name,
                     'phone' => $request->phone ?? $employee->phone,
-                    'group_id' => $request->group_id ?? null,
+                    'group_id' => $request->filled('group_id') ? (int) $request->group_id : null,
                     'position_id' => $request->position_id ?? $employee->position_id,
                     'department_id' => $request->department_id ?? $employee->department_id,
                     'hiring_date' => $request->hiring_date ?? $employee->hiring_date,
