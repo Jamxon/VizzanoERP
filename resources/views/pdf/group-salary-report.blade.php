@@ -35,10 +35,10 @@
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $employee['name'] }}</td>
                 <td>
-                    {{ number_format($employee['attendance_salary'] + $employee['employee_salary'], 2) }}
+                    {{ number_format($employee['attendance_salary'] + $employee['employee_salary']) }}
                 </td>
                 <td>
-                    {{ number_format($employee['tarification_salary'], 2) }}
+                    {{ number_format($employee['tarification_salary']) }}
                 </td>
 
                 <td></td>
