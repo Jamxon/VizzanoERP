@@ -16,6 +16,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Dompdf\Options;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Item; 
 
 class OrderController extends Controller
 {
@@ -195,7 +196,8 @@ class OrderController extends Controller
                 'comment' => 'nullable|string',
                 'model' => 'required|array',
                 'model.id' => 'required|integer',
-                'model.material_id' => 'required|integer|exists:items,id',
+                'model.material_id' => 'nullable|integer|exists:items,id',
+                'model.material_name' => 'nullable|string',
                 'model.submodels' => 'required|array',
                 'model.sizes' => 'required|array',
                 'model.*.sizes.*.id' => 'required|integer',
@@ -251,11 +253,23 @@ class OrderController extends Controller
             $modelRasxod = Models::find($request->model['id'])->rasxod;
             $minute = Models::find($request->model['id'])->minute ?? 0;
 
+            $materialId = $request->model['material_id'] ?? null;
+
+            if (!$materialId && !empty($request->model['material_name'])) {
+                $material = Item::create([
+                    'name'      => $request->model['material_name'],
+                    'branch_id' => $user->employee->branch_id,
+                    'type' => 13,
+                    'color_id' => 48
+                ]);
+                $materialId = $material->id;
+            }
+
             $orderModel = OrderModel::create([
                 'order_id' => $order->id,
                 'model_id' => $request->model['id'],
                 'rasxod' => $modelRasxod ?? 0,
-                'material_id' => $request->model['material_id'],
+                'material_id' => $materialId,
                 'minute' => $minute,
             ]);
 
