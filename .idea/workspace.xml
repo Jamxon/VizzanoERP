@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
+      <change beforePath="$PROJECT_DIR$/resources/views/pdf/group-salary-report.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/pdf/group-salary-report.blade.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -429,15 +431,7 @@
       <workItem from="1754971510318" duration="30586000" />
       <workItem from="1755056050959" duration="1224000" />
       <workItem from="1755098913642" duration="2816000" />
-      <workItem from="1755148942853" duration="5625000" />
-    </task>
-    <task id="LOCAL-01011" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1754642800954</created>
-      <option name="number" value="01011" />
-      <option name="presentableId" value="LOCAL-01011" />
-      <option name="project" value="LOCAL" />
-      <updated>1754642800954</updated>
+      <workItem from="1755148942853" duration="5926000" />
     </task>
     <task id="LOCAL-01012" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -823,7 +817,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755171609411</updated>
     </task>
-    <option name="localTasksCounter" value="1060" />
+    <task id="LOCAL-01060" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1755171751749</created>
+      <option name="number" value="01060" />
+      <option name="presentableId" value="LOCAL-01060" />
+      <option name="project" value="LOCAL" />
+      <updated>1755171751749</updated>
+    </task>
+    <option name="localTasksCounter" value="1061" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

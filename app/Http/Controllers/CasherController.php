@@ -433,7 +433,23 @@ class CasherController extends Controller
         $result = $groups->map(function ($group) use ($startDate, $endDate) {
             $employees = $group->employees
                 ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
-                ->filter();
+                ->filter(function ($employeeData) {
+                    // getEmployeeEarnings null qaytargan bo‘lsa
+                    if (!$employeeData) {
+                        return false;
+                    }
+
+                    // Agar topgan puli 0 bo‘lsa
+                    if (
+                        ($employeeData['total_earned'] ?? 0) == 0 &&
+                        ($employeeData['balance'] ?? 0) == 0
+                    ) {
+                        return false;
+                    }
+
+                    return true;
+                });
+
 
             $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
 
@@ -452,7 +468,18 @@ class CasherController extends Controller
             ->with('salaryPayments')
             ->get()
             ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
-            ->filter();
+            ->filter(function ($employeeData) {
+                if (!$employeeData) {
+                    return false;
+                }
+                if (
+                    ($employeeData['total_earned'] ?? 0) == 0 &&
+                    ($employeeData['balance'] ?? 0) == 0
+                ) {
+                    return false;
+                }
+                return true;
+            });
 
         if ($ungroupedEmployees->isNotEmpty()) {
             $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
