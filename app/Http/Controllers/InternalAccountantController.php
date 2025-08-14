@@ -1096,8 +1096,8 @@ class InternalAccountantController extends Controller
     {
         // Orderni yuklaymiz
         $order = Order::with([
-            'submodels.sewingOutputs',
-            'submodels.group.group.employees.attendanceSalaries'
+            'orderModel.submodels.sewingOutputs',
+            'orderModel.submodels.group.group.employees.attendanceSalaries'
         ])->findOrFail($id);
 
         // 1. sewingOutputsdagi eng birinchi va oxirgi vaqtni topamiz
