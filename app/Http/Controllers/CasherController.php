@@ -418,11 +418,14 @@ class CasherController extends Controller
         }
 
         // Oldingi funksiyadagi kabi ma’lumotlarni olish
+        // Guruhlar bilan olish
         $groupQuery = Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) {
-                $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status')
+                $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status', 'type')
+                    ->where('type', '!=', 'aup') // AUP bo‘lsa olmaymiz
                     ->with('salaryPayments');
             }]);
+
 
         if (!empty($group_id)) {
             $groupQuery->where('id', $group_id);
@@ -467,7 +470,8 @@ class CasherController extends Controller
         // Guruhsiz xodimlar
         $ungroupedEmployees = Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
-            ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status')
+            ->where('type', '!=', 'aup') // AUP bo‘lsa olmaymiz
+            ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status', 'type')
             ->with('salaryPayments')
             ->get()
             ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
@@ -483,8 +487,9 @@ class CasherController extends Controller
                 }
                 return true;
             })
-            ->sortBy(fn($e) => mb_strtolower($e['name'] ?? '')) // Ism bo‘yicha tartiblash
+            ->sortBy(fn($e) => mb_strtolower($e['name'] ?? ''))
             ->values();
+
 
         if ($ungroupedEmployees->isNotEmpty()) {
             $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
