@@ -432,6 +432,7 @@ class CasherController extends Controller
 
         $result = $groups->map(function ($group) use ($startDate, $endDate) {
             $employees = $group->employees
+                ->orderBy('name')
                 ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
                 ->filter(function ($employeeData) {
                     // getEmployeeEarnings null qaytargan bo‘lsa
