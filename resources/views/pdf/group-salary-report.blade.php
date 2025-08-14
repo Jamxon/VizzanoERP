@@ -17,7 +17,10 @@
 @endif
 
 @foreach ($data as $group)
-    <h3>Guruh: {{ $group['name'] }} (Jami hisoblangan: {{ number_format(collect($group['employees'])->sum('total_earned'), 2) }} so'm)</h3>
+    <h3>
+        Guruh: {{ $group['name'] }}
+        (Jami hisoblangan: {{ number_format(collect($group['employees'])->sum('total_earned'), 2) }} so'm)
+    </h3>
 
     <table>
         <thead>
@@ -34,12 +37,16 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $employee['name'] }}</td>
-                <td>
-                    {{ number_format($employee['attendance_salary'] + $employee['employee_salary'], 2) }}
-                </td>
-                <td>
-                    {{ number_format($employee['tarification_salary'], 2) }}
-                </td>
+
+                @if($employee['payment_type'] === 'piece_work')
+                    {{-- Piece work bo‘lsa faqat tarifikatsiya + employee salary hisoblanadi --}}
+                    <td>0.00</td>
+                    <td>{{ number_format($employee['tarification_salary'] + $employee['employee_salary'], 2) }}</td>
+                @else
+                    {{-- Oylik ish bo‘lsa attendance + employee salary --}}
+                    <td>{{ number_format($employee['attendance_salary'] + $employee['employee_salary'], 2) }}</td>
+                    <td>0.00</td>
+                @endif
 
                 <td></td>
             </tr>
