@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -429,7 +431,7 @@
       <workItem from="1754971510318" duration="30586000" />
       <workItem from="1755056050959" duration="1224000" />
       <workItem from="1755098913642" duration="2816000" />
-      <workItem from="1755148942853" duration="1131000" />
+      <workItem from="1755148942853" duration="3366000" />
     </task>
     <task id="LOCAL-01008" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
