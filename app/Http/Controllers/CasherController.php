@@ -687,22 +687,20 @@ class CasherController extends Controller
 
         $employee->loadMissing(['position', 'branch', 'group']);
 
-        // AttendanceSalary + EmployeeSalary yig‘indisi
+        // AttendanceSalary yig‘indisi
         $attendanceQuery = $employee->attendanceSalaries();
         if ($startDate && $endDate) {
             $attendanceQuery->whereBetween('date', [$startDate, $endDate]);
         }
         $attendanceTotal = $attendanceQuery->sum('amount');
 
-
+        // EmployeeSalary yig‘indisi
         $employeeSalaryQuery = $employee->employeeSalaries();
         if ($startDate && $endDate) {
-
             $start = \Carbon\Carbon::parse($startDate);
             $end = \Carbon\Carbon::parse($endDate);
 
             $employeeSalaryQuery->where(function ($q) use ($start, $end) {
-                // Orta yillar
                 $q->whereBetween('year', [$start->year, $end->year])
                     ->where(function ($q) use ($start, $end) {
                         $q->where(function ($q) use ($start) {
@@ -718,11 +716,8 @@ class CasherController extends Controller
                             });
                     });
             });
-
         }
         $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
-
-        $fixedSalariesTotal = $attendanceTotal + $employeeSalaryTotal;
 
         // TarificationLogs yig‘indisi
         $tarificationQuery = $employee->employeeTarificationLogs();
@@ -731,8 +726,14 @@ class CasherController extends Controller
         }
         $tarificationTotal = $tarificationQuery->sum('amount_earned');
 
-        // Umumiy hisob
-        $totalEarned = $fixedSalariesTotal + $tarificationTotal;
+        // Umumiy hisob — payment_type bo‘yicha
+        if ($employee->payment_type === 'piece_work') {
+            // Tarification + EmployeeSalary
+            $totalEarned = $employeeSalaryTotal + $tarificationTotal;
+        } else {
+            // Attendance + EmployeeSalary
+            $totalEarned = $attendanceTotal + $employeeSalaryTotal;
+        }
 
         // To‘lovlarni hisoblash
         $paidQuery = $employee->salaryPayments();
@@ -774,7 +775,6 @@ class CasherController extends Controller
             'net_balance' => round($totalEarned - $paidTotal, 2),
         ];
     }
-
 
     public function getSource(): \Illuminate\Http\JsonResponse
     {
