@@ -39,7 +39,7 @@
             <tr>
                 <th>#</th>
                 <th>F.I.Sh.</th>
-                <th>Summasi</th>
+                <th>Topgan puli</th>
                 <th>Imzo</th>
             </tr>
             </thead>
@@ -50,9 +50,9 @@
                     <td>{{ $employee['name'] }}</td>
                     <td>
                         @if($employee['payment_type'] === 'piece_work')
-                            {{ number_format($employee['tarification_salary'] + $employee['employee_salary'], 2) }}
+                            {{ number_format($employee['tarification_salary'] + $employee['employee_salary']) }}
                         @else
-                            {{ number_format($employee['attendance_salary'] + $employee['employee_salary'], 2) }}
+                            {{ number_format($employee['attendance_salary'] + $employee['employee_salary']) }}
                         @endif
                     </td>
                     <td></td>
