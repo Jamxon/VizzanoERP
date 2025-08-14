@@ -1091,4 +1091,75 @@ class InternalAccountantController extends Controller
             'submodel' => $submodel,
         ]);
     }
+
+    public function getOrderAttendanceSalary($orderId)
+    {
+        // Orderni yuklaymiz
+        $order = Order::with([
+            'submodels.sewingOutputs',
+            'submodels.group.group.employees.attendanceSalaries'
+        ])->findOrFail($orderId);
+
+        // 1. sewingOutputsdagi eng birinchi va oxirgi vaqtni topamiz
+        $firstDate = null;
+        $lastDate = null;
+
+        foreach ($order->submodels as $submodel) {
+            foreach ($submodel->sewingOutputs as $output) {
+                $createdAt = $output->created_at;
+
+                if (is_null($firstDate) || $createdAt < $firstDate) {
+                    $firstDate = $createdAt;
+                }
+                if (is_null($lastDate) || $createdAt > $lastDate) {
+                    $lastDate = $createdAt;
+                }
+            }
+        }
+
+        if (!$firstDate || !$lastDate) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Sewing outputs topilmadi.'
+            ], 404);
+        }
+
+        // 2. Oylik ishchilarning attendance_salary summasini hisoblaymiz
+        $result = [];
+        $totalSalary = 0;
+
+        foreach ($order->submodels as $submodel) {
+            $group = $submodel->group->group ?? null;
+            if (!$group) continue;
+
+            foreach ($group->employees as $employee) {
+                // Faqat piece_work bo'lmaganlar
+                if ($employee->payment_type === 'piece_work') {
+                    continue;
+                }
+
+                // Ushbu davrdagi attendanceSalary yozuvlari
+                $sumSalary = $employee->attendanceSalaries()
+                    ->whereBetween('date', [$firstDate, $lastDate])
+                    ->sum('amount');
+
+                if ($sumSalary > 0) {
+                    $result[] = [
+                        'employee_id' => $employee->id,
+                        'name' => $employee->name,
+                        'salary' => $sumSalary
+                    ];
+                    $totalSalary += $sumSalary;
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'start_date' => $firstDate,
+            'end_date' => $lastDate,
+            'total_salary' => $totalSalary,
+            'employees' => $result
+        ]);
+    }
 }
