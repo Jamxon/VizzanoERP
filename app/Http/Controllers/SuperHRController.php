@@ -977,7 +977,7 @@ class SuperHRController extends Controller
         $request->validate([
             'name' => 'nullable|string',
             'phone' => 'nullable|string',
-            'group_id' => 'nullable|integer|exists:groups,id',
+            'group_id' => 'nullable',
             'position_id' => 'nullable|integer|exists:positions,id',
             'department_id' => 'nullable|integer|exists:departments,id',
             'hiring_date' => 'nullable|date',
