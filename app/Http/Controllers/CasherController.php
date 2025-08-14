@@ -432,7 +432,6 @@ class CasherController extends Controller
 
         $result = $groups->map(function ($group) use ($startDate, $endDate) {
             $employees = $group->employees
-                ->orderBy('name')
                 ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
                 ->filter(function ($employeeData) {
                     // getEmployeeEarnings null qaytargan bo‘lsa
@@ -449,7 +448,10 @@ class CasherController extends Controller
                     }
 
                     return true;
-                });
+                })
+                ->sortBy(fn($e) => mb_strtolower($e['name'] ?? '')) // Ism bo‘yicha tartiblash
+                ->values();
+
 
 
             $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
@@ -480,7 +482,9 @@ class CasherController extends Controller
                     return false;
                 }
                 return true;
-            });
+            })
+            ->sortBy(fn($e) => mb_strtolower($e['name'] ?? '')) // Ism bo‘yicha tartiblash
+            ->values();
 
         if ($ungroupedEmployees->isNotEmpty()) {
             $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
