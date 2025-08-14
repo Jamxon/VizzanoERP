@@ -34,7 +34,12 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $employee['name'] }}</td>
-                <td>{{ number_format($employee['total_earned'], 2) }}</td>
+                <td>
+                    {{ number_format($employee['attendance_salary'] + $employee['employee_salary'], 2) }}
+                    /
+                    {{ number_format($employee['tarification_salary'], 2) }}
+                </td>
+
                 <td></td>
                 <td></td>
             </tr>

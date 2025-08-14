@@ -650,74 +650,38 @@ class CasherController extends Controller
 
         $employee->loadMissing(['position', 'branch', 'group']);
 
-        $earningDetails = [];
-        $totalEarned = 0;
-
-        if ($employee->payment_type !== 'piece_work') {
-            $query = $employee->attendanceSalaries()->with('attendance');
-
-            if ($startDate && $endDate) {
-                $query->whereBetween('date', [$startDate, $endDate]);
-            }
-
-            $salaries = $query->get();
-            $totalEarned = $salaries->sum('amount');
-
-            $earningDetails = [
-                'type' => 'attendance',
-                'total_earned' => $totalEarned,
-//                'salaries' => $salaries->map(function ($s) {
-//                    $workedHours = null;
-//                    if ($s->attendance && $s->attendance->check_in && $s->attendance->check_out) {
-//                        $checkIn = Carbon::parse($s->attendance->check_in);
-//                        $checkOut = Carbon::parse($s->attendance->check_out);
-//                        $workedHours = round($checkOut->floatDiffInHours($checkIn), 2);
-//                    }
-//
-//                    return [
-//                        'date' => $s->date,
-//                        'amount' => $s->amount,
-//                        'worked_hours' => $workedHours,
-//                        'check_in' => $s->attendance->check_in ?? null,
-//                        'check_out' => $s->attendance->check_out ?? null,
-//                    ];
-//                })->values(),
-            ];
-        } else {
-            $query = $employee->employeeTarificationLogs()->with('tarification');
-
-            if ($startDate && $endDate) {
-                $query->whereBetween('date', [$startDate, $endDate]);
-            }
-
-            $logs = $query->get();
-            $totalEarned = $logs->sum('amount_earned');
-
-            $earningDetails = [
-                'type' => 'piece_work',
-                'total_earned' => $totalEarned,
-//                'operations' => $logs->map(fn($log) => [
-//                    'date' => $log->date,
-//                    'tarification' => [
-//                        'id' => $log->tarification->id ?? null,
-//                        'name' => $log->tarification->name ?? null,
-//                        'code' => $log->tarification->code ?? null,
-//                    ],
-//                    'quantity' => $log->quantity,
-//                    'amount_earned' => $log->amount_earned,
-//                ])->values(),
-            ];
+        // AttendanceSalary + EmployeeSalary yig‘indisi
+        $attendanceQuery = $employee->attendanceSalaries();
+        if ($startDate && $endDate) {
+            $attendanceQuery->whereBetween('date', [$startDate, $endDate]);
         }
+        $attendanceTotal = $attendanceQuery->sum('amount');
 
-        // To'lovlar type bo‘yicha: ['advance' => [...], 'salary' => [...]]
+        $employeeSalaryQuery = $employee->employeeSalaries();
+        if ($startDate && $endDate) {
+            $employeeSalaryQuery->whereBetween('date', [$startDate, $endDate]);
+        }
+        $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
+
+        $fixedSalariesTotal = $attendanceTotal + $employeeSalaryTotal;
+
+        // TarificationLogs yig‘indisi
+        $tarificationQuery = $employee->employeeTarificationLogs();
+        if ($startDate && $endDate) {
+            $tarificationQuery->whereBetween('date', [$startDate, $endDate]);
+        }
+        $tarificationTotal = $tarificationQuery->sum('amount_earned');
+
+        // Umumiy hisob
+        $totalEarned = $fixedSalariesTotal + $tarificationTotal;
+
+        // To‘lovlarni hisoblash
         $paidQuery = $employee->salaryPayments();
-
         if ($startDate && $endDate) {
             $paidQuery->whereBetween('month', [$startDate, $endDate]);
         }
 
         $paymentsGrouped = $paidQuery->get()->groupBy('type');
-
         $paidAmountsByType = [];
         $paidTotal = 0;
 
@@ -741,14 +705,17 @@ class CasherController extends Controller
             'balance' => (float) $employee->balance,
             'payment_type' => $employee->payment_type,
 
-            'earning' => $earningDetails,
+            'attendance_salary' => $attendanceTotal,
+            'employee_salary' => $employeeSalaryTotal,
+            'tarification_salary' => $tarificationTotal,
             'total_earned' => $totalEarned,
 
-            'paid_amounts' => $paidAmountsByType,  // <- Type bo‘yicha ro‘yxat
+            'paid_amounts' => $paidAmountsByType,
             'total_paid' => round($paidTotal, 2),
             'net_balance' => round($totalEarned - $paidTotal, 2),
         ];
     }
+
 
     public function getSource(): \Illuminate\Http\JsonResponse
     {
