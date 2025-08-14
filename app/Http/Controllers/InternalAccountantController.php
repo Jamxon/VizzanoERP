@@ -1104,7 +1104,7 @@ class InternalAccountantController extends Controller
         $firstDate = null;
         $lastDate = null;
 
-        foreach ($order->submodels as $submodel) {
+        foreach ($order->orderModel->submodels as $submodel) {
             foreach ($submodel->sewingOutputs as $output) {
                 $createdAt = $output->created_at;
 
@@ -1128,17 +1128,15 @@ class InternalAccountantController extends Controller
         $result = [];
         $totalSalary = 0;
 
-        foreach ($order->submodels as $submodel) {
+        foreach ($order->orderModel->submodels as $submodel) {
             $group = $submodel->group->group ?? null;
             if (!$group) continue;
 
             foreach ($group->employees as $employee) {
-                // Faqat piece_work bo'lmaganlar
                 if ($employee->payment_type === 'piece_work') {
                     continue;
                 }
 
-                // Ushbu davrdagi attendanceSalary yozuvlari
                 $sumSalary = $employee->attendanceSalaries()
                     ->whereBetween('date', [$firstDate, $lastDate])
                     ->sum('amount');
