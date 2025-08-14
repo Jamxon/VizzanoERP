@@ -657,9 +657,24 @@ class CasherController extends Controller
         }
         $attendanceTotal = $attendanceQuery->sum('amount');
 
+
         $employeeSalaryQuery = $employee->employeeSalaries();
         if ($startDate && $endDate) {
-            $employeeSalaryQuery->whereBetween('date', [$startDate, $endDate]);
+            $start = Carbon::parse($startDate);
+            $end = Carbon::parse($endDate);
+
+            $employeeSalaryQuery->where(function ($q) use ($start, $end) {
+                $q->whereYear('year', '>', $start->year)
+                    ->whereYear('year', '<', $end->year)
+                    ->orWhere(function ($q) use ($start, $end) {
+                        $q->whereYear('year', $start->year)
+                            ->whereMonth('month', '>=', $start->month);
+                    })
+                    ->orWhere(function ($q) use ($start, $end) {
+                        $q->whereYear('year', $end->year)
+                            ->whereMonth('month', '<=', $end->month);
+                    });
+            });
         }
         $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
 
