@@ -1139,7 +1139,7 @@ class InternalAccountantController extends Controller
                 if ($employee->payment_type === 'piece_work') {
                     $sum = $employee->employeeTarificationLogs()
                         ->whereBetween('date', [$firstDate, $lastDate])
-                        ->sum('amount');
+                        ->sum('amount_earned');
 
                     if ($sum > 0) {
                         $pieceWorkEmployees[] = [
