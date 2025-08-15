@@ -1125,14 +1125,11 @@ class InternalAccountantController extends Controller
         }
 
         // 2. Hisoblash
-        $pieceWorkEmployees = [];
-        $pieceWorkTotal = 0;
+        $tarificationEmployees = [];
+        $tarificationTotal = 0;
 
         $salaryEmployees = [];
         $salaryTotal = 0;
-
-        $fixedWithTarificationEmployees = [];
-        $fixedWithTarificationTotal = 0;
 
         foreach ($order->orderModel->submodels as $submodel) {
             $group = $submodel->group->group ?? null;
@@ -1140,47 +1137,31 @@ class InternalAccountantController extends Controller
 
             foreach ($group->employees as $employee) {
 
-                if ($employee->payment_type === 'piece_work') {
-                    // Oddiy ish haqi = tarificationLogs summasi
-                    $sum = $employee->employeeTarificationLogs()
-                        ->sum('amount_earned');
+                // TarificationLog bo‘yicha daromad
+                $tarificationSum = $employee->employeeTarificationLogs()
+                    ->sum('amount_earned');
 
-                    if ($sum > 0) {
-                        $pieceWorkEmployees[] = [
-                            'employee_id' => $employee->id,
-                            'name' => $employee->name,
-                            'salary' => $sum
-                        ];
-                        $pieceWorkTotal += $sum;
-                    }
+                if ($tarificationSum > 0) {
+                    $tarificationEmployees[] = [
+                        'employee_id' => $employee->id,
+                        'name' => $employee->name,
+                        'salary' => $tarificationSum
+                    ];
+                    $tarificationTotal += $tarificationSum;
+                }
 
-                } else {
-                    // Oylik/soatlik ish haqi
-                    $salarySum = $employee->attendanceSalaries()
-                        ->whereBetween('date', [$firstDate, $lastDate])
-                        ->sum('amount');
+                // Attendance bo‘yicha daromad (oylik/soatliklar uchun)
+                $salarySum = $employee->attendanceSalaries()
+                    ->whereBetween('date', [$firstDate, $lastDate])
+                    ->sum('amount');
 
-                    if ($salarySum > 0) {
-                        $salaryEmployees[] = [
-                            'employee_id' => $employee->id,
-                            'name' => $employee->name,
-                            'salary' => $salarySum
-                        ];
-                        $salaryTotal += $salarySum;
-                    }
-
-                    // Shu ishchi tarificationLog orqali ham daromad qilganmi?
-                    $tarificationSum = $employee->employeeTarificationLogs()
-                        ->sum('amount_earned');
-
-                    if ($tarificationSum > 0) {
-                        $fixedWithTarificationEmployees[] = [
-                            'employee_id' => $employee->id,
-                            'name' => $employee->name,
-                            'tarification_salary' => $tarificationSum
-                        ];
-                        $fixedWithTarificationTotal += $tarificationSum;
-                    }
+                if ($salarySum > 0) {
+                    $salaryEmployees[] = [
+                        'employee_id' => $employee->id,
+                        'name' => $employee->name,
+                        'salary' => $salarySum
+                    ];
+                    $salaryTotal += $salarySum;
                 }
             }
         }
@@ -1190,17 +1171,14 @@ class InternalAccountantController extends Controller
             'start_date' => $firstDate,
             'end_date' => $lastDate,
 
-            // 1. Piece work
-            'piece_work_total' => $pieceWorkTotal,
-            'piece_work_employees' => $pieceWorkEmployees,
+            // 1. Tarification bo‘yicha umumiy
+            'tarification_total' => $tarificationTotal,
+            'tarification_employees' => $tarificationEmployees,
 
-            // 2. Oylik / soatlik
+            // 2. Attendance bo‘yicha umumiy
             'salary_total' => $salaryTotal,
-            'salary_employees' => $salaryEmployees,
-
-            // 3. Oylik/soatlik, lekin tarificationLogdan ham daromad qilgan
-            'fixed_with_tarification_total' => $fixedWithTarificationTotal,
-            'fixed_with_tarification_employees' => $fixedWithTarificationEmployees
+            'salary_employees' => $salaryEmployees
         ]);
     }
+
 }
