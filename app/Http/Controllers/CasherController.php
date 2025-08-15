@@ -459,14 +459,15 @@ class CasherController extends Controller
             ];
         })->values()->toArray();
 
-        // Guruhsiz xodimlar
+        /*
+        // Guruhsiz xodimlar (hozircha jo‘natilmaydi)
         $ungroupedEmployees = Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
             ->where('type', '!=', 'aup')
             ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status', 'type')
             ->with('salaryPayments')
             ->get()
-            ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds)) // ✅ orderIds qo‘shildi
+            ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds))
             ->filter(function ($employeeData) {
                 if (!$employeeData) {
                     return false;
@@ -491,6 +492,7 @@ class CasherController extends Controller
                 'employees' => $ungroupedEmployees->values()->toArray(),
             ];
         }
+        */
 
         // PDF yasash
         $pdf = Pdf::loadView('pdf.group-salary-report', [
