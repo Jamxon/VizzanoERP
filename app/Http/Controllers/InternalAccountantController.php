@@ -1100,18 +1100,17 @@ class InternalAccountantController extends Controller
             'orderModel.submodels.group.group.employees.attendanceSalaries'
         ])->findOrFail($id);
 
-        // 1. sewingOutputsdagi eng birinchi va oxirgi vaqt
         $firstDate = null;
         $lastDate = null;
 
         foreach ($order->orderModel->submodels as $submodel) {
             foreach ($submodel->sewingOutputs as $output) {
-                $createdAt = $output->created_at;
+                $createdAt = \Carbon\Carbon::parse($output->created_at);
 
-                if (is_null($firstDate) || $createdAt < $firstDate) {
+                if (is_null($firstDate) || $createdAt->lt($firstDate)) {
                     $firstDate = $createdAt;
                 }
-                if (is_null($lastDate) || $createdAt > $lastDate) {
+                if (is_null($lastDate) || $createdAt->gt($lastDate)) {
                     $lastDate = $createdAt;
                 }
             }
@@ -1124,11 +1123,9 @@ class InternalAccountantController extends Controller
             ], 404);
         }
 
-        // 2. TarificationLogs bo‘yicha umumiy hisob
+        // 1. Tarification bo‘yicha umumiy hisob
         $tarificationTotal = 0;
         $tarificationEmployees = [];
-
-        // Ishbay bo‘lmagan, lekin tarificationLogsdan daromad qilganlar
         $fixedWithTarificationTotal = 0;
         $fixedWithTarificationEmployees = [];
 
@@ -1136,10 +1133,9 @@ class InternalAccountantController extends Controller
             foreach ($submodel->tarificationCategories as $category) {
                 foreach ($category->tarifications as $tarification) {
                     foreach ($tarification->tarificationLogs as $log) {
-
                         $tarificationTotal += $log->amount_earned;
-
                         $empId = $log->employee_id;
+
                         if (!isset($tarificationEmployees[$empId])) {
                             $tarificationEmployees[$empId] = [
                                 'employee_id' => $empId,
@@ -1149,7 +1145,6 @@ class InternalAccountantController extends Controller
                         }
                         $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
 
-                        // Agar piece_work bo‘lmasa, alohida hisoblaymiz
                         if ($log->employee && $log->employee->payment_type !== 'piece_work') {
                             if (!isset($fixedWithTarificationEmployees[$empId])) {
                                 $fixedWithTarificationEmployees[$empId] = [
@@ -1166,7 +1161,7 @@ class InternalAccountantController extends Controller
             }
         }
 
-        // 3. AttendanceSalaries bo‘yicha umumiy hisob
+        // 2. Attendance bo‘yicha umumiy hisob
         $salaryTotal = 0;
         $salaryEmployees = [];
 
@@ -1176,7 +1171,7 @@ class InternalAccountantController extends Controller
 
             foreach ($group->employees as $employee) {
                 $salarySum = $employee->attendanceSalaries()
-                    ->whereBetween('date', [$firstDate, $lastDate])
+                    ->whereBetween('date', [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
                     ->sum('amount');
 
                 if ($salarySum > 0) {
@@ -1192,18 +1187,16 @@ class InternalAccountantController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'start_date' => $firstDate,
-            'end_date' => $lastDate,
+            'start_date' => $firstDate->format('Y-m-d'),
+            'end_date' => $lastDate->format('Y-m-d'),
+            'date_range' => $firstDate->format('Y-m-d') . ' — ' . $lastDate->format('Y-m-d'),
 
-            // 1. Tarification bo‘yicha umumiy
             'tarification_total' => $tarificationTotal,
             'tarification_employees' => array_values($tarificationEmployees),
 
-            // 2. Attendance bo‘yicha umumiy
             'salary_total' => $salaryTotal,
             'salary_employees' => $salaryEmployees,
 
-            // 3. Ishbay bo‘lmagan, lekin tarificationLogsdan daromad qilganlar
             'fixed_with_tarification_total' => $fixedWithTarificationTotal,
             'fixed_with_tarification_employees' => array_values($fixedWithTarificationEmployees),
         ]);
