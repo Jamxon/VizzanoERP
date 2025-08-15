@@ -14,10 +14,14 @@
         @foreach($group['employees'] as $emp)
             <tr>
                 <td>{{ $emp['name'] }}</td>
-                <td>{{ $emp['payment_type'] }}</td>
+                <td>@if($emp['payment_type'] === 'piece_work')
+                    Ishbay
+                @else
+                    Oylik
+                @endif</td>
                 <td>{{ $emp['attendance_salary'] }}</td>
                 <td>{{ $emp['attendance_days'] }}</td>
-                <td>{{ $emp['tarification_salary'] }}</td>
+                <td>{{ number_format($emp['tarification_salary']) }}</td>
                 <td> </td>
             </tr>
         @endforeach
