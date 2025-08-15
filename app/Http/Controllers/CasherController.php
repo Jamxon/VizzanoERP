@@ -694,6 +694,13 @@ class CasherController extends Controller
         }
         $attendanceTotal = $attendanceQuery->sum('amount');
 
+        // ✅ Kelgan jami kunlar (attendance_days)
+        $attendanceDays = $employee->attendanceSalaries()
+            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('date', [$startDate, $endDate]);
+            })
+            ->count();
+
         // EmployeeSalary yig‘indisi
         $employeeSalaryQuery = $employee->employeeSalaries();
         if ($startDate && $endDate) {
@@ -766,6 +773,7 @@ class CasherController extends Controller
             'payment_type' => $employee->payment_type,
 
             'attendance_salary' => $attendanceTotal,
+            'attendance_days' => $attendanceDays, // ✅ Qo‘shildi
             'employee_salary' => $employeeSalaryTotal,
             'tarification_salary' => $tarificationTotal,
             'total_earned' => $totalEarned,
