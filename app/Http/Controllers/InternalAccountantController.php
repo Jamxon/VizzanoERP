@@ -1096,7 +1096,7 @@ class InternalAccountantController extends Controller
     {
         $order = Order::with([
             'orderModel.submodels.sewingOutputs',
-            'orderModel.submodels.tarificationCategories.tarifications.tarificationLogs',
+            'orderModel.submodels.tarificationCategories.tarifications.tarificationLogs.employee',
             'orderModel.submodels.group.group.employees.attendanceSalaries'
         ])->findOrFail($id);
 
@@ -1128,23 +1128,39 @@ class InternalAccountantController extends Controller
         $tarificationTotal = 0;
         $tarificationEmployees = [];
 
+        // Ishbay bo‘lmagan, lekin tarificationLogsdan daromad qilganlar
+        $fixedWithTarificationTotal = 0;
+        $fixedWithTarificationEmployees = [];
+
         foreach ($order->orderModel->submodels as $submodel) {
             foreach ($submodel->tarificationCategories as $category) {
-                foreach ($category->tarifications as $tarification) { // bu joyda foreach bo‘lishi kerak
+                foreach ($category->tarifications as $tarification) {
                     foreach ($tarification->tarificationLogs as $log) {
 
-                            $tarificationTotal += $log->amount_earned;
+                        $tarificationTotal += $log->amount_earned;
 
-                            $empId = $log->employee_id;
-                            if (!isset($tarificationEmployees[$empId])) {
-                                $tarificationEmployees[$empId] = [
+                        $empId = $log->employee_id;
+                        if (!isset($tarificationEmployees[$empId])) {
+                            $tarificationEmployees[$empId] = [
+                                'employee_id' => $empId,
+                                'name' => $log->employee->name ?? 'Nomaʼlum',
+                                'salary' => 0
+                            ];
+                        }
+                        $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
+
+                        // Agar piece_work bo‘lmasa, alohida hisoblaymiz
+                        if ($log->employee && $log->employee->payment_type !== 'piece_work') {
+                            if (!isset($fixedWithTarificationEmployees[$empId])) {
+                                $fixedWithTarificationEmployees[$empId] = [
                                     'employee_id' => $empId,
                                     'name' => $log->employee->name ?? 'Nomaʼlum',
-                                    'salary' => 0
+                                    'tarification_salary' => 0
                                 ];
                             }
-                            $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
-
+                            $fixedWithTarificationEmployees[$empId]['tarification_salary'] += $log->amount_earned;
+                            $fixedWithTarificationTotal += $log->amount_earned;
+                        }
                     }
                 }
             }
@@ -1185,7 +1201,11 @@ class InternalAccountantController extends Controller
 
             // 2. Attendance bo‘yicha umumiy
             'salary_total' => $salaryTotal,
-            'salary_employees' => $salaryEmployees
+            'salary_employees' => $salaryEmployees,
+
+            // 3. Ishbay bo‘lmagan, lekin tarificationLogsdan daromad qilganlar
+            'fixed_with_tarification_total' => $fixedWithTarificationTotal,
+            'fixed_with_tarification_employees' => array_values($fixedWithTarificationEmployees),
         ]);
     }
 }
