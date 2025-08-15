@@ -1291,7 +1291,7 @@ class CasherController extends Controller
             ->with(['employees' => function ($query) {
                 $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status', 'type')
                     ->where('type', '!=', 'aup')
-                    ->with(['attendanceSalaries', 'tarificationLogs']);
+                    ->with(['attendanceSalaries', 'employeeTarificationLogs']);
             }]);
 
         if (!empty($group_id)) {
@@ -1322,11 +1322,10 @@ class CasherController extends Controller
                     ->sum('amount');
 
                 // Tarifikatsiyadan topgani (order filter bo‘lsa, unga mos)
-                $tarificationSum = $employee->tarificationLogs()
+                $tarificationSum = $employee->employeeTarificationLogs()
                     ->when(!empty($orderIds), function ($q) use ($orderIds) {
                         $q->whereIn('order_id', $orderIds);
                     })
-                    ->whereBetween('created_at', [$startDate, $endDate])
                     ->sum('amount_earned');
 
                 $total = $attendanceSum + $tarificationSum;
