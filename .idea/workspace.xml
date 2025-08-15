@@ -430,31 +430,7 @@
       <workItem from="1755056050959" duration="1224000" />
       <workItem from="1755098913642" duration="2816000" />
       <workItem from="1755148942853" duration="14030000" />
-      <workItem from="1755231953038" duration="1690000" />
-    </task>
-    <task id="LOCAL-01034" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1754887400356</created>
-      <option name="number" value="01034" />
-      <option name="presentableId" value="LOCAL-01034" />
-      <option name="project" value="LOCAL" />
-      <updated>1754887400356</updated>
-    </task>
-    <task id="LOCAL-01035" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1754887549664</created>
-      <option name="number" value="01035" />
-      <option name="presentableId" value="LOCAL-01035" />
-      <option name="project" value="LOCAL" />
-      <updated>1754887549664</updated>
-    </task>
-    <task id="LOCAL-01036" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1754896147173</created>
-      <option name="number" value="01036" />
-      <option name="presentableId" value="LOCAL-01036" />
-      <option name="project" value="LOCAL" />
-      <updated>1754896147173</updated>
+      <workItem from="1755231953038" duration="2007000" />
     </task>
     <task id="LOCAL-01037" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -824,7 +800,31 @@
       <option name="project" value="LOCAL" />
       <updated>1755234285702</updated>
     </task>
-    <option name="localTasksCounter" value="1083" />
+    <task id="LOCAL-01083" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1755234571216</created>
+      <option name="number" value="01083" />
+      <option name="presentableId" value="LOCAL-01083" />
+      <option name="project" value="LOCAL" />
+      <updated>1755234571219</updated>
+    </task>
+    <task id="LOCAL-01084" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1755234635084</created>
+      <option name="number" value="01084" />
+      <option name="presentableId" value="LOCAL-01084" />
+      <option name="project" value="LOCAL" />
+      <updated>1755234635084</updated>
+    </task>
+    <task id="LOCAL-01085" summary="fix: add endpoint to retrieve model by tarification code with validation">
+      <option name="closed" value="true" />
+      <created>1755234705055</created>
+      <option name="number" value="01085" />
+      <option name="presentableId" value="LOCAL-01085" />
+      <option name="project" value="LOCAL" />
+      <updated>1755234705055</updated>
+    </task>
+    <option name="localTasksCounter" value="1086" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

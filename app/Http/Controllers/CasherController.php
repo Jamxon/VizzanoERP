@@ -721,7 +721,6 @@ class CasherController extends Controller
         $tarificationQuery = $employee->employeeTarificationLogs();
 
         if (!empty($orderIds)) {
-            // Orderlardan tarification_id larni olish
             $tarificationIds = \App\Models\Order::whereIn('id', $orderIds)
                 ->with('orderModel.submodels.tarificationCategories.tarifications:id,tarification_category_id')
                 ->get()
@@ -738,10 +737,8 @@ class CasherController extends Controller
             if ($tarificationIds->isNotEmpty()) {
                 $tarificationQuery->whereIn('tarification_id', $tarificationIds);
             } else {
-                // Agar hech narsa topilmasa 0 qaytarib yuboramiz
                 return null;
             }
-
         } elseif ($startDate && $endDate) {
             $tarificationQuery->whereBetween('date', [$startDate, $endDate]);
         }
