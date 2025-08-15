@@ -597,13 +597,9 @@ class CasherController extends Controller
 
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
-        $search = mb_strtolower($request->search);
 
         $orders = \App\Models\Order::with(['orderModel.submodels.submodel', 'orderModel.model'])
             ->where('branch_id', auth()->user()->employee->branch_id)
-            ->whereHas('orderModel.model', function ($q) use ($search) {
-                $q->whereRaw('LOWER(name) = ?', [$search]); // aniq tenglik, katta-kichik harfsiz
-            })
             ->get();
 
         return response()->json($orders);
