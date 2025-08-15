@@ -1137,7 +1137,7 @@ class InternalAccountantController extends Controller
 
             foreach ($group->employees as $employee) {
                 if ($employee->payment_type === 'piece_work') {
-                    $sum = $employee->tarificationLogs()
+                    $sum = $employee->employeeTarificationLogs()
                         ->whereBetween('date', [$firstDate, $lastDate])
                         ->sum('amount');
 
