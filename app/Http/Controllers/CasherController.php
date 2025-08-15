@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DepartmentGroupsExport;
 use App\Http\Resources\GroupPlanResource;
 use App\Models\Attendance;
 use App\Models\Cashbox;
@@ -18,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -1274,7 +1276,7 @@ class CasherController extends Controller
         ]);
     }
 
-    public function exportGroupsByDepartmentIdExcel(Request $request)
+    public function exportGroupsByDepartmentId(Request $request)
     {
         $departmentId = $request->input('department_id');
         $startDate = $request->input('start_date');
@@ -1286,73 +1288,9 @@ class CasherController extends Controller
             return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
         }
 
-        // Guruhlar bilan xodimlarni olish
-        $groupQuery = Group::where('department_id', $departmentId)
-            ->with(['employees' => function ($query) {
-                $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status', 'type')
-                    ->where('type', '!=', 'aup')
-                    ->with(['attendanceSalaries', 'employeeTarificationLogs']);
-            }]);
-
-        if (!empty($group_id)) {
-            $groupQuery->where('id', $group_id);
-        }
-
-        $groups = $groupQuery->get();
-
-        // Excel uchun ma’lumot tayyorlash
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Sarlavhalar
-        $sheet->fromArray([
-            ['Guruh', 'Xodim', 'Davomat (kun)', 'Davomatdan topgani', 'Tarifikatsiyadan topgani', 'Umumiy', 'Imzo']
-        ], null, 'A1');
-
-        $row = 2;
-        foreach ($groups as $group) {
-            foreach ($group->employees as $employee) {
-                // Davomat kunlari va summasi
-                $attendanceDays = $employee->attendanceSalaries()
-                    ->whereBetween('date', [$startDate, $endDate])
-                    ->count();
-
-                $attendanceSum = $employee->attendanceSalaries()
-                    ->whereBetween('date', [$startDate, $endDate])
-                    ->sum('amount');
-
-                // Tarifikatsiyadan topgani (order filter bo‘lsa, unga mos)
-                $tarificationSum = $employee->employeeTarificationLogs()
-                    ->when(!empty($orderIds), function ($q) use ($orderIds) {
-                        $q->whereIn('order_id', $orderIds);
-                    })
-                    ->sum('amount_earned');
-
-                $total = $attendanceSum + $tarificationSum;
-
-                $sheet->fromArray([
-                    [
-                        $group->name,
-                        $employee->name,
-                        $attendanceDays,
-                        number_format($attendanceSum, 2),
-                        number_format($tarificationSum, 2),
-                        number_format($total, 2),
-                        '' // imzo joyi bo‘sh
-                    ]
-                ], null, 'A' . $row);
-
-                $row++;
-            }
-        }
-
-        // Faylni eksport qilish
-        $writer = new Xlsx($spreadsheet);
-        $fileName = 'group-salary-report.xlsx';
-        $filePath = storage_path('app/public/' . $fileName);
-
-        $writer->save($filePath);
-
-        return response()->download($filePath)->deleteFileAfterSend(true);
+        return Excel::download(
+            new DepartmentGroupsExport($departmentId, $startDate, $endDate, $group_id, $orderIds),
+            'department_groups.xlsx'
+        );
     }
 }
