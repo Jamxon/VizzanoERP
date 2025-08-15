@@ -1143,7 +1143,6 @@ class InternalAccountantController extends Controller
                 if ($employee->payment_type === 'piece_work') {
                     // Oddiy ish haqi = tarificationLogs summasi
                     $sum = $employee->employeeTarificationLogs()
-                        ->whereBetween('date', [$firstDate, $lastDate])
                         ->sum('amount_earned');
 
                     if ($sum > 0) {
@@ -1172,7 +1171,6 @@ class InternalAccountantController extends Controller
 
                     // Shu ishchi tarificationLog orqali ham daromad qilganmi?
                     $tarificationSum = $employee->employeeTarificationLogs()
-                        ->whereBetween('date', [$firstDate, $lastDate])
                         ->sum('amount_earned');
 
                     if ($tarificationSum > 0) {
