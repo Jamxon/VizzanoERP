@@ -1094,10 +1094,10 @@ class InternalAccountantController extends Controller
 
     public function getOrderAttendanceSalary($id)
     {
-        // Orderni yuklaymiz
         $order = Order::with([
             'orderModel.submodels.sewingOutputs',
-            'orderModel.submodels.group.group.employees.attendanceSalaries'
+            'orderModel.submodels.group.group.employees.attendanceSalaries',
+            'orderModel.submodels.group.group.employees.tarificationLogs'
         ])->findOrFail($id);
 
         // 1. sewingOutputsdagi eng birinchi va oxirgi vaqtni topamiz
@@ -1124,9 +1124,12 @@ class InternalAccountantController extends Controller
             ], 404);
         }
 
-        // 2. Oylik ishchilarning attendance_salary summasini hisoblaymiz
-        $result = [];
-        $totalSalary = 0;
+        // 2. Hisoblash
+        $pieceWorkEmployees = [];
+        $pieceWorkTotal = 0;
+
+        $salaryEmployees = [];
+        $salaryTotal = 0;
 
         foreach ($order->orderModel->submodels as $submodel) {
             $group = $submodel->group->group ?? null;
@@ -1134,20 +1137,31 @@ class InternalAccountantController extends Controller
 
             foreach ($group->employees as $employee) {
                 if ($employee->payment_type === 'piece_work') {
-                    continue;
-                }
+                    $sum = $employee->tarificationLogs()
+                        ->whereBetween('date', [$firstDate, $lastDate])
+                        ->sum('amount');
 
-                $sumSalary = $employee->attendanceSalaries()
-                    ->whereBetween('date', [$firstDate, $lastDate])
-                    ->sum('amount');
+                    if ($sum > 0) {
+                        $pieceWorkEmployees[] = [
+                            'employee_id' => $employee->id,
+                            'name' => $employee->name,
+                            'salary' => $sum
+                        ];
+                        $pieceWorkTotal += $sum;
+                    }
+                } else {
+                    $sum = $employee->attendanceSalaries()
+                        ->whereBetween('date', [$firstDate, $lastDate])
+                        ->sum('amount');
 
-                if ($sumSalary > 0) {
-                    $result[] = [
-                        'employee_id' => $employee->id,
-                        'name' => $employee->name,
-                        'salary' => $sumSalary
-                    ];
-                    $totalSalary += $sumSalary;
+                    if ($sum > 0) {
+                        $salaryEmployees[] = [
+                            'employee_id' => $employee->id,
+                            'name' => $employee->name,
+                            'salary' => $sum
+                        ];
+                        $salaryTotal += $sum;
+                    }
                 }
             }
         }
@@ -1156,8 +1170,10 @@ class InternalAccountantController extends Controller
             'status' => 'success',
             'start_date' => $firstDate,
             'end_date' => $lastDate,
-            'total_salary' => $totalSalary,
-            'employees' => $result
+            'piece_work_total' => $pieceWorkTotal,
+            'piece_work_employees' => $pieceWorkEmployees,
+            'salary_total' => $salaryTotal,
+            'salary_employees' => $salaryEmployees
         ]);
     }
 }
