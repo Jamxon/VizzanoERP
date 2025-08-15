@@ -1096,11 +1096,11 @@ class InternalAccountantController extends Controller
     {
         $order = Order::with([
             'orderModel.submodels.sewingOutputs',
-            'orderModel.submodels.group.group.employees.attendanceSalaries',
-            'orderModel.submodels.group.group.employees.employeeTarificationLogs'
+            'orderModel.submodels.tarificationCategories.tarification.tarificationLogs',
+            'orderModel.submodels.group.group.employees.attendanceSalaries'
         ])->findOrFail($id);
 
-        // 1. sewingOutputsdagi eng birinchi va oxirgi vaqtni topamiz
+        // 1. sewingOutputsdagi eng birinchi va oxirgi vaqt
         $firstDate = null;
         $lastDate = null;
 
@@ -1124,33 +1124,39 @@ class InternalAccountantController extends Controller
             ], 404);
         }
 
-        // 2. Hisoblash
-        $tarificationEmployees = [];
+        // 2. TarificationLogs bo‘yicha umumiy hisob
         $tarificationTotal = 0;
+        $tarificationEmployees = [];
 
-        $salaryEmployees = [];
+        foreach ($order->orderModel->submodels as $submodel) {
+            foreach ($submodel->tarificationCategories as $category) {
+                foreach ($category->tarification->tarificationLogs as $log) {
+                    if ($log->date >= $firstDate && $log->date <= $lastDate) {
+                        $tarificationTotal += $log->amount_earned;
+
+                        $empId = $log->employee_id;
+                        if (!isset($tarificationEmployees[$empId])) {
+                            $tarificationEmployees[$empId] = [
+                                'employee_id' => $empId,
+                                'name' => $log->employee->name ?? 'Nomaʼlum',
+                                'salary' => 0
+                            ];
+                        }
+                        $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
+                    }
+                }
+            }
+        }
+
+        // 3. AttendanceSalaries bo‘yicha umumiy hisob
         $salaryTotal = 0;
+        $salaryEmployees = [];
 
         foreach ($order->orderModel->submodels as $submodel) {
             $group = $submodel->group->group ?? null;
             if (!$group) continue;
 
             foreach ($group->employees as $employee) {
-
-                // TarificationLog bo‘yicha daromad
-                $tarificationSum = $employee->employeeTarificationLogs()
-                    ->sum('amount_earned');
-
-                if ($tarificationSum > 0) {
-                    $tarificationEmployees[] = [
-                        'employee_id' => $employee->id,
-                        'name' => $employee->name,
-                        'salary' => $tarificationSum
-                    ];
-                    $tarificationTotal += $tarificationSum;
-                }
-
-                // Attendance bo‘yicha daromad (oylik/soatliklar uchun)
                 $salarySum = $employee->attendanceSalaries()
                     ->whereBetween('date', [$firstDate, $lastDate])
                     ->sum('amount');
@@ -1173,12 +1179,11 @@ class InternalAccountantController extends Controller
 
             // 1. Tarification bo‘yicha umumiy
             'tarification_total' => $tarificationTotal,
-            'tarification_employees' => $tarificationEmployees,
+            'tarification_employees' => array_values($tarificationEmployees),
 
             // 2. Attendance bo‘yicha umumiy
             'salary_total' => $salaryTotal,
             'salary_employees' => $salaryEmployees
         ]);
     }
-
 }
