@@ -1131,12 +1131,17 @@ class InternalAccountantController extends Controller
         $salaryEmployees = [];
         $salaryTotal = 0;
 
+        $fixedWithTarificationEmployees = [];
+        $fixedWithTarificationTotal = 0;
+
         foreach ($order->orderModel->submodels as $submodel) {
             $group = $submodel->group->group ?? null;
             if (!$group) continue;
 
             foreach ($group->employees as $employee) {
+
                 if ($employee->payment_type === 'piece_work') {
+                    // Oddiy ish haqi = tarificationLogs summasi
                     $sum = $employee->employeeTarificationLogs()
                         ->whereBetween('date', [$firstDate, $lastDate])
                         ->sum('amount_earned');
@@ -1149,18 +1154,34 @@ class InternalAccountantController extends Controller
                         ];
                         $pieceWorkTotal += $sum;
                     }
+
                 } else {
-                    $sum = $employee->attendanceSalaries()
+                    // Oylik/soatlik ish haqi
+                    $salarySum = $employee->attendanceSalaries()
                         ->whereBetween('date', [$firstDate, $lastDate])
                         ->sum('amount');
 
-                    if ($sum > 0) {
+                    if ($salarySum > 0) {
                         $salaryEmployees[] = [
                             'employee_id' => $employee->id,
                             'name' => $employee->name,
-                            'salary' => $sum
+                            'salary' => $salarySum
                         ];
-                        $salaryTotal += $sum;
+                        $salaryTotal += $salarySum;
+                    }
+
+                    // Shu ishchi tarificationLog orqali ham daromad qilganmi?
+                    $tarificationSum = $employee->employeeTarificationLogs()
+                        ->whereBetween('date', [$firstDate, $lastDate])
+                        ->sum('amount_earned');
+
+                    if ($tarificationSum > 0) {
+                        $fixedWithTarificationEmployees[] = [
+                            'employee_id' => $employee->id,
+                            'name' => $employee->name,
+                            'tarification_salary' => $tarificationSum
+                        ];
+                        $fixedWithTarificationTotal += $tarificationSum;
                     }
                 }
             }
@@ -1170,10 +1191,18 @@ class InternalAccountantController extends Controller
             'status' => 'success',
             'start_date' => $firstDate,
             'end_date' => $lastDate,
+
+            // 1. Piece work
             'piece_work_total' => $pieceWorkTotal,
             'piece_work_employees' => $pieceWorkEmployees,
+
+            // 2. Oylik / soatlik
             'salary_total' => $salaryTotal,
-            'salary_employees' => $salaryEmployees
+            'salary_employees' => $salaryEmployees,
+
+            // 3. Oylik/soatlik, lekin tarificationLogdan ham daromad qilgan
+            'fixed_with_tarification_total' => $fixedWithTarificationTotal,
+            'fixed_with_tarification_employees' => $fixedWithTarificationEmployees
         ]);
     }
 }
