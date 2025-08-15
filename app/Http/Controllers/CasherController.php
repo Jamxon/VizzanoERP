@@ -690,8 +690,6 @@ class CasherController extends Controller
             $attendanceQuery->whereBetween('date', [$startDate, $endDate]);
         }
         $attendanceTotal = $attendanceQuery->sum('amount');
-
-        // Attendance days
         $attendanceDays = $attendanceQuery->count();
 
         // EmployeeSalary
@@ -721,11 +719,33 @@ class CasherController extends Controller
 
         // TarificationLogs (piece_work uchun)
         $tarificationQuery = $employee->employeeTarificationLogs();
+
         if (!empty($orderIds)) {
-            $tarificationQuery->whereIn('order_id', $orderIds);
+            // Orderlardan tarification_id larni olish
+            $tarificationIds = \App\Models\Order::whereIn('id', $orderIds)
+                ->with('submodels.tarificationCategories.tarifications:id,tarification_category_id')
+                ->get()
+                ->flatMap(function ($order) {
+                    return $order->submodels->flatMap(function ($submodel) {
+                        return $submodel->tarificationCategories->flatMap(function ($category) {
+                            return $category->tarifications->pluck('id');
+                        });
+                    });
+                })
+                ->unique()
+                ->values();
+
+            if ($tarificationIds->isNotEmpty()) {
+                $tarificationQuery->whereIn('tarification_id', $tarificationIds);
+            } else {
+                // Agar hech narsa topilmasa 0 qaytarib yuboramiz
+                return null;
+            }
+
         } elseif ($startDate && $endDate) {
             $tarificationQuery->whereBetween('date', [$startDate, $endDate]);
         }
+
         $tarificationTotal = $tarificationQuery->sum('amount_earned');
 
         // Umumiy hisob
