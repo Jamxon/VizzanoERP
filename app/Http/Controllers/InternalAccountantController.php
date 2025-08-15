@@ -1130,19 +1130,21 @@ class InternalAccountantController extends Controller
 
         foreach ($order->orderModel->submodels as $submodel) {
             foreach ($submodel->tarificationCategories as $category) {
-                foreach ($category->tarifications->tarificationLogs as $log) {
-                    if ($log->date >= $firstDate && $log->date <= $lastDate) {
-                        $tarificationTotal += $log->amount_earned;
+                foreach ($category->tarifications as $tarification) { // bu joyda foreach bo‘lishi kerak
+                    foreach ($tarification->tarificationLogs as $log) {
+                        if ($log->date >= $firstDate && $log->date <= $lastDate) {
+                            $tarificationTotal += $log->amount_earned;
 
-                        $empId = $log->employee_id;
-                        if (!isset($tarificationEmployees[$empId])) {
-                            $tarificationEmployees[$empId] = [
-                                'employee_id' => $empId,
-                                'name' => $log->employee->name ?? 'Nomaʼlum',
-                                'salary' => 0
-                            ];
+                            $empId = $log->employee_id;
+                            if (!isset($tarificationEmployees[$empId])) {
+                                $tarificationEmployees[$empId] = [
+                                    'employee_id' => $empId,
+                                    'name' => $log->employee->name ?? 'Nomaʼlum',
+                                    'salary' => 0
+                                ];
+                            }
+                            $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
                         }
-                        $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
                     }
                 }
             }
