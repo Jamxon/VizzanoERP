@@ -615,6 +615,7 @@ class CasherController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         $group_id = $request->input('group_id');
+        $orderIds = $request->input('order_ids', []); // array
 
         if (!$departmentId) {
             return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
@@ -633,12 +634,12 @@ class CasherController extends Controller
 
         $groups = $groupQuery->get();
 
-        $result = $groups->map(function ($group) use ($startDate, $endDate) {
+        $result = $groups->map(function ($group) use ($startDate, $endDate, $orderIds) {
             $employees = $group->employees
-                ->map(function ($employee) use ($startDate, $endDate) {
-                    return $this->getEmployeeEarnings($employee, $startDate, $endDate);
+                ->map(function ($employee) use ($startDate, $endDate, $orderIds) {
+                    return $this->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds);
                 })
-                ->filter(); // null yoki kerakmas hollarda olib tashlash
+                ->filter(); // null bo‘lsa olib tashlaymiz
 
             $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
 
@@ -650,14 +651,14 @@ class CasherController extends Controller
             ];
         })->values()->toArray();
 
-        // Guruhsiz xodimlarni olish (salaryPayments bilan birga)
+        // Guruhsiz xodimlarni olish
         $ungroupedEmployees = Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
             ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status')
             ->with('salaryPayments')
             ->get()
-            ->map(function ($employee) use ($startDate, $endDate) {
-                return $this->getEmployeeEarnings($employee, $startDate, $endDate);
+            ->map(function ($employee) use ($startDate, $endDate, $orderIds) {
+                return $this->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds);
             })
             ->filter();
 
@@ -679,7 +680,7 @@ class CasherController extends Controller
      * $employee — Employee eloquent modeli (salaryPayments eager-load qilingan bo‘lishi mumkin)
      * $startDate, $endDate — 'Y-m-d' formatdagi string (yoki null)
      */
-    private function getEmployeeEarnings($employee, $startDate, $endDate): ?array
+    private function getEmployeeEarnings($employee, $startDate, $endDate, $orderIds = [])
     {
         if ($employee->status === 'kicked' && ((float) $employee->balance) === 0.0) {
             return null;
@@ -687,21 +688,17 @@ class CasherController extends Controller
 
         $employee->loadMissing(['position', 'branch', 'group']);
 
-        // AttendanceSalary yig‘indisi
+        // AttendanceSalary (oylikchilar uchun)
         $attendanceQuery = $employee->attendanceSalaries();
         if ($startDate && $endDate) {
             $attendanceQuery->whereBetween('date', [$startDate, $endDate]);
         }
         $attendanceTotal = $attendanceQuery->sum('amount');
 
-        // ✅ Kelgan jami kunlar (attendance_days)
-        $attendanceDays = $employee->attendanceSalaries()
-            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
-                $q->whereBetween('date', [$startDate, $endDate]);
-            })
-            ->count();
+        // Attendance days
+        $attendanceDays = $attendanceQuery->count();
 
-        // EmployeeSalary yig‘indisi
+        // EmployeeSalary
         $employeeSalaryQuery = $employee->employeeSalaries();
         if ($startDate && $endDate) {
             $start = \Carbon\Carbon::parse($startDate);
@@ -726,29 +723,29 @@ class CasherController extends Controller
         }
         $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
 
-        // TarificationLogs yig‘indisi
+        // TarificationLogs (piece_work uchun)
         $tarificationQuery = $employee->employeeTarificationLogs();
-        if ($startDate && $endDate) {
+        if (!empty($orderIds)) {
+            $tarificationQuery->whereIn('order_id', $orderIds);
+        } elseif ($startDate && $endDate) {
             $tarificationQuery->whereBetween('date', [$startDate, $endDate]);
         }
         $tarificationTotal = $tarificationQuery->sum('amount_earned');
 
-        // Umumiy hisob — payment_type bo‘yicha
+        // Umumiy hisob
         if ($employee->payment_type === 'piece_work') {
-            // Tarification + EmployeeSalary
             $totalEarned = $employeeSalaryTotal + $tarificationTotal;
         } else {
-            // Attendance + EmployeeSalary
             $totalEarned = $attendanceTotal + $employeeSalaryTotal;
         }
 
-        // To‘lovlarni hisoblash
+        // To'lovlar
         $paidQuery = $employee->salaryPayments();
         if ($startDate && $endDate) {
             $paidQuery->whereBetween('month', [$startDate, $endDate]);
         }
-
         $paymentsGrouped = $paidQuery->get()->groupBy('type');
+
         $paidAmountsByType = [];
         $paidTotal = 0;
 
@@ -773,7 +770,7 @@ class CasherController extends Controller
             'payment_type' => $employee->payment_type,
 
             'attendance_salary' => $attendanceTotal,
-            'attendance_days' => $attendanceDays, // ✅ Qo‘shildi
+            'attendance_days' => $attendanceDays,
             'employee_salary' => $employeeSalaryTotal,
             'tarification_salary' => $tarificationTotal,
             'total_earned' => $totalEarned,
