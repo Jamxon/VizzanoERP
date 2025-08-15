@@ -1132,7 +1132,7 @@ class InternalAccountantController extends Controller
             foreach ($submodel->tarificationCategories as $category) {
                 foreach ($category->tarifications as $tarification) { // bu joyda foreach bo‘lishi kerak
                     foreach ($tarification->tarificationLogs as $log) {
-                        if ($log->date >= $firstDate && $log->date <= $lastDate) {
+
                             $tarificationTotal += $log->amount_earned;
 
                             $empId = $log->employee_id;
@@ -1144,7 +1144,7 @@ class InternalAccountantController extends Controller
                                 ];
                             }
                             $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
-                        }
+
                     }
                 }
             }
