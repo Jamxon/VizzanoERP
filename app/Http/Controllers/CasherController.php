@@ -612,7 +612,7 @@ class CasherController extends Controller
         $groupQuery = Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) {
                 $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status')
-                    ->with('salaryPayments'); // salaryPayments eager-load
+                    ->with('salaryPayments');
             }]);
 
         if (!empty($group_id)) {
@@ -626,7 +626,7 @@ class CasherController extends Controller
                 ->map(function ($employee) use ($startDate, $endDate, $orderIds) {
                     return $this->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds);
                 })
-                ->filter(); // null bo‘lsa olib tashlaymiz
+                ->filter();
 
             $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
 
@@ -638,7 +638,8 @@ class CasherController extends Controller
             ];
         })->values()->toArray();
 
-        // Guruhsiz xodimlarni olish
+        /*
+        // Guruhsiz xodimlarni olish (hozircha jo‘natilmaydi)
         $ungroupedEmployees = Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
             ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status')
@@ -659,9 +660,11 @@ class CasherController extends Controller
                 'employees' => $ungroupedEmployees->values()->toArray(),
             ];
         }
+        */
 
         return response()->json($result);
     }
+
 
     /**
      * $employee — Employee eloquent modeli (salaryPayments eager-load qilingan bo‘lishi mumkin)
