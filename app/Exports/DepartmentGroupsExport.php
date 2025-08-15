@@ -36,7 +36,7 @@ class DepartmentGroupsExport implements FromView
         $result = $groups->map(function ($group) {
             $employees = $group->employees
                 ->map(function ($employee) {
-                    return app('App\Http\Controllers\YourController')
+                    return app('App\Http\Controllers\CasherController')
                         ->getEmployeeEarnings($employee, $this->startDate, $this->endDate, $this->orderIds);
                 })
                 ->filter();
