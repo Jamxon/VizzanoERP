@@ -676,7 +676,7 @@ class CasherController extends Controller
      * $employee — Employee eloquent modeli (salaryPayments eager-load qilingan bo‘lishi mumkin)
      * $startDate, $endDate — 'Y-m-d' formatdagi string (yoki null)
      */
-    private function getEmployeeEarnings($employee, $startDate, $endDate, $orderIds = [])
+    public function getEmployeeEarnings($employee, $startDate, $endDate, $orderIds = [])
     {
         if ($employee->status === 'kicked' && ((float) $employee->balance) === 0.0) {
             return null;
