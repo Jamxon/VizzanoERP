@@ -24,6 +24,7 @@ class DepartmentGroupsExport implements FromView
         $groupQuery = Group::where('department_id', $this->departmentId)
             ->with(['employees' => function ($query) {
                 $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status')
+                    ->where('type', '!=', 'aup')
                     ->with('salaryPayments');
             }]);
 
