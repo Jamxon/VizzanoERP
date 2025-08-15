@@ -18,22 +18,25 @@
 
 @foreach ($data as $group)
     @php
-        // Faqat summasi 0 bo'lmagan xodimlarni olish
-        $filteredEmployees = collect($group['employees'])->filter(function($employee) {
-            if ($employee['payment_type'] === 'piece_work') {
-                return ($employee['tarification_salary'] + $employee['employee_salary']) > 0;
-            } else {
-                return ($employee['attendance_salary'] + $employee['employee_salary']) > 0;
-            }
+        // Piece work ishchilar
+        $pieceWorkEmployees = collect($group['employees'])->filter(function($employee) {
+            return $employee['payment_type'] === 'piece_work' &&
+                   ($employee['tarification_salary'] + $employee['employee_salary']) > 0;
+        })->values();
+
+        // Oylik ishchilar
+        $monthlyEmployees = collect($group['employees'])->filter(function($employee) {
+            return $employee['payment_type'] !== 'piece_work' &&
+                   ($employee['attendance_salary'] + $employee['employee_salary']) > 0;
         })->values();
     @endphp
 
-    @if($filteredEmployees->count() > 0)
+    {{-- Piece Work ishchilar --}}
+    @if($pieceWorkEmployees->count() > 0)
         <h3>
-            Guruh: {{ $group['name'] }}
-            (Jami hisoblangan: {{ number_format($filteredEmployees->sum('total_earned')) }} so'm)
+            Guruh: {{ $group['name'] }} (Donalik ishchilar)
+            (Jami hisoblangan: {{ number_format($pieceWorkEmployees->sum(fn($e) => $e['tarification_salary'] + $e['employee_salary'])) }} so'm)
         </h3>
-
         <table>
             <thead>
             <tr>
@@ -44,17 +47,39 @@
             </tr>
             </thead>
             <tbody>
-            @foreach ($filteredEmployees as $index => $employee)
+            @foreach ($pieceWorkEmployees as $index => $employee)
                 <tr>
                     <td>{{ $index + 1 }}</td>
                     <td>{{ $employee['name'] }}</td>
-                    <td>
-                        @if($employee['payment_type'] === 'piece_work')
-                            {{ number_format($employee['tarification_salary'] + $employee['employee_salary']) }}
-                        @else
-                            {{ number_format($employee['attendance_salary'] + $employee['employee_salary']) }}
-                        @endif
-                    </td>
+                    <td>{{ number_format($employee['tarification_salary'] + $employee['employee_salary']) }}</td>
+                    <td></td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    @endif
+
+    {{-- Oylik ishchilar --}}
+    @if($monthlyEmployees->count() > 0)
+        <h3>
+            Guruh: {{ $group['name'] }} (Oylik ishchilar)
+            (Jami hisoblangan: {{ number_format($monthlyEmployees->sum(fn($e) => $e['attendance_salary'] + $e['employee_salary'])) }} so'm)
+        </h3>
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>F.I.Sh.</th>
+                <th>Topgan puli</th>
+                <th>Imzo</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach ($monthlyEmployees as $index => $employee)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $employee['name'] }}</td>
+                    <td>{{ number_format($employee['attendance_salary'] + $employee['employee_salary']) }}</td>
                     <td></td>
                 </tr>
             @endforeach
@@ -62,5 +87,6 @@
         </table>
     @endif
 @endforeach
+
 </body>
 </html>
