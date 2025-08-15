@@ -412,20 +412,18 @@ class CasherController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         $group_id = $request->input('group_id');
+        $orderIds = $request->input('order_ids', []); // ✅ order_ids qo‘shdik
 
         if (!$departmentId) {
             return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
         }
 
-        // Oldingi funksiyadagi kabi ma’lumotlarni olish
-        // Guruhlar bilan olish
         $groupQuery = Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) {
                 $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status', 'type')
-                    ->where('type', '!=', 'aup') // AUP bo‘lsa olmaymiz
+                    ->where('type', '!=', 'aup')
                     ->with('salaryPayments');
             }]);
-
 
         if (!empty($group_id)) {
             $groupQuery->where('id', $group_id);
@@ -433,29 +431,23 @@ class CasherController extends Controller
 
         $groups = $groupQuery->get();
 
-        $result = $groups->map(function ($group) use ($startDate, $endDate) {
+        $result = $groups->map(function ($group) use ($startDate, $endDate, $orderIds) {
             $employees = $group->employees
-                ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
+                ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds)) // ✅ orderIds qo‘shildi
                 ->filter(function ($employeeData) {
-                    // getEmployeeEarnings null qaytargan bo‘lsa
                     if (!$employeeData) {
                         return false;
                     }
-
-                    // Agar topgan puli 0 bo‘lsa
                     if (
                         ($employeeData['total_earned'] ?? 0) == 0 &&
                         ($employeeData['balance'] ?? 0) == 0
                     ) {
                         return false;
                     }
-
                     return true;
                 })
-                ->sortBy(fn($e) => mb_strtolower($e['name'] ?? '')) // Ism bo‘yicha tartiblash
+                ->sortBy(fn($e) => mb_strtolower($e['name'] ?? ''))
                 ->values();
-
-
 
             $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
 
@@ -470,11 +462,11 @@ class CasherController extends Controller
         // Guruhsiz xodimlar
         $ungroupedEmployees = Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
-            ->where('type', '!=', 'aup') // AUP bo‘lsa olmaymiz
+            ->where('type', '!=', 'aup')
             ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status', 'type')
             ->with('salaryPayments')
             ->get()
-            ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate))
+            ->map(fn($employee) => $this->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds)) // ✅ orderIds qo‘shildi
             ->filter(function ($employeeData) {
                 if (!$employeeData) {
                     return false;
@@ -489,7 +481,6 @@ class CasherController extends Controller
             })
             ->sortBy(fn($e) => mb_strtolower($e['name'] ?? ''))
             ->values();
-
 
         if ($ungroupedEmployees->isNotEmpty()) {
             $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
