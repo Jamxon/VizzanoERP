@@ -1096,7 +1096,7 @@ class InternalAccountantController extends Controller
     {
         $order = Order::with([
             'orderModel.submodels.sewingOutputs',
-            'orderModel.submodels.tarificationCategories.tarification.tarificationLogs',
+            'orderModel.submodels.tarificationCategories.tarifications.tarificationLogs',
             'orderModel.submodels.group.group.employees.attendanceSalaries'
         ])->findOrFail($id);
 
@@ -1130,7 +1130,7 @@ class InternalAccountantController extends Controller
 
         foreach ($order->orderModel->submodels as $submodel) {
             foreach ($submodel->tarificationCategories as $category) {
-                foreach ($category->tarification->tarificationLogs as $log) {
+                foreach ($category->tarifications->tarificationLogs as $log) {
                     if ($log->date >= $firstDate && $log->date <= $lastDate) {
                         $tarificationTotal += $log->amount_earned;
 
