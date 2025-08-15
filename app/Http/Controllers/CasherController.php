@@ -723,7 +723,7 @@ class CasherController extends Controller
         if (!empty($orderIds)) {
             // Orderlardan tarification_id larni olish
             $tarificationIds = \App\Models\Order::whereIn('id', $orderIds)
-                ->with('submodels.tarificationCategories.tarifications:id,tarification_category_id')
+                ->with('orderModel.submodels.tarificationCategories.tarifications:id,tarification_category_id')
                 ->get()
                 ->flatMap(function ($order) {
                     return $order->submodels->flatMap(function ($submodel) {
