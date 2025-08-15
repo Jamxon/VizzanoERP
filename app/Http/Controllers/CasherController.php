@@ -726,11 +726,11 @@ class CasherController extends Controller
                 ->with('orderModel.submodels.tarificationCategories.tarifications:id,tarification_category_id')
                 ->get()
                 ->flatMap(function ($order) {
-                    return $order->submodels->flatMap(function ($submodel) {
-                        return $submodel->tarificationCategories->flatMap(function ($category) {
-                            return $category->tarifications->pluck('id');
-                        });
-                    });
+                    return optional($order->orderModel)->submodels?->flatMap(function ($submodel) {
+                        return optional($submodel->tarificationCategories)->flatMap(function ($category) {
+                            return optional($category->tarifications)->pluck('id');
+                        }) ?? collect();
+                    }) ?? collect();
                 })
                 ->unique()
                 ->values();
