@@ -1170,6 +1170,11 @@ class InternalAccountantController extends Controller
             if (!$group) continue;
 
             foreach ($group->employees as $employee) {
+                // faqat AUP bo‘lmagan xodimlarni olamiz
+                if ($employee->type === 'aup') {
+                    continue;
+                }
+
                 $salarySum = $employee->attendanceSalaries()
                     ->whereBetween('date', [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
                     ->sum('amount');
