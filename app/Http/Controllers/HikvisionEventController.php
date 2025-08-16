@@ -22,7 +22,7 @@ class HikvisionEventController extends Controller
 
         $branchChatMap = [
             4 => -1001457275928, // masalan 4-branch uchun chat_id
-            5 => -4894281196, // 5-branch uchun chat_id
+            5 => -1001883536528, // 5-branch uchun chat_id
         ];
 
         if (str_contains($contentType, 'multipart/form-data')) {
