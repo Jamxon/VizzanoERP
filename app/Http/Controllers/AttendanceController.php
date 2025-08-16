@@ -86,6 +86,34 @@ class AttendanceController extends Controller
             ]
         );
 
+
+        try {
+            $employee = Employee::with(['department', 'group'])->find($attendance->employee_id);
+
+            if ($employee) {
+                $branchId = $employee->branch_id;
+
+                // Shu filialdagi barcha hodimlarni olish
+                $employees = Employee::with(['department', 'group'])
+                    ->where('branch_id', $branchId)
+                    ->get();
+
+                // Chat ID ni DB yoki configdan olish kerak (hozircha branchga bog‘lab yozaylik)
+                $chatId = match ($branchId) {
+                    4 => -1001457275928, // masalan 4-branch uchun chat_id
+                    5 => -4894281196, // misol uchun branch 5 gruppa ID
+                    default => null,
+                };
+
+                if ($chatId) {
+                    app(\App\Services\TelegramService::class)
+                        ->updateDailyReport($branchId, $chatId, $employees);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::error("Telegram report update failed: " . $e->getMessage());
+        }
+
         Log::add(
             auth()->user()->id,
             'Davomat yozildi',
