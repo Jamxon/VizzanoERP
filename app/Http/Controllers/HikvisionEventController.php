@@ -20,6 +20,11 @@ class HikvisionEventController extends Controller
             105 => 5, // Branch 5
         ];
 
+        $branchChatMap = [
+            4 => -1001457275928, // masalan 4-branch uchun chat_id
+            5 => -4894281196, // 5-branch uchun chat_id
+        ];
+
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
             $outerEvent = null;
@@ -93,6 +98,20 @@ class HikvisionEventController extends Controller
                         'device_id' => $deviceId,
                         'time' => $eventTime,
                     ]);
+
+                    $branchId = $employee->branch_id;
+                    $chatId = $branchChatMap[$branchId] ?? null;
+
+                    if ($chatId) {
+                        $employeesToday = Attendance::where('date', $today)
+                            ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
+                            ->with('employee:id,name')
+                            ->get()
+                            ->pluck('employee');
+
+                        app(\App\Services\TelegramService::class)
+                            ->updateDailyReport($branchId, $chatId, $employeesToday);
+                    }
                 } else {
                     Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already_checkin', null, [
                         'employee_id' => $employee->id,
