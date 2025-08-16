@@ -20,6 +20,9 @@ class MarkAttendanceAsLeft extends Command
             ->where('date', $today)
             ->whereNull('check_out')
             ->where('status', 'present')
+            ->whereHas('employee', function ($query) {
+                $query->where('status', 'working');
+            })
             ->get();
 
         $now = Carbon::now();
