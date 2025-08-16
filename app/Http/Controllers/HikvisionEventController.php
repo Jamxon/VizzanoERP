@@ -103,14 +103,15 @@ class HikvisionEventController extends Controller
                     $chatId = $branchChatMap[$branchId] ?? null;
 
                     if ($chatId) {
-                        $employeesToday = Attendance::where('date', $today)
-                            ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
-                            ->with('employee:id,name')
-                            ->get()
-                            ->pluck('employee');
+                        $employees = Employee::with(['department', 'group'])
+                            ->where('branch_id', $branchId)
+                            ->whereHas('attendances', function ($query) use ($today) {
+                                $query->whereDate('check_in', $today);
+                            })
+                            ->get();
 
                         app(\App\Services\TelegramService::class)
-                            ->updateDailyReport($branchId, $chatId, $employeesToday);
+                            ->updateDailyReport($branchId, $chatId, $employees);
                     }
                 } else {
                     Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already_checkin', null, [
