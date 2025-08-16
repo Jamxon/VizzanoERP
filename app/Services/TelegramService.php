@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\TelegramReport;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 
@@ -45,20 +46,18 @@ class TelegramService
     public function updateDailyReport($branchId, $chatId, $employees)
     {
         $today = now()->toDateString();
-        $cacheKey = "telegram_report_message_{$branchId}_{$today}";
 
         // Department bo‘yicha guruhlash
         $departments = $employees->groupBy('department_id');
 
         $text = "<b>📋 {$today} - Davomat (Filial {$branchId})</b>\n\n";
 
-        $aupCount = 0; // boshqa departmentlar uchun umumiy son
+        $aupCount = 0;
 
         foreach ($departments as $departmentId => $deptEmployees) {
             $departmentName = optional($deptEmployees->first()->department)->name ?? "No department";
 
             if ($departmentName === 'Тикув бўлими') {
-                // Tikuv bo‘limini guruhlari bilan chiqaramiz
                 $text .= "🏢 <b>{$departmentName}</b> — " . $deptEmployees->count() . " ta hodim\n";
 
                 $groups = $deptEmployees->groupBy('group_id');
@@ -71,34 +70,50 @@ class TelegramService
 
                 $text .= "\n";
             } else {
-                // Qolgan barcha departmentlarni AUP bo‘lib qo‘shib qo‘yamiz
                 $aupCount += $deptEmployees->count();
             }
         }
 
-        // Agar AUP xodimlari bo‘lsa chiqaramiz
         if ($aupCount > 0) {
             $text .= "🏢 <b>AUP</b> — {$aupCount} ta hodim\n\n";
         }
 
-        // Umumiy son
         $text .= "\n<b>Jami:</b> " . $employees->count() . " ta hodim";
 
-        // Avvalgi message ID olib kelamiz
-        $messageId = Cache::get($cacheKey);
+        // Bazadan avvalgi reportni olib kelamiz
+        $report = TelegramReport::where('branch_id', $branchId)
+            ->where('date', $today)
+            ->first();
 
-        if ($messageId) {
-            $res = $this->editMessage($chatId, $messageId, $text);
+        if ($report && $report->message_id) {
+            // eski xabarni yangilash
+            $res = $this->editMessage($chatId, $report->message_id, $text);
+
             if (!($res['ok'] ?? false)) {
+                // agar yangilanmasa, yangi xabar yuboramiz
                 $res = $this->sendMessage($chatId, $text);
                 if ($res['ok'] ?? false) {
-                    Cache::put($cacheKey, $res['result']['message_id'], now()->addDay());
+                    $report->update([
+                        'message_id' => $res['result']['message_id'],
+                        'text' => $text,
+                    ]);
                 }
+            } else {
+                // agar yangilansa, faqat textni update qilamiz
+                $report->update(['text' => $text]);
             }
         } else {
+            // yangi xabar yuborish
             $res = $this->sendMessage($chatId, $text);
             if ($res['ok'] ?? false) {
-                Cache::put($cacheKey, $res['result']['message_id'], now()->addDay());
+                TelegramReport::updateOrCreate(
+                    ['branch_id' => $branchId, 'date' => $today],
+                    [
+                        'chat_id'    => $chatId,
+                        'message_id' => $res['result']['message_id'],
+                        'text'       => $text,
+                    ]
+                );
             }
         }
     }
