@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceSalary;
 use App\Models\Employee;
 use App\Models\Log;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -94,8 +95,13 @@ class AttendanceController extends Controller
                 $branchId = $employee->branch_id;
 
                 // Shu filialdagi barcha hodimlarni olish
+                $today = Carbon::today();
+
                 $employees = Employee::with(['department', 'group'])
                     ->where('branch_id', $branchId)
+                    ->whereHas('attendances', function ($query) use ($today) {
+                        $query->whereDate('check_in', $today);
+                    })
                     ->get();
 
                 // Chat ID ni DB yoki configdan olish kerak (hozircha branchga bog‘lab yozaylik)
