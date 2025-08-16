@@ -47,27 +47,41 @@ class TelegramService
         $today = now()->toDateString();
         $cacheKey = "telegram_report_message_{$branchId}_{$today}";
 
-        // Department va Group bo‘yicha guruhlash
+        // Department bo‘yicha guruhlash
         $departments = $employees->groupBy('department_id');
 
         $text = "<b>📋 {$today} - Davomat (Filial {$branchId})</b>\n\n";
 
+        $aupCount = 0; // boshqa departmentlar uchun umumiy son
+
         foreach ($departments as $departmentId => $deptEmployees) {
             $departmentName = optional($deptEmployees->first()->department)->name ?? "No department";
-            $text .= "🏢 <b>{$departmentName}</b> — " . $deptEmployees->count() . " ta hodim\n";
 
-            // Group bo‘yicha ham guruhlash
-            $groups = $deptEmployees->groupBy('group_id');
-            foreach ($groups as $groupId => $groupEmployees) {
-                if ($groupId) {
-                    $groupName = optional($groupEmployees->first()->group)->name ?? "No group";
-                    $text .= "   └─ 👥 {$groupName}: " . $groupEmployees->count() . "\n";
+            if ($departmentName === 'Тикув бўлими') {
+                // Tikuv bo‘limini guruhlari bilan chiqaramiz
+                $text .= "🏢 <b>{$departmentName}</b> — " . $deptEmployees->count() . " ta hodim\n";
+
+                $groups = $deptEmployees->groupBy('group_id');
+                foreach ($groups as $groupId => $groupEmployees) {
+                    if ($groupId) {
+                        $groupName = optional($groupEmployees->first()->group)->name ?? "No group";
+                        $text .= "   └─ 👥 {$groupName}: " . $groupEmployees->count() . "\n";
+                    }
                 }
-            }
 
-            $text .= "\n";
+                $text .= "\n";
+            } else {
+                // Qolgan barcha departmentlarni AUP bo‘lib qo‘shib qo‘yamiz
+                $aupCount += $deptEmployees->count();
+            }
         }
 
+        // Agar AUP xodimlari bo‘lsa chiqaramiz
+        if ($aupCount > 0) {
+            $text .= "🏢 <b>AUP</b> — {$aupCount} ta hodim\n\n";
+        }
+
+        // Umumiy son
         $text .= "\n<b>Jami:</b> " . $employees->count() . " ta hodim";
 
         // Avvalgi message ID olib kelamiz
