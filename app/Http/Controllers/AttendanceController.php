@@ -225,5 +225,4 @@ class AttendanceController extends Controller
                 'added_balance' => $salaryToAdd,
             ]);
     }
-
 }
