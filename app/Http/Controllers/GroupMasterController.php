@@ -806,7 +806,20 @@ class GroupMasterController extends Controller
         $dailyPlan = null;
         if ($plan) {
             $daysInMonth = $today->daysInMonth; // shu oy nechta kun
-            $dailyPlan = (int) ceil($plan->quantity / $daysInMonth); // har kun uchun o‘rtacha plan
+
+            // Yakshanbalarni sanash
+            $sundays = 0;
+            for ($i = 1; $i <= $daysInMonth; $i++) {
+                $date = $today->copy()->startOfMonth()->addDays($i - 1);
+                if ($date->isSunday()) {
+                    $sundays++;
+                }
+            }
+
+            // Yakshanbasiz kunlar soni
+            $workingDays = $daysInMonth - $sundays;
+
+            $dailyPlan = (int) ceil($plan->quantity / $workingDays); // faqat ish kuniga taqsimlanadi
         }
 
         return response()->json([
