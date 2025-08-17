@@ -89,21 +89,13 @@ class TelegramService
             // eski xabarni yangilash
             $res = $this->editMessage($chatId, $report->message_id, $text);
 
-            if (!($res['ok'] ?? false)) {
-                // agar yangilanmasa, yangi xabar yuboramiz
-                $res = $this->sendMessage($chatId, $text);
-                if ($res['ok'] ?? false) {
-                    $report->update([
-                        'message_id' => $res['result']['message_id'],
-                        'text' => $text,
-                    ]);
-                }
-            } else {
+            if (($res['ok'] ?? false)) {
                 // agar yangilansa, faqat textni update qilamiz
                 $report->update(['text' => $text]);
             }
+            // ❌ agar yangilanmasa, hech narsa qilmaymiz
         } else {
-            // yangi xabar yuborish
+            // yangi xabar yuborish (faqat birinchi marta)
             $res = $this->sendMessage($chatId, $text);
             if ($res['ok'] ?? false) {
                 TelegramReport::updateOrCreate(
