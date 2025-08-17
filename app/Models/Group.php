@@ -54,4 +54,9 @@ class Group extends Model
     {
         return $this->hasMany(OtkOrderGroup::class);
     }
+
+    public function plans()
+    {
+        return $this->hasMany(GroupPlan::class, 'group_id');
+    }
 }

@@ -7,6 +7,7 @@ use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
 use App\Models\Bonus;
 use App\Models\Employee;
+use App\Models\Group;
 use App\Models\Order;
 use App\Models\OrderCut;
 use App\Models\OrderGroup;
@@ -787,4 +788,32 @@ class GroupMasterController extends Controller
         ]);
     }
 
+    public function tvResult($id)
+    {
+        $today = now();
+        $group = Group::where('id', $id)
+            ->with([
+                'plans' => function ($query) use ($today) {
+                    $query->where('month', $today->month)
+                        ->where('year', $today->year);
+                },
+                'responsibleUser:id,name' // masalan, relation `responsibleUser` bo‘lsa
+            ])
+            ->firstOrFail();
+
+        $plan = $group->plans->first(); // shu oyga tegishli plan
+
+        $dailyPlan = null;
+        if ($plan) {
+            $daysInMonth = $today->daysInMonth; // shu oy nechta kun
+            $dailyPlan = (int) ceil($plan->quantity / $daysInMonth); // har kun uchun o‘rtacha plan
+        }
+
+        return response()->json([
+            'group_id' => $group->id,
+            'group_name' => $group->name,
+            'daily_plan' => $dailyPlan,
+            'responsible_user' => $group->responsibleUser?->name,
+        ]);
+    }
 }
