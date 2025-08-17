@@ -797,7 +797,8 @@ class GroupMasterController extends Controller
                     $query->where('month', $today->month)
                         ->where('year', $today->year);
                 },
-                'responsibleUser.employee' // masalan, relation `responsibleUser` bo‘lsa
+                'responsibleUser.employee',
+                'orders.order.orderModel.submodels' // submodellarga chiqish uchun
             ])
             ->firstOrFail();
 
@@ -822,10 +823,21 @@ class GroupMasterController extends Controller
             $dailyPlan = (int) ceil($plan->quantity / $workingDays); // faqat ish kuniga taqsimlanadi
         }
 
+        // ✅ Bugungi natija hisoblash
+        $submodelIds = $group->orders
+            ->flatMap(fn($order) => $order->order->orderModel?->submodels->pluck('id') ?? collect())
+            ->toArray();
+
+        $todayResult = SewingOutputs::whereIn('order_submodel_id', $submodelIds)
+            ->whereDate('created_at', $today->toDateString())
+            ->sum('quantity');
+
         return response()->json([
-            'group_name' => $group->name,
-            'daily_plan' => $dailyPlan,
-            'responsible_user' => $group->responsibleUser,
+            'group_name'      => $group->name,
+            'daily_plan'      => $dailyPlan,
+            'responsible_user'=> $group->responsibleUser,
+            'today_result'    => $todayResult,
         ]);
     }
+
 }
