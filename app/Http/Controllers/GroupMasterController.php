@@ -797,7 +797,7 @@ class GroupMasterController extends Controller
                     $query->where('month', $today->month)
                         ->where('year', $today->year);
                 },
-                'responsibleUser:id,name' // masalan, relation `responsibleUser` bo‘lsa
+                'responsibleUser.employee' // masalan, relation `responsibleUser` bo‘lsa
             ])
             ->firstOrFail();
 
@@ -810,10 +810,9 @@ class GroupMasterController extends Controller
         }
 
         return response()->json([
-            'group_id' => $group->id,
             'group_name' => $group->name,
             'daily_plan' => $dailyPlan,
-            'responsible_user' => $group->responsibleUser?->name,
+            'responsible_user' => $group->responsibleUser,
         ]);
     }
 }
