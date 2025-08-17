@@ -800,17 +800,20 @@ class GroupMasterController extends Controller
                         ->where('year', $today->year);
                 },
                 'responsibleUser.employee',
-                'orders.order.orderModel.submodels' // submodellarga chiqish uchun
+                'orders.order.orderModel.submodels',
+                'employees.employeeTarificationLogs' => function ($q) use ($today, $yesterday) {
+                    $date = $today->isSunday() ? $yesterday : $today;
+                    $q->whereDate('created_at', $date->toDateString());
+                }
             ])
             ->firstOrFail();
 
-        $plan = $group->plans->first(); // shu oyga tegishli plan
+        $plan = $group->plans->first();
 
         $dailyPlan = null;
         if ($plan) {
-            $daysInMonth = $today->daysInMonth; // shu oy nechta kun
+            $daysInMonth = $today->daysInMonth;
 
-            // Yakshanbalarni sanash
             $sundays = 0;
             for ($i = 1; $i <= $daysInMonth; $i++) {
                 $date = $today->copy()->startOfMonth()->addDays($i - 1);
@@ -819,13 +822,10 @@ class GroupMasterController extends Controller
                 }
             }
 
-            // Yakshanbasiz kunlar soni
             $workingDays = $daysInMonth - $sundays;
-
-            $dailyPlan = (int) ceil($plan->quantity / $workingDays); // faqat ish kuniga taqsimlanadi
+            $dailyPlan = (int) ceil($plan->quantity / $workingDays);
         }
 
-        // ✅ Bugungi natija emas, yakshanba bo'lgani uchun kechagi natija
         $submodelIds = $group->orders
             ->flatMap(fn($order) => $order->order->orderModel?->submodels->pluck('id') ?? collect())
             ->toArray();
@@ -836,13 +836,50 @@ class GroupMasterController extends Controller
             ->whereDate('created_at', $resultDate->toDateString())
             ->sum('quantity');
 
+        // ✅ Employee natijalarini hisoblash
+        $employeeResults = [];
+        foreach ($group->employees as $employee) {
+            $logs = $employee->employeeTarificationLogs;
+
+            if ($logs->isEmpty()) continue;
+
+            $totalAmount = $logs->sum('amount_earned'); // bugungi jami puli
+
+            // eng ko‘p ishlagan operatsiyasini topish
+            $topOperation = $logs->groupBy('tarification_id')
+                ->map->count()
+                ->sortDesc()
+                ->take(1)
+                ->keys()
+                ->first();
+
+            $topCount = $logs->where('tarification_id', $topOperation)->count();
+
+            $employeeResults[] = [
+                'employee_id'   => $employee->id,
+                'employee_name' => $employee->name,
+                'total_amount'  => $totalAmount,
+                'top_operation' => $topOperation,
+                'top_count'     => $topCount,
+            ];
+        }
+
+        // eng ko‘p yozilgan TOP-3 employee
+        $topEmployees = collect($employeeResults)
+            ->sortByDesc('top_count')
+            ->take(3)
+            ->values();
+
         return response()->json([
             'group_name'       => $group->name,
             'daily_plan'       => $dailyPlan,
             'responsible_user' => $group->responsibleUser,
             'today_result'     => $todayResult,
-            'result_date'      => $resultDate->toDateString(), // qo‘shimcha: qaysi sanadan olinganini ko‘rsatadi
+            'result_date'      => $resultDate->toDateString(),
+            'employees'        => $employeeResults, // hammasi
+            'top_3_employees'  => $topEmployees,    // faqat eng ko‘p 3 tasi
         ]);
     }
+
 
 }
