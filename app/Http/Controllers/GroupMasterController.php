@@ -845,7 +845,20 @@ class GroupMasterController extends Controller
 
             $totalAmount = $logs->sum('amount_earned'); // bugungi jami puli
 
-            // eng ko‘p ishlagan operatsiyasini topish
+            // har bir tarifikatsiya bo‘yicha tafsilotlar
+            $details = $logs->groupBy('tarification_id')->map(function ($items, $tarificationId) {
+                $tarification = Tarification::with('tarificationCategory.submodel')->find($tarificationId);
+                return [
+                    'tarification_id' => $tarificationId,
+                    'operation'       => $tarification?->name,
+                    'second'          => $tarification?->second,
+                    'code'            => $tarification?->code,
+                    'quantity'        => $items->sum('quantity'),
+                    'earned'          => $items->sum('amount_earned'),
+                ];
+            })->values();
+
+            // eng ko‘p ishlagan tarifikatsiyani aniqlash
             $topOperation = $logs->groupBy('tarification_id')
                 ->map->count()
                 ->sortDesc()
@@ -858,13 +871,16 @@ class GroupMasterController extends Controller
             $employeeResults[] = [
                 'employee_id'   => $employee->id,
                 'employee_name' => $employee->name,
+                'image'         => $employee->img ?? null,
+                'group'         => $employee->group->name ?? '---',
                 'total_amount'  => $totalAmount,
+                'works'         => $details,
                 'top_operation' => $topOperation,
                 'top_count'     => $topCount,
             ];
         }
 
-        // eng ko‘p yozilgan TOP-3 employee
+// ✅ eng ko‘p yozilgan TOP-3 employee
         $topEmployees = collect($employeeResults)
             ->sortByDesc('top_count')
             ->take(3)
