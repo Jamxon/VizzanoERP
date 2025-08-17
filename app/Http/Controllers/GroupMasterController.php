@@ -791,6 +791,8 @@ class GroupMasterController extends Controller
     public function tvResult($id)
     {
         $today = now();
+        $yesterday = now()->subDay(); // kechagi kun
+
         $group = Group::where('id', $id)
             ->with([
                 'plans' => function ($query) use ($today) {
@@ -823,20 +825,23 @@ class GroupMasterController extends Controller
             $dailyPlan = (int) ceil($plan->quantity / $workingDays); // faqat ish kuniga taqsimlanadi
         }
 
-        // ✅ Bugungi natija hisoblash
+        // ✅ Bugungi natija emas, yakshanba bo'lgani uchun kechagi natija
         $submodelIds = $group->orders
             ->flatMap(fn($order) => $order->order->orderModel?->submodels->pluck('id') ?? collect())
             ->toArray();
 
+        $resultDate = $today->isSunday() ? $yesterday : $today;
+
         $todayResult = SewingOutputs::whereIn('order_submodel_id', $submodelIds)
-            ->whereDate('created_at', $today->toDateString())
+            ->whereDate('created_at', $resultDate->toDateString())
             ->sum('quantity');
 
         return response()->json([
-            'group_name'      => $group->name,
-            'daily_plan'      => $dailyPlan,
-            'responsible_user'=> $group->responsibleUser,
-            'today_result'    => $todayResult,
+            'group_name'       => $group->name,
+            'daily_plan'       => $dailyPlan,
+            'responsible_user' => $group->responsibleUser,
+            'today_result'     => $todayResult,
+            'result_date'      => $resultDate->toDateString(), // qo‘shimcha: qaysi sanadan olinganini ko‘rsatadi
         ]);
     }
 
