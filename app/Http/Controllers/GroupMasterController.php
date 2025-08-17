@@ -791,7 +791,7 @@ class GroupMasterController extends Controller
     public function tvResult($id)
     {
         $today = now();
-        $yesterday = now()->subDay(); // kechagi kun
+        $yesterday = now()->subDay();
 
         $group = Group::where('id', $id)
             ->with([
@@ -801,99 +801,68 @@ class GroupMasterController extends Controller
                 },
                 'responsibleUser.employee',
                 'orders.order.orderModel.submodels',
-                'employees.employeeTarificationLogs' => function ($q) use ($today, $yesterday) {
-                    $date = $today->isSunday() ? $yesterday : $today;
-                    $q->whereDate('created_at', $date->toDateString());
-                }
+                // TOP-3 ni tez topish uchun employee'larni ham yuklab olamiz
+                'employees:id,name,img,group_id'
             ])
             ->firstOrFail();
 
         $plan = $group->plans->first();
 
+        // 🔢 Yakshanbalarni hisobga olmay, ish kunlariga taqsimlangan kunlik plan
         $dailyPlan = null;
         if ($plan) {
             $daysInMonth = $today->daysInMonth;
-
             $sundays = 0;
             for ($i = 1; $i <= $daysInMonth; $i++) {
                 $date = $today->copy()->startOfMonth()->addDays($i - 1);
-                if ($date->isSunday()) {
-                    $sundays++;
-                }
+                if ($date->isSunday()) $sundays++;
             }
-
-            $workingDays = $daysInMonth - $sundays;
+            $workingDays = max(1, $daysInMonth - $sundays);
             $dailyPlan = (int) ceil($plan->quantity / $workingDays);
         }
 
-        $submodelIds = $group->orders
-            ->flatMap(fn($order) => $order->order->orderModel?->submodels->pluck('id') ?? collect())
-            ->toArray();
-
+        // 📅 Yakshanba bo‘lsa — kechagi sana, aks holda — bugungi
         $resultDate = $today->isSunday() ? $yesterday : $today;
+
+        // 🧵 Bugun(kecha) tikilgan natija
+        $submodelIds = $group->orders
+            ->flatMap(fn($o) => $o->order->orderModel?->submodels->pluck('id') ?? collect())
+            ->toArray();
 
         $todayResult = SewingOutputs::whereIn('order_submodel_id', $submodelIds)
             ->whereDate('created_at', $resultDate->toDateString())
             ->sum('quantity');
 
-        // ✅ Employee natijalarini hisoblash
-        $employeeResults = [];
-        foreach ($group->employees as $employee) {
-            $logs = $employee->employeeTarificationLogs;
+        // 🥇 TOP-3 eng ko‘p pul topgan xodim (faqat shu guruh xodimlari ichidan)
+        $employeeIds = $group->employees->pluck('id');
 
-            if ($logs->isEmpty()) continue;
+        $topRows = DB::table('employee_tarification_logs')
+            ->select('employee_id', DB::raw('SUM(amount_earned) AS total_earned'))
+            ->whereIn('employee_id', $employeeIds)
+            ->whereDate('date', $resultDate->toDateString())
+            ->groupBy('employee_id')
+            ->orderByDesc('total_earned')
+            ->limit(3)
+            ->get();
 
-            $totalAmount = $logs->sum('amount_earned'); // bugungi jami puli
-
-            // har bir tarifikatsiya bo‘yicha tafsilotlar
-            $details = $logs->groupBy('tarification_id')->map(function ($items, $tarificationId) {
-                $tarification = Tarification::with('tarificationCategory.submodel')->find($tarificationId);
-                return [
-                    'tarification_id' => $tarificationId,
-                    'operation'       => $tarification?->name,
-                    'second'          => $tarification?->second,
-                    'code'            => $tarification?->code,
-                    'quantity'        => $items->sum('quantity'),
-                    'earned'          => $items->sum('amount_earned'),
-                ];
-            })->values();
-
-            // eng ko‘p ishlagan tarifikatsiyani aniqlash
-            $topOperation = $logs->groupBy('tarification_id')
-                ->map->count()
-                ->sortDesc()
-                ->take(1)
-                ->keys()
-                ->first();
-
-            $topCount = $logs->where('tarification_id', $topOperation)->count();
-
-            $employeeResults[] = [
-                'employee_id'   => $employee->id,
-                'employee_name' => $employee->name,
-                'image'         => $employee->img ?? null,
-                'group'         => $employee->group->name ?? '---',
-                'total_amount'  => $totalAmount,
-                'works'         => $details,
-                'top_operation' => $topOperation,
-                'top_count'     => $topCount,
+        $topEarners = $topRows->map(function ($row) use ($group) {
+            $emp = $group->employees->firstWhere('id', $row->employee_id);
+            return [
+                'employee_id'   => (int) $row->employee_id,
+                'employee_name' => $emp->name ?? '---',
+                'image'         => $emp->img ?? null,
+                'group'         => $group->name,
+                'total_earned'  => (float) $row->total_earned,
             ];
-        }
-
-// ✅ eng ko‘p yozilgan TOP-3 employee
-        $topEmployees = collect($employeeResults)
-            ->sortByDesc('top_count')
-            ->take(3)
-            ->values();
+        })->values();
 
         return response()->json([
-            'group_name'       => $group->name,
-            'daily_plan'       => $dailyPlan,
-            'responsible_user' => $group->responsibleUser,
-            'today_result'     => $todayResult,
-            'result_date'      => $resultDate->toDateString(),
-            'employees'        => $employeeResults, // hammasi
-            'top_3_employees'  => $topEmployees,    // faqat eng ko‘p 3 tasi
+            'group_name'        => $group->name,
+            'daily_plan'        => $dailyPlan,
+            'responsible_user'  => $group->responsibleUser,
+            'today_result'      => (int) $todayResult,
+            'result_date'       => $resultDate->toDateString(),
+            'top_earners'       => $topEarners, // ← faqat eng yuqori 3 ta
         ]);
     }
 
