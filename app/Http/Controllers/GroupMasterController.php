@@ -801,14 +801,13 @@ class GroupMasterController extends Controller
                 },
                 'responsibleUser.employee',
                 'orders.order.orderModel.submodels',
-                // TOP-3 ni tez topish uchun employee'larni ham yuklab olamiz
                 'employees:id,name,img,group_id'
             ])
             ->firstOrFail();
 
         $plan = $group->plans->first();
 
-        // 🔢 Yakshanbalarni hisobga olmay, ish kunlariga taqsimlangan kunlik plan
+        // 🔢 Kunlik plan
         $dailyPlan = null;
         if ($plan) {
             $daysInMonth = $today->daysInMonth;
@@ -821,10 +820,10 @@ class GroupMasterController extends Controller
             $dailyPlan = (int) ceil($plan->quantity / $workingDays);
         }
 
-        // 📅 Yakshanba bo‘lsa — kechagi sana, aks holda — bugungi
+        // 📅 Yakshanba bo‘lsa kechagi
         $resultDate = $today->isSunday() ? $yesterday : $today;
 
-        // 🧵 Bugun(kecha) tikilgan natija
+        // 🧵 Tikilgan natija
         $submodelIds = $group->orders
             ->flatMap(fn($o) => $o->order->orderModel?->submodels->pluck('id') ?? collect())
             ->toArray();
@@ -833,7 +832,7 @@ class GroupMasterController extends Controller
             ->whereDate('created_at', $resultDate->toDateString())
             ->sum('quantity');
 
-        // 🥇 TOP-3 eng ko‘p pul topgan xodim (faqat shu guruh xodimlari ichidan)
+        // 🥇 TOP-3 xodim
         $employeeIds = $group->employees->pluck('id');
 
         $topRows = DB::table('employee_tarification_logs')
@@ -845,14 +844,39 @@ class GroupMasterController extends Controller
             ->limit(3)
             ->get();
 
-        $topEarners = $topRows->map(function ($row) use ($group) {
+        $topEarners = $topRows->map(function ($row) use ($group, $resultDate) {
             $emp = $group->employees->firstWhere('id', $row->employee_id);
+
+            // 🔎 shu kunlik tarifikatsiyalarini olish
+            $tarifications = DB::table('employee_tarification_logs')
+                ->select(
+                    'tarification_id',
+                    DB::raw('SUM(quantity) as total_quantity'),
+                    DB::raw('SUM(amount_earned) as total_earned')
+                )
+                ->where('employee_id', $row->employee_id)
+                ->whereDate('date', $resultDate->toDateString())
+                ->groupBy('tarification_id')
+                ->get()
+                ->map(function ($item) {
+                    $tar = \App\Models\Tarification::with('tarificationCategory.submodel')->find($item->tarification_id);
+                    return [
+                        'tarification_id' => $item->tarification_id,
+                        'operation'       => $tar?->name,
+                        'code'            => $tar?->code,
+                        'second'          => $tar?->second,
+                        'quantity'        => $item->total_quantity,
+                        'earned'          => $item->total_earned,
+                    ];
+                });
+
             return [
                 'employee_id'   => (int) $row->employee_id,
                 'employee_name' => $emp->name ?? '---',
                 'image'         => $emp->img ?? null,
                 'group'         => $group->name,
                 'total_earned'  => (float) $row->total_earned,
+                'works'         => $tarifications, // ← shu kungi barcha operationlari
             ];
         })->values();
 
@@ -862,9 +886,7 @@ class GroupMasterController extends Controller
             'responsible_user'  => $group->responsibleUser,
             'today_result'      => (int) $todayResult,
             'result_date'       => $resultDate->toDateString(),
-            'top_earners'       => $topEarners, // ← faqat eng yuqori 3 ta
+            'top_earners'       => $topEarners, // TOP-3 + tarifikatsiyalari
         ]);
     }
-
-
 }
