@@ -1120,7 +1120,7 @@ class InternalAccountantController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Sewing outputs topilmadi.'
-            ], 404);
+            ], 200);
         }
 
         // 1. Tarification bo‘yicha umumiy hisob
