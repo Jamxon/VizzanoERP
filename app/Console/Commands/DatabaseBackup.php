@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Storage;
 
 class DatabaseBackup extends Command
 {
@@ -51,27 +50,50 @@ class DatabaseBackup extends Command
 
         $this->info("Zip fayl yaratildi: $zipFileName");
 
-        // Telegramga yuboramiz
+        // Faylni bo‘laklash (50 MB dan katta bo‘lsa)
+        $this->sendFileInChunks($zipPath, $zipFileName);
+
+        // Tozalash
+        unlink($filePath);   // .sql
+        unlink($zipPath);    // .zip
+
+        $this->info("Backup fayllar serverdan o‘chirildi.");
+    }
+
+    private function sendFileInChunks($filePath, $originalName)
+    {
         $botToken = "7905618693:AAFsNBRPGOA5TFVWr8gORlyH_rtXzCYhLS8";
         $chatId = "-1002476073696";
+        $chunkSize = 48 * 1024 * 1024; // 48 MB (Telegram limiti xavfsiz bo‘lsin)
 
-        $response = Http::attach('document', fopen($zipPath, 'r'), $zipFileName)
-            ->post("https://api.telegram.org/bot{$botToken}/sendDocument", [
-                'chat_id' => $chatId,
-            ]);
-
-        fclose(fopen($zipPath, 'r'));
-
-        if ($response->successful()) {
-            $this->info("Backup Telegramga yuborildi.");
-
-            // Tozalash
-            unlink($filePath);   // .sql
-            unlink($zipPath);    // .zip
-
-            $this->info("Backup fayllar serverdan o‘chirildi.");
-        } else {
-            $this->error("Backup yuborilmadi: " . $response->body());
+        $handle = fopen($filePath, 'rb');
+        if (!$handle) {
+            $this->error("Faylni ochib bo‘lmadi: $filePath");
+            return;
         }
+
+        $part = 1;
+        while (!feof($handle)) {
+            $chunkData = fread($handle, $chunkSize);
+            $chunkName = $originalName . ".part{$part}";
+
+            $this->info("Yuborilmoqda: {$chunkName}");
+
+            $response = Http::attach('document', $chunkData, $chunkName)
+                ->post("https://api.telegram.org/bot{$botToken}/sendDocument", [
+                    'chat_id' => $chatId,
+                    'caption' => "Backup bo‘lak #{$part}"
+                ]);
+
+            if ($response->successful()) {
+                $this->info("{$chunkName} yuborildi.");
+            } else {
+                $this->error("{$chunkName} yuborilmadi: " . $response->body());
+            }
+
+            $part++;
+        }
+
+        fclose($handle);
     }
 }
