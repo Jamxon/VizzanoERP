@@ -42,6 +42,45 @@ use App\Http\Controllers\TailorMasterController;
 use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('ceo')->middleware('role:ceo')->group(function () {
+    Route::post('incomes', [CasherController::class, 'storeIncome']);
+    Route::post('expenses', [CasherController::class, 'storeExpense']);
+    Route::get('balances', [CasherController::class, 'getBalances']);
+    Route::get('transactions', [CasherController::class, 'getTransactions']);
+    Route::post('transfers', [CasherController::class, 'transferBetweenCashboxes']);
+    Route::get('currencies', [CurrencyController::class, 'index']);
+    Route::post('requestForm', [CasherController::class, 'storeRequestForm']);
+    Route::get('via', [CasherController::class, 'getVia']);
+    Route::get('sources', [CasherController::class, 'getSource']);
+    Route::get('destinations', [CasherController::class, 'getDestination']);
+    Route::get('employees', [SuperHRController::class, 'getEmployees']);
+    Route::get('requests', [CasherController::class, 'getRequestForm']);
+    Route::get('departments', [SuperHRController::class, 'getDepartments']);
+    Route::post('groups', [CasherController::class, 'getGroupsByDepartmentId']);
+    Route::get('orders', [CasherController::class, 'getOrders']);
+    Route::post('salaries', [CasherController::class, 'giveSalaryOrAdvance']);
+    Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
+    Route::get('employee/aup', [SuperHRController::class, 'getAupEmployee']);
+    Route::get('positions' , [SuperHRController::class, 'getPositions']);
+    Route::get('roles', [SuperHRController::class, 'getRoles']);
+    Route::get('employee/edit/{id}', [SuperHRController::class, 'showEmployee']);
+    Route::patch('employees/{employee}', [SuperHRController::class, 'updateEmployees']);
+    Route::post('pdf/employees', [CasherController::class, 'exportGroupsByDepartmentId']);
+    Route::get('dailyReport', [CasherController::class, 'getDailyCost']);
+    Route::post('monthlyExpense', [CasherController::class, 'storeMonthlyExpense']);
+    Route::get('monthlyExpense', [CasherController::class, 'getMonthlyExpense']);
+    Route::patch('monthlyExpense/{id}', [CasherController::class, 'editMonthlyExpense']);
+    Route::post('groupPlans', [CasherController::class, 'storeGroupPlan']);
+    Route::get('groupPlans', [CasherController::class, 'getGroupPlans']);
+    Route::patch('groupPlans/{id}', [CasherController::class, 'editGroupPlan']);
+    Route::get('monthlyReport', [CasherController::class, 'getMonthlyCost']);
+    Route::get('cuttingPlans', [CuttingPlanController::class, 'index']);
+    Route::post('cuttingPlans', [CuttingPlanController::class, 'store']);
+    Route::patch('cuttingPlans/{id}', [CuttingPlanController::class, 'update']);
+    Route::delete('cuttingPlans/{id}', [CuttingPlanController::class, 'destroy']);
+
+});
+
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::get('tarifications/search', [TailorController::class, 'searchTarifications']);
     Route::get('balance', [TailorController::class, 'getDailyBalanceEmployee']);
@@ -92,14 +131,14 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('employee/edit/{id}', [SuperHRController::class, 'showEmployee']);
     Route::patch('employees/{employee}', [SuperHRController::class, 'updateEmployees']);
     Route::post('pdf/employees', [CasherController::class, 'exportGroupsByDepartmentId']);
-    Route::get('dailyReport', [CasherController::class, 'getDailyCost']);
+//    Route::get('dailyReport', [CasherController::class, 'getDailyCost']);
     Route::post('monthlyExpense', [CasherController::class, 'storeMonthlyExpense']);
     Route::get('monthlyExpense', [CasherController::class, 'getMonthlyExpense']);
     Route::patch('monthlyExpense/{id}', [CasherController::class, 'editMonthlyExpense']);
     Route::post('groupPlans', [CasherController::class, 'storeGroupPlan']);
     Route::get('groupPlans', [CasherController::class, 'getGroupPlans']);
     Route::patch('groupPlans/{id}', [CasherController::class, 'editGroupPlan']);
-    Route::get('monthlyReport', [CasherController::class, 'getMonthlyCost']);
+//    Route::get('monthlyReport', [CasherController::class, 'getMonthlyCost']);
     Route::get('cuttingPlans', [CuttingPlanController::class, 'index']);
     Route::post('cuttingPlans', [CuttingPlanController::class, 'store']);
     Route::patch('cuttingPlans/{id}', [CuttingPlanController::class, 'update']);
