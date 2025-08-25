@@ -34,40 +34,49 @@ class CeoController extends Controller
             ])
             ->get();
 
-        foreach ($groups->orders as $order) {
-            foreach ($order->order->orderModel->submodels as $submodel) {
-                foreach ($submodel->tarificationCategories as $tarificationCategory) {
-                    foreach ($tarificationCategory->tarifications as $tarification) {
-                        foreach ($tarification->tarificationLogs as $tarificationLog) {
-                            $tarificationTotal += $tarificationLog->amount_earned;
-                            $empId = $tarificationLog->employee_id;
+        $result = [];
 
-                            if (!isset($tarificationEmployees[$empId])) {
-                                $tarificationEmployees[$empId] = [
-                                    'employee_id' => $empId,
-                                    'name' => $tarificationLog->employee->name ?? 'Nomaʼlum',
-                                    'salary' => 0
-                                ];
-                            }
-                            $tarificationEmployees[$empId]['salary'] += $tarificationLog->amount_earned;
+        foreach ($groups as $group) {
+            $tarificationTotal = 0;
+            $tarificationEmployees = [];
+            $fixedWithTarificationTotal = 0;
+            $fixedWithTarificationEmployees = [];
 
-                            if ($tarificationLog->employee && $tarificationLog->employee->payment_type !== 'piece_work') {
-                                if (!isset($fixedWithTarificationEmployees[$empId])) {
-                                    $fixedWithTarificationEmployees[$empId] = [
+            foreach ($group->orders as $order) {
+                foreach ($order->order->orderModel->submodels as $submodel) {
+                    foreach ($submodel->tarificationCategories as $tarificationCategory) {
+                        foreach ($tarificationCategory->tarifications as $tarification) {
+                            foreach ($tarification->tarificationLogs as $tarificationLog) {
+                                $tarificationTotal += $tarificationLog->amount_earned;
+                                $empId = $tarificationLog->employee_id;
+
+                                if (!isset($tarificationEmployees[$empId])) {
+                                    $tarificationEmployees[$empId] = [
                                         'employee_id' => $empId,
                                         'name' => $tarificationLog->employee->name ?? 'Nomaʼlum',
-                                        'tarification_salary' => 0
+                                        'salary' => 0
                                     ];
                                 }
-                                $fixedWithTarificationEmployees[$empId]['tarification_salary'] += $tarificationLog->amount_earned;
-                                $fixedWithTarificationTotal += $tarificationLog->amount_earned;
+                                $tarificationEmployees[$empId]['salary'] += $tarificationLog->amount_earned;
+
+                                if ($tarificationLog->employee && $tarificationLog->employee->payment_type !== 'piece_work') {
+                                    if (!isset($fixedWithTarificationEmployees[$empId])) {
+                                        $fixedWithTarificationEmployees[$empId] = [
+                                            'employee_id' => $empId,
+                                            'name' => $tarificationLog->employee->name ?? 'Nomaʼlum',
+                                            'tarification_salary' => 0
+                                        ];
+                                    }
+                                    $fixedWithTarificationEmployees[$empId]['tarification_salary'] += $tarificationLog->amount_earned;
+                                    $fixedWithTarificationTotal += $tarificationLog->amount_earned;
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        return response()->json($groups);
+        return response()->json($result);
     }
 
 }
