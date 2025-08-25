@@ -17,11 +17,10 @@ class CeoController extends Controller
                 })->with(['order' => function ($query) {
                     $query->select('id', 'name', 'quantity', 'status', 'start_date', 'end_date');
                 }, 'order.orderModel' => function ($query) {
-                    $query->select('id', 'order_id', 'model_id', 'material_id', 'rasxod', 'status', 'minute')
-                        ->with('model:id,name,article')
-                        ->with('material:id,name,unit');
+                    $query->select('id', 'order_id', 'model_id', 'rasxod', 'status', 'minute')
+                        ->with('model:id,name');
                 }, 'order.orderModel.submodels' => function ($query) {
-                    $query->select('id', 'order_model_id', 'name', 'quantity', 'status')
+                    $query->select('id', 'order_model_id')
                         ->with('sewingOutputs');
                 }]);
             }])
