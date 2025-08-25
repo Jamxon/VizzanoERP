@@ -23,7 +23,8 @@ class CeoController extends Controller
                     $query->select('id', 'order_model_id')
                         ->with('sewingOutputs');
                 }]);
-            }])
+            },
+                'responsibleUser:id,name',])
             ->get();
 
         return response()->json($groups);

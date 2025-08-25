@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove unused endpoints from API routes" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: simplify eager loading in CeoController by removing unused fields" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -439,23 +439,7 @@
       <workItem from="1755751862233" duration="1250000" />
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
-      <workItem from="1756114874304" duration="3187000" />
-    </task>
-    <task id="LOCAL-01093" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755239601350</created>
-      <option name="number" value="01093" />
-      <option name="presentableId" value="LOCAL-01093" />
-      <option name="project" value="LOCAL" />
-      <updated>1755239601350</updated>
-    </task>
-    <task id="LOCAL-01094" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755239711562</created>
-      <option name="number" value="01094" />
-      <option name="presentableId" value="LOCAL-01094" />
-      <option name="project" value="LOCAL" />
-      <updated>1755239711562</updated>
+      <workItem from="1756114874304" duration="3549000" />
     </task>
     <task id="LOCAL-01095" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -833,7 +817,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756118259395</updated>
     </task>
-    <option name="localTasksCounter" value="1142" />
+    <task id="LOCAL-01142" summary="fix: optimize data retrieval in CeoController with eager loading">
+      <option name="closed" value="true" />
+      <created>1756118524079</created>
+      <option name="number" value="01142" />
+      <option name="presentableId" value="LOCAL-01142" />
+      <option name="project" value="LOCAL" />
+      <updated>1756118524079</updated>
+    </task>
+    <task id="LOCAL-01143" summary="fix: simplify eager loading in CeoController by removing unused fields">
+      <option name="closed" value="true" />
+      <created>1756118709917</created>
+      <option name="number" value="01143" />
+      <option name="presentableId" value="LOCAL-01143" />
+      <option name="project" value="LOCAL" />
+      <updated>1756118709917</updated>
+    </task>
+    <option name="localTasksCounter" value="1144" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -863,8 +863,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: remove redundant balance increment logic in AttendanceController" />
-    <MESSAGE value="fix: add check_out property to Attendance model" />
     <MESSAGE value="fix: update attendance salary calculation to use worked seconds for accuracy" />
     <MESSAGE value="fix: add shipment plan API endpoints for managing shipment plans" />
     <MESSAGE value="fix: set default status to 'draft' in shipment plan creation" />
@@ -888,7 +886,9 @@
     <MESSAGE value="fix: add salaryPayments relationship and filter by date in user retrieval" />
     <MESSAGE value="fix: add endpoint to retrieve model by tarification code with validation" />
     <MESSAGE value="fix: remove unused endpoints from API routes" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: remove unused endpoints from API routes" />
+    <MESSAGE value="fix: optimize data retrieval in CeoController with eager loading" />
+    <MESSAGE value="fix: simplify eager loading in CeoController by removing unused fields" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: simplify eager loading in CeoController by removing unused fields" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
