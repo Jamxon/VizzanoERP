@@ -15,10 +15,7 @@ class CeoController extends Controller
             ->with([
                 'orders' => function ($query) use ($startDate, $endDate) {
                     // orders faqat sana bo‘yicha filter qilinadi
-                    $query->whereHas('order.orderModel.submodels.sewingOutputs', function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('created_at', [$startDate, $endDate]);
-                    })
-                        ->with([
+                    $query->with([
                             'order' => function ($q) {
                                 $q->select('id', 'name', 'quantity', 'status', 'start_date', 'end_date');
                             },
