@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: simplify eager loading in CeoController by removing unused fields">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/de1e4679-3154-4b85-94ec-068d67b4feee.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CeoController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CeoController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: simplify eager loading in CeoController by removing unused fields" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -442,15 +439,7 @@
       <workItem from="1755751862233" duration="1250000" />
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
-      <workItem from="1756114874304" duration="3912000" />
-    </task>
-    <task id="LOCAL-01097" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755248584536</created>
-      <option name="number" value="01097" />
-      <option name="presentableId" value="LOCAL-01097" />
-      <option name="project" value="LOCAL" />
-      <updated>1755248584536</updated>
+      <workItem from="1756114874304" duration="4222000" />
     </task>
     <task id="LOCAL-01098" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -836,7 +825,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756118871539</updated>
     </task>
-    <option name="localTasksCounter" value="1146" />
+    <task id="LOCAL-01146" summary="fix: simplify eager loading in CeoController by removing unused fields">
+      <option name="closed" value="true" />
+      <created>1756119276589</created>
+      <option name="number" value="01146" />
+      <option name="presentableId" value="LOCAL-01146" />
+      <option name="project" value="LOCAL" />
+      <updated>1756119276589</updated>
+    </task>
+    <option name="localTasksCounter" value="1147" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
