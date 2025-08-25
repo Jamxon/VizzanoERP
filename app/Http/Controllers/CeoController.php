@@ -48,17 +48,19 @@ class CeoController extends Controller
             foreach ($group->orders as $order) {
                 $salaryTotal = 0;
                 $salaryEmployees = [];
-                foreach ($submodel->sewingOutputs as $output) {
-                    $createdAt = \Carbon\Carbon::parse($output->created_at);
 
-                    if (is_null($firstDate) || $createdAt->lt($firstDate)) {
-                        $firstDate = $createdAt;
-                    }
-                    if (is_null($lastDate) || $createdAt->gt($lastDate)) {
-                        $lastDate = $createdAt;
-                    }
-                }
                 foreach ($order->order->orderModel->submodels as $submodel) {
+                    foreach ($submodel->sewingOutputs as $output) {
+                        $createdAt = \Carbon\Carbon::parse($output->created_at);
+
+                        if (is_null($firstDate) || $createdAt->lt($firstDate)) {
+                            $firstDate = $createdAt;
+                        }
+                        if (is_null($lastDate) || $createdAt->gt($lastDate)) {
+                            $lastDate = $createdAt;
+                        }
+                    }
+
                     $group = $submodel->group->group ?? null;
                     if (!$group) continue;
 
