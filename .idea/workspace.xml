@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove unused endpoints from API routes">
-      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/CeoController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove unused endpoints from API routes" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -442,15 +439,7 @@
       <workItem from="1755751862233" duration="1250000" />
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
-      <workItem from="1756114874304" duration="2815000" />
-    </task>
-    <task id="LOCAL-01092" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755239517858</created>
-      <option name="number" value="01092" />
-      <option name="presentableId" value="LOCAL-01092" />
-      <option name="project" value="LOCAL" />
-      <updated>1755239517858</updated>
+      <workItem from="1756114874304" duration="3187000" />
     </task>
     <task id="LOCAL-01093" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -836,7 +825,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756117319385</updated>
     </task>
-    <option name="localTasksCounter" value="1141" />
+    <task id="LOCAL-01141" summary="fix: remove unused endpoints from API routes">
+      <option name="closed" value="true" />
+      <created>1756118259394</created>
+      <option name="number" value="01141" />
+      <option name="presentableId" value="LOCAL-01141" />
+      <option name="project" value="LOCAL" />
+      <updated>1756118259395</updated>
+    </task>
+    <option name="localTasksCounter" value="1142" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
