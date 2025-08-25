@@ -24,7 +24,7 @@ class CeoController extends Controller
                         ->with('sewingOutputs');
                 }]);
             },
-                'responsibleUser:id,name',])
+                'responsibleUser.employee:id,name',])
             ->get();
 
         return response()->json($groups);
