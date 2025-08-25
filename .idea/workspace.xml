@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: simplify eager loading in CeoController by removing unused fields" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: simplify eager loading in CeoController by removing unnecessary query filters" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -439,31 +439,7 @@
       <workItem from="1755751862233" duration="1250000" />
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
-      <workItem from="1756114874304" duration="4222000" />
-    </task>
-    <task id="LOCAL-01098" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755248745429</created>
-      <option name="number" value="01098" />
-      <option name="presentableId" value="LOCAL-01098" />
-      <option name="project" value="LOCAL" />
-      <updated>1755248745429</updated>
-    </task>
-    <task id="LOCAL-01099" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755248964321</created>
-      <option name="number" value="01099" />
-      <option name="presentableId" value="LOCAL-01099" />
-      <option name="project" value="LOCAL" />
-      <updated>1755248964321</updated>
-    </task>
-    <task id="LOCAL-01100" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755249021675</created>
-      <option name="number" value="01100" />
-      <option name="presentableId" value="LOCAL-01100" />
-      <option name="project" value="LOCAL" />
-      <updated>1755249021675</updated>
+      <workItem from="1756114874304" duration="4756000" />
     </task>
     <task id="LOCAL-01101" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -833,7 +809,31 @@
       <option name="project" value="LOCAL" />
       <updated>1756119276589</updated>
     </task>
-    <option name="localTasksCounter" value="1147" />
+    <task id="LOCAL-01147" summary="fix: optimize eager loading in CeoController by removing unnecessary filters">
+      <option name="closed" value="true" />
+      <created>1756119500832</created>
+      <option name="number" value="01147" />
+      <option name="presentableId" value="LOCAL-01147" />
+      <option name="project" value="LOCAL" />
+      <updated>1756119500832</updated>
+    </task>
+    <task id="LOCAL-01148" summary="fix: simplify eager loading in CeoController by removing unnecessary query filters">
+      <option name="closed" value="true" />
+      <created>1756119587125</created>
+      <option name="number" value="01148" />
+      <option name="presentableId" value="LOCAL-01148" />
+      <option name="project" value="LOCAL" />
+      <updated>1756119587125</updated>
+    </task>
+    <task id="LOCAL-01149" summary="fix: simplify eager loading in CeoController by removing unnecessary query filters">
+      <option name="closed" value="true" />
+      <created>1756119661514</created>
+      <option name="number" value="01149" />
+      <option name="presentableId" value="LOCAL-01149" />
+      <option name="project" value="LOCAL" />
+      <updated>1756119661514</updated>
+    </task>
+    <option name="localTasksCounter" value="1150" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -863,8 +863,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update attendance salary calculation to use worked seconds for accuracy" />
-    <MESSAGE value="fix: add shipment plan API endpoints for managing shipment plans" />
     <MESSAGE value="fix: set default status to 'draft' in shipment plan creation" />
     <MESSAGE value="fix: remove 'created_at' from hidden attributes in EmployeeSalary model" />
     <MESSAGE value="fix: update employee salary query to use parsed start and end dates for filtering" />
@@ -888,7 +886,9 @@
     <MESSAGE value="fix: remove unused endpoints from API routes" />
     <MESSAGE value="fix: optimize data retrieval in CeoController with eager loading" />
     <MESSAGE value="fix: simplify eager loading in CeoController by removing unused fields" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: simplify eager loading in CeoController by removing unused fields" />
+    <MESSAGE value="fix: optimize eager loading in CeoController by removing unnecessary filters" />
+    <MESSAGE value="fix: simplify eager loading in CeoController by removing unnecessary query filters" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: simplify eager loading in CeoController by removing unnecessary query filters" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
