@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/SupplierController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/SupplierController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -439,23 +442,7 @@
       <workItem from="1755751862233" duration="1250000" />
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
-      <workItem from="1756114874304" duration="8500000" />
-    </task>
-    <task id="LOCAL-01110" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755251887372</created>
-      <option name="number" value="01110" />
-      <option name="presentableId" value="LOCAL-01110" />
-      <option name="project" value="LOCAL" />
-      <updated>1755251887372</updated>
-    </task>
-    <task id="LOCAL-01111" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755252035592</created>
-      <option name="number" value="01111" />
-      <option name="presentableId" value="LOCAL-01111" />
-      <option name="project" value="LOCAL" />
-      <updated>1755252035592</updated>
+      <workItem from="1756114874304" duration="10526000" />
     </task>
     <task id="LOCAL-01112" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -833,7 +820,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756124167140</updated>
     </task>
-    <option name="localTasksCounter" value="1159" />
+    <task id="LOCAL-01159" summary="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency">
+      <option name="closed" value="true" />
+      <created>1756124263080</created>
+      <option name="number" value="01159" />
+      <option name="presentableId" value="LOCAL-01159" />
+      <option name="project" value="LOCAL" />
+      <updated>1756124263080</updated>
+    </task>
+    <task id="LOCAL-01160" summary="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance">
+      <option name="closed" value="true" />
+      <created>1756124421072</created>
+      <option name="number" value="01160" />
+      <option name="presentableId" value="LOCAL-01160" />
+      <option name="project" value="LOCAL" />
+      <updated>1756124421072</updated>
+    </task>
+    <option name="localTasksCounter" value="1161" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -863,7 +866,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: add validation for 'for_admins' field in storeIssue method and update Telegram bot logic" />
     <MESSAGE value="fix: enhance user message formatting in UserController and load related employee data" />
     <MESSAGE value="fix: update validation for 'for_admins' field in UserController to allow multiple truthy values" />
     <MESSAGE value="fix: update 'for_admins' condition in UserController to check for string 'true'" />
@@ -888,7 +890,8 @@
     <MESSAGE value="fix: optimize eager loading in CeoController by calculating salary totals and date ranges for improved data accuracy" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring loops for improved clarity and performance" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
+    <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
