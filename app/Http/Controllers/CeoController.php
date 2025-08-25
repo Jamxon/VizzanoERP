@@ -28,8 +28,43 @@ class CeoController extends Controller
                             }])
                             ->withSum('sewingOutputs as total_quantity', 'quantity')
                             ->withMin('sewingOutputs as min_date', 'created_at')
-                            ->withMax('sewingOutputs as max_date', 'created_at'); } ]); }, 'responsibleUser.employee' ])
+                            ->withMax('sewingOutputs as max_date', 'created_at'); } ]); },
+                'responsibleUser.employee',
+                'orders.order.orderModel.submodels.tarificationCategories.tarifications.tarificationLogs.employee'
+            ])
             ->get();
+
+        foreach ($groups->orders->order->orderModel->submodels as $submodel) {
+            foreach ($submodel->tarificationCategories as $tarificationCategory) {
+                foreach ($tarificationCategory->tarifications as $tarification) {
+                    foreach ($tarification->tarificationLogs as $tarificationLog) {
+                        $tarificationTotal += $tarificationLog->amount_earned;
+                        $empId = $tarificationLog->employee_id;
+
+                        if (!isset($tarificationEmployees[$empId])) {
+                            $tarificationEmployees[$empId] = [
+                                'employee_id' => $empId,
+                                'name' => $tarificationLog->employee->name ?? 'Nomaʼlum',
+                                'salary' => 0
+                            ];
+                        }
+                        $tarificationEmployees[$empId]['salary'] += $tarificationLog->amount_earned;
+
+                        if ($tarificationLog->employee && $tarificationLog->employee->payment_type !== 'piece_work') {
+                            if (!isset($fixedWithTarificationEmployees[$empId])) {
+                                $fixedWithTarificationEmployees[$empId] = [
+                                    'employee_id' => $empId,
+                                    'name' => $tarificationLog->employee->name ?? 'Nomaʼlum',
+                                    'tarification_salary' => 0
+                                ];
+                            }
+                            $fixedWithTarificationEmployees[$empId]['tarification_salary'] += $tarificationLog->amount_earned;
+                            $fixedWithTarificationTotal += $tarificationLog->amount_earned;
+                        }
+                    }
+                }
+            }
+        }
         return response()->json($groups);
     }
 
