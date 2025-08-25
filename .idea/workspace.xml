@@ -4,7 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve model by tarification code with validation">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: remove unused endpoints from API routes">
+      <change afterPath="$PROJECT_DIR$/app/Http/Controllers/CeoController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -441,15 +442,7 @@
       <workItem from="1755751862233" duration="1250000" />
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
-      <workItem from="1756114874304" duration="1094000" />
-    </task>
-    <task id="LOCAL-01091" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755235891074</created>
-      <option name="number" value="01091" />
-      <option name="presentableId" value="LOCAL-01091" />
-      <option name="project" value="LOCAL" />
-      <updated>1755235891074</updated>
+      <workItem from="1756114874304" duration="2815000" />
     </task>
     <task id="LOCAL-01092" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -835,7 +828,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755923817725</updated>
     </task>
-    <option name="localTasksCounter" value="1140" />
+    <task id="LOCAL-01140" summary="fix: remove unused endpoints from API routes">
+      <option name="closed" value="true" />
+      <created>1756117319385</created>
+      <option name="number" value="01140" />
+      <option name="presentableId" value="LOCAL-01140" />
+      <option name="project" value="LOCAL" />
+      <updated>1756117319385</updated>
+    </task>
+    <option name="localTasksCounter" value="1141" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -865,7 +866,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: improve attendance salary handling in AttendanceController to adjust employee balance based on salary changes" />
     <MESSAGE value="fix: remove redundant balance increment logic in AttendanceController" />
     <MESSAGE value="fix: add check_out property to Attendance model" />
     <MESSAGE value="fix: update attendance salary calculation to use worked seconds for accuracy" />
@@ -890,7 +890,8 @@
     <MESSAGE value="fix: simplify employee tarification log retrieval and enhance data formatting" />
     <MESSAGE value="fix: add salaryPayments relationship and filter by date in user retrieval" />
     <MESSAGE value="fix: add endpoint to retrieve model by tarification code with validation" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add endpoint to retrieve model by tarification code with validation" />
+    <MESSAGE value="fix: remove unused endpoints from API routes" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: remove unused endpoints from API routes" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
