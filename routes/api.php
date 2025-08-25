@@ -153,7 +153,7 @@ Route::prefix('supplier')->middleware('role:supplier')->group(function () {
 
 Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () {
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
-    Route::get('employees/group', [SuperHRController::class, 'getEmployeeByGroupID']);
+//    Route::get('employees/group', [SuperHRController::class, 'getEmployeeByGroupID']);
     Route::get('employees/working', [SuperHRController::class, 'getWorkingEmployees']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::get('attendances', [AttendanceController::class, 'getAttendances']);
@@ -256,9 +256,6 @@ Route::prefix('qualityControllerMaster')->middleware('role:qualityControllerMast
 Route::prefix('qualityController')->middleware('role:qualityController')->group(function () {
     Route::get('orders',[QualityController::class, 'getOrders']);
     Route::get('orders/{id}',[QualityController::class, 'showOrder']);
-    Route::get('qualityDescription',[QualityController::class, 'getQualityDescription']);
-    Route::post('qualityDescription',[QualityController::class, 'qualityDescriptionStore']);
-    Route::patch('qualityDescription/{qualityDescription}',[QualityController::class, 'updateQualityDescription']);
     Route::post('qualitySuccessCheck',[QualityController::class, 'qualityCheckSuccessStore']);
     Route::post('qualityFailureCheck',[QualityController::class, 'qualityCheckFailureStore']);
     Route::get('qualityCheck',[QualityController::class, 'getQualityChecks']);
@@ -270,7 +267,6 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::get('orders/all/{id}', [GroupMasterController::class, 'showOrdersAll']);
        Route::get('orders/pending',[\App\Http\Controllers\GroupMasterController::class, 'getPendingOrders']);
        Route::get('orders/show/{id}',[\App\Http\Controllers\GroupMasterController::class, 'showOrder']);
-       Route::get('orders/{id}',[\App\Http\Controllers\GroupMasterController::class,'startOrder']);
        Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);
        Route::get('tarifications/{id}',[\App\Http\Controllers\GroupMasterController::class, 'getTarifications']);
        Route::post('tarifications',[\App\Http\Controllers\GroupMasterController::class,'assignEmployeesToTarifications']);
@@ -300,19 +296,6 @@ Route::prefix('groupHelper')->middleware('role:groupHelper')->group(function () 
 
 });
 
-Route::prefix('tailorMaster')->middleware('role:tailorMaster')->group(function () {
-    Route::get('orders', [TailorMasterController::class, 'getOrders']);
-    Route::get('groups', [TailorMasterController::class,'getGroups']);
-    Route::post('sendToConstructor', [TailorMasterController::class, 'sendToConstructor']);
-    Route::get('orders/{order}', [TailorMasterController::class, 'showOrder']);
-    Route::get('completedItems', [TailorMasterController::class, 'getCompletedItems']);
-    Route::post('completedItem', [TailorMasterController::class, 'acceptCompletedItem']);
-    Route::get('specifications/{id}', [TailorMasterController::class, 'getSpecificationByOrderId']);
-    Route::post('markAsTailored', [TailorMasterController::class, 'markAsTailored']);
-    Route::get('cuts/{id}', [TailorMasterController::class, 'getCuts']);
-    Route::post('fasteningOrderToGroup',[TailorMasterController::class, 'fasteningOrderToGroup']);
-});
-
 Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::post('groups', [GroupController::class, 'store']);
     Route::patch('groups/{group}', [GroupController::class, 'update']);
@@ -322,11 +305,6 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::post('plans', [GroupController::class,'orderGroupStore']);
     Route::get('orders/groups', [OrderController::class, 'getOrdersWithoutOrderGroups']);
     Route::get('orders/quantity', [OrderController::class, 'getOrdersWithQuantity']);
-
-
-    Route::get('users/master', [UserController::class, 'getUsersMaster']);
-    Route::get('users/submaster', [UserController::class, 'getUsersSubMaster']);
-    Route::get('users/warehouse', [WarehouseController::class, 'getWarehouseUsers']);
 
     Route::get('contragents', [OrderController::class, 'getContragents']);
 
@@ -357,7 +335,6 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::get('itemtypes', [ItemTypeController::class, 'index']);
     Route::post('itemtypes/{itemType}', [ItemTypeController::class, 'store']);
     Route::patch('itemtypes/{itemType}', [ItemTypeController::class, 'update']);
-    Route::delete('itemtypes/{itemType}', [ItemTypeController::class, 'destroy']);
 
     Route::get('recipes', [RecipeController::class, 'show']);
     Route::get('getrecipes', [RecipeController::class, 'getRecipe']);
@@ -370,22 +347,17 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
     Route::get('units', [UnitController::class, 'index']);
     Route::post('units', [UnitController::class, 'store']);
     Route::patch('units/{unit}', [UnitController::class, 'update']);
-    Route::delete('units/{unit}', [UnitController::class, 'destroy']);
 
     Route::get('colors', [ColorController::class, 'index']);
     Route::post('colors', [ColorController::class, 'store']);
     Route::patch('colors/{color}', [ColorController::class, 'update']);
-    Route::delete('colors/{color}', [ColorController::class, 'destroy']);
 
     Route::get('razryads', [RazryadController::class, 'index']);
     Route::post('razryads', [RazryadController::class, 'store']);
     Route::patch('razryads/{razryad}', [RazryadController::class, 'update']);
     Route::delete('razryads/{razryad}', [RazryadController::class, 'destroy']);
 
-    Route::get('warehouses', [WarehouseController::class, 'getWarehouse']);
-    Route::post('warehouses', [WarehouseController::class, 'warehouseStore']);
-    Route::patch('warehouses/{warehouse}', [WarehouseController::class, 'warehouseUpdate']);
-
+    Route::get('warehouses', [WarehouseController::class, 'getWarehouses']);
     Route::get('departments', [DepartmentController::class, 'index']);
     Route::post('departments', [DepartmentController::class, 'store']);
     Route::patch('departments/{department}', [DepartmentController::class, 'update']);
@@ -488,7 +460,6 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::post('sendToConstructor', [CuttingMasterController::class, 'sendToConstructor']);
     Route::get('orders/{order}', [CuttingMasterController::class, 'showOrder']);
     Route::get('completedItems', [CuttingMasterController::class, 'getCompletedItems']);
-    Route::post('completedItem', [CuttingMasterController::class, 'acceptCompletedItem']);
     Route::get('specifications/{id}', [CuttingMasterController::class, 'getSpecificationByOrderId']);
     Route::get('markAsCut', [CuttingMasterController::class, 'markAsCutAndExportMultiplePdfs']);
     Route::get('cuts/{id}', [CuttingMasterController::class, 'getCuts']);
@@ -541,7 +512,6 @@ Route::middleware('auth:api')->group(function () {
     Route::get('sewingOutputs', [VizzanoReportTvController::class, 'getSewingOutputs']);
     Route::get('groupPlans', [CasherController::class, 'getGroupPlans']);
     Route::post('issue', [UserController::class, 'storeIssue']);
-    Route::get('/test-eskiz-report', [EskizTestController::class, 'reportByRange']);
     Route::post('sendSMS', [EskizTestController::class, 'sendSMS']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::get('topEarners', [TailorController::class, 'getTopEarners']);
