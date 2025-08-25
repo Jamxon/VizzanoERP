@@ -35,6 +35,8 @@ class CeoController extends Controller
             ->get();
 
         $result = [];
+        $firstDate = null;
+        $lastDate = null;
 
         foreach ($groups as $group) {
             $tarificationTotal = 0;
@@ -42,8 +44,43 @@ class CeoController extends Controller
             $fixedWithTarificationTotal = 0;
             $fixedWithTarificationEmployees = [];
 
+
             foreach ($group->orders as $order) {
+                $salaryTotal = 0;
+                $salaryEmployees = [];
+                foreach ($submodel->sewingOutputs as $output) {
+                    $createdAt = \Carbon\Carbon::parse($output->created_at);
+
+                    if (is_null($firstDate) || $createdAt->lt($firstDate)) {
+                        $firstDate = $createdAt;
+                    }
+                    if (is_null($lastDate) || $createdAt->gt($lastDate)) {
+                        $lastDate = $createdAt;
+                    }
+                }
                 foreach ($order->order->orderModel->submodels as $submodel) {
+                    $group = $submodel->group->group ?? null;
+                    if (!$group) continue;
+
+                    foreach ($group->employees as $employee) {
+                        // faqat AUP bo‘lmagan xodimlarni olamiz
+                        if ($employee->type === 'aup') {
+                            continue;
+                        }
+
+                        $salarySum = $employee->attendanceSalaries()
+                            ->whereBetween('date', [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
+                            ->sum('amount');
+
+                        if ($salarySum > 0) {
+                            $salaryEmployees[] = [
+                                'employee_id' => $employee->id,
+                                'name' => $employee->name,
+                                'salary' => $salarySum
+                            ];
+                            $salaryTotal += $salarySum;
+                        }
+                    }
                     foreach ($submodel->tarificationCategories as $tarificationCategory) {
                         foreach ($tarificationCategory->tarifications as $tarification) {
                             foreach ($tarification->tarificationLogs as $tarificationLog) {
@@ -76,7 +113,19 @@ class CeoController extends Controller
                 }
             }
         }
-        return response()->json($result);
+        return response()->json([
+            'groups' => $groups,
+            'first_date' => $firstDate ? $firstDate->format('Y-m-d') : null,
+            'last_date' => $lastDate ? $lastDate->format('Y-m-d') : null,
+            'tarification_total' => $tarificationTotal,
+            'tarification_employees' => array_values($tarificationEmployees),
+
+            'salary_total' => $salaryTotal,
+            'salary_employees' => $salaryEmployees,
+
+            'fixed_with_tarification_total' => $fixedWithTarificationTotal,
+            'fixed_with_tarification_employees' => array_values($fixedWithTarificationEmployees),
+        ]);
     }
 
 }
