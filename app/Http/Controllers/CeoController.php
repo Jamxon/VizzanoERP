@@ -10,104 +10,68 @@ class CeoController extends Controller
     {
         $startDate = $request->start_date;
         $endDate = $request->end_date;
+
+        // 1. Guruhlarni yuklash (faqat kerakli narsalar bilan)
         $groups = \App\Models\Group::where('department_id', $request->department_id)
-            ->with([ 'orders' => function ($query) use ($startDate, $endDate)
-            {
-                // orders faqat sana bo‘yicha filter qilinadi
-                $query->whereHas('order.orderModel.submodels.sewingOutputs', function ($q) use ($startDate, $endDate)
-                {
-                    $q->whereBetween('created_at', [$startDate, $endDate]);
-                })
-                    ->with([ 'order' => function ($q) {
-                        $q->select('id', 'name', 'quantity', 'status', 'start_date', 'end_date'); },
-                        'order.orderModel' => function ($q) { $q->select('id', 'order_id', 'model_id', 'rasxod', 'status', 'minute')
-                            ->with('model:id,name'); },
-                        'order.orderModel.submodels' => function ($q) { $q->select('id', 'order_model_id')
-                            ->with(['sewingOutputs' => function ($sq) {
-                                $sq->select( 'id', 'order_submodel_id', 'quantity', 'created_at' );
-                            }])
-                            ->withSum('sewingOutputs as total_quantity', 'quantity')
-                            ->withMin('sewingOutputs as min_date', 'created_at')
-                            ->withMax('sewingOutputs as max_date', 'created_at'); } ]); },
-                'responsibleUser.employee',
-                'orders.order.orderModel.submodels.tarificationCategories.tarifications.tarificationLogs.employee'
+            ->with([
+                'orders.order:id,name,quantity,status,start_date,end_date',
+                'orders.order.orderModel:id,order_id,model_id,rasxod,status,minute',
+                'orders.order.orderModel.model:id,name',
+                'orders.order.orderModel.submodels' => function ($q) {
+                    $q->select('id', 'order_model_id')
+                        ->withSum('sewingOutputs as total_quantity', 'quantity')
+                        ->withMin('sewingOutputs as min_date', 'created_at')
+                        ->withMax('sewingOutputs as max_date', 'created_at');
+                },
+                'orders.order.orderModel.submodels.tarificationCategories.tarifications.tarificationLogs.employee:id,name,payment_type',
             ])
             ->get();
 
-        $result = [];
+        $tarificationTotal = 0;
+        $tarificationEmployees = [];
+        $fixedWithTarificationTotal = 0;
+        $fixedWithTarificationEmployees = [];
+
         $firstDate = null;
         $lastDate = null;
 
+        // 2. Tarification hisoblash
         foreach ($groups as $group) {
-            $tarificationTotal = 0;
-            $tarificationEmployees = [];
-            $fixedWithTarificationTotal = 0;
-            $fixedWithTarificationEmployees = [];
-
-
             foreach ($group->orders as $order) {
-                $salaryTotal = 0;
-                $salaryEmployees = [];
-
                 foreach ($order->order->orderModel->submodels as $submodel) {
-                    foreach ($submodel->sewingOutputs as $output) {
-                        $createdAt = \Carbon\Carbon::parse($output->created_at);
-
-                        if (is_null($firstDate) || $createdAt->lt($firstDate)) {
-                            $firstDate = $createdAt;
-                        }
-                        if (is_null($lastDate) || $createdAt->gt($lastDate)) {
-                            $lastDate = $createdAt;
-                        }
+                    // sewing outputs dan min/max olish
+                    if ($submodel->min_date && ($firstDate === null || $submodel->min_date < $firstDate)) {
+                        $firstDate = $submodel->min_date;
+                    }
+                    if ($submodel->max_date && ($lastDate === null || $submodel->max_date > $lastDate)) {
+                        $lastDate = $submodel->max_date;
                     }
 
-                    $group = $submodel->group->group ?? null;
-                    if (!$group) continue;
-
-                    foreach ($group->employees as $employee) {
-                        // faqat AUP bo‘lmagan xodimlarni olamiz
-                        if ($employee->type === 'aup') {
-                            continue;
-                        }
-
-                        $salarySum = $employee->attendanceSalaries()
-                            ->whereBetween('date', [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
-                            ->sum('amount');
-
-                        if ($salarySum > 0) {
-                            $salaryEmployees[] = [
-                                'employee_id' => $employee->id,
-                                'name' => $employee->name,
-                                'salary' => $salarySum
-                            ];
-                            $salaryTotal += $salarySum;
-                        }
-                    }
-                    foreach ($submodel->tarificationCategories as $tarificationCategory) {
-                        foreach ($tarificationCategory->tarifications as $tarification) {
-                            foreach ($tarification->tarificationLogs as $tarificationLog) {
-                                $tarificationTotal += $tarificationLog->amount_earned;
-                                $empId = $tarificationLog->employee_id;
+                    foreach ($submodel->tarificationCategories as $category) {
+                        foreach ($category->tarifications as $tarification) {
+                            foreach ($tarification->tarificationLogs as $log) {
+                                $tarificationTotal += $log->amount_earned;
+                                $empId = $log->employee_id;
 
                                 if (!isset($tarificationEmployees[$empId])) {
                                     $tarificationEmployees[$empId] = [
                                         'employee_id' => $empId,
-                                        'name' => $tarificationLog->employee->name ?? 'Nomaʼlum',
+                                        'name' => $log->employee->name ?? 'Nomaʼlum',
                                         'salary' => 0
                                     ];
                                 }
-                                $tarificationEmployees[$empId]['salary'] += $tarificationLog->amount_earned;
+                                $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
 
-                                if ($tarificationLog->employee && $tarificationLog->employee->payment_type !== 'piece_work') {
+                                if ($log->employee && $log->employee->payment_type !== 'piece_work') {
                                     if (!isset($fixedWithTarificationEmployees[$empId])) {
                                         $fixedWithTarificationEmployees[$empId] = [
                                             'employee_id' => $empId,
-                                            'name' => $tarificationLog->employee->name ?? 'Nomaʼlum',
+                                            'name' => $log->employee->name ?? 'Nomaʼlum',
                                             'tarification_salary' => 0
                                         ];
                                     }
-                                    $fixedWithTarificationEmployees[$empId]['tarification_salary'] += $tarificationLog->amount_earned;
-                                    $fixedWithTarificationTotal += $tarificationLog->amount_earned;
+                                    $fixedWithTarificationEmployees[$empId]['tarification_salary'] += $log->amount_earned;
+                                    $fixedWithTarificationTotal += $log->amount_earned;
                                 }
                             }
                         }
@@ -115,10 +79,38 @@ class CeoController extends Controller
                 }
             }
         }
+
+        // 3. Attendance salaries (bitta query bilan olish)
+        $salaryEmployees = [];
+        $salaryTotal = 0;
+
+        if ($firstDate && $lastDate) {
+            $salaries = \App\Models\AttendanceSalary::whereBetween('date', [
+                \Carbon\Carbon::parse($firstDate)->format('Y-m-d'),
+                \Carbon\Carbon::parse($lastDate)->format('Y-m-d'),
+            ])
+                ->whereHas('employee', function ($q) {
+                    $q->where('type', '!=', 'aup'); // faqat AUP bo‘lmaganlar
+                })
+                ->with('employee:id,name,type')
+                ->selectRaw('employee_id, SUM(amount) as total_salary')
+                ->groupBy('employee_id')
+                ->get();
+
+            foreach ($salaries as $s) {
+                $salaryEmployees[] = [
+                    'employee_id' => $s->employee_id,
+                    'name' => $s->employee->name,
+                    'salary' => $s->total_salary
+                ];
+                $salaryTotal += $s->total_salary;
+            }
+        }
+
         return response()->json([
             'groups' => $groups,
-            'first_date' => $firstDate ? $firstDate->format('Y-m-d') : null,
-            'last_date' => $lastDate ? $lastDate->format('Y-m-d') : null,
+            'first_date' => $firstDate ? date('Y-m-d', strtotime($firstDate)) : null,
+            'last_date' => $lastDate ? date('Y-m-d', strtotime($lastDate)) : null,
             'tarification_total' => $tarificationTotal,
             'tarification_employees' => array_values($tarificationEmployees),
 
@@ -129,5 +121,6 @@ class CeoController extends Controller
             'fixed_with_tarification_employees' => array_values($fixedWithTarificationEmployees),
         ]);
     }
+
 
 }
