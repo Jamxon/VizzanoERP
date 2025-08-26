@@ -184,6 +184,8 @@ Route::prefix('internalAccountant')->middleware('role:internalAccountant')->grou
     Route::get('tarifications/pdf', [TechnologController::class, 'exportTarificationsPdf']);
     Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
     Route::get('tarifSearch', [InternalAccountantController::class, 'getModelByTarificationCode']);
+    Route::get('orderSalary/{id}', [InternalAccountantController::class, 'getOrderAttendanceSalary']);
+
 });
 
 Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(function () {
