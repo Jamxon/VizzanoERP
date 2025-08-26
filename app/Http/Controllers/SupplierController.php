@@ -106,7 +106,7 @@ class SupplierController extends Controller
                 $totalsStr .= "• <b>{$fmt($sum)} {$cCode}</b>\n";
             }
 
-            $creator = auth()->user()->employee->name ?? auth()->user()->name ?? '---';
+            $creator = auth()->user()->employee->name ?? '---';
             $comment = trim((string)$order->comment);
             $commentLine = $comment ? "\n📝 Izoh: {$comment}\n" : "";
 
