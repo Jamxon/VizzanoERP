@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update supplier name retrieval in SupplierController for order notifications">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add route for retrieving employee tarification logs in InternalAccountantController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -442,23 +442,7 @@
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="7418000" />
-    </task>
-    <task id="LOCAL-01123" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755343950355</created>
-      <option name="number" value="01123" />
-      <option name="presentableId" value="LOCAL-01123" />
-      <option name="project" value="LOCAL" />
-      <updated>1755343950355</updated>
-    </task>
-    <task id="LOCAL-01124" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755362525013</created>
-      <option name="number" value="01124" />
-      <option name="presentableId" value="LOCAL-01124" />
-      <option name="project" value="LOCAL" />
-      <updated>1755362525013</updated>
+      <workItem from="1756179711186" duration="9242000" />
     </task>
     <task id="LOCAL-01125" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -836,7 +820,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756186635374</updated>
     </task>
-    <option name="localTasksCounter" value="1172" />
+    <task id="LOCAL-01172" summary="fix: enhance order data structure in CeoController to include submodel sewing outputs">
+      <option name="closed" value="true" />
+      <created>1756188715968</created>
+      <option name="number" value="01172" />
+      <option name="presentableId" value="LOCAL-01172" />
+      <option name="project" value="LOCAL" />
+      <updated>1756188715968</updated>
+    </task>
+    <task id="LOCAL-01173" summary="fix: add route for retrieving employee tarification logs in InternalAccountantController">
+      <option name="closed" value="true" />
+      <created>1756189382728</created>
+      <option name="number" value="01173" />
+      <option name="presentableId" value="LOCAL-01173" />
+      <option name="project" value="LOCAL" />
+      <updated>1756189382730</updated>
+    </task>
+    <option name="localTasksCounter" value="1174" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -866,8 +866,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: simplify employee tarification log retrieval and enhance data formatting" />
-    <MESSAGE value="fix: add salaryPayments relationship and filter by date in user retrieval" />
     <MESSAGE value="fix: add endpoint to retrieve model by tarification code with validation" />
     <MESSAGE value="fix: remove unused endpoints from API routes" />
     <MESSAGE value="fix: optimize data retrieval in CeoController with eager loading" />
@@ -891,7 +889,9 @@
     <MESSAGE value="fix: enhance InternalAccountantController to include order date in salary calculations" />
     <MESSAGE value="fix: update chat ID in SupplierController for Telegram notifications" />
     <MESSAGE value="fix: update supplier name retrieval in SupplierController for order notifications" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update supplier name retrieval in SupplierController for order notifications" />
+    <MESSAGE value="fix: enhance order data structure in CeoController to include submodel sewing outputs" />
+    <MESSAGE value="fix: add route for retrieving employee tarification logs in InternalAccountantController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add route for retrieving employee tarification logs in InternalAccountantController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

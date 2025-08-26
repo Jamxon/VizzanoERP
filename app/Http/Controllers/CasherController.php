@@ -315,6 +315,9 @@ class CasherController extends Controller
 
         $dailyExpense = $dailyExpenseMonthly + $totalIncomePercentageExpense + $totalAmortizationExpense;
 
+        // Umumiy quantity va har bir dona uchun xarajat hisoblash
+        $costPerUnitOverall = $totalOutputQty > 0 ? $totalFixedCost / $totalOutputQty : 0;
+
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
@@ -337,6 +340,10 @@ class CasherController extends Controller
                 ->whereDate('employee_tarification_logs.date', $date)
                 ->whereIn('employee_tarification_logs.employee_id', $relatedEmployeeIds)
                 ->sum('employee_tarification_logs.amount_earned'),
+
+            // Yangi qo'shilgan qismlar
+            'total_output_quantity' => $totalOutputQty,
+            'cost_per_unit_overall_uzs' => round($costPerUnitOverall, 2),
         ]);
     }
 
