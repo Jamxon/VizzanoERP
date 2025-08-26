@@ -123,7 +123,7 @@ class SupplierController extends Controller
 
             // Telegramga yuborish (HTML parse_mode)
             $botToken = '7976854451:AAGKnnFBQJ0-GC8FAwET_GD09S4PuktlrDo';
-            $chatId   = -4682244887;
+            $chatId   = -1002865541209;
 
             try {
                 Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
