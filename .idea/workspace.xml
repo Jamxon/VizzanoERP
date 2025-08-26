@@ -440,15 +440,7 @@
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="5435000" />
-    </task>
-    <task id="LOCAL-01121" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755343483752</created>
-      <option name="number" value="01121" />
-      <option name="presentableId" value="LOCAL-01121" />
-      <option name="project" value="LOCAL" />
-      <updated>1755343483752</updated>
+      <workItem from="1756179711186" duration="5750000" />
     </task>
     <task id="LOCAL-01122" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -834,7 +826,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756186054038</updated>
     </task>
-    <option name="localTasksCounter" value="1170" />
+    <task id="LOCAL-01170" summary="fix: update supplier name retrieval in SupplierController for order notifications">
+      <option name="closed" value="true" />
+      <created>1756186238564</created>
+      <option name="number" value="01170" />
+      <option name="presentableId" value="LOCAL-01170" />
+      <option name="project" value="LOCAL" />
+      <updated>1756186238564</updated>
+    </task>
+    <option name="localTasksCounter" value="1171" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

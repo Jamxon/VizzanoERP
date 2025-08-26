@@ -88,7 +88,7 @@ class SupplierController extends Controller
                 $unitStr = $unitTxt ? " <i>($unitTxt)</i>" : '';
 
                 $lines[] =
-                    "{$i}. <b>{$name}</b>{$unitStr}\n".
+                    "{$i}. <b>{$name}</b>\n".
                     "   ├─ Miqdor: <b>{$fmt($qty)}</b>\n".
                     "   ├─ Narx: <b>{$fmt($price)} {$codeC}</b>\n".
                     "   └─ Jami: <b>{$fmt($line)} {$codeC}</b>";
@@ -104,11 +104,13 @@ class SupplierController extends Controller
             $comment = trim((string)$order->comment);
             $commentLine = $comment ? "\n📝 Izoh: {$comment}\n" : "";
 
+            $deadlineFormatted = date('d.m', strtotime($order->deadline));
+
             $message =
                 "<b>🆕 Yangi buyurtma yaratildi!</b>\n\n".
                 "📌 Kod: <b>{$order->code}</b>\n".
                 "🏢 Ta'minotchi: <b>{$order->supplier->employee->name}</b>\n".
-                "📅 Deadline: <b>{$order->deadline}</b>\n".
+                "📅 Muddat: <b>{$deadlineFormatted}</b>\n".
                 "👤 Yaratuvchi: <b>{$creator}</b>".
                 $commentLine.
                 "\n<b>🧾 Pozitsiyalar:</b>\n".
