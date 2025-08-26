@@ -1103,7 +1103,14 @@ class InternalAccountantController extends Controller
         $firstDate = null;
         $lastDate = null;
 
+        $totalSumma = 0;
+
         foreach ($order->orderModel->submodels as $submodel) {
+            $maxSpend = $submodel->submodelSpend->max('summa');
+
+            if ($maxSpend) {
+                $totalSumma += $maxSpend * $order->quantity;
+            }
             foreach ($submodel->sewingOutputs as $output) {
                 $createdAt = \Carbon\Carbon::parse($output->created_at);
 
@@ -1214,6 +1221,7 @@ class InternalAccountantController extends Controller
 
         return response()->json([
             'status' => 'success',
+            'total_summa' => $totalSumma,
             'start_date' => $firstDate->format('Y-m-d'),
             'end_date' => $lastDate->format('Y-m-d'),
             'date_range' => $firstDate->format('Y-m-d') . ' — ' . $lastDate->format('Y-m-d'),
