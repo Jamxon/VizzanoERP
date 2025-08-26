@@ -113,7 +113,7 @@ class SupplierController extends Controller
             $message =
                 "<b>🆕 Yangi buyurtma yaratildi!</b>\n\n".
                 "📌 Kod: <b>{$order->code}</b>\n".
-                "🏢 Ta'minotchi: <b>{$order->supplier->name}</b>\n".
+                "🏢 Ta'minotchi: <b>{$order->supplier->employee->name}</b>\n".
                 "📅 Deadline: <b>{$order->deadline}</b>\n".
                 "👤 Yaratuvchi: <b>{$creator}</b>".
                 $commentLine.
