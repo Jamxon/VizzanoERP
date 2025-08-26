@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 use App\Models\Employee;
+use Illuminate\Support\Facades\DB;
 use Svg\Tag\Rect;
 
 class InternalAccountantController extends Controller
@@ -1098,7 +1099,7 @@ class InternalAccountantController extends Controller
         $order = Order::with([
             'orderModel.submodels' => function($query) {
                 $query->with([
-                    'sewingOutputs:id,submodel_id,created_at',
+                    'sewingOutputs',
                     'submodelSpend:submodel_id,summa',
                     'tarificationCategories.tarifications.tarificationLogs' => function($q) {
                         $q->with('employee:id,name,payment_type')
@@ -1217,7 +1218,7 @@ class InternalAccountantController extends Controller
 
         if (!empty($employeeIds) && !empty($orderDates)) {
             // Bitta query bilan barcha attendance ma'lumotlarini olamiz
-            $attendanceSalaries = DB::table('attendance_salaries')
+            $attendanceSalaries = DB::table('attendance_salary')
                 ->whereIn('employee_id', $employeeIds)
                 ->whereIn(DB::raw('DATE(date)'), $orderDates)
                 ->select('employee_id', DB::raw('DATE(date) as date'), 'amount')
@@ -1228,16 +1229,16 @@ class InternalAccountantController extends Controller
             $groupOrdersCounts = [];
             if (!empty($groupIds)) {
                 $groupOrdersData = DB::table('sewing_outputs')
-                    ->join('submodels', 'sewing_outputs.submodel_id', '=', 'submodels.id')
-                    ->join('group_submodels', 'submodels.id', '=', 'group_submodels.submodel_id')
-                    ->whereIn('group_submodels.group_id', $groupIds)
+                    ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
+                    ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id')
+                    ->whereIn('order_groups.group_id', $groupIds)
                     ->whereIn(DB::raw('DATE(sewing_outputs.created_at)'), $orderDates)
                     ->select(
-                        'group_submodels.group_id',
+                        'order_groups.group_id',
                         DB::raw('DATE(sewing_outputs.created_at) as date'),
                         DB::raw('COUNT(DISTINCT submodels.order_model_id) as orders_count')
                     )
-                    ->groupBy('group_submodels.group_id', 'date')
+                    ->groupBy('order_groups.group_id', 'date')
                     ->get();
 
                 foreach ($groupOrdersData as $data) {
