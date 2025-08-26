@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class CeoController extends Controller
 {
-    public function getGroupResult(Request $request)
+    public function getGroupOrder(Request $request)
     {
         $startDate = $request->start_date;
         $endDate = $request->end_date;

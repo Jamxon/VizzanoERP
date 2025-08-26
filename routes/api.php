@@ -43,7 +43,7 @@ use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('ceo')->middleware('role:ceo')->group(function () {
-    Route::get('groupsResult', [\App\Http\Controllers\CeoController::class, 'getGroupResult']);
+    Route::get('groupsOrders', [\App\Http\Controllers\CeoController::class, 'getGroupOrder']);
     Route::post('incomes', [CasherController::class, 'storeIncome']);
     Route::post('expenses', [CasherController::class, 'storeExpense']);
     Route::get('balances', [CasherController::class, 'getBalances']);

@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance SupplierController to optimize order creation and improve Telegram notification formatting">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -442,15 +440,7 @@
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="2628000" />
-    </task>
-    <task id="LOCAL-01113" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755252279068</created>
-      <option name="number" value="01113" />
-      <option name="presentableId" value="LOCAL-01113" />
-      <option name="project" value="LOCAL" />
-      <updated>1755252279068</updated>
+      <workItem from="1756179711186" duration="3467000" />
     </task>
     <task id="LOCAL-01114" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -836,7 +826,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756126271506</updated>
     </task>
-    <option name="localTasksCounter" value="1162" />
+    <task id="LOCAL-01162" summary="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency">
+      <option name="closed" value="true" />
+      <created>1756182818903</created>
+      <option name="number" value="01162" />
+      <option name="presentableId" value="LOCAL-01162" />
+      <option name="project" value="LOCAL" />
+      <updated>1756182818904</updated>
+    </task>
+    <option name="localTasksCounter" value="1163" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -888,10 +886,10 @@
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring loops and improving data aggregation" />
     <MESSAGE value="fix: optimize eager loading in CeoController by calculating salary totals and date ranges for improved data accuracy" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring loops for improved clarity and performance" />
-    <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance" />
     <MESSAGE value="fix: enhance SupplierController to optimize order creation and improve Telegram notification formatting" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance SupplierController to optimize order creation and improve Telegram notification formatting" />
+    <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
