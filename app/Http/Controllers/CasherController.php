@@ -61,6 +61,7 @@ class CasherController extends Controller
             'total_fixed_cost_uzs' => 0,
             'net_profit_uzs' => 0,
             'employee_count_sum' => 0,
+            'total_output_quantity' => 0,
         ];
 
         foreach ($period as $dateObj) {
@@ -83,6 +84,7 @@ class CasherController extends Controller
             $monthlyStats['total_fixed_cost_uzs'] += $daily['total_fixed_cost_uzs'] ?? 0;
             $monthlyStats['net_profit_uzs'] += $daily['net_profit_uzs'] ?? 0;
             $monthlyStats['employee_count_sum'] += $daily['employee_count'] ?? 0;
+            $monthlyStats['total_output_quantity'] += $daily['total_output_quantity'] ?? 0;
 
             if (!isset($daily['orders'])) continue;
 
@@ -130,6 +132,11 @@ class CasherController extends Controller
         $averageEmployeeCount = round($monthlyStats['employee_count_sum'] / max($workingDays, 1));
         $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
 
+        // Umumiy quantity va har bir dona uchun xarajat hisoblash
+        $costPerUnitOverall = $monthlyStats['total_output_quantity'] > 0
+            ? $monthlyStats['total_fixed_cost_uzs'] / $monthlyStats['total_output_quantity']
+            : 0;
+
         return response()->json([
             'start_date' => $start->toDateString(),
             'end_date' => $end->toDateString(),
@@ -147,6 +154,10 @@ class CasherController extends Controller
             'average_employee_count' => $averageEmployeeCount,
             'per_employee_cost_uzs' => $perEmployeeCost,
             'orders' => array_values($orderSummaries),
+
+            // Yangi qo'shilgan qismlar
+            'total_output_quantity' => $monthlyStats['total_output_quantity'],
+            'cost_per_unit_overall_uzs' => round($costPerUnitOverall, 2),
         ]);
     }
 
