@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add route for retrieving order attendance salary in InternalAccountantController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: calculate overall cost per unit and include total output quantity in CasherController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -440,15 +443,7 @@
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="9561000" />
-    </task>
-    <task id="LOCAL-01127" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755419457779</created>
-      <option name="number" value="01127" />
-      <option name="presentableId" value="LOCAL-01127" />
-      <option name="project" value="LOCAL" />
-      <updated>1755419457779</updated>
+      <workItem from="1756179711186" duration="11431000" />
     </task>
     <task id="LOCAL-01128" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -834,7 +829,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756194129478</updated>
     </task>
-    <option name="localTasksCounter" value="1176" />
+    <task id="LOCAL-01176" summary="fix: calculate overall cost per unit and include total output quantity in CasherController">
+      <option name="closed" value="true" />
+      <created>1756194378566</created>
+      <option name="number" value="01176" />
+      <option name="presentableId" value="LOCAL-01176" />
+      <option name="project" value="LOCAL" />
+      <updated>1756194378566</updated>
+    </task>
+    <option name="localTasksCounter" value="1177" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -887,9 +890,9 @@
     <MESSAGE value="fix: update supplier name retrieval in SupplierController for order notifications" />
     <MESSAGE value="fix: enhance order data structure in CeoController to include submodel sewing outputs" />
     <MESSAGE value="fix: add route for retrieving employee tarification logs in InternalAccountantController" />
-    <MESSAGE value="fix: calculate overall cost per unit and include total output quantity in CasherController" />
     <MESSAGE value="fix: add route for retrieving order attendance salary in InternalAccountantController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add route for retrieving order attendance salary in InternalAccountantController" />
+    <MESSAGE value="fix: calculate overall cost per unit and include total output quantity in CasherController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: calculate overall cost per unit and include total output quantity in CasherController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

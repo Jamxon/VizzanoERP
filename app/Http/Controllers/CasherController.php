@@ -220,6 +220,9 @@ class CasherController extends Controller
             ->whereHas('orderSubmodel.orderModel.order', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
             })
+            ->whereHas('orderSubmodel.group.group', function ($q) {
+                $q->where('name', 'not like', '%Трикотаж%'); // '!=' emas, 'not like'
+            })
             ->get();
 
         $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);
