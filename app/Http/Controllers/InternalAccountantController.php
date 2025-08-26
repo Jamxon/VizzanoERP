@@ -1210,7 +1210,8 @@ class InternalAccountantController extends Controller
                     $salaryEmployees[] = [
                         'employee_id' => $employee->id,
                         'name' => $employee->name,
-                        'salary' => $totalSalary
+                        'salary' => $totalSalary,
+                        'date' => $ordersWorkedOnThisDate
                     ];
                     $salaryTotal += $totalSalary;
                 }
@@ -1234,7 +1235,6 @@ class InternalAccountantController extends Controller
         ]);
     }
 
-// Yordamchi funksiya - guruhning berilgan sanada nechta orderda ishlaganini topish
     private function getGroupOrdersCountForDate($groupId, $date)
     {
         $group = \App\Models\Group::where('id', $groupId)
