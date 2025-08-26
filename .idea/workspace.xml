@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add endpoint to retrieve order attendance salary in InternalAccountantController">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: calculate total summa based on maximum spend in InternalAccountantController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -442,15 +440,7 @@
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="14275000" />
-    </task>
-    <task id="LOCAL-01132" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755420676361</created>
-      <option name="number" value="01132" />
-      <option name="presentableId" value="LOCAL-01132" />
-      <option name="project" value="LOCAL" />
-      <updated>1755420676361</updated>
+      <workItem from="1756179711186" duration="15109000" />
     </task>
     <task id="LOCAL-01133" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -836,7 +826,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756199961459</updated>
     </task>
-    <option name="localTasksCounter" value="1181" />
+    <task id="LOCAL-01181" summary="fix: calculate total summa based on maximum spend in InternalAccountantController">
+      <option name="closed" value="true" />
+      <created>1756200939955</created>
+      <option name="number" value="01181" />
+      <option name="presentableId" value="LOCAL-01181" />
+      <option name="project" value="LOCAL" />
+      <updated>1756200939955</updated>
+    </task>
+    <option name="localTasksCounter" value="1182" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -866,7 +864,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: enhance eager loading in CeoController by optimizing query structure and removing unnecessary fields" />
     <MESSAGE value="fix: optimize eager loading and calculations in CeoController for improved performance" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and reducing unnecessary data retrieval" />
     <MESSAGE value="fix: enhance eager loading in CeoController by restructuring queries and adding calculations for employee salaries" />
@@ -891,7 +888,8 @@
     <MESSAGE value="fix: optimize daily salary calculation in InternalAccountantController" />
     <MESSAGE value="fix: refine daily salary calculation logic in InternalAccountantController" />
     <MESSAGE value="fix: add endpoint to retrieve order attendance salary in InternalAccountantController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add endpoint to retrieve order attendance salary in InternalAccountantController" />
+    <MESSAGE value="fix: calculate total summa based on maximum spend in InternalAccountantController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: calculate total summa based on maximum spend in InternalAccountantController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

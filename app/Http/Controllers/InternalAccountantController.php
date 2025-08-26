@@ -1094,31 +1094,69 @@ class InternalAccountantController extends Controller
 
     public function getOrderAttendanceSalary($id)
     {
+        // 1. Bitta query bilan barcha kerakli ma'lumotlarni olamiz
         $order = Order::with([
-            'orderModel.submodels.sewingOutputs',
-            'orderModel.submodels.tarificationCategories.tarifications.tarificationLogs.employee',
-            'orderModel.submodels.group.group.employees.attendanceSalaries'
+            'orderModel.submodels' => function($query) {
+                $query->with([
+                    'sewingOutputs:id,submodel_id,created_at',
+                    'submodelSpend:submodel_id,summa',
+                    'tarificationCategories.tarifications.tarificationLogs' => function($q) {
+                        $q->with('employee:id,name,payment_type')
+                            ->select('id', 'tarification_id', 'employee_id', 'amount_earned');
+                    },
+                    'group.group.employees' => function($q) {
+                        $q->where('type', '!=', 'aup')
+                            ->select('id', 'name', 'type', 'group_id');
+                    }
+                ]);
+            }
         ])->findOrFail($id);
 
+        // 2. Asosiy o'zgaruvchilarni initsializatsiya qilamiz
         $firstDate = null;
         $lastDate = null;
-
         $totalSumma = 0;
+        $currentOrderDates = [];
+        $groupIds = [];
+        $employeeIds = [];
 
+        // 3. Birinchi pass: sanalar va summa hisoblash
         foreach ($order->orderModel->submodels as $submodel) {
+            // Summa hisoblash
             $maxSpend = $submodel->submodelSpend->max('summa');
-
             if ($maxSpend) {
                 $totalSumma += $maxSpend * $order->quantity;
             }
+
+            // Sanalarni yig'ish
             foreach ($submodel->sewingOutputs as $output) {
                 $createdAt = \Carbon\Carbon::parse($output->created_at);
+                $date = $createdAt->format('Y-m-d');
+
+                if (!isset($currentOrderDates[$date])) {
+                    $currentOrderDates[$date] = true;
+                }
 
                 if (is_null($firstDate) || $createdAt->lt($firstDate)) {
                     $firstDate = $createdAt;
                 }
                 if (is_null($lastDate) || $createdAt->gt($lastDate)) {
                     $lastDate = $createdAt;
+                }
+            }
+
+            // Group ID'larni yig'ish
+            if ($submodel->group && $submodel->group->group) {
+                $groupId = $submodel->group->group->id;
+                if (!in_array($groupId, $groupIds)) {
+                    $groupIds[] = $groupId;
+                }
+
+                // Employee ID'larni yig'ish
+                foreach ($submodel->group->group->employees as $employee) {
+                    if (!in_array($employee->id, $employeeIds)) {
+                        $employeeIds[] = $employee->id;
+                    }
                 }
             }
         }
@@ -1130,7 +1168,9 @@ class InternalAccountantController extends Controller
             ], 200);
         }
 
-        // 1. Tarification bo'yicha umumiy hisob
+        $orderDates = array_keys($currentOrderDates);
+
+        // 4. Tarification hisoblash (optimizatsiya qilingan)
         $tarificationTotal = 0;
         $tarificationEmployees = [];
         $fixedWithTarificationTotal = 0;
@@ -1142,21 +1182,24 @@ class InternalAccountantController extends Controller
                     foreach ($tarification->tarificationLogs as $log) {
                         $tarificationTotal += $log->amount_earned;
                         $empId = $log->employee_id;
+                        $employee = $log->employee;
 
+                        // Tarification employees array'ini to'ldirish
                         if (!isset($tarificationEmployees[$empId])) {
                             $tarificationEmployees[$empId] = [
                                 'employee_id' => $empId,
-                                'name' => $log->employee->name ?? 'Nomaʼlum',
+                                'name' => $employee->name ?? 'Nomaʼlum',
                                 'salary' => 0
                             ];
                         }
                         $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
 
-                        if ($log->employee && $log->employee->payment_type !== 'piece_work') {
+                        // Fixed employees bilan tarification
+                        if ($employee && $employee->payment_type !== 'piece_work') {
                             if (!isset($fixedWithTarificationEmployees[$empId])) {
                                 $fixedWithTarificationEmployees[$empId] = [
                                     'employee_id' => $empId,
-                                    'name' => $log->employee->name ?? 'Nomaʼlum',
+                                    'name' => $employee->name ?? 'Nomaʼlum',
                                     'tarification_salary' => 0
                                 ];
                             }
@@ -1168,38 +1211,64 @@ class InternalAccountantController extends Controller
             }
         }
 
-        // 2. Attendance bo'yicha umumiy hisob
+        // 5. Attendance salary hisoblash (eng katta optimizatsiya)
         $salaryTotal = 0;
         $salaryEmployees = [];
 
-        // Order ishlagan kunlar
-        $currentOrderDates = [];
-        foreach ($order->orderModel->submodels as $submodel) {
-            foreach ($submodel->sewingOutputs as $output) {
-                $date = \Carbon\Carbon::parse($output->created_at)->format('Y-m-d');
-                if (!in_array($date, $currentOrderDates)) {
-                    $currentOrderDates[] = $date;
+        if (!empty($employeeIds) && !empty($orderDates)) {
+            // Bitta query bilan barcha attendance ma'lumotlarini olamiz
+            $attendanceSalaries = DB::table('attendance_salaries')
+                ->whereIn('employee_id', $employeeIds)
+                ->whereIn(DB::raw('DATE(date)'), $orderDates)
+                ->select('employee_id', DB::raw('DATE(date) as date'), 'amount')
+                ->get()
+                ->groupBy(['employee_id', 'date']);
+
+            // Group orders count'ni bitta query bilan olamiz
+            $groupOrdersCounts = [];
+            if (!empty($groupIds)) {
+                $groupOrdersData = DB::table('sewing_outputs')
+                    ->join('submodels', 'sewing_outputs.submodel_id', '=', 'submodels.id')
+                    ->join('group_submodels', 'submodels.id', '=', 'group_submodels.submodel_id')
+                    ->whereIn('group_submodels.group_id', $groupIds)
+                    ->whereIn(DB::raw('DATE(sewing_outputs.created_at)'), $orderDates)
+                    ->select(
+                        'group_submodels.group_id',
+                        DB::raw('DATE(sewing_outputs.created_at) as date'),
+                        DB::raw('COUNT(DISTINCT submodels.order_model_id) as orders_count')
+                    )
+                    ->groupBy('group_submodels.group_id', 'date')
+                    ->get();
+
+                foreach ($groupOrdersData as $data) {
+                    $groupOrdersCounts[$data->group_id][$data->date] = $data->orders_count;
                 }
             }
-        }
 
-        foreach ($order->orderModel->submodels as $submodel) {
-            $group = $submodel->group->group ?? null;
-            if (!$group) continue;
+            // Employee ma'lumotlarini olish
+            $employees = DB::table('employees')
+                ->whereIn('id', $employeeIds)
+                ->select('id', 'name', 'group_id')
+                ->get()
+                ->keyBy('id');
 
-            foreach ($group->employees as $employee) {
-                if ($employee->type === 'aup') continue;
+            // Har bir employee uchun salary hisoblash
+            foreach ($employees as $employee) {
+                if (!isset($attendanceSalaries[$employee->id])) {
+                    continue;
+                }
 
                 $totalSalary = 0;
 
-                foreach ($currentOrderDates as $date) {
-                    // ✅ faqat shu employee uchun shu sanada attendance yig‘indisi
-                    $dailySalary = $employee->attendanceSalaries()
-                        ->whereDate('date', $date)
-                        ->sum('amount');
+                foreach ($orderDates as $date) {
+                    if (!isset($attendanceSalaries[$employee->id][$date])) {
+                        continue;
+                    }
+
+                    $dailySalary = $attendanceSalaries[$employee->id][$date]->sum('amount');
 
                     if ($dailySalary > 0) {
-                        $ordersWorkedOnThisDate = $this->getGroupOrdersCountForDate($group->id, $date);
+                        $ordersWorkedOnThisDate = $groupOrdersCounts[$employee->group_id][$date] ?? 0;
 
                         if ($ordersWorkedOnThisDate > 0) {
                             $proportionalSalary = $dailySalary / $ordersWorkedOnThisDate;
@@ -1237,41 +1306,17 @@ class InternalAccountantController extends Controller
         ]);
     }
 
+// Helper method optimizatsiyasi
     private function getGroupOrdersCountForDate($groupId, $date)
     {
-        $group = \App\Models\Group::where('id', $groupId)
-            ->with(['orders' => function ($query) use ($date) {
-                $query->whereHas('order.orderModel.submodels.sewingOutputs', function ($q) use ($date) {
-                    $q->whereDate('created_at', $date);
-                })
-                    ->with([
-                        'order.orderModel.submodels' => function ($q) use ($date) {
-                            $q->with(['sewingOutputs' => function ($sq) use ($date) {
-                                $sq->whereDate('created_at', $date);
-                            }]);
-                        }
-                    ]);
-            }])
-            ->first();
-
-        if (!$group) {
-            return 0;
-        }
-
-        $orderCount = 0;
-        foreach ($group->orders as $order) {
-            $hasOutput = false;
-            foreach ($order->order->orderModel->submodels as $submodel) {
-                if ($submodel->sewingOutputs->count() > 0) {
-                    $hasOutput = true;
-                    break;
-                }
-            }
-            if ($hasOutput) {
-                $orderCount++;
-            }
-        }
-
-        return $orderCount;
+        // Bu method'ni ham optimizatsiya qilish kerak, lekin yuqoridagi kodda
+        // uni batch query bilan almashtirib yubordik
+        return DB::table('sewing_outputs')
+            ->join('submodels', 'sewing_outputs.submodel_id', '=', 'submodels.id')
+            ->join('group_submodels', 'submodels.id', '=', 'group_submodels.submodel_id')
+            ->where('group_submodels.group_id', $groupId)
+            ->whereDate('sewing_outputs.created_at', $date)
+            ->distinct('submodels.order_model_id')
+            ->count('submodels.order_model_id');
     }
 }
