@@ -1236,7 +1236,7 @@ class InternalAccountantController extends Controller
                     ->select(
                         'order_groups.group_id',
                         DB::raw('DATE(sewing_outputs.created_at) as date'),
-                        DB::raw('COUNT(DISTINCT submodels.order_model_id) as orders_count')
+                        DB::raw('COUNT(DISTINCT order_sub_models.order_model_id) as orders_count')
                     )
                     ->groupBy('order_groups.group_id', 'date')
                     ->get();
