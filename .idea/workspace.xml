@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: rename endpoint in CeoController to improve clarity and align with functionality">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -440,15 +442,7 @@
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="3467000" />
-    </task>
-    <task id="LOCAL-01114" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755276378342</created>
-      <option name="number" value="01114" />
-      <option name="presentableId" value="LOCAL-01114" />
-      <option name="project" value="LOCAL" />
-      <updated>1755276378342</updated>
+      <workItem from="1756179711186" duration="3814000" />
     </task>
     <task id="LOCAL-01115" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -834,7 +828,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756182818904</updated>
     </task>
-    <option name="localTasksCounter" value="1163" />
+    <task id="LOCAL-01163" summary="fix: rename endpoint in CeoController to improve clarity and align with functionality">
+      <option name="closed" value="true" />
+      <created>1756184119787</created>
+      <option name="number" value="01163" />
+      <option name="presentableId" value="LOCAL-01163" />
+      <option name="project" value="LOCAL" />
+      <updated>1756184119787</updated>
+    </task>
+    <option name="localTasksCounter" value="1164" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -864,7 +866,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update validation for 'for_admins' field in UserController to allow multiple truthy values" />
     <MESSAGE value="fix: update 'for_admins' condition in UserController to check for string 'true'" />
     <MESSAGE value="fix: filter attendance records to include only 'present' status" />
     <MESSAGE value="fix: optimize employee tarification log checks and improve validation logic" />
@@ -889,7 +890,8 @@
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance" />
     <MESSAGE value="fix: enhance SupplierController to optimize order creation and improve Telegram notification formatting" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
+    <MESSAGE value="fix: rename endpoint in CeoController to improve clarity and align with functionality" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: rename endpoint in CeoController to improve clarity and align with functionality" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

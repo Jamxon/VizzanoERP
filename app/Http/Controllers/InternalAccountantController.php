@@ -1123,7 +1123,7 @@ class InternalAccountantController extends Controller
             ], 200);
         }
 
-        // 1. Tarification bo‘yicha umumiy hisob
+        // 1. Tarification bo'yicha umumiy hisob
         $tarificationTotal = 0;
         $tarificationEmployees = [];
         $fixedWithTarificationTotal = 0;
@@ -1161,31 +1161,58 @@ class InternalAccountantController extends Controller
             }
         }
 
-        // 2. Attendance bo‘yicha umumiy hisob
+        // 2. Attendance bo'yicha umumiy hisob (yangi logika bilan)
         $salaryTotal = 0;
         $salaryEmployees = [];
+
+        // Har bir kun uchun hozirgi orderda ishlaganlarni topamiz
+        $currentOrderDates = [];
+        foreach ($order->orderModel->submodels as $submodel) {
+            foreach ($submodel->sewingOutputs as $output) {
+                $date = \Carbon\Carbon::parse($output->created_at)->format('Y-m-d');
+                if (!in_array($date, $currentOrderDates)) {
+                    $currentOrderDates[] = $date;
+                }
+            }
+        }
 
         foreach ($order->orderModel->submodels as $submodel) {
             $group = $submodel->group->group ?? null;
             if (!$group) continue;
 
             foreach ($group->employees as $employee) {
-                // faqat AUP bo‘lmagan xodimlarni olamiz
+                // faqat AUP bo'lmagan xodimlarni olamiz
                 if ($employee->type === 'aup') {
                     continue;
                 }
 
-                $salarySum = $employee->attendanceSalaries()
-                    ->whereBetween('date', [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
-                    ->sum('amount');
+                $totalSalary = 0;
 
-                if ($salarySum > 0) {
+                // Har bir kun uchun hisoblash
+                foreach ($currentOrderDates as $date) {
+                    $dailySalary = $employee->attendanceSalaries()
+                        ->whereDate('date', $date)
+                        ->sum('amount');
+
+                    if ($dailySalary > 0) {
+                        // Shu kunda guruhning qancha orderida ishlaganini topamiz
+                        $ordersWorkedOnThisDate = $this->getGroupOrdersCountForDate($group->id, $date);
+
+                        if ($ordersWorkedOnThisDate > 0) {
+                            // Kunlik maoshni orderlar soniga bo'lamiz
+                            $proportionalSalary = $dailySalary / $ordersWorkedOnThisDate;
+                            $totalSalary += $proportionalSalary;
+                        }
+                    }
+                }
+
+                if ($totalSalary > 0) {
                     $salaryEmployees[] = [
                         'employee_id' => $employee->id,
                         'name' => $employee->name,
-                        'salary' => $salarySum
+                        'salary' => $totalSalary
                     ];
-                    $salaryTotal += $salarySum;
+                    $salaryTotal += $totalSalary;
                 }
             }
         }
@@ -1205,5 +1232,16 @@ class InternalAccountantController extends Controller
             'fixed_with_tarification_total' => $fixedWithTarificationTotal,
             'fixed_with_tarification_employees' => array_values($fixedWithTarificationEmployees),
         ]);
+    }
+
+// Yordamchi funksiya - guruhning berilgan sanada nechta orderda ishlaganini topish
+    private function getGroupOrdersCountForDate($groupId, $date)
+    {
+        return \App\Models\Order::whereHas('orderModel.submodels', function ($query) use ($groupId, $date) {
+            $query->where('group_id', $groupId)
+                ->whereHas('sewingOutputs', function ($q) use ($date) {
+                    $q->whereDate('created_at', $date);
+                });
+        })->count();
     }
 }
