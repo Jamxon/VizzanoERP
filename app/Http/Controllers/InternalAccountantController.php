@@ -1190,9 +1190,9 @@ class InternalAccountantController extends Controller
 
                 // Har bir kun uchun hisoblash
                 foreach ($currentOrderDates as $date) {
-                    $dailySalary = $employee->attendanceSalaries()
-                        ->whereDate('date', $date)
-                        ->sum('amount');
+                    $dailySalary = Employee::withSum(['attendanceSalaries as total_amount' => function ($q) use ($firstDate, $lastDate) {
+                        $q->whereBetween('date', [$firstDate, $lastDate]);
+                    }], 'amount')->get();
 
                     if ($dailySalary > 0) {
                         // Shu kunda guruhning qancha orderida ishlaganini topamiz
