@@ -1313,11 +1313,11 @@ class InternalAccountantController extends Controller
         // Bu method'ni ham optimizatsiya qilish kerak, lekin yuqoridagi kodda
         // uni batch query bilan almashtirib yubordik
         return DB::table('sewing_outputs')
-            ->join('submodels', 'sewing_outputs.submodel_id', '=', 'submodels.id')
-            ->join('group_submodels', 'submodels.id', '=', 'group_submodels.submodel_id')
-            ->where('group_submodels.group_id', $groupId)
+            ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
+            ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id')
+            ->where('order_groups.group_id', $groupId)
             ->whereDate('sewing_outputs.created_at', $date)
-            ->distinct('submodels.order_model_id')
-            ->count('submodels.order_model_id');
+            ->distinct('order_sub_models.order_model_id')
+            ->count('order_sub_models.order_model_id');
     }
 }
