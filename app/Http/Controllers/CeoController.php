@@ -19,7 +19,8 @@ class CeoController extends Controller
                     ->with([
                         'order:id,name',
                         'order.orderModel.submodels' => function ($q) use ($startDate, $endDate) {
-                            $q->with(['sewingOutputs' => function ($sq) use ($startDate, $endDate) {
+                            $q->select('id', 'order_model_id') // submodel_id sifatida id ni qo'shamiz
+                            ->with(['sewingOutputs' => function ($sq) use ($startDate, $endDate) {
                                 $sq->select('id', 'order_submodel_id', 'quantity', 'created_at')
                                     ->whereBetween('created_at', [$startDate, $endDate]);
                             }]);
@@ -41,12 +42,23 @@ class CeoController extends Controller
                 $orderData = [
                     'order_id' => $order->order->id,
                     'order_name' => $order->order->name,
+                    'submodels' => [], // submodellar uchun array qo'shamiz
                     'total_sewn' => 0
                 ];
 
                 foreach ($order->order->orderModel->submodels as $submodel) {
+                    $submodelData = [
+                        'submodel_id' => $submodel->id,
+                        'total_sewn' => 0
+                    ];
+
                     foreach ($submodel->sewingOutputs as $output) {
+                        $submodelData['total_sewn'] += $output->quantity;
                         $orderData['total_sewn'] += $output->quantity;
+                    }
+
+                    if ($submodelData['total_sewn'] > 0) {
+                        $orderData['submodels'][] = $submodelData;
                     }
                 }
 
