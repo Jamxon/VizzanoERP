@@ -1161,11 +1161,11 @@ class InternalAccountantController extends Controller
             }
         }
 
-        // 2. Attendance bo'yicha umumiy hisob (yangi logika bilan)
+        // 2. Attendance bo'yicha umumiy hisob
         $salaryTotal = 0;
         $salaryEmployees = [];
 
-        // Har bir kun uchun hozirgi orderda ishlaganlarni topamiz
+        // Order ishlagan kunlar
         $currentOrderDates = [];
         foreach ($order->orderModel->submodels as $submodel) {
             foreach ($submodel->sewingOutputs as $output) {
@@ -1181,25 +1181,20 @@ class InternalAccountantController extends Controller
             if (!$group) continue;
 
             foreach ($group->employees as $employee) {
-                // faqat AUP bo'lmagan xodimlarni olamiz
-                if ($employee->type === 'aup') {
-                    continue;
-                }
+                if ($employee->type === 'aup') continue;
 
                 $totalSalary = 0;
 
-                // Har bir kun uchun hisoblash
                 foreach ($currentOrderDates as $date) {
-                    $dailySalary = Employee::withSum(['attendanceSalaries as total_amount' => function ($q) use ($firstDate, $lastDate) {
-                        $q->whereBetween('date', [$firstDate, $lastDate]);
-                    }], 'amount')->get();
+                    // ✅ faqat shu employee uchun shu sanada attendance yig‘indisi
+                    $dailySalary = $employee->attendanceSalaries()
+                        ->whereDate('date', $date)
+                        ->sum('amount');
 
                     if ($dailySalary > 0) {
-                        // Shu kunda guruhning qancha orderida ishlaganini topamiz
                         $ordersWorkedOnThisDate = $this->getGroupOrdersCountForDate($group->id, $date);
 
                         if ($ordersWorkedOnThisDate > 0) {
-                            // Kunlik maoshni orderlar soniga bo'lamiz
                             $proportionalSalary = $dailySalary / $ordersWorkedOnThisDate;
                             $totalSalary += $proportionalSalary;
                         }
@@ -1210,8 +1205,7 @@ class InternalAccountantController extends Controller
                     $salaryEmployees[] = [
                         'employee_id' => $employee->id,
                         'name' => $employee->name,
-                        'salary' => $totalSalary,
-                        'date' => $ordersWorkedOnThisDate
+                        'salary' => $totalSalary
                     ];
                     $salaryTotal += $totalSalary;
                 }
