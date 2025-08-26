@@ -1237,11 +1237,39 @@ class InternalAccountantController extends Controller
 // Yordamchi funksiya - guruhning berilgan sanada nechta orderda ishlaganini topish
     private function getGroupOrdersCountForDate($groupId, $date)
     {
-        return \App\Models\Order::whereHas('orderModel.submodels', function ($query) use ($groupId, $date) {
-            $query->where('group_id', $groupId)
-                ->whereHas('sewingOutputs', function ($q) use ($date) {
+        $group = \App\Models\Group::where('id', $groupId)
+            ->with(['orders' => function ($query) use ($date) {
+                $query->whereHas('order.orderModel.submodels.sewingOutputs', function ($q) use ($date) {
                     $q->whereDate('created_at', $date);
-                });
-        })->count();
+                })
+                    ->with([
+                        'order.orderModel.submodels' => function ($q) use ($date) {
+                            $q->with(['sewingOutputs' => function ($sq) use ($date) {
+                                $sq->whereDate('created_at', $date);
+                            }]);
+                        }
+                    ]);
+            }])
+            ->first();
+
+        if (!$group) {
+            return 0;
+        }
+
+        $orderCount = 0;
+        foreach ($group->orders as $order) {
+            $hasOutput = false;
+            foreach ($order->order->orderModel->submodels as $submodel) {
+                if ($submodel->sewingOutputs->count() > 0) {
+                    $hasOutput = true;
+                    break;
+                }
+            }
+            if ($hasOutput) {
+                $orderCount++;
+            }
+        }
+
+        return $orderCount;
     }
 }
