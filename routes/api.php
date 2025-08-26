@@ -79,6 +79,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::post('cuttingPlans', [CuttingPlanController::class, 'store']);
     Route::patch('cuttingPlans/{id}', [CuttingPlanController::class, 'update']);
     Route::delete('cuttingPlans/{id}', [CuttingPlanController::class, 'destroy']);
+    Route::get('tarificationLogs', [InternalAccountantController::class, 'getEmployeeTarificationLog']);
 
 });
 
