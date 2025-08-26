@@ -1201,10 +1201,10 @@ class InternalAccountantController extends Controller
                                 $fixedWithTarificationEmployees[$empId] = [
                                     'employee_id' => $empId,
                                     'name' => $employee->name ?? 'Nomaʼlum',
-                                    'tarification_salary' => 0
+                                    'salary' => 0
                                 ];
                             }
-                            $fixedWithTarificationEmployees[$empId]['tarification_salary'] += $log->amount_earned;
+                            $fixedWithTarificationEmployees[$empId]['salary'] += $log->amount_earned;
                             $fixedWithTarificationTotal += $log->amount_earned;
                         }
                     }
