@@ -55,12 +55,6 @@ class SupplierController extends Controller
 
             DB::commit();
 
-            // --- Telegramga batafsil xabar tayyorlash ---
-            // Buyurtmani kerakli relationlar bilan yuklaymiz
-            $order->load([
-                'supplier:id,name',
-                'items.item:id,name,unit', // agar itemda unit bo‘lsa
-            ]);
 
             // Currency kodlarini birdaniga olib qo‘yamiz (N+1 bo‘lmasin)
             $currencyMap = [];

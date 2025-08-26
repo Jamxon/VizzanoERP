@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update chat ID in SupplierController for Telegram notifications" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update supplier name retrieval in SupplierController for order notifications" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -440,23 +440,7 @@
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="5120000" />
-    </task>
-    <task id="LOCAL-01119" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755329441985</created>
-      <option name="number" value="01119" />
-      <option name="presentableId" value="LOCAL-01119" />
-      <option name="project" value="LOCAL" />
-      <updated>1755329441985</updated>
-    </task>
-    <task id="LOCAL-01120" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755329701920</created>
-      <option name="number" value="01120" />
-      <option name="presentableId" value="LOCAL-01120" />
-      <option name="project" value="LOCAL" />
-      <updated>1755329701920</updated>
+      <workItem from="1756179711186" duration="5435000" />
     </task>
     <task id="LOCAL-01121" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -834,7 +818,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756185733735</updated>
     </task>
-    <option name="localTasksCounter" value="1168" />
+    <task id="LOCAL-01168" summary="fix: update supplier name retrieval in SupplierController for order notifications">
+      <option name="closed" value="true" />
+      <created>1756185976493</created>
+      <option name="number" value="01168" />
+      <option name="presentableId" value="LOCAL-01168" />
+      <option name="project" value="LOCAL" />
+      <updated>1756185976493</updated>
+    </task>
+    <task id="LOCAL-01169" summary="fix: update supplier name retrieval in SupplierController for order notifications">
+      <option name="closed" value="true" />
+      <created>1756186054038</created>
+      <option name="number" value="01169" />
+      <option name="presentableId" value="LOCAL-01169" />
+      <option name="project" value="LOCAL" />
+      <updated>1756186054038</updated>
+    </task>
+    <option name="localTasksCounter" value="1170" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -864,7 +864,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: enhance employee tarification log retrieval and summary calculations" />
     <MESSAGE value="fix: simplify employee tarification log retrieval and enhance data formatting" />
     <MESSAGE value="fix: add salaryPayments relationship and filter by date in user retrieval" />
     <MESSAGE value="fix: add endpoint to retrieve model by tarification code with validation" />
@@ -889,7 +888,8 @@
     <MESSAGE value="fix: enhance getGroupOrdersCountForDate method to improve order counting logic and optimize eager loading" />
     <MESSAGE value="fix: enhance InternalAccountantController to include order date in salary calculations" />
     <MESSAGE value="fix: update chat ID in SupplierController for Telegram notifications" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update chat ID in SupplierController for Telegram notifications" />
+    <MESSAGE value="fix: update supplier name retrieval in SupplierController for order notifications" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update supplier name retrieval in SupplierController for order notifications" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
