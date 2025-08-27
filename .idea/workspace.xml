@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController">
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add max-width and overflow handling for product column in stock balances table">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -443,23 +443,7 @@
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
-      <workItem from="1756268702388" duration="3956000" />
-    </task>
-    <task id="LOCAL-01138" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755582053625</created>
-      <option name="number" value="01138" />
-      <option name="presentableId" value="LOCAL-01138" />
-      <option name="project" value="LOCAL" />
-      <updated>1755582053625</updated>
-    </task>
-    <task id="LOCAL-01139" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755923817724</created>
-      <option name="number" value="01139" />
-      <option name="presentableId" value="LOCAL-01139" />
-      <option name="project" value="LOCAL" />
-      <updated>1755923817725</updated>
+      <workItem from="1756268702388" duration="5039000" />
     </task>
     <task id="LOCAL-01140" summary="fix: remove unused endpoints from API routes">
       <option name="closed" value="true" />
@@ -837,7 +821,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756205181760</updated>
     </task>
-    <option name="localTasksCounter" value="1187" />
+    <task id="LOCAL-01187" summary="fix: add max-width and overflow handling for product column in stock balances table">
+      <option name="closed" value="true" />
+      <created>1756274086871</created>
+      <option name="number" value="01187" />
+      <option name="presentableId" value="LOCAL-01187" />
+      <option name="project" value="LOCAL" />
+      <updated>1756274086871</updated>
+    </task>
+    <task id="LOCAL-01188" summary="fix: adjust max-width and overflow handling for product column in stock balances table">
+      <option name="closed" value="true" />
+      <created>1756274183475</created>
+      <option name="number" value="01188" />
+      <option name="presentableId" value="LOCAL-01188" />
+      <option name="project" value="LOCAL" />
+      <updated>1756274183475</updated>
+    </task>
+    <option name="localTasksCounter" value="1189" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -867,7 +867,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: optimize eager loading in CeoController by calculating salary totals and date ranges for improved data accuracy" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring loops for improved clarity and performance" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance" />
     <MESSAGE value="fix: enhance SupplierController to optimize order creation and improve Telegram notification formatting" />
@@ -892,7 +891,8 @@
     <MESSAGE value="fix: update joins in attendance salary query for order submodels in InternalAccountantController" />
     <MESSAGE value="fix: correct orders_count calculation in attendance salary query for order submodels in InternalAccountantController" />
     <MESSAGE value="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController" />
+    <MESSAGE value="fix: add max-width and overflow handling for product column in stock balances table" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add max-width and overflow handling for product column in stock balances table" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

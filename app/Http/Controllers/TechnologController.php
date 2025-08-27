@@ -871,39 +871,34 @@ class TechnologController extends Controller
     {
         $user = auth()->user();
 
+        // Ordersni faqat kerakli ustunlar bilan olish
         $orders = Order::where('branch_id', $user->employee->branch_id)
+            ->select('id', 'branch_id', 'order_model_id', 'quantity') // minimal ustunlar
             ->with([
-                'orderModel',
-                'orderModel.model',
-                'orderModel.submodels.submodel',
-                'orderModel.submodels.tarificationCategories.tarifications',
+                'orderModel:id,order_id,model_id',
+                'orderModel.model:id,name',
+                'orderModel.submodels:id,order_model_id,submodel_id',
+                'orderModel.submodels.submodel:id,name',
+                'orderModel.submodels.tarificationCategories:id,submodel_id',
             ])
+            ->withCount('orderModel.submodels.tarificationCategories.tarifications') // tarificationlar sonini hisoblaymiz
             ->get();
 
-        // Transformatsiya qilamiz
+        // Transformatsiya — has_tarifications qo‘shamiz
         $orders = $orders->map(function ($order) {
             $orderData = $order->toArray();
 
             foreach ($orderData['order_model']['submodels'] as &$submodelItem) {
-                $hasTarifications = false;
-
-                if (!empty($submodelItem['tarification_categories'])) {
-                    foreach ($submodelItem['tarification_categories'] as $category) {
-                        if (!empty($category['tarifications'])) {
-                            $hasTarifications = true;
-                            break;
-                        }
-                    }
-                }
-
-                $submodelItem['has_tarifications'] = $hasTarifications;
+                // `tarification_categories_tarifications_count` dan foydalanamiz
+                $submodelItem['has_tarifications'] = $order->order_model_submodels_tarification_categories_tarifications_count > 0;
             }
 
             return $orderData;
         });
 
-        return response()->json($orders, 200);
+        return response()->json($orders, 200, [], JSON_UNESCAPED_UNICODE);
     }
+
 
     public function showTarification($id): \Illuminate\Http\JsonResponse
     {
