@@ -9,12 +9,12 @@
         th, td { border: 1px solid #444; padding: 5px; text-align: left; }
         th { background-color: #f2f2f2; }
 
-        /* Mahsulot ustuniga max-width beramiz */
+        /* Mahsulot ustuniga max-width beramiz va sig'magan qismini pastga tushiramiz */
         td:nth-child(2) {
             max-width: 150px;   /* kerakli uzunlik */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal; /* qatordan tushirishga ruxsat beriladi */
+            word-wrap: break-word; /* uzun so‘zlarni bo‘lib tashlaydi */
+            word-break: break-word;
         }
     </style>
 </head>
