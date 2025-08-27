@@ -51,7 +51,7 @@ class CeoController extends Controller
                 foreach ($order->order->orderModel->submodels as $submodel) {
                     $submodelData = [
                         'submodel_id' => $submodel->id,
-                        'submodel_name' => $submodel->submodel->name,
+                        'submodel_name' => optional($submodel->submodel)->name ?? 'N/A',
                         'total_sewn' => 0,
                         'outputs' => []   // outputs qo‘shdik
                     ];
