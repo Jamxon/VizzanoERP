@@ -42,6 +42,7 @@ class CeoController extends Controller
                 $orderData = [
                     'order_id' => $order->order->id,
                     'order_name' => $order->order->name,
+                    'status' => $order->status,
                     'submodels' => [], // submodellar uchun array qo'shamiz
                     'total_sewn' => 0
                 ];
@@ -49,6 +50,7 @@ class CeoController extends Controller
                 foreach ($order->order->orderModel->submodels as $submodel) {
                     $submodelData = [
                         'submodel_id' => $submodel->id,
+                        'submodel_name' => $submodel->submodel->name,
                         'total_sewn' => 0
                     ];
 
