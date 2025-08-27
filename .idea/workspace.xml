@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: add max-width and overflow handling for product column in stock balances table">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order retrieval in TechnologController by refining selected columns and adding has_tarifications logic">
+      <change beforePath="$PROJECT_DIR$/app/Models/OrderSubModel.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/OrderSubModel.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -443,23 +443,7 @@
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
-      <workItem from="1756268702388" duration="5039000" />
-    </task>
-    <task id="LOCAL-01140" summary="fix: remove unused endpoints from API routes">
-      <option name="closed" value="true" />
-      <created>1756117319385</created>
-      <option name="number" value="01140" />
-      <option name="presentableId" value="LOCAL-01140" />
-      <option name="project" value="LOCAL" />
-      <updated>1756117319385</updated>
-    </task>
-    <task id="LOCAL-01141" summary="fix: remove unused endpoints from API routes">
-      <option name="closed" value="true" />
-      <created>1756118259394</created>
-      <option name="number" value="01141" />
-      <option name="presentableId" value="LOCAL-01141" />
-      <option name="project" value="LOCAL" />
-      <updated>1756118259395</updated>
+      <workItem from="1756268702388" duration="5397000" />
     </task>
     <task id="LOCAL-01142" summary="fix: optimize data retrieval in CeoController with eager loading">
       <option name="closed" value="true" />
@@ -837,7 +821,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756274183475</updated>
     </task>
-    <option name="localTasksCounter" value="1189" />
+    <task id="LOCAL-01189" summary="fix: optimize order retrieval in TechnologController by reducing selected columns and improving tarification check">
+      <option name="closed" value="true" />
+      <created>1756275034780</created>
+      <option name="number" value="01189" />
+      <option name="presentableId" value="LOCAL-01189" />
+      <option name="project" value="LOCAL" />
+      <updated>1756275034780</updated>
+    </task>
+    <task id="LOCAL-01190" summary="fix: enhance order retrieval in TechnologController by refining selected columns and adding has_tarifications logic">
+      <option name="closed" value="true" />
+      <created>1756275190066</created>
+      <option name="number" value="01190" />
+      <option name="presentableId" value="LOCAL-01190" />
+      <option name="project" value="LOCAL" />
+      <updated>1756275190066</updated>
+    </task>
+    <option name="localTasksCounter" value="1191" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -867,8 +867,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: optimize eager loading in CeoController by restructuring loops for improved clarity and performance" />
-    <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance" />
     <MESSAGE value="fix: enhance SupplierController to optimize order creation and improve Telegram notification formatting" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency" />
     <MESSAGE value="fix: rename endpoint in CeoController to improve clarity and align with functionality" />
@@ -892,7 +890,9 @@
     <MESSAGE value="fix: correct orders_count calculation in attendance salary query for order submodels in InternalAccountantController" />
     <MESSAGE value="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController" />
     <MESSAGE value="fix: add max-width and overflow handling for product column in stock balances table" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: add max-width and overflow handling for product column in stock balances table" />
+    <MESSAGE value="fix: optimize order retrieval in TechnologController by reducing selected columns and improving tarification check" />
+    <MESSAGE value="fix: enhance order retrieval in TechnologController by refining selected columns and adding has_tarifications logic" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance order retrieval in TechnologController by refining selected columns and adding has_tarifications logic" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

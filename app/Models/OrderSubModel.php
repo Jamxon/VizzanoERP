@@ -85,4 +85,16 @@ class OrderSubModel extends Model
     {
         return $this->hasMany(ExampleOutputs::class, 'order_submodel_id');
     }
+
+    public function tarifications()
+    {
+        return $this->hasManyThrough(
+            Tarification::class,
+            TarificationCategory::class,
+            'submodel_id',              // TarificationCategory jadvalida submodel_id
+            'tarification_category_id', // Tarification jadvalida foreign key
+            'id',                       // Submodel jadvali
+            'id'                        // TarificationCategory jadvali
+        );
+    }
 }

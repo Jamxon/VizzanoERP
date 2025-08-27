@@ -874,28 +874,21 @@ class TechnologController extends Controller
         $orders = Order::where('branch_id', $user->employee->branch_id)
             ->with([
                 'orderModel.model:id,name',
+                'orderModel.submodels:id,order_model_id,submodel_id',
                 'orderModel.submodels.submodel:id,name',
-                'orderModel.submodels.tarificationCategories.tarifications:id,tarification_category_id'
             ])
+            ->with(['orderModel.submodels' => function ($q) {
+                $q->withCount('tarifications'); // SQL darajasida hisoblaydi
+            }])
             ->get();
 
-        // Har bir submodelga has_tarifications qo‘shamiz
+        // Endi PHP’da loop shart emas, faqat arrayga qo‘shib qo‘yamiz
         $orders = $orders->map(function ($order) {
             $orderData = $order->toArray();
 
             foreach ($orderData['order_model']['submodels'] as &$submodelItem) {
-                $hasTarifications = false;
-
-                if (!empty($submodelItem['tarification_categories'])) {
-                    foreach ($submodelItem['tarification_categories'] as $category) {
-                        if (!empty($category['tarifications'])) {
-                            $hasTarifications = true;
-                            break;
-                        }
-                    }
-                }
-
-                $submodelItem['has_tarifications'] = $hasTarifications;
+                $submodelItem['has_tarifications'] = $submodelItem['tarifications_count'] > 0;
+                unset($submodelItem['tarifications_count']); // keraksiz ustunni olib tashlaymiz
             }
 
             return $orderData;
