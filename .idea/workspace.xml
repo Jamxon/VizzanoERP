@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct orders_count calculation in attendance salary query for order submodels in InternalAccountantController" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -440,15 +442,8 @@
       <workItem from="1755837746056" duration="2550000" />
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="16597000" />
-    </task>
-    <task id="LOCAL-01137" summary="fix: add endpoint to retrieve model by tarification code with validation">
-      <option name="closed" value="true" />
-      <created>1755579501298</created>
-      <option name="number" value="01137" />
-      <option name="presentableId" value="LOCAL-01137" />
-      <option name="project" value="LOCAL" />
-      <updated>1755579501298</updated>
+      <workItem from="1756179711186" duration="19501000" />
+      <workItem from="1756268702388" duration="3956000" />
     </task>
     <task id="LOCAL-01138" summary="fix: add endpoint to retrieve model by tarification code with validation">
       <option name="closed" value="true" />
@@ -834,7 +829,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756203631493</updated>
     </task>
-    <option name="localTasksCounter" value="1186" />
+    <task id="LOCAL-01186" summary="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController">
+      <option name="closed" value="true" />
+      <created>1756205181760</created>
+      <option name="number" value="01186" />
+      <option name="presentableId" value="LOCAL-01186" />
+      <option name="project" value="LOCAL" />
+      <updated>1756205181760</updated>
+    </task>
+    <option name="localTasksCounter" value="1187" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -864,7 +867,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: optimize eager loading in CeoController by restructuring loops and improving data aggregation" />
     <MESSAGE value="fix: optimize eager loading in CeoController by calculating salary totals and date ranges for improved data accuracy" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring loops for improved clarity and performance" />
     <MESSAGE value="fix: optimize eager loading in CeoController by restructuring queries and enhancing data retrieval for improved performance" />
@@ -889,7 +891,8 @@
     <MESSAGE value="fix: update attendance salary table and optimize group orders query in InternalAccountantController" />
     <MESSAGE value="fix: update joins in attendance salary query for order submodels in InternalAccountantController" />
     <MESSAGE value="fix: correct orders_count calculation in attendance salary query for order submodels in InternalAccountantController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct orders_count calculation in attendance salary query for order submodels in InternalAccountantController" />
+    <MESSAGE value="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
