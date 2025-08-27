@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding outputs to submodels" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CeoController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CeoController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -441,23 +443,7 @@
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
-      <workItem from="1756268702388" duration="13516000" />
-    </task>
-    <task id="LOCAL-01147" summary="fix: optimize eager loading in CeoController by removing unnecessary filters">
-      <option name="closed" value="true" />
-      <created>1756119500832</created>
-      <option name="number" value="01147" />
-      <option name="presentableId" value="LOCAL-01147" />
-      <option name="project" value="LOCAL" />
-      <updated>1756119500832</updated>
-    </task>
-    <task id="LOCAL-01148" summary="fix: simplify eager loading in CeoController by removing unnecessary query filters">
-      <option name="closed" value="true" />
-      <created>1756119587125</created>
-      <option name="number" value="01148" />
-      <option name="presentableId" value="LOCAL-01148" />
-      <option name="project" value="LOCAL" />
-      <updated>1756119587125</updated>
+      <workItem from="1756268702388" duration="13941000" />
     </task>
     <task id="LOCAL-01149" summary="fix: simplify eager loading in CeoController by removing unnecessary query filters">
       <option name="closed" value="true" />
@@ -835,7 +821,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756295883485</updated>
     </task>
-    <option name="localTasksCounter" value="1196" />
+    <task id="LOCAL-01196" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756296097750</created>
+      <option name="number" value="01196" />
+      <option name="presentableId" value="LOCAL-01196" />
+      <option name="project" value="LOCAL" />
+      <updated>1756296097750</updated>
+    </task>
+    <task id="LOCAL-01197" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756296208884</created>
+      <option name="number" value="01197" />
+      <option name="presentableId" value="LOCAL-01197" />
+      <option name="project" value="LOCAL" />
+      <updated>1756296208884</updated>
+    </task>
+    <option name="localTasksCounter" value="1198" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -865,7 +867,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: enhance InternalAccountantController to improve salary calculation logic and add order tracking" />
     <MESSAGE value="fix: enhance getGroupOrdersCountForDate method to improve order counting logic and optimize eager loading" />
     <MESSAGE value="fix: enhance InternalAccountantController to include order date in salary calculations" />
     <MESSAGE value="fix: update chat ID in SupplierController for Telegram notifications" />
@@ -890,7 +891,8 @@
     <MESSAGE value="fix: enhance order retrieval in TechnologController by adding tarifications relationship and simplifying has_tarifications logic" />
     <MESSAGE value="fix: enhance order data structure in CeoController by adding status and submodel name fields" />
     <MESSAGE value="fix: enhance order data structure in CeoController by adding outputs to submodels" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance order data structure in CeoController by adding outputs to submodels" />
+    <MESSAGE value="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
