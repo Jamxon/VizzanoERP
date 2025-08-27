@@ -18,6 +18,7 @@ class CeoController extends Controller
                 })
                     ->with([
                         'order:id,name',
+                        'order.orderModel.submodels.submodel:id,name',
                         'order.orderModel.submodels' => function ($q) use ($startDate, $endDate) {
                             $q->select('id', 'order_model_id')
                                 ->with(['sewingOutputs' => function ($sq) use ($startDate, $endDate) {
@@ -50,6 +51,7 @@ class CeoController extends Controller
                 foreach ($order->order->orderModel->submodels as $submodel) {
                     $submodelData = [
                         'submodel_id' => $submodel->id,
+                        'submodel_name' => $submodel->submodel->name,
                         'total_sewn' => 0,
                         'outputs' => []   // outputs qo‘shdik
                     ];
