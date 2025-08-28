@@ -58,7 +58,7 @@ class PackageMasterController extends Controller
 
     public function packageStore(Request $request): \Illuminate\Http\JsonResponse
     {
-        set_time_limit(0); // Unlimited for background job
+        set_time_limit(120); // Unlimited for background job
         ini_set('memory_limit', '2G');
 
         $validated = $request->validate([
