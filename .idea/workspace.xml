@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -442,23 +444,7 @@
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
       <workItem from="1756268702388" duration="17501000" />
-      <workItem from="1756353994222" duration="17448000" />
-    </task>
-    <task id="LOCAL-01169" summary="fix: update supplier name retrieval in SupplierController for order notifications">
-      <option name="closed" value="true" />
-      <created>1756186054038</created>
-      <option name="number" value="01169" />
-      <option name="presentableId" value="LOCAL-01169" />
-      <option name="project" value="LOCAL" />
-      <updated>1756186054038</updated>
-    </task>
-    <task id="LOCAL-01170" summary="fix: update supplier name retrieval in SupplierController for order notifications">
-      <option name="closed" value="true" />
-      <created>1756186238564</created>
-      <option name="number" value="01170" />
-      <option name="presentableId" value="LOCAL-01170" />
-      <option name="project" value="LOCAL" />
-      <updated>1756186238564</updated>
+      <workItem from="1756353994222" duration="18722000" />
     </task>
     <task id="LOCAL-01171" summary="fix: update supplier name retrieval in SupplierController for order notifications">
       <option name="closed" value="true" />
@@ -836,7 +822,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756383451045</updated>
     </task>
-    <option name="localTasksCounter" value="1218" />
+    <task id="LOCAL-01218" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756383575362</created>
+      <option name="number" value="01218" />
+      <option name="presentableId" value="LOCAL-01218" />
+      <option name="project" value="LOCAL" />
+      <updated>1756383575362</updated>
+    </task>
+    <task id="LOCAL-01219" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756383639992</created>
+      <option name="number" value="01219" />
+      <option name="presentableId" value="LOCAL-01219" />
+      <option name="project" value="LOCAL" />
+      <updated>1756383639992</updated>
+    </task>
+    <option name="localTasksCounter" value="1220" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
