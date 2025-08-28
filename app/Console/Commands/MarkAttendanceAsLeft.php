@@ -42,7 +42,7 @@ class MarkAttendanceAsLeft extends Command
                     $salaryToAdd = $employee->salary / 26;
                 } elseif ($employee->payment_type === 'daily') {
                     $salaryToAdd = $employee->salary;
-                } elseif ($employee->payment_type === 'hourly' || $employee->payment_type === 'fixed_percentage_bonus_group') {
+                } elseif ($employee->payment_type === 'hourly') {
                     $checkIn = Carbon::parse($attendance->check_in);
 
 // 🔎 Agar 08:00 gacha bo‘lsa → 07:30 qilib qo‘yamiz
@@ -62,6 +62,22 @@ class MarkAttendanceAsLeft extends Command
 
                     $salaryToAdd = $employee->salary * $workedHours;
 
+                } elseif ( $employee->payment_type === 'fixed_percentage_bonus_group')
+                {
+                        $checkIn = \Carbon\Carbon::parse($attendance->check_in);
+                        $checkOut = \Carbon\Carbon::parse($attendance->check_out);
+
+                        // 🔎 Agar 8:00 gacha bo'lsa => 7:30 ga tenglashtiramiz
+                        if ($checkIn->lt($checkIn->copy()->setTime(8, 0))) {
+                            $checkIn->setTime(7, 30);
+                        }
+
+                        $workedSeconds = $checkOut->diffInSeconds($checkIn);
+                        $workedHours = $workedSeconds / 3600;
+
+                        $salary = ($employee->salary / 26) / 10;
+
+                        $salaryToAdd = $salary * $workedHours;
                 }
 
                 // Cheklovdan katta bo‘lsa yozmaslik
