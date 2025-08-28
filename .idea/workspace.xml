@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -444,23 +442,7 @@
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
       <workItem from="1756268702388" duration="17501000" />
-      <workItem from="1756353994222" duration="11239000" />
-    </task>
-    <task id="LOCAL-01155" summary="fix: optimize eager loading in CeoController by restructuring loops and improving data aggregation">
-      <option name="closed" value="true" />
-      <created>1756123465481</created>
-      <option name="number" value="01155" />
-      <option name="presentableId" value="LOCAL-01155" />
-      <option name="project" value="LOCAL" />
-      <updated>1756123465481</updated>
-    </task>
-    <task id="LOCAL-01156" summary="fix: optimize eager loading in CeoController by calculating salary totals and date ranges for improved data accuracy">
-      <option name="closed" value="true" />
-      <created>1756123744962</created>
-      <option name="number" value="01156" />
-      <option name="presentableId" value="LOCAL-01156" />
-      <option name="project" value="LOCAL" />
-      <updated>1756123744962</updated>
+      <workItem from="1756353994222" duration="11815000" />
     </task>
     <task id="LOCAL-01157" summary="fix: optimize eager loading in CeoController by restructuring loops for improved clarity and performance">
       <option name="closed" value="true" />
@@ -838,7 +820,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756359008937</updated>
     </task>
-    <option name="localTasksCounter" value="1204" />
+    <task id="LOCAL-01204" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756374360176</created>
+      <option name="number" value="01204" />
+      <option name="presentableId" value="LOCAL-01204" />
+      <option name="project" value="LOCAL" />
+      <updated>1756374360176</updated>
+    </task>
+    <task id="LOCAL-01205" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756374685886</created>
+      <option name="number" value="01205" />
+      <option name="presentableId" value="LOCAL-01205" />
+      <option name="project" value="LOCAL" />
+      <updated>1756374685886</updated>
+    </task>
+    <option name="localTasksCounter" value="1206" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
