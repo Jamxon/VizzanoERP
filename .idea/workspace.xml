@@ -5,7 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CeoController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CeoController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -443,15 +444,7 @@
       <workItem from="1755920289579" duration="3129000" />
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
-      <workItem from="1756268702388" duration="13941000" />
-    </task>
-    <task id="LOCAL-01149" summary="fix: simplify eager loading in CeoController by removing unnecessary query filters">
-      <option name="closed" value="true" />
-      <created>1756119661514</created>
-      <option name="number" value="01149" />
-      <option name="presentableId" value="LOCAL-01149" />
-      <option name="project" value="LOCAL" />
-      <updated>1756119661514</updated>
+      <workItem from="1756268702388" duration="17501000" />
     </task>
     <task id="LOCAL-01150" summary="fix: enhance eager loading in CeoController by optimizing query structure and removing unnecessary fields">
       <option name="closed" value="true" />
@@ -837,7 +830,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756296208884</updated>
     </task>
-    <option name="localTasksCounter" value="1198" />
+    <task id="LOCAL-01198" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756296405987</created>
+      <option name="number" value="01198" />
+      <option name="presentableId" value="LOCAL-01198" />
+      <option name="project" value="LOCAL" />
+      <updated>1756296405987</updated>
+    </task>
+    <option name="localTasksCounter" value="1199" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

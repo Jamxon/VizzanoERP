@@ -665,7 +665,6 @@ class CasherController extends Controller
             ];
         })->values()->toArray();
 
-        /*
         // Guruhsiz xodimlarni olish (hozircha jo‘natilmaydi)
         $ungroupedEmployees = Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
@@ -687,7 +686,6 @@ class CasherController extends Controller
                 'employees' => $ungroupedEmployees->values()->toArray(),
             ];
         }
-        */
 
         return response()->json($result);
     }
