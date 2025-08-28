@@ -47,39 +47,9 @@ class CasherController extends Controller
         }
 
         $dollarRate = $request->dollar_rate ?? 12900;
-        $branchId = auth()->user()->employee->branch_id;
 
-        /**
-         * 1. Barcha kunlik ma’lumotlarni oldindan olib kelamiz
-         */
-        $attendances = DB::table('attendance_salary')
-            ->whereBetween('date', [$start, $end])
-            ->whereIn('employee_id', Employee::where('branch_id', $branchId)->pluck('id'))
-            ->get()
-            ->groupBy('date');
-
-        $transport = DB::table('transport_attendance')
-            ->join('transport', 'transport_attendance.transport_id', '=', 'transport.id')
-            ->whereBetween('transport_attendance.date', [$start, $end])
-            ->where('transport.branch_id', $branchId)
-            ->selectRaw('transport_attendance.date, SUM((transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type) as total')
-            ->groupBy('transport_attendance.date')
-            ->pluck('total','date');
-
-        $bonuses = DB::table('bonuses')
-            ->join('employees', 'bonuses.employee_id', '=', 'employees.id')
-            ->whereBetween('bonuses.created_at', [$start, $end])
-            ->where('employees.branch_id', $branchId)
-            ->selectRaw('DATE(bonuses.created_at) as date, SUM(bonuses.amount) as total')
-            ->groupBy('date')
-            ->pluck('total', 'date');
-
-        // va hokazo… boshqa querylarni ham shu tarzda BETWEEN qilib olib kelish mumkin
-
-        /**
-         * 2. Endi $period bo‘yicha loop qilib, oldindan olingan kolleksiyadan olish
-         */
         $period = CarbonPeriod::create($start, $end);
+        $orderSummaries = [];
         $monthlyStats = [
             'aup' => 0,
             'kpi' => 0,
@@ -93,30 +63,76 @@ class CasherController extends Controller
             'employee_count_sum' => 0,
             'total_output_quantity' => 0,
         ];
-        $orderSummaries = [];
 
         foreach ($period as $dateObj) {
             $date = $dateObj->toDateString();
 
-            $daily = [
-                'aup' => $attendances[$date]->sum('amount') ?? 0,
-                'transport' => $transport[$date] ?? 0,
-                'bonus' => $bonuses[$date] ?? 0,
-                // boshqa jadvaldan kelgan qiymatlar ham shu yerda
-            ];
+            $requestForDay = new Request([
+                'date' => $date,
+                'dollar_rate' => $dollarRate,
+            ]);
 
-            // shu yerda $monthlyStats larni qo‘shib ketiladi
-            $monthlyStats['aup'] += $daily['aup'];
-            $monthlyStats['transport_attendance'] += $daily['transport'];
-            $monthlyStats['kpi'] += $daily['bonus'];
+            $daily = $this->getDailyCost($requestForDay)->getData(true);
 
-            // Order va boshqa hisoblashlar getDailyCost() dagi kabi yoziladi
+            $monthlyStats['aup'] += $daily['aup'] ?? 0;
+            $monthlyStats['kpi'] += $daily['kpi'] ?? 0;
+            $monthlyStats['transport_attendance'] += $daily['transport_attendance'] ?? 0;
+            $monthlyStats['tarification'] += $daily['tarification'] ?? 0;
+            $monthlyStats['daily_expenses'] += $daily['daily_expenses'] ?? 0;
+            $monthlyStats['total_earned_uzs'] += $daily['total_earned_uzs'] ?? 0;
+            $monthlyStats['total_output_cost_uzs'] += isset($daily['orders']) ? array_sum(array_column($daily['orders'], 'total_output_cost_uzs')) : 0;
+            $monthlyStats['total_fixed_cost_uzs'] += $daily['total_fixed_cost_uzs'] ?? 0;
+            $monthlyStats['net_profit_uzs'] += $daily['net_profit_uzs'] ?? 0;
+            $monthlyStats['employee_count_sum'] += $daily['employee_count'] ?? 0;
+            $monthlyStats['total_output_quantity'] += $daily['total_output_quantity'] ?? 0;
+
+            if (!isset($daily['orders'])) continue;
+
+            foreach ($daily['orders'] as $order) {
+                $orderId = $order['order']['id'] ?? null;
+                if (!$orderId) continue;
+
+                if (!isset($orderSummaries[$orderId])) {
+                    $orderSummaries[$orderId] = $order;
+                    $orderSummaries[$orderId]['total_earned_uzs'] = $order['total_output_cost_uzs']; // initial
+                    continue;
+                }
+
+                $orderSummaries[$orderId]['total_quantity'] += $order['total_quantity'];
+                $orderSummaries[$orderId]['rasxod_limit_uzs'] += $order['rasxod_limit_uzs'];
+                $orderSummaries[$orderId]['bonus'] += $order['bonus'];
+                $orderSummaries[$orderId]['tarification'] += $order['tarification'];
+                $orderSummaries[$orderId]['total_earned_uzs'] += $order['total_output_cost_uzs'];
+                $orderSummaries[$orderId]['total_output_cost_uzs'] += $order['total_output_cost_uzs'];
+                $orderSummaries[$orderId]['total_fixed_cost_uzs'] += $order['total_fixed_cost_uzs'];
+                $orderSummaries[$orderId]['net_profit_uzs'] += $order['net_profit_uzs'];
+
+                foreach ($order['costs_uzs'] as $key => $val) {
+                    if (!isset($orderSummaries[$orderId]['costs_uzs'][$key])) {
+                        $orderSummaries[$orderId]['costs_uzs'][$key] = 0;
+                    }
+                    $orderSummaries[$orderId]['costs_uzs'][$key] += $val;
+                }
+            }
+        }
+
+        foreach ($orderSummaries as &$order) {
+            $qty = max($order['total_quantity'], 1);
+            $totalCost = $order['total_fixed_cost_uzs'];
+            $earned = $order['total_earned_uzs'];
+
+            $order['cost_per_unit_uzs'] = round($totalCost / $qty);
+            $order['profit_per_unit_uzs'] = round(($earned / $qty) - $order['cost_per_unit_uzs']);
+            $order['profitability_percent'] = $totalCost > 0
+                ? round(($order['net_profit_uzs'] / $totalCost) * 100, 2)
+                : null;
         }
 
         $workingDays = collect($period)->filter(fn($date) => !$date->isSunday())->count();
         $averageEmployeeCount = round($monthlyStats['employee_count_sum'] / max($workingDays, 1));
         $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
 
+        // Umumiy quantity va har bir dona uchun xarajat hisoblash
         $costPerUnitOverall = $monthlyStats['total_output_quantity'] > 0
             ? $monthlyStats['total_fixed_cost_uzs'] / $monthlyStats['total_output_quantity']
             : 0;
@@ -138,6 +154,8 @@ class CasherController extends Controller
             'average_employee_count' => $averageEmployeeCount,
             'per_employee_cost_uzs' => $perEmployeeCost,
             'orders' => array_values($orderSummaries),
+
+            // Yangi qo'shilgan qismlar
             'total_output_quantity' => $monthlyStats['total_output_quantity'],
             'cost_per_unit_overall_uzs' => round($costPerUnitOverall, 2),
         ]);
@@ -590,7 +608,7 @@ class CasherController extends Controller
             if ($difference !== 0) {
                 $employee->decrement('balance', $difference);
 
-                $cashboxBalance->decrement('amount', $difference);
+                $cashboxBalance->decrement('balance', $difference);
             }
 
             return $payment;

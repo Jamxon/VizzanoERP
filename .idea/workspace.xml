@@ -442,23 +442,7 @@
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
       <workItem from="1756268702388" duration="17501000" />
-      <workItem from="1756353994222" duration="16145000" />
-    </task>
-    <task id="LOCAL-01164" summary="fix: enhance InternalAccountantController to improve salary calculation logic and add order tracking">
-      <option name="closed" value="true" />
-      <created>1756184511245</created>
-      <option name="number" value="01164" />
-      <option name="presentableId" value="LOCAL-01164" />
-      <option name="project" value="LOCAL" />
-      <updated>1756184511245</updated>
-    </task>
-    <task id="LOCAL-01165" summary="fix: enhance getGroupOrdersCountForDate method to improve order counting logic and optimize eager loading">
-      <option name="closed" value="true" />
-      <created>1756184717270</created>
-      <option name="number" value="01165" />
-      <option name="presentableId" value="LOCAL-01165" />
-      <option name="project" value="LOCAL" />
-      <updated>1756184717270</updated>
+      <workItem from="1756353994222" duration="16747000" />
     </task>
     <task id="LOCAL-01166" summary="fix: enhance InternalAccountantController to include order date in salary calculations">
       <option name="closed" value="true" />
@@ -836,7 +820,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756382115964</updated>
     </task>
-    <option name="localTasksCounter" value="1213" />
+    <task id="LOCAL-01213" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756382270097</created>
+      <option name="number" value="01213" />
+      <option name="presentableId" value="LOCAL-01213" />
+      <option name="project" value="LOCAL" />
+      <updated>1756382270097</updated>
+    </task>
+    <task id="LOCAL-01214" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756382368085</created>
+      <option name="number" value="01214" />
+      <option name="presentableId" value="LOCAL-01214" />
+      <option name="project" value="LOCAL" />
+      <updated>1756382368085</updated>
+    </task>
+    <option name="localTasksCounter" value="1215" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
