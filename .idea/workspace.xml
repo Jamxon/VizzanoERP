@@ -444,23 +444,7 @@
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
       <workItem from="1756268702388" duration="17501000" />
-      <workItem from="1756353994222" duration="3052000" />
-    </task>
-    <task id="LOCAL-01153" summary="fix: enhance eager loading in CeoController by restructuring queries and adding calculations for employee salaries">
-      <option name="closed" value="true" />
-      <created>1756123137328</created>
-      <option name="number" value="01153" />
-      <option name="presentableId" value="LOCAL-01153" />
-      <option name="project" value="LOCAL" />
-      <updated>1756123137329</updated>
-    </task>
-    <task id="LOCAL-01154" summary="fix: enhance eager loading in CeoController by restructuring nested loops for improved clarity and performance">
-      <option name="closed" value="true" />
-      <created>1756123296674</created>
-      <option name="number" value="01154" />
-      <option name="presentableId" value="LOCAL-01154" />
-      <option name="project" value="LOCAL" />
-      <updated>1756123296674</updated>
+      <workItem from="1756353994222" duration="11239000" />
     </task>
     <task id="LOCAL-01155" summary="fix: optimize eager loading in CeoController by restructuring loops and improving data aggregation">
       <option name="closed" value="true" />
@@ -838,7 +822,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756354877491</updated>
     </task>
-    <option name="localTasksCounter" value="1202" />
+    <task id="LOCAL-01202" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756358952873</created>
+      <option name="number" value="01202" />
+      <option name="presentableId" value="LOCAL-01202" />
+      <option name="project" value="LOCAL" />
+      <updated>1756358952873</updated>
+    </task>
+    <task id="LOCAL-01203" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756359008937</created>
+      <option name="number" value="01203" />
+      <option name="presentableId" value="LOCAL-01203" />
+      <option name="project" value="LOCAL" />
+      <updated>1756359008937</updated>
+    </task>
+    <option name="localTasksCounter" value="1204" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
