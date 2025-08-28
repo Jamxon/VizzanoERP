@@ -67,13 +67,12 @@ class CasherController extends Controller
             ->pluck('total','date');
 
         $bonuses = DB::table('bonuses')
-            ->whereBetween('created_at', [$start, $end])
-            ->whereHas('employee', function ($q) use ($branchId) {
-                $q->where('branch_id', $branchId);
-            })
-            ->selectRaw('DATE(created_at) as date, SUM(amount) as total')
+            ->join('employees', 'bonuses.employee_id', '=', 'employees.id')
+            ->whereBetween('bonuses.created_at', [$start, $end])
+            ->where('employees.branch_id', $branchId)
+            ->selectRaw('DATE(bonuses.created_at) as date, SUM(bonuses.amount) as total')
             ->groupBy('date')
-            ->pluck('total','date');
+            ->pluck('total', 'date');
 
         // va hokazo… boshqa querylarni ham shu tarzda BETWEEN qilib olib kelish mumkin
 
