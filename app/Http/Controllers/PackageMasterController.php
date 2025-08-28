@@ -66,7 +66,7 @@ class PackageMasterController extends Controller
         // Ma'lumotlarni optimizatsiyalangan tarzda olish
         $orders = Order::with(['orderModel.model:id,name', 'contragent:id,name,image'])
             ->whereIn('id', $validated['orders'])
-            ->get(['id', 'order_model_id', 'contragent_id']);
+            ->get(['id', 'contragent_id']);
 
         if ($orders->isEmpty()) {
             return response()->json(['message' => 'Buyurtmalar topilmadi'], 404);
@@ -106,13 +106,13 @@ class PackageMasterController extends Controller
     private function getModelDetails($firstOrder): array
     {
         $submodelName = Cache::remember(
-            "submodel_{$firstOrder->order_model_id}",
+            "submodel_{$firstOrder->id}",
             600,
             fn() => $firstOrder?->orderModel?->submodels->first()?->submodel?->name ?? 'Submodel nomi yoq'
         );
 
         $orderSizes = Cache::remember(
-            "order_sizes_{$firstOrder->order_model_id}",
+            "order_sizes_{$firstOrder->id}",
             600,
             fn() => $firstOrder?->orderModel?->sizes->map(fn($item) => $item->size->name)->toArray() ?? []
         );
