@@ -442,15 +442,7 @@
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
       <workItem from="1756268702388" duration="17501000" />
-      <workItem from="1756353994222" duration="11815000" />
-    </task>
-    <task id="LOCAL-01157" summary="fix: optimize eager loading in CeoController by restructuring loops for improved clarity and performance">
-      <option name="closed" value="true" />
-      <created>1756123823141</created>
-      <option name="number" value="01157" />
-      <option name="presentableId" value="LOCAL-01157" />
-      <option name="project" value="LOCAL" />
-      <updated>1756123823141</updated>
+      <workItem from="1756353994222" duration="12130000" />
     </task>
     <task id="LOCAL-01158" summary="fix: optimize eager loading in CeoController by restructuring queries and improving data retrieval efficiency">
       <option name="closed" value="true" />
@@ -836,7 +828,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756374685886</updated>
     </task>
-    <option name="localTasksCounter" value="1206" />
+    <task id="LOCAL-01206" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756374899957</created>
+      <option name="number" value="01206" />
+      <option name="presentableId" value="LOCAL-01206" />
+      <option name="project" value="LOCAL" />
+      <updated>1756374899958</updated>
+    </task>
+    <option name="localTasksCounter" value="1207" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

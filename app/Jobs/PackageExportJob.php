@@ -50,8 +50,8 @@ class PackageExportJob implements ShouldQueue
     {
         try {
             // Memory limit oshirish
-            ini_set('memory_limit', '512M');
-            set_time_limit(300);
+            ini_set('memory_limit', '2G');
+            set_time_limit(0); // Unlimited for background job
 
             $timestamp = now()->timestamp;
             $random = Str::random(6);
