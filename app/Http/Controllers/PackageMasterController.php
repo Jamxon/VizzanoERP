@@ -36,7 +36,7 @@ class PackageMasterController extends Controller
                     'orderModel.submodels.submodel:id,name',
                     'orderModel.sizes.size:id,name'
                 ])
-                ->select('id', 'branch_id', 'order_model_id', 'contragent_id')
+                ->select('id', 'branch_id', 'contragent_id')
                 ->get();
         });
 
