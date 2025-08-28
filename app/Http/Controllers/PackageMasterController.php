@@ -20,25 +20,20 @@ class PackageMasterController extends Controller
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
         $search = $request->input('search', '');
-        $cacheKey = "orders_" . auth()->user()->employee->branch_id . "_" . md5($search);
 
-        // Cache bilan optimizatsiya
-        $orders = Cache::remember($cacheKey, 300, function () use ($search) {
-            return Order::where('branch_id', auth()->user()->employee->branch_id)
-                ->when($search, function ($query, $search) {
-                    $query->whereHas('orderModel.model', function ($q) use ($search) {
-                        $q->where('name', 'like', "%{$search}%");
-                    });
-                })
-                ->with([
-                    'orderModel.model:id,name',
-                    'orderModel.material:id,name',
-                    'orderModel.submodels.submodel:id,name',
-                    'orderModel.sizes.size:id,name'
-                ])
-                ->select('id', 'branch_id', 'contragent_id')
-                ->get();
-        });
+        $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
+            ->where(function ($query) use ($search) {
+                $query->whereHas('orderModel.model', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            })
+            ->with(
+                'orderModel.model',
+                'orderModel.material',
+                'orderModel.submodels.submodel',
+                'orderModel.sizes.size'
+            )
+            ->get();
 
         return response()->json($orders);
     }
