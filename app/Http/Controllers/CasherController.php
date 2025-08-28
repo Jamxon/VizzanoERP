@@ -607,6 +607,8 @@ class CasherController extends Controller
 
             if ($difference !== 0) {
                 $employee->decrement('balance', $difference);
+
+                $cashboxBalance->decrement('balance', $difference);
             }
 
             return $payment;
