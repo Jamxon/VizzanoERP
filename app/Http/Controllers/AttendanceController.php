@@ -156,13 +156,13 @@ class AttendanceController extends Controller
             $salaryToAdd = 0;
 
             if ($employee->payment_type === 'monthly' || $employee->payment_type === 'fixed_tailored_bonus' || $employee->payment_type === 'fixed_cutted_bonus' || $employee->payment_type === 'fixed_tailored_bonus_group' || $employee->payment_type === 'fixed_packaged_bonus'
-            || $employee->payment_type === 'fixed_completed_bonus' || $employee->payment_type === 'fixed_percentage_bonus_group'
+            || $employee->payment_type === 'fixed_completed_bonus'
                 || $employee->payment_type === 'fixed_percentage_bonus' || $employee->payment_type === 'cutting_bonus' )
             {
                 $salaryToAdd = $employee->salary / 26;
             } elseif ($employee->payment_type === 'daily') {
                 $salaryToAdd = $employee->salary;
-            } elseif ($employee->payment_type === 'hourly') {
+            } elseif ($employee->payment_type === 'hourly' || $employee->payment_type === 'fixed_percentage_bonus_group') {
                 try {
                     $checkIn = \Carbon\Carbon::parse($attendance->check_in);
                     $checkOut = \Carbon\Carbon::parse($attendance->check_out);

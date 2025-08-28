@@ -38,11 +38,11 @@ class MarkAttendanceAsLeft extends Command
             $attendance->save();
 
             try {
-                if (in_array($employee->payment_type, ['monthly', 'fixed_tailored_bonus', 'fixed_cutted_bonus', 'fixed_tailored_bonus_group', 'fixed_percentage_bonus_group', 'cutting_bonus'])) {
+                if (in_array($employee->payment_type, ['monthly', 'fixed_tailored_bonus', 'fixed_cutted_bonus', 'fixed_tailored_bonus_group', 'cutting_bonus'])) {
                     $salaryToAdd = $employee->salary / 26;
                 } elseif ($employee->payment_type === 'daily') {
                     $salaryToAdd = $employee->salary;
-                } elseif ($employee->payment_type === 'hourly') {
+                } elseif ($employee->payment_type === 'hourly' || $employee->payment_type === 'fixed_percentage_bonus_group') {
                     $checkIn = Carbon::parse($attendance->check_in);
 
 // 🔎 Agar 08:00 gacha bo‘lsa → 07:30 qilib qo‘yamiz
