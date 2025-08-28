@@ -44,14 +44,24 @@ class MarkAttendanceAsLeft extends Command
                     $salaryToAdd = $employee->salary;
                 } elseif ($employee->payment_type === 'hourly') {
                     $checkIn = Carbon::parse($attendance->check_in);
+
+// 🔎 Agar 08:00 gacha bo‘lsa → 07:30 qilib qo‘yamiz
+                    if ($checkIn->lt($checkIn->copy()->setTime(8, 0))) {
+                        $checkIn->setTime(7, 30);
+                    }
+
                     if ($checkIn->greaterThan($now)) {
                         throw new \Exception("check_in vaqt noto‘g‘ri (kelajakda)");
                     }
+
                     $workedHours = $now->diffInHours($checkIn);
+
                     if ($workedHours > 24) {
                         throw new \Exception("ishlagan soat 24 soatdan oshib ketgan: $workedHours");
                     }
+
                     $salaryToAdd = $employee->salary * $workedHours;
+
                 }
 
                 // Cheklovdan katta bo‘lsa yozmaslik
