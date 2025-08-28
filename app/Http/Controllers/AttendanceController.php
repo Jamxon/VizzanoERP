@@ -162,7 +162,7 @@ class AttendanceController extends Controller
                 $salaryToAdd = $employee->salary / 26;
             } elseif ($employee->payment_type === 'daily') {
                 $salaryToAdd = $employee->salary;
-            } elseif ($employee->payment_type === 'hourly' || $employee->payment_type === 'fixed_percentage_bonus_group') {
+            } elseif ($employee->payment_type === 'hourly') {
                 try {
                     $checkIn = \Carbon\Carbon::parse($attendance->check_in);
                     $checkOut = \Carbon\Carbon::parse($attendance->check_out);
@@ -181,6 +181,27 @@ class AttendanceController extends Controller
                     return response()->json(['error' => 'Check-in yoki check-out noto‘g‘ri formatda.'], 422);
                 }
 
+            } elseif ( $employee->payment_type === 'fixed_percentage_bonus_group')
+            {
+                try {
+                    $checkIn = \Carbon\Carbon::parse($attendance->check_in);
+                    $checkOut = \Carbon\Carbon::parse($attendance->check_out);
+
+                    // 🔎 Agar 8:00 gacha bo'lsa => 7:30 ga tenglashtiramiz
+                    if ($checkIn->lt($checkIn->copy()->setTime(8, 0))) {
+                        $checkIn->setTime(7, 30);
+                    }
+
+                    $workedSeconds = $checkOut->diffInSeconds($checkIn);
+                    $workedHours = $workedSeconds / 3600;
+
+                    $salary = ($employee->salary / 26) / 10;
+
+                    $salaryToAdd = $salary * $workedHours;
+
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Check-in yoki check-out noto‘g‘ri formatda.'], 422);
+                }
             }
 
         $attendanceSalary = AttendanceSalary::where('attendance_id', $attendance->id)->first();

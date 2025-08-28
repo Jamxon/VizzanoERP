@@ -442,23 +442,7 @@
       <workItem from="1756114874304" duration="11544000" />
       <workItem from="1756179711186" duration="19501000" />
       <workItem from="1756268702388" duration="17501000" />
-      <workItem from="1756353994222" duration="17048000" />
-    </task>
-    <task id="LOCAL-01167" summary="fix: update chat ID in SupplierController for Telegram notifications">
-      <option name="closed" value="true" />
-      <created>1756185733735</created>
-      <option name="number" value="01167" />
-      <option name="presentableId" value="LOCAL-01167" />
-      <option name="project" value="LOCAL" />
-      <updated>1756185733735</updated>
-    </task>
-    <task id="LOCAL-01168" summary="fix: update supplier name retrieval in SupplierController for order notifications">
-      <option name="closed" value="true" />
-      <created>1756185976493</created>
-      <option name="number" value="01168" />
-      <option name="presentableId" value="LOCAL-01168" />
-      <option name="project" value="LOCAL" />
-      <updated>1756185976493</updated>
+      <workItem from="1756353994222" duration="17448000" />
     </task>
     <task id="LOCAL-01169" summary="fix: update supplier name retrieval in SupplierController for order notifications">
       <option name="closed" value="true" />
@@ -836,7 +820,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756382962963</updated>
     </task>
-    <option name="localTasksCounter" value="1216" />
+    <task id="LOCAL-01216" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756383219038</created>
+      <option name="number" value="01216" />
+      <option name="presentableId" value="LOCAL-01216" />
+      <option name="project" value="LOCAL" />
+      <updated>1756383219038</updated>
+    </task>
+    <task id="LOCAL-01217" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756383451045</created>
+      <option name="number" value="01217" />
+      <option name="presentableId" value="LOCAL-01217" />
+      <option name="project" value="LOCAL" />
+      <updated>1756383451045</updated>
+    </task>
+    <option name="localTasksCounter" value="1218" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
