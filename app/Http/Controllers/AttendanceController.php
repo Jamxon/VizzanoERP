@@ -167,8 +167,12 @@ class AttendanceController extends Controller
                     $checkIn = \Carbon\Carbon::parse($attendance->check_in);
                     $checkOut = \Carbon\Carbon::parse($attendance->check_out);
 
-                    $workedSeconds = $checkOut->diffInSeconds($checkIn);
+                    // 🔎 Agar 8:00 gacha bo'lsa => 7:30 ga tenglashtiramiz
+                    if ($checkIn->lt($checkIn->copy()->setTime(8, 0))) {
+                        $checkIn->setTime(7, 30);
+                    }
 
+                    $workedSeconds = $checkOut->diffInSeconds($checkIn);
                     $workedHours = $workedSeconds / 3600;
 
                     $salaryToAdd = $employee->salary * $workedHours;
@@ -176,6 +180,7 @@ class AttendanceController extends Controller
                 } catch (\Exception $e) {
                     return response()->json(['error' => 'Check-in yoki check-out noto‘g‘ri formatda.'], 422);
                 }
+
             }
 
         $attendanceSalary = AttendanceSalary::where('attendance_id', $attendance->id)->first();
