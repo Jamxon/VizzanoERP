@@ -68,7 +68,9 @@ class CasherController extends Controller
 
         $bonuses = DB::table('bonuses')
             ->whereBetween('created_at', [$start, $end])
-            ->where('branch_id', $branchId)
+            ->whereHas('employee', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+            })
             ->selectRaw('DATE(created_at) as date, SUM(amount) as total')
             ->groupBy('date')
             ->pluck('total','date');
