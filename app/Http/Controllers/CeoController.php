@@ -20,10 +20,17 @@ class CeoController extends Controller
                         'order:id,name',
                         'order.orderModel.submodels' => function ($q) use ($startDate, $endDate) {
                             $q->select('id', 'order_model_id', 'submodel_id')
-                                ->with(['sewingOutputs' => function ($sq) use ($startDate, $endDate) {
-                                    $sq->select('id', 'order_submodel_id', 'quantity', 'created_at')
-                                        ->whereBetween('created_at', [$startDate, $endDate]);
-                                }]);
+                                ->with([
+                                    // hammasini olamiz
+                                    'sewingOutputs' => function ($sq) {
+                                        $sq->select('id', 'order_submodel_id', 'quantity', 'created_at');
+                                    },
+                                    // faqat sana bo‘yicha
+                                    'filteredOutputs' => function ($sq) use ($startDate, $endDate) {
+                                        $sq->select('id', 'order_submodel_id', 'quantity', 'created_at')
+                                            ->whereBetween('created_at', [$startDate, $endDate]);
+                                    },
+                                ]);
                         },
                         'order.orderModel.submodels.submodel:id,name',
                     ]);
@@ -53,15 +60,25 @@ class CeoController extends Controller
                         'submodel_id' => $submodel->id,
                         'submodel_name' => optional($submodel->submodel)->name ?? 'N/A',
                         'total_sewn' => 0,
-                        'outputs' => []   // outputs qo‘shdik
+                        'outputs' => [],          // faqat sanaga kirganlari
+                        'all_outputs' => []       // hamma outputlar
                     ];
 
-                    foreach ($submodel->sewingOutputs as $output) {
+                    // faqat sanaga to‘g‘ri kelganlarni hisoblash
+                    foreach ($submodel->filteredOutputs as $output) {
                         $submodelData['total_sewn'] += $output->quantity;
                         $orderData['total_sewn'] += $output->quantity;
 
-                        // har bir outputni qo‘shamiz
                         $submodelData['outputs'][] = [
+                            'id' => $output->id,
+                            'quantity' => $output->quantity,
+                            'created_at' => $output->created_at->format('Y-m-d H:i:s')
+                        ];
+                    }
+
+                    // hamma outputsni qo‘shish
+                    foreach ($submodel->sewingOutputs as $output) {
+                        $submodelData['all_outputs'][] = [
                             'id' => $output->id,
                             'quantity' => $output->quantity,
                             'created_at' => $output->created_at->format('Y-m-d H:i:s')
