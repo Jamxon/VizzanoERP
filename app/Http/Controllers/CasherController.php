@@ -632,6 +632,7 @@ class CasherController extends Controller
         $endDate = $request->input('end_date');
         $group_id = $request->input('group_id');
         $orderIds = $request->input('order_ids', []); // array
+        $type = $request->input('type'); // normal yoki aup
 
         if (!$departmentId) {
             return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
@@ -639,9 +640,14 @@ class CasherController extends Controller
 
         // Guruhlarni olish (xodimlar bilan birga salaryPayments ham yuklaymiz)
         $groupQuery = Group::where('department_id', $departmentId)
-            ->with(['employees' => function ($query) {
+            ->with(['employees' => function ($query) use ($type) {
                 $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status')
                     ->with('salaryPayments');
+                if ($type === 'aup') {
+                    $query->where('type', 'aup');
+                } else {
+                    $query->where('type', '!=', 'aup');
+                }
             }]);
 
         if (!empty($group_id)) {
@@ -670,7 +676,8 @@ class CasherController extends Controller
         // Guruhsiz xodimlarni olish (hozircha jo‘natilmaydi)
         $ungroupedEmployees = Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
-            ->select('id', 'name', 'group_id', 'position_id', 'balance', 'payment_type', 'status')
+            ->where('type', $type === 'aup' ? 'aup' : '!=', 'aup')
+            ->select('id', 'name', 'group_id', 'position_id', 'balance', 'salary', 'payment_type', 'status')
             ->with('salaryPayments')
             ->get()
             ->map(function ($employee) use ($startDate, $endDate, $orderIds) {

@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -448,23 +448,7 @@
       <workItem from="1756353994222" duration="19196000" />
       <workItem from="1756720738596" duration="3110000" />
       <workItem from="1756783969780" duration="6307000" />
-      <workItem from="1756793374710" duration="7535000" />
-    </task>
-    <task id="LOCAL-01185" summary="fix: correct orders_count calculation in attendance salary query for order submodels in InternalAccountantController">
-      <option name="closed" value="true" />
-      <created>1756203631493</created>
-      <option name="number" value="01185" />
-      <option name="presentableId" value="LOCAL-01185" />
-      <option name="project" value="LOCAL" />
-      <updated>1756203631493</updated>
-    </task>
-    <task id="LOCAL-01186" summary="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController">
-      <option name="closed" value="true" />
-      <created>1756205181760</created>
-      <option name="number" value="01186" />
-      <option name="presentableId" value="LOCAL-01186" />
-      <option name="project" value="LOCAL" />
-      <updated>1756205181760</updated>
+      <workItem from="1756793374710" duration="8166000" />
     </task>
     <task id="LOCAL-01187" summary="fix: add max-width and overflow handling for product column in stock balances table">
       <option name="closed" value="true" />
@@ -842,7 +826,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756801837196</updated>
     </task>
-    <option name="localTasksCounter" value="1234" />
+    <task id="LOCAL-01234" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756803049898</created>
+      <option name="number" value="01234" />
+      <option name="presentableId" value="LOCAL-01234" />
+      <option name="project" value="LOCAL" />
+      <updated>1756803049899</updated>
+    </task>
+    <task id="LOCAL-01235" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756803371061</created>
+      <option name="number" value="01235" />
+      <option name="presentableId" value="LOCAL-01235" />
+      <option name="project" value="LOCAL" />
+      <updated>1756803371061</updated>
+    </task>
+    <option name="localTasksCounter" value="1236" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
