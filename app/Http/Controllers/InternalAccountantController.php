@@ -1113,7 +1113,7 @@ class InternalAccountantController extends Controller
             }
         ])->findOrFail($id);
 
-        // 2. Asosiy o'zgaruvchilarni initsializatsiya qilamiz
+        // 2. Asosiy o'zgaruvchilar
         $firstDate = null;
         $lastDate = null;
         $totalSumma = 0;
@@ -1123,20 +1123,16 @@ class InternalAccountantController extends Controller
 
         // 3. Birinchi pass: sanalar va summa hisoblash
         foreach ($order->orderModel->submodels as $submodel) {
-            // Summa hisoblash
             $maxSpend = $submodel->submodelSpend->max('summa');
             if ($maxSpend) {
                 $totalSumma += $maxSpend * $order->quantity;
             }
 
-            // Sanalarni yig'ish
             foreach ($submodel->sewingOutputs as $output) {
                 $createdAt = \Carbon\Carbon::parse($output->created_at);
                 $date = $createdAt->format('Y-m-d');
 
-                if (!isset($currentOrderDates[$date])) {
-                    $currentOrderDates[$date] = true;
-                }
+                $currentOrderDates[$date] = true;
 
                 if (is_null($firstDate) || $createdAt->lt($firstDate)) {
                     $firstDate = $createdAt;
@@ -1146,14 +1142,12 @@ class InternalAccountantController extends Controller
                 }
             }
 
-            // Group ID'larni yig'ish
             if ($submodel->group && $submodel->group->group) {
                 $groupId = $submodel->group->group->id;
                 if (!in_array($groupId, $groupIds)) {
                     $groupIds[] = $groupId;
                 }
 
-                // Employee ID'larni yig'ish
                 foreach ($submodel->group->group->employees as $employee) {
                     if (!in_array($employee->id, $employeeIds)) {
                         $employeeIds[] = $employee->id;
@@ -1171,7 +1165,7 @@ class InternalAccountantController extends Controller
 
         $orderDates = array_keys($currentOrderDates);
 
-        // 4. Tarification hisoblash (optimizatsiya qilingan)
+        // 4. Tarification hisoblash
         $tarificationTotal = 0;
         $tarificationEmployees = [];
         $fixedWithTarificationTotal = 0;
@@ -1185,7 +1179,6 @@ class InternalAccountantController extends Controller
                         $empId = $log->employee_id;
                         $employee = $log->employee;
 
-                        // Tarification employees array'ini to'ldirish
                         if (!isset($tarificationEmployees[$empId])) {
                             $tarificationEmployees[$empId] = [
                                 'employee_id' => $empId,
@@ -1195,7 +1188,6 @@ class InternalAccountantController extends Controller
                         }
                         $tarificationEmployees[$empId]['salary'] += $log->amount_earned;
 
-                        // Fixed employees bilan tarification
                         if ($employee && $employee->payment_type !== 'piece_work') {
                             if (!isset($fixedWithTarificationEmployees[$empId])) {
                                 $fixedWithTarificationEmployees[$empId] = [
@@ -1212,14 +1204,13 @@ class InternalAccountantController extends Controller
             }
         }
 
-        // 5. Attendance salary hisoblash (to‘g‘rilangan)
+        // 5. Attendance salary hisoblash
         $salaryTotal = 0;
         $salaryEmployees = [];
         $extraDays = [];
         $extraDaysTotal = 0;
 
         if (!empty($employeeIds) && $firstDate && $lastDate) {
-            // Attendance'ni butun date-range bo‘yicha olamiz (faqat orderDates emas!)
             $attendanceSalaries = DB::table('attendance_salary')
                 ->whereIn('employee_id', $employeeIds)
                 ->whereBetween(DB::raw('DATE(date)'), [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
@@ -1227,14 +1218,14 @@ class InternalAccountantController extends Controller
                 ->get()
                 ->groupBy(['employee_id', 'date']);
 
-            // Group orders count'ni orderDates bo‘yicha olamiz
+            // ✅ Endi butun date-range bo‘yicha groupOrdersCounts
             $groupOrdersCounts = [];
             if (!empty($groupIds)) {
                 $groupOrdersData = DB::table('sewing_outputs')
                     ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
                     ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id')
                     ->whereIn('order_groups.group_id', $groupIds)
-                    ->whereIn(DB::raw('DATE(sewing_outputs.created_at)'), $orderDates)
+                    ->whereBetween(DB::raw('DATE(sewing_outputs.created_at)'), [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
                     ->select(
                         'order_groups.group_id',
                         DB::raw('DATE(sewing_outputs.created_at) as date'),
@@ -1248,14 +1239,12 @@ class InternalAccountantController extends Controller
                 }
             }
 
-            // Employee ma'lumotlari
             $employees = DB::table('employees')
                 ->whereIn('id', $employeeIds)
                 ->select('id', 'name', 'group_id')
                 ->get()
                 ->keyBy('id');
 
-            // Har bir employee uchun
             foreach ($employees as $employee) {
                 if (!isset($attendanceSalaries[$employee->id])) {
                     continue;
@@ -1268,24 +1257,20 @@ class InternalAccountantController extends Controller
                     $dailySalary = collect($records)->sum('amount');
 
                     if ($orderDates && in_array($date, $orderDates)) {
-                        // ✅ Output bo‘lgan kun
                         $ordersWorkedOnThisDate = $groupOrdersCounts[$employee->group_id][$date] ?? 0;
                         if ($ordersWorkedOnThisDate > 0) {
                             $empSalary += $dailySalary / $ordersWorkedOnThisDate;
                         }
                     } else {
-                        // ✅ Output bo‘lmagan kun → extraDays
-                        $groupId = $employee->group_id;
-
-// Agar shu sanada shu group allaqachon extraDays ga qo‘shilgan bo‘lsa → boshqa order uchun qo‘shmaymiz
-                        if (isset($extraDays[$date][$groupId])) {
-                            continue;
+                        // ✅ Output bo‘lmagan kun → faqat shu group boshqa orderda ishlamagan bo‘lsa
+                        if (!empty($groupOrdersCounts[$employee->group_id][$date])) {
+                            continue; // shu sanada boshqa orderda ham ishlagan → qo‘shmaymiz
                         }
 
+                        $groupId = $employee->group_id;
                         if (!isset($extraDays[$date])) {
                             $extraDays[$date] = [];
                         }
-
                         if (!isset($extraDays[$date][$groupId])) {
                             $extraDays[$date][$groupId] = [
                                 'date' => $date,
