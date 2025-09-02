@@ -641,7 +641,7 @@ class CasherController extends Controller
         // Guruhlarni olish (xodimlar bilan birga salaryPayments ham yuklaymiz)
         $groupQuery = Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) use ($type) {
-                $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status')
+                $query->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status')
                     ->with('salaryPayments');
                 if ($type === 'aup') {
                     $query->where('type', 'aup');
