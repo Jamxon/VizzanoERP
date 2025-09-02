@@ -1275,19 +1275,33 @@ class InternalAccountantController extends Controller
                         }
                     } else {
                         // ✅ Output bo‘lmagan kun → extraDays
+                        $groupId = $employee->group_id;
+
+// Agar shu sanada shu group allaqachon extraDays ga qo‘shilgan bo‘lsa → boshqa order uchun qo‘shmaymiz
+                        if (isset($extraDays[$date][$groupId])) {
+                            continue;
+                        }
+
                         if (!isset($extraDays[$date])) {
-                            $extraDays[$date] = [
+                            $extraDays[$date] = [];
+                        }
+
+                        if (!isset($extraDays[$date][$groupId])) {
+                            $extraDays[$date][$groupId] = [
                                 'date' => $date,
+                                'group_id' => $groupId,
                                 'employees' => [],
                                 'total' => 0,
                             ];
                         }
-                        $extraDays[$date]['employees'][] = [
+
+                        $extraDays[$date][$groupId]['employees'][] = [
                             'employee_id' => $employee->id,
                             'name' => $employee->name,
                             'salary' => $dailySalary,
                         ];
-                        $extraDays[$date]['total'] += $dailySalary;
+
+                        $extraDays[$date][$groupId]['total'] += $dailySalary;
                         $extraDaysTotal += $dailySalary;
                     }
                 }
