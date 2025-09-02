@@ -809,6 +809,7 @@ class CasherController extends Controller
             'group' => optional($employee->group)->name ?? 'N/A',
             'balance' => (float) $employee->balance,
             'payment_type' => $employee->payment_type,
+            'salary' => (float) $employee->salary,
 
             'attendance_salary' => $attendanceTotal,
             'attendance_days' => $attendanceDays,

@@ -445,15 +445,7 @@
       <workItem from="1756353994222" duration="19196000" />
       <workItem from="1756720738596" duration="3110000" />
       <workItem from="1756783969780" duration="6307000" />
-      <workItem from="1756793374710" duration="8905000" />
-    </task>
-    <task id="LOCAL-01188" summary="fix: adjust max-width and overflow handling for product column in stock balances table">
-      <option name="closed" value="true" />
-      <created>1756274183475</created>
-      <option name="number" value="01188" />
-      <option name="presentableId" value="LOCAL-01188" />
-      <option name="project" value="LOCAL" />
-      <updated>1756274183475</updated>
+      <workItem from="1756793374710" duration="9480000" />
     </task>
     <task id="LOCAL-01189" summary="fix: optimize order retrieval in TechnologController by reducing selected columns and improving tarification check">
       <option name="closed" value="true" />
@@ -839,7 +831,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756803801760</updated>
     </task>
-    <option name="localTasksCounter" value="1237" />
+    <task id="LOCAL-01237" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756804535654</created>
+      <option name="number" value="01237" />
+      <option name="presentableId" value="LOCAL-01237" />
+      <option name="project" value="LOCAL" />
+      <updated>1756804535654</updated>
+    </task>
+    <option name="localTasksCounter" value="1238" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
