@@ -1282,7 +1282,6 @@ class InternalAccountantController extends Controller
                                 ->join('order_groups', 'order_groups.order_id', '=', 'orders.id')
                                 ->join('groups', 'groups.id', '=', 'order_groups.group_id')
                                 ->where('groups.id', $employee->group_id)
-                                ->where('orders.id', '!=', $id)
                                 ->whereDate('so.created_at', $prevDate)
                                 ->distinct()
                                 ->pluck('orders.id')
