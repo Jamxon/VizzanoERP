@@ -1262,32 +1262,42 @@ class InternalAccountantController extends Controller
                             $empSalary += $dailySalary / $ordersWorkedOnThisDate;
                         }
                     } else {
-                        // ✅ Output bo‘lmagan kun → faqat shu group boshqa orderda ishlamagan bo‘lsa
-                        if (!empty($groupOrdersCounts[$employee->group_id][$date])) {
-                            continue; // shu sanada boshqa orderda ham ishlagan → qo‘shmaymiz
-                        }
+                        // ✅ Output bo‘lmagan kun → eng yaqin oldingi outputni qidiramiz
+                        $dateCarbon = \Carbon\Carbon::parse($date);
+                        $found = false;
 
-                        $groupId = $employee->group_id;
-                        if (!isset($extraDays[$date])) {
-                            $extraDays[$date] = [];
-                        }
-                        if (!isset($extraDays[$date][$groupId])) {
-                            $extraDays[$date][$groupId] = [
-                                'date' => $date,
-                                'group_id' => $groupId,
-                                'employees' => [],
-                                'total' => 0,
-                            ];
-                        }
+                        for ($i = 1; $i <= 7; $i++) { // masalan, 7 kun orqaga qidiramiz
+                            $prevDate = $dateCarbon->copy()->subDays($i)->format('Y-m-d');
 
-                        $extraDays[$date][$groupId]['employees'][] = [
-                            'employee_id' => $employee->id,
-                            'name' => $employee->name,
-                            'salary' => $dailySalary,
-                        ];
+                            if (in_array($prevDate, $orderDates)) {
+                                // ✅ Oldingi kunda output bor → shu orderga qo‘shamiz
+                                $groupId = $employee->group_id;
 
-                        $extraDays[$date][$groupId]['total'] += $dailySalary;
-                        $extraDaysTotal += $dailySalary;
+                                if (!isset($extraDays[$prevDate])) {
+                                    $extraDays[$prevDate] = [];
+                                }
+                                if (!isset($extraDays[$prevDate][$groupId])) {
+                                    $extraDays[$prevDate][$groupId] = [
+                                        'date' => $prevDate,
+                                        'group_id' => $groupId,
+                                        'employees' => [],
+                                        'total' => 0,
+                                    ];
+                                }
+
+                                $extraDays[$prevDate][$groupId]['employees'][] = [
+                                    'employee_id' => $employee->id,
+                                    'name' => $employee->name,
+                                    'salary' => $dailySalary,
+                                ];
+
+                                $extraDays[$prevDate][$groupId]['total'] += $dailySalary;
+                                $extraDaysTotal += $dailySalary;
+
+                                $found = true;
+                                break; // birinchi chiqqan oldingi outputga qo‘shib chiqamiz
+                            }
+                        }
                     }
                 }
 
