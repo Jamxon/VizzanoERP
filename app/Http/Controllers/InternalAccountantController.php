@@ -1252,6 +1252,7 @@ class InternalAccountantController extends Controller
 
                 $empAttendance = $attendanceSalaries[$employee->id];
                 $empSalary = 0;
+                $attendanceDetails = []; // ✅ sanalar bo‘yicha saqlash uchun
 
                 foreach ($empAttendance as $date => $records) {
                     $dailySalary = collect($records)->sum('amount');
@@ -1259,17 +1260,21 @@ class InternalAccountantController extends Controller
                     if ($orderDates && in_array($date, $orderDates)) {
                         $ordersWorkedOnThisDate = $groupOrdersCounts[$employee->group_id][$date] ?? 0;
                         if ($ordersWorkedOnThisDate > 0) {
-                            $empSalary += $dailySalary / $ordersWorkedOnThisDate;
+                            $share = $dailySalary / $ordersWorkedOnThisDate;
+                            $empSalary += $share;
+
+                            $attendanceDetails[] = [
+                                'date' => $date,
+                                'amount' => $share,
+                                'type' => 'order_day'
+                            ];
                         }
                     } else {
-                        // ✅ Output bo‘lmagan kun → lekin group boshqa orderda ishlaganmi?
                         if (!empty($groupOrdersCounts[$employee->group_id][$date])) {
-                            continue; // shu sanada boshqa orderda ishlagan → extraDays emas
+                            continue; // boshqa orderda ishlagan
                         }
 
-                        // ✅ Endi eng yaqin oldingi outputni qidiramiz
                         $dateCarbon = \Carbon\Carbon::parse($date);
-                        $found = false;
 
                         for ($i = 1; $i <= 7; $i++) {
                             $prevDate = $dateCarbon->copy()->subDays($i)->format('Y-m-d');
@@ -1286,10 +1291,6 @@ class InternalAccountantController extends Controller
                                 ->distinct()
                                 ->pluck('orders.id')
                                 ->toArray();
-
-
-//                            return response()->json($prevOrders);
-
 
                             if (!empty($prevOrders)) {
                                 $minOrderId = min($prevOrders);
@@ -1317,23 +1318,32 @@ class InternalAccountantController extends Controller
 
                                     $extraDays[$prevDate][$groupId]['total'] += $dailySalary;
                                     $extraDaysTotal += $dailySalary;
+
+                                    // ✅ extra day sanasini ham employee uchun yozib qo‘yamiz
+                                    $attendanceDetails[] = [
+                                        'date' => $date,
+                                        'amount' => $dailySalary,
+                                        'type' => 'extra_day'
+                                    ];
                                 }
 
-                                break; // birinchi mos kelgan kun topilgach to‘xtaymiz
+                                break;
                             }
                         }
                     }
                 }
 
-                if ($empSalary > 0) {
+                if ($empSalary > 0 || !empty($attendanceDetails)) {
                     $salaryEmployees[] = [
                         'employee_id' => $employee->id,
                         'name' => $employee->name,
-                        'salary' => $empSalary
+                        'salary' => $empSalary,
+                        'attendance' => $attendanceDetails, // ✅ sanalar qo‘shildi
                     ];
                     $salaryTotal += $empSalary;
                 }
             }
+
         }
 
         return response()->json([
