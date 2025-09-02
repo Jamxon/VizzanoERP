@@ -1313,6 +1313,9 @@ class InternalAccountantController extends Controller
             'tarification_total' => $tarificationTotal,
             'tarification_employees' => array_values($tarificationEmployees),
 
+            'extra_days_total' => $extraDaysTotal,
+            'extra_days' => array_values($extraDays),
+
             'salary_total' => $salaryTotal,
             'salary_employees' => $salaryEmployees,
 
