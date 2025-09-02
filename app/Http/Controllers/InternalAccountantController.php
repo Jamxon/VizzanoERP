@@ -1289,7 +1289,7 @@ class InternalAccountantController extends Controller
                                 ->toArray();
 
 
-                            return response()->json($prevOrders);
+//                            return response()->json($prevOrders);
 
 
                             if (!empty($prevOrders)) {
