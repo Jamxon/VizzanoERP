@@ -1164,7 +1164,6 @@ class InternalAccountantController extends Controller
         }
 
         $orderDates = array_keys($currentOrderDates);
-        $orderLength = count($orderDates); // ✅ Hozirgi orderning kunlari soni
 
         // 4. Tarification hisoblash
         $tarificationTotal = 0;
@@ -1225,19 +1224,18 @@ class InternalAccountantController extends Controller
                 $groupOrdersData = DB::table('sewing_outputs')
                     ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
                     ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id')
-                    ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
                     ->whereIn('order_groups.group_id', $groupIds)
                     ->whereBetween(DB::raw('DATE(sewing_outputs.created_at)'), [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
                     ->select(
                         'order_groups.group_id',
-                        'order_models.order_id',
-                        DB::raw('COUNT(DISTINCT DATE(sewing_outputs.created_at)) as days_count')
+                        DB::raw('DATE(sewing_outputs.created_at) as date'),
+                        DB::raw('COUNT(DISTINCT order_sub_models.order_model_id) as orders_count')
                     )
-                    ->groupBy('order_groups.group_id', 'order_models.order_id')
+                    ->groupBy('order_groups.group_id', 'date')
                     ->get();
 
                 foreach ($groupOrdersData as $data) {
-                    $groupOrdersCounts[$data->group_id][$data->order_id] = $data->days_count;
+                    $groupOrdersCounts[$data->group_id][$data->date] = $data->orders_count;
                 }
             }
 
@@ -1259,57 +1257,49 @@ class InternalAccountantController extends Controller
                     $dailySalary = collect($records)->sum('amount');
 
                     if ($orderDates && in_array($date, $orderDates)) {
-                        $ordersWorkedOnThisDate = $groupOrdersCounts[$employee->group_id][$order->id] ?? 0;
+                        $ordersWorkedOnThisDate = $groupOrdersCounts[$employee->group_id][$date] ?? 0;
                         if ($ordersWorkedOnThisDate > 0) {
                             $empSalary += $dailySalary / $ordersWorkedOnThisDate;
                         }
                     } else {
                         // ✅ Output bo‘lmagan kun → lekin group boshqa orderda ishlaganmi?
-                        $groupOrdersThatDay = collect($groupOrdersCounts[$employee->group_id] ?? []);
-                        if ($groupOrdersThatDay->isNotEmpty()) {
+                        if (!empty($groupOrdersCounts[$employee->group_id][$date])) {
                             continue; // shu sanada boshqa orderda ishlagan → extraDays emas
                         }
 
                         // ✅ Endi eng yaqin oldingi outputni qidiramiz
                         $dateCarbon = \Carbon\Carbon::parse($date);
+                        $found = false;
+
                         for ($i = 1; $i <= 7; $i++) { // masalan, 7 kun orqaga qidiramiz
                             $prevDate = $dateCarbon->copy()->subDays($i)->format('Y-m-d');
 
                             if (in_array($prevDate, $orderDates)) {
+                                // ✅ Oldingi kunda output bor → shu orderga qo‘shamiz
                                 $groupId = $employee->group_id;
 
-                                // ✅ Shu group uchun boshqa order uzunligini solishtiramiz
-                                $otherOrderLengths = $groupOrdersCounts[$groupId] ?? [];
-                                $maxOtherLength = 0;
-                                foreach ($otherOrderLengths as $otherOrderId => $daysCount) {
-                                    if ($otherOrderId != $order->id) {
-                                        $maxOtherLength = max($maxOtherLength, $daysCount);
-                                    }
+                                if (!isset($extraDays[$prevDate])) {
+                                    $extraDays[$prevDate] = [];
                                 }
-
-                                if ($orderLength >= $maxOtherLength) { // ✅ faqat eng uzun orderga qo‘shamiz
-                                    if (!isset($extraDays[$prevDate])) {
-                                        $extraDays[$prevDate] = [];
-                                    }
-                                    if (!isset($extraDays[$prevDate][$groupId])) {
-                                        $extraDays[$prevDate][$groupId] = [
-                                            'date' => $date,
-                                            'group_id' => $groupId,
-                                            'employees' => [],
-                                            'total' => 0,
-                                        ];
-                                    }
-
-                                    $extraDays[$prevDate][$groupId]['employees'][] = [
-                                        'employee_id' => $employee->id,
-                                        'name' => $employee->name,
-                                        'salary' => $dailySalary,
+                                if (!isset($extraDays[$prevDate][$groupId])) {
+                                    $extraDays[$prevDate][$groupId] = [
+                                        'date' => $date,
+                                        'group_id' => $groupId,
+                                        'employees' => [],
+                                        'total' => 0,
                                     ];
-
-                                    $extraDays[$prevDate][$groupId]['total'] += $dailySalary;
-                                    $extraDaysTotal += $dailySalary;
                                 }
 
+                                $extraDays[$prevDate][$groupId]['employees'][] = [
+                                    'employee_id' => $employee->id,
+                                    'name' => $employee->name,
+                                    'salary' => $dailySalary,
+                                ];
+
+                                $extraDays[$prevDate][$groupId]['total'] += $dailySalary;
+                                $extraDaysTotal += $dailySalary;
+
+                                $found = true;
                                 break;
                             }
                         }
