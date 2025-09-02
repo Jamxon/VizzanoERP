@@ -1283,7 +1283,7 @@ class InternalAccountantController extends Controller
                                 }
                                 if (!isset($extraDays[$prevDate][$groupId])) {
                                     $extraDays[$prevDate][$groupId] = [
-                                        'date' => $dateCarbon,
+                                        'date' => $date,
                                         'group_id' => $groupId,
                                         'employees' => [],
                                         'total' => 0,
