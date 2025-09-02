@@ -1212,20 +1212,22 @@ class InternalAccountantController extends Controller
             }
         }
 
-        // 5. Attendance salary hisoblash (eng katta optimizatsiya)
+        // 5. Attendance salary hisoblash (to‘g‘rilangan)
         $salaryTotal = 0;
         $salaryEmployees = [];
+        $extraDays = [];
+        $extraDaysTotal = 0;
 
-        if (!empty($employeeIds) && !empty($orderDates)) {
-            // Bitta query bilan barcha attendance ma'lumotlarini olamiz
+        if (!empty($employeeIds) && $firstDate && $lastDate) {
+            // Attendance'ni butun date-range bo‘yicha olamiz (faqat orderDates emas!)
             $attendanceSalaries = DB::table('attendance_salary')
                 ->whereIn('employee_id', $employeeIds)
-                ->whereIn(DB::raw('DATE(date)'), $orderDates)
+                ->whereBetween(DB::raw('DATE(date)'), [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
                 ->select('employee_id', DB::raw('DATE(date) as date'), 'amount')
                 ->get()
                 ->groupBy(['employee_id', 'date']);
 
-            // Group orders count'ni bitta query bilan olamiz
+            // Group orders count'ni orderDates bo‘yicha olamiz
             $groupOrdersCounts = [];
             if (!empty($groupIds)) {
                 $groupOrdersData = DB::table('sewing_outputs')
@@ -1246,45 +1248,57 @@ class InternalAccountantController extends Controller
                 }
             }
 
-            // Employee ma'lumotlarini olish
+            // Employee ma'lumotlari
             $employees = DB::table('employees')
                 ->whereIn('id', $employeeIds)
                 ->select('id', 'name', 'group_id')
                 ->get()
                 ->keyBy('id');
 
-            // Har bir employee uchun salary hisoblash
+            // Har bir employee uchun
             foreach ($employees as $employee) {
                 if (!isset($attendanceSalaries[$employee->id])) {
                     continue;
                 }
 
-                $totalSalary = 0;
+                $empAttendance = $attendanceSalaries[$employee->id];
+                $empSalary = 0;
 
-                foreach ($orderDates as $date) {
-                    if (!isset($attendanceSalaries[$employee->id][$date])) {
-                        continue;
-                    }
+                foreach ($empAttendance as $date => $records) {
+                    $dailySalary = collect($records)->sum('amount');
 
-                    $dailySalary = $attendanceSalaries[$employee->id][$date]->sum('amount');
-
-                    if ($dailySalary > 0) {
+                    if ($orderDates && in_array($date, $orderDates)) {
+                        // ✅ Output bo‘lgan kun
                         $ordersWorkedOnThisDate = $groupOrdersCounts[$employee->group_id][$date] ?? 0;
-
                         if ($ordersWorkedOnThisDate > 0) {
-                            $proportionalSalary = $dailySalary / $ordersWorkedOnThisDate;
-                            $totalSalary += $proportionalSalary;
+                            $empSalary += $dailySalary / $ordersWorkedOnThisDate;
                         }
+                    } else {
+                        // ✅ Output bo‘lmagan kun → extraDays
+                        if (!isset($extraDays[$date])) {
+                            $extraDays[$date] = [
+                                'date' => $date,
+                                'employees' => [],
+                                'total' => 0,
+                            ];
+                        }
+                        $extraDays[$date]['employees'][] = [
+                            'employee_id' => $employee->id,
+                            'name' => $employee->name,
+                            'salary' => $dailySalary,
+                        ];
+                        $extraDays[$date]['total'] += $dailySalary;
+                        $extraDaysTotal += $dailySalary;
                     }
                 }
 
-                if ($totalSalary > 0) {
+                if ($empSalary > 0) {
                     $salaryEmployees[] = [
                         'employee_id' => $employee->id,
                         'name' => $employee->name,
-                        'salary' => $totalSalary
+                        'salary' => $empSalary
                     ];
-                    $salaryTotal += $totalSalary;
+                    $salaryTotal += $empSalary;
                 }
             }
         }
