@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -445,15 +447,7 @@
       <workItem from="1756353994222" duration="19196000" />
       <workItem from="1756720738596" duration="3110000" />
       <workItem from="1756783969780" duration="6307000" />
-      <workItem from="1756793374710" duration="9480000" />
-    </task>
-    <task id="LOCAL-01189" summary="fix: optimize order retrieval in TechnologController by reducing selected columns and improving tarification check">
-      <option name="closed" value="true" />
-      <created>1756275034780</created>
-      <option name="number" value="01189" />
-      <option name="presentableId" value="LOCAL-01189" />
-      <option name="project" value="LOCAL" />
-      <updated>1756275034780</updated>
+      <workItem from="1756793374710" duration="13048000" />
     </task>
     <task id="LOCAL-01190" summary="fix: enhance order retrieval in TechnologController by refining selected columns and adding has_tarifications logic">
       <option name="closed" value="true" />
@@ -839,7 +833,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756804535654</updated>
     </task>
-    <option name="localTasksCounter" value="1238" />
+    <task id="LOCAL-01238" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756805040989</created>
+      <option name="number" value="01238" />
+      <option name="presentableId" value="LOCAL-01238" />
+      <option name="project" value="LOCAL" />
+      <updated>1756805040989</updated>
+    </task>
+    <option name="localTasksCounter" value="1239" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
