@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InternalAccountantController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -447,23 +448,7 @@
       <workItem from="1756353994222" duration="19196000" />
       <workItem from="1756720738596" duration="3110000" />
       <workItem from="1756783969780" duration="6307000" />
-      <workItem from="1756793374710" duration="13048000" />
-    </task>
-    <task id="LOCAL-01190" summary="fix: enhance order retrieval in TechnologController by refining selected columns and adding has_tarifications logic">
-      <option name="closed" value="true" />
-      <created>1756275190066</created>
-      <option name="number" value="01190" />
-      <option name="presentableId" value="LOCAL-01190" />
-      <option name="project" value="LOCAL" />
-      <updated>1756275190066</updated>
-    </task>
-    <task id="LOCAL-01191" summary="fix: enhance order retrieval in TechnologController by adding tarifications relationship and simplifying has_tarifications logic">
-      <option name="closed" value="true" />
-      <created>1756275328309</created>
-      <option name="number" value="01191" />
-      <option name="presentableId" value="LOCAL-01191" />
-      <option name="project" value="LOCAL" />
-      <updated>1756275328310</updated>
+      <workItem from="1756793374710" duration="14078000" />
     </task>
     <task id="LOCAL-01192" summary="fix: enhance order data structure in CeoController by adding status and submodel name fields">
       <option name="closed" value="true" />
@@ -841,7 +826,23 @@
       <option name="project" value="LOCAL" />
       <updated>1756805040989</updated>
     </task>
-    <option name="localTasksCounter" value="1239" />
+    <task id="LOCAL-01239" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756816149641</created>
+      <option name="number" value="01239" />
+      <option name="presentableId" value="LOCAL-01239" />
+      <option name="project" value="LOCAL" />
+      <updated>1756816149641</updated>
+    </task>
+    <task id="LOCAL-01240" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756816251490</created>
+      <option name="number" value="01240" />
+      <option name="presentableId" value="LOCAL-01240" />
+      <option name="project" value="LOCAL" />
+      <updated>1756816251490</updated>
+    </task>
+    <option name="localTasksCounter" value="1241" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
