@@ -333,6 +333,12 @@ class UserController extends Controller
             }
         };
 
+        $relations['attendanceSalaries'] = function ($query) use ($start_date, $end_date) {
+            if ($start_date && $end_date) {
+                $query->whereBetween('date', [$start_date, $end_date]);
+            }
+        };
+
         if ($employee->payment_type === 'piece_work') {
             $relations['attendances'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
@@ -371,12 +377,6 @@ class UserController extends Controller
             };
 
         } else {
-            $relations['attendanceSalaries'] = function ($query) use ($start_date, $end_date) {
-                if ($start_date && $end_date) {
-                    $query->whereBetween('date', [$start_date, $end_date]);
-                }
-            };
-
             $relations['employeeTarificationLogs'] = function ($query) use ($start_date, $end_date) {
                 if ($start_date && $end_date) {
                     $query->whereBetween('date', [$start_date, $end_date]);
