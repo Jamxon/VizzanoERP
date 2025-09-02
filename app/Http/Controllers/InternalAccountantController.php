@@ -1212,60 +1212,68 @@ class InternalAccountantController extends Controller
             }
         }
 
-        // 5. Attendance salary hisoblash
+        // 5. Attendance salary hisoblash (eng katta optimizatsiya)
         $salaryTotal = 0;
         $salaryEmployees = [];
-        $extraDays = []; // ✅ Natija bo‘lmagan kunlar
-        $extraDaysTotal = 0;
 
-        if (!empty($employeeIds) && $firstDate && $lastDate) {
-            // Attendance'ni butun date-range bo‘yicha olamiz
+        if (!empty($employeeIds) && !empty($orderDates)) {
+            // Bitta query bilan barcha attendance ma'lumotlarini olamiz
             $attendanceSalaries = DB::table('attendance_salary')
                 ->whereIn('employee_id', $employeeIds)
-                ->whereBetween(DB::raw('DATE(date)'), [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
+                ->whereIn(DB::raw('DATE(date)'), $orderDates)
                 ->select('employee_id', DB::raw('DATE(date) as date'), 'amount')
                 ->get()
                 ->groupBy(['employee_id', 'date']);
 
-            // Order chiqqan sanalar
-            $orderDates = collect(array_keys($currentOrderDates))->sort()->values();
+            // Group orders count'ni bitta query bilan olamiz
+            $groupOrdersCounts = [];
+            if (!empty($groupIds)) {
+                $groupOrdersData = DB::table('sewing_outputs')
+                    ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
+                    ->join('order_groups', 'order_sub_models.id', '=', 'order_groups.submodel_id')
+                    ->whereIn('order_groups.group_id', $groupIds)
+                    ->whereIn(DB::raw('DATE(sewing_outputs.created_at)'), $orderDates)
+                    ->select(
+                        'order_groups.group_id',
+                        DB::raw('DATE(sewing_outputs.created_at) as date'),
+                        DB::raw('COUNT(DISTINCT order_sub_models.order_model_id) as orders_count')
+                    )
+                    ->groupBy('order_groups.group_id', 'date')
+                    ->get();
 
-            // Har bir xodim uchun
-            foreach ($employeeIds as $empId) {
-                $employee = DB::table('employees')
-                    ->where('id', $empId)
-                    ->select('id', 'name', 'group_id')
-                    ->first();
-                if (!$employee) continue;
+                foreach ($groupOrdersData as $data) {
+                    $groupOrdersCounts[$data->group_id][$data->date] = $data->orders_count;
+                }
+            }
+
+            // Employee ma'lumotlarini olish
+            $employees = DB::table('employees')
+                ->whereIn('id', $employeeIds)
+                ->select('id', 'name', 'group_id')
+                ->get()
+                ->keyBy('id');
+
+            // Har bir employee uchun salary hisoblash
+            foreach ($employees as $employee) {
+                if (!isset($attendanceSalaries[$employee->id])) {
+                    continue;
+                }
 
                 $totalSalary = 0;
-                $empAttendance = $attendanceSalaries[$empId] ?? [];
 
-                foreach ($empAttendance as $date => $records) {
-                    $dailySalary = collect($records)->sum('amount');
+                foreach ($orderDates as $date) {
+                    if (!isset($attendanceSalaries[$employee->id][$date])) {
+                        continue;
+                    }
+
+                    $dailySalary = $attendanceSalaries[$employee->id][$date]->sum('amount');
 
                     if ($dailySalary > 0) {
-                        if ($orderDates->contains($date)) {
-                            // ✅ Output chiqqan kun — asosiy hisob-kitob
-                            $ordersWorked = $groupOrdersCounts[$employee->group_id][$date] ?? 0;
-                            $proportionalSalary = $ordersWorked > 0 ? $dailySalary / $ordersWorked : $dailySalary;
+                        $ordersWorkedOnThisDate = $groupOrdersCounts[$employee->group_id][$date] ?? 0;
+
+                        if ($ordersWorkedOnThisDate > 0) {
+                            $proportionalSalary = $dailySalary / $ordersWorkedOnThisDate;
                             $totalSalary += $proportionalSalary;
-                        } else {
-                            // ✅ Output chiqmagan kun — alohida yozib qo‘yamiz
-                            if (!isset($extraDays[$date])) {
-                                $extraDays[$date] = [
-                                    'date' => $date,
-                                    'employees' => [],
-                                    'total' => 0,
-                                ];
-                            }
-                            $extraDays[$date]['employees'][] = [
-                                'employee_id' => $employee->id,
-                                'name' => $employee->name,
-                                'salary' => $dailySalary,
-                            ];
-                            $extraDays[$date]['total'] += $dailySalary;
-                            $extraDaysTotal += $dailySalary;
                         }
                     }
                 }
@@ -1290,9 +1298,6 @@ class InternalAccountantController extends Controller
 
             'tarification_total' => $tarificationTotal,
             'tarification_employees' => array_values($tarificationEmployees),
-
-            'extra_days_total' => $extraDaysTotal,
-            'extra_days' => array_values($extraDays),
 
             'salary_total' => $salaryTotal,
             'salary_employees' => $salaryEmployees,
