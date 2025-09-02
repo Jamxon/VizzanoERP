@@ -1288,6 +1288,10 @@ class InternalAccountantController extends Controller
                                 ->pluck('orders.id')
                                 ->toArray();
 
+
+                            return response()->json($prevOrders);
+
+
                             if (!empty($prevOrders)) {
                                 $minOrderId = min($prevOrders);
 
