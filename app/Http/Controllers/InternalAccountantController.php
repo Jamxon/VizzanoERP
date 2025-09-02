@@ -1212,12 +1212,14 @@ class InternalAccountantController extends Controller
             }
         }
 
-        // 5. Attendance salary hisoblash (optimallashtirilgan)
+        // 5. Attendance salary hisoblash
         $salaryTotal = 0;
         $salaryEmployees = [];
+        $extraDays = []; // ✅ Natija bo‘lmagan kunlar
+        $extraDaysTotal = 0;
 
         if (!empty($employeeIds) && $firstDate && $lastDate) {
-            // Attendance'ni to‘liq date-range bo‘yicha olamiz
+            // Attendance'ni butun date-range bo‘yicha olamiz
             $attendanceSalaries = DB::table('attendance_salary')
                 ->whereIn('employee_id', $employeeIds)
                 ->whereBetween(DB::raw('DATE(date)'), [$firstDate->format('Y-m-d'), $lastDate->format('Y-m-d')])
@@ -1225,37 +1227,45 @@ class InternalAccountantController extends Controller
                 ->get()
                 ->groupBy(['employee_id', 'date']);
 
-            // Order chiqgan sanalar ro‘yxati
+            // Order chiqqan sanalar
             $orderDates = collect(array_keys($currentOrderDates))->sort()->values();
 
-            // Har bir employee uchun
+            // Har bir xodim uchun
             foreach ($employeeIds as $empId) {
-                $employee = DB::table('employees')->where('id', $empId)->select('id', 'name', 'group_id')->first();
+                $employee = DB::table('employees')
+                    ->where('id', $empId)
+                    ->select('id', 'name', 'group_id')
+                    ->first();
                 if (!$employee) continue;
 
                 $totalSalary = 0;
-
-                // Attendance'dagi barcha kunlarni ko‘rib chiqamiz
                 $empAttendance = $attendanceSalaries[$empId] ?? [];
 
                 foreach ($empAttendance as $date => $records) {
                     $dailySalary = collect($records)->sum('amount');
 
                     if ($dailySalary > 0) {
-                        // Agar bu sana order chiqgan kun bo‘lsa → shu kunga yozamiz
                         if ($orderDates->contains($date)) {
+                            // ✅ Output chiqqan kun — asosiy hisob-kitob
                             $ordersWorked = $groupOrdersCounts[$employee->group_id][$date] ?? 0;
                             $proportionalSalary = $ordersWorked > 0 ? $dailySalary / $ordersWorked : $dailySalary;
                             $totalSalary += $proportionalSalary;
                         } else {
-                            // ❗ Agar bu sanada output yo‘q bo‘lsa → eng yaqin oldingi output kuniga yuklaymiz
-                            $prevOrderDate = $orderDates->filter(fn($d) => $d < $date)->last();
-
-                            if ($prevOrderDate) {
-                                $ordersWorked = $groupOrdersCounts[$employee->group_id][$prevOrderDate] ?? 0;
-                                $proportionalSalary = $ordersWorked > 0 ? $dailySalary / $ordersWorked : $dailySalary;
-                                $totalSalary += $proportionalSalary;
+                            // ✅ Output chiqmagan kun — alohida yozib qo‘yamiz
+                            if (!isset($extraDays[$date])) {
+                                $extraDays[$date] = [
+                                    'date' => $date,
+                                    'employees' => [],
+                                    'total' => 0,
+                                ];
                             }
+                            $extraDays[$date]['employees'][] = [
+                                'employee_id' => $employee->id,
+                                'name' => $employee->name,
+                                'salary' => $dailySalary,
+                            ];
+                            $extraDays[$date]['total'] += $dailySalary;
+                            $extraDaysTotal += $dailySalary;
                         }
                     }
                 }
@@ -1280,6 +1290,9 @@ class InternalAccountantController extends Controller
 
             'tarification_total' => $tarificationTotal,
             'tarification_employees' => array_values($tarificationEmployees),
+
+            'extra_days_total' => $extraDaysTotal,
+            'extra_days' => array_values($extraDays),
 
             'salary_total' => $salaryTotal,
             'salary_employees' => $salaryEmployees,
