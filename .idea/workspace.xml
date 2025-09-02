@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -447,15 +445,7 @@
       <workItem from="1756353994222" duration="19196000" />
       <workItem from="1756720738596" duration="3110000" />
       <workItem from="1756783969780" duration="6307000" />
-      <workItem from="1756793374710" duration="5229000" />
-    </task>
-    <task id="LOCAL-01181" summary="fix: calculate total summa based on maximum spend in InternalAccountantController">
-      <option name="closed" value="true" />
-      <created>1756200939955</created>
-      <option name="number" value="01181" />
-      <option name="presentableId" value="LOCAL-01181" />
-      <option name="project" value="LOCAL" />
-      <updated>1756200939955</updated>
+      <workItem from="1756793374710" duration="5586000" />
     </task>
     <task id="LOCAL-01182" summary="fix: optimize order attendance salary calculation in InternalAccountantController">
       <option name="closed" value="true" />
@@ -841,7 +831,15 @@
       <option name="project" value="LOCAL" />
       <updated>1756799209616</updated>
     </task>
-    <option name="localTasksCounter" value="1230" />
+    <task id="LOCAL-01230" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1756800860932</created>
+      <option name="number" value="01230" />
+      <option name="presentableId" value="LOCAL-01230" />
+      <option name="project" value="LOCAL" />
+      <updated>1756800860932</updated>
+    </task>
+    <option name="localTasksCounter" value="1231" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

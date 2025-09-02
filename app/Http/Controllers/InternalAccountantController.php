@@ -1262,7 +1262,12 @@ class InternalAccountantController extends Controller
                             $empSalary += $dailySalary / $ordersWorkedOnThisDate;
                         }
                     } else {
-                        // ✅ Output bo‘lmagan kun → eng yaqin oldingi outputni qidiramiz
+                        // ✅ Output bo‘lmagan kun → lekin group boshqa orderda ishlaganmi?
+                        if (!empty($groupOrdersCounts[$employee->group_id][$date])) {
+                            continue; // shu sanada boshqa orderda ishlagan → extraDays emas
+                        }
+
+                        // ✅ Endi eng yaqin oldingi outputni qidiramiz
                         $dateCarbon = \Carbon\Carbon::parse($date);
                         $found = false;
 
@@ -1295,7 +1300,7 @@ class InternalAccountantController extends Controller
                                 $extraDaysTotal += $dailySalary;
 
                                 $found = true;
-                                break; // birinchi chiqqan oldingi outputga qo‘shib chiqamiz
+                                break;
                             }
                         }
                     }
