@@ -1356,13 +1356,10 @@ class CasherController extends Controller
     public function getLatestSources(Request $request): \Illuminate\Http\JsonResponse
     {
         $sources = CashboxTransaction::where('type', 'income')
-            ->whereHas('source')
             ->distinct()
             ->orderBy('created_at', 'desc')
             ->limit(1000)
-            ->with('source')
-            ->get()
-            ->pluck('source.name');
+            ->pluck('source');
 
         return response()->json($sources);
     }
