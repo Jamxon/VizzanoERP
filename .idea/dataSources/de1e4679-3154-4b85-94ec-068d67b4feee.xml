@@ -5817,7 +5817,7 @@ gas</Labels>
     </table>
     <table id="377" parent="263" name="cashbox_transactions">
       <ObjectId>23210</ObjectId>
-      <StateNumber>257901</StateNumber>
+      <StateNumber>3293824</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -7053,11 +7053,11 @@ currency_id</ColNames>
       <StoredType>date|0s</StoredType>
       <TypeId>1082</TypeId>
     </column>
-    <column id="564" parent="377" name="source_id">
+    <column id="564" parent="377" name="source">
       <Position>7</Position>
-      <StateNumber>257709</StateNumber>
-      <StoredType>integer|0s</StoredType>
-      <TypeId>23</TypeId>
+      <StateNumber>3293824</StateNumber>
+      <StoredType>varchar|0s</StoredType>
+      <TypeId>1043</TypeId>
     </column>
     <column id="565" parent="377" name="destination_id">
       <Position>8</Position>
@@ -7144,7 +7144,7 @@ currency_id</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>23220</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>257901</StateNumber>
+      <StateNumber>3293824</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>

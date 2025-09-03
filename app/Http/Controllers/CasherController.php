@@ -846,31 +846,19 @@ class CasherController extends Controller
         $data = $request->validate([
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
-            'source_id' => 'nullable|exists:income_sources,id',
-            'source_name' => 'nullable|string|max:255',
-            'via_id' => 'required|exists:employees,id',
+            'source' => 'nullable|string|max:255',
+//            'via_id' => 'required|exists:employees,id',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
             'purpose' => 'nullable|string|max:1000',
         ]);
 
-        if (empty($data['source_id'])) {
-            if (empty($data['source_name'])) {
-                return response()->json([
-                    'message' => '❌ source_id ham source_name ham kiritilmadi.'
-                ], 422);
-            }
-
-            $source = \App\Models\IncomeSource::firstOrCreate([
-                'name' => $data['source_name']
-            ]);
-            $data['source_id'] = $source->id;
-        }
-
         try {
             $data['type'] = 'income';
             $data['date'] = $data['date'] ?? now()->toDateString();
             $data['branch_id'] = auth()->user()->employee->branch_id;
+
+            $data['via_id'] = auth()->user()->employee->id;
 
             DB::transaction(function () use (&$data) {
                 // ✅ 1. Branch bo‘yicha bitta Cashbox topamiz yoki yaratamiz
@@ -910,8 +898,8 @@ class CasherController extends Controller
         $data = $request->validate([
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
-            'destination_id' => 'required|exists:employees,id',
-            'via_id' => 'required|exists:employees,id',
+//            'destination_id' => 'nullable|exists:employees,id',
+//            'via_id' => 'required|exists:employees,id',
             'purpose' => 'nullable|string|max:1000',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
@@ -930,6 +918,8 @@ class CasherController extends Controller
                 );
 
                 $data['cashbox_id'] = $cashbox->id;
+
+                $data['via_id'] = auth()->user()->employee->id;
 
                 // ✅ Balansni tekshiramiz
                 $balance = \App\Models\CashboxBalance::firstOrCreate(
@@ -1321,5 +1311,43 @@ class CasherController extends Controller
             new DepartmentGroupsExport($departmentId, $startDate, $endDate, $group_id, $orderIds),
             'department_groups.xlsx'
         );
+    }
+
+    public function getLatestPurposes(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $purposes = CashboxTransaction::where('type', $request->type)
+            ->whereNotNull('purpose')
+            ->distinct()
+            ->orderBy('created_at', 'desc')
+            ->limit(1000)
+            ->pluck('purpose');
+
+        return response()->json($purposes);
+    }
+
+    public function getLatestComments(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $comments = CashboxTransaction::where('type', $request->type)
+            ->whereNotNull('comment')
+            ->distinct()
+            ->orderBy('created_at', 'desc')
+            ->limit(1000)
+            ->pluck('comment');
+
+        return response()->json($comments);
+    }
+
+    public function getLatestSources(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $sources = CashboxTransaction::where('type', 'income')
+            ->whereHas('source')
+            ->distinct()
+            ->orderBy('created_at', 'desc')
+            ->limit(1000)
+            ->with('source')
+            ->get()
+            ->pluck('source.name');
+
+        return response()->json($sources);
     }
 }

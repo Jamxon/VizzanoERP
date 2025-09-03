@@ -81,6 +81,9 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::delete('cuttingPlans/{id}', [CuttingPlanController::class, 'destroy']);
     Route::get('tarificationLogs', [InternalAccountantController::class, 'getEmployeeTarificationLog']);
     Route::get('orderSalary/{id}', [InternalAccountantController::class, 'getOrderAttendanceSalary']);
+    Route::get('purposes', [CasherController::class, 'getLatestPurposes']);
+    Route::get('comments', [CasherController::class, 'getLatestComments']);
+    Route::get('sources', [CasherController::class, 'getLatestSources']);
 
 });
 

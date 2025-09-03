@@ -18,7 +18,7 @@ class CashboxTransaction extends Model
         'type',
         'amount',
         'date',
-        'source_id',
+        'source',
         'destination_id',
         'via_id',
         'purpose',
@@ -34,11 +34,6 @@ class CashboxTransaction extends Model
     public function currency(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(Currency::class);
-    }
-
-    public function source(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-    {
-        return $this->belongsTo(IncomeSource::class, 'source_id');
     }
 
     public function via(): \Illuminate\Database\Eloquent\Relations\BelongsTo
