@@ -21,24 +21,37 @@ class DepartmentGroupsExport implements FromView
 
     public function view(): View
     {
-        $groupQuery = Group::where('department_id', $this->departmentId)
-            ->with(['employees' => function ($query) {
-                $query->select('id', 'name', 'position_id', 'group_id', 'balance', 'payment_type', 'status')
-                    ->where('type', '!=', 'aup')
+        $departmentId = $this->departmentId;
+        $startDate = $this->startDate;
+        $endDate = $this->endDate;
+        $groupId = $this->groupId;
+        $orderIds = $this->orderIds ?? [];
+        $type = $this->type ?? 'normal'; // agar aup kerak bo‘lsa
+
+        // Guruhlarni olish (xodimlar bilan birga salaryPayments ham yuklaymiz)
+        $groupQuery = Group::where('department_id', $departmentId)
+            ->with(['employees' => function ($query) use ($type) {
+                $query->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status')
                     ->with('salaryPayments');
+
+                if ($type === 'aup') {
+                    $query->where('type', 'aup');
+                } else {
+                    $query->where('type', '!=', 'aup');
+                }
             }]);
 
-        if (!empty($this->groupId)) {
-            $groupQuery->where('id', $this->groupId);
+        if (!empty($groupId)) {
+            $groupQuery->where('id', $groupId);
         }
 
         $groups = $groupQuery->get();
 
-        $result = $groups->map(function ($group) {
+        $result = $groups->map(function ($group) use ($startDate, $endDate, $orderIds) {
             $employees = $group->employees
-                ->map(function ($employee) {
+                ->map(function ($employee) use ($startDate, $endDate, $orderIds) {
                     return app('App\Http\Controllers\CasherController')
-                        ->getEmployeeEarnings($employee, $this->startDate, $this->endDate, $this->orderIds);
+                        ->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds);
                 })
                 ->filter();
 
@@ -52,8 +65,33 @@ class DepartmentGroupsExport implements FromView
             ];
         })->values()->toArray();
 
+        // Guruhsiz xodimlarni olish
+        $ungroupedEmployees = Employee::where('department_id', $departmentId)
+            ->whereNull('group_id')
+            ->where('type', $type === 'aup' ? 'aup' : '!=', 'aup')
+            ->select('id', 'name', 'group_id', 'position_id', 'balance', 'salary', 'payment_type', 'status')
+            ->with('salaryPayments')
+            ->get()
+            ->map(function ($employee) use ($startDate, $endDate, $orderIds) {
+                return app('App\Http\Controllers\CasherController')
+                    ->getEmployeeEarnings($employee, $startDate, $endDate, $orderIds);
+            })
+            ->filter();
+
+        if ($ungroupedEmployees->isNotEmpty()) {
+            $ungroupedTotal = $ungroupedEmployees->sum(fn($e) => $e['balance'] ?? 0);
+
+            $result[] = [
+                'id' => null,
+                'name' => 'Guruhsiz',
+                'total_balance' => $ungroupedTotal,
+                'employees' => $ungroupedEmployees->values()->toArray(),
+            ];
+        }
+
         return view('exports.department_groups', [
             'groups' => $result
         ]);
     }
+
 }
