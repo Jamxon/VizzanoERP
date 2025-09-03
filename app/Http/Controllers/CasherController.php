@@ -1016,10 +1016,7 @@ class CasherController extends Controller
         if ($request->filled('search')) {
             $search = mb_strtolower($request->search); // PHP tomonda lowercase qilish
             $query->where(function ($q) use ($search) {
-                $q->whereHas('source', function ($q2) use ($search) {
-                    $q2->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
-                })
-                    ->orWhereHas('via', function ($q3) use ($search) {
+                $q->orWhereHas('via', function ($q3) use ($search) {
                         $q3->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
                     })
                     ->orWhereHas('destination', function ($q4) use ($search) {
