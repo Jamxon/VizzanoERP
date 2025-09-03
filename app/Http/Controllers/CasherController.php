@@ -540,7 +540,6 @@ class CasherController extends Controller
                 'comment' => 'nullable|string',
             ]);
 
-            $validated['date'] = Carbon::now()->toDateString();
             $validated['month'] = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
 
             $employee = Employee::findOrFail($validated['employee_id']);
@@ -561,7 +560,7 @@ class CasherController extends Controller
             $cashboxId = $cashboxBalance->cashbox_id;
             $currency = Currency::where('name', "So'm")->first();
 
-            // 🔎 Eski to‘lovni tekshirib olish
+            // 🔎 Eski paymentni tekshirish
             $existingPayment = SalaryPayment::where([
                 'employee_id' => $validated['employee_id'],
                 'month' => $validated['month'],
@@ -570,7 +569,7 @@ class CasherController extends Controller
 
             $oldAmount = $existingPayment?->amount ?? 0;
 
-            // 🔄 Yaratish yoki yangilash
+            // 🔄 Payment update/create
             $payment = SalaryPayment::updateOrCreate(
                 [
                     'employee_id' => $validated['employee_id'],
@@ -579,19 +578,18 @@ class CasherController extends Controller
                 ],
                 [
                     'amount' => $validated['amount'],
-                    'date' => $validated['date'],
                     'comment' => $validated['comment'] ?? null,
                 ]
             );
 
-            // 🧾 Kassa tranzaktsiyasi
-            CashboxTransaction::create([
+            // 🔄 Transaction update/create
+            $transactionData = [
                 'cashbox_id' => $cashboxId,
                 'currency_id' => $currency->id,
                 'type' => 'expense',
                 'amount' => $validated['amount'],
-                'date' => $validated['date'],
-                'source_id' => null,
+                'date' => now()->toDateString(),
+                'source' => null,
                 'destination_id' => $employee->id,
                 'via_id' => auth()->user()->employee->id,
                 'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
@@ -600,14 +598,32 @@ class CasherController extends Controller
                 'exchange_rate' => null,
                 'target_amount' => null,
                 'branch_id' => auth()->user()->employee->branch_id,
-            ]);
+            ];
 
-            // 💰 Balansni to‘g‘ri yangilash (farqni ayirish)
+            if ($existingPayment) {
+                // eski transactionni topib yangilash
+                $existingTransaction = CashboxTransaction::where([
+                    'destination_id' => $employee->id,
+                    'purpose' => $transactionData['purpose'],
+                    'amount' => $oldAmount,
+                    'cashbox_id' => $cashboxId,
+                    'currency_id' => $currency->id,
+                ])->first();
+
+                if ($existingTransaction) {
+                    $existingTransaction->update($transactionData);
+                } else {
+                    CashboxTransaction::create($transactionData);
+                }
+            } else {
+                CashboxTransaction::create($transactionData);
+            }
+
+            // 💰 Balans farqni hisoblash
             $difference = $validated['amount'] - $oldAmount;
 
             if ($difference !== 0) {
                 $employee->decrement('balance', $difference);
-
                 $cashboxBalance->decrement('amount', $difference);
             }
 
