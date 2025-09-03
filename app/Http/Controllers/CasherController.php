@@ -1333,8 +1333,8 @@ class CasherController extends Controller
     {
         $purposes = CashboxTransaction::where('type', $request->type)
             ->whereNotNull('purpose')
+            ->select('purpose')
             ->distinct()
-            ->orderBy('created_at', 'desc')
             ->limit(1000)
             ->pluck('purpose');
 
@@ -1345,10 +1345,11 @@ class CasherController extends Controller
     {
         $comments = CashboxTransaction::where('type', $request->type)
             ->whereNotNull('comment')
-            ->distinct()
-            ->orderBy('created_at', 'desc')
-            ->limit(1000)
-            ->pluck('comment');
+            ->orderByDesc('created_at')
+            ->pluck('comment')
+            ->unique()
+            ->take(1000)
+            ->values();
 
         return response()->json($comments);
     }
