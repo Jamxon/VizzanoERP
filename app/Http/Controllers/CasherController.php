@@ -1332,11 +1332,13 @@ class CasherController extends Controller
     public function getLatestPurposes(Request $request): \Illuminate\Http\JsonResponse
     {
         $purposes = CashboxTransaction::where('type', $request->type)
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->whereNotNull('purpose')
-            ->select('purpose')
-            ->distinct()
-            ->limit(1000)
-            ->pluck('purpose');
+            ->orderByDesc('created_at')
+            ->pluck('purpose')
+            ->unique()
+            ->take(1000)
+            ->values();
 
         return response()->json($purposes);
     }
@@ -1344,6 +1346,7 @@ class CasherController extends Controller
     public function getLatestComments(Request $request): \Illuminate\Http\JsonResponse
     {
         $comments = CashboxTransaction::where('type', $request->type)
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->whereNotNull('comment')
             ->orderByDesc('created_at')
             ->pluck('comment')
@@ -1357,10 +1360,13 @@ class CasherController extends Controller
     public function getLatestSources(Request $request): \Illuminate\Http\JsonResponse
     {
         $sources = CashboxTransaction::where('type', 'income')
-            ->distinct()
-            ->orderBy('created_at', 'desc')
-            ->limit(1000)
-            ->pluck('source');
+            ->where('branch_id', auth()->user()->employee->branch_id)
+            ->whereNotNull('source')
+            ->orderByDesc('created_at')
+            ->pluck('source')
+            ->unique()
+            ->take(1000)
+            ->values();
 
         return response()->json($sources);
     }
