@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Employee;
 use App\Models\Group;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
