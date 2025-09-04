@@ -77,7 +77,7 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
     {
         return [
             'A' => 5,   // No
-            'B' => 25,  // FIO
+            'B' => 35,  // FIO
             'C' => 12,  // Ish kunlari
             'D' => 15,  // To'lov turi
             'E' => 20,  // Ish haqi (oylik)
