@@ -732,7 +732,6 @@ class CasherController extends Controller
             return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
         }
 
-        // Guruhlarni olish
         $groupQuery = Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) use ($type) {
                 $query->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status');
@@ -752,7 +751,49 @@ class CasherController extends Controller
         $result = $groups->map(function ($group) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
             $employees = $group->employees
                 ->map(function ($employee) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
-                    // Xodimning shu davrdagi tarification loglari
+
+                    $employee->loadMissing(['position', 'group']);
+
+                    /**
+                     * AttendanceSalary (oylikchilar uchun)
+                     */
+                    $attendanceQuery = $employee->attendanceSalaries();
+                    if ($startDate && $endDate) {
+                        $attendanceQuery->whereBetween('date', [$startDate, $endDate]);
+                    }
+                    $attendanceTotal = $attendanceQuery->sum('amount');
+                    $attendanceDays = $attendanceQuery->count();
+
+                    /**
+                     * EmployeeSalary (oy/bonus tarzida kiritilgan summalar)
+                     */
+                    $employeeSalaryQuery = $employee->employeeSalaries();
+                    if ($startDate && $endDate) {
+                        $start = \Carbon\Carbon::parse($startDate);
+                        $end = \Carbon\Carbon::parse($endDate);
+
+                        $employeeSalaryQuery->where(function ($q) use ($start, $end) {
+                            $q->whereBetween('year', [$start->year, $end->year])
+                                ->where(function ($q) use ($start, $end) {
+                                    $q->where(function ($q) use ($start) {
+                                        $q->where('year', $start->year)
+                                            ->where('month', '>=', $start->month);
+                                    })
+                                        ->orWhere(function ($q) use ($end) {
+                                            $q->where('year', $end->year)
+                                                ->where('month', '<=', $end->month);
+                                        })
+                                        ->orWhere(function ($q) use ($start, $end) {
+                                            $q->whereBetween('year', [$start->year + 1, $end->year - 1]);
+                                        });
+                                });
+                        });
+                    }
+                    $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
+
+                    /**
+                     * TarificationLogs (piece_work uchun)
+                     */
                     $logsQuery = $employee->employeeTarificationLogs()
                         ->with('tarification.tarificationCategory.submodel.orderModel.order');
 
@@ -762,7 +803,6 @@ class CasherController extends Controller
 
                     $logs = $logsQuery->get();
 
-                    // Orderlarni chiqarib olish
                     $orders = $logs->map(function ($log) {
                         return $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
                     })->filter()->unique('id');
@@ -778,19 +818,66 @@ class CasherController extends Controller
                         $orders = $orders->reject(fn($o) => in_array($o->id, $minusOrderIds));
                     }
 
-                    // Hisoblash (amount_earned bo‘yicha)
-                    $totalEarned = $logs->sum('amount_earned');
+                    $tarificationTotal = $logs->sum('amount_earned');
+
+                    /**
+                     * Total earned hisoblash
+                     */
+                    if ($employee->payment_type === 'piece_work') {
+                        $totalEarned = $employeeSalaryTotal + $tarificationTotal;
+                    } else {
+                        $totalEarned = $attendanceTotal + $employeeSalaryTotal;
+                    }
+
+                    /**
+                     * Paid salaries
+                     */
+                    $paidQuery = $employee->salaryPayments();
+                    if ($startDate && $endDate) {
+                        $paidQuery->whereBetween('month', [$startDate, $endDate]);
+                    }
+                    $paymentsGrouped = $paidQuery->get()->groupBy('type');
+
+                    $paidAmountsByType = [];
+                    $paidTotal = 0;
+
+                    foreach ($paymentsGrouped as $type => $payments) {
+                        $paidAmountsByType[$type] = $payments->map(function ($payment) use (&$paidTotal) {
+                            $paidTotal += (float) $payment->amount;
+                            return [
+                                'amount' => (float) $payment->amount,
+                                'date' => $payment->date,
+                                'comment' => $payment->comment,
+                                'month' => $payment->month->format('Y-m'),
+                            ];
+                        })->values();
+                    }
 
                     return [
                         'id' => $employee->id,
                         'name' => $employee->name,
-                        'balance' => $totalEarned,
-                        'orders' => $orders->pluck('id'),
+                        'position' => $employee->position->name ?? 'N/A',
+                        'group' => optional($employee->group)->name ?? 'N/A',
+                        'balance' => (float) $employee->balance,
+                        'payment_type' => $employee->payment_type,
+                        'salary' => (float) $employee->salary,
+
+                        'attendance_salary' => $attendanceTotal,
+                        'attendance_days' => $attendanceDays,
+                        'employee_salary' => $employeeSalaryTotal,
+                        'tarification_salary' => $tarificationTotal,
+                        'total_earned' => $totalEarned,
+
+                        'paid_amounts' => $paidAmountsByType,
+                        'total_paid' => round($paidTotal, 2),
+                        'net_balance' => round($totalEarned - $paidTotal, 2),
+
+                        'orders' => $orders->pluck('id')->values(),
                     ];
                 })
                 ->filter();
 
-            $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
+            $groupTotal = $employees->sum(fn($e) => $e['total_earned'] ?? 0);
 
             return [
                 'id' => $group->id,
