@@ -735,7 +735,7 @@ class CasherController extends Controller
 
         $groupQuery = Group::where('department_id', $departmentId)
             ->with(['employees' => function ($query) use ($type) {
-                $query->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status');
+                $query->select('id', 'name', 'position_id', 'status', 'group_id', 'salary', 'balance', 'payment_type', 'status');
                 if ($type === 'aup') {
                     $query->where('type', 'aup');
                 } else {
