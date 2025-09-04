@@ -12,6 +12,7 @@ use App\Models\CashboxBalance;
 use App\Models\CashboxTransaction;
 use App\Models\Currency;
 use App\Models\MonthlyExpense;
+use App\Models\Order;
 use App\Models\SalaryPayment;
 use App\Models\SewingOutputs;
 use Carbon\CarbonPeriod;
@@ -751,32 +752,34 @@ class CasherController extends Controller
         $result = $groups->map(function ($group) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
             $employees = $group->employees
                 ->map(function ($employee) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
-                    // Xodimning shu davrdagi orderlarini olish
-                    $orders = $employee->orders()
-                        ->whereBetween('created_at', [$startDate, $endDate])
-                        ->get();
+                    // Xodimning shu davrdagi tarification loglari
+                    $logsQuery = $employee->employeeTarificationLogs()
+                        ->with('tarification.tarificationCategory.submodel.orderModel.order');
+
+                    if ($startDate && $endDate) {
+                        $logsQuery->whereBetween('date', [$startDate, $endDate]);
+                    }
+
+                    $logs = $logsQuery->get();
+
+                    // Orderlarni chiqarib olish
+                    $orders = $logs->map(function ($log) {
+                        return $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
+                    })->filter()->unique('id');
 
                     // Qo‘shimcha orderlarni qo‘shish
                     if (!empty($addOrderIds)) {
-                        $missingOrders = Order::whereIn('id', $addOrderIds)
-                            ->whereDoesntHave('employees', function ($q) use ($employee) {
-                                $q->where('employee_id', $employee->id);
-                            })
-                            ->get();
-                        $orders = $orders->merge($missingOrders);
+                        $extraOrders = Order::whereIn('id', $addOrderIds)->get();
+                        $orders = $orders->merge($extraOrders)->unique('id');
                     }
 
                     // Minus orderlarni chiqarib tashlash
                     if (!empty($minusOrderIds)) {
-                        $orders = $orders->reject(function ($order) use ($minusOrderIds) {
-                            return in_array($order->id, $minusOrderIds);
-                        });
+                        $orders = $orders->reject(fn($o) => in_array($o->id, $minusOrderIds));
                     }
 
-                    // Hisoblash
-                    $totalEarned = $orders->sum(function ($order) {
-                        return $order->pivot->earned ?? 0; // pivot jadvaldan qancha topgani
-                    });
+                    // Hisoblash (amount_earned bo‘yicha)
+                    $totalEarned = $logs->sum('amount_earned');
 
                     return [
                         'id' => $employee->id,
