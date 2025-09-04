@@ -36,12 +36,12 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
                     $emp['name'],
                     $emp['attendance_days'],
                     $paymentType,
-                    $emp['attendance_salary'],   // oylik
-                    $emp['tarification_salary'], // ishbay
-                    $emp['total_earned'],        // umumiy topgan puli
-                    $emp['total_paid'],          // avans
-                    $emp['net_balance'],         // qolgan summa
-                    '',                          // imzo uchun bo‘sh joy
+                    (int) $emp['attendance_salary'],   // oylik
+                    (int) $emp['tarification_salary'], // ishbay
+                    (int) $emp['total_earned'],        // umumiy topgan puli
+                    (int) $emp['total_paid'],          // avans
+                    (int) $emp['net_balance'],         // qolgan summa
+                    '',                                // imzo uchun bo‘sh joy
                 ];
             }
         }
