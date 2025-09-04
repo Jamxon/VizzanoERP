@@ -882,7 +882,13 @@ class CasherController extends Controller
                         'orders' => $orders->pluck('id')->values(),
                     ];
                 })
-                ->filter();
+                ->filter(function ($emp) {
+                    // ❌ Agar bo'shatilgan bo‘lsa va total_earned = 0 → chiqmasin
+                    if ($emp['status'] === 'kicked' && $emp['total_earned'] <= 0) {
+                        return false;
+                    }
+                    return true;
+                });
 
             $groupTotal = $employees->sum(fn($e) => $e['total_earned'] ?? 0);
 
