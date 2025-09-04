@@ -749,6 +749,23 @@ class CasherController extends Controller
 
         $groups = $groupQuery->get();
 
+        // ➕ group_id null bo‘lsa → department ichida group_id null bo‘lgan employee-larni ham qo‘shamiz
+        if (empty($groupId)) {
+            $extraEmployees = Employee::where('department_id', $departmentId)
+                ->whereNull('group_id')
+                ->when($type === 'aup', fn($q) => $q->where('type', 'aup'))
+                ->when($type !== 'aup', fn($q) => $q->where('type', '!=', 'aup'))
+                ->get();
+
+            if ($extraEmployees->isNotEmpty()) {
+                $groups->push(new Group([
+                    'id' => null,
+                    'name' => 'Guruhsiz',
+                    'employees' => $extraEmployees
+                ]));
+            }
+        }
+
         $result = $groups->map(function ($group) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
             $employees = $group->employees
                 ->map(function ($employee) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
@@ -756,7 +773,7 @@ class CasherController extends Controller
                     $employee->loadMissing(['position', 'group']);
 
                     /**
-                     * AttendanceSalary (oylikchilar uchun)
+                     * AttendanceSalary
                      */
                     $attendanceQuery = $employee->attendanceSalaries();
                     if ($startDate && $endDate) {
@@ -766,21 +783,16 @@ class CasherController extends Controller
                     $attendanceDays = $attendanceQuery->count();
 
                     /**
-                     * TarificationLogs (piece_work uchun)
+                     * TarificationLogs
                      */
                     $logsQuery = $employee->employeeTarificationLogs()
                         ->with('tarification.tarificationCategory.submodel.orderModel.order');
 
                     $logs = $logsQuery->get();
 
-                    // ❌ minus orderlarga yoki statusi pending/cutting bo‘lgan orderlarga tegishli loglarni chiqarib tashlash
                     $logs = $logs->reject(function ($log) use ($minusOrderIds) {
                         $order = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
-
-                        if (!$order) {
-                            return true; // order yo‘q bo‘lsa, olib tashlash
-                        }
-
+                        if (!$order) return true;
                         return in_array($order->id, $minusOrderIds)
                             || in_array($order->status, ['pending', 'cutting','tailoring']);
                     });
@@ -789,7 +801,6 @@ class CasherController extends Controller
                         return $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
                     })->filter()->unique('id');
 
-                    // Qo‘shimcha orderlarni qo‘shish (faqat statusi ok bo‘lsa)
                     if (!empty($addOrderIds)) {
                         $extraOrders = Order::whereIn('id', $addOrderIds)
                             ->whereNotIn('status', ['pending', 'cutting'])
@@ -800,13 +811,10 @@ class CasherController extends Controller
 
                     $tarificationTotal = $logs->sum('amount_earned');
 
-                    /**
-                     * Total earned hisoblash
-                     */
                     if ($employee->payment_type === 'piece_work') {
                         $totalEarned =  $tarificationTotal;
                     } else {
-                        $totalEarned = $attendanceTotal ;
+                        $totalEarned = $attendanceTotal;
                     }
 
                     /**
@@ -842,26 +850,17 @@ class CasherController extends Controller
                         'payment_type' => $employee->payment_type,
                         'salary' => (float) $employee->salary,
                         'status' => $employee->status,
-
                         'attendance_salary' => $attendanceTotal,
                         'attendance_days' => $attendanceDays,
                         'tarification_salary' => $tarificationTotal,
                         'total_earned' => $totalEarned,
-
                         'paid_amounts' => $paidAmountsByType,
                         'total_paid' => round($paidTotal, 2),
                         'net_balance' => round($totalEarned - $paidTotal, 2),
-
                         'orders' => $orders->pluck('id')->values(),
                     ];
                 })
-                ->filter(function ($emp) {
-                    // ❌ Agar bo'shatilgan bo‘lsa va total_earned = 0 → chiqmasin
-                    if ($emp['status'] === 'kicked' && $emp['total_earned'] <= 0) {
-                        return false;
-                    }
-                    return true;
-                });
+                ->filter(fn($emp) => !($emp['status'] === 'kicked' && $emp['total_earned'] <= 0));
 
             $groupTotal = $employees->sum(fn($e) => $e['total_earned'] ?? 0);
 
