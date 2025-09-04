@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\DepartmentGroupsExport;
+use App\Exports\GroupsOrdersEarningsExport;
 use App\Http\Resources\GroupPlanResource;
 use App\Models\Attendance;
 use App\Models\Cashbox;
@@ -888,6 +889,19 @@ class CasherController extends Controller
         })->values()->toArray();
 
         return response()->json($result);
+    }
+
+    //2-usul excel
+
+    public function exportGroupsOrdersEarnings(Request $request)
+    {
+        // Avval xuddi getGroupsOrdersEarnings dagi $result ni hisoblaymiz
+        $data = $this->getGroupsOrdersEarnings($request)->getData(true);
+
+        // Excel export qilish
+        $fileName = 'groups_orders_earnings_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+
+        return Excel::download(new GroupsOrdersEarningsExport($data), $fileName);
     }
 
     /**
