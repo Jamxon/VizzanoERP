@@ -758,11 +758,12 @@ class CasherController extends Controller
                 ->get();
 
             if ($extraEmployees->isNotEmpty()) {
-                $groups->push(new Group([
-                    'id' => null,
-                    'name' => 'Guruhsiz',
-                    'employees' => $extraEmployees
-                ]));
+                $fakeGroup = new Group();
+                $fakeGroup->id = null;
+                $fakeGroup->name = 'Guruhsiz';
+                $fakeGroup->setRelation('employees', $extraEmployees);
+
+                $groups->push($fakeGroup);
             }
         }
 
