@@ -797,9 +797,9 @@ class CasherController extends Controller
                     $logsQuery = $employee->employeeTarificationLogs()
                         ->with('tarification.tarificationCategory.submodel.orderModel.order');
 
-                    if ($startDate && $endDate) {
-                        $logsQuery->whereBetween('date', [$startDate, $endDate]);
-                    }
+//                    if ($startDate && $endDate) {
+//                        $logsQuery->whereBetween('date', [$startDate, $endDate]);
+//                    }
 
                     $logs = $logsQuery->get();
 
