@@ -766,45 +766,14 @@ class CasherController extends Controller
                     $attendanceDays = $attendanceQuery->count();
 
                     /**
-                     * EmployeeSalary (oy/bonus tarzida kiritilgan summalar)
-                     */
-//                    $employeeSalaryQuery = $employee->employeeSalaries();
-//                    if ($startDate && $endDate) {
-//                        $start = \Carbon\Carbon::parse($startDate);
-//                        $end = \Carbon\Carbon::parse($endDate);
-//
-//                        $employeeSalaryQuery->where(function ($q) use ($start, $end) {
-//                            $q->whereBetween('year', [$start->year, $end->year])
-//                                ->where(function ($q) use ($start, $end) {
-//                                    $q->where(function ($q) use ($start) {
-//                                        $q->where('year', $start->year)
-//                                            ->where('month', '>=', $start->month);
-//                                    })
-//                                        ->orWhere(function ($q) use ($end) {
-//                                            $q->where('year', $end->year)
-//                                                ->where('month', '<=', $end->month);
-//                                        })
-//                                        ->orWhere(function ($q) use ($start, $end) {
-//                                            $q->whereBetween('year', [$start->year + 1, $end->year - 1]);
-//                                        });
-//                                });
-//                        });
-//                    }
-//                    $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
-
-                    /**
                      * TarificationLogs (piece_work uchun)
                      */
                     $logsQuery = $employee->employeeTarificationLogs()
                         ->with('tarification.tarificationCategory.submodel.orderModel.order');
 
-//                    if ($startDate && $endDate) {
-//                        $logsQuery->whereBetween('date', [$startDate, $endDate]);
-//                    }
-
                     $logs = $logsQuery->get();
 
-// ❌ minus orderlarga yoki statusi pending/cutting bo‘lgan orderlarga tegishli loglarni chiqarib tashlash
+                    // ❌ minus orderlarga yoki statusi pending/cutting bo‘lgan orderlarga tegishli loglarni chiqarib tashlash
                     $logs = $logs->reject(function ($log) use ($minusOrderIds) {
                         $order = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
 
@@ -820,7 +789,7 @@ class CasherController extends Controller
                         return $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
                     })->filter()->unique('id');
 
-// Qo‘shimcha orderlarni qo‘shish (faqat statusi ok bo‘lsa)
+                    // Qo‘shimcha orderlarni qo‘shish (faqat statusi ok bo‘lsa)
                     if (!empty($addOrderIds)) {
                         $extraOrders = Order::whereIn('id', $addOrderIds)
                             ->whereNotIn('status', ['pending', 'cutting'])
@@ -831,16 +800,9 @@ class CasherController extends Controller
 
                     $tarificationTotal = $logs->sum('amount_earned');
 
-
                     /**
                      * Total earned hisoblash
                      */
-//                    if ($employee->payment_type === 'piece_work') {
-//                        $totalEarned = $employeeSalaryTotal + $tarificationTotal;
-//                    } else {
-//                        $totalEarned = $attendanceTotal + $employeeSalaryTotal;
-//                    }
-
                     if ($employee->payment_type === 'piece_work') {
                         $totalEarned =  $tarificationTotal;
                     } else {
@@ -883,7 +845,6 @@ class CasherController extends Controller
 
                         'attendance_salary' => $attendanceTotal,
                         'attendance_days' => $attendanceDays,
-//                        'employee_salary' => $employeeSalaryTotal,
                         'tarification_salary' => $tarificationTotal,
                         'total_earned' => $totalEarned,
 
