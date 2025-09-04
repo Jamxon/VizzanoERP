@@ -813,7 +813,7 @@ class CasherController extends Controller
                         }
 
                         return in_array($order->id, $minusOrderIds)
-                            || in_array($order->status, ['pending', 'cutting']);
+                            || in_array($order->status, ['pending', 'cutting','tailoring']);
                     });
 
                     $orders = $logs->map(function ($log) {
