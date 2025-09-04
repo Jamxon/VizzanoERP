@@ -715,6 +715,90 @@ class CasherController extends Controller
         return response()->json($result);
     }
 
+    //2-usul
+
+    public function getGroupsOrdersEarnings(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $departmentId = $request->input('department_id');
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+        $groupId = $request->input('group_id');
+        $addOrderIds = $request->input('add', []);   // qo‘shiladigan order_id lar
+        $minusOrderIds = $request->input('minus', []); // ayiriladigan order_id lar
+        $type = $request->input('type'); // normal yoki aup
+
+        if (!$departmentId) {
+            return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
+        }
+
+        // Guruhlarni olish
+        $groupQuery = Group::where('department_id', $departmentId)
+            ->with(['employees' => function ($query) use ($type) {
+                $query->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status');
+                if ($type === 'aup') {
+                    $query->where('type', 'aup');
+                } else {
+                    $query->where('type', '!=', 'aup');
+                }
+            }]);
+
+        if (!empty($groupId)) {
+            $groupQuery->where('id', $groupId);
+        }
+
+        $groups = $groupQuery->get();
+
+        $result = $groups->map(function ($group) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
+            $employees = $group->employees
+                ->map(function ($employee) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
+                    // Xodimning shu davrdagi orderlarini olish
+                    $orders = $employee->orders()
+                        ->whereBetween('created_at', [$startDate, $endDate])
+                        ->get();
+
+                    // Qo‘shimcha orderlarni qo‘shish
+                    if (!empty($addOrderIds)) {
+                        $missingOrders = Order::whereIn('id', $addOrderIds)
+                            ->whereDoesntHave('employees', function ($q) use ($employee) {
+                                $q->where('employee_id', $employee->id);
+                            })
+                            ->get();
+                        $orders = $orders->merge($missingOrders);
+                    }
+
+                    // Minus orderlarni chiqarib tashlash
+                    if (!empty($minusOrderIds)) {
+                        $orders = $orders->reject(function ($order) use ($minusOrderIds) {
+                            return in_array($order->id, $minusOrderIds);
+                        });
+                    }
+
+                    // Hisoblash
+                    $totalEarned = $orders->sum(function ($order) {
+                        return $order->pivot->earned ?? 0; // pivot jadvaldan qancha topgani
+                    });
+
+                    return [
+                        'id' => $employee->id,
+                        'name' => $employee->name,
+                        'balance' => $totalEarned,
+                        'orders' => $orders->pluck('id'),
+                    ];
+                })
+                ->filter();
+
+            $groupTotal = $employees->sum(fn($e) => $e['balance'] ?? 0);
+
+            return [
+                'id' => $group->id,
+                'name' => $group->name,
+                'total_balance' => $groupTotal,
+                'employees' => $employees->values()->toArray(),
+            ];
+        })->values()->toArray();
+
+        return response()->json($result);
+    }
 
     /**
      * $employee — Employee eloquent modeli (salaryPayments eager-load qilingan bo‘lishi mumkin)

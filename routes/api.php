@@ -58,6 +58,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('requests', [CasherController::class, 'getRequestForm']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::post('groups', [CasherController::class, 'getGroupsByDepartmentId']);
+    Route::post('groups2', [CasherController::class, 'getGroupsOrdersEarnings']);
     Route::get('orders', [CasherController::class, 'getOrders']);
     Route::post('salaries', [CasherController::class, 'giveSalaryOrAdvance']);
     Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
