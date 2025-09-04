@@ -768,29 +768,29 @@ class CasherController extends Controller
                     /**
                      * EmployeeSalary (oy/bonus tarzida kiritilgan summalar)
                      */
-                    $employeeSalaryQuery = $employee->employeeSalaries();
-                    if ($startDate && $endDate) {
-                        $start = \Carbon\Carbon::parse($startDate);
-                        $end = \Carbon\Carbon::parse($endDate);
-
-                        $employeeSalaryQuery->where(function ($q) use ($start, $end) {
-                            $q->whereBetween('year', [$start->year, $end->year])
-                                ->where(function ($q) use ($start, $end) {
-                                    $q->where(function ($q) use ($start) {
-                                        $q->where('year', $start->year)
-                                            ->where('month', '>=', $start->month);
-                                    })
-                                        ->orWhere(function ($q) use ($end) {
-                                            $q->where('year', $end->year)
-                                                ->where('month', '<=', $end->month);
-                                        })
-                                        ->orWhere(function ($q) use ($start, $end) {
-                                            $q->whereBetween('year', [$start->year + 1, $end->year - 1]);
-                                        });
-                                });
-                        });
-                    }
-                    $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
+//                    $employeeSalaryQuery = $employee->employeeSalaries();
+//                    if ($startDate && $endDate) {
+//                        $start = \Carbon\Carbon::parse($startDate);
+//                        $end = \Carbon\Carbon::parse($endDate);
+//
+//                        $employeeSalaryQuery->where(function ($q) use ($start, $end) {
+//                            $q->whereBetween('year', [$start->year, $end->year])
+//                                ->where(function ($q) use ($start, $end) {
+//                                    $q->where(function ($q) use ($start) {
+//                                        $q->where('year', $start->year)
+//                                            ->where('month', '>=', $start->month);
+//                                    })
+//                                        ->orWhere(function ($q) use ($end) {
+//                                            $q->where('year', $end->year)
+//                                                ->where('month', '<=', $end->month);
+//                                        })
+//                                        ->orWhere(function ($q) use ($start, $end) {
+//                                            $q->whereBetween('year', [$start->year + 1, $end->year - 1]);
+//                                        });
+//                                });
+//                        });
+//                    }
+//                    $employeeSalaryTotal = $employeeSalaryQuery->sum('amount');
 
                     /**
                      * TarificationLogs (piece_work uchun)
@@ -824,10 +824,16 @@ class CasherController extends Controller
                     /**
                      * Total earned hisoblash
                      */
+//                    if ($employee->payment_type === 'piece_work') {
+//                        $totalEarned = $employeeSalaryTotal + $tarificationTotal;
+//                    } else {
+//                        $totalEarned = $attendanceTotal + $employeeSalaryTotal;
+//                    }
+
                     if ($employee->payment_type === 'piece_work') {
-                        $totalEarned = $employeeSalaryTotal + $tarificationTotal;
+                        $totalEarned =  $tarificationTotal;
                     } else {
-                        $totalEarned = $attendanceTotal + $employeeSalaryTotal;
+                        $totalEarned = $attendanceTotal ;
                     }
 
                     /**
@@ -865,7 +871,7 @@ class CasherController extends Controller
 
                         'attendance_salary' => $attendanceTotal,
                         'attendance_days' => $attendanceDays,
-                        'employee_salary' => $employeeSalaryTotal,
+//                        'employee_salary' => $employeeSalaryTotal,
                         'tarification_salary' => $tarificationTotal,
                         'total_earned' => $totalEarned,
 

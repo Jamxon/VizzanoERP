@@ -26,10 +26,16 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
             foreach ($group['employees'] as $emp) {
                 // payment_type ni tarjima qilish
                 $paymentType = match ($emp['payment_type']) {
-                    'piece_work' => 'Ishbay',
-                    'salary'     => 'Oylik',
-                    default      => ucfirst($emp['payment_type'] ?? 'Oylik'),
+                    'piece_work'             => 'Ishbay',
+                    'monthly'                => 'Oylik',
+                    'hourly'                 => 'Soatbay',
+                    'daily'                  => 'Kunlik',
+                    'fixed_cutted_bonus'     => 'Kesilgan bonus',
+                    'fixed_percentage_bonus' => 'Foizli bonus',
+                    'fixed_tailored_bonus_group' => 'Guruh bonus',
+                    default                  => ucfirst($emp['payment_type'] ?? 'Oylik'),
                 };
+
 
                 $rows[] = [
                     $i++,
