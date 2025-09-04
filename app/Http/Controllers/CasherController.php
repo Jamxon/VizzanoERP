@@ -804,21 +804,28 @@ class CasherController extends Controller
 
                     $logs = $logsQuery->get();
 
-// ❌ minus orderlarga tegishli loglarni chiqarib tashlash
-                    if (!empty($minusOrderIds)) {
-                        $logs = $logs->reject(function ($log) use ($minusOrderIds) {
-                            $orderId = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order?->id;
-                            return in_array($orderId, $minusOrderIds);
-                        });
-                    }
+// ❌ minus orderlarga yoki statusi pending/cutting bo‘lgan orderlarga tegishli loglarni chiqarib tashlash
+                    $logs = $logs->reject(function ($log) use ($minusOrderIds) {
+                        $order = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
+
+                        if (!$order) {
+                            return true; // order yo‘q bo‘lsa, olib tashlash
+                        }
+
+                        return in_array($order->id, $minusOrderIds)
+                            || in_array($order->status, ['pending', 'cutting']);
+                    });
 
                     $orders = $logs->map(function ($log) {
                         return $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
                     })->filter()->unique('id');
 
-// Qo‘shimcha orderlarni qo‘shish
+// Qo‘shimcha orderlarni qo‘shish (faqat statusi ok bo‘lsa)
                     if (!empty($addOrderIds)) {
-                        $extraOrders = Order::whereIn('id', $addOrderIds)->get();
+                        $extraOrders = Order::whereIn('id', $addOrderIds)
+                            ->whereNotIn('status', ['pending', 'cutting'])
+                            ->get();
+
                         $orders = $orders->merge($extraOrders)->unique('id');
                     }
 
