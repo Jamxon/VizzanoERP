@@ -868,6 +868,7 @@ class CasherController extends Controller
                         'balance' => (float) $employee->balance,
                         'payment_type' => $employee->payment_type,
                         'salary' => (float) $employee->salary,
+                        'status' => $employee->status,
 
                         'attendance_salary' => $attendanceTotal,
                         'attendance_days' => $attendanceDays,
