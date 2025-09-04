@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\SpecificationCategoryExport;
 use App\Exports\TarificationCategoryExport;
 use App\Models\Employee;
+use App\Models\EmployeeTarificationLog;
 use App\Models\Log;
 use App\Models\Order;
 use App\Models\OrderGroup;
@@ -568,6 +569,12 @@ class TechnologController extends Controller
                             ]);
 
                             $newTarificationsChanged[] = $existing->fresh()->toArray();
+
+                            // 🔄 EmployeeTarificationLogs dagi summani yangilash
+                            EmployeeTarificationLog::where('tarification_id', $existing->id)
+                                ->update([
+                                    'amount_earned' => DB::raw("quantity * {$summa}")
+                                ]);
                         }
                     } else {
                         $created = Tarification::create([
