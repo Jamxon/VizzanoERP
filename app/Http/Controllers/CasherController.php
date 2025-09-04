@@ -804,22 +804,26 @@ class CasherController extends Controller
 
                     $logs = $logsQuery->get();
 
+// ❌ minus orderlarga tegishli loglarni chiqarib tashlash
+                    if (!empty($minusOrderIds)) {
+                        $logs = $logs->reject(function ($log) use ($minusOrderIds) {
+                            $orderId = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order?->id;
+                            return in_array($orderId, $minusOrderIds);
+                        });
+                    }
+
                     $orders = $logs->map(function ($log) {
                         return $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
                     })->filter()->unique('id');
 
-                    // Qo‘shimcha orderlarni qo‘shish
+// Qo‘shimcha orderlarni qo‘shish
                     if (!empty($addOrderIds)) {
                         $extraOrders = Order::whereIn('id', $addOrderIds)->get();
                         $orders = $orders->merge($extraOrders)->unique('id');
                     }
 
-                    // Minus orderlarni chiqarib tashlash
-                    if (!empty($minusOrderIds)) {
-                        $orders = $orders->reject(fn($o) => in_array($o->id, $minusOrderIds));
-                    }
-
                     $tarificationTotal = $logs->sum('amount_earned');
+
 
                     /**
                      * Total earned hisoblash
