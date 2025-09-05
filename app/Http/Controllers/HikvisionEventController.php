@@ -54,13 +54,6 @@ class HikvisionEventController extends Controller
                 return response()->json(['status' => 'unknown_device']);
             }
 
-            $image = $request->file('Picture');
-            $imagePath = null;
-            if ($image && $image->isValid()) {
-                $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
-                $image->storeAs('/public/hikvision/', $filename);
-                $imagePath = 'hikvision/' . $filename;
-            }
 
             $employee = Employee::find($employeeNo);
 
@@ -87,6 +80,13 @@ class HikvisionEventController extends Controller
             if ($deviceId === 255 || $deviceId === 105) {
                 // Check In
                 if (!$attendance->check_in) {
+                    $image = $request->file('Picture');
+                    $imagePath = null;
+                    if ($image && $image->isValid()) {
+                        $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
+                        $image->storeAs('/public/hikvision/', $filename);
+                        $imagePath = 'hikvision/' . $filename;
+                    }
                     $attendance->check_in = $eventCarbon;
                     $attendance->check_in_image = $imagePath;
                     $attendance->status = 'present';
@@ -118,19 +118,19 @@ class HikvisionEventController extends Controller
                         'employee_id' => $employee->id,
                         'device_id' => $deviceId,
                         'time' => $eventTime,
-                        'image_path' => $imagePath,
+//                        'image_path' => $imagePath,
                     ]);
                 }
             } elseif ($deviceId === 256) {
                 // Check Out
                 if (!$attendance->check_out) {
                     $attendance->check_out = $eventCarbon;
-                    $attendance->check_out_image = $imagePath;
+//                    $attendance->check_out_image = $imagePath;
                     $attendance->save();
 
                     Log::add($employee->user_id ?? null, 'Hodim ishdan ketdi', 'Check Out', null, [
                         'employee_id' => $employee->id,
-                        'image_path' => $imagePath,
+//                        'image_path' => $imagePath,
                         'device_id' => $deviceId,
                         'time' => $eventTime,
                     ]);
@@ -139,7 +139,7 @@ class HikvisionEventController extends Controller
                         'employee_id' => $employee->id,
                         'device_id' => $deviceId,
                         'time' => $eventTime,
-                        'image_path' => $imagePath,
+//                        'image_path' => $imagePath,
                     ]);
                 }
             }
