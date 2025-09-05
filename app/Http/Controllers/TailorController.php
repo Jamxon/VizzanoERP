@@ -163,9 +163,7 @@ class TailorController extends Controller
         $group = auth()->user()->employee->group ?? null;
 
         $startDate = now()->subDays(14)->toDateString();
-        //ertagani ham olish kerak tomorrow
         $endDate = now()->addDay()->toDateString();
-//        $endDate = now()->toDateString();
 
         $order = OrderGroup::where('group_id', $group->id ?? 0)
             ->whereHas('order', function ($query) {
