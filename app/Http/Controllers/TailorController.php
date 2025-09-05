@@ -162,11 +162,23 @@ class TailorController extends Controller
     {
         $group = auth()->user()->employee->group ?? null;
 
+        $startDate = now()->subDays(14)->toDateString();
+        $endDate = now()->toDateString();
+
         $order = OrderGroup::where('group_id', $group->id ?? 0)
             ->whereHas('order', function ($query) {
                 $query->whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting']);
             })
-            ->with(['order.orderModel.model', 'order.orderModel.submodels.submodel'])
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->whereHas('order.orderModel.submodels.sewingOutputs', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                })
+                    ->orWhereDoesntHave('order.orderModel.submodels.sewingOutputs');
+            })
+            ->with([
+                'order.orderModel.model',
+                'order.orderModel.submodels.submodel'
+            ])
             ->get();
 
         $resource = ShowOrderForTailorResource::collection($order);
