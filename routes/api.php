@@ -151,7 +151,9 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::post('cuttingPlans', [CuttingPlanController::class, 'store']);
     Route::patch('cuttingPlans/{id}', [CuttingPlanController::class, 'update']);
     Route::delete('cuttingPlans/{id}', [CuttingPlanController::class, 'destroy']);
-
+    Route::get('purposes', [CasherController::class, 'getLatestPurposes']);
+    Route::get('comments', [CasherController::class, 'getLatestComments']);
+    Route::get('sources', [CasherController::class, 'getLatestSources']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
