@@ -4,15 +4,12 @@ namespace App\Exports;
 
 use App\Models\Employee;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithDrawings;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 
-class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithDrawings, WithColumnWidths
+class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithColumnWidths
 {
     protected Request $request;
     protected $employees;
@@ -48,7 +45,6 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
             });
         }
 
-
         $query->when($filters['department_id'] ?? null, fn($q, $val) => $q->where('department_id', $val))
             ->when($filters['group_id'] ?? null, fn($q, $val) => $q->where('group_id', $val))
             ->when($filters['status'] ?? null, fn($q, $val) => $q->where('status', $val))
@@ -61,8 +57,7 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
     {
         return [
             'ID', 'ФИО', 'Логин', 'Разрешение', 'Телефон', 'Группа', 'Отдел', 'Ишга келган сана',
-            'Позиция', 'Паспорт', 'Адрес', 'Дата рождения',
-            'Комментарий', 'Фото',
+            'Позиция', 'Паспорт', 'Адрес', 'Дата рождения', 'Комментарий',
         ];
     }
 
@@ -82,27 +77,7 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
             $employee->address,
             $employee->birthday,
             $employee->comment,
-            '', // Bu yerga rasm joylashadi
         ];
-    }
-
-    public function drawings()
-    {
-        $drawings = [];
-
-        foreach ($this->employees as $index => $employee) {
-            if ($employee->img && file_exists(public_path('storage/' . Str::after($employee->img, 'storage/')))) {
-                $drawing = new Drawing();
-                $drawing->setName($employee->name);
-                $drawing->setDescription('Rasm');
-                $drawing->setPath(public_path('storage/' . Str::after($employee->img, 'storage/')));
-                $drawing->setHeight(50);
-                $drawing->setCoordinates('R' . ($index + 2)); // 'R' = 18-column
-                $drawings[] = $drawing;
-            }
-        }
-
-        return $drawings;
     }
 
     public function columnWidths(): array
@@ -116,12 +91,11 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithD
             'F' => 18,  // Группа
             'G' => 18,  // Отдел
             'H' => 15,  // Ишга келган сана
-            'J' => 18,  // Позиция
-            'N' => 15,  // Паспорт
-            'O' => 30,  // Адрес
-            'P' => 15,  // Дата рождения
-            'Q' => 25,  // Комментарий
-            'R' => 20,  // Фото
+            'I' => 18,  // Позиция
+            'J' => 15,  // Паспорт
+            'K' => 30,  // Адрес
+            'L' => 15,  // Дата рождения
+            'M' => 25,  // Комментарий
         ];
     }
 }
