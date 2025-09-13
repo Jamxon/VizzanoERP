@@ -68,7 +68,7 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithC
             $employee->name,
             $employee->user->username ?? '',
             $employee->user->role->description ?? '',
-            $employee->phone,
+            number_format($employee->phone),
             $employee->group->name ?? '',
             $employee->department->name ?? '',
             $employee->hiring_date,
