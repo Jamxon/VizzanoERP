@@ -139,14 +139,14 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('employee/edit/{id}', [SuperHRController::class, 'showEmployee']);
     Route::patch('employees/{employee}', [SuperHRController::class, 'updateEmployees']);
     Route::post('pdf/employees', [CasherController::class, 'exportGroupsByDepartmentId']);
-//    Route::get('dailyReport', [CasherController::class, 'getDailyCost']);
+    //    Route::get('dailyReport', [CasherController::class, 'getDailyCost']);
     Route::post('monthlyExpense', [CasherController::class, 'storeMonthlyExpense']);
     Route::get('monthlyExpense', [CasherController::class, 'getMonthlyExpense']);
     Route::patch('monthlyExpense/{id}', [CasherController::class, 'editMonthlyExpense']);
     Route::post('groupPlans', [CasherController::class, 'storeGroupPlan']);
     Route::get('groupPlans', [CasherController::class, 'getGroupPlans']);
     Route::patch('groupPlans/{id}', [CasherController::class, 'editGroupPlan']);
-//    Route::get('monthlyReport', [CasherController::class, 'getMonthlyCost']);
+    //    Route::get('monthlyReport', [CasherController::class, 'getMonthlyCost']);
     Route::get('cuttingPlans', [CuttingPlanController::class, 'index']);
     Route::post('cuttingPlans', [CuttingPlanController::class, 'store']);
     Route::patch('cuttingPlans/{id}', [CuttingPlanController::class, 'update']);
@@ -161,9 +161,9 @@ Route::prefix('supplier')->middleware('role:supplier')->group(function () {
     Route::get('receive/{id}', [SupplierController::class, 'receiveSupplierOrder']);
 });
 
-Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () {
+Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () { 
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
-//    Route::get('employees/group', [SuperHRController::class, 'getEmployeeByGroupID']);
+    //    Route::get('employees/group', [SuperHRController::class, 'getEmployeeByGroupID']);
     Route::get('employees/working', [SuperHRController::class, 'getWorkingEmployees']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::get('attendances', [AttendanceController::class, 'getAttendances']);
