@@ -551,7 +551,12 @@ class GroupMasterController extends Controller
     {
         try {
             $botToken = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
-            $chatId = -1001883536528;
+            $chatIdMap = [
+                5 => -1001883536528,
+                4 => -1002865541209,
+            ];
+            $branchId = auth()->user()->employee->branch_id;
+            $chatId = $chatIdMap[$branchId] ?? null;
             $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
 
             $response = Http::post($url, [
