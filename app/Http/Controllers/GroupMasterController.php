@@ -485,8 +485,8 @@ class GroupMasterController extends Controller
     {
         try {
             $chatIdMap = [
-                5 => '-1001883536528',
-                4 => '-1002865541209',
+                5 => -1001883536528,
+                4 => -1002865541209,
             ];
 
             $chatId = $chatIdMap[$branchId] ?? null;
