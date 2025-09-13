@@ -173,6 +173,9 @@ class TailorController extends Controller
                 $q->whereHas('order.orderModel.submodels.sewingOutputs', function ($query) use ($startDate, $endDate) {
                     $query->whereBetween('created_at', [$startDate, $endDate]);
                 })
+                    ->whereHas('order.orderModel.submodels.tarificationCategories.', function ($query) {
+                        $query->where('region', 'uz');
+                    })
                     ->orWhereDoesntHave('order.orderModel.submodels.sewingOutputs');
             })
             ->with([
