@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\EmployeeAttendanceExport;
 use App\Http\Resources\GetEmployeeResourceCollection;
 use App\Models\Attendance;
 use App\Models\Department;
@@ -1528,5 +1529,20 @@ class SuperHRController extends Controller
     public function showLid(Lid $lid): \Illuminate\Http\JsonResponse
     {
         return response()->json($lid);
+    }
+
+    public function exportEmployeeAttendance(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $fileName = 'employee_attendance_' . now()->format('Y_m_d_His') . '.xlsx';
+
+        return Excel::download(
+            new EmployeeAttendanceExport($request->start_date, $request->end_date),
+            $fileName
+        );
     }
 }
