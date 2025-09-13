@@ -426,9 +426,9 @@ class TailorController extends Controller
         $employee = auth()->user()->employee;
 
         $orders = Order::whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting'])
-            ->whereHas('orderModel.submodels.group', function ($query) use ($employee) {
-                $query->where('group_id', $employee->group_id);
-            })
+//            ->whereHas('orderModel.submodels.group', function ($query) use ($employee) {
+//                $query->where('group_id', $employee->group_id);
+//            })
             ->with([
                 'orderModel.submodels.tarificationCategories.tarifications' => function ($query) use ($employee) {
                     $query->where('user_id', $employee->id);
