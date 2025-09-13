@@ -484,7 +484,7 @@ class GroupMasterController extends Controller
         try {
             $chatIdMap = [
                 5 => -1001883536528,
-                4 => -1002865541209,
+                4 => -1003041140850,
             ];
 
             $chatId = $chatIdMap[$branchId] ?? null;
@@ -551,7 +551,7 @@ class GroupMasterController extends Controller
             $botToken = "7544266151:AAEzvGwm2kQRcHmlD17DxDA7xadjiY_-nkY";
             $chatIdMap = [
                 5 => -1001883536528,
-                4 => -1002865541209,
+                4 => -1003041140850,
             ];
             $branchId = auth()->user()->employee->branch_id;
             $chatId = $chatIdMap[$branchId] ?? null;
