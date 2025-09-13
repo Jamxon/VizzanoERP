@@ -484,7 +484,19 @@ class GroupMasterController extends Controller
     private function sendTelegramMessageWithEditSupport(string $message, string $timeName, int $timeId, int $branchId)
     {
         try {
-            $chatId = -1001883536528; // Replace with your actual chat ID
+            $chatIdMap = [
+                5 => '-1001883536528',
+                4 => '-1002865541209',
+            ];
+
+            $chatId = $chatIdMap[$branchId] ?? null;
+
+            if (!$chatId) {
+                return [
+                    'status' => 'error',
+                    'message' => "Branch uchun chatId topilmadi (branch_id: $branchId)"
+                ];
+            }
             $today = now()->toDateString();
 
             $existing = TelegramSewingMessage::whereDate('date', $today)
