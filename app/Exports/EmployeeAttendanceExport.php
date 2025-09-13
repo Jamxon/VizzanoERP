@@ -35,7 +35,7 @@ class EmployeeAttendanceExport implements FromCollection, WithHeadings, WithMapp
             }, $this->endDate) + 1;
 
         // Sababli yo‘qliklar -> faqat holidays
-        $holidayCount = $employee->holidays()
+        $holidayCount = $employee->employeeHolidays()
             ->where(function ($q) {
                 $q->whereBetween('start_date', [$this->startDate, $this->endDate])
                     ->orWhereBetween('end_date', [$this->startDate, $this->endDate]);
@@ -43,7 +43,7 @@ class EmployeeAttendanceExport implements FromCollection, WithHeadings, WithMapp
             ->count();
 
         // Sababsiz yo‘qliklar -> absences + attendance.status=absent
-        $absenceCount = $employee->absences()
+        $absenceCount = $employee->employeeAbsences()
             ->where(function ($q) {
                 $q->whereBetween('start_date', [$this->startDate, $this->endDate])
                     ->orWhereBetween('end_date', [$this->startDate, $this->endDate]);
