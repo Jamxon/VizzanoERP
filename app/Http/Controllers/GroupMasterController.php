@@ -455,7 +455,6 @@ class GroupMasterController extends Controller
         }
         $summaryMessage .= "⏰ <b><i>Jami natijalar: {$totalSumForTime} dona </i></b> ⚡️\n";
 
-        if ($user->employee->branch_id === 5){
             $telegramResult = $this->sendTelegramMessageWithEditSupport(
                 $newEntryMessage . $summaryMessage,
                 $time->time,
@@ -466,7 +465,6 @@ class GroupMasterController extends Controller
             if ($telegramResult['status'] === 'error') {
                 return response()->json($telegramResult, 500);
             }
-        }
 
         Log::add(
             auth()->id(),
