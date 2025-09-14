@@ -13,7 +13,8 @@ class Position extends Model
 
     protected $fillable = [
         'name',
-        'department_id'
+        'department_id',
+        'duties',
     ];
 
     public function department(): \Illuminate\Database\Eloquent\Relations\BelongsTo

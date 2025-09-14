@@ -817,6 +817,7 @@ class SuperHRController extends Controller
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
             'salary' => 'nullable|numeric',
             'gender'=> 'required|string',
+            'salary_visible' => 'nullable|boolean',
         ]);
 
         try {
@@ -860,6 +861,7 @@ class SuperHRController extends Controller
                 'img' => $img,
                 'salary' => $request->salary ?? null,
                 'gender' => $request->gender,
+                'salary_visible' => $request->salary_visible ?? true,
             ]);
 
 
@@ -936,7 +938,8 @@ class SuperHRController extends Controller
                 'user_id' => $userId,
                 'status' => 'working',
                 'img' => null,
-                'gender' => $request->gender ?? null
+                'gender' => $request->gender ?? null,
+                'salary_visible' => true,
             ]);
 
             DB::commit();
@@ -994,6 +997,7 @@ class SuperHRController extends Controller
             'salary' => 'nullable|numeric',
             'gender'=> 'nullable|string',
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480',
+            'salary_visible' => 'nullable|boolean',
         ]);
 
         try {
@@ -1037,6 +1041,7 @@ class SuperHRController extends Controller
                     'salary' => $request->salary ?? $employee->salary,
                     'gender' => $request->gender ?? $employee->gender,
                     'bonus' => $request->bonus ?? $employee->bonus,
+                    'salary_visible' => $request->salary_visible ?? $employee->salary_visible,
                 ]);
             } else {
                 $employee->update([
@@ -1059,6 +1064,7 @@ class SuperHRController extends Controller
                     'gender' => $request->gender ?? $employee->gender,
                     'status' => $request->status ?? 'working',
                     'bonus' => $request->bonus ?? $employee->bonus,
+                    'salary_visible' => $request->salary_visible ?? $employee->salary_visible,
                 ]);
             }
 
@@ -1154,7 +1160,8 @@ class SuperHRController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'department_id' => 'required|integer|exists:departments,id'
+            'department_id' => 'required|integer|exists:departments,id',
+            'duties' => 'nullable|string',
         ]);
 
         try {
@@ -1162,7 +1169,8 @@ class SuperHRController extends Controller
 
             $position = DB::table('positions')->insert([
                 'name' => $request->name,
-                'department_id' => $request->department_id
+                'department_id' => $request->department_id,
+                'duties' => $request->duties ?? null,
             ]);
 
             DB::commit();
@@ -1186,13 +1194,16 @@ class SuperHRController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'duties' => 'nullable|string',
         ]);
 
         try {
             DB::beginTransaction();
+
             $position = DB::table('positions')->where('id', $id)->update([
                 'name' => $request->name,
-                'department_id' => $request->department_id ?? null
+                'department_id' => $request->department_id ?? null,
+                'duties' => $request->duties ?? null,
             ]);
 
             DB::commit();
