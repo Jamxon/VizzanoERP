@@ -67,6 +67,7 @@ class GetEmployeeResource extends JsonResource
             'absence_count' => $this->absence_count,
             'holidays_count' => $this->holidays_count,
             'attendance_absent_count' => $this->attendance_absent_count,
+            'salary_visible' => $this->salary_visible ?? true,
         ];
     }
 }

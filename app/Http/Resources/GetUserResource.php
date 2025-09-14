@@ -82,6 +82,7 @@ class GetUserResource extends JsonResource
             'bonus' => $this->bonus,
             'employeeSalaries' => $this->employeeSalaries,
             'salaryPayments' => $this->salaryPayments ?? null,
+            'salary_visible' => $this->salary_visible ?? true
         ];
     }
 }
