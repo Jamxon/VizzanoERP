@@ -59,6 +59,7 @@ class GetEmployeeResource extends JsonResource
             'birthday' => $this->birthday ?? null,
             'position' => $this->position->name ?? null,
             'position_id' => $this->position->id ?? null,
+            'duties' => $this->position->duties ?? null,
             'comment' => $this->comment ?? null,
             'gender' => $this->gender ?? null,
             'kicked_date' => $this->kicked_date ?? null,
