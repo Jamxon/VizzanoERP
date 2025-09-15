@@ -474,20 +474,41 @@ class SuperHRController extends Controller
             if ($employee->img) {
                 $photos[] = storage_path("app/public/" . $employee->img);
             }
+// 🔹 Path to real file or URL aniqlash
+            function getPhotoContent($path) {
+                if (!$path) {
+                    return null;
+                }
+
+                // Agar URL bo‘lsa
+                if (filter_var($path, FILTER_VALIDATE_URL)) {
+                    return file_get_contents($path);
+                }
+
+                // Aks holda local storage ichidagi fayl
+                $fullPath = storage_path("app/public/" . ltrim($path, '/'));
+                if (file_exists($fullPath)) {
+                    return file_get_contents($fullPath);
+                }
+
+                return null;
+            }
 
 // 🔹 Telegramga yuborish
             if (!empty($photos)) {
                 foreach ($photos as $index => $photoPath) {
-                    Http::attach('photo', file_get_contents($photoPath), basename($photoPath))
-                        ->post("https://api.telegram.org/bot{$telegramToken}/sendPhoto", [
-                            'chat_id' => $chatId,
-                            // Faqat 1-rasmda caption chiqsin
-                            'caption' => $index == 0 ? $messageText : null,
-                            'parse_mode' => 'Markdown',
-                        ]);
+                    $photoContent = getPhotoContent($photoPath);
+                    if ($photoContent) {
+                        Http::attach('photo', $photoContent, basename($photoPath))
+                            ->post("https://api.telegram.org/bot{$telegramToken}/sendPhoto", [
+                                'chat_id' => $chatId,
+                                'caption' => $index == 0 ? $messageText : null,
+                                'parse_mode' => 'Markdown',
+                            ]);
+                    }
                 }
             } else {
-                // Agar rasm bo‘lmasa oddiy xabar
+                // Agar umuman rasm bo‘lmasa
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
                     'chat_id' => $chatId,
                     'text' => $messageText,
