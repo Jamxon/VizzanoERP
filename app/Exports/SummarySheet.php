@@ -87,7 +87,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
  * DailySheet
  */
 
-class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithColumnFormatting
+class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithColumnFormatting, WithEvents
 {
     protected array $daily;
 
