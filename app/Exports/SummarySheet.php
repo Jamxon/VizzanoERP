@@ -64,7 +64,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'B' => '# ##0',
             'C' => NumberFormat::FORMAT_NUMBER_00,
         ];
     }
@@ -132,14 +132,14 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // AUP (so‘m)
-            'C' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // KPI (so‘m)
-            'D' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Transport
-            'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Tarifikatsiya
-            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Kunlik xarajatlar
-            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Jami daromad
-            'H' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Doimiy xarajat
-            'I' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Sof foyda
+            'B' => '# ##0', // AUP (so‘m)
+            'C' => '# ##0', // KPI (so‘m)
+            'D' => '# ##0', // Transport
+            'E' => '# ##0', // Tarifikatsiya
+            'F' => '# ##0', // Kunlik xarajatlar
+            'G' => '# ##0', // Jami daromad
+            'H' => '# ##0', // Doimiy xarajat
+            'I' => '# ##0', // Sof foyda
         ];
     }
 
@@ -184,7 +184,7 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
     public function headings(): array
     {
         return [
-            'Buyurtma ID','Buyurtma#','Model','Submodellari','Mas’ul','Narx USD','Narx so‘m',
+            'Buyurtma ID','Model','Submodellari','Mas’ul','Narx USD','Narx so‘m',
             'Umumiy qty','Rasxod limiti (so‘m)','Bonus','Tarifikatsiya','Ajratilgan transport','Ajratilgan AUP',
             'Ajratilgan oylik xarajat','Daromad % xarajat','Amortizatsiya','Jami qo‘shimcha','Doimiy xarajat (so‘m)',
             'Jami ishlab chiqarish tannarxi (so‘m)','Sof foyda (so‘m)','Bir dona mahsulot tannarxi (so‘m)',
@@ -202,10 +202,9 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
         return array_map(function ($o) {
             return [
                 $o['id'] ?? '',
-                $o['order_number'] ?? '',
-                $o['model'] ?? '',
-                $o['submodels'] ?? '',
-                $o['responsible'] ?? '',
+                $o['model']->name ?? '',
+                $o['submodels']->name ?? '',
+                $o['responsibleUser']['employee']['name'] ?? '',
                 $o['price_usd'] ?? 0,
                 $o['price_uzs'] ?? 0,
                 $o['total_qty'] ?? 0,
@@ -231,10 +230,10 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
     public function columnFormats(): array
     {
         return [
-            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Narx USD
-            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Narx so‘m
-            'I' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Rasxod limiti
-            'R' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Sof foyda
+            'F' => '# ##0', // Narx USD
+            'G' => '# ##0', // Narx so‘m
+            'I' => '# ##0', // Rasxod limiti
+            'R' => '# ##0', // Sof foyda
         ];
     }
 
@@ -291,7 +290,7 @@ class CostsByTypeSheet implements FromArray, WithHeadings, WithTitle, ShouldAuto
     public function columnFormats(): array
     {
         return [
-            'B' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Jami (so‘m)
+            'B' => '# ##0', // Jami (so‘m)
         ];
     }
 }
