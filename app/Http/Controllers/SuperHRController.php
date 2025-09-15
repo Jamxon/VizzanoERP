@@ -484,16 +484,43 @@ class SuperHRController extends Controller
             }
 
             if (!empty($photos)) {
+                $media = [];
                 foreach ($photos as $index => $photoPath) {
                     $photoContent = getPhotoContent($photoPath);
                     if ($photoContent) {
-                        Http::attach('photo', $photoContent, basename($photoPath))
-                            ->post("https://api.telegram.org/bot{$telegramToken}/sendPhoto", [
-                                'chat_id' => $chatId,
-                                'caption' => $index == 0 ? $messageText : null,
-                                'parse_mode' => 'Markdown',
-                            ]);
+                        // Faylni vaqtincha saqlash
+                        $tmpFile = tempnam(sys_get_temp_dir(), 'tg');
+                        file_put_contents($tmpFile, $photoContent);
+
+                        $media[] = [
+                            'type' => 'photo',
+                            'media' => new \CURLFile($tmpFile, null, basename($photoPath)),
+                            'caption' => $index == 0 ? $messageText : null,
+                            'parse_mode' => 'Markdown'
+                        ];
                     }
+                }
+
+                if (!empty($media)) {
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, "https://api.telegram.org/bot{$telegramToken}/sendMediaGroup");
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+                    // Media fayllarini alohida belgilash
+                    $postFields = ['chat_id' => $chatId];
+                    foreach ($media as $i => $m) {
+                        $postFields["media[$i][type]"] = $m['type'];
+                        $postFields["media[$i][media]"] = $m['media'];
+                        if (isset($m['caption'])) {
+                            $postFields["media[$i][caption]"] = $m['caption'];
+                            $postFields["media[$i][parse_mode]"] = $m['parse_mode'];
+                        }
+                    }
+
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+                    $response = curl_exec($ch);
+                    curl_close($ch);
                 }
             } else {
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
