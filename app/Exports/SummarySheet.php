@@ -221,8 +221,8 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
     public function array(): array
     {
         $rows = [];
+        $count = count($this->orders);
 
-        // itogo uchun umumiy yig‘indi
         $totals = [
             'price_usd' => 0,
             'price_uzs' => 0,
@@ -263,15 +263,11 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
                 $o['rasxod_limit_uzs'] ?? 0,
                 $o['bonus'] ?? 0,
                 $o['tarification'] ?? 0,
-
-                // costs_uzs
                 $costs['allocatedTransport'] ?? 0,
                 $costs['allocatedAup'] ?? 0,
                 $costs['incomePercentageExpense'] ?? 0,
                 $costs['amortizationExpense'] ?? 0,
                 $costs['remainder'] ?? 0,
-
-                // umumiy hisoblangan maydonlar
                 $o['total_fixed_cost_uzs'] ?? 0,
                 $o['total_output_cost_uzs'] ?? 0,
                 $o['net_profit_uzs'] ?? 0,
@@ -282,27 +278,13 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
 
             $rows[] = $row;
 
-            // itogo yig‘ish
-            $totals['price_usd'] += $o['price_usd'] ?? 0;
-            $totals['price_uzs'] += $o['price_uzs'] ?? 0;
-            $totals['total_quantity'] += $o['total_quantity'] ?? 0;
-            $totals['rasxod_limit_uzs'] += $o['rasxod_limit_uzs'] ?? 0;
-            $totals['bonus'] += $o['bonus'] ?? 0;
-            $totals['tarification'] += $o['tarification'] ?? 0;
-            $totals['allocatedTransport'] += $costs['allocatedTransport'] ?? 0;
-            $totals['allocatedAup'] += $costs['allocatedAup'] ?? 0;
-            $totals['incomePercentageExpense'] += $costs['incomePercentageExpense'] ?? 0;
-            $totals['amortizationExpense'] += $costs['amortizationExpense'] ?? 0;
-            $totals['remainder'] += $costs['remainder'] ?? 0;
-            $totals['total_fixed_cost_uzs'] += $o['total_fixed_cost_uzs'] ?? 0;
-            $totals['total_output_cost_uzs'] += $o['total_output_cost_uzs'] ?? 0;
-            $totals['net_profit_uzs'] += $o['net_profit_uzs'] ?? 0;
-            $totals['cost_per_unit_uzs'] += $o['cost_per_unit_uzs'] ?? 0;
-            $totals['profit_per_unit_uzs'] += $o['profit_per_unit_uzs'] ?? 0;
-            $totals['profitability_percent'] += $o['profitability_percent'] ?? 0;
+            // totals
+            foreach ($totals as $key => $val) {
+                $totals[$key] += $o[$key] ?? ($costs[$key] ?? 0);
+            }
         }
 
-        // itogo qatori
+        // itogo (JAMI)
         $rows[] = [
             '', 'JAMI:', '', '', '',
             $totals['price_usd'],
@@ -319,9 +301,18 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
             $totals['total_fixed_cost_uzs'],
             $totals['total_output_cost_uzs'],
             $totals['net_profit_uzs'],
-            $totals['cost_per_unit_uzs'], // bitta qiymatlarni qo‘shish emas, o‘rtacha olish ham mumkin
-            $totals['profit_per_unit_uzs'], // shu joyni o‘rtacha qilish mumkin
-            $totals['profitability_percent'], // foizlarni o‘rtacha qilish kerak
+            '', '', '' // bu joy o‘rtacha qilinadi
+        ];
+
+        // itogo (O‘RTACHA)
+        $rows[] = [
+            '', 'O‘RTACHA:', '', '', '',
+            '', '', '', '', '', '',
+            '', '', '', '', '',
+            '', '', '',
+            $count > 0 ? round($totals['cost_per_unit_uzs'] / $count, 2) : 0,
+            $count > 0 ? round($totals['profit_per_unit_uzs'] / $count, 2) : 0,
+            $count > 0 ? round($totals['profitability_percent'] / $count, 2) : 0,
         ];
 
         return $rows;
