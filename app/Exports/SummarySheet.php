@@ -58,7 +58,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
             ["Kunlik o'rtacha daromad", $toInt($d['total_earned_uzs'] ?? 0) / $days, $toUsd(($d['total_earned_uzs'] ?? 0) / $days), ''],
             ["Kunlik o'rtacha sof foyda", $toInt($d['net_profit_uzs'] ?? 0) / $days, $toUsd(($d['net_profit_uzs'] ?? 0) / $days), ''],
             [],
-            ['Ishlab chiqarilgan umumiy qty', $toInt($d['total_output_quantity'] ?? 0), '', ''],
+            ['Ishlab chiqarilgan umumiy son', $toInt($d['total_output_quantity'] ?? 0), '', ''],
             ['Bir dona mahsulot tannarxi', $toInt($d['cost_per_unit_overall_uzs'] ?? 0), $toUsd($d['cost_per_unit_overall_uzs'] ?? 0), ''],
             ["O'rtacha xodimlar soni", $toInt($d['average_employee_count'] ?? 0), '', ''],
             ["Bir xodimga to'g'ri keladigan xarajat", $toInt($d['per_employee_cost_uzs'] ?? 0), $toUsd($d['per_employee_cost_uzs'] ?? 0), ''],
@@ -216,7 +216,14 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                         ]);
                         $sheet->getRowDimension($i)->setRowHeight(30);
                     }
-                    elseif (in_array($cellValue, ["Kunlik o'rtacha daromad", "Kunlik o'rtacha sof foyda"])) {
+                    elseif (in_array($cellValue, [
+                        "Kunlik o'rtacha daromad",
+                        "Kunlik o'rtacha sof foyda",
+                        "Ishlab chiqarilgan umumiy son",
+                        "Bir dona mahsulot tannarxi",
+                        "O'rtacha xodimlar soni",
+                        "Bir xodimga to'g'ri keladigan xarajat"
+                        ])) {
                         $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
                             'font' => [
                                 'bold' => true, //red
