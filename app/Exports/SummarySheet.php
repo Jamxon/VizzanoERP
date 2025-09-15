@@ -435,16 +435,17 @@ class CostsByTypeSheet implements FromArray, WithHeadings, WithTitle, ShouldAuto
     protected function translateCostType(string $key): string
     {
         $map = [
-            'bonus' => 'Bonus',
-            'remainder' => 'Qoldiq',
-            'tarification' => 'Tarifikatsiya',
-            'allocatedTransport' => 'Transport xarajati',
-            'allocatedAup' => 'AUP xarajati',
-            'allocatedMonthlyExpenseMonthly' => 'Oylik xarajat',
-            'incomePercentageExpense' => 'Daromad foizi xarajati',
-            'amortizationExpense' => 'Amortizatsiya',
+            'allocatedAup' => "AUP",
+            'bonus' => "KPI", // bonusni KPI deb chiqaramiz
+            'total_fixed_cost_uzs' => "O‘zgarmas xarajat",
+            'allocatedTransport' => "Transport",
+            'amortizationExpense' => "Amortizatsiya",
+            'incomePercentageExpense' => "Soliq",
+            'tarification' => "Tikuv uchun",
+            'remainder' => "Tikuvchilar", // agar bu qoldiqni tikuvchilarga taqsimlangan deb ko‘rsatayotgan bo‘lsang
         ];
 
         return $map[$key] ?? $key;
     }
+
 }
