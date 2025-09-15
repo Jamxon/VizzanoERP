@@ -471,8 +471,8 @@ class SuperHRController extends Controller
             }
 
 // 3. Employee rasmi
-            if ($employee->img) {
-                $photos[] = storage_path("app/public/" . $employee->img);
+            if ($employee->imgage) {
+                $photos[] = storage_path("app/public/" . $employee->imgage);
             }
 // 🔹 Path to real file or URL aniqlash
             function getPhotoContent($path) {
