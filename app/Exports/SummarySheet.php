@@ -107,7 +107,7 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
 
     public function array(): array
     {
-        return array_map(function ($d) {
+        $rows = array_map(function ($d) {
             return [
                 $d['date'] ?? '',
                 $d['aup'] ?? 0,
@@ -122,6 +122,45 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
                 $d['total_output_quantity'] ?? 0,
             ];
         }, $this->daily);
+
+        if (count($this->daily) > 0) {
+            $days = count($this->daily);
+
+            // umumiy yig‘indi
+            $totals = [
+                'Umumiy:',
+                array_sum(array_column($rows, 1)), // AUP
+                array_sum(array_column($rows, 2)), // KPI
+                array_sum(array_column($rows, 3)), // Transport
+                array_sum(array_column($rows, 4)), // Tarifikatsiya
+                array_sum(array_column($rows, 5)), // Kunlik xarajat
+                array_sum(array_column($rows, 6)), // Daromad
+                array_sum(array_column($rows, 7)), // Doimiy xarajat
+                array_sum(array_column($rows, 8)), // Sof foyda
+                array_sum(array_column($rows, 9)), // Xodimlar soni (jami)
+                array_sum(array_column($rows, 10)), // qty
+            ];
+
+            // o‘rtacha qiymatlar
+            $averages = [
+                'O‘rtacha:',
+                round($totals[1] / $days), // AUP
+                round($totals[2] / $days), // KPI
+                round($totals[3] / $days), // Transport
+                round($totals[4] / $days), // Tarifikatsiya
+                round($totals[5] / $days), // Kunlik xarajat
+                round($totals[6] / $days), // Daromad
+                round($totals[7] / $days), // Doimiy xarajat
+                round($totals[8] / $days), // Sof foyda
+                round($totals[9] / $days), // Xodimlar soni
+                round($totals[10] / $days), // qty
+            ];
+
+            $rows[] = $totals;
+            $rows[] = $averages;
+        }
+
+        return $rows;
     }
 
     public function title(): string
@@ -149,18 +188,20 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // 1-qator (headings)ni qalin va sariq qilish
+                // Headingsni sariq va qalin
                 $sheet->getStyle('A1:K1')->applyFromArray([
-                    'font' => [
-                        'bold' => true,
-                    ],
+                    'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'color' => ['rgb' => 'FFFF99']
                     ]
                 ]);
 
-                // Ustunlarni avtomatik kengaytirish
+                // Oxirgi 2 qator (Umumiy va O‘rtacha)ni qalin qilish
+                $lastRow = $sheet->getHighestRow();
+                $sheet->getStyle("A{$lastRow}:K{$lastRow}")->getFont()->setBold(true);
+                $sheet->getStyle("A".($lastRow-1).":K".($lastRow-1))->getFont()->setBold(true);
+
                 foreach (range('A', 'K') as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
