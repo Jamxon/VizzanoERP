@@ -485,16 +485,20 @@ class SuperHRController extends Controller
 
             if (!empty($photos)) {
                 $media = [];
+                $files = [];
+
                 foreach ($photos as $index => $photoPath) {
                     $photoContent = getPhotoContent($photoPath);
                     if ($photoContent) {
-                        // Faylni vaqtincha saqlash
                         $tmpFile = tempnam(sys_get_temp_dir(), 'tg');
                         file_put_contents($tmpFile, $photoContent);
 
+                        $fieldName = "photo{$index}";
+                        $files[$fieldName] = new \CURLFile($tmpFile, null, basename($photoPath));
+
                         $media[] = [
                             'type' => 'photo',
-                            'media' => new \CURLFile($tmpFile, null, basename($photoPath)),
+                            'media' => "attach://{$fieldName}",
                             'caption' => $index == 0 ? $messageText : null,
                             'parse_mode' => 'Markdown'
                         ];
@@ -502,25 +506,24 @@ class SuperHRController extends Controller
                 }
 
                 if (!empty($media)) {
+                    $postFields = [
+                        'chat_id' => $chatId,
+                        'media'   => json_encode($media, JSON_UNESCAPED_UNICODE),
+                    ];
+
+                    $postFields = array_merge($postFields, $files);
+
                     $ch = curl_init();
                     curl_setopt($ch, CURLOPT_URL, "https://api.telegram.org/bot{$telegramToken}/sendMediaGroup");
                     curl_setopt($ch, CURLOPT_POST, true);
                     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-                    // Media fayllarini alohida belgilash
-                    $postFields = ['chat_id' => $chatId];
-                    foreach ($media as $i => $m) {
-                        $postFields["media[$i][type]"] = $m['type'];
-                        $postFields["media[$i][media]"] = $m['media'];
-                        if (isset($m['caption'])) {
-                            $postFields["media[$i][caption]"] = $m['caption'];
-                            $postFields["media[$i][parse_mode]"] = $m['parse_mode'];
-                        }
-                    }
-
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+
                     $response = curl_exec($ch);
                     curl_close($ch);
+
+                    // Debug uchun
+                    // dd($response);
                 }
             } else {
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
@@ -529,6 +532,7 @@ class SuperHRController extends Controller
                     'parse_mode' => 'Markdown',
                 ]);
             }
+
 
             return response()->json([
                 'status' => 'success',
