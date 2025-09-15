@@ -63,19 +63,31 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
     public function columnFormats(): array
     {
-        // TODO: Implement columnFormats() method.
+        return [
+            'B' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
+            'C' => NumberFormat::FORMAT_NUMBER_00,
+        ];
     }
 
     public function registerEvents(): array
     {
-        // TODO: Implement registerEvents() method.
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $event->sheet->getDelegate()->getStyle('A1:C1')->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => ['fillType' => 'solid','startColor' => ['rgb' => 'D9EDF7']],
+                ]);
+                $event->sheet->getDelegate()->freezePane('A2');
+            },
+        ];
     }
 }
 
 /**
  * DailySheet
  */
-class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithEvents, WithColumnFormatting
+
+class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithColumnFormatting
 {
     protected array $daily;
 
@@ -119,12 +131,41 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
 
     public function columnFormats(): array
     {
-        // TODO: Implement columnFormats() method.
+        return [
+            'B' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // AUP (so‘m)
+            'C' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // KPI (so‘m)
+            'D' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Transport
+            'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Tarifikatsiya
+            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Kunlik xarajatlar
+            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Jami daromad
+            'H' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Doimiy xarajat
+            'I' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Sof foyda
+        ];
     }
 
     public function registerEvents(): array
     {
-        // TODO: Implement registerEvents() method.
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+
+                // 1-qator (headings)ni qalin va sariq qilish
+                $sheet->getStyle('A1:K1')->applyFromArray([
+                    'font' => [
+                        'bold' => true,
+                    ],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['rgb' => 'FFFF99']
+                    ]
+                ]);
+
+                // Ustunlarni avtomatik kengaytirish
+                foreach (range('A', 'K') as $col) {
+                    $sheet->getColumnDimension($col)->setAutoSize(true);
+                }
+            }
+        ];
     }
 }
 
@@ -145,8 +186,9 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
         return [
             'Buyurtma ID','Buyurtma#','Model','Submodellari','Mas’ul','Narx USD','Narx so‘m',
             'Umumiy qty','Rasxod limiti (so‘m)','Bonus','Tarifikatsiya','Ajratilgan transport','Ajratilgan AUP',
-            'Ajratilgan oylik xarajat','Daromad % xarajat','Amortizatsiya','Jami qo‘shimcha','Doimiy xarajat (so‘m)','Jami ishlab chiqarish tannarxi (so‘m)',
-            'Sof foyda (so‘m)','Bir dona mahsulot tannarxi (so‘m)','Bir dona foyda (so‘m)','Rentabellik %'
+            'Ajratilgan oylik xarajat','Daromad % xarajat','Amortizatsiya','Jami qo‘shimcha','Doimiy xarajat (so‘m)',
+            'Jami ishlab chiqarish tannarxi (so‘m)','Sof foyda (so‘m)','Bir dona mahsulot tannarxi (so‘m)',
+            'Bir dona foyda (so‘m)','Rentabellik %'
         ];
     }
 
@@ -157,30 +199,73 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
 
     public function array(): array
     {
-        // TODO: Implement array() method.
+        return array_map(function ($o) {
+            return [
+                $o['id'] ?? '',
+                $o['order_number'] ?? '',
+                $o['model'] ?? '',
+                $o['submodels'] ?? '',
+                $o['responsible'] ?? '',
+                $o['price_usd'] ?? 0,
+                $o['price_uzs'] ?? 0,
+                $o['total_qty'] ?? 0,
+                $o['limit_expense'] ?? 0,
+                $o['bonus'] ?? 0,
+                $o['tarification'] ?? 0,
+                $o['allocated_transport'] ?? 0,
+                $o['allocated_aup'] ?? 0,
+                $o['allocated_monthly_expense'] ?? 0,
+                $o['income_vs_expense'] ?? 0,
+                $o['amortization'] ?? 0,
+                $o['total_additional'] ?? 0,
+                $o['fixed_cost'] ?? 0,
+                $o['total_cost'] ?? 0,
+                $o['net_profit'] ?? 0,
+                $o['unit_cost'] ?? 0,
+                $o['unit_profit'] ?? 0,
+                $o['rentability_percent'] ?? 0,
+            ];
+        }, $this->orders);
     }
 
     public function columnFormats(): array
     {
-        // TODO: Implement columnFormats() method.
+        return [
+            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Narx USD
+            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Narx so‘m
+            'I' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Rasxod limiti
+            'R' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Sof foyda
+        ];
     }
 
     public function registerEvents(): array
     {
-        // TODO: Implement registerEvents() method.
+        return [
+            AfterSheet::class => function(AfterSheet $event) {
+                $sheet = $event->sheet->getDelegate();
+                $sheet->getStyle('A1:W1')->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['rgb' => 'FFFFCC']
+                    ]
+                ]);
+            }
+        ];
     }
+
 }
 
 /**
  * CostsByTypeSheet
  */
-class CostsByTypeSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithEvents
+class CostsByTypeSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithColumnFormatting
 {
-    protected array $orders;
+    protected array $costs;
 
-    public function __construct(array $orders)
+    public function __construct(array $costs)
     {
-        $this->orders = $orders;
+        $this->costs = $costs;
     }
 
     public function headings(): array
@@ -195,11 +280,18 @@ class CostsByTypeSheet implements FromArray, WithHeadings, WithTitle, ShouldAuto
 
     public function array(): array
     {
-        // TODO: Implement array() method.
+        return array_map(function ($c) {
+            return [
+                $c['type'] ?? '',
+                $c['amount'] ?? 0,
+            ];
+        }, $this->costs);
     }
 
-    public function registerEvents(): array
+    public function columnFormats(): array
     {
-        // TODO: Implement registerEvents() method.
+        return [
+            'B' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1, // Jami (so‘m)
+        ];
     }
 }
