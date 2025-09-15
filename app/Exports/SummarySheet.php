@@ -200,6 +200,22 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
     public function array(): array
     {
         $rows = [];
+        $totals = [
+            'price_usd' => 0,
+            'price_uzs' => 0,
+            'total_quantity' => 0,
+            'rasxod_limit_uzs' => 0,
+            'bonus' => 0,
+            'tarification' => 0,
+            'allocatedTransport' => 0,
+            'allocatedAup' => 0,
+            'allocatedMonthlyExpenseMonthly' => 0,
+            'incomePercentageExpense' => 0,
+            'amortizationExpense' => 0,
+            'remainder' => 0,
+            'total_output_cost_uzs' => 0,
+            'net_profit_uzs' => 0,
+        ];
 
         foreach ($this->orders as $o) {
             $order = $o['order'] ?? [];
@@ -233,10 +249,60 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
                 $o['profit_per_unit_uzs'] ?? 0,
                 $o['profitability_percent'] ?? 0,
             ];
+
+            // yig‘ib boramiz
+            $totals['price_usd'] += $o['price_usd'] ?? 0;
+            $totals['price_uzs'] += $o['price_uzs'] ?? 0;
+            $totals['total_quantity'] += $o['total_quantity'] ?? 0;
+            $totals['rasxod_limit_uzs'] += $o['rasxod_limit_uzs'] ?? 0;
+            $totals['bonus'] += $o['bonus'] ?? 0;
+            $totals['tarification'] += $o['tarification'] ?? 0;
+            $totals['allocatedTransport'] += $costs['allocatedTransport'] ?? 0;
+            $totals['allocatedAup'] += $costs['allocatedAup'] ?? 0;
+            $totals['allocatedMonthlyExpenseMonthly'] += $costs['allocatedMonthlyExpenseMonthly'] ?? 0;
+            $totals['incomePercentageExpense'] += $costs['incomePercentageExpense'] ?? 0;
+            $totals['amortizationExpense'] += $costs['amortizationExpense'] ?? 0;
+            $totals['remainder'] += $costs['remainder'] ?? 0;
+            $totals['total_output_cost_uzs'] += $o['total_output_cost_uzs'] ?? 0;
+            $totals['net_profit_uzs'] += $o['net_profit_uzs'] ?? 0;
         }
+
+        // Itogo qatori qo‘shamiz
+        $rows[] = [
+            '', 'UMUMIY:', '', '', '',
+            $totals['price_usd'],
+            $totals['price_uzs'],
+            $totals['total_quantity'],
+            $totals['rasxod_limit_uzs'],
+            $totals['bonus'],
+            $totals['tarification'],
+            $totals['allocatedTransport'],
+            $totals['allocatedAup'],
+            $totals['allocatedMonthlyExpenseMonthly'],
+            $totals['incomePercentageExpense'],
+            $totals['amortizationExpense'],
+            $totals['remainder'],
+            $totals['total_output_cost_uzs'],
+            $totals['net_profit_uzs'],
+            // 1 dona mahsulot tannarxi
+            $totals['total_quantity'] > 0
+                ? round($totals['total_output_cost_uzs'] / $totals['total_quantity'])
+                : 0,
+
+            // 1 dona foyda
+            $totals['total_quantity'] > 0
+                ? round($totals['net_profit_uzs'] / $totals['total_quantity'])
+                : 0,
+
+            // Rentabellik %
+            $totals['total_output_cost_uzs'] > 0
+                ? round(($totals['net_profit_uzs'] / $totals['total_output_cost_uzs']) * 100, 2)
+                : 0,
+        ];
 
         return $rows;
     }
+
 
     public function columnFormats(): array
     {
