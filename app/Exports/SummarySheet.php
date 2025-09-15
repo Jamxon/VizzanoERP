@@ -219,6 +219,32 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                     elseif (in_array($cellValue, ["Kunlik o'rtacha daromad", "Kunlik o'rtacha sof foyda"])) {
                         $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
                             'font' => [
+                                'bold' => true, //red
+                                'color' => ['rgb' => '856404'],
+                                'size' => 14,
+                                'name' => 'Arial'
+                            ],
+                            'fill' => [
+                                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                                'color' => ['rgb' => 'FFF3CD']
+                            ],
+                            'borders' => [
+                                'allBorders' => [
+                                    'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
+                                    'color' => ['rgb' => 'FFC107']
+                                ]
+                            ],
+                            'alignment' => [
+                                'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+                            ]
+                        ]);
+                        $sheet->getRowDimension($i)->setRowHeight(28);
+                    }
+                    // Oddiy qatorlar uchun - KATTA
+                    else {
+                        $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
+                            'font' => [
                                 'bold' => true,
                                 'color' => ['rgb' => '0B3D91'],
                                 'size' => 14,
@@ -240,23 +266,6 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                             ]
                         ]);
                         $sheet->getRowDimension($i)->setRowHeight(28);
-                    }
-                    // Oddiy qatorlar uchun - KATTA
-                    else {
-                        $bgColor = ($i % 2 === 0) ? 'FFFFFF' : 'F8F9FA';
-                        $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
-                            'font' => [
-                                'size' => 13,  // 10 dan 26 ga
-                                'name' => 'Arial'
-                            ],
-                            'fill' => [
-                                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                                'color' => ['rgb' => $bgColor]
-                            ],
-                            'alignment' => [
-                                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
-                            ]
-                        ]);
                     }
                 }
 
