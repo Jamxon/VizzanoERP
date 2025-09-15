@@ -86,16 +86,18 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Headings stili
+                // Headings stili - JUDA KATTA
                 $sheet->getStyle('A1:D1')->applyFromArray([
                     'font' => [
                         'bold' => true,
-                        'size' => 11,
-                        'color' => ['rgb' => '2F4F4F']
+                        'size' => 36,  // 11 dan 36 ga (3x katta)
+                        'color' => ['rgb' => '2F4F4F'],
+                        'name' => 'Arial'
                     ],
                     'alignment' => [
                         'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER,
+                        'wrapText' => true
                     ],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -103,32 +105,47 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                     ],
                     'borders' => [
                         'allBorders' => [
-                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
                             'color' => ['rgb' => '4A90E2']
                         ]
                     ]
                 ]);
 
-                // Umumiy ma'lumotlar stili (1-4 qatorlar)
+                // Header qatori balandligi - KATTA
+                $sheet->getRowDimension(1)->setRowHeight(80);
+
+                // Umumiy ma'lumotlar stili (2-5 qatorlar) - KATTA
                 $sheet->getStyle('A2:D5')->applyFromArray([
-                    'font' => ['size' => 10],
+                    'font' => [
+                        'size' => 28,  // 10 dan 28 ga
+                        'name' => 'Arial'
+                    ],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'color' => ['rgb' => 'F9F9F9']
                     ]
                 ]);
 
-                // Asosiy ma'lumotlar uchun alternating colors
+                // 2-5 qatorlar balandligi
+                for ($i = 2; $i <= 5; $i++) {
+                    $sheet->getRowDimension($i)->setRowHeight(50);
+                }
+
+                // Asosiy ma'lumotlar uchun
                 $lastRow = $sheet->getHighestRow();
                 for ($i = 6; $i <= $lastRow; $i++) {
                     $cellValue = $sheet->getCell("A{$i}")->getValue();
 
                     // Bo'sh qatorlarni o'tkazib yuborish
                     if (empty($cellValue)) {
+                        $sheet->getRowDimension($i)->setRowHeight(25); // Bo'sh qatorlar kichikroq
                         continue;
                     }
 
-                    // Sof foyda uchun maxsus rang
+                    // Har bir qator balandligi
+                    $sheet->getRowDimension($i)->setRowHeight(55);
+
+                    // Sof foyda uchun maxsus rang - JUDA KATTA
                     if ($cellValue === 'Sof foyda') {
                         $value = (float)$sheet->getCell("B{$i}")->getValue();
                         if ($value >= 0) {
@@ -136,7 +153,8 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                                 'font' => [
                                     'bold' => true,
                                     'color' => ['rgb' => '155724'],
-                                    'size' => 11
+                                    'size' => 32,  // 11 dan 32 ga
+                                    'name' => 'Arial'
                                 ],
                                 'fill' => [
                                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -144,17 +162,23 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                                 ],
                                 'borders' => [
                                     'allBorders' => [
-                                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
                                         'color' => ['rgb' => '28A745']
                                     ]
+                                ],
+                                'alignment' => [
+                                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
                                 ]
                             ]);
+                            // Sof foyda qatori yanada baland
+                            $sheet->getRowDimension($i)->setRowHeight(65);
                         } else {
                             $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
                                 'font' => [
                                     'bold' => true,
                                     'color' => ['rgb' => '721C24'],
-                                    'size' => 11
+                                    'size' => 32,  // 11 dan 32 ga
+                                    'name' => 'Arial'
                                 ],
                                 'fill' => [
                                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
@@ -162,80 +186,93 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                                 ],
                                 'borders' => [
                                     'allBorders' => [
-                                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK,
                                         'color' => ['rgb' => 'DC3545']
                                     ]
+                                ],
+                                'alignment' => [
+                                    'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
                                 ]
                             ]);
+                            // Sof foyda qatori yanada baland
+                            $sheet->getRowDimension($i)->setRowHeight(65);
                         }
                     }
-                    // Jami daromad uchun maxsus stil
+                    // Jami daromad uchun maxsus stil - KATTA
                     elseif ($cellValue === 'Jami daromad') {
                         $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
                             'font' => [
                                 'bold' => true,
                                 'color' => ['rgb' => '0C5460'],
-                                'size' => 11
+                                'size' => 30,  // 11 dan 30 ga
+                                'name' => 'Arial'
                             ],
                             'fill' => [
                                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                                 'color' => ['rgb' => 'B8DAFF']
+                            ],
+                            'alignment' => [
+                                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
                             ]
                         ]);
+                        $sheet->getRowDimension($i)->setRowHeight(60);
                     }
-                    // Oddiy qatorlar uchun alternating style
+                    // Oddiy qatorlar uchun - KATTA
                     else {
                         $bgColor = ($i % 2 === 0) ? 'FFFFFF' : 'F8F9FA';
                         $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
-                            'font' => ['size' => 10],
+                            'font' => [
+                                'size' => 26,  // 10 dan 26 ga
+                                'name' => 'Arial'
+                            ],
                             'fill' => [
                                 'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                                 'color' => ['rgb' => $bgColor]
+                            ],
+                            'alignment' => [
+                                'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
                             ]
                         ]);
                     }
                 }
 
-                // Ustunlar kengligi
-                $sheet->getColumnDimension('A')->setWidth(35);
-                $sheet->getColumnDimension('B')->setWidth(18);
-                $sheet->getColumnDimension('C')->setWidth(15);
-                $sheet->getColumnDimension('D')->setWidth(12);
+                // Ustunlar kengligi - JUDA KENG
+                $sheet->getColumnDimension('A')->setWidth(80);  // 35 dan 80 ga
+                $sheet->getColumnDimension('B')->setWidth(40);  // 18 dan 40 ga
+                $sheet->getColumnDimension('C')->setWidth(35);  // 15 dan 35 ga
+                $sheet->getColumnDimension('D')->setWidth(25);  // 12 dan 25 ga
 
+                // Raqamlar uchun o'ng tomondan tekislash + vertikal markazlash
+                $sheet->getStyle('B:D')->getAlignment()
+                    ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT)
+                    ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
-                // Ustunlar kengligi (katta fontlar uchun kengaytirildi)
-                $sheet->getColumnDimension('A')->setWidth(60);
-                $sheet->getColumnDimension('B')->setWidth(30);
-                $sheet->getColumnDimension('C')->setWidth(25);
-                $sheet->getColumnDimension('D')->setWidth(20);
-
-                // Raqamlar uchun o'ng tomondan tekislash
-                $sheet->getStyle('B:D')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
-
-                // Birinchi ustunni chap tomondan tekislash
-                $sheet->getStyle('A:A')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+                // Birinchi ustunni chap tomondan tekislash + vertikal markazlash
+                $sheet->getStyle('A:A')->getAlignment()
+                    ->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT)
+                    ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
                 // Freeze pane
                 $sheet->freezePane('A2');
 
-                // Print uchun sozlamalar
+                // Print uchun sozlamalar - landscape qilamiz katta bo'lgani uchun
                 $sheet->getPageSetup()
-                    ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT)
+                    ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_LANDSCAPE)  // Landscape
                     ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4)
                     ->setFitToWidth(1)
-                    ->setFitToHeight(0);
+                    ->setFitToHeight(0)
+                    ->setScale(85);  // 85% scale katta fontlar uchun
 
-                // Margins
+                // Margins - kichikroq qilamiz
                 $sheet->getPageMargins()
-                    ->setTop(0.75)
-                    ->setRight(0.7)
-                    ->setLeft(0.7)
-                    ->setBottom(0.75);
+                    ->setTop(0.5)
+                    ->setRight(0.5)
+                    ->setLeft(0.5)
+                    ->setBottom(0.5);
             },
         ];
     }
-}
-/**
+}/**
  * DailySheet
  */
 
