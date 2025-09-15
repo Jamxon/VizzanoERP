@@ -306,7 +306,7 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
             $count > 0 ? round($totals['cost_per_unit_uzs'] / $count, 2) : 0,
             $count > 0 ? round($totals['profit_per_unit_uzs'] / $count, 2) : 0,
             $count > 0 ? round($totals['profitability_percent'] / $count, 2) : 0,
-            'O‘RTACHA:',
+            'O‘RTACHA',
         ];
 
         return $rows;
@@ -369,11 +369,11 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
  */
 class CostsByTypeSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithColumnFormatting
 {
-    protected array $costs;
+    protected array $orders;
 
-    public function __construct(array $costs)
+    public function __construct(array $orders)
     {
-        $this->costs = $costs;
+        $this->orders = $orders;
     }
 
     public function headings(): array
@@ -388,18 +388,63 @@ class CostsByTypeSheet implements FromArray, WithHeadings, WithTitle, ShouldAuto
 
     public function array(): array
     {
-        return array_map(function ($c) {
-            return [
-                $c['type'] ?? '',
-                $c['amount'] ?? 0,
+        $totals = [];
+
+        // Har bir order ichidan costs_uzs ni yig‘amiz
+        foreach ($this->orders as $order) {
+            if (!empty($order['costs_uzs']) && is_array($order['costs_uzs'])) {
+                foreach ($order['costs_uzs'] as $type => $amount) {
+                    if (!isset($totals[$type])) {
+                        $totals[$type] = 0;
+                    }
+                    $totals[$type] += $amount;
+                }
+            }
+        }
+
+        $rows = [];
+        $grandTotal = 0;
+
+        foreach ($totals as $type => $amount) {
+            $rows[] = [
+                $this->translateCostType($type),
+                round($amount),
             ];
-        }, $this->costs);
+            $grandTotal += $amount;
+        }
+
+        // Umumiy yig‘indi satri
+        $rows[] = [
+            'JAMI',
+            round($grandTotal),
+        ];
+
+        return $rows;
     }
 
     public function columnFormats(): array
     {
         return [
-            'B' => '# ##0', // Jami (so‘m)
+            'B' => '#,##0', // Jami (so‘m) formatlash
         ];
+    }
+
+    /**
+     * Xarajat turlarini odamga tushunarli nomga o‘tkazish
+     */
+    protected function translateCostType(string $key): string
+    {
+        $map = [
+            'bonus' => 'Bonus',
+            'remainder' => 'Qoldiq',
+            'tarification' => 'Tarifikatsiya',
+            'allocatedTransport' => 'Transport xarajati',
+            'allocatedAup' => 'AUP xarajati',
+            'allocatedMonthlyExpenseMonthly' => 'Oylik xarajat',
+            'incomePercentageExpense' => 'Daromad foizi xarajati',
+            'amortizationExpense' => 'Amortizatsiya',
+        ];
+
+        return $map[$key] ?? $key;
     }
 }
