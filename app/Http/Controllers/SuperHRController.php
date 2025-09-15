@@ -451,41 +451,29 @@ class SuperHRController extends Controller
             $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
             $chatId = -1002655761088;
 
-// 🔹 Rasmlar ro‘yxatini yig‘amiz
             $photos = [];
 
-// 1. Holiday yuklangan rasm
             if ($filename) {
-                $photos[] = storage_path("app/public/holidays/" . $filename);
+                $photos[] = 'holidays/' . $filename; // faqat nisbiy path
             }
 
-// 2. Attendance rasmi (faqat bitta kunga belgilangan bo‘lsa)
-            if ($request->start_date == $request->end_date) {
                 $attendance = \App\Models\Attendance::where('employee_id', $request->employee_id)
                     ->whereDate('date', $request->start_date)
                     ->first();
 
                 if ($attendance && $attendance->check_in_image) {
-                    $photos[] = storage_path("app/public/" . $attendance->check_in_image);
+                    $photos[] = $attendance->check_in_image;
                 }
-            }
 
-// 3. Employee rasmi
             if ($employee->image) {
-                $photos[] = storage_path("app/public/" . $employee->image);
+                $photos[] = $employee->image;
             }
-// 🔹 Path to real file or URL aniqlash
-            function getPhotoContent($path) {
-                if (!$path) {
-                    return null;
-                }
 
-                // Agar URL bo‘lsa
+            function getPhotoContent($path) {
                 if (filter_var($path, FILTER_VALIDATE_URL)) {
                     return file_get_contents($path);
                 }
 
-                // Aks holda local storage ichidagi fayl
                 $fullPath = storage_path("app/public/" . ltrim($path, '/'));
                 if (file_exists($fullPath)) {
                     return file_get_contents($fullPath);
@@ -494,7 +482,6 @@ class SuperHRController extends Controller
                 return null;
             }
 
-// 🔹 Telegramga yuborish
             if (!empty($photos)) {
                 foreach ($photos as $index => $photoPath) {
                     $photoContent = getPhotoContent($photoPath);
@@ -508,7 +495,6 @@ class SuperHRController extends Controller
                     }
                 }
             } else {
-                // Agar umuman rasm bo‘lmasa
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
                     'chat_id' => $chatId,
                     'text' => $messageText,
