@@ -465,13 +465,14 @@ class SuperHRController extends Controller
                     $photos[] = $attendance->check_in_image;
                 }
 
-            if ($employee->img && $attendance && $attendance->check_in_image) {
+            if ($employee->img && (!$attendance && !$attendance->check_in_image)) {
                 $photos[] = $employee->img;
             }
 
             function getPhotoContent($path) {
                 if (filter_var($path, FILTER_VALIDATE_URL)) {
-                    return file_get_contents($path);
+                    $response = Http::get($path);
+                    return $response->successful() ? $response->body() : null;
                 }
 
                 $fullPath = storage_path("app/public/" . ltrim($path, '/'));
