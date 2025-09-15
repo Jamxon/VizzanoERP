@@ -465,14 +465,14 @@ class SuperHRController extends Controller
                     ->whereDate('date', $request->start_date)
                     ->first();
 
-                if ($attendance && $attendance->image) {
-                    $photos[] = storage_path("app/public/" . $attendance->image);
+                if ($attendance && $attendance->check_in_image) {
+                    $photos[] = storage_path("app/public/" . $attendance->check_in_image);
                 }
             }
 
 // 3. Employee rasmi
-            if ($employee->imgage) {
-                $photos[] = storage_path("app/public/" . $employee->imgage);
+            if ($employee->image) {
+                $photos[] = storage_path("app/public/" . $employee->image);
             }
 // 🔹 Path to real file or URL aniqlash
             function getPhotoContent($path) {
