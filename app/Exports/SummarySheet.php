@@ -199,32 +199,43 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
 
     public function array(): array
     {
-        return array_map(function ($o) {
-            return [
-                $o['id'] ?? '',
-                $o['model']->name ?? '',
-                $o['submodels']->name ?? '',
-                $o['responsibleUser']['employee']['name'] ?? '',
+        $rows = [];
+
+        foreach ($this->orders as $o) {
+            $order = $o['order'] ?? [];
+            $model = $o['model'] ?? [];
+            $submodels = implode(', ', array_map(fn($s) => $s['name'] ?? '', $o['submodels'] ?? []));
+            $responsibleUsers = implode(', ', array_map(fn($u) => $u['employee']['name'] ?? '', $o['responsibleUser'] ?? []));
+
+            $costs = $o['costs_uzs'] ?? [];
+
+            $rows[] = [
+                $order['id'] ?? '',
+                $order['name'] ?? '',
+                $model['name'] ?? '',
+                $submodels,
+                $responsibleUsers,
                 $o['price_usd'] ?? 0,
                 $o['price_uzs'] ?? 0,
-                $o['total_qty'] ?? 0,
-                $o['limit_expense'] ?? 0,
+                $o['total_quantity'] ?? 0,
+                $o['rasxod_limit_uzs'] ?? 0,
                 $o['bonus'] ?? 0,
                 $o['tarification'] ?? 0,
-                $o['allocated_transport'] ?? 0,
-                $o['allocated_aup'] ?? 0,
-                $o['allocated_monthly_expense'] ?? 0,
-                $o['income_vs_expense'] ?? 0,
-                $o['amortization'] ?? 0,
-                $o['total_additional'] ?? 0,
-                $o['fixed_cost'] ?? 0,
-                $o['total_cost'] ?? 0,
-                $o['net_profit'] ?? 0,
-                $o['unit_cost'] ?? 0,
-                $o['unit_profit'] ?? 0,
-                $o['rentability_percent'] ?? 0,
+                $costs['allocatedTransport'] ?? 0,
+                $costs['allocatedAup'] ?? 0,
+                $costs['allocatedMonthlyExpenseMonthly'] ?? 0,
+                $costs['incomePercentageExpense'] ?? 0,
+                $costs['amortizationExpense'] ?? 0,
+                $costs['remainder'] ?? 0,
+                $o['total_output_cost_uzs'] ?? 0,
+                $o['net_profit_uzs'] ?? 0,
+                $o['cost_per_unit_uzs'] ?? 0,
+                $o['profit_per_unit_uzs'] ?? 0,
+                $o['profitability_percent'] ?? 0,
             ];
-        }, $this->orders);
+        }
+
+        return $rows;
     }
 
     public function columnFormats(): array
