@@ -48,7 +48,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
             ['AUP', $toInt($d['aup'] ?? 0), $toUsd($d['aup'] ?? 0), $toPct($d['aup'] ?? 0)],
             ['KPI', $toInt($d['kpi'] ?? 0), $toUsd($d['kpi'] ?? 0), $toPct($d['kpi'] ?? 0)],
             ['Transport', $toInt($d['transport_attendance'] ?? 0), $toUsd($d['transport_attendance'] ?? 0), $toPct($d['transport_attendance'] ?? 0)],
-            ['Tikuv uchun', $toInt($d['rasxod_limit_uzs'] ?? 0), $toUsd($d['rasxod_limit_uzs'] ?? 0), $toPct($d['tarification'] ?? 0)],
+            ['Tikuv uchun', $toInt($d['rasxod_limit_uzs'] ?? 0), $toUsd($d['rasxod_limit_uzs'] ?? 0), $toPct($d['rasxod_limit_uzs'] ?? 0)],
             ["O'zgarmas xarajatlar", $toInt($d['monthly_expenses'] ?? 0), $toUsd($d['monthly_expenses'] ?? 0), $toPct($d['monthly_expenses'] ?? 0)],
             [],
             ['Jami xarajat', $toInt($d['total_fixed_cost_uzs'] ?? 0), $toUsd($d['total_fixed_cost_uzs'] ?? 0), $toPct($d['total_fixed_cost_uzs'] ?? 0)],
