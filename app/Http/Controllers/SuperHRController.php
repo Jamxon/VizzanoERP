@@ -448,7 +448,16 @@ class SuperHRController extends Controller
             }
 
             $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
-            $chatId = -1002655761088;
+//            $chatId = -1002655761088;
+
+            $chatIdMap = [
+                5 => -1002655761088,
+                4 => -1003041140850,
+            ];
+
+            $branchId = $employee->branch_id;
+
+            $chatId = $chatIdMap[$branchId] ?? null;
 
             $photos = [];
 
