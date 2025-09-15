@@ -88,7 +88,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 $sheet = $event->sheet->getDelegate();
 
                 // Headings stili - JUDA KATTA
-                $sheet->getStyle('A4:D4')->applyFromArray([
+                $sheet->getStyle('A5:D5')->applyFromArray([
                     'font' => [
                         'bold' => true,
                         'size' => 16,  // 11 dan 36 ga (3x katta)
@@ -113,10 +113,10 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 ]);
 
                 // Header qatori balandligi - KATTA
-                $sheet->getRowDimension(1)->setRowHeight(30);
+//                $sheet->getRowDimension(1)->setRowHeight(30);
 
                 // Umumiy ma'lumotlar stili (2-5 qatorlar) - KATTA
-                $sheet->getStyle('A2:D5')->applyFromArray([
+                $sheet->getStyle('A1:D5')->applyFromArray([
                     'font' => [
                         'size' => 14,  // 10 dan 28 ga
                         'name' => 'Arial'
