@@ -222,6 +222,27 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
     {
         $rows = [];
 
+        // itogo uchun umumiy yig‘indi
+        $totals = [
+            'price_usd' => 0,
+            'price_uzs' => 0,
+            'total_quantity' => 0,
+            'rasxod_limit_uzs' => 0,
+            'bonus' => 0,
+            'tarification' => 0,
+            'allocatedTransport' => 0,
+            'allocatedAup' => 0,
+            'incomePercentageExpense' => 0,
+            'amortizationExpense' => 0,
+            'remainder' => 0,
+            'total_fixed_cost_uzs' => 0,
+            'total_output_cost_uzs' => 0,
+            'net_profit_uzs' => 0,
+            'cost_per_unit_uzs' => 0,
+            'profit_per_unit_uzs' => 0,
+            'profitability_percent' => 0,
+        ];
+
         foreach ($this->orders as $o) {
             $order = $o['order'] ?? [];
             $model = $o['model'] ?? [];
@@ -230,7 +251,7 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
 
             $costs = $o['costs_uzs'] ?? [];
 
-            $rows[] = [
+            $row = [
                 $order['id'] ?? '',
                 $order['name'] ?? '',
                 $model['name'] ?? '',
@@ -258,7 +279,50 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
                 $o['profit_per_unit_uzs'] ?? 0,
                 $o['profitability_percent'] ?? 0,
             ];
+
+            $rows[] = $row;
+
+            // itogo yig‘ish
+            $totals['price_usd'] += $o['price_usd'] ?? 0;
+            $totals['price_uzs'] += $o['price_uzs'] ?? 0;
+            $totals['total_quantity'] += $o['total_quantity'] ?? 0;
+            $totals['rasxod_limit_uzs'] += $o['rasxod_limit_uzs'] ?? 0;
+            $totals['bonus'] += $o['bonus'] ?? 0;
+            $totals['tarification'] += $o['tarification'] ?? 0;
+            $totals['allocatedTransport'] += $costs['allocatedTransport'] ?? 0;
+            $totals['allocatedAup'] += $costs['allocatedAup'] ?? 0;
+            $totals['incomePercentageExpense'] += $costs['incomePercentageExpense'] ?? 0;
+            $totals['amortizationExpense'] += $costs['amortizationExpense'] ?? 0;
+            $totals['remainder'] += $costs['remainder'] ?? 0;
+            $totals['total_fixed_cost_uzs'] += $o['total_fixed_cost_uzs'] ?? 0;
+            $totals['total_output_cost_uzs'] += $o['total_output_cost_uzs'] ?? 0;
+            $totals['net_profit_uzs'] += $o['net_profit_uzs'] ?? 0;
+            $totals['cost_per_unit_uzs'] += $o['cost_per_unit_uzs'] ?? 0;
+            $totals['profit_per_unit_uzs'] += $o['profit_per_unit_uzs'] ?? 0;
+            $totals['profitability_percent'] += $o['profitability_percent'] ?? 0;
         }
+
+        // itogo qatori
+        $rows[] = [
+            '', 'JAMI:', '', '', '',
+            $totals['price_usd'],
+            $totals['price_uzs'],
+            $totals['total_quantity'],
+            $totals['rasxod_limit_uzs'],
+            $totals['bonus'],
+            $totals['tarification'],
+            $totals['allocatedTransport'],
+            $totals['allocatedAup'],
+            $totals['incomePercentageExpense'],
+            $totals['amortizationExpense'],
+            $totals['remainder'],
+            $totals['total_fixed_cost_uzs'],
+            $totals['total_output_cost_uzs'],
+            $totals['net_profit_uzs'],
+            $totals['cost_per_unit_uzs'], // bitta qiymatlarni qo‘shish emas, o‘rtacha olish ham mumkin
+            $totals['profit_per_unit_uzs'], // shu joyni o‘rtacha qilish mumkin
+            $totals['profitability_percent'], // foizlarni o‘rtacha qilish kerak
+        ];
 
         return $rows;
     }
@@ -282,11 +346,23 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
+                $highestRow = $sheet->getHighestRow();
+
+                // heading style
                 $sheet->getStyle('A1:V1')->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'color' => ['rgb' => 'FFFFCC']
+                    ]
+                ]);
+
+                // itogo qatori style
+                $sheet->getStyle("A{$highestRow}:V{$highestRow}")->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['rgb' => 'CCFFCC']
                     ]
                 ]);
             }
