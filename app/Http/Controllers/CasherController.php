@@ -595,7 +595,7 @@ class CasherController extends Controller
                 'destination_id' => $employee->id,
                 'via_id' => auth()->user()->employee->id,
                 'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
-                'comment' => $validated['comment'] ?? null,
+                'comment' => $employee->name . " uchun " . ($validated['type'] === 'advance' ? 'avans' : 'oylik') . " to'lovi" . " - " . ($validated['comment'] ?? ''),
                 'target_cashbox_id' => null,
                 'exchange_rate' => null,
                 'target_amount' => null,
