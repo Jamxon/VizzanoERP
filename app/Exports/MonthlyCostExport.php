@@ -26,7 +26,6 @@ class MonthlyCostExport implements WithMultipleSheets
             new DailySheet($this->payload['daily'] ?? []),
             new OrdersSheet($this->payload['orders'] ?? []),
             new CostsByTypeSheet($this->payload['orders'] ?? []),
-            new RawDataSheet($this->payload),
         ];
     }
 }
