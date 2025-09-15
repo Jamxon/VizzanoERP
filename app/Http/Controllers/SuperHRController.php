@@ -521,7 +521,7 @@ class SuperHRController extends Controller
                     curl_close($ch);
 
                     // Debug uchun
-                     dd($response);
+//                     dd($response);
                 }
             } else {
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
