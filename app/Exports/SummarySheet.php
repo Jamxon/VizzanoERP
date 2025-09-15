@@ -112,7 +112,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 ]);
 
                 // Header qatori balandligi - KATTA
-                $sheet->getRowDimension(1)->setRowHeight(40);
+                $sheet->getRowDimension(1)->setRowHeight(30);
 
                 // Umumiy ma'lumotlar stili (2-5 qatorlar) - KATTA
                 $sheet->getStyle('A2:D5')->applyFromArray([
@@ -128,7 +128,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
                 // 2-5 qatorlar balandligi
                 for ($i = 2; $i <= 5; $i++) {
-                    $sheet->getRowDimension($i)->setRowHeight(25);
+                    $sheet->getRowDimension($i)->setRowHeight(20);
                 }
 
                 // Asosiy ma'lumotlar uchun
@@ -171,7 +171,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                                 ]
                             ]);
                             // Sof foyda qatori yanada baland
-                            $sheet->getRowDimension($i)->setRowHeight(65);
+                            $sheet->getRowDimension($i)->setRowHeight(35);
                         } else {
                             $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
                                 'font' => [
@@ -195,7 +195,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                                 ]
                             ]);
                             // Sof foyda qatori yanada baland
-                            $sheet->getRowDimension($i)->setRowHeight(65);
+                            $sheet->getRowDimension($i)->setRowHeight(35);
                         }
                     }
                     // Jami daromad uchun maxsus stil - KATTA
@@ -215,7 +215,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                                 'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
                             ]
                         ]);
-                        $sheet->getRowDimension($i)->setRowHeight(60);
+                        $sheet->getRowDimension($i)->setRowHeight(30);
                     }
                     // Oddiy qatorlar uchun - KATTA
                     else {
