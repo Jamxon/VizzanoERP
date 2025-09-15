@@ -25,64 +25,50 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
     public function headings(): array
     {
-        return ['Metric', 'Value (UZS)', 'Value (USD)'];
+        return ['Ko‘rsatkich', 'Qiymat (so‘m)', 'Qiymat (USD)'];
     }
 
     public function array(): array
     {
         $dollar = $this->stats['dollar_rate'] ?? 1;
 
-        $rows = [
-            ['Start Date', $this->stats['start_date'] ?? '', ''],
-            ['End Date', $this->stats['end_date'] ?? '', ''],
-            ['Days in period', $this->stats['days_in_period'] ?? '', ''],
-            ['Dollar rate', $this->stats['dollar_rate'] ?? '', ''],
+        return [
+            ['Boshlanish sanasi', $this->stats['start_date'] ?? '', ''],
+            ['Tugash sanasi', $this->stats['end_date'] ?? '', ''],
+            ['Davr ichidagi kunlar', $this->stats['days_in_period'] ?? '', ''],
+            ['Dollar kursi', $this->stats['dollar_rate'] ?? '', ''],
             [],
-            ['AUP (UZS)', $this->stats['aup'] ?? 0, ($this->stats['aup'] ?? 0) / max($dollar,1)],
-            ['KPI (UZS)', $this->stats['kpi'] ?? 0, ($this->stats['kpi'] ?? 0) / max($dollar,1)],
-            ['Transport attendance (UZS)', $this->stats['transport_attendance'] ?? 0, ($this->stats['transport_attendance'] ?? 0) / max($dollar,1)],
-            ['Tarification (UZS)', $this->stats['tarification'] ?? 0, ($this->stats['tarification'] ?? 0) / max($dollar,1)],
-            ['Monthly expenses (UZS)', $this->stats['monthly_expenses'] ?? 0, ($this->stats['monthly_expenses'] ?? 0) / max($dollar,1)],
+            ['AUP (so‘m)', $this->stats['aup'] ?? 0, ($this->stats['aup'] ?? 0) / max($dollar,1)],
+            ['KPI (so‘m)', $this->stats['kpi'] ?? 0, ($this->stats['kpi'] ?? 0) / max($dollar,1)],
+            ['Transport davomat (so‘m)', $this->stats['transport_attendance'] ?? 0, ($this->stats['transport_attendance'] ?? 0) / max($dollar,1)],
+            ['Tarifikatsiya (so‘m)', $this->stats['tarification'] ?? 0, ($this->stats['tarification'] ?? 0) / max($dollar,1)],
+            ['Oylik xarajatlar (so‘m)', $this->stats['monthly_expenses'] ?? 0, ($this->stats['monthly_expenses'] ?? 0) / max($dollar,1)],
             [],
-            ['Total earned (UZS)', $this->stats['total_earned_uzs'] ?? 0, ($this->stats['total_earned_uzs'] ?? 0) / max($dollar,1)],
-            ['Total output cost (UZS)', $this->stats['total_output_cost_uzs'] ?? 0, ($this->stats['total_output_cost_uzs'] ?? 0) / max($dollar,1)],
-            ['Total fixed cost (UZS)', $this->stats['total_fixed_cost_uzs'] ?? 0, ($this->stats['total_fixed_cost_uzs'] ?? 0) / max($dollar,1)],
-            ['Net profit (UZS)', $this->stats['net_profit_uzs'] ?? 0, ($this->stats['net_profit_uzs'] ?? 0) / max($dollar,1)],
+            ['Jami daromad (so‘m)', $this->stats['total_earned_uzs'] ?? 0, ($this->stats['total_earned_uzs'] ?? 0) / max($dollar,1)],
+            ['Jami ishlab chiqarish tannarxi (so‘m)', $this->stats['total_output_cost_uzs'] ?? 0, ($this->stats['total_output_cost_uzs'] ?? 0) / max($dollar,1)],
+            ['Jami doimiy xarajat (so‘m)', $this->stats['total_fixed_cost_uzs'] ?? 0, ($this->stats['total_fixed_cost_uzs'] ?? 0) / max($dollar,1)],
+            ['Sof foyda (so‘m)', $this->stats['net_profit_uzs'] ?? 0, ($this->stats['net_profit_uzs'] ?? 0) / max($dollar,1)],
             [],
-            ['Total output quantity', $this->stats['total_output_quantity'] ?? 0, ''],
-            ['Cost per unit overall (UZS)', $this->stats['cost_per_unit_overall_uzs'] ?? 0, (($this->stats['cost_per_unit_overall_uzs'] ?? 0) / max($dollar,1))],
-            ['Average employee count', $this->stats['average_employee_count'] ?? 0, ''],
-            ['Per employee cost (UZS)', $this->stats['per_employee_cost_uzs'] ?? 0, (($this->stats['per_employee_cost_uzs'] ?? 0) / max($dollar,1))],
+            ['Ishlab chiqarilgan umumiy miqdor', $this->stats['total_output_quantity'] ?? 0, ''],
+            ['Bir dona mahsulot tannarxi (so‘m)', $this->stats['cost_per_unit_overall_uzs'] ?? 0, ($this->stats['cost_per_unit_overall_uzs'] ?? 0) / max($dollar,1)],
+            ['O‘rtacha xodimlar soni', $this->stats['average_employee_count'] ?? 0, ''],
+            ['Bir xodimga to‘g‘ri keladigan xarajat (so‘m)', $this->stats['per_employee_cost_uzs'] ?? 0, ($this->stats['per_employee_cost_uzs'] ?? 0) / max($dollar,1)],
         ];
-
-        return $rows;
     }
 
     public function title(): string
     {
-        return 'Summary';
-    }
-
-    public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class => function (AfterSheet $event) {
-                // header style
-                $event->sheet->getDelegate()->getStyle('A1:C1')->applyFromArray([
-                    'font' => ['bold' => true],
-                    'fill' => ['fillType' => 'solid','startColor' => ['rgb' => 'D9EDF7']],
-                ]);
-                $event->sheet->getDelegate()->freezePane('A2');
-            },
-        ];
+        return 'Xulosa';
     }
 
     public function columnFormats(): array
     {
-        return [
-            'B' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'C' => NumberFormat::FORMAT_NUMBER_00,
-        ];
+        // TODO: Implement columnFormats() method.
+    }
+
+    public function registerEvents(): array
+    {
+        // TODO: Implement registerEvents() method.
     }
 }
 
@@ -101,9 +87,9 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
     public function headings(): array
     {
         return [
-            'Date', 'AUP (UZS)', 'KPI (UZS)', 'Transport (UZS)', 'Tarification (UZS)',
-            'Daily expenses (UZS)', 'Total earned (UZS)', 'Total fixed cost (UZS)', 'Net profit (UZS)',
-            'Employee count', 'Total output qty'
+            'Sana', 'AUP (so‘m)', 'KPI (so‘m)', 'Transport (so‘m)', 'Tarifikatsiya (so‘m)',
+            'Kunlik xarajatlar (so‘m)', 'Jami daromad (so‘m)', 'Doimiy xarajat (so‘m)', 'Sof foyda (so‘m)',
+            'Xodimlar soni', 'Jami ishlab chiqarilgan qty'
         ];
     }
 
@@ -128,36 +114,17 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
 
     public function title(): string
     {
-        return 'Daily';
-    }
-
-    public function registerEvents(): array
-    {
-        return [
-            AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->getDelegate()->getStyle('A1:K1')->applyFromArray([
-                    'font' => ['bold' => true],
-                    'fill' => ['fillType' => 'solid','startColor' => ['rgb' => 'F0F8FF']],
-                ]);
-                $event->sheet->getDelegate()->freezePane('A2');
-            },
-        ];
+        return 'Kunlik';
     }
 
     public function columnFormats(): array
     {
-        return [
-            'B' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'C' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'D' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'E' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'F' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'H' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'I' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'J' => NumberFormat::FORMAT_NUMBER,
-            'K' => NumberFormat::FORMAT_NUMBER,
-        ];
+        // TODO: Implement columnFormats() method.
+    }
+
+    public function registerEvents(): array
+    {
+        // TODO: Implement registerEvents() method.
     }
 }
 
@@ -176,100 +143,31 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
     public function headings(): array
     {
         return [
-            'Order ID','Order#','Model','Submodels','Responsible','Price USD','Price UZS',
-            'Total Qty','Rasxod Limit (UZS)','Bonus','Tarification','Allocated Transport','Allocated AUP',
-            'Monthly Allocated','Income % Exp','Amortization','Total Extra','Fixed Cost (UZS)','Total Earned (UZS)',
-            'Net Profit (UZS)','Cost/Unit (UZS)','Profit/Unit (UZS)','Profitability %'
+            'Buyurtma ID','Buyurtma#','Model','Submodellari','Mas’ul','Narx USD','Narx so‘m',
+            'Umumiy qty','Rasxod limiti (so‘m)','Bonus','Tarifikatsiya','Ajratilgan transport','Ajratilgan AUP',
+            'Ajratilgan oylik xarajat','Daromad % xarajat','Amortizatsiya','Jami qo‘shimcha','Doimiy xarajat (so‘m)','Jami ishlab chiqarish tannarxi (so‘m)',
+            'Sof foyda (so‘m)','Bir dona mahsulot tannarxi (so‘m)','Bir dona foyda (so‘m)','Rentabellik %'
         ];
-    }
-
-    protected function joinNames($collection)
-    {
-        if (is_array($collection)) {
-            return implode(", ", array_map(function($v){ return is_array($v) && isset($v['name']) ? $v['name'] : (string)$v; }, $collection));
-        }
-        return (string)$collection;
-    }
-
-    public function array(): array
-    {
-        return array_map(function ($o) {
-            $order = $o['order'] ?? [];
-            $model = $o['model'] ?? [];
-            $submodels = $o['submodels'] ?? [];
-            $responsible = $o['responsibleUser'] ?? [];
-
-            // costs_uzs stored as associative keys
-            $costs = $o['costs_uzs'] ?? [];
-
-            return [
-                $order['id'] ?? '',
-                $order['order_number'] ?? ($order['name'] ?? ''),
-                $model['name'] ?? ($model['title'] ?? ''),
-                $this->joinNames($submodels),
-                is_array($responsible) ? implode(", ", array_map(fn($r)=>($r['employee']['name'] ?? ''), $responsible)) : '',
-                $o['price_usd'] ?? 0,
-                $o['price_uzs'] ?? 0,
-                $o['total_quantity'] ?? 0,
-                $o['rasxod_limit_uzs'] ?? 0,
-                $o['bonus'] ?? 0,
-                $o['tarification'] ?? 0,
-                $costs['allocatedTransport'] ?? ($o['costs_uzs']['allocatedTransport'] ?? 0),
-                $costs['allocatedAup'] ?? ($o['costs_uzs']['allocatedAup'] ?? 0),
-                $costs['allocatedMonthlyExpenseMonthly'] ?? 0,
-                $costs['incomePercentageExpense'] ?? 0,
-                $costs['amortizationExpense'] ?? 0,
-                ($o['total_fixed_cost_uzs'] ?? 0) - ($o['bonus'] ?? 0), // estimate total extra
-                $o['total_fixed_cost_uzs'] ?? 0,
-                $o['total_output_cost_uzs'] ?? 0,
-                $o['net_profit_uzs'] ?? 0,
-                $o['cost_per_unit_uzs'] ?? 0,
-                $o['profit_per_unit_uzs'] ?? 0,
-                $o['profitability_percent'] ?? 0,
-            ];
-        }, $this->orders);
     }
 
     public function title(): string
     {
-        return 'Orders';
+        return 'Buyurtmalar';
     }
 
-    public function registerEvents(): array
+    public function array(): array
     {
-        return [
-            AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->getDelegate()->getStyle('A1:W1')->applyFromArray([
-                    'font' => ['bold' => true],
-                    'fill' => ['fillType' => 'solid','startColor' => ['rgb' => 'FFF2CC']],
-                ]);
-                $event->sheet->getDelegate()->freezePane('A2');
-            },
-        ];
+        // TODO: Implement array() method.
     }
 
     public function columnFormats(): array
     {
-        return [
-            'F' => NumberFormat::FORMAT_NUMBER_00,
-            'G' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'H' => NumberFormat::FORMAT_NUMBER,
-            'I' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'J' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'K' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'L' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'M' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'N' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'O' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'P' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'Q' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'R' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'S' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'T' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'U' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'V' => NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1,
-            'W' => NumberFormat::FORMAT_NUMBER_00,
-        ];
+        // TODO: Implement columnFormats() method.
+    }
+
+    public function registerEvents(): array
+    {
+        // TODO: Implement registerEvents() method.
     }
 }
 
@@ -287,68 +185,21 @@ class CostsByTypeSheet implements FromArray, WithHeadings, WithTitle, ShouldAuto
 
     public function headings(): array
     {
-        return ['Cost Type', 'Total (UZS)'];
-    }
-
-    public function array(): array
-    {
-        $totals = [];
-
-        foreach ($this->orders as $o) {
-            $costs = $o['costs_uzs'] ?? [];
-            foreach ($costs as $k => $v) {
-                $totals[$k] = ($totals[$k] ?? 0) + ($v ?? 0);
-            }
-        }
-
-        $rows = [];
-        foreach ($totals as $k => $v) {
-            $rows[] = [$k, $v];
-        }
-
-        return $rows;
+        return ['Xarajat turi', 'Jami (so‘m)'];
     }
 
     public function title(): string
     {
-        return 'Costs by Type';
+        return 'Xarajat turlari';
+    }
+
+    public function array(): array
+    {
+        // TODO: Implement array() method.
     }
 
     public function registerEvents(): array
     {
-        return [
-            AfterSheet::class => function (AfterSheet $event) {
-                $event->sheet->getDelegate()->getStyle('A1:B1')->applyFromArray([
-                    'font' => ['bold' => true],
-                    'fill' => ['fillType' => 'solid','startColor' => ['rgb' => 'E2EFDA']],
-                ]);
-            },
-        ];
-    }
-}
-
-/**
- * RawDataSheet
- */
-class RawDataSheet implements FromArray, WithTitle, ShouldAutoSize
-{
-    protected array $payload;
-
-    public function __construct(array $payload)
-    {
-        $this->payload = $payload;
-    }
-
-    public function array(): array
-    {
-        return [
-            ['Raw JSON payload'],
-            [json_encode($this->payload, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT)]
-        ];
-    }
-
-    public function title(): string
-    {
-        return 'Raw Data';
+        // TODO: Implement registerEvents() method.
     }
 }
