@@ -184,7 +184,7 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
     public function headings(): array
     {
         return [
-            'Buyurtma ID','Model','Submodellari','Mas’ul','Narx USD','Narx so‘m',
+            'Buyurtma ID', "Buyurtma nomi",'Model','Submodellari','Mas’ul','Narx USD','Narx so‘m',
             'Umumiy qty','Rasxod limiti (so‘m)','Bonus','Tarifikatsiya','Ajratilgan transport','Ajratilgan AUP',
             'Ajratilgan oylik xarajat','Daromad % xarajat','Amortizatsiya','Jami qo‘shimcha','Doimiy xarajat (so‘m)',
             'Jami ishlab chiqarish tannarxi (so‘m)','Sof foyda (so‘m)','Bir dona mahsulot tannarxi (so‘m)',
