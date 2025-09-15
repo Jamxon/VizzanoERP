@@ -71,7 +71,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
     public function columnFormats(): array
     {
         return [
-            'B' => '# ##0',
+            'B' => '# ##0;[Red]-# ##0',
             'C' => NumberFormat::FORMAT_NUMBER_00,
             'D' => NumberFormat::FORMAT_NUMBER_00,
         ];
@@ -156,14 +156,14 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
     public function columnFormats(): array
     {
         return [
-            'B' => '# ##0', // AUP (so‘m)
-            'C' => '# ##0', // KPI (so‘m)
-            'D' => '# ##0', // Transport
-            'E' => '# ##0', // Tarifikatsiya
-            'F' => '# ##0', // Kunlik xarajatlar
-            'G' => '# ##0', // Jami daromad
-            'H' => '# ##0', // Doimiy xarajat
-            'I' => '# ##0', // Sof foyda
+            'B' => '# ##0;[Red]-# ##0', // AUP (so‘m)
+            'C' => '# ##0;[Red]-# ##0', // KPI (so‘m)
+            'D' => '# ##0;[Red]-# ##0', // Transport
+            'E' => '# ##0;[Red]-# ##0', // Tarifikatsiya
+            'F' => '# ##0;[Red]-# ##0', // Kunlik xarajatlar
+            'G' => '# ##0;[Red]-# ##0', // Jami daromad
+            'H' => '# ##0;[Red]-# ##0', // Doimiy xarajat
+            'I' => '# ##0;[Red]-# ##0', // Sof foyda
         ];
     }
 
@@ -407,14 +407,14 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
     public function columnFormats(): array
     {
         return [
-            'F' => '# ##0', // Narx USD
-            'G' => '# ##0', // Narx so‘m
-            'I' => '# ##0', // Rasxod limiti
-            'Q' => '# ##0', // Doimiy xarajat
-            'R' => '# ##0', // Jami ishlab chiqarish tannarxi
-            'S' => '# ##0', // Sof foyda
-            'T' => '# ##0', // Bir dona tannarxi
-            'U' => '# ##0', // Bir dona foyda
+            'F' => '# ##0;[Red]-# ##0', // Narx USD
+            'G' => '# ##0;[Red]-# ##0', // Narx so‘m
+            'I' => '# ##0;[Red]-# ##0', // Rasxod limiti
+            'Q' => '# ##0;[Red]-# ##0', // Doimiy xarajat
+            'R' => '# ##0;[Red]-# ##0', // Jami ishlab chiqarish tannarxi
+            'S' => '# ##0;[Red]-# ##0', // Sof foyda
+            'T' => '# ##0;[Red]-# ##0', // Bir dona tannarxi
+            'U' => '# ##0;[Red]-# ##0', // Bir dona foyda
         ];
     }
 
