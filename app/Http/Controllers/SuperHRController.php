@@ -485,45 +485,44 @@ class SuperHRController extends Controller
 
             if (!empty($photos)) {
                 $media = [];
-                $files = [];
+                $multipart = [];
 
                 foreach ($photos as $index => $photoPath) {
                     $photoContent = getPhotoContent($photoPath);
                     if ($photoContent) {
-                        $tmpFile = tempnam(sys_get_temp_dir(), 'tg');
-                        file_put_contents($tmpFile, $photoContent);
-
                         $fieldName = "photo{$index}";
-                        $files[$fieldName] = new \CURLFile($tmpFile, null, basename($photoPath));
 
                         $media[] = [
                             'type' => 'photo',
                             'media' => "attach://{$fieldName}",
-                            'caption' => $index == 0 ? $messageText : null,
-                            'parse_mode' => 'Markdown'
+                            'caption' => $index === 0 ? $messageText : null,
+                            'parse_mode' => 'Markdown',
+                        ];
+
+                        $multipart[] = [
+                            'name'     => $fieldName,
+                            'contents' => $photoContent,
+                            'filename' => basename($photoPath),
                         ];
                     }
                 }
 
                 if (!empty($media)) {
-                    $postFields = [
-                        'chat_id' => $chatId,
-                        'media'   => json_encode($media, JSON_UNESCAPED_UNICODE),
+                    $multipart[] = [
+                        'name'     => 'chat_id',
+                        'contents' => $chatId,
+                    ];
+                    $multipart[] = [
+                        'name'     => 'media',
+                        'contents' => json_encode($media, JSON_UNESCAPED_UNICODE),
                     ];
 
-                    $postFields = array_merge($postFields, $files);
-
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, "https://api.telegram.org/bot{$telegramToken}/sendMediaGroup");
-                    curl_setopt($ch, CURLOPT_POST, true);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-
-                    $response = curl_exec($ch);
-                    curl_close($ch);
+                    $response = Http::withOptions([
+                        'multipart' => $multipart,
+                    ])->post("https://api.telegram.org/bot{$telegramToken}/sendMediaGroup");
 
                     // Debug uchun
-                    // dd($response);
+                    // dd($response->body());
                 }
             } else {
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
