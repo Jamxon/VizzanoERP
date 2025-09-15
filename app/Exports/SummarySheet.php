@@ -188,20 +188,39 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Headingsni sariq va qalin
+                // Headings style (sariq fon)
                 $sheet->getStyle('A1:K1')->applyFromArray([
-                    'font' => ['bold' => true],
+                    'font' => ['bold' => true, 'color' => ['rgb' => '000000']],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'color' => ['rgb' => 'FFFF99']
+                    ],
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
                     ]
                 ]);
 
-                // Oxirgi 2 qator (Umumiy va O‘rtacha)ni qalin qilish
                 $lastRow = $sheet->getHighestRow();
-                $sheet->getStyle("A{$lastRow}:K{$lastRow}")->getFont()->setBold(true);
-                $sheet->getStyle("A".($lastRow-1).":K".($lastRow-1))->getFont()->setBold(true);
 
+                // "Umumiy" qatori → yashil fon
+                $sheet->getStyle("A".($lastRow-1).":K".($lastRow-1))->applyFromArray([
+                    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['rgb' => '4CAF50'] // yashil
+                    ]
+                ]);
+
+                // "O‘rtacha" qatori → ko‘k fon
+                $sheet->getStyle("A{$lastRow}:K{$lastRow}")->applyFromArray([
+                    'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['rgb' => '2196F3'] // ko‘k
+                    ]
+                ]);
+
+                // Ustunlarni avtomatik kengaytirish
                 foreach (range('A', 'K') as $col) {
                     $sheet->getColumnDimension($col)->setAutoSize(true);
                 }
