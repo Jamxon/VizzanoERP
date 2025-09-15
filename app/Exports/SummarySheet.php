@@ -303,10 +303,10 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
             $totals['net_profit_uzs'],
 
             // shu joydan O‘RTACHA qiymatlar ketadi
-            'O‘RTACHA:',
             $count > 0 ? round($totals['cost_per_unit_uzs'] / $count, 2) : 0,
             $count > 0 ? round($totals['profit_per_unit_uzs'] / $count, 2) : 0,
             $count > 0 ? round($totals['profitability_percent'] / $count, 2) : 0,
+            'O‘RTACHA:',
         ];
 
         return $rows;
