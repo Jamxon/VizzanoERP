@@ -90,7 +90,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 $sheet->getStyle('A1:D1')->applyFromArray([
                     'font' => [
                         'bold' => true,
-                        'size' => 36,  // 11 dan 36 ga (3x katta)
+                        'size' => 16,  // 11 dan 36 ga (3x katta)
                         'color' => ['rgb' => '2F4F4F'],
                         'name' => 'Arial'
                     ],
@@ -117,7 +117,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 // Umumiy ma'lumotlar stili (2-5 qatorlar) - KATTA
                 $sheet->getStyle('A2:D5')->applyFromArray([
                     'font' => [
-                        'size' => 28,  // 10 dan 28 ga
+                        'size' => 14,  // 10 dan 28 ga
                         'name' => 'Arial'
                     ],
                     'fill' => [
@@ -153,7 +153,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                                 'font' => [
                                     'bold' => true,
                                     'color' => ['rgb' => '155724'],
-                                    'size' => 32,  // 11 dan 32 ga
+                                    'size' => 16,  // 11 dan 32 ga
                                     'name' => 'Arial'
                                 ],
                                 'fill' => [
@@ -177,7 +177,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                                 'font' => [
                                     'bold' => true,
                                     'color' => ['rgb' => '721C24'],
-                                    'size' => 32,  // 11 dan 32 ga
+                                    'size' => 16,  // 11 dan 32 ga
                                     'name' => 'Arial'
                                 ],
                                 'fill' => [
@@ -204,7 +204,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                             'font' => [
                                 'bold' => true,
                                 'color' => ['rgb' => '0C5460'],
-                                'size' => 30,  // 11 dan 30 ga
+                                'size' => 15,  // 11 dan 30 ga
                                 'name' => 'Arial'
                             ],
                             'fill' => [
@@ -222,7 +222,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                         $bgColor = ($i % 2 === 0) ? 'FFFFFF' : 'F8F9FA';
                         $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
                             'font' => [
-                                'size' => 26,  // 10 dan 26 ga
+                                'size' => 13,  // 10 dan 26 ga
                                 'name' => 'Arial'
                             ],
                             'fill' => [
