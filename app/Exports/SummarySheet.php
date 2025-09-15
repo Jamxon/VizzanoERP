@@ -112,7 +112,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 ]);
 
                 // Header qatori balandligi - KATTA
-                $sheet->getRowDimension(1)->setRowHeight(80);
+                $sheet->getRowDimension(1)->setRowHeight(40);
 
                 // Umumiy ma'lumotlar stili (2-5 qatorlar) - KATTA
                 $sheet->getStyle('A2:D5')->applyFromArray([
@@ -128,7 +128,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
                 // 2-5 qatorlar balandligi
                 for ($i = 2; $i <= 5; $i++) {
-                    $sheet->getRowDimension($i)->setRowHeight(50);
+                    $sheet->getRowDimension($i)->setRowHeight(25);
                 }
 
                 // Asosiy ma'lumotlar uchun
@@ -138,12 +138,12 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
                     // Bo'sh qatorlarni o'tkazib yuborish
                     if (empty($cellValue)) {
-                        $sheet->getRowDimension($i)->setRowHeight(25); // Bo'sh qatorlar kichikroq
+                        $sheet->getRowDimension($i)->setRowHeight(15); // Bo'sh qatorlar kichikroq
                         continue;
                     }
 
                     // Har bir qator balandligi
-                    $sheet->getRowDimension($i)->setRowHeight(55);
+                    $sheet->getRowDimension($i)->setRowHeight(25);
 
                     // Sof foyda uchun maxsus rang - JUDA KATTA
                     if ($cellValue === 'Sof foyda') {
