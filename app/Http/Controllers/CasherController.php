@@ -75,6 +75,7 @@ class CasherController extends Controller
                     'net_profit_uzs' => $daily['net_profit_uzs'] ?? 0,
                     'employee_count' => $daily['employee_count'] ?? 0,
                     'total_output_quantity' => $daily['total_output_quantity'] ?? 0,
+                    'rasxod_limit_uzs' => $daily['rasxod_limit_uzs'] ?? 0,
                 ];
             }
 
