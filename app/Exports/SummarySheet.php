@@ -202,6 +202,13 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 $sheet->getColumnDimension('C')->setWidth(15);
                 $sheet->getColumnDimension('D')->setWidth(12);
 
+
+                // Ustunlar kengligi (katta fontlar uchun kengaytirildi)
+                $sheet->getColumnDimension('A')->setWidth(60);
+                $sheet->getColumnDimension('B')->setWidth(30);
+                $sheet->getColumnDimension('C')->setWidth(25);
+                $sheet->getColumnDimension('D')->setWidth(20);
+
                 // Raqamlar uchun o'ng tomondan tekislash
                 $sheet->getStyle('B:D')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
 
