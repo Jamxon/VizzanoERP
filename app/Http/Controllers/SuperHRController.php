@@ -498,7 +498,7 @@ class SuperHRController extends Controller
                         $media[] = [
                             'type' => 'photo',
                             'media' => "attach://{$fieldName}",
-                            'caption' => $index === 0 ? $messageText : null,
+                            'caption' => $index === 0 ? (string) $messageText : "",
                             'parse_mode' => 'Markdown',
                         ];
                     }
