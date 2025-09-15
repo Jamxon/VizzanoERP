@@ -105,64 +105,6 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
         ];
     }
 
-    public function array(): array
-    {
-        $rows = array_map(function ($d) {
-            return [
-                $d['date'] ?? '',
-                $d['aup'] ?? 0,
-                $d['kpi'] ?? 0,
-                $d['transport_attendance'] ?? 0,
-                $d['tarification'] ?? 0,
-                $d['daily_expenses'] ?? 0,
-                $d['total_earned_uzs'] ?? 0,
-                $d['total_fixed_cost_uzs'] ?? 0,
-                $d['net_profit_uzs'] ?? 0,
-                $d['employee_count'] ?? 0,
-                $d['total_output_quantity'] ?? 0,
-            ];
-        }, $this->daily);
-
-        if (count($this->daily) > 0) {
-            $days = count($this->daily);
-
-            // umumiy yig‘indi
-            $totals = [
-                'Umumiy:',
-                array_sum(array_column($rows, 1)), // AUP
-                array_sum(array_column($rows, 2)), // KPI
-                array_sum(array_column($rows, 3)), // Transport
-                array_sum(array_column($rows, 4)), // Tarifikatsiya
-                array_sum(array_column($rows, 5)), // Kunlik xarajat
-                array_sum(array_column($rows, 6)), // Daromad
-                array_sum(array_column($rows, 7)), // Doimiy xarajat
-                array_sum(array_column($rows, 8)), // Sof foyda
-                array_sum(array_column($rows, 9)), // Xodimlar soni (jami)
-                array_sum(array_column($rows, 10)), // qty
-            ];
-
-            // o‘rtacha qiymatlar
-            $averages = [
-                'O‘rtacha:',
-                round($totals[1] / $days), // AUP
-                round($totals[2] / $days), // KPI
-                round($totals[3] / $days), // Transport
-                round($totals[4] / $days), // Tarifikatsiya
-                round($totals[5] / $days), // Kunlik xarajat
-                round($totals[6] / $days), // Daromad
-                round($totals[7] / $days), // Doimiy xarajat
-                round($totals[8] / $days), // Sof foyda
-                round($totals[9] / $days), // Xodimlar soni
-                round($totals[10] / $days), // qty
-            ];
-
-            $rows[] = $totals;
-            $rows[] = $averages;
-        }
-
-        return $rows;
-    }
-
     public function title(): string
     {
         return 'Kunlik';
@@ -182,48 +124,95 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
         ];
     }
 
+    public function array(): array
+    {
+        $rows = array_map(function ($d) {
+            return [
+                $d['date'] ?? '',
+                $d['aup'] ?? 0,
+                $d['kpi'] ?? 0,
+                $d['transport_attendance'] ?? 0,
+                $d['tarification'] ?? 0,
+                $d['daily_expenses'] ?? 0,
+                $d['total_earned_uzs'] ?? 0,
+                $d['total_fixed_cost_uzs'] ?? 0,
+                $d['net_profit_uzs'] ?? 0,
+                $d['employee_count'] ?? 0,
+                $d['total_output_quantity'] ?? 0,
+            ];
+        }, $this->daily);
+
+        // Umumiy hisob
+        $totals = [
+            'Umumiy:',
+            array_sum(array_column($rows, 1)),
+            array_sum(array_column($rows, 2)),
+            array_sum(array_column($rows, 3)),
+            array_sum(array_column($rows, 4)),
+            array_sum(array_column($rows, 5)),
+            array_sum(array_column($rows, 6)),
+            array_sum(array_column($rows, 7)),
+            array_sum(array_column($rows, 8)),
+            array_sum(array_column($rows, 9)),
+            array_sum(array_column($rows, 10)),
+        ];
+
+        // O‘rtacha hisob
+        $count = count($rows) ?: 1;
+        $averages = [
+            "O‘rtacha:",
+            round($totals[1] / $count),
+            round($totals[2] / $count),
+            round($totals[3] / $count),
+            round($totals[4] / $count),
+            round($totals[5] / $count),
+            round($totals[6] / $count),
+            round($totals[7] / $count),
+            round($totals[8] / $count),
+            round($totals[9] / $count),
+            round($totals[10] / $count),
+        ];
+
+        $rows[] = $totals;
+        $rows[] = $averages;
+
+        return $rows;
+    }
+
     public function registerEvents(): array
     {
         return [
             AfterSheet::class => function(AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Headings style (sariq fon)
+                // Headings
                 $sheet->getStyle('A1:K1')->applyFromArray([
-                    'font' => ['bold' => true, 'color' => ['rgb' => '000000']],
+                    'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'color' => ['rgb' => 'FFFF99']
-                    ],
-                    'alignment' => [
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
                     ]
                 ]);
 
                 $lastRow = $sheet->getHighestRow();
 
-                // "Umumiy" qatori → yashil fon
+                // Umumiy → yashil
                 $sheet->getStyle("A".($lastRow-1).":K".($lastRow-1))->applyFromArray([
                     'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'color' => ['rgb' => '4CAF50'] // yashil
+                        'color' => ['rgb' => '4CAF50']
                     ]
                 ]);
 
-                // "O‘rtacha" qatori → ko‘k fon
+                // O‘rtacha → ko‘k
                 $sheet->getStyle("A{$lastRow}:K{$lastRow}")->applyFromArray([
                     'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'color' => ['rgb' => '2196F3'] // ko‘k
+                        'color' => ['rgb' => '2196F3']
                     ]
                 ]);
-
-                // Ustunlarni avtomatik kengaytirish
-                foreach (range('A', 'K') as $col) {
-                    $sheet->getColumnDimension($col)->setAutoSize(true);
-                }
             }
         ];
     }
