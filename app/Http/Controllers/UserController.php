@@ -471,6 +471,7 @@ class UserController extends Controller
                 'attendance_salaries' => $employee->attendanceSalaries,
                 'employee_salaries' => $employee->employeeSalaries,
                 'salary_payments' => $employee->salaryPayments ?? null,
+                'salary_visible' => $employee->salary_visible,
                 'employee_tarification_logs' => $employee->employeeTarificationLogs->map(function ($log) {
                     return [
                         'id' => $log->id,
