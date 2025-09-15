@@ -209,7 +209,46 @@ class CasherController extends Controller
 
         $workingDays = collect($period)->filter(fn($date) => !$date->isSunday())->count();
         $averageEmployeeCount = round($monthlyStats['employee_count_sum'] / max($workingDays, 1));
-        $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
+//        $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
+// per_employee_cost_uzs breakdown
+        $employeeCount = max($monthlyStats['employee_count_sum'], 1);
+
+        $rasxodLimit = $monthlyStats['rasxod_limit_uzs'] / $employeeCount;
+        $transportCost = $monthlyStats['transport_attendance'] / $employeeCount;
+        $aupCost = $monthlyStats['aup'] / $employeeCount;
+        $monthlyExpenseCost = $monthlyStats['daily_expenses'] / $employeeCount;
+        $incomePercentageCost = collect($orderSummaries)->sum(fn($order) => $order['costs_uzs']['incomePercentageExpense'] ?? 0) / $employeeCount;
+        $amortizationCost = collect($orderSummaries)->sum(fn($order) => $order['costs_uzs']['amortizationExpense'] ?? 0) / $employeeCount;
+
+        $totalPerEmployee = $rasxodLimit + $transportCost + $aupCost + $monthlyExpenseCost + $incomePercentageCost + $amortizationCost;
+
+        $perEmployeeCosts = [
+            'rasxod_limit_uzs' => [
+                'amount' => round($rasxodLimit),
+                'percent' => round(($rasxodLimit / $totalPerEmployee) * 100, 2)
+            ],
+            'transport' => [
+                'amount' => round($transportCost),
+                'percent' => round(($transportCost / $totalPerEmployee) * 100, 2)
+            ],
+            'aup' => [
+                'amount' => round($aupCost),
+                'percent' => round(($aupCost / $totalPerEmployee) * 100, 2)
+            ],
+            'monthly_expense' => [
+                'amount' => round($monthlyExpenseCost),
+                'percent' => round(($monthlyExpenseCost / $totalPerEmployee) * 100, 2)
+            ],
+            'income_percentage_expense' => [
+                'amount' => round($incomePercentageCost),
+                'percent' => round(($incomePercentageCost / $totalPerEmployee) * 100, 2)
+            ],
+            'amortization_expense' => [
+                'amount' => round($amortizationCost),
+                'percent' => round(($amortizationCost / $totalPerEmployee) * 100, 2)
+            ],
+            'total' => round($totalPerEmployee)
+        ];
 
         // Umumiy quantity va har bir dona uchun xarajat hisoblash
         $costPerUnitOverall = $monthlyStats['total_output_quantity'] > 0
@@ -231,7 +270,7 @@ class CasherController extends Controller
             'total_fixed_cost_uzs' => $monthlyStats['total_fixed_cost_uzs'],
             'net_profit_uzs' => $monthlyStats['net_profit_uzs'],
             'average_employee_count' => $averageEmployeeCount,
-            'per_employee_cost_uzs' => $perEmployeeCost,
+            'per_employee_cost_uzs' => $perEmployeeCosts,
             'orders' => array_values($orderSummaries),
             'rasxod_limit_uzs' => $monthlyStats['rasxod_limit_uzs'],
 
