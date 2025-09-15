@@ -44,7 +44,7 @@ class CasherController extends Controller
                 ? Carbon::parse($request->end_date)->endOfDay()
                 : Carbon::now()->endOfMonth();
 
-            $dollarRate = $request->dollar_rate ?? 12900;
+            $dollarRate = $request->dollar_rate ?? 12700;
 
             $period = CarbonPeriod::create($start, $end);
 
