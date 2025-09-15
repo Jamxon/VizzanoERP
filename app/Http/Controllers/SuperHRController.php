@@ -430,13 +430,14 @@ class SuperHRController extends Controller
 
             // 🟢 Telegramga yuborish
             $employee = \App\Models\Employee::find($request->employee_id);
+
             $messageText = "🌴 ️*Sababli:*\n\n"
                 . "*Ismi:* {$employee->name}\n"
                 . "*Telefon:* {$employee->phone}\n"
                 . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
                 . "*Izoh:* " . ($request->comment ?? 'Yo‘q');
 
-// 🔽 Guruh va masʼul shaxs haqida qo‘shimcha
+// Guruh va masʼul shaxs haqida qo‘shimcha
             if ($employee->group_id) {
                 $group = \App\Models\Group::with('responsibleUser')->find($employee->group_id);
                 if ($group) {
@@ -447,20 +448,46 @@ class SuperHRController extends Controller
                 }
             }
 
-
             $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
             $chatId = -1002655761088;
 
-            if ($filename) {
-                $imagePath = storage_path("app/public/holidays/" . $filename);
+// 🔹 Rasmlar ro‘yxatini yig‘amiz
+            $photos = [];
 
-                Http::attach('photo', file_get_contents($imagePath), $filename)
-                    ->post("https://api.telegram.org/bot{$telegramToken}/sendPhoto", [
-                        'chat_id' => $chatId,
-                        'caption' => $messageText,
-                        'parse_mode' => 'Markdown',
-                    ]);
+// 1. Holiday yuklangan rasm
+            if ($filename) {
+                $photos[] = storage_path("app/public/holidays/" . $filename);
+            }
+
+// 2. Attendance rasmi (faqat bitta kunga belgilangan bo‘lsa)
+            if ($request->start_date == $request->end_date) {
+                $attendance = \App\Models\Attendance::where('employee_id', $request->employee_id)
+                    ->whereDate('date', $request->start_date)
+                    ->first();
+
+                if ($attendance && $attendance->image) {
+                    $photos[] = storage_path("app/public/" . $attendance->image);
+                }
+            }
+
+// 3. Employee rasmi
+            if ($employee->img) {
+                $photos[] = storage_path("app/public/" . $employee->img);
+            }
+
+// 🔹 Telegramga yuborish
+            if (!empty($photos)) {
+                foreach ($photos as $index => $photoPath) {
+                    Http::attach('photo', file_get_contents($photoPath), basename($photoPath))
+                        ->post("https://api.telegram.org/bot{$telegramToken}/sendPhoto", [
+                            'chat_id' => $chatId,
+                            // Faqat 1-rasmda caption chiqsin
+                            'caption' => $index == 0 ? $messageText : null,
+                            'parse_mode' => 'Markdown',
+                        ]);
+                }
             } else {
+                // Agar rasm bo‘lmasa oddiy xabar
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
                     'chat_id' => $chatId,
                     'text' => $messageText,
