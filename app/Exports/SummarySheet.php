@@ -30,37 +30,40 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
     public function array(): array
     {
-        $dollar = $this->stats['dollar_rate'] ?? 1;
-        $income = max($this->stats['total_earned_uzs'] ?? 0, 1); // bo‘linishda 0 bo‘lmasin
-        $days   = max($this->stats['days_in_period'] ?? 0, 1);
+        $d = $this->stats;
+        $dollar = max(1, (float)($d['dollar_rate'] ?? 1));
+        $income = max((float)($d['total_earned_uzs'] ?? 0), 1);
+        $days   = max((int)($d['days_in_period'] ?? 0), 1);
 
-        $rows = [
-            ['Boshlanish sanasi', $this->stats['start_date'] ?? '', '', ''],
-            ['Tugash sanasi', $this->stats['end_date'] ?? '', '', ''],
-            ['Davr ichidagi kunlar', $this->stats['days_in_period'] ?? '', '', ''],
-            ['Dollar kursi', $this->stats['dollar_rate'] ?? '', '', ''],
+        $toInt = fn($v) => (int) round((float)($v ?? 0));
+        $toUsd = fn($v) => round($toInt($v) / $dollar, 2);
+        $toPct = fn($v) => round($toInt($v) / $income * 100, 2);
+
+        return [
+            ['Boshlanish sanasi', $d['start_date'] ?? '', '', ''],
+            ['Tugash sanasi', $d['end_date'] ?? '', '', ''],
+            ['Davr ichidagi kunlar', $days, '', ''],
+            ['Dollar kursi', $dollar, '', ''],
             [],
-            ['AUP', $this->stats['aup'] ?? 0, ($this->stats['aup'] ?? 0)/$dollar, round(($this->stats['aup'] ?? 0)/$income*100, 2)],
-            ['KPI', $this->stats['kpi'] ?? 0, ($this->stats['kpi'] ?? 0)/$dollar, round(($this->stats['kpi'] ?? 0)/$income*100, 2)],
-            ['Transport', $this->stats['transport_attendance'] ?? 0, ($this->stats['transport_attendance'] ?? 0)/$dollar, round(($this->stats['transport_attendance'] ?? 0)/$income*100, 2)],
-            ['Tarifikatsiya', $this->stats['tarification'] ?? 0, ($this->stats['tarification'] ?? 0)/$dollar, round(($this->stats['tarification'] ?? 0)/$income*100, 2)],
-            ['Oylik xarajatlar', $this->stats['monthly_expenses'] ?? 0, ($this->stats['monthly_expenses'] ?? 0)/$dollar, round(($this->stats['monthly_expenses'] ?? 0)/$income*100, 2)],
+            ['AUP', $toInt($d['aup'] ?? 0), $toUsd($d['aup'] ?? 0), $toPct($d['aup'] ?? 0)],
+            ['KPI', $toInt($d['kpi'] ?? 0), $toUsd($d['kpi'] ?? 0), $toPct($d['kpi'] ?? 0)],
+            ['Transport', $toInt($d['transport_attendance'] ?? 0), $toUsd($d['transport_attendance'] ?? 0), $toPct($d['transport_attendance'] ?? 0)],
+            ['Tarifikatsiya', $toInt($d['tarification'] ?? 0), $toUsd($d['tarification'] ?? 0), $toPct($d['tarification'] ?? 0)],
+            ['Oylik xarajatlar', $toInt($d['monthly_expenses'] ?? 0), $toUsd($d['monthly_expenses'] ?? 0), $toPct($d['monthly_expenses'] ?? 0)],
             [],
-            ['Jami daromad', $this->stats['total_earned_uzs'] ?? 0, ($this->stats['total_earned_uzs'] ?? 0)/$dollar, '100'],
-            ['Jami ishlab chiqarish tannarxi', $this->stats['total_output_cost_uzs'] ?? 0, ($this->stats['total_output_cost_uzs'] ?? 0)/$dollar, round(($this->stats['total_output_cost_uzs'] ?? 0)/$income*100, 2)],
-            ['Jami doimiy xarajat', $this->stats['total_fixed_cost_uzs'] ?? 0, ($this->stats['total_fixed_cost_uzs'] ?? 0)/$dollar, round(($this->stats['total_fixed_cost_uzs'] ?? 0)/$income*100, 2)],
-            ['Sof foyda', $this->stats['net_profit_uzs'] ?? 0, ($this->stats['net_profit_uzs'] ?? 0)/$dollar, round(($this->stats['net_profit_uzs'] ?? 0)/$income*100, 2)],
+            ['Jami daromad', $toInt($d['total_earned_uzs'] ?? 0), $toUsd($d['total_earned_uzs'] ?? 0), 100],
+            ['Jami ishlab chiqarish tannarxi', $toInt($d['total_output_cost_uzs'] ?? 0), $toUsd($d['total_output_cost_uzs'] ?? 0), $toPct($d['total_output_cost_uzs'] ?? 0)],
+            ['Jami doimiy xarajat', $toInt($d['total_fixed_cost_uzs'] ?? 0), $toUsd($d['total_fixed_cost_uzs'] ?? 0), $toPct($d['total_fixed_cost_uzs'] ?? 0)],
+            ['Sof foyda', $toInt($d['net_profit_uzs'] ?? 0), $toUsd($d['net_profit_uzs'] ?? 0), $toPct($d['net_profit_uzs'] ?? 0)],
             [],
-            ['Kunlik o‘rtacha daromad', round(($this->stats['total_earned_uzs'] ?? 0)/$days), round(($this->stats['total_earned_uzs'] ?? 0)/$days/$dollar,2), ''],
-            ['Kunlik o‘rtacha sof foyda', round(($this->stats['net_profit_uzs'] ?? 0)/$days), round(($this->stats['net_profit_uzs'] ?? 0)/$days/$dollar,2), ''],
+            ['Kunlik o‘rtacha daromad', $toInt($d['total_earned_uzs'] ?? 0) / $days, $toUsd(($d['total_earned_uzs'] ?? 0) / $days), ''],
+            ['Kunlik o‘rtacha sof foyda', $toInt($d['net_profit_uzs'] ?? 0) / $days, $toUsd(($d['net_profit_uzs'] ?? 0) / $days), ''],
             [],
-            ['Ishlab chiqarilgan umumiy qty', $this->stats['total_output_quantity'] ?? 0, '', ''],
-            ['Bir dona mahsulot tannarxi', $this->stats['cost_per_unit_overall_uzs'] ?? 0, ($this->stats['cost_per_unit_overall_uzs'] ?? 0)/$dollar, ''],
-            ['O‘rtacha xodimlar soni', $this->stats['average_employee_count'] ?? 0, '', ''],
-            ['Bir xodimga to‘g‘ri keladigan xarajat', $this->stats['per_employee_cost_uzs'] ?? 0, ($this->stats['per_employee_cost_uzs'] ?? 0)/$dollar, ''],
+            ['Ishlab chiqarilgan umumiy qty', $toInt($d['total_output_quantity'] ?? 0), '', ''],
+            ['Bir dona mahsulot tannarxi', $toInt($d['cost_per_unit_overall_uzs'] ?? 0), $toUsd($d['cost_per_unit_overall_uzs'] ?? 0), ''],
+            ['O‘rtacha xodimlar soni', $toInt($d['average_employee_count'] ?? 0), '', ''],
+            ['Bir xodimga to‘g‘ri keladigan xarajat', $toInt($d['per_employee_cost_uzs'] ?? 0), $toUsd($d['per_employee_cost_uzs'] ?? 0), ''],
         ];
-
-        return $rows;
     }
 
     public function title(): string
@@ -71,9 +74,8 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
     public function columnFormats(): array
     {
         return [
-            'B' => '# ##0;[Red]-# ##0',
-            'C' => NumberFormat::FORMAT_NUMBER_00,
-            'D' => NumberFormat::FORMAT_NUMBER_00,
+            'B' => '# ##0;[Red]-# ##0',     // so‘m → har 3 xonada guruhlash, manfiylar qizil
+            'D' => NumberFormat::FORMAT_NUMBER_00, // % → 2 xonali kasr
         ];
     }
 
@@ -83,7 +85,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Headingsni ajratib qo‘yish
+                // Headings
                 $sheet->getStyle('A1:D1')->applyFromArray([
                     'font' => ['bold' => true],
                     'alignment' => ['horizontal' => 'center'],
@@ -95,7 +97,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
                 // Sof foyda → yashil/qizil
                 $lastRow = $sheet->getHighestRow();
-                for ($i=2; $i<=$lastRow; $i++) {
+                for ($i = 2; $i <= $lastRow; $i++) {
                     $indicator = $sheet->getCell("A{$i}")->getValue();
                     if ($indicator === 'Sof foyda') {
                         $value = $sheet->getCell("B{$i}")->getValue();
@@ -113,10 +115,12 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                     }
                 }
 
-                // Guruhlar oralig‘iga qalin border
+                // Qalin borderlar
                 foreach ([5, 11, 15, 18] as $row) {
                     $sheet->getStyle("A{$row}:D{$row}")->applyFromArray([
-                        'borders' => ['top' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK]]
+                        'borders' => [
+                            'top' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK]
+                        ]
                     ]);
                 }
 
