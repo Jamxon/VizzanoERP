@@ -437,7 +437,6 @@ class SuperHRController extends Controller
                 . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
                 . "*Izoh:* " . ($request->comment ?? 'Yo‘q');
 
-// Guruh va masʼul shaxs haqida qo‘shimcha
             if ($employee->group_id) {
                 $group = \App\Models\Group::with('responsibleUser')->find($employee->group_id);
                 if ($group) {
@@ -454,16 +453,16 @@ class SuperHRController extends Controller
             $photos = [];
 
             if ($filename) {
-                $photos[] = 'holidays/' . $filename; // faqat nisbiy path
+                $photos[] = 'holidays/' . $filename;
             }
 
-                $attendance = \App\Models\Attendance::where('employee_id', $request->employee_id)
-                    ->whereDate('date', $request->start_date)
-                    ->first();
+            $attendance = \App\Models\Attendance::where('employee_id', $request->employee_id)
+                ->whereDate('date', $request->start_date)
+                ->first();
 
-                if ($attendance && $attendance->check_in_image) {
-                    $photos[] = $attendance->check_in_image;
-                }
+            if ($attendance && $attendance->check_in_image) {
+                $photos[] = $attendance->check_in_image;
+            }
 
             if ($employee->img && (!$attendance || !$attendance->check_in_image)) {
                 $photos[] = $employee->img;
@@ -485,13 +484,16 @@ class SuperHRController extends Controller
 
             if (!empty($photos)) {
                 $media = [];
-
-                $http = Http::baseUrl("https://api.telegram.org/bot{$telegramToken}");
+                $files = [];
 
                 foreach ($photos as $index => $photoPath) {
                     $photoContent = getPhotoContent($photoPath);
                     if ($photoContent) {
+                        $tmpFile = tempnam(sys_get_temp_dir(), 'tg');
+                        file_put_contents($tmpFile, $photoContent);
+
                         $fieldName = "photo{$index}";
+                        $files[$fieldName] = new \CURLFile($tmpFile, mime_content_type($tmpFile), basename($photoPath));
 
                         $media[] = [
                             'type' => 'photo',
@@ -499,20 +501,27 @@ class SuperHRController extends Controller
                             'caption' => $index === 0 ? $messageText : null,
                             'parse_mode' => 'Markdown',
                         ];
-
-                        // 🔗 attach qilib boramiz
-                        $http = $http->attach($fieldName, $photoContent, basename($photoPath));
                     }
                 }
 
                 if (!empty($media)) {
-                    $response = $http->post("/sendMediaGroup", [
+                    $postFields = [
                         'chat_id' => $chatId,
-                        'media'   => json_encode($media, JSON_UNESCAPED_UNICODE),
-                    ]);
+                        'media' => json_encode($media, JSON_UNESCAPED_UNICODE),
+                    ];
+                    $postFields = array_merge($postFields, $files);
+
+                    $ch = curl_init();
+                    curl_setopt($ch, CURLOPT_URL, "https://api.telegram.org/bot{$telegramToken}/sendMediaGroup");
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+
+                    $response = curl_exec($ch);
+                    curl_close($ch);
 
                     // Debug uchun
-                    // dd($response->body());
+                    // dd($response);
                 }
             } else {
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
@@ -521,7 +530,6 @@ class SuperHRController extends Controller
                     'parse_mode' => 'Markdown',
                 ]);
             }
-
 
             return response()->json([
                 'status' => 'success',
