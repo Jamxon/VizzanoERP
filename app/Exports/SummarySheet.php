@@ -25,7 +25,13 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
     public function headings(): array
     {
-        return ["Ko'rsatkich", "Qiymat (so'm)", 'Qiymat (USD)', 'Ulushi (%)'];
+        $d = $this->stats;
+        $dollar = max(1, (float)($d['dollar_rate'] ?? 1));
+        $days   = max((int)($d['days_in_period'] ?? 0), 1);
+        return [['Boshlanish sanasi', $d['start_date'] ?? '', '', ''],
+            ['Tugash sanasi', $d['end_date'] ?? '', '', ''],
+            ['Davr ichidagi kunlar', $days, '', ''],
+            ['Dollar kursi', $dollar, '', '']];
     }
 
     public function array(): array
@@ -40,11 +46,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
         $toPct = fn($v) => round($toInt($v) / $income * 100, 2);
 
         return [
-            ['Boshlanish sanasi', $d['start_date'] ?? '', '', ''],
-            ['Tugash sanasi', $d['end_date'] ?? '', '', ''],
-            ['Davr ichidagi kunlar', $days, '', ''],
-            ['Dollar kursi', $dollar, '', ''],
-            [],
+            ["Ko'rsatkich", "Qiymat (so'm)", 'Qiymat (USD)', 'Ulushi (%)'],
             ['AUP', $toInt($d['aup'] ?? 0), $toUsd($d['aup'] ?? 0), $toPct($d['aup'] ?? 0)],
             ['KPI', $toInt($d['kpi'] ?? 0), $toUsd($d['kpi'] ?? 0), $toPct($d['kpi'] ?? 0)],
             ['Transport', $toInt($d['transport_attendance'] ?? 0), $toUsd($d['transport_attendance'] ?? 0), $toPct($d['transport_attendance'] ?? 0)],
@@ -86,7 +88,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 $sheet = $event->sheet->getDelegate();
 
                 // Headings stili - JUDA KATTA
-                $sheet->getStyle('A1:D1')->applyFromArray([
+                $sheet->getStyle('A4:D4')->applyFromArray([
                     'font' => [
                         'bold' => true,
                         'size' => 16,  // 11 dan 36 ga (3x katta)
