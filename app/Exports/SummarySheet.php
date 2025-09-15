@@ -25,7 +25,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
 
     public function headings(): array
     {
-        return ['Ko‘rsatkich', 'Qiymat (so‘m)', 'Qiymat (USD)', 'Ulushi (%)'];
+        return ["Ko'rsatkich", "Qiymat (so'm)", 'Qiymat (USD)', 'Ulushi (%)'];
     }
 
     public function array(): array
@@ -56,13 +56,13 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
             ['Jami doimiy xarajat', $toInt($d['total_fixed_cost_uzs'] ?? 0), $toUsd($d['total_fixed_cost_uzs'] ?? 0), $toPct($d['total_fixed_cost_uzs'] ?? 0)],
             ['Sof foyda', $toInt($d['net_profit_uzs'] ?? 0), $toUsd($d['net_profit_uzs'] ?? 0), $toPct($d['net_profit_uzs'] ?? 0)],
             [],
-            ['Kunlik o‘rtacha daromad', $toInt($d['total_earned_uzs'] ?? 0) / $days, $toUsd(($d['total_earned_uzs'] ?? 0) / $days), ''],
-            ['Kunlik o‘rtacha sof foyda', $toInt($d['net_profit_uzs'] ?? 0) / $days, $toUsd(($d['net_profit_uzs'] ?? 0) / $days), ''],
+            ["Kunlik o'rtacha daromad", $toInt($d['total_earned_uzs'] ?? 0) / $days, $toUsd(($d['total_earned_uzs'] ?? 0) / $days), ''],
+            ["Kunlik o'rtacha sof foyda", $toInt($d['net_profit_uzs'] ?? 0) / $days, $toUsd(($d['net_profit_uzs'] ?? 0) / $days), ''],
             [],
             ['Ishlab chiqarilgan umumiy qty', $toInt($d['total_output_quantity'] ?? 0), '', ''],
             ['Bir dona mahsulot tannarxi', $toInt($d['cost_per_unit_overall_uzs'] ?? 0), $toUsd($d['cost_per_unit_overall_uzs'] ?? 0), ''],
-            ['O‘rtacha xodimlar soni', $toInt($d['average_employee_count'] ?? 0), '', ''],
-            ['Bir xodimga to‘g‘ri keladigan xarajat', $toInt($d['per_employee_cost_uzs'] ?? 0), $toUsd($d['per_employee_cost_uzs'] ?? 0), ''],
+            ["O'rtacha xodimlar soni", $toInt($d['average_employee_count'] ?? 0), '', ''],
+            ["Bir xodimga to'g'ri keladigan xarajat", $toInt($d['per_employee_cost_uzs'] ?? 0), $toUsd($d['per_employee_cost_uzs'] ?? 0), ''],
         ];
     }
 
@@ -74,8 +74,9 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
     public function columnFormats(): array
     {
         return [
-            'B' => '# ##0;[Red]-# ##0',     // so‘m → har 3 xonada guruhlash, manfiylar qizil
-            'D' => NumberFormat::FORMAT_NUMBER_00, // % → 2 xonali kasr
+            'B' => '#,##0_-;[Red]-#,##0_-',  // so'm → ming ajratgichlari bilan
+            'C' => '#,##0.00_-;[Red]-#,##0.00_-',  // USD → ming ajratgichlari + 2 kasr
+            'D' => '0.00"%"_-;[Red]-0.00"%"_-',   // % → foiz belgisi bilan
         ];
     }
 
@@ -85,51 +86,148 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
 
-                // Headings
+                // Headings stili
                 $sheet->getStyle('A1:D1')->applyFromArray([
-                    'font' => ['bold' => true],
-                    'alignment' => ['horizontal' => 'center'],
+                    'font' => [
+                        'bold' => true,
+                        'size' => 11,
+                        'color' => ['rgb' => '2F4F4F']
+                    ],
+                    'alignment' => [
+                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER
+                    ],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'color' => ['rgb' => 'D9EDF7']
+                        'color' => ['rgb' => 'E8F4FD']
+                    ],
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                            'color' => ['rgb' => '4A90E2']
+                        ]
                     ]
                 ]);
 
-                // Sof foyda → yashil/qizil
+                // Umumiy ma'lumotlar stili (1-4 qatorlar)
+                $sheet->getStyle('A2:D5')->applyFromArray([
+                    'font' => ['size' => 10],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['rgb' => 'F9F9F9']
+                    ]
+                ]);
+
+                // Asosiy ma'lumotlar uchun alternating colors
                 $lastRow = $sheet->getHighestRow();
-                for ($i = 2; $i <= $lastRow; $i++) {
-                    $indicator = $sheet->getCell("A{$i}")->getValue();
-                    if ($indicator === 'Sof foyda') {
-                        $value = $sheet->getCell("B{$i}")->getValue();
+                for ($i = 6; $i <= $lastRow; $i++) {
+                    $cellValue = $sheet->getCell("A{$i}")->getValue();
+
+                    // Bo'sh qatorlarni o'tkazib yuborish
+                    if (empty($cellValue)) {
+                        continue;
+                    }
+
+                    // Sof foyda uchun maxsus rang
+                    if ($cellValue === 'Sof foyda') {
+                        $value = (float)$sheet->getCell("B{$i}")->getValue();
                         if ($value >= 0) {
                             $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
-                                'font' => ['bold' => true, 'color' => ['rgb' => '006400']],
-                                'fill' => ['fillType' => 'solid','color' => ['rgb' => 'C6EFCE']]
+                                'font' => [
+                                    'bold' => true,
+                                    'color' => ['rgb' => '155724'],
+                                    'size' => 11
+                                ],
+                                'fill' => [
+                                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                                    'color' => ['rgb' => 'D4EDDA']
+                                ],
+                                'borders' => [
+                                    'allBorders' => [
+                                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                                        'color' => ['rgb' => '28A745']
+                                    ]
+                                ]
                             ]);
                         } else {
                             $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
-                                'font' => ['bold' => true, 'color' => ['rgb' => '9C0006']],
-                                'fill' => ['fillType' => 'solid','color' => ['rgb' => 'FFC7CE']]
+                                'font' => [
+                                    'bold' => true,
+                                    'color' => ['rgb' => '721C24'],
+                                    'size' => 11
+                                ],
+                                'fill' => [
+                                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                                    'color' => ['rgb' => 'F8D7DA']
+                                ],
+                                'borders' => [
+                                    'allBorders' => [
+                                        'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_MEDIUM,
+                                        'color' => ['rgb' => 'DC3545']
+                                    ]
+                                ]
                             ]);
                         }
                     }
+                    // Jami daromad uchun maxsus stil
+                    elseif ($cellValue === 'Jami daromad') {
+                        $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
+                            'font' => [
+                                'bold' => true,
+                                'color' => ['rgb' => '0C5460'],
+                                'size' => 11
+                            ],
+                            'fill' => [
+                                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                                'color' => ['rgb' => 'B8DAFF']
+                            ]
+                        ]);
+                    }
+                    // Oddiy qatorlar uchun alternating style
+                    else {
+                        $bgColor = ($i % 2 === 0) ? 'FFFFFF' : 'F8F9FA';
+                        $sheet->getStyle("A{$i}:D{$i}")->applyFromArray([
+                            'font' => ['size' => 10],
+                            'fill' => [
+                                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                                'color' => ['rgb' => $bgColor]
+                            ]
+                        ]);
+                    }
                 }
 
-                // Qalin borderlar
-                foreach ([5, 11, 15, 18] as $row) {
-                    $sheet->getStyle("A{$row}:D{$row}")->applyFromArray([
-                        'borders' => [
-                            'top' => ['borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THICK]
-                        ]
-                    ]);
-                }
+                // Ustunlar kengligi
+                $sheet->getColumnDimension('A')->setWidth(35);
+                $sheet->getColumnDimension('B')->setWidth(18);
+                $sheet->getColumnDimension('C')->setWidth(15);
+                $sheet->getColumnDimension('D')->setWidth(12);
 
+                // Raqamlar uchun o'ng tomondan tekislash
+                $sheet->getStyle('B:D')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
+                // Birinchi ustunni chap tomondan tekislash
+                $sheet->getStyle('A:A')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT);
+
+                // Freeze pane
                 $sheet->freezePane('A2');
+
+                // Print uchun sozlamalar
+                $sheet->getPageSetup()
+                    ->setOrientation(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::ORIENTATION_PORTRAIT)
+                    ->setPaperSize(\PhpOffice\PhpSpreadsheet\Worksheet\PageSetup::PAPERSIZE_A4)
+                    ->setFitToWidth(1)
+                    ->setFitToHeight(0);
+
+                // Margins
+                $sheet->getPageMargins()
+                    ->setTop(0.75)
+                    ->setRight(0.7)
+                    ->setLeft(0.7)
+                    ->setBottom(0.75);
             },
         ];
     }
 }
-
 /**
  * DailySheet
  */
