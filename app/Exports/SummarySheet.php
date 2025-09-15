@@ -284,7 +284,7 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
             }
         }
 
-        // itogo (JAMI)
+        // bitta row ichida jami va o‘rtacha
         $rows[] = [
             '', 'JAMI:', '', '', '',
             $totals['price_usd'],
@@ -301,15 +301,9 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
             $totals['total_fixed_cost_uzs'],
             $totals['total_output_cost_uzs'],
             $totals['net_profit_uzs'],
-            '', '', '' // bu joy o‘rtacha qilinadi
-        ];
 
-        // itogo (O‘RTACHA)
-        $rows[] = [
-            '', 'O‘RTACHA:', '', '', '',
-            '', '', '', '', '', '',
-            '', '', '', '', '',
-            '', '', '',
+            // shu joydan O‘RTACHA qiymatlar ketadi
+            'O‘RTACHA:',
             $count > 0 ? round($totals['cost_per_unit_uzs'] / $count, 2) : 0,
             $count > 0 ? round($totals['profit_per_unit_uzs'] / $count, 2) : 0,
             $count > 0 ? round($totals['profitability_percent'] / $count, 2) : 0,
@@ -348,12 +342,21 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
                     ]
                 ]);
 
-                // itogo qatori style
-                $sheet->getStyle("A{$highestRow}:V{$highestRow}")->applyFromArray([
+                // JAMI segment (masalan A:U ustunlari)
+                $sheet->getStyle("A{$highestRow}:S{$highestRow}")->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'color' => ['rgb' => 'CCFFCC']
+                        'color' => ['rgb' => 'CCFFCC'] // yashil
+                    ]
+                ]);
+
+                // O‘RTACHA segment (masalan T:V ustunlari)
+                $sheet->getStyle("T{$highestRow}:V{$highestRow}")->applyFromArray([
+                    'font' => ['bold' => true],
+                    'fill' => [
+                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                        'color' => ['rgb' => 'CCCCFF'] // ko‘k
                     ]
                 ]);
             }
