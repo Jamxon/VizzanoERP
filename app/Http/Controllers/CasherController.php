@@ -412,6 +412,48 @@ class CasherController extends Controller
         // Umumiy quantity va har bir dona uchun xarajat hisoblash
         $costPerUnitOverall = $totalOutputQty > 0 ? $totalFixedCost / $totalOutputQty : 0;
 
+        // Umumiy xarajatlar breakdown
+        $perEmployeeCosts = [];
+        $employeeCount = max($employees, 1);
+
+        $rasxodLimit = $orders->sum('rasxod_limit_uzs') / $employeeCount;
+        $transportCost = $transport / $employeeCount;
+        $aupCost = $aup / $employeeCount;
+        $monthlyExpenseCost = $dailyExpenseMonthly / $employeeCount;
+        $incomePercentageCost = $orders->sum('costs_uzs.incomePercentageExpense') / $employeeCount;
+        $amortizationCost = $orders->sum('costs_uzs.amortizationExpense') / $employeeCount;
+
+        $totalPerEmployee = $rasxodLimit + $transportCost + $aupCost + $monthlyExpenseCost + $incomePercentageCost + $amortizationCost;
+
+        $perEmployeeCosts = [
+            'rasxod_limit_uzs' => [
+                'amount' => round($rasxodLimit),
+                'percent' => round(($rasxodLimit / $totalPerEmployee) * 100, 2)
+            ],
+            'transport' => [
+                'amount' => round($transportCost),
+                'percent' => round(($transportCost / $totalPerEmployee) * 100, 2)
+            ],
+            'aup' => [
+                'amount' => round($aupCost),
+                'percent' => round(($aupCost / $totalPerEmployee) * 100, 2)
+            ],
+            'monthly_expense' => [
+                'amount' => round($monthlyExpenseCost),
+                'percent' => round(($monthlyExpenseCost / $totalPerEmployee) * 100, 2)
+            ],
+            'income_percentage_expense' => [
+                'amount' => round($incomePercentageCost),
+                'percent' => round(($incomePercentageCost / $totalPerEmployee) * 100, 2)
+            ],
+            'amortization_expense' => [
+                'amount' => round($amortizationCost),
+                'percent' => round(($amortizationCost / $totalPerEmployee) * 100, 2)
+            ],
+            'total' => round($totalPerEmployee)
+        ];
+
+
         return response()->json([
             'date' => $date,
             'dollar_rate' => $dollarRate,
@@ -423,7 +465,7 @@ class CasherController extends Controller
             'total_fixed_cost_uzs' => $totalFixedCost,
             'employee_count' => $employees,
             'rasxod_limit_uzs' => $orders->sum('rasxod_limit_uzs'),
-            'per_employee_cost_uzs' => $totalFixedCost / max($employees, 1),
+            'per_employee_cost_uzs' => $perEmployeeCosts,
             'net_profit_uzs' => $totalEarned - $totalFixedCost,
             'kpi' => DB::table('bonuses')->whereDate('created_at', $date)->sum('amount'),
             'tarification' => DB::table('employee_tarification_logs')
