@@ -485,7 +485,8 @@ class SuperHRController extends Controller
 
             if (!empty($photos)) {
                 $media = [];
-                $multipart = [];
+
+                $http = Http::baseUrl("https://api.telegram.org/bot{$telegramToken}");
 
                 foreach ($photos as $index => $photoPath) {
                     $photoContent = getPhotoContent($photoPath);
@@ -499,27 +500,16 @@ class SuperHRController extends Controller
                             'parse_mode' => 'Markdown',
                         ];
 
-                        $multipart[] = [
-                            'name'     => $fieldName,
-                            'contents' => $photoContent,
-                            'filename' => basename($photoPath),
-                        ];
+                        // 🔗 attach qilib boramiz
+                        $http = $http->attach($fieldName, $photoContent, basename($photoPath));
                     }
                 }
 
                 if (!empty($media)) {
-                    $multipart[] = [
-                        'name'     => 'chat_id',
-                        'contents' => $chatId,
-                    ];
-                    $multipart[] = [
-                        'name'     => 'media',
-                        'contents' => json_encode($media, JSON_UNESCAPED_UNICODE),
-                    ];
-
-                    $response = Http::withOptions([
-                        'multipart' => $multipart,
-                    ])->post("https://api.telegram.org/bot{$telegramToken}/sendMediaGroup");
+                    $response = $http->post("/sendMediaGroup", [
+                        'chat_id' => $chatId,
+                        'media'   => json_encode($media, JSON_UNESCAPED_UNICODE),
+                    ]);
 
                     // Debug uchun
                     // dd($response->body());
