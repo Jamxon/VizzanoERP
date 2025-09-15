@@ -128,7 +128,7 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                 ]);
 
                 // 2-5 qatorlar balandligi
-                for ($i = 2; $i <= 5; $i++) {
+                for ($i = 1; $i <= 5; $i++) {
                     $sheet->getRowDimension($i)->setRowHeight(20);
                 }
 
@@ -295,7 +295,8 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
                     ->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER);
 
                 // Freeze pane
-                $sheet->freezePane('A2');
+//                $sheet->freezePane('A2');
+//
 
                 // Print uchun sozlamalar - landscape qilamiz katta bo'lgani uchun
                 $sheet->getPageSetup()
