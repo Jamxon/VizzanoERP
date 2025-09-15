@@ -352,7 +352,7 @@ class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize,
                 ]);
 
                 // O‘RTACHA segment (masalan T:V ustunlari)
-                $sheet->getStyle("T{$highestRow}:V{$highestRow}")->applyFromArray([
+                $sheet->getStyle("T{$highestRow}:W{$highestRow}")->applyFromArray([
                     'font' => ['bold' => true],
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
