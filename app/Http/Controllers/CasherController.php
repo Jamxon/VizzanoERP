@@ -422,6 +422,7 @@ class CasherController extends Controller
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
             'employee_count' => $employees,
+            'rasxod_limit_uzs' => $orders->sum('rasxod_limit_uzs'),
             'per_employee_cost_uzs' => $totalFixedCost / max($employees, 1),
             'net_profit_uzs' => $totalEarned - $totalFixedCost,
             'kpi' => DB::table('bonuses')->whereDate('created_at', $date)->sum('amount'),
