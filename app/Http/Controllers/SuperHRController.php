@@ -465,7 +465,7 @@ class SuperHRController extends Controller
                     $photos[] = $attendance->check_in_image;
                 }
 
-            if ($employee->img && (!$attendance && !$attendance->check_in_image)) {
+            if ($employee->img && (!$attendance || !$attendance->check_in_image)) {
                 $photos[] = $employee->img;
             }
 
