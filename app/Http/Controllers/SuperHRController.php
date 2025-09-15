@@ -465,8 +465,8 @@ class SuperHRController extends Controller
                     $photos[] = $attendance->check_in_image;
                 }
 
-            if ($employee->image) {
-                $photos[] = $employee->image;
+            if ($employee->img && $attendance && $attendance->check_in_image) {
+                $photos[] = $employee->img;
             }
 
             function getPhotoContent($path) {
