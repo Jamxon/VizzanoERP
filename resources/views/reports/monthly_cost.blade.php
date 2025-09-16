@@ -32,8 +32,8 @@
         @endphp
         <tr class="{{ $class }}">
             <td>{{ $row[0] }}</td>
-            <td>{{ number_format($row[1] ?? 0) }}</td>
-            <td>{{ number_format($row[2] ?? 0, 2) }}</td>
+            <td>{{ number_format((float) ($row[1] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($row[2] ?? 0), 2) }}</td>
             <td>{{ $row[3] ?? '' }}</td>
         </tr>
     @endforeach
@@ -57,14 +57,14 @@
     @foreach($daily as $d)
         <tr>
             <td>{{ $d['date'] }}</td>
-            <td>{{ number_format($d['aup']) }}</td>
-            <td>{{ number_format($d['kpi']) }}</td>
-            <td>{{ number_format($d['transport_attendance']) }}</td>
-            <td>{{ number_format($d['tarification']) }}</td>
-            <td>{{ number_format($d['daily_expenses']) }}</td>
-            <td>{{ number_format($d['total_earned_uzs']) }}</td>
-            <td>{{ number_format($d['total_fixed_cost_uzs']) }}</td>
-            <td>{{ number_format($d['net_profit_uzs']) }}</td>
+            <td>{{ number_format((float) ($d['aup'] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($d['kpi'] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($d['transport_attendance'] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($d['tarification'] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($d['daily_expenses'] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($d['total_earned_uzs'] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($d['total_fixed_cost_uzs'] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($d['net_profit_uzs'] ?? 0)) }}</td>
             <td>{{ $d['employee_count'] }}</td>
             <td>{{ $d['total_output_quantity'] }}</td>
         </tr>
@@ -92,11 +92,11 @@
             <td>{{ $o['model']['name'] ?? '' }}</td>
             <td>{{ implode(', ', array_column($o['submodels'] ?? [], 'name')) }}</td>
             <td>{{ implode(', ', array_map(fn($u) => $u['employee']['name'] ?? '', $o['responsibleUser'] ?? [])) }}</td>
-            <td>{{ number_format($o['price_usd'] ?? 0, 2) }}</td>
-            <td>{{ number_format($o['price_uzs'] ?? 0) }}</td>
+            <td>{{ number_format((float) ($o['price_usd'] ?? 0), 2) }}</td>
+            <td>{{ number_format((float) ($o['price_uzs'] ?? 0)) }}</td>
             <td>{{ $o['total_quantity'] ?? 0 }}</td>
-            <td>{{ number_format($o['total_fixed_cost_uzs'] ?? 0) }}</td>
-            <td>{{ number_format($o['net_profit_uzs'] ?? 0) }}</td>
+            <td>{{ number_format((float) ($o['total_fixed_cost_uzs'] ?? 0)) }}</td>
+            <td>{{ number_format((float) ($o['net_profit_uzs'] ?? 0)) }}</td>
         </tr>
     @endforeach
 </table>
