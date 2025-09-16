@@ -26,6 +26,65 @@ use App\Exports\MonthlyCostExport;
 
 class CasherController extends Controller
 {
+    public function exportMonthlyCostPdf(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'dollar_rate' => 'nullable|numeric',
+        ]);
+
+        try {
+            $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : Carbon::now()->startOfMonth();
+            $end   = $request->end_date   ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfMonth();
+            $dollarRate = $request->dollar_rate ?? 12700;
+
+            $period = CarbonPeriod::create($start, $end);
+
+            $dailyRows = [];
+            foreach ($period as $dateObj) {
+                $date = $dateObj->toDateString();
+                $dailyResp = $this->getDailyCost(new Request(['date'=>$date,'dollar_rate'=>$dollarRate]));
+                $daily = is_object($dailyResp) && method_exists($dailyResp, 'getData') ? $dailyResp->getData(true) : $dailyResp;
+                $dailyRows[] = [
+                    'date' => $date,
+                    'aup' => $daily['aup'] ?? 0,
+                    'kpi' => $daily['kpi'] ?? 0,
+                    'transport_attendance' => $daily['transport_attendance'] ?? 0,
+                    'tarification' => $daily['tarification'] ?? 0,
+                    'daily_expenses' => $daily['daily_expenses'] ?? 0,
+                    'total_earned_uzs' => $daily['total_earned_uzs'] ?? 0,
+                    'total_fixed_cost_uzs' => $daily['total_fixed_cost_uzs'] ?? 0,
+                    'net_profit_uzs' => $daily['net_profit_uzs'] ?? 0,
+                    'employee_count' => $daily['employee_count'] ?? 0,
+                    'total_output_quantity' => $daily['total_output_quantity'] ?? 0,
+                ];
+            }
+
+            $monthlyResp = $this->getMonthlyCost(new Request([
+                'start_date' => $start->toDateString(),
+                'end_date' => $end->toDateString(),
+                'dollar_rate' => $dollarRate,
+            ]));
+            $monthly = $monthlyResp->getData(true);
+
+            // Blade uchun summary rows tayyorlash (Excel dagi kabi)
+            $summaryRows = (new \App\Exports\SummarySheet($monthly))->array();
+
+            $pdf = Pdf::loadView('reports.monthly_cost', [
+                'summary' => $monthly,
+                'summaryRows' => $summaryRows,
+                'daily' => $dailyRows,
+                'orders' => $monthly['orders'] ?? [],
+            ]);
+
+            $fileName = sprintf("MonthlyReport_%s_%s.pdf", $start->toDateString(), $end->toDateString());
+            return $pdf->download($fileName);
+
+        } catch (\Exception $e) {
+            return response()->json(['status'=>'error','message'=>$e->getMessage()], 500);
+        }
+    }
 
     public function exportMonthlyCostExcel(Request $request)
     {
