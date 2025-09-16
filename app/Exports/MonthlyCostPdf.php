@@ -161,11 +161,21 @@ class MonthlyCostPdf
                 text-transform: uppercase;
             }
 
+            /* Summary Grid - Flexbox yordamida */
+            .summary-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+                padding: 20px;
+            }
+
             .summary-info {
+                flex: 1 1 45%;
                 background: #f8f9fa;
                 padding: 15px;
                 border-radius: 6px;
                 border-left: 4px solid #17a2b8;
+                min-width: 250px;
             }
 
             .summary-info h3 {
@@ -190,11 +200,14 @@ class MonthlyCostPdf
             .info-label {
                 font-weight: bold;
                 color: #495057;
+                flex: 1;
             }
 
             .info-value {
                 color: #007bff;
                 font-weight: bold;
+                text-align: right;
+                flex: 0 0 auto;
             }
 
             .summary-table {
@@ -304,11 +317,22 @@ class MonthlyCostPdf
                 font-size: 10px;
             }
 
-            .cost-types-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
+            /* Cost Types Grid - Flexbox yordamida */
+            .cost-types-container {
+                display: flex;
+                flex-wrap: wrap;
                 gap: 20px;
                 padding: 20px;
+            }
+
+            .cost-types-left {
+                flex: 1 1 45%;
+                min-width: 300px;
+            }
+
+            .cost-types-right {
+                flex: 1 1 45%;
+                min-width: 300px;
             }
 
             .cost-item {
@@ -324,11 +348,14 @@ class MonthlyCostPdf
             .cost-label {
                 font-weight: bold;
                 color: #495057;
+                flex: 1;
             }
 
             .cost-amount {
                 color: #28a745;
                 font-weight: bold;
+                text-align: right;
+                flex: 0 0 auto;
             }
 
             .grand-total {
@@ -340,17 +367,6 @@ class MonthlyCostPdf
                 padding: 15px;
                 border-radius: 6px;
                 margin-top: 15px;
-            }
-            .summary-grid {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 20px; /* ustunlar orasidagi masofa */
-            }
-            
-            .summary-info {
-                background: #f9f9f9;
-                padding: 15px;
-                border-radius: 8px;
             }
 
         ";
@@ -644,11 +660,11 @@ class MonthlyCostPdf
         return "
             <div class='section'>
                 <h2 class='section-title'>💰 XARAJAT TURLARI</h2>
-                <div style='display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;'>
-                    <div style='flex: 1 1 48%;'>
+                <div class='cost-types-container'>
+                    <div class='cost-types-left'>
                         {$costItems}
                     </div>
-                    <div style='flex: 1 1 48%;'>
+                    <div class='cost-types-right'>
                         <div class='grand-total'>
                             <div>JAMI XARAJAT</div>
                             <div style='font-size: 18px; margin-top: 10px;'>" . number_format(round($grandTotal), 0, '.', ' ') . " so'm</div>
