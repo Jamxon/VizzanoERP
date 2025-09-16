@@ -90,10 +90,6 @@ class MonthlyCostPdf
                 <!-- Cost Types Section -->
                 {$this->generateCostTypesSection($orders)}
 
-                <!-- Footer -->
-                <div class='footer'>
-                    <p>© " . date('Y') . " Tikuv korxonasi - Buxgalteriya hisoboti</p>
-                </div>
             </div>
         </body>
         </html>";
