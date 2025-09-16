@@ -152,7 +152,7 @@ class MonthlyCostPdf
 
             .section-title {
                 background: linear-gradient(135deg, #2196F3, #21CBF3);
-                color: white;
+                color: #333;
                 font-size: 16px;
                 font-weight: bold;
                 padding: 12px 20px;
