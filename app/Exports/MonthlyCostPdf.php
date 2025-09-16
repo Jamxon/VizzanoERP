@@ -389,11 +389,11 @@ class MonthlyCostPdf
 
         return "
             <div class='section'>
-                <h2 class='section-title'>📊 UMUMIY XULOSA</h2>
+                <h2 class='section-title'>UMUMIY XULOSA</h2>
             
                 <div class='summary-grid'>
                     <div class='summary-info'>
-                        <h3>🗓️ Davr ma'lumotlari</h3>
+                        <h3>Davr ma'lumotlari</h3>
                         <div class='info-row'>
                             <span class='info-label'>Boshlanish sanasi:</span>
                             <span class='info-value'>" . ($summary['start_date'] ?? '') . "</span>
@@ -413,7 +413,7 @@ class MonthlyCostPdf
                     </div>
             
                     <div class='summary-info'>
-                        <h3>💰 Asosiy ko'rsatkichlar</h3>
+                        <h3>Asosiy ko'rsatkichlar</h3>
                         <div class='info-row'>
                             <span class='info-label'>Kunlik o'rtacha daromad:</span>
                             <span class='info-value'>" . $formatUzs($income / $days) . " so'm</span>
@@ -438,7 +438,7 @@ class MonthlyCostPdf
     protected function generateDailySection(array $daily): string
     {
         if (empty($daily)) {
-            return "<div class='section'><h2 class='section-title'>📅 KUNLIK HISOBOT</h2><p style='padding: 20px;'>Ma'lumot topilmadi.</p></div>";
+            return "<div class='section'><h2 class='section-title'>KUNLIK HISOBOT</h2><p style='padding: 20px;'>Ma'lumot topilmadi.</p></div>";
         }
 
         $tableRows = '';
@@ -477,7 +477,7 @@ class MonthlyCostPdf
 
         return "
         <div class='section'>
-            <h2 class='section-title'>📅 KUNLIK HISOBOT</h2>
+            <h2 class='section-title'>KUNLIK HISOBOT</h2>
             <table>
                 <thead>
                     <tr>
@@ -530,7 +530,7 @@ class MonthlyCostPdf
     protected function generateOrdersSection(array $orders): string
     {
         if (empty($orders)) {
-            return "<div class='section'><h2 class='section-title'>🛍️ BUYURTMALAR</h2><p style='padding: 20px;'>Buyurtmalar topilmadi.</p></div>";
+            return "<div class='section'><h2 class='section-title'>BUYURTMALAR</h2><p style='padding: 20px;'>Buyurtmalar topilmadi.</p></div>";
         }
 
         $tableRows = '';
@@ -579,7 +579,7 @@ class MonthlyCostPdf
 
         return "
         <div class='section'>
-            <h2 class='section-title'>🛍️ BUYURTMALAR</h2>
+            <h2 class='section-title'>BUYURTMALAR</h2>
             <table style='font-size: 8px;'>
                 <thead>
                     <tr>
@@ -590,8 +590,8 @@ class MonthlyCostPdf
                         <th>Mas'ul</th>
                         <th>Narx<br>USD</th>
                         <th>Narx<br>so'm</th>
-                        <th>Qty</th>
-                        <th>Rasxod limiti<br>(so'm)</th>
+                        <th>Soni</th>
+                        <th>Tikuv uchun<br>(so'm)</th>
                         <th>Bonus<br>(so'm)</th>
                         <th>Tarifikatsiya<br>(so'm)</th>
                         <th>Doimiy xarajat<br>(so'm)</th>
@@ -627,7 +627,7 @@ class MonthlyCostPdf
     protected function generateCostTypesSection(array $orders): string
     {
         if (empty($orders)) {
-            return "<div class='section'><h2 class='section-title'>💰 XARAJAT TURLARI</h2><p style='padding: 20px;'>Ma'lumot topilmadi.</p></div>";
+            return "<div class='section'><h2 class='section-title'>XARAJAT TURLARI</h2><p style='padding: 20px;'>Ma'lumot topilmadi.</p></div>";
         }
 
         $costTotals = [];
@@ -659,7 +659,7 @@ class MonthlyCostPdf
 
         return "
             <div class='section'>
-                <h2 class='section-title'>💰 XARAJAT TURLARI</h2>
+                <h2 class='section-title'>XARAJAT TURLARI</h2>
                 <div class='cost-types-container'>
                     <div class='cost-types-left'>
                         {$costItems}
