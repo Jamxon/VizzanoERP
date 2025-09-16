@@ -348,6 +348,18 @@ class MonthlyCostPdf
                 border-radius: 6px;
                 margin-top: 15px;
             }
+            .summary-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px; /* ustunlar orasidagi masofa */
+            }
+            
+            .summary-info {
+                background: #f9f9f9;
+                padding: 15px;
+                border-radius: 8px;
+            }
+
         ";
     }
 
