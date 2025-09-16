@@ -477,6 +477,7 @@ class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, 
 }
 
 /**
+ *
  * OrdersSheet
  */
 class OrdersSheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithEvents, WithColumnFormatting

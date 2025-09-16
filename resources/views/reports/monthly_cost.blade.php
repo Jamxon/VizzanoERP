@@ -15,29 +15,76 @@
     </style>
 </head>
 <body>
-<h2>Monthly Report: {{ $summary['start_date'] ?? '' }} - {{ $summary['end_date'] ?? '' }}</h2>
-
-<h3>Summary</h3>
-<table>
+<h1>Monthly Cost Report</h1>
+<h2>Summary</h2>
+<table border="1" cellspacing="0" cellpadding="5">
+    <thead>
     <tr>
         <th>Ko'rsatkich</th>
         <th>Qiymat (so'm)</th>
         <th>Qiymat (USD)</th>
         <th>Ulushi (%)</th>
     </tr>
+    </thead>
+    <tbody>
     @foreach($summaryRows as $row)
-        @php
-            $class = '';
-            if($row[0] === 'Sof foyda') $class = $row[1] >= 0 ? 'highlight' : 'negative';
-        @endphp
-        <tr class="{{ $class }}">
-            <td>{{ $row[0] }}</td>
-            <td>{{ number_format((float) ($row[1] ?? 0)) }}</td>
-            <td>{{ number_format((float) ($row[2] ?? 0), 2) }}</td>
-            <td>{{ $row[3] ?? '' }}</td>
+        <tr>
+            @foreach($row as $cell)
+                <td>{{ $cell }}</td>
+            @endforeach
         </tr>
     @endforeach
+    </tbody>
 </table>
+
+<h2>Daily Details</h2>
+<table border="1" cellspacing="0" cellpadding="5">
+    <thead>
+    <tr>
+        <th>Sana</th>
+        <th>AUP</th>
+        <th>KPI</th>
+        <th>Transport</th>
+        <th>Tarifikatsiya</th>
+        <th>Kunlik xarajat</th>
+        <th>Jami daromad</th>
+        <th>Doimiy xarajat</th>
+        <th>Sof foyda</th>
+        <th>Xodimlar soni</th>
+        <th>Jami ishlab chiqarilgan</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach($daily as $row)
+        <tr>
+            @foreach($row as $cell)
+                <td>{{ $cell }}</td>
+            @endforeach
+        </tr>
+    @endforeach
+    </tbody>
+</table>
+
+<h2>Orders</h2>
+<table border="1" cellspacing="0" cellpadding="5">
+    <thead>
+    <tr>
+        @foreach($orders[0] ?? [] as $key => $val)
+            <th>{{ $key }}</th>
+        @endforeach
+    </tr>
+    </thead>
+    <tbody>
+    @foreach($orders as $row)
+        <tr>
+            @foreach($row as $cell)
+                <td>{{ $cell }}</td>
+            @endforeach
+        </tr>
+    @endforeach
+    </tbody>
+</table>
+
 
 <h3>Daily Details</h3>
 <table>
