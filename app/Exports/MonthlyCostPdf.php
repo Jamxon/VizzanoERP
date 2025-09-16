@@ -161,13 +161,6 @@ class MonthlyCostPdf
                 text-transform: uppercase;
             }
 
-            .summary-grid {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-                padding: 20px;
-            }
-
             .summary-info {
                 background: #f8f9fa;
                 padding: 15px;
