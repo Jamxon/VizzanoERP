@@ -367,120 +367,51 @@ class MonthlyCostPdf
         $profitClass = $netProfit >= 0 ? 'profit-positive' : 'profit-negative';
 
         return "
-        <div class='section'>
-            <h2 class='section-title'>📊 UMUMIY XULOSA</h2>
+            <div class='section'>
+                <h2 class='section-title'>📊 UMUMIY XULOSA</h2>
             
-            <div class='summary-grid'>
-                <div class='summary-info'>
-                    <h3>🗓️ Davr ma'lumotlari</h3>
-                    <div class='info-row'>
-                        <span class='info-label'>Boshlanish sanasi:</span>
-                        <span class='info-value'>" . ($summary['start_date'] ?? '') . "</span>
+                <div class='summary-grid'>
+                    <div class='summary-info'>
+                        <h3>🗓️ Davr ma'lumotlari</h3>
+                        <div class='info-row'>
+                            <span class='info-label'>Boshlanish sanasi:</span>
+                            <span class='info-value'>" . ($summary['start_date'] ?? '') . "</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Tugash sanasi:</span>
+                            <span class='info-value'>" . ($summary['end_date'] ?? '') . "</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Davr kunlari:</span>
+                            <span class='info-value'>{$days} kun</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Dollar kursi:</span>
+                            <span class='info-value'>" . number_format($dollar, 0, '.', ' ') . " so'm</span>
+                        </div>
                     </div>
-                    <div class='info-row'>
-                        <span class='info-label'>Tugash sanasi:</span>
-                        <span class='info-value'>" . ($summary['end_date'] ?? '') . "</span>
-                    </div>
-                    <div class='info-row'>
-                        <span class='info-label'>Davr kunlari:</span>
-                        <span class='info-value'>{$days} kun</span>
-                    </div>
-                    <div class='info-row'>
-                        <span class='info-label'>Dollar kursi:</span>
-                        <span class='info-value'>" . number_format($dollar, 0, '.', ' ') . " so'm</span>
+            
+                    <div class='summary-info'>
+                        <h3>💰 Asosiy ko'rsatkichlar</h3>
+                        <div class='info-row'>
+                            <span class='info-label'>Kunlik o'rtacha daromad:</span>
+                            <span class='info-value'>" . $formatUzs($income / $days) . " so'm</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Kunlik o'rtacha foyda:</span>
+                            <span class='info-value'>" . $formatUzs($netProfit / $days) . " so'm</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>O'rtacha xodimlar:</span>
+                            <span class='info-value'>" . $toInt($summary['average_employee_count'] ?? 0) . " kishi</span>
+                        </div>
+                        <div class='info-row'>
+                            <span class='info-label'>Ishlab chiqarildi:</span>
+                            <span class='info-value'>" . $toInt($summary['total_output_quantity'] ?? 0) . " dona</span>
+                        </div>
                     </div>
                 </div>
-
-                <div class='summary-info'>
-                    <h3>💰 Asosiy ko'rsatkichlar</h3>
-                    <div class='info-row'>
-                        <span class='info-label'>Kunlik o'rtacha daromad:</span>
-                        <span class='info-value'>" . $formatUzs($income / $days) . " so'm</span>
-                    </div>
-                    <div class='info-row'>
-                        <span class='info-label'>Kunlik o'rtacha foyda:</span>
-                        <span class='info-value'>" . $formatUzs($netProfit / $days) . " so'm</span>
-                    </div>
-                    <div class='info-row'>
-                        <span class='info-label'>O'rtacha xodimlar:</span>
-                        <span class='info-value'>" . $toInt($summary['average_employee_count'] ?? 0) . " kishi</span>
-                    </div>
-                    <div class='info-row'>
-                        <span class='info-label'>Ishlab chiqarildi:</span>
-                        <span class='info-value'>" . $toInt($summary['total_output_quantity'] ?? 0) . " dona</span>
-                    </div>
-                </div>
-            </div>
-
-            <table class='summary-table'>
-                <thead>
-                    <tr>
-                        <th>Ko'rsatkich</th>
-                        <th>Qiymat (so'm)</th>
-                        <th>Qiymat (USD)</th>
-                        <th>Ulushi (%)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>AUP</strong></td>
-                        <td class='number'>" . $formatUzs($summary['aup'] ?? 0) . "</td>
-                        <td class='number'>$" . $toUsd($summary['aup'] ?? 0) . "</td>
-                        <td class='number'>" . $toPct($summary['aup'] ?? 0, $income) . "%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>KPI</strong></td>
-                        <td class='number'>" . $formatUzs($summary['kpi'] ?? 0) . "</td>
-                        <td class='number'>$" . $toUsd($summary['kpi'] ?? 0) . "</td>
-                        <td class='number'>" . $toPct($summary['kpi'] ?? 0, $income) . "%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Transport</strong></td>
-                        <td class='number'>" . $formatUzs($summary['transport_attendance'] ?? 0) . "</td>
-                        <td class='number'>$" . $toUsd($summary['transport_attendance'] ?? 0) . "</td>
-                        <td class='number'>" . $toPct($summary['transport_attendance'] ?? 0, $income) . "%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Tikuv uchun</strong></td>
-                        <td class='number'>" . $formatUzs($summary['rasxod_limit_uzs'] ?? 0) . "</td>
-                        <td class='number'>$" . $toUsd($summary['rasxod_limit_uzs'] ?? 0) . "</td>
-                        <td class='number'>" . $toPct($summary['rasxod_limit_uzs'] ?? 0, $income) . "%</td>
-                    </tr>
-                    <tr>
-                        <td><strong>O'zgarmas xarajatlar</strong></td>
-                        <td class='number'>" . $formatUzs($summary['monthly_expenses'] ?? 0) . "</td>
-                        <td class='number'>$" . $toUsd($summary['monthly_expenses'] ?? 0) . "</td>
-                        <td class='number'>" . $toPct($summary['monthly_expenses'] ?? 0, $income) . "%</td>
-                    </tr>
-                    <tr style='height: 10px;'><td colspan='4'></td></tr>
-                    <tr>
-                        <td><strong>Jami xarajat</strong></td>
-                        <td class='number'>" . $formatUzs($summary['total_fixed_cost_uzs'] ?? 0) . "</td>
-                        <td class='number'>$" . $toUsd($summary['total_fixed_cost_uzs'] ?? 0) . "</td>
-                        <td class='number'>" . $toPct($summary['total_fixed_cost_uzs'] ?? 0, $income) . "%</td>
-                    </tr>
-                    <tr class='total-income'>
-                        <td><strong>JAMI DAROMAD</strong></td>
-                        <td class='number'>" . $formatUzs($summary['total_earned_uzs'] ?? 0) . "</td>
-                        <td class='number'>$" . $toUsd($summary['total_earned_uzs'] ?? 0) . "</td>
-                        <td class='number'>100.00%</td>
-                    </tr>
-                    <tr class='{$profitClass}'>
-                        <td><strong>SOF FOYDA</strong></td>
-                        <td class='number'>" . $formatUzs($netProfit) . "</td>
-                        <td class='number'>$" . $toUsd($netProfit) . "</td>
-                        <td class='number'>" . $toPct($netProfit, $income) . "%</td>
-                    </tr>
-                    <tr style='height: 10px;'><td colspan='4'></td></tr>
-                    <tr class='highlight-row'>
-                        <td><strong>O'rtacha bir dona tannarxi</strong></td>
-                        <td class='number'>" . $formatUzs($summary['cost_per_unit_overall_uzs'] ?? 0) . "</td>
-                        <td class='number'>$" . $toUsd($summary['cost_per_unit_overall_uzs'] ?? 0) . "</td>
-                        <td>-</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>";
+            </div>";
     }
 
     protected function generateDailySection(array $daily): string
@@ -739,87 +670,5 @@ class MonthlyCostPdf
         ];
 
         return $map[$key] ?? $key;
-    }
-}
-
-// Controller method
-class YourController
-{
-    public function exportMonthlyCostPdf(Request $request)
-    {
-        $request->validate([
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'dollar_rate' => 'nullable|numeric',
-        ]);
-
-        try {
-            $start = $request->start_date
-                ? Carbon::parse($request->start_date)->startOfDay()
-                : Carbon::now()->startOfMonth();
-
-            $end = $request->end_date
-                ? Carbon::parse($request->end_date)->endOfDay()
-                : Carbon::now()->endOfMonth();
-
-            $dollarRate = $request->dollar_rate ?? 12700;
-
-            $period = CarbonPeriod::create($start, $end);
-
-            // 1) Kunlik tafsilotlarni to'plash
-            $dailyRows = [];
-            foreach ($period as $dateObj) {
-                $date = $dateObj->toDateString();
-
-                $dailyResp = $this->getDailyCost(new Request([
-                    'date' => $date,
-                    'dollar_rate' => $dollarRate,
-                ]));
-
-                $daily = is_object($dailyResp) && method_exists($dailyResp, 'getData')
-                    ? $dailyResp->getData(true)
-                    : (is_array($dailyResp) ? $dailyResp : []);
-
-                $dailyRows[] = [
-                    'date' => $date,
-                    'aup' => $daily['aup'] ?? 0,
-                    'kpi' => $daily['kpi'] ?? 0,
-                    'transport_attendance' => $daily['transport_attendance'] ?? 0,
-                    'tarification' => $daily['tarification'] ?? 0,
-                    'daily_expenses' => $daily['daily_expenses'] ?? 0,
-                    'total_earned_uzs' => $daily['total_earned_uzs'] ?? 0,
-                    'total_fixed_cost_uzs' => $daily['total_fixed_cost_uzs'] ?? 0,
-                    'net_profit_uzs' => $daily['net_profit_uzs'] ?? 0,
-                    'employee_count' => $daily['employee_count'] ?? 0,
-                    'total_output_quantity' => $daily['total_output_quantity'] ?? 0,
-                    'rasxod_limit_uzs' => $daily['rasxod_limit_uzs'] ?? 0,
-                ];
-            }
-
-            // 2) Umumiy oylik hisob-kitoblarni olish
-            $monthlyResp = $this->getMonthlyCost(new Request([
-                'start_date' => $start->toDateString(),
-                'end_date' => $end->toDateString(),
-                'dollar_rate' => $dollarRate,
-            ]));
-
-            $monthly = $monthlyResp->getData(true);
-
-            // 3) payload tayyorlash
-            $payload = [
-                'summary' => $monthly,
-                'daily' => $dailyRows,
-                'orders' => $monthly['orders'] ?? [],
-            ];
-
-            // 4) PDF yaratish
-            $pdf = new MonthlyCostPdf($payload);
-            $fileName = sprintf("MonthlyReport_%s_%s.pdf", $start->toDateString(), $end->toDateString());
-
-            return $pdf->generate()->download($fileName);
-
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => $e->getMessage()], 500);
-        }
     }
 }
