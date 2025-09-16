@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\DepartmentGroupsExport;
 use App\Exports\GroupsOrdersEarningsExport;
+use App\Exports\MonthlyCostPdf;
 use App\Http\Resources\GroupPlanResource;
 use App\Models\Attendance;
 use App\Models\Cashbox;
@@ -34,18 +35,52 @@ class CasherController extends Controller
             'dollar_rate' => 'nullable|numeric',
         ]);
 
-        try {
-            $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : Carbon::now()->startOfMonth();
-            $end   = $request->end_date   ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfMonth();
-            $dollarRate = $request->dollar_rate ?? 12700;
+        $start = $request->start_date
+            ? Carbon::parse($request->start_date)->startOfDay()
+            : Carbon::now()->startOfMonth();
 
-            $period = CarbonPeriod::create($start, $end);
+        $end = $request->end_date
+            ? Carbon::parse($request->end_date)->endOfDay()
+            : Carbon::now()->endOfMonth();
 
-            $dailyRows = [];
-            foreach ($period as $dateObj) {
-                $date = $dateObj->toDateString();
-                $dailyResp = $this->getDailyCost(new Request(['date'=>$date,'dollar_rate'=>$dollarRate]));
-                $daily = is_object($dailyResp) && method_exists($dailyResp, 'getData') ? $dailyResp->getData(true) : $dailyResp;
+        $dollarRate = $request->dollar_rate ?? 12700;
+
+        // Sana oralig'i juda katta bo'lsa, ogohlantiramiz
+        if ($start->diffInDays($end) > 366) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Sana oralig\'i 1 yildan ko\'p bo\'lmasligi kerak'
+            ], 400);
+        }
+
+        $period = CarbonPeriod::create($start, $end);
+
+        // 1) Kunlik tafsilotlarni to'plash
+        $dailyRows = [];
+        $progressData = [
+            'total_days' => $period->count(),
+            'processed_days' => 0
+        ];
+
+        foreach ($period as $dateObj) {
+            $date = $dateObj->toDateString();
+
+            try {
+                // getDailyCost methodini chaqirish
+                $dailyResp = $this->getDailyCost(new Request([
+                    'date' => $date,
+                    'dollar_rate' => $dollarRate,
+                ]));
+
+                // Response ni array formatiga o'tkazish
+                if (is_object($dailyResp) && method_exists($dailyResp, 'getData')) {
+                    $daily = $dailyResp->getData(true);
+                } elseif (is_array($dailyResp)) {
+                    $daily = $dailyResp;
+                } else {
+                    $daily = [];
+                }
+
                 $dailyRows[] = [
                     'date' => $date,
                     'aup' => $daily['aup'] ?? 0,
@@ -58,32 +93,73 @@ class CasherController extends Controller
                     'net_profit_uzs' => $daily['net_profit_uzs'] ?? 0,
                     'employee_count' => $daily['employee_count'] ?? 0,
                     'total_output_quantity' => $daily['total_output_quantity'] ?? 0,
+                    'rasxod_limit_uzs' => $daily['rasxod_limit_uzs'] ?? 0,
+                ];
+
+                $progressData['processed_days']++;
+
+            } catch (\Exception $e) {
+                // Agar biron bir kun uchun ma'lumot olmasa, bo'sh qiymatlar qo'yamiz
+                \Log::warning("Kunlik ma'lumot olishda xatolik [{$date}]: " . $e->getMessage());
+
+                $dailyRows[] = [
+                    'date' => $date,
+                    'aup' => 0, 'kpi' => 0, 'transport_attendance' => 0,
+                    'tarification' => 0, 'daily_expenses' => 0, 'total_earned_uzs' => 0,
+                    'total_fixed_cost_uzs' => 0, 'net_profit_uzs' => 0,
+                    'employee_count' => 0, 'total_output_quantity' => 0, 'rasxod_limit_uzs' => 0,
                 ];
             }
+        }
 
+        // 2) Umumiy oylik hisob-kitoblarni olish
+        try {
             $monthlyResp = $this->getMonthlyCost(new Request([
                 'start_date' => $start->toDateString(),
                 'end_date' => $end->toDateString(),
                 'dollar_rate' => $dollarRate,
             ]));
+
             $monthly = $monthlyResp->getData(true);
-
-            // Blade uchun summary rows tayyorlash (Excel dagi kabi)
-            $summaryRows = (new \App\Exports\SummarySheet($monthly))->array();
-
-            $pdf = Pdf::loadView('reports.monthly_cost', [
-                'summary' => $monthly,
-                'summaryRows' => $summaryRows,
-                'daily' => $dailyRows,
-                'orders' => $monthly['orders'] ?? [],
-            ]);
-
-            $fileName = sprintf("MonthlyReport_%s_%s.pdf", $start->toDateString(), $end->toDateString());
-            return $pdf->download($fileName);
-
         } catch (\Exception $e) {
-            return response()->json(['status'=>'error','message'=>$e->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Oylik hisobotni olishda xatolik: ' . $e->getMessage()
+            ], 500);
         }
+
+        // 3) Payload tayyorlash
+        $payload = [
+            'summary' => array_merge($monthly, [
+                'start_date' => $start->format('d.m.Y'),
+                'end_date' => $end->format('d.m.Y'),
+                'dollar_rate' => $dollarRate,
+                'days_in_period' => $start->diffInDays($end) + 1,
+                'generated_at' => Carbon::now()->format('d.m.Y H:i:s'),
+            ]),
+            'daily' => $dailyRows,
+            'orders' => $monthly['orders'] ?? [],
+            'progress' => $progressData,
+        ];
+
+        // 4) PDF yaratish
+        $pdf = new MonthlyCostPdf($payload);
+
+        // Fayl nomini yaratish
+        $fileName = sprintf(
+            "Oylik_Hisobot_%s_%s.pdf",
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d')
+        );
+
+        // Memory limit ni oshirish katta hisobotlar uchun
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', 300); // 5 minut
+
+        // PDF yaratish va yuklash
+        return $pdf->generate()->download($fileName);
+
+
     }
 
     public function exportMonthlyCostExcel(Request $request)
