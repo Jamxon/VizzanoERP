@@ -642,20 +642,21 @@ class MonthlyCostPdf
         }
 
         return "
-        <div class='section'>
-            <h2 class='section-title'>💰 XARAJAT TURLARI</h2>
-            <div class='cost-types-grid'>
-                <div>
-                    {$costItems}
-                </div>
-                <div>
-                    <div class='grand-total'>
-                        <div>JAMI XARAJAT</div>
-                        <div style='font-size: 18px; margin-top: 10px;'>" . number_format(round($grandTotal), 0, '.', ' ') . " so'm</div>
+            <div class='section'>
+                <h2 class='section-title'>💰 XARAJAT TURLARI</h2>
+                <div style='display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;'>
+                    <div style='flex: 1 1 48%;'>
+                        {$costItems}
+                    </div>
+                    <div style='flex: 1 1 48%;'>
+                        <div class='grand-total'>
+                            <div>JAMI XARAJAT</div>
+                            <div style='font-size: 18px; margin-top: 10px;'>" . number_format(round($grandTotal), 0, '.', ' ') . " so'm</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>";
+            </div>";
+
     }
 
     /**
