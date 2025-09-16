@@ -45,7 +45,8 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
         $toUsd = fn($v) => round($toInt($v) / $dollar, 2);
         $toPct = fn($v) => round($toInt($v) / $income * 100, 2);
 
-        return [
+        // Boshlang'ich statik qatorlar
+        $rows = [
             ["Ko'rsatkich", "Qiymat (so'm)", 'Qiymat (USD)', 'Ulushi (%)'],
             ['AUP', $toInt($d['aup'] ?? 0), $toUsd($d['aup'] ?? 0), $toPct($d['aup'] ?? 0)],
             ['KPI', $toInt($d['kpi'] ?? 0), $toUsd($d['kpi'] ?? 0), $toPct($d['kpi'] ?? 0)],
@@ -63,8 +64,32 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
             ['Ishlab chiqarilgan umumiy son', $toInt($d['total_output_quantity'] ?? 0), '', ''],
             ["O'rtacha bir dona mahsulot tannarxi", $toInt($d['cost_per_unit_overall_uzs'] ?? 0), $toUsd($d['cost_per_unit_overall_uzs'] ?? 0), ''],
             ["O'rtacha xodimlar soni", $toInt($d['average_employee_count'] ?? 0), '', ''],
-            ["Bir xodimga to'g'ri keladigan xarajat", $toInt($d['per_employee_cost_uzs'] ?? 0), $toUsd($d['per_employee_cost_uzs'] ?? 0), ''],
         ];
+
+        // per_employee_cost_uzs breakdown
+        if (isset($d['per_employee_cost_uzs']) && is_array($d['per_employee_cost_uzs'])) {
+            foreach ($d['per_employee_cost_uzs'] as $key => $val) {
+                if ($key === 'total') continue;
+                $nameMap = [
+                    'rasxod_limit_uzs' => "Tikuv uchun",
+                    'transport' => "Transport",
+                    'aup' => "AUP",
+                    'monthly_expense' => "O'zgarmas xarajatlar",
+                    'income_percentage_expense' => "Soliq",
+                    'amortization_expense' => "Amortizatsiya xarajat"
+                ];
+                $rows[] = [
+                    $nameMap[$key] ?? $key,
+                    $toInt($val['amount']),
+                    $toUsd($val['amount']),
+                    $val['percent']
+                ];
+            }
+            // Umumiy total
+            $rows[] = ["Bir xodimga to'g'ri keladigan xarajat", $toInt($d['per_employee_cost_uzs']['total']), $toUsd($d['per_employee_cost_uzs']['total']), 100];
+        }
+
+        return $rows;
     }
 
     public function title(): string
@@ -315,9 +340,10 @@ class SummarySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize
             },
         ];
     }
-}/**
+}
+/**
  * DailySheet
- */
+ **/
 
 class DailySheet implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithColumnFormatting, WithEvents
 {
