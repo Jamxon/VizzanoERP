@@ -24,16 +24,16 @@ class TransportAttendanceResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
-            'date' => $this->date->format('Y-m-d'),
-            'attendance_type' => $this->attendance_type,
-            'salary' => $this->salary,
-            'fuel_bonus' => $this->fuel_bonus,
-            'method' => $this->method,
+            'id' => $this->id ?? null,
+            'date' => $this->date->format('Y-m-d') ?? null,
+            'attendance_type' => $this->attendance_type ?? null,
+            'salary' => $this->salary ?? null,
+            'fuel_bonus' => $this->fuel_bonus ?? null,
+            'method' => $this->method ?? null,
             'transport' => [
-                'id' => $this->transport->id,
-                'name' => $this->transport->name,
-                'state_number' => $this->transport->state_number,
+                'id' => $this->transport->id ?? null,
+                'name' => $this->transport->name ?? null,
+                'state_number' => $this->transport->state_number ?? null,
             ],
         ];
     }
