@@ -1243,12 +1243,9 @@ class CasherController extends Controller
         $result = $groups->map(function ($group) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
             $employees = $group->employees
                 ->map(function ($employee) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
-
                     $employee->loadMissing(['position', 'group']);
 
-                    /**
-                     * AttendanceSalary
-                     */
+                    // Attendance
                     $attendanceQuery = $employee->attendanceSalaries();
                     if ($startDate && $endDate) {
                         $attendanceQuery->whereBetween('date', [$startDate, $endDate]);
@@ -1256,24 +1253,19 @@ class CasherController extends Controller
                     $attendanceTotal = $attendanceQuery->sum('amount');
                     $attendanceDays = $attendanceQuery->count();
 
-                    /**
-                     * TarificationLogs
-                     */
+                    // Tarification logs
                     $logsQuery = $employee->employeeTarificationLogs()
                         ->with('tarification.tarificationCategory.submodel.orderModel.order');
 
-                    $logs = $logsQuery->get();
-
-                    $logs = $logs->reject(function ($log) use ($minusOrderIds) {
+                    $logs = $logsQuery->get()->reject(function ($log) use ($minusOrderIds) {
                         $order = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
                         if (!$order) return true;
                         return in_array($order->id, $minusOrderIds)
-                            || in_array($order->status, ['pending', 'cutting','tailoring']);
+                            || in_array($order->status, ['pending', 'cutting', 'tailoring']);
                     });
 
-                    $orders = $logs->map(function ($log) {
-                        return $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
-                    })->filter()->unique('id');
+                    $orders = $logs->map(fn($log) => $log->tarification?->tarificationCategory?->submodel?->orderModel?->order)
+                        ->filter()->unique('id');
 
                     if (!empty($addOrderIds)) {
                         $extraOrders = Order::whereIn('id', $addOrderIds)
@@ -1284,16 +1276,11 @@ class CasherController extends Controller
                     }
 
                     $tarificationTotal = $logs->sum('amount_earned');
+                    $totalEarned = $employee->payment_type === 'piece_work'
+                        ? $tarificationTotal
+                        : $attendanceTotal;
 
-                    if ($employee->payment_type === 'piece_work') {
-                        $totalEarned =  $tarificationTotal;
-                    } else {
-                        $totalEarned = $attendanceTotal;
-                    }
-
-                    /**
-                     * Paid salaries
-                     */
+                    // Paid salaries
                     $paidQuery = $employee->salaryPayments();
                     if ($startDate && $endDate) {
                         $paidQuery->whereBetween('month', [$startDate, $endDate]);
@@ -1310,13 +1297,9 @@ class CasherController extends Controller
                                 'amount' => (float) $payment->amount,
                                 'date' => $payment->date,
                                 'comment' => $payment->comment,
-                                'month' => $payment->month->format('Y-m'),
+                                'month' => optional($payment->month)->format('Y-m'),
                             ];
                         })->values();
-                    }
-
-                    if ($totalEarned === 0){
-                        return null;
                     }
 
                     return [
@@ -1338,6 +1321,8 @@ class CasherController extends Controller
                         'orders' => $orders->pluck('id')->values(),
                     ];
                 })
+                // ❌ null qaytarmaydi, faqat filterlash
+                ->filter(fn($emp) => $emp['total_earned'] > 0)
                 ->filter(fn($emp) => !($emp['status'] === 'kicked' && $emp['total_earned'] < 0));
 
             $groupTotal = $employees->sum(fn($e) => $e['total_earned'] ?? 0);
