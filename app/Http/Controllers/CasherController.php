@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\MonthlyCostExport;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class CasherController extends Controller
 {
@@ -966,6 +967,120 @@ class CasherController extends Controller
             ->get();
 
         return response()->json($orders);
+    }
+
+    public function exportEmployeeAttendance(Request $request)
+    {
+        $departmentId = $request->input('department_id');
+        $branchId = auth()->user()->employee->branch_id;
+        $groupId = $request->input('group_id');
+        $month = $request->input('month', date('Y-m')); // Format: 2024-01
+        $type = $request->input('type'); // aup, simple
+
+        // Oyning birinchi va oxirgi kunlarini aniqlash
+        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth();
+        $daysInMonth = $startDate->daysInMonth;
+
+        // Xodimlarni olish
+        $employeeQuery = Employee::select('id', 'name', 'group_id', 'department_id')
+            ->with(['group:id,name', 'department:id,name']);
+
+        // Filtrlar
+        if ($departmentId) {
+            $employeeQuery->where('department_id', $departmentId);
+        } elseif ($branchId) {
+            $employeeQuery->whereHas('department', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
+            });
+        }
+
+        if ($groupId) {
+            $employeeQuery->where('group_id', $groupId);
+        }
+
+        if ($type === 'aup') {
+            $employeeQuery->where('type', 'aup');
+        } elseif ($type === 'simple') {
+            $employeeQuery->where('type', '!=', 'aup');
+        } else {
+            $employeeQuery->whereIn('type', ['aup', 'simple']);
+        }
+
+        $employees = $employeeQuery->orderBy('name')->get();
+
+        if ($employees->isEmpty()) {
+            return response()->json(['message' => 'Xodimlar topilmadi'], 404);
+        }
+
+        // Excel yaratish
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Sarlavha
+        $sheet->setCellValue('A1', '№');
+        $sheet->setCellValue('B1', 'Xodim nomi');
+
+        // Kunlarni qo'yish (C1 dan boshlab)
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($day + 2); // C, D, E...
+            $sheet->setCellValue($column . '1', $day);
+        }
+
+        // Xodimlar ma'lumotlarini qo'yish
+        $row = 2;
+        foreach ($employees as $index => $employee) {
+            $sheet->setCellValue('A' . $row, $index + 1);
+            $sheet->setCellValue('B' . $row, $employee->name);
+
+            // Kunlar uchun bo'sh kataklar (istegancha to'ldirish mumkin)
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($day + 2);
+                $sheet->setCellValue($column . $row, ''); // Bo'sh katak
+            }
+
+            $row++;
+        }
+
+        // Styling
+        $headerRange = 'A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($daysInMonth + 2) . '1';
+        $sheet->getStyle($headerRange)->applyFromArray([
+            'font' => ['bold' => true],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]],
+            'fill' => [
+                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'startColor' => ['rgb' => 'E2E8F0']
+            ]
+        ]);
+
+        // Barcha ma'lumotlar uchun border
+        $dataRange = 'A1:' . \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($daysInMonth + 2) . ($row - 1);
+        $sheet->getStyle($dataRange)->applyFromArray([
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN]]
+        ]);
+
+        // Column width
+        $sheet->getColumnDimension('A')->setWidth(5);
+        $sheet->getColumnDimension('B')->setWidth(25);
+        for ($day = 1; $day <= $daysInMonth; $day++) {
+            $column = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($day + 2);
+            $sheet->getColumnDimension($column)->setWidth(4);
+        }
+
+        // Fayl nomini yaratish
+        $fileName = 'Xodimlar_Davomat_' . $month . '_' . date('YmdHis') . '.xlsx';
+
+        // Response headers
+        $response = response()->streamDownload(function () use ($spreadsheet) {
+            $writer = new Xlsx($spreadsheet);
+            $writer->save('php://output');
+        }, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
+
+        return $response;
     }
 
     public function getGroupsByDepartmentId(Request $request): \Illuminate\Http\JsonResponse

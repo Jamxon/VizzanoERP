@@ -88,6 +88,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('sources', [CasherController::class, 'getLatestSources']);
     Route::get('/monthly-export/excel', [CasherController::class, 'exportMonthlyCostExcel']);
     Route::get('monthly-export/pdf', [CasherController::class, 'exportMonthlyCostPdf']);
+    Route::get('export-attendance', [CasherController::class, 'exportEmployeeAttendance']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
