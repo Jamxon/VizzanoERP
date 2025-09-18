@@ -1021,7 +1021,9 @@ class CasherController extends Controller
         // Guruhsiz xodimlarni olish (hozircha jo‘natilmaydi)
         $ungroupedEmployees = Employee::where('department_id', $departmentId)
             ->whereNull('group_id')
-            ->where('type', $type === 'aup' ? 'aup' : '!=', 'aup')
+            ->when($type === 'aup', fn($q) => $q->where('type', 'aup'))
+            ->when($type === 'simple', fn($q) => $q->where('type', '!=', 'aup'))
+            ->whereIn('type', ['aup','simple'])
             ->select('id', 'name', 'group_id', 'position_id', 'balance', 'salary', 'payment_type', 'status')
             ->with('salaryPayments')
             ->get()
@@ -1065,8 +1067,10 @@ class CasherController extends Controller
                 $query->select('id', 'name', 'position_id', 'status', 'group_id', 'salary', 'balance', 'payment_type', 'status');
                 if ($type === 'aup') {
                     $query->where('type', 'aup');
-                } else {
+                } elseif ($type === 'simple') {
                     $query->where('type', '!=', 'aup');
+                }else{
+                    $query->whereIn('type', ['aup','simple']);
                 }
             }]);
 
@@ -1082,6 +1086,7 @@ class CasherController extends Controller
                 ->whereNull('group_id')
                 ->when($type === 'aup', fn($q) => $q->where('type', 'aup'))
                 ->when($type !== 'aup', fn($q) => $q->where('type', '!=', 'aup'))
+                ->whereIn('type', ['aup','simple'])
                 ->get();
 
             if ($extraEmployees->isNotEmpty()) {
