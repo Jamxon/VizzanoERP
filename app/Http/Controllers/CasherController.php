@@ -454,6 +454,10 @@ class CasherController extends Controller
         $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id');
 
         $aup = DB::table('attendance_salary')
+            ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
+            ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
+            ->where('employees.branch_id', $branchId)
+            ->where('employees.type', 'aup')
             ->whereDate('date', $date)
             ->whereIn('employee_id', $thisBranchEmployeeIds)
             ->sum('amount');
