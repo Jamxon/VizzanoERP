@@ -92,7 +92,8 @@ class CeoController extends Controller
         $query = MonthlySelectedOrder::with([
             'order.orderModel.submodels' => function ($q) {
                 $q->withSum('sewingOutputs', 'quantity');
-            }
+            },
+            'order.orderModel.submodels.submodel',
         ]);
 
         if ($request->filled('month')) {
@@ -112,7 +113,7 @@ class CeoController extends Controller
             }
 
             // faqat done_quantity qo‘shamiz
-            unset($order->orderModel->submodels->sewingOutputs); // ❌ submodels chiqmasin desangiz
+//            unset($order->orderModel->submodels->sewingOutputs); // ❌ submodels chiqmasin desangiz
 
             $order->done_quantity = $doneQuantity;
 
