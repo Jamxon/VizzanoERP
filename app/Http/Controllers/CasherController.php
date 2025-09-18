@@ -605,8 +605,19 @@ class CasherController extends Controller
         // Kunlik xarajat (orders bo'lmasa ham mavjud)
         $dailyExpense = $dailyExpenseMonthly + $totalIncomePercentageExpense + $totalAmortizationExpense;
 
+        // Tarification calculation (orders bo'lmasa ham hisoblanishi kerak)
+        $tarificationTotal = DB::table('employee_tarification_logs')
+            ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+            ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+            ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+            ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+            ->join('orders', 'order_models.order_id', '=', 'orders.id')
+            ->whereDate('employee_tarification_logs.date', $date)
+            ->whereIn('employee_tarification_logs.employee_id', $relatedEmployeeIds)
+            ->sum('employee_tarification_logs.amount_earned');
+
         // Umumiy harajat (orders bo'lmasa ham o'zgarmas harajatlar mavjud)
-        $totalFixedCost = $transport + $aup + $dailyExpense;
+        $totalFixedCost = $transport + $aup + $dailyExpense + $tarificationTotal;
 
         // Per employee cost calculation
         $perEmployeeCosts = [];
@@ -652,17 +663,6 @@ class CasherController extends Controller
 
         // Cost per unit calculation
         $costPerUnitOverall = $totalOutputQty > 0 ? $totalFixedCost / $totalOutputQty : 0;
-
-        // Tarification calculation (orders bo'lmasa ham hisoblanishi kerak)
-        $tarificationTotal = DB::table('employee_tarification_logs')
-            ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
-            ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
-            ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
-            ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
-            ->join('orders', 'order_models.order_id', '=', 'orders.id')
-            ->whereDate('employee_tarification_logs.date', $date)
-            ->whereIn('employee_tarification_logs.employee_id', $relatedEmployeeIds)
-            ->sum('employee_tarification_logs.amount_earned');
 
         // Bonuses calculation (orders bo'lmasa ham hisoblanishi kerak)
         $kpiTotal = DB::table('bonuses')->whereDate('created_at', $date)->sum('amount');
