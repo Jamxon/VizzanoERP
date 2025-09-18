@@ -3,10 +3,71 @@
 namespace App\Http\Controllers;
 
 use App\Models\MonthlySelectedOrder;
+use App\Models\Order;
 use Illuminate\Http\Request;
 
 class CeoController extends Controller
 {
+    public function getMonthlySelectedOrders(Request $request)
+    {
+        $branchId = auth()->user()->employee->branch_id;
+
+        $query = MonthlySelectedOrder::with([
+            'order.orderModel.submodels' => function ($q) {
+                $q->withSum('sewingOutputs', 'quantity');
+            },
+        ])->whereHas('order', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+
+        });
+
+        if ($request->filled('month')) {
+            $query->whereMonth('month', date('m', strtotime($request->month)))
+                ->whereYear('month', date('Y', strtotime($request->month)));
+        }
+
+        $records = $query->get()->map(function ($item) {
+            $order = $item->order;
+
+            $doneQuantity = 0;
+            if ($order && $order->orderModel) {
+                foreach ($order->orderModel->submodels as $submodel) {
+                    $doneQuantity += $submodel->sewing_outputs_sum_quantity ?? 0;
+                }
+            }
+
+            $order->done_quantity = $doneQuantity;
+
+            return $item;
+        });
+
+        // ✅ Recommendation (branchdagi, lekin monthly_selected_orders jadvalida yo‘q bo‘lganlar)
+        $selectedOrderIds = $records->pluck('order_id');
+
+        $recommendations = Order::with(['orderModel.submodels' => function ($q) {
+            $q->withSum('sewingOutputs', 'quantity');
+        }])
+            ->where('branch_id', $branchId) // ✅ branch filter
+            ->whereIn('status', ['cutting', 'pending', 'tailoring', 'tailored']) // ✅ status filter
+            ->whereNotIn('id', $selectedOrderIds) // ✅ ro‘yxatda yo‘q bo‘lganlarni olamiz
+            ->get()
+            ->map(function ($order) {
+                $doneQuantity = 0;
+                if ($order->orderModel) {
+                    foreach ($order->orderModel->submodels as $submodel) {
+                        $doneQuantity += $submodel->sewing_outputs_sum_quantity ?? 0;
+                    }
+                }
+                $order->done_quantity = $doneQuantity;
+                return $order;
+            });
+
+        return response()->json([
+            'selected' => $records,
+            'recommendations' => $recommendations,
+        ]);
+    }
+
     public function getGroupOrder(Request $request)
     {
         $startDate = $request->start_date;
@@ -86,41 +147,6 @@ class CeoController extends Controller
         return response()->json([
             'groups' => $result
         ]);
-    }
-    public function getMonthlySelectedOrders(Request $request)
-    {
-        $query = MonthlySelectedOrder::with([
-            'order.orderModel.submodels' => function ($q) {
-                $q->withSum('sewingOutputs', 'quantity');
-            },
-            'order.orderModel.submodels.submodel',
-        ]);
-
-        if ($request->filled('month')) {
-            $query->whereMonth('month', date('m', strtotime($request->month)))
-                ->whereYear('month', date('Y', strtotime($request->month)));
-        }
-
-        $records = $query->get()->map(function ($item) {
-            $order = $item->order;
-
-            $doneQuantity = 0;
-            if ($order && $order->orderModel) {
-                foreach ($order->orderModel->submodels as $submodel) {
-                    // sewing_outputs_sum_quantity avtomatik chiqadi
-                    $doneQuantity += $submodel->sewing_outputs_sum_quantity ?? 0;
-                }
-            }
-
-            // faqat done_quantity qo‘shamiz
-//            unset($order->orderModel->submodels->sewingOutputs); // ❌ submodels chiqmasin desangiz
-
-            $order->done_quantity = $doneQuantity;
-
-            return $item;
-        });
-
-        return response()->json($records);
     }
 
     public function storeMonthlySelectedOrders(Request $request)
