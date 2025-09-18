@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CasherController;
+use App\Http\Controllers\CeoController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ConstructorController;
 use App\Http\Controllers\CurrencyController;
