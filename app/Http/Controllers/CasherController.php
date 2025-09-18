@@ -1237,18 +1237,34 @@ class CasherController extends Controller
 
         // ➕ group_id null bo‘lsa → department ichida group_id null bo‘lgan employee-larni ham qo‘shamiz
         if (empty($groupId)) {
-            $extraEmployees = Employee::where('department_id', $departmentId)
-                ->whereNull('group_id')
-                ->when($type === 'aup', fn($q) => $q->where('type', 'aup'))
-                ->when($type !== 'aup', fn($q) => $q->where('type', '!=', 'aup'))
-                ->whereIn('type', ['aup','simple'])
-                ->get();
+            // Guruhsiz xodimlarni olish
+            $ungroupedQuery = Employee::whereNull('group_id');
 
-            if ($extraEmployees->isNotEmpty()) {
+            if ($departmentId) {
+                $ungroupedQuery->where('department_id', $departmentId);
+            } elseif ($branchId) {
+                $ungroupedQuery->whereHas('department', function ($query) use ($branchId) {
+                    $query->where('branch_id', $branchId);
+                });
+            }
+
+            $ungroupedEmployees = $ungroupedQuery
+                ->when($type === 'aup', fn($q) => $q->where('type', 'aup'))
+                ->when($type === 'simple', fn($q) => $q->where('type', '!=', 'aup'))
+                ->when(!$type || !in_array($type, ['aup', 'simple']), fn($q) => $q->whereIn('type', ['aup','simple']))
+                ->select('id', 'name', 'group_id', 'position_id', 'balance', 'salary', 'payment_type', 'status')
+                ->with('salaryPayments')
+                ->get()
+                ->map(function ($employee) use ($startDate, $endDate) {
+                    return $this->getEmployeeEarnings($employee, $startDate, $endDate);
+                })
+                ->filter();
+
+            if ($ungroupedEmployees->isNotEmpty()) {
                 $fakeGroup = new Group();
                 $fakeGroup->id = null;
                 $fakeGroup->name = 'Guruhsiz';
-                $fakeGroup->setRelation('employees', $extraEmployees);
+                $fakeGroup->setRelation('employees', $ungroupedEmployees);
 
 
                 $groups->push($fakeGroup);
