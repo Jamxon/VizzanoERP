@@ -378,6 +378,7 @@ Route::prefix('supervisor')->middleware('role:supervisor')->group(function () {
 });
 
 Route::prefix('superhr')->middleware('role:superhr')->group(function () {
+    Route::get('export-attendance', [CasherController::class, 'exportEmployeeAttendance']);
     Route::get('employees/aup', [SuperHRController::class, 'getAupEmployee']);
     Route::get('positions' , [SuperHRController::class, 'getPositions']);
     Route::post('positions' , [SuperHRController::class, 'storePositions']);
