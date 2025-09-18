@@ -123,6 +123,8 @@ Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function
 });
 
 Route::prefix('casher')->middleware('role:casher')->group(function () {
+    Route::post('groups2', [CasherController::class, 'getGroupsOrdersEarnings']);
+    Route::post('groups2/excel', [CasherController::class, 'exportGroupsOrdersEarnings']);
     Route::post('incomes', [CasherController::class, 'storeIncome']);
     Route::post('expenses', [CasherController::class, 'storeExpense']);
     Route::get('balances', [CasherController::class, 'getBalances']);
