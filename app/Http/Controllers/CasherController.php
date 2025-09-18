@@ -1175,6 +1175,10 @@ class CasherController extends Controller
                         })->values();
                     }
 
+                    if ($totalEarned === 0){
+                        return null;
+                    }
+
                     return [
                         'id' => $employee->id,
                         'name' => $employee->name,
@@ -1322,6 +1326,10 @@ class CasherController extends Controller
                     'month' => $payment->month->format('Y-m'),
                 ];
             })->values();
+        }
+
+        if ($totalEarned === 0){
+            return null;
         }
 
         return [
