@@ -432,14 +432,14 @@ class CasherController extends Controller
             ->unique()
             ->values();
 
-        // Transport
+        // Transport - har doim hisoblanadi
         $transport = DB::table('transport_attendance')
             ->join('transport', 'transport_attendance.transport_id', '=', 'transport.id')
             ->whereDate('transport_attendance.date', $date)
             ->where('transport.branch_id', $branchId)
             ->sum(DB::raw('(transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type'));
 
-        // Monthly expenses ni type bo'yicha ajratish
+        // Monthly expenses ni type bo'yicha ajratish - har doim hisoblanadi
         $monthlyExpenses = DB::table('monthly_expenses')
             ->whereMonth('month', $carbonDate->month)
             ->whereYear('month', $carbonDate->year)
@@ -453,7 +453,7 @@ class CasherController extends Controller
 
         $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id');
 
-        // AUP xarajatlari (faqat type = 'aup' bo'lganlar)
+        // AUP xarajatlari - har doim hisoblanadi
         $aup = DB::table('attendance_salary')
             ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
             ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
@@ -463,7 +463,7 @@ class CasherController extends Controller
             ->whereIn('attendance_salary.employee_id', $thisBranchEmployeeIds)
             ->sum('attendance_salary.amount');
 
-        // AUP emas lekin oylikka ishlovchilar (FAQAT KO'RSATISH UCHUN, harajatga qo'shilmaydi)
+        // AUP emas lekin oylikka ishlovchilar - har doim hisoblanadi
         $isNotAup = DB::table('attendance_salary')
             ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
             ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
@@ -473,6 +473,7 @@ class CasherController extends Controller
             ->whereIn('attendance_salary.employee_id', $thisBranchEmployeeIds)
             ->sum('attendance_salary.amount');
 
+        // Ishchilar soni - har doim hisoblanadi
         $employees = Attendance::whereDate('date', $date)
             ->where('status', 'present')
             ->whereHas('employee', function ($q) use ($branchId)  {
@@ -494,127 +495,131 @@ class CasherController extends Controller
         $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);
         $totalOutputQty = $outputs->sum('quantity');
 
-        $orders = $grouped->map(function ($items) use (
-            $dollarRate, $date, $relatedEmployeeIds,
-            $dailyExpenseMonthly, $transport, $aup, $isNotAup, $totalOutputQty, $monthlyExpenses
-        ) {
-            $first = $items->first();
-            $orderModel = optional($first->orderSubmodel)->orderModel;
-            $order = optional($orderModel)->order;
-            $orderId = $order->id ?? null;
+        // Agar orders mavjud bo'lsa, ularga xos harajatlarni hisoblash
+        $orders = collect();
+        $totalEarned = 0;
+        $totalOrderSpecificCosts = 0;
 
-            $totalQty = $items->sum('quantity');
-            $priceUSD = $order->price ?? 0;
-            $priceUZS = $priceUSD * $dollarRate;
-            $remainder = ($orderModel->rasxod ?? 0) * $totalQty;
+        if ($grouped->count() > 0) {
+            $orders = $grouped->map(function ($items) use (
+                $dollarRate, $date, $relatedEmployeeIds,
+                $dailyExpenseMonthly, $transport, $aup, $isNotAup, $totalOutputQty, $monthlyExpenses
+            ) {
+                $first = $items->first();
+                $orderModel = optional($first->orderSubmodel)->orderModel;
+                $order = optional($orderModel)->order;
+                $orderId = $order->id ?? null;
 
-            $bonus = DB::table('bonuses')
-                ->whereDate('created_at', $date)
-                ->where('order_id', $orderId)
-                ->sum('amount');
+                $totalQty = $items->sum('quantity');
+                $priceUSD = $order->price ?? 0;
+                $priceUZS = $priceUSD * $dollarRate;
+                $remainder = ($orderModel->rasxod ?? 0) * $totalQty;
 
-            $tarification = DB::table('employee_tarification_logs')
-                ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
-                ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
-                ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
-                ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
-                ->join('orders', 'order_models.order_id', '=', 'orders.id')
-                ->whereDate('employee_tarification_logs.date', $date)
-                ->where('orders.id', $orderId)
-                ->sum('employee_tarification_logs.amount_earned');
+                $bonus = DB::table('bonuses')
+                    ->whereDate('created_at', $date)
+                    ->where('order_id', $orderId)
+                    ->sum('amount');
 
-            // Type bo'yicha xarajatlarni hisoblash
-            $orderShareRatio = $totalOutputQty > 0 ? $totalQty / $totalOutputQty : 0;
+                $tarification = DB::table('employee_tarification_logs')
+                    ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+                    ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+                    ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+                    ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+                    ->join('orders', 'order_models.order_id', '=', 'orders.id')
+                    ->whereDate('employee_tarification_logs.date', $date)
+                    ->where('orders.id', $orderId)
+                    ->sum('employee_tarification_logs.amount_earned');
 
-            // Monthly type xarajat
-            $allocatedMonthlyExpenseMonthly = $dailyExpenseMonthly * $orderShareRatio;
+                // Type bo'yicha xarajatlarni hisoblash
+                $orderShareRatio = $totalOutputQty > 0 ? $totalQty / $totalOutputQty : 0;
 
-            // Income percentage type xarajat
-            $incomePercentageExpense = 0;
-            $incomePercentageExpenses = $monthlyExpenses->where('type', 'income_percentage');
-            foreach ($incomePercentageExpenses as $expense) {
-                $percentageAmount = ($priceUZS * $totalQty) * ($expense->amount / 100);
-                $incomePercentageExpense += $percentageAmount;
-            }
+                // Monthly type xarajat
+                $allocatedMonthlyExpenseMonthly = $dailyExpenseMonthly * $orderShareRatio;
 
-            // Amortization type xarajat (har bir mahsulot uchun 10 sent)
-            $amortizationExpense = 0;
-            $amortizationExpenses = $monthlyExpenses->where('type', 'amortization');
-            if ($amortizationExpenses->count() > 0) {
-                $amortizationExpense = $totalQty * 0.10 * $dollarRate;
-            }
+                // Income percentage type xarajat
+                $incomePercentageExpense = 0;
+                $incomePercentageExpenses = $monthlyExpenses->where('type', 'income_percentage');
+                foreach ($incomePercentageExpenses as $expense) {
+                    $percentageAmount = ($priceUZS * $totalQty) * ($expense->amount / 100);
+                    $incomePercentageExpense += $percentageAmount;
+                }
 
-            $fixedCost = $bonus + $remainder;
+                // Amortization type xarajat (har bir mahsulot uchun 10 sent)
+                $amortizationExpense = 0;
+                $amortizationExpenses = $monthlyExpenses->where('type', 'amortization');
+                if ($amortizationExpenses->count() > 0) {
+                    $amortizationExpense = $totalQty * 0.10 * $dollarRate;
+                }
 
-            $allocatedTransport = $transport * $orderShareRatio;
-            $allocatedAup = $aup * $orderShareRatio;
-            // isNotAup ni ajratish lekin harajatga qo'shmaslik
-            $allocatedIsNotAup = $isNotAup * $orderShareRatio;
+                $fixedCost = $bonus + $remainder;
 
-            // MUHIM: isNotAup ni totalExtra ga qo'shmaymiz
-            $totalExtra = $allocatedTransport + $allocatedAup + $allocatedMonthlyExpenseMonthly + $incomePercentageExpense + $amortizationExpense;
+                $allocatedTransport = $transport * $orderShareRatio;
+                $allocatedAup = $aup * $orderShareRatio;
+                $allocatedIsNotAup = $isNotAup * $orderShareRatio;
 
-            $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
-            $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
+                $totalExtra = $allocatedTransport + $allocatedAup + $allocatedMonthlyExpenseMonthly + $incomePercentageExpense + $amortizationExpense;
 
-            $responsibleUsers = $orderModel->submodels->map(function ($submodel) {
-                return optional($submodel->group->group)->responsibleUser;
-            })->filter()->unique('id')->values();
+                $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
+                $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
 
-            $rasxodPercentOfPrice = $priceUZS > 0
-                ? round((($orderModel->rasxod ?? 0) / $priceUZS) * 100, 2)
-                : null;
+                $responsibleUsers = $orderModel->submodels->map(function ($submodel) {
+                    return optional($submodel->group->group)->responsibleUser;
+                })->filter()->unique('id')->values();
 
-            return [
-                'order' => $order,
-                'responsibleUser' => $responsibleUsers,
-                'model' => $orderModel->model ?? null,
-                'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
-                'price_usd' => $priceUSD,
-                'price_uzs' => $priceUZS,
-                'total_quantity' => $totalQty,
-                'rasxod_limit_uzs' => $remainder,
-                'rasxod_percent_of_price' => $rasxodPercentOfPrice,
-                'bonus' => $bonus,
-                'tarification' => $tarification,
-                'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
-                'costs_uzs' => compact('bonus', 'remainder', 'tarification', 'allocatedTransport', 'allocatedAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
-                'total_fixed_cost_uzs' => $fixedCost + $totalExtra, // isNotAup qo'shilmaydi
-                'net_profit_uzs' => $profitUZS,
-                'cost_per_unit_uzs' => round($perUnitCost),
-                'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
-                'profitability_percent' => ($fixedCost + $totalExtra) > 0
-                    ? round(($profitUZS / ($fixedCost + $totalExtra)) * 100, 2)
-                    : null,
-            ];
-        })->values();
+                $rasxodPercentOfPrice = $priceUZS > 0
+                    ? round((($orderModel->rasxod ?? 0) / $priceUZS) * 100, 2)
+                    : null;
 
-        $totalEarned = $orders->sum('total_output_cost_uzs');
-        // isNotAup ni umumiy harajatga qo'shmaymiz
-        $totalFixedCost = $totalEarned - $orders->sum('net_profit_uzs');
+                return [
+                    'order' => $order,
+                    'responsibleUser' => $responsibleUsers,
+                    'model' => $orderModel->model ?? null,
+                    'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
+                    'price_usd' => $priceUSD,
+                    'price_uzs' => $priceUZS,
+                    'total_quantity' => $totalQty,
+                    'rasxod_limit_uzs' => $remainder,
+                    'rasxod_percent_of_price' => $rasxodPercentOfPrice,
+                    'bonus' => $bonus,
+                    'tarification' => $tarification,
+                    'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
+                    'costs_uzs' => compact('bonus', 'remainder', 'tarification', 'allocatedTransport', 'allocatedAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
+                    'total_fixed_cost_uzs' => $fixedCost + $totalExtra,
+                    'net_profit_uzs' => $profitUZS,
+                    'cost_per_unit_uzs' => round($perUnitCost),
+                    'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
+                    'profitability_percent' => ($fixedCost + $totalExtra) > 0
+                        ? round(($profitUZS / ($fixedCost + $totalExtra)) * 100, 2)
+                        : null,
+                ];
+            })->values();
 
-        // Umumiy xarajatlarni hisoblash
+            $totalEarned = $orders->sum('total_output_cost_uzs');
+            $totalOrderSpecificCosts = $orders->sum('total_fixed_cost_uzs');
+        }
+
+        // Agar orders bo'sh bo'lsa ham harajatlarni hisoblash
         $totalIncomePercentageExpense = $orders->sum('costs_uzs.incomePercentageExpense');
         $totalAmortizationExpense = $orders->sum('costs_uzs.amortizationExpense');
 
+        // Kunlik xarajat (orders bo'lmasa ham mavjud)
         $dailyExpense = $dailyExpenseMonthly + $totalIncomePercentageExpense + $totalAmortizationExpense;
 
-        // Umumiy quantity va har bir dona uchun xarajat hisoblash
-        $costPerUnitOverall = $totalOutputQty > 0 ? $totalFixedCost / $totalOutputQty : 0;
+        // Umumiy harajat (orders bo'lmasa ham o'zgarmas harajatlar mavjud)
+        $totalFixedCost = $transport + $aup + $dailyExpense;
 
-        // Per employee cost calculation (isNotAup qo'shilmaydi)
+        // Per employee cost calculation
         $perEmployeeCosts = [];
         $employeeCount = max($employees, 1);
 
         $rasxodLimit = $orders->sum('rasxod_limit_uzs') / $employeeCount;
         $transportCost = $transport / $employeeCount;
         $aupCost = $aup / $employeeCount;
-        $isNotAupCost = $isNotAup / $employeeCount; // faqat ko'rsatish uchun
+        $isNotAupCost = $isNotAup / $employeeCount;
         $monthlyExpenseCost = $dailyExpenseMonthly / $employeeCount;
-        $incomePercentageCost = $orders->sum('costs_uzs.incomePercentageExpense') / $employeeCount;
-        $amortizationCost = $orders->sum('costs_uzs.amortizationExpense') / $employeeCount;
+        $incomePercentageCost = $totalIncomePercentageExpense / $employeeCount;
+        $amortizationCost = $totalAmortizationExpense / $employeeCount;
 
-        // MUHIM: isNotAupCost ni totalPerEmployee ga qo'shmaymiz
         $totalPerEmployee = $rasxodLimit + $transportCost + $aupCost + $monthlyExpenseCost + $incomePercentageCost + $amortizationCost;
 
         $perEmployeeCosts = [
@@ -642,8 +647,25 @@ class CasherController extends Controller
                 'amount' => round($amortizationCost),
                 'percent' => $totalPerEmployee > 0 ? round(($amortizationCost / $totalPerEmployee) * 100, 2) : 0
             ],
-            'total' => round($totalPerEmployee) // isNotAup qo'shilmaydi
+            'total' => round($totalPerEmployee)
         ];
+
+        // Cost per unit calculation
+        $costPerUnitOverall = $totalOutputQty > 0 ? $totalFixedCost / $totalOutputQty : 0;
+
+        // Tarification calculation (orders bo'lmasa ham hisoblanishi kerak)
+        $tarificationTotal = DB::table('employee_tarification_logs')
+            ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+            ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+            ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+            ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+            ->join('orders', 'order_models.order_id', '=', 'orders.id')
+            ->whereDate('employee_tarification_logs.date', $date)
+            ->whereIn('employee_tarification_logs.employee_id', $relatedEmployeeIds)
+            ->sum('employee_tarification_logs.amount_earned');
+
+        // Bonuses calculation (orders bo'lmasa ham hisoblanishi kerak)
+        $kpiTotal = DB::table('bonuses')->whereDate('created_at', $date)->sum('amount');
 
         return response()->json([
             'date' => $date,
@@ -652,23 +674,15 @@ class CasherController extends Controller
             'transport_attendance' => $transport,
             'daily_expenses' => $dailyExpense,
             'aup' => $aup,
-            'isNotAup' => $isNotAup, // ko'rsatish uchun qaytaramiz
+            'isNotAup' => $isNotAup,
             'total_earned_uzs' => $totalEarned,
-            'total_fixed_cost_uzs' => $totalFixedCost, // isNotAup qo'shilmagan
+            'total_fixed_cost_uzs' => $totalFixedCost,
             'employee_count' => $employees,
             'rasxod_limit_uzs' => $orders->sum('rasxod_limit_uzs'),
             'per_employee_cost_uzs' => $perEmployeeCosts,
             'net_profit_uzs' => $totalEarned - $totalFixedCost,
-            'kpi' => DB::table('bonuses')->whereDate('created_at', $date)->sum('amount'),
-            'tarification' => DB::table('employee_tarification_logs')
-                ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
-                ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
-                ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
-                ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
-                ->join('orders', 'order_models.order_id', '=', 'orders.id')
-                ->whereDate('employee_tarification_logs.date', $date)
-                ->whereIn('employee_tarification_logs.employee_id', $relatedEmployeeIds)
-                ->sum('employee_tarification_logs.amount_earned'),
+            'kpi' => $kpiTotal,
+            'tarification' => $tarificationTotal,
             'total_output_quantity' => $totalOutputQty,
             'cost_per_unit_overall_uzs' => round($costPerUnitOverall, 2),
         ]);
