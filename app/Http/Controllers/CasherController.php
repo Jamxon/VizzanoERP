@@ -989,7 +989,7 @@ class CasherController extends Controller
         $employeeQuery = Employee::select('id', 'name', 'group_id', 'department_id')
             ->with(['group:id,name', 'department:id,name']);
 
-        $employeeQuery->where('status', '!=', 'kicked');
+        $employeeQuery->where('status', 'working');
 
         // Filtrlar
         if ($departmentId) {
