@@ -56,7 +56,7 @@ class GetGroupsForResultCheckerResource extends JsonResource
                         ->distinct('employee_id')
                         ->count('employee_id');
 
-                    $totalQuantity = $submodel->sewingOutputs->sum('quantity');
+                    $totalQuantity = \App\Models\SewingOutputs::where('submodel_id', $submodel->id)->sum('quantity');
 
                     $todaySewingOutputs = $submodel->sewingOutputs
                         ->whereBetween('created_at', [now()->startOfDay(), now()->endOfDay()])
