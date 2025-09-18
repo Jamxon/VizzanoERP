@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MonthlySelectedOrder;
 use Illuminate\Http\Request;
 
 class CeoController extends Controller
@@ -86,5 +87,49 @@ class CeoController extends Controller
             'groups' => $result
         ]);
     }
+    public function getMonthlySelectedOrders(Request $request)
+    {
+        $query = MonthlySelectedOrder::with('order');
 
+        if ($request->filled('month')) {
+            $query->whereMonth('month', date('m', strtotime($request->month)))
+                ->whereYear('month', date('Y', strtotime($request->month)));
+        }
+
+        return response()->json($query->get());
+    }
+
+    public function storeMonthlySelectedOrders(Request $request)
+    {
+        $data = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'month' => 'required|date',
+        ]);
+
+        $record = MonthlySelectedOrder::create($data);
+
+        return response()->json($record, 201);
+    }
+
+    public function updateMonthlySelectedOrders(Request $request, $id)
+    {
+        $record = MonthlySelectedOrder::findOrFail($id);
+
+        $data = $request->validate([
+            'order_id' => 'sometimes|exists:orders,id',
+            'month' => 'sometimes|date',
+        ]);
+
+        $record->update($data);
+
+        return response()->json($record);
+    }
+
+    public function destroyMonthlySelectedOrders($id)
+    {
+        $record = MonthlySelectedOrder::findOrFail($id);
+        $record->delete();
+
+        return response()->json(['message' => 'Deleted successfully']);
+    }
 }

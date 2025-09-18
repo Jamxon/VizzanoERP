@@ -89,6 +89,10 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('/monthly-export/excel', [CasherController::class, 'exportMonthlyCostExcel']);
     Route::get('monthly-export/pdf', [CasherController::class, 'exportMonthlyCostPdf']);
     Route::get('export-attendance', [CasherController::class, 'exportEmployeeAttendance']);
+    Route::get('monthlySelectedOrders', [CeoController::class, 'getMonthlySelectedOrders']);
+    Route::post('monthlySelectedOrders', [CeoController::class, 'storeMonthlySelectedOrders']);
+    Route::delete('monthlySelectedOrders/{id}', [CeoController::class, 'destroyMonthlySelectedOrders']);
+    Route::patch('monthlySelectedOrders/{id}', [CeoController::class, 'updateMonthlySelectedOrders']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
