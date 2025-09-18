@@ -89,14 +89,32 @@ class CeoController extends Controller
     }
     public function getMonthlySelectedOrders(Request $request)
     {
-        $query = MonthlySelectedOrder::with('order');
+        $query = MonthlySelectedOrder::with([
+            'order.orderModel.submodels.sewingOutputs'
+        ]);
 
         if ($request->filled('month')) {
             $query->whereMonth('month', date('m', strtotime($request->month)))
                 ->whereYear('month', date('Y', strtotime($request->month)));
         }
 
-        return response()->json($query->get());
+        $records = $query->get()->map(function ($item) {
+            $order = $item->order;
+
+            $doneQuantity = 0;
+            if ($order && $order->orderModel) {
+                foreach ($order->orderModel->submodels as $submodel) {
+                    $doneQuantity += $submodel->sewingOutputs->sum('quantity');
+                }
+            }
+
+            // order ichiga qo‘shamiz
+            $order->done_quantity = $doneQuantity;
+
+            return $item;
+        });
+
+        return response()->json($records);
     }
 
     public function storeMonthlySelectedOrders(Request $request)
