@@ -1195,7 +1195,8 @@ class CasherController extends Controller
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
         $group_id = $request->input('group_id');
-        $addOrderIds = $request->input('order_ids', []); // array
+        $addOrderIds = $request->input('add', []); // array
+        $minusOrderIds = $request->input('minus', []); // array
         $type = $request->input('type'); // normal yoki aup
 
         // Agar department_id ham, branch_id ham kelmasa xato
