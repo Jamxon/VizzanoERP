@@ -1191,31 +1191,45 @@ class CasherController extends Controller
     public function getGroupsOrdersEarnings(Request $request): \Illuminate\Http\JsonResponse
     {
         $departmentId = $request->input('department_id');
+        $branchId = auth()->user()->employee->branch_id;
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        $groupId = $request->input('group_id');
-        $addOrderIds = $request->input('add', []);   // qo‘shiladigan order_id lar
-        $minusOrderIds = $request->input('minus', []); // ayiriladigan order_id lar
+        $group_id = $request->input('group_id');
+        $orderIds = $request->input('order_ids', []); // array
         $type = $request->input('type'); // normal yoki aup
 
-        if (!$departmentId) {
-            return response()->json(['message' => '❌ department_id kiritilmadi.'], 422);
+        // Agar department_id ham, branch_id ham kelmasa xato
+        if (!$departmentId && !$branchId) {
+            return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
         }
 
-        $groupQuery = Group::where('department_id', $departmentId)
-            ->with(['employees' => function ($query) use ($type) {
-                $query->select('id', 'name', 'position_id', 'status', 'group_id', 'salary', 'balance', 'payment_type', 'status');
-                if ($type === 'aup') {
-                    $query->where('type', 'aup');
-                } elseif ($type === 'simple') {
-                    $query->where('type', '!=', 'aup');
-                }else{
-                    $query->whereIn('type', ['aup','simple']);
-                }
-            }]);
+        // Guruhlarni olish
+        $groupQuery = Group::query();
 
-        if (!empty($groupId)) {
-            $groupQuery->where('id', $groupId);
+        if ($departmentId) {
+            // Agar department_id berilgan bo'lsa
+            $groupQuery->where('department_id', $departmentId);
+        } elseif ($branchId) {
+            // Agar faqat branch_id berilgan bo'lsa, shu branchdagi barcha departmentlar
+            $groupQuery->whereHas('department', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
+            });
+        }
+
+        $groupQuery->with(['employees' => function ($query) use ($type) {
+            $query->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status')
+                ->with('salaryPayments');
+            if ($type === 'aup') {
+                $query->where('type', 'aup');
+            } elseif ($type === 'simple') {
+                $query->where('type', '!=', 'aup');
+            } else {
+                $query->whereIn('type', ['aup','simple']);
+            }
+        }]);
+
+        if (!empty($group_id)) {
+            $groupQuery->where('id', $group_id);
         }
 
         $groups = $groupQuery->get();
