@@ -578,7 +578,7 @@ class CasherController extends Controller
                 'bonus' => $bonus,
                 'tarification' => $tarification,
                 'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
-                'costs_uzs' => compact('bonus', 'remainder', 'tarification', 'allocatedTransport', 'allocatedAup', 'allocatedIsNotAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
+                'costs_uzs' => compact('bonus', 'remainder', 'tarification', 'allocatedTransport', 'allocatedAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
                 'total_fixed_cost_uzs' => $fixedCost + $totalExtra, // isNotAup qo'shilmaydi
                 'net_profit_uzs' => $profitUZS,
                 'cost_per_unit_uzs' => round($perUnitCost),
@@ -629,10 +629,6 @@ class CasherController extends Controller
             'aup' => [
                 'amount' => round($aupCost),
                 'percent' => $totalPerEmployee > 0 ? round(($aupCost / $totalPerEmployee) * 100, 2) : 0
-            ],
-            'isNotAup' => [
-                'amount' => round($isNotAupCost),
-                'percent' => 0 // foizini 0 qilamiz chunki umumiy harajatga qo'shilmaydi
             ],
             'monthly_expense' => [
                 'amount' => round($monthlyExpenseCost),
