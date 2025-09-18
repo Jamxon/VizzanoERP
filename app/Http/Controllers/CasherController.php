@@ -453,14 +453,25 @@ class CasherController extends Controller
 
         $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id');
 
+        // AUP xarajatlari (faqat type = 'aup' bo'lganlar)
         $aup = DB::table('attendance_salary')
             ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
             ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
             ->where('employees.branch_id', $branchId)
             ->where('employees.type', 'aup')
-            ->whereDate('attendance.date', $date) // ✅ jadval nomi bilan
-            ->whereIn('attendance_salary.employee_id', $thisBranchEmployeeIds) // ✅ jadval nomi bilan
-            ->sum('attendance_salary.amount'); // ✅ jadval nomi bilan
+            ->whereDate('attendance.date', $date)
+            ->whereIn('attendance_salary.employee_id', $thisBranchEmployeeIds)
+            ->sum('attendance_salary.amount');
+
+        // AUP emas lekin oylikka ishlovchilar (FAQAT KO'RSATISH UCHUN, harajatga qo'shilmaydi)
+        $isNotAup = DB::table('attendance_salary')
+            ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
+            ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
+            ->where('employees.branch_id', $branchId)
+            ->where('employees.type', '!=', 'aup')
+            ->whereDate('attendance.date', $date)
+            ->whereIn('attendance_salary.employee_id', $thisBranchEmployeeIds)
+            ->sum('attendance_salary.amount');
 
         $employees = Attendance::whereDate('date', $date)
             ->where('status', 'present')
@@ -478,9 +489,6 @@ class CasherController extends Controller
             ->whereHas('orderSubmodel.orderModel.order', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
             })
-//            ->whereHas('orderSubmodel.group.group', function ($q) {
-//                $q->where('name', 'not like', '%Трикотаж%'); // '!=' emas, 'not like'
-//            })
             ->get();
 
         $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);
@@ -488,7 +496,7 @@ class CasherController extends Controller
 
         $orders = $grouped->map(function ($items) use (
             $dollarRate, $date, $relatedEmployeeIds,
-            $dailyExpenseMonthly, $transport, $aup, $totalOutputQty, $monthlyExpenses
+            $dailyExpenseMonthly, $transport, $aup, $isNotAup, $totalOutputQty, $monthlyExpenses
         ) {
             $first = $items->first();
             $orderModel = optional($first->orderSubmodel)->orderModel;
@@ -540,7 +548,10 @@ class CasherController extends Controller
 
             $allocatedTransport = $transport * $orderShareRatio;
             $allocatedAup = $aup * $orderShareRatio;
+            // isNotAup ni ajratish lekin harajatga qo'shmaslik
+            $allocatedIsNotAup = $isNotAup * $orderShareRatio;
 
+            // MUHIM: isNotAup ni totalExtra ga qo'shmaymiz
             $totalExtra = $allocatedTransport + $allocatedAup + $allocatedMonthlyExpenseMonthly + $incomePercentageExpense + $amortizationExpense;
 
             $perUnitCost = $totalQty > 0 ? ($fixedCost + $totalExtra) / $totalQty : 0;
@@ -567,8 +578,8 @@ class CasherController extends Controller
                 'bonus' => $bonus,
                 'tarification' => $tarification,
                 'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
-                'costs_uzs' => compact('bonus', 'remainder', 'tarification', 'allocatedTransport', 'allocatedAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
-                'total_fixed_cost_uzs' => $fixedCost + $totalExtra,
+                'costs_uzs' => compact('bonus', 'remainder', 'tarification', 'allocatedTransport', 'allocatedAup', 'allocatedIsNotAup', 'allocatedMonthlyExpenseMonthly', 'incomePercentageExpense', 'amortizationExpense'),
+                'total_fixed_cost_uzs' => $fixedCost + $totalExtra, // isNotAup qo'shilmaydi
                 'net_profit_uzs' => $profitUZS,
                 'cost_per_unit_uzs' => round($perUnitCost),
                 'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
@@ -579,6 +590,7 @@ class CasherController extends Controller
         })->values();
 
         $totalEarned = $orders->sum('total_output_cost_uzs');
+        // isNotAup ni umumiy harajatga qo'shmaymiz
         $totalFixedCost = $totalEarned - $orders->sum('net_profit_uzs');
 
         // Umumiy xarajatlarni hisoblash
@@ -590,47 +602,52 @@ class CasherController extends Controller
         // Umumiy quantity va har bir dona uchun xarajat hisoblash
         $costPerUnitOverall = $totalOutputQty > 0 ? $totalFixedCost / $totalOutputQty : 0;
 
-        // Umumiy xarajatlar breakdown
+        // Per employee cost calculation (isNotAup qo'shilmaydi)
         $perEmployeeCosts = [];
         $employeeCount = max($employees, 1);
 
         $rasxodLimit = $orders->sum('rasxod_limit_uzs') / $employeeCount;
         $transportCost = $transport / $employeeCount;
         $aupCost = $aup / $employeeCount;
+        $isNotAupCost = $isNotAup / $employeeCount; // faqat ko'rsatish uchun
         $monthlyExpenseCost = $dailyExpenseMonthly / $employeeCount;
         $incomePercentageCost = $orders->sum('costs_uzs.incomePercentageExpense') / $employeeCount;
         $amortizationCost = $orders->sum('costs_uzs.amortizationExpense') / $employeeCount;
 
+        // MUHIM: isNotAupCost ni totalPerEmployee ga qo'shmaymiz
         $totalPerEmployee = $rasxodLimit + $transportCost + $aupCost + $monthlyExpenseCost + $incomePercentageCost + $amortizationCost;
 
         $perEmployeeCosts = [
             'rasxod_limit_uzs' => [
                 'amount' => round($rasxodLimit),
-                'percent' => round(($rasxodLimit / $totalPerEmployee) * 100, 2)
+                'percent' => $totalPerEmployee > 0 ? round(($rasxodLimit / $totalPerEmployee) * 100, 2) : 0
             ],
             'transport' => [
                 'amount' => round($transportCost),
-                'percent' => round(($transportCost / $totalPerEmployee) * 100, 2)
+                'percent' => $totalPerEmployee > 0 ? round(($transportCost / $totalPerEmployee) * 100, 2) : 0
             ],
             'aup' => [
                 'amount' => round($aupCost),
-                'percent' => round(($aupCost / $totalPerEmployee) * 100, 2)
+                'percent' => $totalPerEmployee > 0 ? round(($aupCost / $totalPerEmployee) * 100, 2) : 0
+            ],
+            'isNotAup' => [
+                'amount' => round($isNotAupCost),
+                'percent' => 0 // foizini 0 qilamiz chunki umumiy harajatga qo'shilmaydi
             ],
             'monthly_expense' => [
                 'amount' => round($monthlyExpenseCost),
-                'percent' => round(($monthlyExpenseCost / $totalPerEmployee) * 100, 2)
+                'percent' => $totalPerEmployee > 0 ? round(($monthlyExpenseCost / $totalPerEmployee) * 100, 2) : 0
             ],
             'income_percentage_expense' => [
                 'amount' => round($incomePercentageCost),
-                'percent' => round(($incomePercentageCost / $totalPerEmployee) * 100, 2)
+                'percent' => $totalPerEmployee > 0 ? round(($incomePercentageCost / $totalPerEmployee) * 100, 2) : 0
             ],
             'amortization_expense' => [
                 'amount' => round($amortizationCost),
-                'percent' => round(($amortizationCost / $totalPerEmployee) * 100, 2)
+                'percent' => $totalPerEmployee > 0 ? round(($amortizationCost / $totalPerEmployee) * 100, 2) : 0
             ],
-            'total' => round($totalPerEmployee)
+            'total' => round($totalPerEmployee) // isNotAup qo'shilmaydi
         ];
-
 
         return response()->json([
             'date' => $date,
@@ -639,8 +656,9 @@ class CasherController extends Controller
             'transport_attendance' => $transport,
             'daily_expenses' => $dailyExpense,
             'aup' => $aup,
+            'isNotAup' => $isNotAup, // ko'rsatish uchun qaytaramiz
             'total_earned_uzs' => $totalEarned,
-            'total_fixed_cost_uzs' => $totalFixedCost,
+            'total_fixed_cost_uzs' => $totalFixedCost, // isNotAup qo'shilmagan
             'employee_count' => $employees,
             'rasxod_limit_uzs' => $orders->sum('rasxod_limit_uzs'),
             'per_employee_cost_uzs' => $perEmployeeCosts,
@@ -655,8 +673,6 @@ class CasherController extends Controller
                 ->whereDate('employee_tarification_logs.date', $date)
                 ->whereIn('employee_tarification_logs.employee_id', $relatedEmployeeIds)
                 ->sum('employee_tarification_logs.amount_earned'),
-
-            // Yangi qo'shilgan qismlar
             'total_output_quantity' => $totalOutputQty,
             'cost_per_unit_overall_uzs' => round($costPerUnitOverall, 2),
         ]);
