@@ -90,7 +90,9 @@ class CeoController extends Controller
     public function getMonthlySelectedOrders(Request $request)
     {
         $query = MonthlySelectedOrder::with([
-            'order.orderModel.submodels.sewingOutputs'
+            'order.orderModel.submodels' => function ($q) {
+                $q->withSum('sewingOutputs', 'quantity');
+            }
         ]);
 
         if ($request->filled('month')) {
@@ -104,11 +106,14 @@ class CeoController extends Controller
             $doneQuantity = 0;
             if ($order && $order->orderModel) {
                 foreach ($order->orderModel->submodels as $submodel) {
-                    $doneQuantity += $submodel->sewingOutputs->sum('quantity');
+                    // sewing_outputs_sum_quantity avtomatik chiqadi
+                    $doneQuantity += $submodel->sewing_outputs_sum_quantity ?? 0;
                 }
             }
 
-            // order ichiga qo‘shamiz
+            // faqat done_quantity qo‘shamiz
+            unset($order->orderModel->submodels); // ❌ submodels chiqmasin desangiz
+
             $order->done_quantity = $doneQuantity;
 
             return $item;
