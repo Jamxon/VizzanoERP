@@ -112,7 +112,7 @@ class CeoController extends Controller
             }
 
             // faqat done_quantity qo‘shamiz
-            unset($order->orderModel->submodels); // ❌ submodels chiqmasin desangiz
+//            unset($order->orderModel->submodels); // ❌ submodels chiqmasin desangiz
 
             $order->done_quantity = $doneQuantity;
 
