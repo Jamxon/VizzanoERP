@@ -80,6 +80,7 @@ class GetGroupsForResultCheckerResource extends JsonResource
                         ],
                         'status' => $order->order->status ?? null,
                         'todayPlan' => $todayPlan,
+                        'orderQuantity' => $order->order->quantity,
                         'sewingOutputs' => $todaySewingOutputs->map(function ($sewingOutput) {
                             return [
                                 'id' => $sewingOutput->id,
