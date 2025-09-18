@@ -458,9 +458,9 @@ class CasherController extends Controller
             ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
             ->where('employees.branch_id', $branchId)
             ->where('employees.type', 'aup')
-            ->whereDate('date', $date)
-            ->whereIn('employee_id', $thisBranchEmployeeIds)
-            ->sum('amount');
+            ->whereDate('attendance.date', $date) // ✅ jadval nomi bilan
+            ->whereIn('attendance_salary.employee_id', $thisBranchEmployeeIds) // ✅ jadval nomi bilan
+            ->sum('attendance_salary.amount'); // ✅ jadval nomi bilan
 
         $employees = Attendance::whereDate('date', $date)
             ->where('status', 'present')
