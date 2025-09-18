@@ -1022,7 +1022,7 @@ class CasherController extends Controller
 
         // Sarlavha
         $sheet->setCellValue('A1', '№');
-        $sheet->setCellValue('B1', 'Xodim nomi');
+        $sheet->setCellValue('B1', 'Xodim ismi');
 
         // Kunlarni qo'yish (C1 dan boshlab)
         for ($day = 1; $day <= $daysInMonth; $day++) {
