@@ -1191,60 +1191,57 @@ class CasherController extends Controller
     public function getGroupsOrdersEarnings(Request $request): \Illuminate\Http\JsonResponse
     {
         $departmentId = $request->input('department_id');
-        $branchId = auth()->user()->employee->branch_id;
+        $branchId = auth()->user()->employee->branch_id ?? null;
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        $group_id = $request->input('group_id');
-        $addOrderIds = $request->input('add', []); // array
-        $minusOrderIds = $request->input('minus', []); // array
-        $type = $request->input('type'); // normal yoki aup
+        $groupId = $request->input('group_id'); // consistent name
+        $addOrderIds = (array) $request->input('add', []);
+        $minusOrderIds = (array) $request->input('minus', []);
+        $type = $request->input('type');
 
-        // Agar department_id ham, branch_id ham kelmasa xato
         if (!$departmentId && !$branchId) {
             return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
         }
 
-        // Guruhlarni olish
+        // Build groups query
         $groupQuery = Group::query();
 
         if ($departmentId) {
-            // Agar department_id berilgan bo'lsa
             $groupQuery->where('department_id', $departmentId);
         } elseif ($branchId) {
-            // Agar faqat branch_id berilgan bo'lsa, shu branchdagi barcha departmentlar
-            $groupQuery->whereHas('department', function ($query) use ($branchId) {
-                $query->where('branch_id', $branchId);
+            $groupQuery->whereHas('department', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
             });
         }
 
-        $groupQuery->with(['employees' => function ($query) use ($type) {
-            $query->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status')
+        $groupQuery->with(['employees' => function ($q) use ($type) {
+            $q->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status')
                 ->with('salaryPayments');
+
             if ($type === 'aup') {
-                $query->where('type', 'aup');
+                $q->where('type', 'aup');
             } elseif ($type === 'simple') {
-                $query->where('type', '!=', 'aup');
+                $q->where('type', '!=', 'aup');
             } else {
-                $query->whereIn('type', ['aup','simple']);
+                $q->whereIn('type', ['aup', 'simple']);
             }
         }]);
 
-        if (!empty($group_id)) {
-            $groupQuery->where('id', $group_id);
+        if (!empty($groupId)) {
+            $groupQuery->where('id', $groupId);
         }
 
         $groups = $groupQuery->get();
 
-        // ➕ group_id null bo‘lsa → department ichida group_id null bo‘lgan employee-larni ham qo‘shamiz
+        // Agar group_id berilmagan bo'lsa, guruhsiz xodimlarni ham qo'shamiz — ASOSIY: bu yerda **modellari** olinadi (array emas)
         if (empty($groupId)) {
-            // Guruhsiz xodimlarni olish
             $ungroupedQuery = Employee::whereNull('group_id');
 
             if ($departmentId) {
                 $ungroupedQuery->where('department_id', $departmentId);
             } elseif ($branchId) {
-                $ungroupedQuery->whereHas('department', function ($query) use ($branchId) {
-                    $query->where('branch_id', $branchId);
+                $ungroupedQuery->whereHas('department', function ($q) use ($branchId) {
+                    $q->where('branch_id', $branchId);
                 });
             }
 
@@ -1254,19 +1251,13 @@ class CasherController extends Controller
                 ->when(!$type || !in_array($type, ['aup', 'simple']), fn($q) => $q->whereIn('type', ['aup','simple']))
                 ->select('id', 'name', 'group_id', 'position_id', 'balance', 'salary', 'payment_type', 'status')
                 ->with('salaryPayments')
-                ->get()
-                ->map(function ($employee) use ($startDate, $endDate) {
-                    return $this->getEmployeeEarnings($employee, $startDate, $endDate);
-                })
-                ->filter();
+                ->get(); // <--- MODELS collection, NOT mapped to arrays
 
             if ($ungroupedEmployees->isNotEmpty()) {
                 $fakeGroup = new Group();
                 $fakeGroup->id = null;
                 $fakeGroup->name = 'Guruhsiz';
                 $fakeGroup->setRelation('employees', $ungroupedEmployees);
-
-
                 $groups->push($fakeGroup);
             }
         }
@@ -1274,7 +1265,12 @@ class CasherController extends Controller
         $result = $groups->map(function ($group) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
             $employees = $group->employees
                 ->map(function ($employee) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
-                    $employee->loadMissing(['position', 'group']);
+                    // defensive: agar $employee array bo'lib qolsa, chiqarib yuborish (ammo yuqorida buni model qilishga o'zgartirdik)
+                    if (is_array($employee)) {
+                        return $employee;
+                    }
+
+                    $employee->loadMissing(['position', 'group', 'salaryPayments']);
 
                     // Attendance
                     $attendanceQuery = $employee->attendanceSalaries();
@@ -1285,15 +1281,14 @@ class CasherController extends Controller
                     $attendanceDays = $attendanceQuery->count();
 
                     // Tarification logs
-                    $logsQuery = $employee->employeeTarificationLogs()
-                        ->with('tarification.tarificationCategory.submodel.orderModel.order');
-
-                    $logs = $logsQuery->get()->reject(function ($log) use ($minusOrderIds) {
-                        $order = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
-                        if (!$order) return true;
-                        return in_array($order->id, $minusOrderIds)
-                            || in_array($order->status, ['pending', 'cutting', 'tailoring']);
-                    });
+                    $logs = $employee->employeeTarificationLogs()
+                        ->with('tarification.tarificationCategory.submodel.orderModel.order')
+                        ->get()
+                        ->reject(function ($log) use ($minusOrderIds) {
+                            $order = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
+                            if (!$order) return true;
+                            return in_array($order->id, $minusOrderIds) || in_array($order->status, ['pending', 'cutting', 'tailoring']);
+                        });
 
                     $orders = $logs->map(fn($log) => $log->tarification?->tarificationCategory?->submodel?->orderModel?->order)
                         ->filter()->unique('id');
@@ -1302,14 +1297,12 @@ class CasherController extends Controller
                         $extraOrders = Order::whereIn('id', $addOrderIds)
                             ->whereNotIn('status', ['pending', 'cutting'])
                             ->get();
-
                         $orders = $orders->merge($extraOrders)->unique('id');
                     }
 
                     $tarificationTotal = $logs->sum('amount_earned');
-                    $totalEarned = $employee->payment_type === 'piece_work'
-                        ? $tarificationTotal
-                        : $attendanceTotal;
+
+                    $totalEarned = $employee->payment_type === 'piece_work' ? $tarificationTotal : $attendanceTotal;
 
                     // Paid salaries
                     $paidQuery = $employee->salaryPayments();
@@ -1320,9 +1313,8 @@ class CasherController extends Controller
 
                     $paidAmountsByType = [];
                     $paidTotal = 0;
-
-                    foreach ($paymentsGrouped as $type => $payments) {
-                        $paidAmountsByType[$type] = $payments->map(function ($payment) use (&$paidTotal) {
+                    foreach ($paymentsGrouped as $ptype => $payments) {
+                        $paidAmountsByType[$ptype] = $payments->map(function ($payment) use (&$paidTotal) {
                             $paidTotal += (float) $payment->amount;
                             return [
                                 'amount' => (float) $payment->amount,
@@ -1331,6 +1323,11 @@ class CasherController extends Controller
                                 'month' => optional($payment->month)->format('Y-m'),
                             ];
                         })->values();
+                    }
+
+                    // Agar xodim hech narsa topmagan bo'lsa, null qaytaramiz — keyin filter bilan o'chiramiz
+                    if (($totalEarned ?? 0) == 0) {
+                        return null;
                     }
 
                     return [
@@ -1352,9 +1349,14 @@ class CasherController extends Controller
                         'orders' => $orders->pluck('id')->values(),
                     ];
                 })
-                // ❌ null qaytarmaydi, faqat filterlash
-                ->filter(fn($emp) => $emp['total_earned'] > 0)
-                ->filter(fn($emp) => !($emp['status'] === 'kicked' && $emp['total_earned'] < 0));
+                // SAFELY filter out nulls and kicked-with-negative etc.
+                ->filter(function ($emp) {
+                    if ($emp === null) return false;
+                    if (($emp['total_earned'] ?? 0) <= 0) return false;
+                    if (($emp['status'] ?? '') === 'kicked' && ($emp['total_earned'] ?? 0) < 0) return false;
+                    return true;
+                })
+                ->values();
 
             $groupTotal = $employees->sum(fn($e) => $e['total_earned'] ?? 0);
 
@@ -1362,7 +1364,7 @@ class CasherController extends Controller
                 'id' => $group->id,
                 'name' => $group->name,
                 'total_balance' => $groupTotal,
-                'employees' => $employees->values()->toArray(),
+                'employees' => $employees->toArray(),
             ];
         })->values()->toArray();
 
