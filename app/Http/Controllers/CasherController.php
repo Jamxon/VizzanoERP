@@ -988,8 +988,10 @@ class CasherController extends Controller
                     ->with('salaryPayments');
                 if ($type === 'aup') {
                     $query->where('type', 'aup');
-                } else {
+                } elseif ($type === 'simple') {
                     $query->where('type', '!=', 'aup');
+                }else{
+                    $query->whereIn('type', ['aup','simple']);
                 }
             }]);
 
@@ -1187,7 +1189,7 @@ class CasherController extends Controller
                         'orders' => $orders->pluck('id')->values(),
                     ];
                 })
-                ->filter(fn($emp) => !($emp['status'] === 'kicked' && $emp['total_earned'] <= 0));
+                ->filter(fn($emp) => !($emp['status'] === 'kicked' && $emp['total_earned'] < 0));
 
             $groupTotal = $employees->sum(fn($e) => $e['total_earned'] ?? 0);
 
