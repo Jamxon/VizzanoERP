@@ -70,6 +70,7 @@ class GetGroupsForResultCheckerResource extends JsonResource
 
                     return [
                         'id' => $order->id,
+                        'orderName' => $order->order->name ?? null,
                         'model' => [
                             'id' => $orderModel->model->id ?? null,
                             'name' => $orderModel->model->name ?? null,
