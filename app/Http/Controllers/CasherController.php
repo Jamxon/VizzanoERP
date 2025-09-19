@@ -1309,7 +1309,6 @@ class CasherController extends Controller
 
                     if (!empty($addOrderIds)) {
                         $extraOrders = Order::whereIn('id', $addOrderIds)
-                            ->whereNotIn('status', ['pending', 'cutting'])
                             ->get();
                         $orders = $orders->merge($extraOrders)->unique('id');
                     }
