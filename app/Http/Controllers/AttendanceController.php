@@ -55,7 +55,7 @@ class AttendanceController extends Controller
             ->first();
 
         // Agar eski yozuv "present" bo'lib, yangi status "absent" bo'lsa
-        if ($existing && $existing->status === 'present' && $request->status === 'absent') {
+        if ($existing && $existing->status === 'present') {
             // AttendanceSalary topamiz
             $salaryRecord = AttendanceSalary::where('employee_id', $request->employee_id)
                 ->whereDate('date', $today)
