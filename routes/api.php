@@ -33,6 +33,7 @@ use App\Http\Controllers\SuperHRController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TailorController;
 use App\Http\Controllers\TechnologController;
+use App\Http\Controllers\TodoListController;
 use App\Http\Controllers\TransportAttendanceController;
 use App\Http\Controllers\TransportController;
 use App\Http\Controllers\UnitController;
@@ -538,7 +539,10 @@ Route::middleware('auth:api')->group(function () {
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::get('topEarners', [TailorController::class, 'getTopEarners']);
     Route::get('shipmentPlans', [ShipmentPlanController::class, 'getShipmentActive']);
-
+    Route::get('/todos', [TodoListController::class, 'index']);
+    Route::post('/todos', [TodoListController::class, 'store']);
+    Route::put('/todos/{id}', [TodoListController::class, 'update']);
+    Route::delete('/todos/{id}', [TodoListController::class, 'destroy']);
 });
 
 Route::post('register', [AuthController::class, 'register']);
