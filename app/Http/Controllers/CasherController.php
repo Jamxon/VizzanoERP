@@ -1709,6 +1709,7 @@ class CasherController extends Controller
                         $q4->whereRaw('LOWER(name) LIKE ?', ["%{$search}%"]);
                     })
                     ->orWhereRaw('LOWER(purpose) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(source) LIKE ?', ["%{$search}%"])
                     ->orWhereRaw('LOWER(comment) LIKE ?', ["%{$search}%"]);
             });
         }
