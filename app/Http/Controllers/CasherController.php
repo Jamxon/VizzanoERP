@@ -1197,13 +1197,15 @@ class CasherController extends Controller
         $branchId = auth()->user()->employee->branch_id ?? null;
         $groupId = $request->input('group_id');
         $type = $request->input('type');
-        $month = $request->input('month', date('Y-m')) . '-01';
+        $month = $request->input('month', date('Y-m'));
 
         if (!$departmentId && !$branchId) {
             return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
         }
 
-        $addOrderIds = MonthlySelectedOrder::where('month', $month)
+        $monthDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
+
+        $addOrderIds = MonthlySelectedOrder::where('month', $monthDate)
             ->pluck('order_id')
             ->toArray();
 
