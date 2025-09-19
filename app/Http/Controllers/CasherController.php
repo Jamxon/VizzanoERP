@@ -1197,7 +1197,7 @@ class CasherController extends Controller
         $branchId = auth()->user()->employee->branch_id ?? null;
         $groupId = $request->input('group_id');
         $type = $request->input('type');
-        $month = $request->input('month', date('Y-m'));
+        $month = $request->input('month', date('Y-m')) . '-01';
 
         if (!$departmentId && !$branchId) {
             return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
