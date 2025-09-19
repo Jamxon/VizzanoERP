@@ -14,6 +14,7 @@ use App\Models\CashboxBalance;
 use App\Models\CashboxTransaction;
 use App\Models\Currency;
 use App\Models\MonthlyExpense;
+use App\Models\MonthlySelectedOrder;
 use App\Models\Order;
 use App\Models\SalaryPayment;
 use App\Models\SewingOutputs;
@@ -1194,16 +1195,22 @@ class CasherController extends Controller
     {
         $departmentId = $request->input('department_id');
         $branchId = auth()->user()->employee->branch_id ?? null;
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
-        $groupId = $request->input('group_id'); // consistent name
-        $addOrderIds = (array) $request->input('add', []);
-        $minusOrderIds = (array) $request->input('minus', []);
+        $groupId = $request->input('group_id');
         $type = $request->input('type');
+        $month = $request->input('month', date('Y-m'));
 
         if (!$departmentId && !$branchId) {
             return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
         }
+
+        $addOrderIds = MonthlySelectedOrder::where('month', $month)
+            ->pluck('order_id')
+            ->toArray();
+
+        $allOrderIds = Order::pluck('id')->toArray();
+
+        $minusOrderIds = array_diff($allOrderIds, $addOrderIds);
+
 
         // Build groups query
         $groupQuery = Group::query();
@@ -1263,6 +1270,9 @@ class CasherController extends Controller
                 $groups->push($fakeGroup);
             }
         }
+
+        $startDate = $month ? Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString() : null;
+        $endDate = $month ? Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString() : null;
 
         $result = $groups->map(function ($group) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
             $employees = $group->employees
