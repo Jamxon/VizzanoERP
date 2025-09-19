@@ -1301,7 +1301,7 @@ class CasherController extends Controller
                         ->reject(function ($log) use ($minusOrderIds) {
                             $order = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
                             if (!$order) return true;
-                            return in_array($order->id, $minusOrderIds) || in_array($order->status, ['pending', 'cutting', 'tailoring']);
+                            return in_array($order->id, $minusOrderIds);
                         });
 
                     $orders = $logs->map(fn($log) => $log->tarification?->tarificationCategory?->submodel?->orderModel?->order)
