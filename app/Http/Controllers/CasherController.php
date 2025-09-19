@@ -1315,7 +1315,7 @@ class CasherController extends Controller
 
                     $tarificationTotal = $logs->sum('amount_earned');
 
-                    $totalEarned = $employee->payment_type === 'piece_work' ? $tarificationTotal : $attendanceTotal;
+                    $totalEarned = $tarificationTotal + $attendanceTotal;
 
                     // Paid salaries
                     $paidQuery = $employee->salaryPayments();
