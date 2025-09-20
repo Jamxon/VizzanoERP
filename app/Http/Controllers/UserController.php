@@ -31,10 +31,17 @@ class UserController extends Controller
                 ->where('branch_id', $branchId)
                 ->when($request->department_id, fn($q) => $q->where('department_id', $request->department_id))
                 ->when($request->group_id, fn($q) => $q->where('group_id', $request->group_id))
-                ->with(['employeeTarificationLogs' => function ($q) use ($request) {
-                    $q->whereBetween('date', [$request->start_date, $request->end_date])
-                        ->with('tarification');
-                }])
+                ->with([
+                    'employeeTarificationLogs' => function ($q) use ($request) {
+                        $q->whereBetween('date', [$request->start_date, $request->end_date])
+                            ->with('tarification');
+                    },
+                ])
+                ->withCount([
+                    'attendances as attended_days' => function ($q) use ($request) {
+                        $q->whereBetween('date', [$request->start_date, $request->end_date]);
+                    }
+                ])
                 ->get();
 
             $results = $employees->map(function ($employee) {
@@ -69,6 +76,7 @@ class UserController extends Controller
                     'branch_id' => $employee->branch_id,
                     'department_id' => $employee->department_id,
                     'group_id' => $employee->group_id,
+                    'attended_days' => $employee->attended_days, // ✅ shu joyda necha kun kelgani chiqadi
                     'days' => $dailyResult,
                 ];
             });
@@ -83,6 +91,7 @@ class UserController extends Controller
             ], 500);
         }
     }
+
 
     public function getProfile(Request $request): \Illuminate\Http\JsonResponse
     {
