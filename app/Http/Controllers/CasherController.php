@@ -1206,9 +1206,8 @@ class CasherController extends Controller
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
         $endDate   = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
 
-        // ✅ faqat kerakli order_id larni olish
-        $addOrderIds = MonthlySelectedOrder::where('month', $startDate)->pluck('order_id');
-        $minusOrderIds = Order::whereNotIn('id', $addOrderIds)->pluck('id');
+        $addOrderIds = MonthlySelectedOrder::where('month', $startDate)->pluck('order_id')->toArray();
+        $minusOrderIds = Order::whereNotIn('id', $addOrderIds)->pluck('id')->toArray();
 
         // ✅ Guruhlarni olish
         $groupQuery = Group::query();
@@ -1238,13 +1237,18 @@ class CasherController extends Controller
                     ->with(['salaryPayments' => fn($q) =>
                     $q->whereBetween('month', [$startDate, $endDate])
                     ])
-                    ->with(['employeeTarificationLogs' => fn($q) use ($startDate, $endDate, $minusOrderIds) {
-                    $q->whereBetween('date', [$startDate, $endDate])
-                        ->whereHas('tarification.tarificationCategory.submodel.orderModel.order', function ($q) use ($minusOrderIds) {
-                            $q->whereNotIn('id', $minusOrderIds);
-                        })
-                        ->with('tarification.tarificationCategory.submodel.orderModel.order');
-                }]);
+                    ->with(['employeeTarificationLogs' => function ($q) use ($startDate, $endDate, $minusOrderIds) {
+                        $q->select('id', 'employee_id', 'date', 'amount_earned', 'tarification_id')
+                            ->whereBetween('date', [$startDate, $endDate])
+                            ->whereHas('tarification.tarificationCategory.submodel.orderModel.order', function ($q) use ($minusOrderIds) {
+                                $q->whereNotIn('id', $minusOrderIds);
+                            })
+                            ->with(['tarification:id,tarification_category_id',
+                                'tarification.tarificationCategory:id,submodel_id',
+                                'tarification.tarificationCategory.submodel:id,order_model_id',
+                                'tarification.tarificationCategory.submodel.orderModel:id,order_id',
+                                'tarification.tarificationCategory.submodel.orderModel.order:id']);
+                    }]);
         }])
             ->get();
 
@@ -1270,7 +1274,7 @@ class CasherController extends Controller
                     ->unique('id');
 
                 if ($addOrderIds->isNotEmpty()) {
-                    $extraOrders = Order::whereIn('id', $addOrderIds)->get();
+                    $extraOrders = !empty($addOrderIds) ? Order::whereIn('id', $addOrderIds)->get() : collect();
                     $orders = $orders->merge($extraOrders)->unique('id');
                 }
 
