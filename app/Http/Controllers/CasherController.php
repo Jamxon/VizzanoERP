@@ -1212,76 +1212,74 @@ class CasherController extends Controller
 
         return Cache::remember($cacheKey, 300, function() use ($departmentId, $branchId, $groupId, $type, $startDate, $endDate) {
 
-            // ✅ Bitta raw SQL query bilan barcha kerakli ma'lumotlarni olish
+            // ✅ PostgreSQL uchun optimallashtirulgan query
             $sql = "
             WITH selected_orders AS (
                 SELECT order_id FROM monthly_selected_orders WHERE month = ?
-            ),
-            filtered_orders AS (
-                SELECT id FROM orders 
-                WHERE id NOT IN (SELECT order_id FROM selected_orders)
-            ),
-            employee_earnings AS (
-                SELECT 
-                    e.id as employee_id,
-                    e.name,
-                    e.salary,
-                    e.balance,
-                    e.payment_type,
-                    e.status,
-                    e.group_id,
-                    p.name as position_name,
-                    g.name as group_name,
-                    g.id as group_id_check,
-                    
-                    -- Attendance salary
-                    COALESCE(SUM(DISTINCT ats.amount), 0) as attendance_salary,
-                    COUNT(DISTINCT att.id) as attendance_days,
-                    
-                    -- Tarification salary
-                    COALESCE(SUM(DISTINCT etl.amount_earned), 0) as tarification_salary,
-                    
-                    -- Total paid
-                    COALESCE(SUM(DISTINCT sp.amount), 0) as total_paid,
-                    
-                    -- Orders (JSON array)
-                    JSON_ARRAYAGG(DISTINCT o.id) as order_ids
-                    
-                FROM employees e
-                LEFT JOIN positions p ON e.position_id = p.id
-                LEFT JOIN groups g ON e.group_id = g.id
-                LEFT JOIN departments d ON g.department_id = d.id
+            )
+            SELECT 
+                e.id as employee_id,
+                e.name,
+                e.salary,
+                e.balance,
+                e.payment_type,
+                e.status,
+                e.group_id,
+                p.name as position_name,
+                g.name as group_name,
+                g.id as group_id_check,
                 
-                -- Attendance data
-                LEFT JOIN attendances att ON e.id = att.employee_id 
-                    AND att.date BETWEEN ? AND ?
-                LEFT JOIN attendance_salaries ats ON e.id = ats.employee_id 
-                    AND ats.date BETWEEN ? AND ?
+                -- Attendance salary
+                COALESCE(SUM(DISTINCT ats.amount), 0) as attendance_salary,
+                COUNT(DISTINCT att.id) as attendance_days,
                 
-                -- Tarification data
-                LEFT JOIN employee_tarification_logs etl ON e.id = etl.employee_id 
-                    AND etl.date BETWEEN ? AND ?
-                LEFT JOIN tarifications t ON etl.tarification_id = t.id
-                LEFT JOIN tarification_categories tc ON t.tarification_category_id = tc.id
-                LEFT JOIN submodels sm ON tc.submodel_id = sm.id
-                LEFT JOIN order_models om ON sm.order_model_id = om.id
-                LEFT JOIN orders o ON om.order_id = o.id
-                    AND o.id NOT IN (SELECT id FROM filtered_orders)
+                -- Tarification salary
+                COALESCE(SUM(DISTINCT etl.amount_earned), 0) as tarification_salary,
                 
-                -- Salary payments
-                LEFT JOIN salary_payments sp ON e.id = sp.employee_id 
-                    AND sp.month BETWEEN ? AND ?
+                -- Total paid
+                COALESCE(SUM(DISTINCT sp.amount), 0) as total_paid,
                 
-                WHERE 1=1
-                " . ($departmentId ? " AND d.id = ?" : "") . "
-                " . ($branchId ? " AND d.branch_id = ?" : "") . "
-                " . ($groupId ? " AND g.id = ?" : "") . "
-                " . ($type === 'aup' ? " AND e.type = 'aup'" : "") . "
-                " . ($type === 'simple' ? " AND e.type != 'aup'" : "") . "
+                -- Orders (array)
+                ARRAY_AGG(DISTINCT o.id) FILTER (WHERE o.id IS NOT NULL) as order_ids
                 
-                GROUP BY e.id, e.name, e.salary, e.balance, e.payment_type, e.status, 
-                         e.group_id, p.name, g.name, g.id
-                HAVING (COALESCE(SUM(DISTINCT etl.amount_earned), 0) + COALESCE(SUM(DISTINCT ats.amount), 0)) > 0
+            FROM employees e
+            LEFT JOIN positions p ON e.position_id = p.id
+            LEFT JOIN groups g ON e.group_id = g.id
+            LEFT JOIN departments d ON g.department_id = d.id
+            
+            -- Attendance data
+            LEFT JOIN attendances att ON e.id = att.employee_id 
+                AND att.date BETWEEN ? AND ?
+            LEFT JOIN attendance_salaries ats ON e.id = ats.employee_id 
+                AND ats.date BETWEEN ? AND ?
+            
+            -- Tarification data
+            LEFT JOIN employee_tarification_logs etl ON e.id = etl.employee_id 
+                AND etl.date BETWEEN ? AND ?
+            LEFT JOIN tarifications t ON etl.tarification_id = t.id
+            LEFT JOIN tarification_categories tc ON t.tarification_category_id = tc.id
+            LEFT JOIN submodels sm ON tc.submodel_id = sm.id
+            LEFT JOIN order_models om ON sm.order_model_id = om.id
+            LEFT JOIN orders o ON om.order_id = o.id
+                AND o.id NOT IN (
+                    SELECT o2.id FROM orders o2 
+                    WHERE o2.id NOT IN (SELECT order_id FROM selected_orders)
+                )
+            
+            -- Salary payments
+            LEFT JOIN salary_payments sp ON e.id = sp.employee_id 
+                AND sp.month BETWEEN ? AND ?
+            
+            WHERE 1=1
+            " . ($departmentId ? " AND d.id = ?" : "") . "
+            " . ($branchId ? " AND d.branch_id = ?" : "") . "
+            " . ($groupId ? " AND g.id = ?" : "") . "
+            " . ($type === 'aup' ? " AND e.type = 'aup'" : "") . "
+            " . ($type === 'simple' ? " AND e.type != 'aup'" : "") . "
+            
+            GROUP BY e.id, e.name, e.salary, e.balance, e.payment_type, e.status, 
+                     e.group_id, p.name, g.name, g.id
+            HAVING (COALESCE(SUM(DISTINCT etl.amount_earned), 0) + COALESCE(SUM(DISTINCT ats.amount), 0)) > 0
         ";
 
             $params = [$startDate, $startDate, $endDate, $startDate, $endDate, $startDate, $endDate, $startDate, $endDate];
@@ -1331,8 +1329,13 @@ class CasherController extends Controller
                 $totalEarned = $attendanceTotal + $tarificationTotal;
                 $totalPaid = (float) $emp->total_paid;
 
-                // Order IDs ni parse qilish
-                $orderIds = json_decode($emp->order_ids ?? '[]', true) ?: [];
+                // Order IDs ni parse qilish (PostgreSQL array)
+                $orderIds = [];
+                if (!empty($emp->order_ids)) {
+                    // PostgreSQL array formatini parse qilish: {1,2,3} -> [1,2,3]
+                    $orderIds = explode(',', trim($emp->order_ids, '{}'));
+                    $orderIds = array_map('intval', array_filter($orderIds));
+                }
                 if ($addOrderIds->isNotEmpty()) {
                     $orderIds = array_unique(array_merge($orderIds, $addOrderIds->toArray()));
                 }
