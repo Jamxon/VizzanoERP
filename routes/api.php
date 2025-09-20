@@ -95,6 +95,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::post('monthlySelectedOrders', [CeoController::class, 'storeMonthlySelectedOrders']);
     Route::delete('monthlySelectedOrders/{id}', [CeoController::class, 'destroyMonthlySelectedOrders']);
     Route::patch('monthlySelectedOrders/{id}', [CeoController::class, 'updateMonthlySelectedOrders']);
+    Route::get('employeeEfficiency', [UserController::class, 'getEmployeeEfficiency']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {

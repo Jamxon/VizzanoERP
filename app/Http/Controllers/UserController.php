@@ -15,6 +15,75 @@ use Carbon\Carbon;
 
 class UserController extends Controller
 {
+    public function getEmployeeEfficiency(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+            'department_id' => 'nullable|integer',
+            'group_id' => 'nullable|integer',
+        ]);
+
+        try {
+            $branchId = auth()->user()->employee->branch_id ?? null;
+
+            $employees = \App\Models\Employee::query()
+                ->where('branch_id', $branchId)
+                ->when($request->department_id, fn($q) => $q->where('department_id', $request->department_id))
+                ->when($request->group_id, fn($q) => $q->where('group_id', $request->group_id))
+                ->with(['tarificationLogs' => function ($q) use ($request) {
+                    $q->whereBetween('date', [$request->start_date, $request->end_date])
+                        ->with('tarification');
+                }])
+                ->get();
+
+            $results = $employees->map(function ($employee) {
+                $daily = [];
+
+                foreach ($employee->tarificationLogs as $log) {
+                    $date = $log->date;
+                    $seconds = $log->quantity * ($log->tarification->second ?? 0);
+
+                    if (!isset($daily[$date])) {
+                        $daily[$date] = 0;
+                    }
+                    $daily[$date] += $seconds;
+                }
+
+                $dailyResult = [];
+                foreach ($daily as $date => $seconds) {
+                    $minutes = round($seconds / 60, 2);
+                    $percent = round(($minutes / 500) * 100, 2);
+
+                    $dailyResult[] = [
+                        'date' => $date,
+                        'worked_seconds' => $seconds,
+                        'worked_minutes' => $minutes,
+                        'efficiency_percent' => $percent,
+                    ];
+                }
+
+                return [
+                    'employee_id' => $employee->id,
+                    'employee_name' => $employee->full_name ?? $employee->name,
+                    'branch_id' => $employee->branch_id,
+                    'department_id' => $employee->department_id,
+                    'group_id' => $employee->group_id,
+                    'days' => $dailyResult,
+                ];
+            });
+
+            return response()->json($results);
+
+        } catch (\Throwable $e) {
+            \Log::error("getEmployeeEfficiency error", ['error' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function getProfile(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = Auth::user();
@@ -311,7 +380,6 @@ class UserController extends Controller
             ], 500);
         }
     }
-
 
     public function showEmployee(Employee $employee, Request $request): \Illuminate\Http\JsonResponse
     {
