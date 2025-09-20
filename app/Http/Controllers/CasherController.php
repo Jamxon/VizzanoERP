@@ -1258,7 +1258,7 @@ class CasherController extends Controller
                 AND etl.date BETWEEN ? AND ?
             LEFT JOIN tarifications t ON etl.tarification_id = t.id
             LEFT JOIN tarification_categories tc ON t.tarification_category_id = tc.id
-            LEFT JOIN order_submodels sm ON tc.submodel_id = sm.id
+            LEFT JOIN order_sub_models sm ON tc.submodel_id = sm.id
             LEFT JOIN order_models om ON sm.order_model_id = om.id
             LEFT JOIN orders o ON om.order_id = o.id
                 AND o.id NOT IN (
