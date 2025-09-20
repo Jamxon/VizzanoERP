@@ -1206,7 +1206,7 @@ class CasherController extends Controller
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
         $endDate   = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
 
-        $addOrderIds = MonthlySelectedOrder::where('month', $startDate)->pluck('order_id')->toArray();
+        $addOrderIds = MonthlySelectedOrder::where('month', $startDate)->pluck('order_id');
         $minusOrderIds = Order::whereNotIn('id', $addOrderIds)->pluck('id')->toArray();
 
         // ✅ Guruhlarni olish
