@@ -27,41 +27,53 @@ class UserController extends Controller
         try {
             $branchId = auth()->user()->employee->branch_id ?? null;
 
-            // 1️⃣ asosiy query — bitta joyda yig‘ish
+            // 1️⃣ Tarification loglari
             $logs = \DB::table('employee_tarification_logs as etl')
                 ->join('employees as e', 'e.id', '=', 'etl.employee_id')
                 ->join('tarifications as t', 't.id', '=', 'etl.tarification_id')
                 ->select(
                     'etl.employee_id',
                     'e.name',
+                    'e.img',
                     'e.branch_id',
                     'e.department_id',
                     'e.group_id',
                     'etl.date',
-                    \DB::raw('SUM(etl.quantity * t.second) as total_seconds')
+                    \DB::raw('SUM(etl.quantity * t.second) as total_seconds'),
+                    \DB::raw('SUM(etl.amount_earned) as tarification_earned')
                 )
                 ->where('e.branch_id', $branchId)
                 ->where('payment_type', 'piece_work')
                 ->when($request->department_id, fn($q) => $q->where('e.department_id', $request->department_id))
                 ->when($request->group_id, fn($q) => $q->where('e.group_id', $request->group_id))
                 ->whereBetween('etl.date', [$request->start_date, $request->end_date])
-                ->groupBy('etl.employee_id', 'e.name', 'e.branch_id', 'e.department_id', 'e.group_id', 'etl.date')
+                ->groupBy('etl.employee_id', 'e.name', 'e.img', 'e.branch_id', 'e.department_id', 'e.group_id', 'etl.date')
                 ->get();
 
-            // 2️⃣ attendance kunlari ham bitta queryda
+            // 2️⃣ Attendance kunlari va summasi
             $attendance = \DB::table('attendance as a')
                 ->join('employees as e', 'e.id', '=', 'a.employee_id')
-                ->select('a.employee_id', \DB::raw('COUNT(DISTINCT a.date) as attended_days'))
+                ->leftJoin('attendance_salary as ats', function ($q) {
+                    $q->on('ats.employee_id', '=', 'a.employee_id')
+                        ->on('ats.date', '=', 'a.date');
+                })
+                ->select(
+                    'a.employee_id',
+                    \DB::raw('COUNT(DISTINCT a.date) as attended_days'),
+                    \DB::raw('COALESCE(SUM(ats.amount),0) as attendance_earned')
+                )
                 ->where('e.branch_id', $branchId)
                 ->when($request->department_id, fn($q) => $q->where('e.department_id', $request->department_id))
                 ->when($request->group_id, fn($q) => $q->where('e.group_id', $request->group_id))
                 ->whereBetween('a.date', [$request->start_date, $request->end_date])
                 ->groupBy('a.employee_id')
-                ->pluck('attended_days', 'employee_id');
+                ->get()
+                ->keyBy('employee_id');
 
-            // 3️⃣ PHP da faqat array yig‘ish
+            // 3️⃣ PHP da yig‘ish
             $results = $logs->groupBy('employee_id')->map(function ($rows, $employeeId) use ($attendance) {
                 $first = $rows->first();
+
                 $dailyResult = $rows->map(function ($r) {
                     $minutes = round($r->total_seconds / 60, 2);
                     $percent = round(($minutes / 500) * 100, 2);
@@ -70,16 +82,29 @@ class UserController extends Controller
                         'worked_seconds' => (int) $r->total_seconds,
                         'worked_minutes' => $minutes,
                         'efficiency_percent' => $percent,
+                        'tarification_earned' => (float) $r->tarification_earned,
                     ];
                 });
 
+                $att = $attendance[$employeeId] ?? null;
+                $attended_days = $att->attended_days ?? 0;
+                $attendance_earned = (float) ($att->attendance_earned ?? 0);
+
+                $tarification_total = $rows->sum('tarification_earned');
+                $total_earned = $tarification_total + $attendance_earned;
+
                 return [
                     'employee_id' => $employeeId,
-                    'employee_name' => $first->full_name ?? $first->name,
+                    'employee_name' => $first->name,
+                    'image' => $first->image ? url('storage/'.$first->image) : null,
                     'branch_id' => $first->branch_id,
                     'department_id' => $first->department_id,
                     'group_id' => $first->group_id,
-                    'attended_days' => $attendance[$employeeId] ?? 0,
+                    'attended_days' => $attended_days,
+                    'tarification_earned' => $tarification_total,
+                    'attendance_earned' => $attendance_earned,
+                    'total_earned' => $total_earned,
+                    'avg_per_day' => $attended_days > 0 ? round($total_earned / $attended_days, 2) : 0,
                     'days' => $dailyResult->values(),
                 ];
             })->values();
