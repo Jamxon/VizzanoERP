@@ -21,7 +21,6 @@ use App\Models\SewingOutputs;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
@@ -1192,190 +1191,6 @@ class CasherController extends Controller
 
     //2-usul
 
-//    public function getGroupsOrdersEarnings(Request $request): \Illuminate\Http\JsonResponse
-//    {
-//        $departmentId = $request->input('department_id');
-//        $branchId = auth()->user()->employee->branch_id ?? null;
-//        $groupId = $request->input('group_id');
-//        $type = $request->input('type');
-//        $month = $request->input('month', date('Y-m'));
-//
-//        if (!$departmentId && !$branchId) {
-//            return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
-//        }
-//
-//        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
-//        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
-//
-//        // ✅ Cache key yaratish
-//        $cacheKey = "groups_orders_earnings_{$departmentId}_{$branchId}_{$groupId}_{$type}_{$month}";
-//
-//        return Cache::remember($cacheKey, 300, function() use ($departmentId, $branchId, $groupId, $type, $startDate, $endDate) {
-//
-//            // ✅ PostgreSQL uchun optimallashtirulgan query
-//            $sql = "
-//            WITH selected_orders AS (
-//                SELECT order_id FROM monthly_selected_orders WHERE month = ?
-//            )
-//            SELECT
-//                e.id as employee_id,
-//                e.name,
-//                e.salary,
-//                e.balance,
-//                e.payment_type,
-//                e.status,
-//                e.group_id,
-//                p.name as position_name,
-//                g.name as group_name,
-//                g.id as group_id_check,
-//
-//                -- Attendance salary
-//                COALESCE(SUM(DISTINCT ats.amount), 0) as attendance_salary,
-//                COUNT(DISTINCT att.id) as attendance_days,
-//
-//                -- Tarification salary
-//                COALESCE(SUM(DISTINCT etl.amount_earned), 0) as tarification_salary,
-//
-//                -- Total paid
-//                COALESCE(SUM(DISTINCT sp.amount), 0) as total_paid,
-//
-//                -- Orders (array)
-//                ARRAY_AGG(DISTINCT o.id) FILTER (WHERE o.id IS NOT NULL) as order_ids
-//
-//            FROM employees e
-//            LEFT JOIN positions p ON e.position_id = p.id
-//            LEFT JOIN groups g ON e.group_id = g.id
-//            LEFT JOIN departments d ON g.department_id = d.id
-//
-//            -- Attendance data
-//            LEFT JOIN attendance att ON e.id = att.employee_id
-//                AND att.date BETWEEN ? AND ?
-//            LEFT JOIN attendance_salary ats ON e.id = ats.employee_id
-//                AND ats.date BETWEEN ? AND ?
-//
-//            -- Tarification data
-//            LEFT JOIN employee_tarification_logs etl ON e.id = etl.employee_id
-//                AND etl.date BETWEEN ? AND ?
-//            LEFT JOIN tarifications t ON etl.tarification_id = t.id
-//            LEFT JOIN tarification_categories tc ON t.tarification_category_id = tc.id
-//            LEFT JOIN order_sub_models sm ON tc.submodel_id = sm.id
-//            LEFT JOIN order_models om ON sm.order_model_id = om.id
-//            LEFT JOIN orders o ON om.order_id = o.id
-//                AND o.id NOT IN (
-//                    SELECT o2.id FROM orders o2
-//                    WHERE o2.id NOT IN (SELECT order_id FROM selected_orders)
-//                )
-//
-//            -- Salary payments
-//            LEFT JOIN salary_payments sp ON e.id = sp.employee_id
-//                AND sp.month BETWEEN ? AND ?
-//
-//            WHERE 1=1
-//            " . ($departmentId ? " AND d.id = ?" : "") . "
-//            " . ($branchId ? " AND d.branch_id = ?" : "") . "
-//            " . ($groupId ? " AND g.id = ?" : "") . "
-//            " . ($type === 'aup' ? " AND e.type = 'aup'" : "") . "
-//            " . ($type === 'simple' ? " AND e.type != 'aup'" : "") . "
-//
-//            GROUP BY e.id, e.name, e.salary, e.balance, e.payment_type, e.status,
-//                     e.group_id, p.name, g.name, g.id
-//            HAVING (COALESCE(SUM(DISTINCT etl.amount_earned), 0) + COALESCE(SUM(DISTINCT ats.amount), 0)) > 0
-//        ";
-//
-//            $params = [$startDate, $startDate, $endDate, $startDate, $endDate, $startDate, $endDate, $startDate, $endDate];
-//
-//            if ($departmentId) $params[] = $departmentId;
-//            if ($branchId) $params[] = $branchId;
-//            if ($groupId) $params[] = $groupId;
-//
-//            $employees = DB::select($sql, $params);
-//
-//            // ✅ Extra orders qo'shish (agar mavjud bo'lsa)
-//            $addOrderIds = DB::table('monthly_selected_orders')
-//                ->where('month', $startDate)
-//                ->pluck('order_id');
-//
-//            // ✅ Salary payments detailini alohida olish (faqat kerakli employeelar uchun)
-//            $employeeIds = collect($employees)->pluck('employee_id')->toArray();
-//            $salaryPayments = [];
-//
-//            if (!empty($employeeIds)) {
-//                $payments = DB::table('salary_payments')
-//                    ->whereIn('employee_id', $employeeIds)
-//                    ->whereBetween('month', [$startDate, $endDate])
-//                    ->select('employee_id', 'type', 'amount', 'date', 'comment', 'month')
-//                    ->get()
-//                    ->groupBy('employee_id');
-//
-//                foreach ($payments as $empId => $empPayments) {
-//                    $salaryPayments[$empId] = $empPayments->groupBy('type')->map(function ($typePayments) {
-//                        return $typePayments->map(function ($payment) {
-//                            return [
-//                                'amount' => (float) $payment->amount,
-//                                'date' => $payment->date,
-//                                'comment' => $payment->comment,
-//                                'month' => $payment->month ? Carbon::parse($payment->month)->format('Y-m') : null,
-//                            ];
-//                        });
-//                    });
-//                }
-//            }
-//
-//            // ✅ Natijalarni guruhlash va formatlash
-//            $groupedData = [];
-//            foreach ($employees as $emp) {
-//                $attendanceTotal = (float) $emp->attendance_salary;
-//                $tarificationTotal = (float) $emp->tarification_salary;
-//                $totalEarned = $attendanceTotal + $tarificationTotal;
-//                $totalPaid = (float) $emp->total_paid;
-//
-//                // Order IDs ni parse qilish (PostgreSQL array)
-//                $orderIds = [];
-//                if (!empty($emp->order_ids)) {
-//                    // PostgreSQL array formatini parse qilish: {1,2,3} -> [1,2,3]
-//                    $orderIds = explode(',', trim($emp->order_ids, '{}'));
-//                    $orderIds = array_map('intval', array_filter($orderIds));
-//                }
-//                if ($addOrderIds->isNotEmpty()) {
-//                    $orderIds = array_unique(array_merge($orderIds, $addOrderIds->toArray()));
-//                }
-//
-//                $employeeData = [
-//                    'id' => $emp->employee_id,
-//                    'name' => $emp->name,
-//                    'position' => $emp->position_name ?? 'N/A',
-//                    'group' => $emp->group_name ?? 'N/A',
-//                    'balance' => (float) $emp->balance,
-//                    'payment_type' => $emp->payment_type,
-//                    'salary' => (float) $emp->salary,
-//                    'status' => $emp->status,
-//                    'attendance_salary' => $attendanceTotal,
-//                    'attendance_days' => (int) $emp->attendance_days,
-//                    'tarification_salary' => $tarificationTotal,
-//                    'total_earned' => $totalEarned,
-//                    'paid_amounts' => $salaryPayments[$emp->employee_id] ?? [],
-//                    'total_paid' => round($totalPaid, 2),
-//                    'net_balance' => round($totalEarned - $totalPaid, 2),
-//                    'orders' => array_values($orderIds),
-//                ];
-//
-//                if (!isset($groupedData[$emp->group_id_check])) {
-//                    $groupedData[$emp->group_id_check] = [
-//                        'id' => $emp->group_id_check,
-//                        'name' => $emp->group_name,
-//                        'total_balance' => 0,
-//                        'employees' => [],
-//                    ];
-//                }
-//
-//                $groupedData[$emp->group_id_check]['employees'][] = $employeeData;
-//                $groupedData[$emp->group_id_check]['total_balance'] += $totalEarned;
-//            }
-//
-//            return response()->json(array_values($groupedData));
-//        });
-//    }
-
     public function getGroupsOrdersEarnings(Request $request): \Illuminate\Http\JsonResponse
     {
         $departmentId = $request->input('department_id');
@@ -1388,180 +1203,185 @@ class CasherController extends Controller
             return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
         }
 
-        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
-        $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
+        $monthDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
 
-        // ✅ Cache key
-        $cacheKey = "groups_orders_earnings_{$departmentId}_{$branchId}_{$groupId}_{$type}_{$month}";
+        $addOrderIds = MonthlySelectedOrder::where('month', $monthDate)
+            ->pluck('order_id')
+            ->toArray();
 
-        return Cache::remember($cacheKey, 300, function() use ($departmentId, $branchId, $groupId, $type, $startDate, $endDate) {
+        $allOrderIds = Order::pluck('id')->toArray();
 
-            // ✅ Parallel data fetching
-            $selectedOrderIds = DB::table('monthly_selected_orders')
-                ->where('month', $startDate)
-                ->pluck('order_id')
-                ->toArray();
+        $minusOrderIds = array_diff($allOrderIds, $addOrderIds);
 
-            // ✅ Base employee query
-            $employeeQuery = DB::table('employees as e')
-                ->join('groups as g', 'e.group_id', '=', 'g.id')
-                ->join('departments as d', 'g.department_id', '=', 'd.id')
-                ->leftJoin('positions as p', 'e.position_id', '=', 'p.id')
-                ->select([
-                    'e.id as employee_id',
-                    'e.name',
-                    'e.salary',
-                    'e.balance',
-                    'e.payment_type',
-                    'e.status',
-                    'e.group_id',
-                    'p.name as position_name',
-                    'g.name as group_name',
-                    'g.id as group_id_check'
-                ]);
 
-            if ($departmentId) {
-                $employeeQuery->where('d.id', $departmentId);
-            } elseif ($branchId) {
-                $employeeQuery->where('d.branch_id', $branchId);
-            }
+        // Build groups query
+        $groupQuery = Group::query();
 
-            if ($groupId) {
-                $employeeQuery->where('g.id', $groupId);
-            }
+        if ($departmentId) {
+            $groupQuery->where('department_id', $departmentId);
+        } elseif ($branchId) {
+            $groupQuery->whereHas('department', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+            });
+        }
+
+        $groupQuery->with(['employees' => function ($q) use ($type) {
+            $q->select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status')
+                ->with('salaryPayments');
 
             if ($type === 'aup') {
-                $employeeQuery->where('e.type', 'aup');
+                $q->where('type', 'aup');
             } elseif ($type === 'simple') {
-                $employeeQuery->where('e.type', '!=', 'aup');
+                $q->where('type', '!=', 'aup');
+            } else {
+                $q->whereIn('type', ['aup', 'simple']);
             }
+        }]);
 
-            $employees = $employeeQuery->get()->keyBy('employee_id');
-            $employeeIds = $employees->keys()->toArray();
+        if (!empty($groupId)) {
+            $groupQuery->where('id', $groupId);
+        }
 
-            if (empty($employeeIds)) {
-                return response()->json([]);
-            }
+        $groups = $groupQuery->get();
 
-            // ✅ Parallel data collection
-            $attendanceSalaries = DB::table('attendance_salary')
-                ->whereIn('employee_id', $employeeIds)
-                ->whereBetween('date', [$startDate, $endDate])
-                ->selectRaw('employee_id, SUM(amount) as total_attendance_salary')
-                ->groupBy('employee_id')
-                ->pluck('total_attendance_salary', 'employee_id');
+        // Agar group_id berilmagan bo'lsa, guruhsiz xodimlarni ham qo'shamiz — ASOSIY: bu yerda **modellari** olinadi (array emas)
+        if (empty($groupId)) {
+            $ungroupedQuery = Employee::whereNull('group_id');
 
-            $attendanceDays = DB::table('attendance')
-                ->whereIn('employee_id', $employeeIds)
-                ->whereBetween('date', [$startDate, $endDate])
-                ->selectRaw('employee_id, COUNT(*) as total_days')
-                ->groupBy('employee_id')
-                ->pluck('total_days', 'employee_id');
-
-            // ✅ Tarification earnings with order filtering
-            $tarificationQuery = DB::table('employee_tarification_logs as etl')
-                ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
-                ->join('tarification_categories as tc', 't.tarification_category_id', '=', 'tc.id')
-                ->join('order_sub_models as sm', 'tc.submodel_id', '=', 'sm.id')
-                ->join('order_models as om', 'sm.order_model_id', '=', 'om.id')
-                ->join('orders as o', 'om.order_id', '=', 'o.id')
-                ->whereIn('etl.employee_id', $employeeIds)
-                ->whereBetween('etl.date', [$startDate, $endDate]);
-
-            if (!empty($selectedOrderIds)) {
-                $excludedOrderIds = DB::table('orders')
-                    ->whereNotIn('id', $selectedOrderIds)
-                    ->pluck('id')
-                    ->toArray();
-
-                if (!empty($excludedOrderIds)) {
-                    $tarificationQuery->whereNotIn('o.id', $excludedOrderIds);
-                }
-            }
-
-            $tarificationEarnings = $tarificationQuery
-                ->selectRaw('etl.employee_id, SUM(etl.amount_earned) as total_tarification, ARRAY_AGG(DISTINCT o.id) as order_ids')
-                ->groupBy('etl.employee_id')
-                ->get()
-                ->keyBy('employee_id');
-
-            // ✅ Salary payments
-            $salaryPayments = DB::table('salary_payments')
-                ->whereIn('employee_id', $employeeIds)
-                ->whereBetween('month', [$startDate, $endDate])
-                ->select(['employee_id', 'type', 'amount', 'date', 'comment', 'month'])
-                ->get()
-                ->groupBy('employee_id');
-
-            // ✅ Process results
-            $groupedData = [];
-
-            foreach ($employees as $empId => $employee) {
-                $attendanceTotal = (float) ($attendanceSalaries[$empId] ?? 0);
-                $tarificationTotal = (float) ($tarificationEarnings[$empId]->total_tarification ?? 0);
-                $totalEarned = $attendanceTotal + $tarificationTotal;
-
-                // Skip employees with no earnings
-                if ($totalEarned <= 0) continue;
-
-                // Process salary payments
-                $empPayments = $salaryPayments[$empId] ?? collect();
-                $totalPaid = $empPayments->sum('amount');
-                $paymentsGrouped = $empPayments->groupBy('type')->map(function ($payments) {
-                    return $payments->map(function ($p) {
-                        return [
-                            'amount' => (float) $p->amount,
-                            'date' => $p->date,
-                            'comment' => $p->comment,
-                            'month' => $p->month ? Carbon::parse($p->month)->format('Y-m') : null,
-                        ];
-                    });
+            if ($departmentId) {
+                $ungroupedQuery->where('department_id', $departmentId);
+            } elseif ($branchId) {
+                $ungroupedQuery->whereHas('department', function ($q) use ($branchId) {
+                    $q->where('branch_id', $branchId);
                 });
-
-                // Process order IDs
-                $orderIds = [];
-                if (isset($tarificationEarnings[$empId]) && $tarificationEarnings[$empId]->order_ids) {
-                    $orderIds = explode(',', trim($tarificationEarnings[$empId]->order_ids, '{}'));
-                    $orderIds = array_map('intval', array_filter($orderIds));
-                }
-                if (!empty($selectedOrderIds)) {
-                    $orderIds = array_unique(array_merge($orderIds, $selectedOrderIds));
-                }
-
-                $employeeData = [
-                    'id' => $employee->employee_id,
-                    'name' => $employee->name,
-                    'position' => $employee->position_name ?? 'N/A',
-                    'group' => $employee->group_name ?? 'N/A',
-                    'balance' => (float) $employee->balance,
-                    'payment_type' => $employee->payment_type,
-                    'salary' => (float) $employee->salary,
-                    'status' => $employee->status,
-                    'attendance_salary' => $attendanceTotal,
-                    'attendance_days' => (int) ($attendanceDays[$empId] ?? 0),
-                    'tarification_salary' => $tarificationTotal,
-                    'total_earned' => $totalEarned,
-                    'paid_amounts' => $paymentsGrouped,
-                    'total_paid' => round($totalPaid, 2),
-                    'net_balance' => round($totalEarned - $totalPaid, 2),
-                    'orders' => array_values($orderIds),
-                ];
-
-                if (!isset($groupedData[$employee->group_id_check])) {
-                    $groupedData[$employee->group_id_check] = [
-                        'id' => $employee->group_id_check,
-                        'name' => $employee->group_name,
-                        'total_balance' => 0,
-                        'employees' => [],
-                    ];
-                }
-
-                $groupedData[$employee->group_id_check]['employees'][] = $employeeData;
-                $groupedData[$employee->group_id_check]['total_balance'] += $totalEarned;
             }
 
-            return response()->json(array_values($groupedData));
-        });
+            $ungroupedEmployees = $ungroupedQuery
+                ->when($type === 'aup', fn($q) => $q->where('type', 'aup'))
+                ->when($type === 'simple', fn($q) => $q->where('type', '!=', 'aup'))
+                ->when(!$type || !in_array($type, ['aup', 'simple']), fn($q) => $q->whereIn('type', ['aup','simple']))
+                ->select('id', 'name', 'group_id', 'position_id', 'balance', 'salary', 'payment_type', 'status')
+                ->with('salaryPayments')
+                ->get(); // <--- MODELS collection, NOT mapped to arrays
+
+            if ($ungroupedEmployees->isNotEmpty()) {
+                $fakeGroup = new Group();
+                $fakeGroup->id = null;
+                $fakeGroup->name = 'Guruhsiz';
+                $fakeGroup->setRelation('employees', $ungroupedEmployees);
+                $groups->push($fakeGroup);
+            }
+        }
+
+        $startDate = $month ? Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString() : null;
+        $endDate = $month ? Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString() : null;
+
+        $result = $groups->map(function ($group) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
+            $employees = $group->employees
+                ->map(function ($employee) use ($startDate, $endDate, $addOrderIds, $minusOrderIds) {
+                    // defensive: agar $employee array bo'lib qolsa, chiqarib yuborish (ammo yuqorida buni model qilishga o'zgartirdik)
+                    if (is_array($employee)) {
+                        return $employee;
+                    }
+
+                    $employee->loadMissing(['position', 'group', 'salaryPayments']);
+
+                    // Attendance
+                    $attendanceQuery = $employee->attendanceSalaries();
+                    if ($startDate && $endDate) {
+                        $attendanceQuery->whereBetween('date', [$startDate, $endDate]);
+                    }
+                    $attendanceTotal = $attendanceQuery->sum('amount');
+                    $attendanceDays = $attendanceQuery->count();
+
+                    // Tarification logs
+                    $logs = $employee->employeeTarificationLogs()
+                        ->with('tarification.tarificationCategory.submodel.orderModel.order')
+                        ->get()
+                        ->reject(function ($log) use ($minusOrderIds) {
+                            $order = $log->tarification?->tarificationCategory?->submodel?->orderModel?->order;
+                            if (!$order) return true;
+                            return in_array($order->id, $minusOrderIds);
+                        });
+
+                    $orders = $logs->map(fn($log) => $log->tarification?->tarificationCategory?->submodel?->orderModel?->order)
+                        ->filter()->unique('id');
+
+                    if (!empty($addOrderIds)) {
+                        $extraOrders = Order::whereIn('id', $addOrderIds)
+                            ->get();
+                        $orders = $orders->merge($extraOrders)->unique('id');
+                    }
+
+                    $tarificationTotal = $logs->sum('amount_earned');
+
+                    $totalEarned = $tarificationTotal + $attendanceTotal;
+
+                    // Paid salaries
+                    $paidQuery = $employee->salaryPayments();
+                    if ($startDate && $endDate) {
+                        $paidQuery->whereBetween('month', [$startDate, $endDate]);
+                    }
+                    $paymentsGrouped = $paidQuery->get()->groupBy('type');
+
+                    $paidAmountsByType = [];
+                    $paidTotal = 0;
+                    foreach ($paymentsGrouped as $ptype => $payments) {
+                        $paidAmountsByType[$ptype] = $payments->map(function ($payment) use (&$paidTotal) {
+                            $paidTotal += (float) $payment->amount;
+                            return [
+                                'amount' => (float) $payment->amount,
+                                'date' => $payment->date,
+                                'comment' => $payment->comment,
+                                'month' => optional($payment->month)->format('Y-m'),
+                            ];
+                        })->values();
+                    }
+
+                    // Agar xodim hech narsa topmagan bo'lsa, null qaytaramiz — keyin filter bilan o'chiramiz
+                    if (($totalEarned ?? 0) == 0) {
+                        return null;
+                    }
+
+                    return [
+                        'id' => $employee->id,
+                        'name' => $employee->name,
+                        'position' => $employee->position->name ?? 'N/A',
+                        'group' => optional($employee->group)->name ?? 'N/A',
+                        'balance' => (float) $employee->balance,
+                        'payment_type' => $employee->payment_type,
+                        'salary' => (float) $employee->salary,
+                        'status' => $employee->status,
+                        'attendance_salary' => $attendanceTotal,
+                        'attendance_days' => $attendanceDays,
+                        'tarification_salary' => $tarificationTotal,
+                        'total_earned' => $totalEarned,
+                        'paid_amounts' => $paidAmountsByType,
+                        'total_paid' => round($paidTotal, 2),
+                        'net_balance' => round($totalEarned - $paidTotal, 2),
+                        'orders' => $orders->pluck('id')->values(),
+                    ];
+                })
+                // SAFELY filter out nulls and kicked-with-negative etc.
+                ->filter(function ($emp) {
+                    if ($emp === null) return false;
+                    if (($emp['total_earned'] ?? 0) <= 0) return false;
+                    if (($emp['status'] ?? '') === 'kicked' && ($emp['total_earned'] ?? 0) < 0) return false;
+                    return true;
+                })
+                ->values();
+
+            $groupTotal = $employees->sum(fn($e) => $e['total_earned'] ?? 0);
+
+            return [
+                'id' => $group->id,
+                'name' => $group->name,
+                'total_balance' => $groupTotal,
+                'employees' => $employees->toArray(),
+            ];
+        })->values()->toArray();
+
+        return response()->json($result);
     }
 
     //2-usul excel
@@ -1900,7 +1720,7 @@ class CasherController extends Controller
                 return [
                     'cashbox' => $tx->cashbox,
                     'type' => $tx->type,
-                    'amount' => $tx->amount,
+                    'amount' => number_format($tx->amount, 2, '.', ' '),
                     'currency' => $tx->currency,
                     'date' => $tx->date,
                     'source' => $tx->source,
