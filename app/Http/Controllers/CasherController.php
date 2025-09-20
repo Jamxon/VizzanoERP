@@ -1248,7 +1248,7 @@ class CasherController extends Controller
             LEFT JOIN departments d ON g.department_id = d.id
             
             -- Attendance data
-            LEFT JOIN attendances att ON e.id = att.employee_id 
+            LEFT JOIN attendance att ON e.id = att.employee_id 
                 AND att.date BETWEEN ? AND ?
             LEFT JOIN attendance_salaries ats ON e.id = ats.employee_id 
                 AND ats.date BETWEEN ? AND ?
