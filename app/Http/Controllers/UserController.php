@@ -31,7 +31,7 @@ class UserController extends Controller
                 ->where('branch_id', $branchId)
                 ->when($request->department_id, fn($q) => $q->where('department_id', $request->department_id))
                 ->when($request->group_id, fn($q) => $q->where('group_id', $request->group_id))
-                ->with(['tarificationLogs' => function ($q) use ($request) {
+                ->with(['employeeTarificationLogs' => function ($q) use ($request) {
                     $q->whereBetween('date', [$request->start_date, $request->end_date])
                         ->with('tarification');
                 }])
