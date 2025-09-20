@@ -27,59 +27,61 @@ class UserController extends Controller
         try {
             $branchId = auth()->user()->employee->branch_id ?? null;
 
-            $employees = \App\Models\Employee::query()
-                ->where('branch_id', $branchId)
-                ->when($request->department_id, fn($q) => $q->where('department_id', $request->department_id))
-                ->when($request->group_id, fn($q) => $q->where('group_id', $request->group_id))
-                ->with([
-                    'employeeTarificationLogs' => function ($q) use ($request) {
-                        $q->whereBetween('date', [$request->start_date, $request->end_date])
-                            ->with('tarification');
-                    },
-                ])
-                ->withCount([
-                    'attendances as attended_days' => function ($q) use ($request) {
-                        $q->whereBetween('date', [$request->start_date, $request->end_date]);
-                    }
-                ])
+            // 1️⃣ asosiy query — bitta joyda yig‘ish
+            $logs = \DB::table('employee_tarification_logs as etl')
+                ->join('employees as e', 'e.id', '=', 'etl.employee_id')
+                ->join('tarifications as t', 't.id', '=', 'etl.tarification_id')
+                ->select(
+                    'etl.employee_id',
+                    'e.name',
+                    'e.branch_id',
+                    'e.department_id',
+                    'e.group_id',
+                    'etl.date',
+                    \DB::raw('SUM(etl.quantity * t.second) as total_seconds')
+                )
+                ->where('e.branch_id', $branchId)
+                ->when($request->department_id, fn($q) => $q->where('e.department_id', $request->department_id))
+                ->when($request->group_id, fn($q) => $q->where('e.group_id', $request->group_id))
+                ->whereBetween('etl.date', [$request->start_date, $request->end_date])
+                ->groupBy('etl.employee_id', 'e.name', 'e.branch_id', 'e.department_id', 'e.group_id', 'etl.date')
                 ->get();
 
-            $results = $employees->map(function ($employee) {
-                $daily = [];
+            // 2️⃣ attendance kunlari ham bitta queryda
+            $attendance = \DB::table('attendance as a')
+                ->join('employees as e', 'e.id', '=', 'a.employee_id')
+                ->select('a.employee_id', \DB::raw('COUNT(DISTINCT a.date) as attended_days'))
+                ->where('e.branch_id', $branchId)
+                ->when($request->department_id, fn($q) => $q->where('e.department_id', $request->department_id))
+                ->when($request->group_id, fn($q) => $q->where('e.group_id', $request->group_id))
+                ->whereBetween('a.date', [$request->start_date, $request->end_date])
+                ->groupBy('a.employee_id')
+                ->pluck('attended_days', 'employee_id');
 
-                foreach ($employee->employeeTarificationLogs ?? [] as $log) {
-                    $date = $log->date;
-                    $seconds = $log->quantity * ($log->tarification->second ?? 0);
-
-                    if (!isset($daily[$date])) {
-                        $daily[$date] = 0;
-                    }
-                    $daily[$date] += $seconds;
-                }
-
-                $dailyResult = [];
-                foreach ($daily as $date => $seconds) {
-                    $minutes = round($seconds / 60, 2);
+            // 3️⃣ PHP da faqat array yig‘ish
+            $results = $logs->groupBy('employee_id')->map(function ($rows, $employeeId) use ($attendance) {
+                $first = $rows->first();
+                $dailyResult = $rows->map(function ($r) {
+                    $minutes = round($r->total_seconds / 60, 2);
                     $percent = round(($minutes / 500) * 100, 2);
-
-                    $dailyResult[] = [
-                        'date' => $date,
-                        'worked_seconds' => $seconds,
+                    return [
+                        'date' => $r->date,
+                        'worked_seconds' => (int) $r->total_seconds,
                         'worked_minutes' => $minutes,
                         'efficiency_percent' => $percent,
                     ];
-                }
+                });
 
                 return [
-                    'employee_id' => $employee->id,
-                    'employee_name' => $employee->full_name ?? $employee->name,
-                    'branch_id' => $employee->branch_id,
-                    'department_id' => $employee->department_id,
-                    'group_id' => $employee->group_id,
-                    'attended_days' => $employee->attended_days, // ✅ shu joyda necha kun kelgani chiqadi
-                    'days' => $dailyResult,
+                    'employee_id' => $employeeId,
+                    'employee_name' => $first->full_name ?? $first->name,
+                    'branch_id' => $first->branch_id,
+                    'department_id' => $first->department_id,
+                    'group_id' => $first->group_id,
+                    'attended_days' => $attendance[$employeeId] ?? 0,
+                    'days' => $dailyResult->values(),
                 ];
-            });
+            })->values();
 
             return response()->json($results);
 
@@ -91,7 +93,6 @@ class UserController extends Controller
             ], 500);
         }
     }
-
 
     public function getProfile(Request $request): \Illuminate\Http\JsonResponse
     {
