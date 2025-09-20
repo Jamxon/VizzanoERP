@@ -1900,7 +1900,7 @@ class CasherController extends Controller
                 return [
                     'cashbox' => $tx->cashbox,
                     'type' => $tx->type,
-                    'amount' => number_format($tx->amount, 2, '.', ' '),
+                    'amount' => $tx->amount,
                     'currency' => $tx->currency,
                     'date' => $tx->date,
                     'source' => $tx->source,
