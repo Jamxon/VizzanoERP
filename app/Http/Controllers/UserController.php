@@ -40,7 +40,7 @@ class UserController extends Controller
             $results = $employees->map(function ($employee) {
                 $daily = [];
 
-                foreach ($employee->tarificationLogs as $log) {
+                foreach ($employee->employeeTarificationLogs ?? [] as $log) {
                     $date = $log->date;
                     $seconds = $log->quantity * ($log->tarification->second ?? 0);
 
