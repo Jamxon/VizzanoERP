@@ -869,7 +869,7 @@ class InternalAccountantController extends Controller
         $isPresent = $employee->attendances()->where('date', $date)->where('status', 'present')->exists();
 
         if (!$isPresent) {
-            return response()->json(['message' => '❌ Xodim bugun ishga kelmagan.'], 500);
+            return response()->json(['message' => "❌ Xodim $date kuni ishga kelmagan."], 500);
         }
 
         foreach ($request->tarifications as $tarificationData) {
