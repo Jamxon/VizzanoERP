@@ -29,19 +29,6 @@ class TransportResource extends JsonResource
             'branch_id' => $this->branch ?? null,
             'region_id' => $this->region ?? null,
             'is_active' => $this->is_active ?? null,
-            'vin_number' => $this->vin_number ?? null,
-            'tech_passport_number' => $this->tech_passport_number ?? null,
-            'engine_number' => $this->engine_number ?? null,
-            'year' => $this->year ?? null,
-            'color' => $this->color ?? null,
-
-            'registration_date' => optional($this->registration_date)->format('Y-m-d'),
-            'insurance_expiry' => optional($this->insurance_expiry)->format('Y-m-d'),
-            'inspection_expiry' => optional($this->inspection_expiry)->format('Y-m-d'),
-
-            'driver_passport_number' => $this->driver_passport_number ?? null,
-            'driver_license_number' => $this->driver_license_number ?? null,
-            'driver_experience_years' => $this->driver_experience_years ?? null,
             'salary' => $this->salary ?? null,
             'fuel_bonus' => $this->fuel_bonus ?? null,
 
