@@ -24,13 +24,13 @@ class TransportAttendanceController extends Controller
 
             if ($request->has('date')) {
                 $date = \Carbon\Carbon::parse($request->date);
-                $attendances = TransportAttendance::with('transport')
+                $attendances = TransportAttendance::with('transport.dailyEmployees')
                 ->whereYear('date', $date->year)
                     ->whereMonth('date', $date->month)
                     ->orderBy('date', 'desc')
                     ->get();
             } else {
-                $attendances = TransportAttendance::with('transport')
+                $attendances = TransportAttendance::with('transport.dailyEmployees')
                 ->whereYear('date', $currentYear)
                     ->whereMonth('date', $currentMonth)
                     ->orderBy('date', 'desc')
