@@ -27,17 +27,6 @@ class Transport extends Model
         'branch_id',                    // Qaysi filialga tegishli ekanligi (foreign key)
         'region_id',                    // Ro‘yxatdan o‘tgan hudud IDsi (foreign key)
         'is_active',                    // Holati: aktiv yoki aktiv emas (true/false)
-        'vin_number',                   // VIN-kod (unikal avtomobil identifikatori)
-        'tech_passport_number',         // Texnik pasport raqami
-        'engine_number',                // Dvigatel raqami
-        'year',                         // Ishlab chiqarilgan yil (raqam sifatida, masalan 2018)
-        'color',                        // Transport vositasining rangi
-        'registration_date',            // Ro‘yxatga olingan sanasi (date)
-        'insurance_expiry',             // Sug‘urta muddati tugash sanasi (date)
-        'inspection_expiry',            // Texnik ko‘rik muddati tugash sanasi (date)
-        'driver_passport_number',       // Haydovchining pasport raqami
-        'driver_license_number',        // Haydovchilik guvohnomasi raqami
-        'driver_experience_years',      // Haydovchilik tajribasi (yil bilan)
         'salary',                       // Haydovchining kunlik maoshi
         'fuel_bonus',                   // Haydovchiga beriladigan yoqilg‘i bonusi
         'balance',                      // Transport balansidagi mablag‘ (default 0)
@@ -49,10 +38,6 @@ class Transport extends Model
      */
     protected $casts = [
         'is_active' => 'boolean',
-        'driver_experience_years' => 'integer',
-        'registration_date' => 'date',
-        'insurance_expiry' => 'date',
-        'inspection_expiry' => 'date',
     ];
 
     public function branch(): \Illuminate\Database\Eloquent\Relations\BelongsTo
