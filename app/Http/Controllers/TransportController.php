@@ -158,4 +158,35 @@ class TransportController extends Controller
             return response()->json(['message' => 'Tahrirlashda xatolik yuz berdi', 'error' => $e->getMessage()], 500);
         }
     }
+
+    public function employeeTransportStore(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'transport_id' => 'required|exists:transport,id',
+        ]);
+
+        try {
+            $transport = Transport::findOrFail($data['transport_id']);
+            $employee = \App\Models\Employee::findOrFail($data['employee_id']);
+
+            // Faqatgina o'z filialidagi xodimlarni bog'lashga ruxsat beramiz
+            if ($employee->branch_id !== auth()->user()->employee->branch_id) {
+                return response()->json(['error' => 'Siz faqat o‘z filialingizdagi xodimlarni bog‘lashingiz mumkin'], 403);
+            }
+
+            // Xodim allaqachon ushbu transportga bog'langanligini tekshirish
+            if ($transport->employees()->where('employee_id', $employee->id)->exists()) {
+                return response()->json(['error' => 'Xodim allaqachon ushbu transportga bog‘langan'], 409);
+            }
+
+            $transport->employees()->attach($employee->id);
+
+            Log::add(Auth::id(), 'Xodim transportga bog‘landi', 'link', null, ['employee_id' => $employee->id, 'transport_id' => $transport->id]);
+
+            return response()->json(['message' => 'Xodim muvaffaqiyatli transportga bog‘landi'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Xatolik yuz berdi: ' . $e->getMessage()], 500);
+        }
+    }
 }
