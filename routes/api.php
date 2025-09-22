@@ -257,6 +257,7 @@ Route::prefix('transport')->middleware('role:transport')->group(function () {
     Route::patch('employeeTransportDaily/{id}', [TransportAttendanceController::class, 'employeeTransportDailyUpdate']);
     Route::post('employeeTransport', [TransportController::class, 'employeeTransportStore']);
     Route::patch('employeeTransport', [TransportController::class, 'updateEmployeeTransport']);
+    Route::delete('employeeTransport', [TransportController::class, 'deleteEmployeeTransport']);
 });
 
 Route::prefix('packageMaster')->middleware('role:packageMaster')->group(function () {
