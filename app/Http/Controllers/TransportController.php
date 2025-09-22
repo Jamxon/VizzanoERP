@@ -189,4 +189,31 @@ class TransportController extends Controller
             return response()->json(['error' => 'Xatolik yuz berdi: ' . $e->getMessage()], 500);
         }
     }
+
+    public function updateEmployeeTransport(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'transport_id' => 'required|exists:transport,id',
+        ]);
+
+        try {
+            $updated = \DB::table('employee_transport')
+                ->where('employee_id', $data['employee_id'])
+                ->update([
+                    'transport_id' => $data['transport_id'],
+                    'updated_at' => now(),
+                ]);
+
+            if (!$updated) {
+                return response()->json(['error' => 'Xodim transportga bog‘lanmagan'], 404);
+            }
+
+            return response()->json(['message' => 'Transport muvaffaqiyatli yangilandi'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Xatolik yuz berdi: ' . $e->getMessage()], 500);
+        }
+    }
+
 }
