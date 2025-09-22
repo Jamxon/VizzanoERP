@@ -105,6 +105,7 @@ class TransportController extends Controller
         try {
             $transport = Transport::where('id', $id)
                 ->where('branch_id', auth()->user()->employee->branch_id)
+                ->with(['employees'])
                 ->firstOrFail();
 
             return (new TransportResource($transport))->response();
