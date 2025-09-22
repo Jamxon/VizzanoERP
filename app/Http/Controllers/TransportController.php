@@ -216,4 +216,25 @@ class TransportController extends Controller
         }
     }
 
+    public function deleteEmployeeTransport(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+        ]);
+
+        try {
+            $deleted = \DB::table('employee_transport')
+                ->where('employee_id', $data['employee_id'])
+                ->delete();
+
+            if (!$deleted) {
+                return response()->json(['error' => 'Xodim transportga bog‘lanmagan'], 404);
+            }
+
+            return response()->json(['message' => 'Xodimning transport bilan bog‘lanishi muvaffaqiyatli o‘chirildi'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Xatolik yuz berdi: ' . $e->getMessage()], 500);
+        }
+    }
 }
