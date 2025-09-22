@@ -60,7 +60,6 @@ class TransportController extends Controller
         }
     }
 
-
     public function store(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([

@@ -12,7 +12,6 @@ class EmployeeTransportDaily extends Model
         'employee_id',
         'transport_id',
         'date',
-        'note',
     ];
 
     public function employee()
