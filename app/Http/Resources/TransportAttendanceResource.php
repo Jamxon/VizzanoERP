@@ -26,18 +26,19 @@ class TransportAttendanceResource extends JsonResource
                     'name' => $this->transport->name,
 
                     'employees' => $this->transport->dailyEmployees
-                        ->where('date', $this->date)
+                        ->filter(function ($daily) {
+                            return $daily->date->format('Y-m-d') === $this->date->format('Y-m-d');
+                        })
                         ->map(function ($daily) {
                             return [
                                 'id'   => $daily->employee->id ?? null,
                                 'name' => $daily->employee->name ?? null,
-                                'attendance_status' => \DB::table('attendance')
+                                'attendance_status' => DB::table('attendance')
                                         ->where('employee_id', $daily->employee_id)
                                         ->whereDate('date', $daily->date)
                                         ->value('status') ?? 'absent',
                             ];
                         })->values(),
-
                 ];
             }),
         ];
