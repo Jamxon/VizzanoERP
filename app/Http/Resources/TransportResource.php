@@ -43,14 +43,30 @@ class TransportResource extends JsonResource
                     ->values();
             }),
 
-            'daily_employees' => $this->whenLoaded('dailyEmployees'/*, function () use ($currentYear, $currentMonth) {
-                return $this->dailyEmployees
-                    ->where('date', '>=', Carbon::create($currentYear, $currentMonth, 1)->startOfDay())
-                    ->where('date', '<=', Carbon::create($currentYear, $currentMonth, 1)->endOfMonth())
-                    ->values();
-            }*/),
+            'daily_employees' => $this->whenLoaded('dailyEmployees', function () {
+                return $this->dailyEmployees->map(function ($item) {
+                    // attendance ni shu kunga tekshirish
+                    $attendance = $item->employee->attendances
+                        ->where('date', $item->date)
+                        ->first();
 
-            'employees' => $this->employees ?? null,
+                    return [
+                        'id' => $item->id,
+                        'date' => $item->date,
+                        'employee_name' => $item->employee->name ?? null,
+                        'attendance_status' => $attendance ? $attendance->status : 'absent',
+                    ];
+                });
+            }),
+
+            'employees' => $this->whenLoaded('employees', function () {
+                return $this->employees->map(function ($employee) {
+                    return [
+                        'id' => $employee->id,
+                        'name' => $employee->name,
+                    ];
+                });
+            }),
         ];
     }
 }
