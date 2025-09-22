@@ -97,7 +97,11 @@ class UserController extends Controller
                 return [
                     'employee_id' => $employeeId,
                     'employee_name' => $first->name,
-                    'image' => $first->img ? $first->img : null,
+                    'image' => $first->img
+                        ? (filter_var($first->img, FILTER_VALIDATE_URL)
+                            ? $first->img
+                            : url('storage/' . $first->img))
+                        : null,
                     'branch_id' => $first->branch_id,
                     'department_id' => $first->department_id,
                     'group_id' => $first->group_id,
