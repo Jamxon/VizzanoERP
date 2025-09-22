@@ -43,7 +43,14 @@ class TransportResource extends JsonResource
                     ->values();
             }),
 
-            'employees' => $this->employees ?? [],
+            'employees' => $this->whenLoaded('employees', function () {
+                return $this->employees->map(function ($employee) {
+                    return [
+                        'id' => $employee->id,
+                        'name' => $employee->name,
+                    ];
+                });
+            }),
         ];
     }
 }
