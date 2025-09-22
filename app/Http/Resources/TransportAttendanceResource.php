@@ -21,6 +21,9 @@ class TransportAttendanceResource extends JsonResource
         return [
             'id'   => $this->id,
             'date' => $this->date,
+            'attendance_type' => $this->attendance_type,
+            'salary' => $this->salary,
+            'fuel_bonus' => $this->fuel_bonus,
 
             'transport' => $this->whenLoaded('transport', function () {
                 if (!$this->transport) {
