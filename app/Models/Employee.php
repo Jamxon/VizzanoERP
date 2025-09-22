@@ -136,4 +136,15 @@ class Employee extends Model
     {
         return $this->hasMany(EmployeeSalary::class, 'employee_id');
     }
+
+    public function transports()
+    {
+        return $this->belongsToMany(Transport::class, 'employee_transport');
+    }
+
+    public function dailyTransports()
+    {
+        return $this->hasMany(EmployeeTransportDaily::class);
+    }
+
 }

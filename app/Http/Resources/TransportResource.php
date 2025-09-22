@@ -55,6 +55,13 @@ class TransportResource extends JsonResource
                     ->where('date', '<=', Carbon::create($currentYear, $currentMonth, 1)->endOfMonth())
                     ->values();
             }),
+
+            'daily_employees' => $this->whenLoaded('dailyEmployees'/*, function () use ($currentYear, $currentMonth) {
+                return $this->dailyEmployees
+                    ->where('date', '>=', Carbon::create($currentYear, $currentMonth, 1)->startOfDay())
+                    ->where('date', '<=', Carbon::create($currentYear, $currentMonth, 1)->endOfMonth())
+                    ->values();
+            }*/),
         ];
     }
 }

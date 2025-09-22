@@ -23,12 +23,31 @@ class TransportController extends Controller
                     $year = $date->year;
                     $month = $date->month;
 
+                    // payments
                     $query->with(['payments' => function ($q) use ($year, $month) {
                         $q->whereDate('date', '>=', Carbon::create($year, $month, 1)->startOfDay())
                             ->whereDate('date', '<=', Carbon::create($year, $month, 1)->endOfMonth());
                     }]);
+
+                    // employee_transport_daily
+                    if ($request->filled('day')) {
+                        // agar aniq sana berilsa (masalan 2025-09-22)
+                        $day = Carbon::createFromFormat('Y-m-d', $request->input('day'));
+                        $query->with(['dailyEmployees' => function ($q) use ($day) {
+                            $q->where('date', $day);
+                        }]);
+                    } else {
+                        // agar faqat oy bo‘lsa, butun oydagi yozuvlar
+                        $query->with(['dailyEmployees' => function ($q) use ($year, $month) {
+                            $q->whereBetween('date', [
+                                Carbon::create($year, $month, 1)->startOfDay(),
+                                Carbon::create($year, $month, 1)->endOfMonth(),
+                            ]);
+                        }]);
+                    }
+
                 } catch (\Exception $e) {
-                    return response()->json(['error' => 'Noto‘g‘ri sana formati. To‘g‘ri format: YYYY-MM'], 422);
+                    return response()->json(['error' => 'Noto‘g‘ri sana formati. To‘g‘ri format: YYYY-MM yoki YYYY-MM-DD'], 422);
                 }
             }
 

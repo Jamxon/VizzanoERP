@@ -59,4 +59,15 @@ class Transport extends Model
     {
         return $this->hasMany(TransportTransaction::class, 'transport_id');
     }
+
+    public function employees()
+    {
+        return $this->belongsToMany(Employee::class, 'employee_transport');
+    }
+
+    public function dailyEmployees()
+    {
+        return $this->hasMany(EmployeeTransportDaily::class);
+    }
+
 }
