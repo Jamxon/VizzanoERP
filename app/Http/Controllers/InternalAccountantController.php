@@ -866,6 +866,12 @@ class InternalAccountantController extends Controller
             return response()->json(['message' => '❌ Xodim ishdan bo‘shatilgan.'], 403);
         }
 
+        $isPresent = $employee->attendances()->where('date', $date)->where('status', 'present')->exists();
+
+        if (!$isPresent) {
+            return response()->json(['message' => '❌ Xodim bugun ishga kelmagan.'], 500);
+        }
+
         foreach ($request->tarifications as $tarificationData) {
             $tarificationId = $tarificationData['id'];
             $quantity = $tarificationData['quantity'];
