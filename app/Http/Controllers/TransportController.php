@@ -46,6 +46,8 @@ class TransportController extends Controller
                         }]);
                     }
 
+                    $query->with('employees');
+
                 } catch (\Exception $e) {
                     return response()->json(['error' => 'Noto‘g‘ri sana formati. To‘g‘ri format: YYYY-MM yoki YYYY-MM-DD'], 422);
                 }
