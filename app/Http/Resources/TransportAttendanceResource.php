@@ -34,6 +34,18 @@ class TransportAttendanceResource extends JsonResource
                 'id' => $this->transport->id ?? null,
                 'name' => $this->transport->name ?? null,
                 'state_number' => $this->transport->state_number ?? null,
+                'employees' => $this->transport->dailyEmployees
+                    ->where('date', $this->date) // faqat shu sana uchun
+                    ->map(function ($daily) {
+                        return [
+                            'id'   => $daily->employee->id,
+                            'name' => $daily->employee->name,
+                            'attendance_status' => \DB::table('attendance')
+                                    ->where('employee_id', $daily->employee_id)
+                                    ->whereDate('date', $daily->date)
+                                    ->value('status') ?? 'absent',
+                        ];
+                    })->values(),
             ],
         ];
     }
