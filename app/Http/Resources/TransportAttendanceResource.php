@@ -24,7 +24,6 @@ class TransportAttendanceResource extends JsonResource
                 return [
                     'id'   => $this->transport->id,
                     'name' => $this->transport->name,
-                    'capacity' => $this->transport->capacity,
 
                     'employees' => $this->transport->dailyEmployees
                         ->filter(function ($daily) {
