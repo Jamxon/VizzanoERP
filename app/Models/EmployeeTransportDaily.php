@@ -14,6 +14,10 @@ class EmployeeTransportDaily extends Model
         'date',
     ];
 
+    protected $casts = [
+        'date' => 'date',
+    ];
+
     public function employee()
     {
         return $this->belongsTo(Employee::class);
