@@ -42,6 +42,8 @@ class TransportResource extends JsonResource
                     ->where('date', '<=', Carbon::create($currentYear, $currentMonth, 1)->endOfMonth())
                     ->values();
             }),
+
+            'employees' => $this->employees ?? [],
         ];
     }
 }
