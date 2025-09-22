@@ -63,6 +63,7 @@ class UserController extends Controller
                     \DB::raw('COALESCE(SUM(ats.amount),0) as attendance_earned')
                 )
                 ->where('e.branch_id', $branchId)
+                ->where('a.status', 'present')
                 ->when($request->department_id, fn($q) => $q->where('e.department_id', $request->department_id))
                 ->when($request->group_id, fn($q) => $q->where('e.group_id', $request->group_id))
                 ->whereBetween('a.date', [$request->start_date, $request->end_date])
