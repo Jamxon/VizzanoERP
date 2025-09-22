@@ -254,7 +254,7 @@ Route::prefix('transport')->middleware('role:transport')->group(function () {
     Route::post('payment', [TransportAttendanceController::class, 'storeTransaction']);
     Route::patch('payment/{id}', [TransportAttendanceController::class, 'updateTransaction']);
     Route::get('regions', [SuperHRController::class, 'getRegions']);
-
+    Route::patch('employeeTransportDaily/{id}', [TransportAttendanceController::class, 'employeeTransportDailyUpdate']);
 });
 
 Route::prefix('packageMaster')->middleware('role:packageMaster')->group(function () {

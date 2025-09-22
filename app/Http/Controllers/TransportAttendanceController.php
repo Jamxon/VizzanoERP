@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\TransportAttendanceResource;
+use App\Models\EmployeeTransportDaily;
 use App\Models\Log;
 use App\Models\MonthlyClosure;
 use App\Models\Transport;
@@ -618,6 +619,19 @@ class TransportAttendanceController extends Controller
                     'message' => $e->getMessage()
                 ], 500);
             }
+    }
+
+    public function employeeTransportDailyUpdate(Request $request, $id)
+    {
+        $daily = EmployeeTransportDaily::findOrFail($id);
+
+        $request->validate([
+            'transport_id' => 'required|exists:transports,id',
+        ]);
+
+        $daily->update($request->only('transport_id', 'note'));
+
+        return response()->json($daily);
     }
 
 }
