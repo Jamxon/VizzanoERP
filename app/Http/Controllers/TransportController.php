@@ -27,7 +27,9 @@ class TransportController extends Controller
                     $query->with(['payments' => function ($q) use ($year, $month) {
                         $q->whereDate('date', '>=', Carbon::create($year, $month, 1)->startOfDay())
                             ->whereDate('date', '<=', Carbon::create($year, $month, 1)->endOfMonth());
-                    }]);
+                    },
+                        'employees'
+                    ]);
 
                 } catch (\Exception $e) {
                     return response()->json(['error' => 'Noto‘g‘ri sana formati. To‘g‘ri format: YYYY-MM yoki YYYY-MM-DD'], 422);
