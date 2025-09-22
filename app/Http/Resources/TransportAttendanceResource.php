@@ -2,28 +2,19 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
-/**
- * @property mixed $attendance_type
- * @property mixed $salary
- * @property mixed $date
- * @property mixed $id
- * @property mixed $fuel_bonus
- * @property mixed $method
- * @property mixed $transport
- */
 class TransportAttendanceResource extends JsonResource
 {
     public function toArray($request)
     {
         return [
-            'id'   => $this->id,
-            'date' => date_format($this->date, 'Y-m-d'),
+            'id'              => $this->id,
+            'date'            => $this->date ? $this->date->format('Y-m-d') : null,
             'attendance_type' => $this->attendance_type,
-            'salary' => $this->salary,
-            'fuel_bonus' => $this->fuel_bonus,
+            'salary'          => $this->salary,
+            'fuel_bonus'      => $this->fuel_bonus,
 
             'transport' => $this->whenLoaded('transport', function () {
                 if (!$this->transport) {
@@ -34,21 +25,24 @@ class TransportAttendanceResource extends JsonResource
                     'id'   => $this->transport->id,
                     'name' => $this->transport->name,
 
-                    'employees' => $this->transport->dailyEmployees
-                        ->where('date', $this->date)
-                        ->map(function ($daily) {
-                            return [
-                                'id'   => $daily->employee->id ?? null,
-                                'name' => $daily->employee->name ?? null,
-                                'attendance_status' => \DB::table('attendance')
-                                        ->where('employee_id', $daily->employee_id)
-                                        ->whereDate('date', $daily->date)
-                                        ->value('status') ?? 'absent',
-                            ];
-                        })->values(),
+                    'employees' => $this->transport->employees->map(function ($employee) {
+                        // shu kuni transport daily yozuvini tekshiramiz
+                        $daily = $employee->dailyEmployees()
+                            ->whereDate('date', $this->date)
+                            ->first();
+
+                        return [
+                            'id'   => $employee->id,
+                            'name' => $employee->name,
+                            'attendance_status' => DB::table('attendance')
+                                    ->where('employee_id', $employee->id)
+                                    ->whereDate('date', $this->date)
+                                    ->value('status') ?? 'absent',
+                            'transport_status'  => $daily ? 'present' : 'absent',
+                        ];
+                    })->values(),
                 ];
             }),
         ];
     }
-
 }
