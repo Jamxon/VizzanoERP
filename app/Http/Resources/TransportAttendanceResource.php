@@ -20,7 +20,7 @@ class TransportAttendanceResource extends JsonResource
     {
         return [
             'id'   => $this->id,
-            'date' => $this->date,
+            'date' => date_format($this->date, 'Y-m-d'),
             'attendance_type' => $this->attendance_type,
             'salary' => $this->salary,
             'fuel_bonus' => $this->fuel_bonus,
