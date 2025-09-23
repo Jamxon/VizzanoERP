@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\AttendanceSalary;
 use App\Models\Employee;
+use App\Models\EmployeeTransportDaily;
 use App\Models\Log;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -86,6 +87,29 @@ class AttendanceController extends Controller
                 'status' => $request->status ?? 'present',
             ]
         );
+
+        // ✅ Agar status "present" bo‘lsa transport davomatini ham yozamiz
+        if ($attendance->status === 'present') {
+            $employee = Employee::with('transports')->find($attendance->employee_id);
+
+            if ($employee && $employee->transports->isNotEmpty()) {
+                $transport = $employee->transports->first();
+
+                $exists = EmployeeTransportDaily::where('employee_id', $employee->id)
+                    ->where('transport_id', $transport->id)
+                    ->whereDate('date', $today)
+                    ->exists();
+
+                if (!$exists) {
+                    EmployeeTransportDaily::create([
+                        'employee_id' => $employee->id,
+                        'transport_id' => $transport->id,
+                        'date' => $today,
+                    ]);
+                }
+            }
+        }
+
 
 
         try {
