@@ -279,7 +279,9 @@ class CasherController extends Controller
             'net_profit_uzs' => 0,
             'employee_count_sum' => 0,
             'total_output_quantity' => 0,
-            'rasxod_limit_uzs' => 0
+            'rasxod_limit_uzs' => 0,
+            'transport_employees_count' => 0,
+            'transport_per_employee' => 0,
         ];
 
         foreach ($period as $dateObj) {
@@ -304,6 +306,8 @@ class CasherController extends Controller
             $monthlyStats['employee_count_sum'] += $daily['employee_count'] ?? 0;
             $monthlyStats['total_output_quantity'] += $daily['total_output_quantity'] ?? 0;
             $monthlyStats['rasxod_limit_uzs'] += $daily['rasxod_limit_uzs'] ?? 0;
+            $monthlyStats['transport_employees_count'] += $daily['transport_employees_count'] ?? 0;
+            $monthlyStats['transport_per_employee'] += $daily['transport_per_employee'] ?? 0;
 
             if (!isset($daily['orders'])) continue;
 
@@ -414,6 +418,10 @@ class CasherController extends Controller
             'orders' => array_values($orderSummaries),
             'rasxod_limit_uzs' => $monthlyStats['rasxod_limit_uzs'],
 
+            'employee_count_sum' => $monthlyStats['employee_count_sum'],
+            'transport_employees_count' => $monthlyStats['transport_employees_count'],
+            'transport_per_employee' => $monthlyStats['transport_per_employee'],
+
             // Yangi qo'shilgan qismlar
             'total_output_quantity' => $monthlyStats['total_output_quantity'],
             'cost_per_unit_overall_uzs' => round($costPerUnitOverall, 2),
@@ -443,6 +451,22 @@ class CasherController extends Controller
             ->whereDate('transport_attendance.date', $date)
             ->where('transport.branch_id', $branchId)
             ->sum(DB::raw('(transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type'));
+
+
+        // 🚍 Shu kuni transportda kelgan odamlar soni
+        $transportEmployeesCount = DB::table('employee_transport_daily as etd')
+            ->join('employees as e', 'etd.employee_id', '=', 'e.id')
+            ->join('transport as t', 'etd.transport_id', '=', 't.id')
+            ->whereDate('etd.date', $date)
+            ->where('t.branch_id', $branchId)   // transport shu filialdan bo‘lishi kerak
+            ->where('e.branch_id', $branchId)   // xodim ham shu filialdan bo‘lishi kerak
+            ->count('etd.employee_id');
+
+        // 🚍 Bir kishi uchun transport xarajati
+        $transportPerEmployee = $transportEmployeesCount > 0
+            ? $transport / $transportEmployeesCount
+            : 0;
+
 
         // Monthly expenses ni type bo'yicha ajratish - har doim hisoblanadi
         $monthlyExpenses = DB::table('monthly_expenses')
@@ -677,6 +701,8 @@ class CasherController extends Controller
             'dollar_rate' => $dollarRate,
             'orders' => $orders,
             'transport_attendance' => $transport,
+            'transport_employees_count' => $transportEmployeesCount,
+            'transport_per_employee' => round($transportPerEmployee),
             'daily_expenses' => $dailyExpense,
             'aup' => $aup,
             'isNotAup' => $isNotAup,
