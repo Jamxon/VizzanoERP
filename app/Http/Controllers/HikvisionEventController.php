@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EmployeeTransportDaily;
 use App\Models\Log;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -55,7 +56,7 @@ class HikvisionEventController extends Controller
             }
 
 
-            $employee = Employee::find($employeeNo);
+            $employee = Employee::with('transports')->find($employeeNo);
 
             // Hodim topilmasa yoki branch mos kelmasa
             if (!$employee || (int)$employee->branch_id !== (int)$branchFromDevice) {
@@ -91,6 +92,24 @@ class HikvisionEventController extends Controller
                     $attendance->check_in_image = $imagePath;
                     $attendance->status = 'present';
                     $attendance->save();
+
+                    if (!$employee->transports->isEmpty()) {
+                        $transport = $employee->transports->first();
+
+                        $date = now();
+                        $exists = EmployeeTransportDaily::where('employee_id', $employee->id)
+                            ->where('transport_id', $transport->id)
+                            ->whereDate('date', $date)
+                            ->exists();
+
+                        if (!$exists) {
+                            EmployeeTransportDaily::create([
+                                'employee_id' => $employee->id,
+                                'transport_id' => $transport->id,
+                                'date' => $date,
+                            ]);
+                        }
+                    }
 
                     Log::add($employee->user_id ?? null, 'Hodim ishga keldi', 'Check In', null, [
                         'employee_id' => $employee->id,
