@@ -116,7 +116,7 @@ class TransportController extends Controller
 
     public function transportShow(Transport $transport): \Illuminate\Http\JsonResponse
     {
-        $transport->load(['region','transportAttendances','payments', 'employees']);
+        $transport->load(['region','transportAttendances','payments', 'employees.department', 'employees.group']);
 
         return response()->json($transport);
     }
