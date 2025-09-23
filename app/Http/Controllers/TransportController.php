@@ -36,6 +36,8 @@ class TransportController extends Controller
                 }
             }
 
+            $query->with(['employees']);
+
             $transports = $query->orderBy('id', 'desc')->get();
             $resource = TransportResource::collection($transports);
 
