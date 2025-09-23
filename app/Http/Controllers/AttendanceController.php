@@ -96,7 +96,6 @@ class AttendanceController extends Controller
                 $transport = $employee->transports->first();
 
                 $exists = EmployeeTransportDaily::where('employee_id', $employee->id)
-                    ->where('transport_id', $transport->id)
                     ->whereDate('date', $today)
                     ->exists();
 
