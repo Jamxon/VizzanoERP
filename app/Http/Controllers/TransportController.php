@@ -171,23 +171,54 @@ class TransportController extends Controller
             $transport = Transport::findOrFail($data['transport_id']);
             $employee = \App\Models\Employee::findOrFail($data['employee_id']);
 
-            // Faqatgina o'z filialidagi xodimlarni bog'lashga ruxsat beramiz
+            // ✅ Filialni tekshirish
             if ($employee->branch_id !== auth()->user()->employee->branch_id) {
-                return response()->json(['error' => 'Siz faqat o‘z filialingizdagi xodimlarni bog‘lashingiz mumkin'], 403);
+                return response()->json([
+                    'error' => 'Siz faqat o‘z filialingizdagi xodimlarni bog‘lashingiz mumkin'
+                ], 403);
             }
 
-            // Xodim allaqachon ushbu transportga bog'langanligini tekshirish
-            if ($transport->employees()->where('employee_id', $employee->id)->exists()) {
-                return response()->json(['error' => 'Xodim allaqachon ushbu transportga bog‘langan'], 409);
+            // ✅ Transport sig‘imini tekshirish
+            $currentCount = $transport->employees()->count();
+            if ($currentCount >= $transport->capacity) {
+                return response()->json([
+                    'error' => "Transport sig‘imi to‘ldi! ({$transport->capacity} o‘rin)"
+                ], 409);
             }
 
+            // ✅ Xodim allaqachon boshqa transportga bog‘langanmi?
+            $currentTransport = $employee->transports()->first();
+            if ($currentTransport) {
+                if ($currentTransport->id === $transport->id) {
+                    return response()->json([
+                        'error' => 'Xodim allaqachon ushbu transportga bog‘langan'
+                    ], 409);
+                }
+
+                return response()->json([
+                    'error' => "Xodim allaqachon boshqa transportga biriktirilgan (ID: {$currentTransport->id})"
+                ], 409);
+            }
+
+            // ✅ Yangi transportga biriktirish
             $transport->employees()->attach($employee->id);
 
-            Log::add(Auth::id(), 'Xodim transportga bog‘landi', 'link', null, ['employee_id' => $employee->id, 'transport_id' => $transport->id]);
+            Log::add(
+                Auth::id(),
+                'Xodim transportga bog‘landi',
+                'link',
+                null,
+                ['employee_id' => $employee->id, 'transport_id' => $transport->id]
+            );
 
-            return response()->json(['message' => 'Xodim muvaffaqiyatli transportga bog‘landi'], 200);
+            return response()->json([
+                'message' => "Xodim muvaffaqiyatli transportga bog‘landi. (Hozir {$currentCount + 1}/{$transport->capacity})"
+            ], 200);
+
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Xatolik yuz berdi: ' . $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Xatolik yuz berdi: ' . $e->getMessage()
+            ], 500);
         }
     }
 
