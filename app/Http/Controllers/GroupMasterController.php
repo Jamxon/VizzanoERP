@@ -407,6 +407,7 @@ class GroupMasterController extends Controller
         $newEntryMessage = "<b>🧵 Yangi natija kiritildi</b>\n";
         $newEntryMessage .= "⏰<b>{$time->time}</b>\n";
         $newEntryMessage .= "➕ <b>Kiritilgan:</b> {$newQuantity} dona\n";
+        $newEntryMessage .= "📉 <b>Qolgan:</b> " . ($orderQuantity - $combinedQuantity) . " dona\n";
         $newEntryMessage .= "👤 <b>Foydalanuvchi:</b> {$user->employee->name}\n";
         $newEntryMessage .= "📦 <b>Buyurtma:</b> {$orderName}\n";
         $newEntryMessage .= "🧶 <b>Submodel:</b> {$submodelName}\n";
