@@ -211,9 +211,14 @@ class TransportController extends Controller
                 ['employee_id' => $employee->id, 'transport_id' => $transport->id]
             );
 
+// Hozirgi band o‘rinlarni hisoblash
+            $occupied = $currentCount + 1;
+            $totalCapacity = $transport->capacity;
+
             return response()->json([
-                'message' => "Xodim muvaffaqiyatli transportga bog‘landi. (Hozir {$currentCount + 1}/{$transport->capacity})"
+                'message' => "Xodim muvaffaqiyatli transportga bog‘landi. (Hozir {$occupied}/{$totalCapacity})"
             ], 200);
+
 
         } catch (\Exception $e) {
             return response()->json([
