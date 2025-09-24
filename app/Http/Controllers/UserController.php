@@ -142,7 +142,14 @@ class UserController extends Controller
                     $query->whereBetween('date', [$startDate, $endDate]);
                 },
                 'employeeTarificationLogs' => function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('date', [$startDate, $endDate])
+                    $query->whereHas('tarification.tarificationCategory.submodel.orderModel.order', function ($q) use ($startDate) {
+                            $month = Carbon::parse($startDate)->format('Y-m');
+                            $q->whereIn('id', function ($subQuery) use ($month) {
+                                $subQuery->select('order_id')
+                                    ->from('monthly_selected_orders')
+                                    ->where('month', $month);
+                            });
+                        })
                         ->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'is_own', 'amount_earned')
                         ->with(['tarification' => function ($q) {
                             $q->select('id', 'name', 'code', 'second', 'summa', 'tarification_category_id')
@@ -155,7 +162,7 @@ class UserController extends Controller
                                                         ->with([
                                                             'orderModel' => function ($q4) {
                                                                 $q4->select('id', 'model_id')
-                                                                    ->with('model:id,name'); // faqat kerakli maydon
+                                                                    ->with('model:id,name');
                                                             },
                                                             'submodel' => function ($q5) {
                                                                 $q5->select('id', 'name');
@@ -208,7 +215,14 @@ class UserController extends Controller
             $employee->load([
                 'attendanceSalaries',
                 'employeeTarificationLogs' => function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('date', [$startDate, $endDate])
+                    $query->whereHas('tarification.tarificationCategory.submodel.orderModel.order', function ($q) use ($startDate) {
+                            $month = Carbon::parse($startDate)->format('Y-m');
+                            $q->whereIn('id', function ($subQuery) use ($month) {
+                                $subQuery->select('order_id')
+                                    ->from('monthly_selected_orders')
+                                    ->where('month', $month);
+                            });
+                        })
                         ->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'is_own', 'amount_earned')
                         ->with(['tarification' => function ($q) {
                             $q->select('id', 'name', 'code', 'second', 'summa', 'tarification_category_id')
@@ -221,7 +235,7 @@ class UserController extends Controller
                                                         ->with([
                                                             'orderModel' => function ($q4) {
                                                                 $q4->select('id', 'model_id')
-                                                                    ->with('model:id,name'); // faqat kerakli maydon
+                                                                    ->with('model:id,name');
                                                             },
                                                             'submodel' => function ($q5) {
                                                                 $q5->select('id', 'name');

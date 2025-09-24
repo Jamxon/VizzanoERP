@@ -992,7 +992,7 @@ class CasherController extends Controller
     public function getOrders(Request $request): \Illuminate\Http\JsonResponse
     {
 
-        $orders = \App\Models\Order::with(['orderModel.submodels.submodel', 'orderModel.model'])
+        $orders = \App\Models\Order::with(['orderModel.submodels.submodel', 'orderModel.model', 'orderModel.submodels.group.group'])
             ->where('branch_id', auth()->user()->employee->branch_id)
             ->get();
 
