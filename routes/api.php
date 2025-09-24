@@ -549,6 +549,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/todos', [TodoListController::class, 'store']);
     Route::put('/todos/{id}', [TodoListController::class, 'update']);
     Route::delete('/todos/{id}', [TodoListController::class, 'destroy']);
+    Route::get('employeeEfficiency', [UserController::class, 'getEmployeeEfficiency']);
 });
 
 Route::post('register', [AuthController::class, 'register']);
