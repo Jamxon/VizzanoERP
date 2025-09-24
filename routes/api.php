@@ -111,7 +111,7 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::get('myWorks', [TailorController::class, 'getMyWorks']);
 });
 
-Route::prefix('universalTailor')->middleware('role:tailor')->group(function () {
+Route::prefix('universalTailor')->middleware('role:universalTailor')->group(function () {
     Route::get('tarifications/search', [TailorController::class, 'searchTarifications']);
     Route::get('balance', [TailorController::class, 'getDailyBalanceEmployee']);
     Route::post('tarificationLog', [TailorController::class, 'storeTarificationLog']);
