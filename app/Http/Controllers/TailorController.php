@@ -160,16 +160,18 @@ class TailorController extends Controller
 
     public function getModelWithTarification(): \Illuminate\Http\JsonResponse
     {
-        $group = auth()->user()->employee->group ?? null;
+        $user = auth()->user();
+        $group = $user->employee->group ?? null;
 
         $startDate = now()->subDays(14)->toDateString();
         $endDate = now()->addDay()->toDateString();
 
         $order = OrderGroup::query()
-            ->when($group, function ($q) use ($group) {
-                // ✅ Agar group mavjud bo‘lsa, shuni filter qilamiz
+            ->when($user->role === 'tailor' && $group, function ($q) use ($group) {
+                // 👷‍♂️ Agar role = tailor bo‘lsa, group filter ishlaydi
                 $q->where('group_id', $group->id);
-            }) // ❌ Agar group null bo‘lsa, bu filter qo‘shilmaydi va hamma group qaytadi
+            })
+            // universalTailor bo‘lsa, bu filter umuman qo‘shilmaydi
             ->whereHas('order', function ($query) {
                 $query->whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting']);
             })
