@@ -172,8 +172,9 @@ class TailorController extends Controller
                 $q->where('group_id', $group->id);
             })
             // universalTailor bo‘lsa, bu filter umuman qo‘shilmaydi
-            ->whereHas('order', function ($query) {
+            ->whereHas('order', function ($query) use ($user) {
                 $query->whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting']);
+                $query->where('branch_id', $user->employee->branch_id);
             })
             ->where(function ($q) use ($startDate, $endDate) {
                 $q->whereHas('order.orderModel.submodels.sewingOutputs', function ($query) use ($startDate, $endDate) {
