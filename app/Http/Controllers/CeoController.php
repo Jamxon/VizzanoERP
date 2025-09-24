@@ -47,6 +47,8 @@ class CeoController extends Controller
         // ✅ Recommendation (branchdagi, lekin monthly_selected_orders jadvalida yo‘q bo‘lganlar)
         $selectedOrderIds = $records->pluck('order_id');
 
+        $allSelectedOrderIds = MonthlySelectedOrder::pluck('order_id')->toArray();
+
         $recommendations = Order::with(['orderModel.submodels' => function ($q) {
             $q->withSum('sewingOutputs', 'quantity');
         },
@@ -56,7 +58,7 @@ class CeoController extends Controller
             ])
             ->where('branch_id', $branchId) // ✅ branch filter
             ->whereIn('status', ['cutting', 'pending', 'tailoring', 'tailored']) // ✅ status filter
-            ->whereNotIn('id', $selectedOrderIds) // ✅ ro‘yxatda yo‘q bo‘lganlarni olamiz
+            ->whereNotIn('id', $allSelectedOrderIds) // ✅ ro‘yxatda yo‘q bo‘lganlarni olamiz
             ->get()
             ->map(function ($order) {
                 $doneQuantity = 0;
