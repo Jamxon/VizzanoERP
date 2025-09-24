@@ -1274,7 +1274,7 @@ class CasherController extends Controller
         // BULK: Barcha kerakli ma'lumotlarni bir marta olamiz
 
         // 1. Attendance salaries - BULK
-        $attendanceData = DB::table('attendance_salaries')
+        $attendanceData = DB::table('attendance_salary')
             ->whereIn('employee_id', $employeeIds)
             ->whereBetween('date', [$startDate, $endDate])
             ->selectRaw('employee_id, SUM(amount) as total_amount, COUNT(*) as days_count')
@@ -1286,7 +1286,7 @@ class CasherController extends Controller
         $tarificationData = DB::table('employee_tarification_logs as etl')
             ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
             ->join('tarification_categories as tc', 't.tarification_category_id', '=', 'tc.id')
-            ->join('submodels as sm', 'tc.submodel_id', '=', 'sm.id')
+            ->join('order_sub_models as sm', 'tc.submodel_id', '=', 'sm.id')
             ->join('order_models as om', 'sm.order_model_id', '=', 'om.id')
             ->join('orders as o', 'om.order_id', '=', 'o.id')
             ->whereIn('etl.employee_id', $employeeIds)
