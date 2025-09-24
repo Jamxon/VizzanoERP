@@ -16,7 +16,8 @@ class CeoController extends Controller
             'order.orderModel.submodels' => function ($q) {
                 $q->withSum('sewingOutputs', 'quantity');
             },
-        ])->whereHas('order', function ($q) use ($branchId) {
+            'order.orderModel.submodels.group.group',
+            ])->whereHas('order', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
 
         });
@@ -46,7 +47,9 @@ class CeoController extends Controller
 
         $recommendations = Order::with(['orderModel.submodels' => function ($q) {
             $q->withSum('sewingOutputs', 'quantity');
-        }])
+        },
+            'orderModel.submodels.group.group',
+            ])
             ->where('branch_id', $branchId) // ✅ branch filter
             ->whereIn('status', ['cutting', 'pending', 'tailoring', 'tailored']) // ✅ status filter
             ->whereNotIn('id', $selectedOrderIds) // ✅ ro‘yxatda yo‘q bo‘lganlarni olamiz
