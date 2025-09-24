@@ -451,8 +451,17 @@ class GroupMasterController extends Controller
             $responsible = optional($first->orderSubmodel->group->group->responsibleUser->employee)->name ?? '—';
             $sum = $entry['total_quantity'];
 
+            // ✅ Shu submodelga tegishli buyurtma miqdori
+            $orderQty = optional($first->orderSubmodel->orderModel->order)->quantity ?? 0;
+
+            // ✅ Shu submodel bo‘yicha umumiy tikilgan son
+            $sewnQty = SewingOutputs::where('order_submodel_id', $first->order_submodel_id)->sum('quantity');
+
+            // ✅ Qoldiq hisoblash
+            $remaining = max($orderQty - $sewnQty, 0);
+
             $summaryMessage .= "🔹 {$model} — {$group}\n";
-            $summaryMessage .= "👤 {$responsible} | ✅ {$sum} dona\n\n";
+            $summaryMessage .= "👤 {$responsible} | ✅ {$sum} dona | 📉 Qoldiq: {$remaining} dona\n\n";
         }
         $summaryMessage .= "⏰ <b><i>Jami natijalar: {$totalSumForTime} dona </i></b> ⚡️\n";
 
