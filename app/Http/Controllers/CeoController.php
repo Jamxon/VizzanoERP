@@ -17,6 +17,7 @@ class CeoController extends Controller
                 $q->withSum('sewingOutputs', 'quantity');
             },
             'order.orderModel.submodels.submodel',
+            'order.orderModel.model',
             'order.orderModel.submodels.group.group',
             ])->whereHas('order', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
@@ -50,6 +51,7 @@ class CeoController extends Controller
             $q->withSum('sewingOutputs', 'quantity');
         },
             'orderModel.submodels.submodel',
+            'orderModel.model',
             'orderModel.submodels.group.group',
             ])
             ->where('branch_id', $branchId) // ✅ branch filter
