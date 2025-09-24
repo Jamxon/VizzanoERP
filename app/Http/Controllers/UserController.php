@@ -143,13 +143,13 @@ class UserController extends Controller
                 },
                 'employeeTarificationLogs' => function ($query) use ($startDate, $endDate) {
                     $query->whereHas('tarification.tarificationCategory.submodel.orderModel.order', function ($q) use ($startDate) {
-                            $month = Carbon::parse($startDate)->format('Y-m');
-                            $q->whereIn('id', function ($subQuery) use ($month) {
-                                $subQuery->select('order_id')
-                                    ->from('monthly_selected_orders')
-                                    ->where('month', $month);
-                            });
-                        })
+                        $month = Carbon::parse($startDate)->format('Y-m');
+                        $q->whereIn('id', function ($subQuery) use ($month) {
+                            $subQuery->select('order_id')
+                                ->from('monthly_selected_orders')
+                                ->where('month', $month);
+                        });
+                    })
                         ->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'is_own', 'amount_earned')
                         ->with(['tarification' => function ($q) {
                             $q->select('id', 'name', 'code', 'second', 'summa', 'tarification_category_id')
@@ -216,13 +216,15 @@ class UserController extends Controller
                 'attendanceSalaries',
                 'employeeTarificationLogs' => function ($query) use ($startDate, $endDate) {
                     $query->whereHas('tarification.tarificationCategory.submodel.orderModel.order', function ($q) use ($startDate) {
-                            $month = Carbon::parse($startDate)->format('Y-m');
-                            $q->whereIn('id', function ($subQuery) use ($month) {
-                                $subQuery->select('order_id')
-                                    ->from('monthly_selected_orders')
-                                    ->where('month', $month);
-                            });
-                        })
+                        // Oyning birinchi kuni qilib olish
+                        $monthStart = Carbon::parse($startDate)->startOfMonth()->toDateString(); // 2025-09-01
+                        $q->whereIn('id', function ($subQuery) use ($monthStart) {
+                            $subQuery->select('order_id')
+                                ->from('monthly_selected_orders')
+                                ->where('month', $monthStart);
+                        });
+                    })
+                        ->whereBetween('date', [$startDate, $endDate])
                         ->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'is_own', 'amount_earned')
                         ->with(['tarification' => function ($q) {
                             $q->select('id', 'name', 'code', 'second', 'summa', 'tarification_category_id')
