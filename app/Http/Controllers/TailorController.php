@@ -165,7 +165,11 @@ class TailorController extends Controller
         $startDate = now()->subDays(14)->toDateString();
         $endDate = now()->addDay()->toDateString();
 
-        $order = OrderGroup::where('group_id', $group->id ?? 0)
+        $order = OrderGroup::query()
+            ->when($group, function ($q) use ($group) {
+                // ✅ Agar group mavjud bo‘lsa, shuni filter qilamiz
+                $q->where('group_id', $group->id);
+            }) // ❌ Agar group null bo‘lsa, bu filter qo‘shilmaydi va hamma group qaytadi
             ->whereHas('order', function ($query) {
                 $query->whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting']);
             })
@@ -188,6 +192,7 @@ class TailorController extends Controller
 
         return response()->json($resource);
     }
+
 
     public function getTopEarners(Request $request): \Illuminate\Http\JsonResponse
     {

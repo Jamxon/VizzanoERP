@@ -111,6 +111,19 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::get('myWorks', [TailorController::class, 'getMyWorks']);
 });
 
+Route::prefix('universalTailor')->middleware('role:tailor')->group(function () {
+    Route::get('tarifications/search', [TailorController::class, 'searchTarifications']);
+    Route::get('balance', [TailorController::class, 'getDailyBalanceEmployee']);
+    Route::post('tarificationLog', [TailorController::class, 'storeTarificationLog']);
+    Route::get('models', [TailorController::class, 'getModelWithTarification']);
+    Route::get('packets', [TailorController::class, 'getTarificationPackets']);
+    Route::post('packets', [TailorController::class, 'storeTarificationPackets']);
+    Route::patch('packets/{id}', [TailorController::class, 'updateTarificationPacket']);
+    Route::delete('packets/{id}', [TailorController::class, 'deleteTarificationPacket']);
+    Route::delete('packets/item/{id}', [TailorController::class, 'deleteTarificationPacketItem']);
+    Route::get('myWorks', [TailorController::class, 'getMyWorks']);
+});
+
 Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
     Route::get('groups', [ResultCheckerController::class, 'getGroups']);
     Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
