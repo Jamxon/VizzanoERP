@@ -473,8 +473,18 @@ class UserController extends Controller
             };
 
             $relations['employeeTarificationLogs'] = function ($query) use ($start_date, $end_date) {
-                if ($start_date && $end_date) {
-                    $query->whereBetween('date', [$start_date, $end_date]);
+
+                // 🔹 Oyni monthly_selected_orders bilan filterlash
+                if ($start_date) {
+                    $monthStart = Carbon::parse($start_date)->startOfMonth()->format('Y-m'); // faqat yil-oy formatida
+
+                    $query->whereHas('tarification.tarificationCategory.submodel.orderModel.order', function ($q) use ($monthStart) {
+                        $q->whereIn('id', function ($subQuery) use ($monthStart) {
+                            $subQuery->select('order_id')
+                                ->from('monthly_selected_orders')
+                                ->whereRaw("to_char(month, 'YYYY-MM') = ?", [$monthStart]);
+                        });
+                    });
                 }
 
                 $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'is_own', 'amount_earned')
@@ -504,11 +514,21 @@ class UserController extends Controller
 
         } else {
             $relations['employeeTarificationLogs'] = function ($query) use ($start_date, $end_date) {
-                if ($start_date && $end_date) {
-                    $query->whereBetween('date', [$start_date, $end_date]);
+
+                // 🔹 Oyni monthly_selected_orders bilan filterlash
+                if ($start_date) {
+                    $monthStart = Carbon::parse($start_date)->startOfMonth()->format('Y-m'); // faqat yil-oy formatida
+
+                    $query->whereHas('tarification.tarificationCategory.submodel.orderModel.order', function ($q) use ($monthStart) {
+                        $q->whereIn('id', function ($subQuery) use ($monthStart) {
+                            $subQuery->select('order_id')
+                                ->from('monthly_selected_orders')
+                                ->whereRaw("to_char(month, 'YYYY-MM') = ?", [$monthStart]);
+                        });
+                    });
                 }
 
-                $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'amount_earned', 'is_own')
+                $query->select('id', 'employee_id', 'date', 'tarification_id', 'quantity', 'is_own', 'amount_earned')
                     ->with(['tarification' => function ($q) {
                         $q->select('id', 'name', 'code', 'second', 'summa', 'tarification_category_id')
                             ->with([
