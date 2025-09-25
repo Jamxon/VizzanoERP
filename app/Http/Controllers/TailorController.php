@@ -167,7 +167,7 @@ class TailorController extends Controller
         $endDate = now()->addDay()->toDateString();
 
         $order = OrderGroup::query()
-            ->when($user->role === 'tailor' && $group, function ($q) use ($group) {
+            ->when($user->role->name === 'tailor' && $group, function ($q) use ($group) {
                 // 👷‍♂️ Agar role = tailor bo‘lsa, group filter ishlaydi
                 $q->where('group_id', $group->id);
             })
