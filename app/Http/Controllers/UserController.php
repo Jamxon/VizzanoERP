@@ -52,7 +52,7 @@ class UserController extends Controller
                 ->when($request->department_id, fn($q) => $q->where('e.department_id', $request->department_id))
                 ->when($request->group_id, fn($q) => $q->where('e.group_id', $request->group_id))
                 ->whereBetween('etl.date', [$request->start_date, $request->end_date])
-                ->groupBy('etl.employee_id', 'e.name', 'e.img', 'e.branch_id', 'e.department_id', 'e.group_id', 'etl.date')
+                ->groupBy('etl.employee_id', 'e.name', 'e.img', 'e.salary_visible', 'e.branch_id', 'e.department_id', 'e.group_id', 'etl.date')
                 ->get();
 
             // 2️⃣ Attendance kunlari va summasi
