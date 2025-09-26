@@ -35,6 +35,7 @@ class UserController extends Controller
                     'etl.employee_id',
                     'e.name',
                     'e.img',
+                    'e.salary_visible',
                     'e.branch_id',
                     'e.department_id',
                     'e.group_id',
@@ -102,6 +103,7 @@ class UserController extends Controller
                 return [
                     'employee_id' => $employeeId,
                     'employee_name' => $first->name,
+                    'salary_visible' => $first->salary_visible,
                     'image' => $first->img
                         ? (filter_var($first->img, FILTER_VALIDATE_URL)
                             ? $first->img
