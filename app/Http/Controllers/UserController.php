@@ -89,7 +89,8 @@ class UserController extends Controller
                         'efficiency_percent' => $percent,
                         'tarification_earned' => (float) $r->tarification_earned,
                     ];
-                });
+                })->sortBy('date')->values(); // 🔥 date bo‘yicha tartiblanadi
+
 
                 $att = $attendance[$employeeId] ?? null;
                 $attended_days = $att->attended_days ?? 0;
