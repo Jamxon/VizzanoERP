@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CashboxTransactionsExport;
 use App\Exports\DepartmentGroupsExport;
 use App\Exports\GroupsOrdersEarningsExport;
 use App\Exports\MonthlyCostPdf;
@@ -2078,5 +2079,22 @@ class CasherController extends Controller
             ->values();
 
         return response()->json($sources);
+    }
+
+    public function exportTransactions(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date',
+            'branch_id'  => 'required|integer',
+            'type'       => 'nullable|string',
+        ]);
+
+        return Excel::download(new CashboxTransactionsExport(
+            $request->branch_id,
+            $request->start_date,
+            $request->end_date,
+            $request->type
+        ), 'cashbox_transactions.xlsx');
     }
 }

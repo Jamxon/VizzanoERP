@@ -142,6 +142,7 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::post('groups2/excel', [CasherController::class, 'exportGroupsOrdersEarnings']);
     Route::post('incomes', [CasherController::class, 'storeIncome']);
     Route::post('expenses', [CasherController::class, 'storeExpense']);
+    Route::get('exportTransactions/excel', [CasherController::class, 'exportTransactions']);
     Route::get('balances', [CasherController::class, 'getBalances']);
     Route::get('transactions', [CasherController::class, 'getTransactions']);
     Route::post('transfers', [CasherController::class, 'transferBetweenCashboxes']);
