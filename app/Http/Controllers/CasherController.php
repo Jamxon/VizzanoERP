@@ -2086,12 +2086,12 @@ class CasherController extends Controller
         $request->validate([
             'start_date' => 'required|date',
             'end_date'   => 'required|date',
-            'branch_id'  => 'required|integer',
+
             'type'       => 'nullable|string',
         ]);
 
         return Excel::download(new CashboxTransactionsExport(
-            $request->branch_id,
+            auth()->user()->employee->branch_id,
             $request->start_date,
             $request->end_date,
             $request->type
