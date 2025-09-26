@@ -2086,7 +2086,6 @@ class CasherController extends Controller
         $request->validate([
             'start_date' => 'required|date',
             'end_date'   => 'required|date',
-
             'type'       => 'nullable|string',
         ]);
 
