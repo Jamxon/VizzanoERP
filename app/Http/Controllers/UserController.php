@@ -300,51 +300,16 @@ class UserController extends Controller
 
             $user->update($updateData);
 
-//            if ($request->hasFile('img')) {
-//                $file = $request->file('img');
-//                $filename = time() . '.' . $file->getClientOriginalExtension();
-//
-//                // S3 ga yuklaymiz
-//                $path = $file->storeAs('images', $filename, 's3');
-//
-//// faylni public qilish
-//                Storage::disk('s3')->setVisibility($path, 'public');
-//
-//                $employee->img = Storage::disk('s3')->url($path);
-//                $employee->save();
-//            }
-
             if ($request->hasFile('img')) {
                 $file = $request->file('img');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
 
-                // 1️⃣ Thumbnail (yumaloq)
-                $thumb = Image::make($file)
-                    ->fit(100, 100) // kvadrat qilib qirqadi
-                    ->encode($file->getClientOriginalExtension(), 80);
+                // S3 ga yuklaymiz
+                $path = $file->storeAs('images', $filename, 's3');
 
-                $thumbPath = "images/thumbs/{$filename}";
-                Storage::disk('s3')->put($thumbPath, (string) $thumb, 'public');
+                Storage::disk('s3')->setVisibility($path, 'public');
 
-                // 2️⃣ Medium
-                $medium = Image::make($file)
-                    ->resize(500, 500, function ($constraint) {
-                        $constraint->aspectRatio();
-                        $constraint->upsize();
-                    })
-                    ->encode($file->getClientOriginalExtension(), 85);
-
-                $mediumPath = "images/medium/{$filename}";
-                Storage::disk('s3')->put($mediumPath, (string) $medium, 'public');
-
-                // 3️⃣ Original
-                $originalPath = $file->storeAs("images/original", $filename, 's3');
-                Storage::disk('s3')->setVisibility($originalPath, 'public');
-
-                // Database’ga saqlash
-                $employee->img_thumb = Storage::disk('s3')->url($thumbPath);
-                $employee->img_medium = Storage::disk('s3')->url($mediumPath);
-                $employee->img_original = Storage::disk('s3')->url($originalPath);
+                $employee->img = Storage::disk('s3')->url($path);
                 $employee->save();
             }
 
