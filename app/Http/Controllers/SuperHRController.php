@@ -407,15 +407,13 @@ class SuperHRController extends Controller
         try {
             DB::beginTransaction();
 
-            $filename = null;
+            $fileUrl = null;
 
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-
-                $path = $file->storeAs('holidays', $filename, 's3');
-
-                Storage::disk('s3')->setVisibility($path, 'public');
+                $path = $file->store('holidays', 's3'); // faylni joylaymiz
+                Storage::disk('s3')->setVisibility($path, 'public'); // umumiy qilish
+                $fileUrl = Storage::disk('s3')->url($path); // URL ni olish
             }
 
             $holiday = \App\Models\EmployeeHolidays::create([
@@ -423,7 +421,7 @@ class SuperHRController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'comment' => $request->comment,
-                'image' => $filename ? Storage::disk('s3')->url($path) : null,
+                'image' => $fileUrl,
             ]);
 
             DB::commit();
@@ -455,22 +453,18 @@ class SuperHRController extends Controller
                 }
             }
 
-            $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
-//            $chatId = -1002655761088;
-
+            $telegramToken = env("TELEGRAM_BOT_TOKEN"); // .env ga chiqar
             $chatIdMap = [
                 5 => -1002655761088,
                 4 => -1003041140850,
             ];
 
-            $branchId = $employee->branch_id;
-
-            $chatId = $chatIdMap[$branchId] ?? null;
+            $chatId = $chatIdMap[$employee->branch_id] ?? null;
 
             $photos = [];
 
-            if ($filename) {
-                $photos[] = 'holidays/' . $filename;
+            if ($fileUrl) {
+                $photos[] = $fileUrl;
             }
 
             $attendance = \App\Models\Attendance::where('employee_id', $request->employee_id)
@@ -485,61 +479,21 @@ class SuperHRController extends Controller
                 $photos[] = $employee->img;
             }
 
-            function getPhotoContent($path) {
-                if (filter_var($path, FILTER_VALIDATE_URL)) {
-                    $response = Http::get($path);
-                    return $response->successful() ? $response->body() : null;
-                }
-
-                $fullPath = storage_path("app/public/" . ltrim($path, '/'));
-                if (file_exists($fullPath)) {
-                    return file_get_contents($fullPath);
-                }
-
-                return null;
-            }
-
             if (!empty($photos)) {
                 $media = [];
-                $files = [];
-
-                foreach ($photos as $index => $photoPath) {
-                    $photoContent = getPhotoContent($photoPath);
-                    if ($photoContent) {
-                        $tmpFile = tempnam(sys_get_temp_dir(), 'tg');
-                        file_put_contents($tmpFile, $photoContent);
-
-                        $fieldName = "photo{$index}";
-                        $files[$fieldName] = new \CURLFile($tmpFile, mime_content_type($tmpFile), basename($photoPath));
-
-                        $media[] = [
-                            'type' => 'photo',
-                            'media' => "attach://{$fieldName}",
-                            'caption' => $index === 0 ? (string) $messageText : "",
-                            'parse_mode' => 'Markdown',
-                        ];
-                    }
-                }
-
-                if (!empty($media)) {
-                    $postFields = [
-                        'chat_id' => $chatId,
-                        'media' => json_encode($media, JSON_UNESCAPED_UNICODE),
+                foreach ($photos as $index => $photoUrl) {
+                    $media[] = [
+                        'type' => 'photo',
+                        'media' => $photoUrl,
+                        'caption' => $index === 0 ? (string) $messageText : "",
+                        'parse_mode' => 'Markdown',
                     ];
-                    $postFields = array_merge($postFields, $files);
-
-                    $ch = curl_init();
-                    curl_setopt($ch, CURLOPT_URL, "https://api.telegram.org/bot{$telegramToken}/sendMediaGroup");
-                    curl_setopt($ch, CURLOPT_POST, true);
-                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-
-                    $response = curl_exec($ch);
-                    curl_close($ch);
-
-                    // Debug uchun
-//                     dd($response);
                 }
+
+                Http::post("https://api.telegram.org/bot{$telegramToken}/sendMediaGroup", [
+                    'chat_id' => $chatId,
+                    'media' => json_encode($media, JSON_UNESCAPED_UNICODE),
+                ]);
             } else {
                 Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
                     'chat_id' => $chatId,

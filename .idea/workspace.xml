@@ -469,15 +469,7 @@
       <workItem from="1758711605755" duration="4029000" />
       <workItem from="1758774127700" duration="11612000" />
       <workItem from="1758864472510" duration="6523000" />
-      <workItem from="1758949185635" duration="18896000" />
-    </task>
-    <task id="LOCAL-01506" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1758712136612</created>
-      <option name="number" value="01506" />
-      <option name="presentableId" value="LOCAL-01506" />
-      <option name="project" value="LOCAL" />
-      <updated>1758712136612</updated>
+      <workItem from="1758949185635" duration="19221000" />
     </task>
     <task id="LOCAL-01507" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
@@ -863,7 +855,15 @@
       <option name="project" value="LOCAL" />
       <updated>1758975774951</updated>
     </task>
-    <option name="localTasksCounter" value="1555" />
+    <task id="LOCAL-01555" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1758975967562</created>
+      <option name="number" value="01555" />
+      <option name="presentableId" value="LOCAL-01555" />
+      <option name="project" value="LOCAL" />
+      <updated>1758975967562</updated>
+    </task>
+    <option name="localTasksCounter" value="1556" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
