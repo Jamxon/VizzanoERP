@@ -188,6 +188,7 @@ Route::prefix('supplier')->middleware('role:supplier')->group(function () {
 
 Route::prefix('internalAccountant')->middleware('role:internalAccountant')->group(function () { 
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
+    Route::get('employees/export-excel', [SuperHRController::class, 'exportToExcel']);
     //    Route::get('employees/group', [SuperHRController::class, 'getEmployeeByGroupID']);
     Route::get('employees/working', [SuperHRController::class, 'getWorkingEmployees']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
