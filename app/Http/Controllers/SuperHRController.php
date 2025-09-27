@@ -91,7 +91,12 @@ class SuperHRController extends Controller
 
 
             $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
-            $chatId = -1002655761088;
+            $chatIdMap = [
+                5 => -1002655761088,
+                4 => -1003041140850,
+            ];
+
+            $chatId = $chatIdMap[$employee->branch_id] ?? null;
 
             if ($filename) {
                 $fileContent = Storage::disk('s3')->get($path);
