@@ -415,9 +415,9 @@ Route::prefix('superhr')->middleware('role:superhr')->group(function () {
     Route::post('positions' , [SuperHRController::class, 'storePositions']);
     Route::patch('positions/{position}', [SuperHRController::class, 'updatePositions']);
     Route::get('roles', [SuperHRController::class, 'getRoles']);
+    Route::get('employees', [SuperHRController::class, 'getEmployees']);
     Route::get('/employees/export-excel', [SuperHRController::class, 'exportToExcel']);
     Route::post('resetPassword/{id}', [SuperHRController::class, 'resetPassword']);
-    Route::get('employees', [SuperHRController::class, 'getEmployees']);
     Route::get('employees/attendances/export', [SuperHRController::class, 'exportEmployeeAttendance']);
     Route::get('employees/working', [SuperHRController::class, 'getWorkingEmployees']);
     Route::get('employees/{id}', [SuperHRController::class, 'showEmployee']);
