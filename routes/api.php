@@ -308,7 +308,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::get('orders/all/{id}', [GroupMasterController::class, 'showOrdersAll']);
        Route::get('orders/pending',[\App\Http\Controllers\GroupMasterController::class, 'getPendingOrders']);
        Route::get('orders/show/{id}',[\App\Http\Controllers\GroupMasterController::class, 'showOrder']);
-       Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);
+//       Route::get('employees',[\App\Http\Controllers\GroupMasterController::class, 'getEmployees']);
        Route::get('tarifications/{id}',[\App\Http\Controllers\GroupMasterController::class, 'getTarifications']);
        Route::post('tarifications',[\App\Http\Controllers\GroupMasterController::class,'assignEmployeesToTarifications']);
        Route::get('times',[\App\Http\Controllers\GroupMasterController::class, 'getTimes']);
@@ -325,7 +325,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
        Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
        Route::get('topEarners', [GroupMasterController::class, 'getTopEarners']);
-//       Route::get('employees', [SuperHRController::class, 'getEmployees']);
+       Route::get('employees', [SuperHRController::class, 'getEmployees']);
        Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
 
 });
