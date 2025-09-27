@@ -453,7 +453,7 @@ class SuperHRController extends Controller
                 }
             }
 
-            $telegramToken = env("TELEGRAM_BOT_TOKEN"); // .env ga chiqar
+            $telegramToken = "8055327076:AAEDwAlq1mvZiEbAi_ofnUwnJeIm4P6tE1A";
             $chatIdMap = [
                 5 => -1002655761088,
                 4 => -1003041140850,
