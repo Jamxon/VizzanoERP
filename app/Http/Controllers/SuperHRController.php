@@ -305,7 +305,7 @@ class SuperHRController extends Controller
                 'was_on_holiday' => $wasOnHoliday,
                 'was_on_absence' => $wasOnAbsence,
                 'comment' => $comment,
-                'image' => (!empty($image) && Str::contains($image, '/')) ? url('storage/' . $image) : null,
+                'image' => $image ?? null
             ];
         });
 
