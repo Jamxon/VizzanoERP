@@ -20,6 +20,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Exports\EmployeeExport;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -45,7 +46,10 @@ class SuperHRController extends Controller
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/public/absences/', $filename);
+
+                $path = $file->storeAs('absence', $filename, 's3');
+
+                Storage::disk('s3')->setVisibility($path, 'public');
             }
 
             $absence = EmployeeAbsence::create([
@@ -53,7 +57,7 @@ class SuperHRController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'comment' => $request->comment,
-                'image' => $filename ? 'absences/' . $filename : null,
+                'image' => $filename ? Storage::disk('s3')->url($path) : null,
             ]);
 
             DB::commit();
@@ -336,7 +340,7 @@ class SuperHRController extends Controller
         $holidays = $query->with('employee.department','employee.group')->orderBy('id', 'DESC')->paginate(10);
 
         $holidays->getCollection()->transform(function ($holiday) {
-            $holiday->image = $holiday->image ? url('storage/' . $holiday->image) : null;
+            $holiday->image = $holiday->image ?? null;
             return $holiday;
         });
 
@@ -404,10 +408,14 @@ class SuperHRController extends Controller
             DB::beginTransaction();
 
             $filename = null;
+
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/public/holidays/', $filename);
+
+                $path = $file->storeAs('holidays', $filename, 's3');
+
+                Storage::disk('s3')->setVisibility($path, 'public');
             }
 
             $holiday = \App\Models\EmployeeHolidays::create([
@@ -415,7 +423,7 @@ class SuperHRController extends Controller
                 'start_date' => $request->start_date,
                 'end_date' => $request->end_date,
                 'comment' => $request->comment,
-                'image' => $filename ? 'holidays/' . $filename : null,
+                'image' => $filename ? Storage::disk('s3')->url($path) : null,
             ]);
 
             DB::commit();
