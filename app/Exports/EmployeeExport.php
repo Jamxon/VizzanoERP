@@ -46,7 +46,17 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithC
         }
 
         $query->when($filters['department_id'] ?? null, fn($q, $val) => $q->where('department_id', $val))
-            ->when($filters['group_id'] ?? null, fn($q, $val) => $q->where('group_id', $val))
+            ->when(
+                true,
+                function ($q) use ($user, $filters) {
+                    if ($user->role->name === 'groupMaster') {
+                        // group_id ni user->employee ichidan olish kerak
+                        $q->where('employees.group_id', $user->employee->group_id);
+                    } elseif (!empty($filters['group_id'])) {
+                        $q->where('employees.group_id', $filters['group_id']);
+                    }
+                }
+            )
             ->when($filters['status'] ?? null, fn($q, $val) => $q->where('status', $val))
             ->when($filters['role_id'] ?? null, fn($q, $val) => $q->whereHas('user', fn($q) => $q->where('role_id', $val)));
 
