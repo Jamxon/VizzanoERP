@@ -57,7 +57,7 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithC
     {
         return [
             'ID', 'ФИО', 'Логин', 'Разрешение', 'Телефон', 'Группа', 'Отдел', 'Ишга келган сана',
-            'Позиция', 'Паспорт', 'Адрес', 'Дата рождения', 'Комментарий',
+            'Позиция', 'Паспорт', 'Адрес', 'Дата рождения', 'Комментарий', 'Ойлик', // <-- salary ustuni qo'shildi
         ];
     }
 
@@ -77,6 +77,7 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithC
             $employee->address,
             $employee->birthday,
             $employee->comment,
+            $employee->salary_visible ? $employee->salary : '----', // <-- shart bilan
         ];
     }
 
@@ -96,6 +97,7 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithC
             'K' => 30,  // Адрес
             'L' => 15,  // Дата рождения
             'M' => 25,  // Комментарий
+            'N' => 15,  // Ойлик
         ];
     }
 }
