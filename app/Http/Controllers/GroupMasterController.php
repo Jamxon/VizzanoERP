@@ -274,15 +274,28 @@ class GroupMasterController extends Controller
         return response()->json(new ShowOrderGroupMaster($order));
     }
 
-    public function getEmployees(): \Illuminate\Http\JsonResponse
+    public function getEmployees(Request $request): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
+        $search = $request->search; // Employee name search query
+        $paymentType = $request->payment_type; // Employee payment type filter
+        $status = $request->status; // Employee status filter
 
         if (!$user->group) {
             return response()->json(['message' => 'Group not found'], 404);
         }
 
-        $employees = $user->group->employees()->get();
+        $employees = $user->group->employees()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->when($paymentType, function ($query, $paymentType) {
+                $query->where('payment_type', $paymentType);
+            })
+            ->when(isset($status), function ($query) use ($status) {
+                $query->where('status', $status);
+            })
+            ->paginate(10);
 
         return response()->json($employees);
     }
