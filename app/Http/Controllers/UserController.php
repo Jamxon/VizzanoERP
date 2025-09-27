@@ -307,7 +307,9 @@ class UserController extends Controller
                 // S3 ga yuklaymiz
                 $path = $file->storeAs('images', $filename, 's3');
 
-                // to‘liq URL olish
+// faylni public qilish
+                Storage::disk('s3')->setVisibility($path, 'public');
+
                 $employee->img = Storage::disk('s3')->url($path);
                 $employee->save();
             }
