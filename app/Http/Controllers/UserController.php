@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 
 class UserController extends Controller
@@ -302,8 +303,12 @@ class UserController extends Controller
             if ($request->hasFile('img')) {
                 $file = $request->file('img');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/public/images/', $filename);
-                $employee->img = 'images/' . $filename;
+
+                // S3 ga yuklaymiz
+                $path = $file->storeAs('images', $filename, 's3');
+
+                // to‘liq URL olish
+                $employee->img = Storage::disk('s3')->url($path);
                 $employee->save();
             }
 
