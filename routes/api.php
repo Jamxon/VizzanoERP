@@ -325,6 +325,9 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::patch('tarification/{id}', [TechnologController::class, 'updateTarification']);
        Route::get('tarification/{id}', [TechnologController::class, 'showTarificationCategory']);
        Route::get('topEarners', [GroupMasterController::class, 'getTopEarners']);
+       Route::get('employees', [SuperHRController::class, 'getEmployees']);
+       Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
+
 });
 
 Route::prefix('groupHelper')->middleware('role:groupHelper')->group(function () {
