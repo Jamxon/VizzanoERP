@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Models\Employee;
 use App\Models\Attendance;
+use Illuminate\Support\Facades\Storage;
 
 class HikvisionEventController extends Controller
 {
@@ -84,9 +85,26 @@ class HikvisionEventController extends Controller
                     $image = $request->file('Picture');
                     $imagePath = null;
                     if ($image && $image->isValid()) {
+//                        $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
+//                        $image->storeAs('/public/hikvision/', $filename);
+//                        $imagePath = 'hikvision/' . $filename;
+                        //if ($request->hasFile('img')) {
+                        //                $file = $request->file('img');
+                        //                $filename = time() . '.' . $file->getClientOriginalExtension();
+                        //
+                        //                // S3 ga yuklaymiz
+                        //                $path = $file->storeAs('images', $filename, 's3');
+                        //
+                        //                Storage::disk('s3')->setVisibility($path, 'public');
+                        //
+                        //                $employee->img = Storage::disk('s3')->url($path);
+                        //                $employee->save();
+                        //            }
+
                         $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
-                        $image->storeAs('/public/hikvision/', $filename);
-                        $imagePath = 'hikvision/' . $filename;
+                        $path = $image->storeAs('images', $filename, 's3');
+                        Storage::disk('s3')->setVisibility($path, 'public');
+                        $imagePath = Storage::disk('s3')->url($path);
                     }
                     $attendance->check_in = $eventCarbon;
                     $attendance->check_in_image = $imagePath;
