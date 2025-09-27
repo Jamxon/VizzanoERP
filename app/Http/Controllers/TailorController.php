@@ -47,6 +47,7 @@ class TailorController extends Controller
         $resource = $employeeTarificationLogs->map(function ($log) {
             return [
                 'id' => $log->id,
+                'order_id' => $log->tarification->tarificationCategory->submodel->orderModel->order->id ?? null,
                 'tarification' => [
                     'id' => $log->tarification->id,
                     'name' => $log->tarification->name,
