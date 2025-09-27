@@ -843,12 +843,13 @@ class SuperHRController extends Controller
                 true,
                 function ($q) use ($user, $filters) {
                     if ($user->role->name === 'groupMaster') {
-                        $q->where('employees.group_id', $user->group_id);
+                        $q->where('group_id', $user->group_id);
                     } elseif (!empty($filters['group_id'])) {
-                        $q->where('employees.group_id', $filters['group_id']);
+                        $q->where('group_id', $filters['group_id']);
                     }
                 }
             )
+//            ->when($filters['group_id'] ?? false, fn($q) => $q->where('group_id', $filters['group_id']))
             ->when($filters['status'] ?? false, fn($q) => $q->where('employees.status', $filters['status']))
             ->when($filters['type'] ?? false, fn($q) => $q->where('employees.type', $filters['type']))
             ->when($filters['role_id'] ?? false, function ($q) use ($filters) {
