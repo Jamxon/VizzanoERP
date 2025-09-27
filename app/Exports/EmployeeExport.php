@@ -87,7 +87,29 @@ class EmployeeExport implements FromCollection, WithMapping, WithHeadings, WithC
             $employee->address,
             $employee->birthday,
             $employee->comment,
-            $employee->payment_type == 'hourly' ? 'Соатлик' : ($employee->payment_type == 'daily' ? 'Кунлик' : 'Ойлик'),
+            //const payment_types = {
+            //  piece_work: "Ishbay",
+            //  hourly: "Soatbay",
+            //  daily: "Kunlik",
+            //  monthly: "Oylik",
+            //  fixed_percentage_bonus: "Foiz umumiy songa",
+            //  fixed_percentage_bonus_group: "Foiz guruhi uchun",
+            //  cutting_bonus: "Kesish foizi uchun",
+            //  // fixed_tailored_bonus: "Tikilgan umumiy songa",
+            //  // fixed_tailored_bonus_group: "1 ta patokda tikilgan songa",
+            //  // fixed_cutted_bonus: "Kesilgan umumiy songa",
+            //  // fixed_packaged_bonus: "Qadoqlangan umumiy songa",
+            //  // fixed_completed_bonus: "Yakunlangan umumiy songa",
+            //};
+            //
+            //export default payment_types;
+            $employee->payment_type == 'piece_work' ? "Ishbay" :
+            ($employee->payment_type == 'hourly' ? "Soatbay" :
+            ($employee->payment_type == 'daily' ? "Kunlik" :
+            ($employee->payment_type == 'monthly' ? "Oylik" :
+            ($employee->payment_type == 'fixed_percentage_bonus' ? "Foiz umumiy songa" :
+            ($employee->payment_type == 'fixed_percentage_bonus_group' ? "Foiz guruhi uchun" :
+            ($employee->payment_type == 'cutting_bonus' ? "Kesish foizi uchun" : $employee->payment_type)))))),
             $employee->salary_visible ? $employee->salary : '----', // <-- shart bilan
         ];
     }
