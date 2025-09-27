@@ -94,10 +94,10 @@ class SuperHRController extends Controller
             $chatId = -1002655761088;
 
             if ($filename) {
-                // Rasm bilan yuborish
-                $imagePath = storage_path("app/public/absences/" . $filename);
+                $fileContent = Storage::disk('s3')->get($path);
+                $fileName = basename($path);
 
-                Http::attach('photo', file_get_contents($imagePath), $filename)
+                Http::attach('photo', $fileContent, $filename)
                     ->post("https://api.telegram.org/bot{$telegramToken}/sendPhoto", [
                         'chat_id' => $chatId,
                         'caption' => $messageText,
