@@ -18,7 +18,7 @@ class MigrateImagesToS3 extends Command
 
         Employee::whereNotNull('img')->chunk(100, function ($employees) {
             foreach ($employees as $employee) {
-                $oldPath = $employee->img; // masalan: "images/profile/123.jpg"
+                $oldPath = $employee->img;
 
                 if (Storage::disk('public')->exists($oldPath)) {
                     // Faylni o‘qish
