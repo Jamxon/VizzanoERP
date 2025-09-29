@@ -629,7 +629,7 @@ class SuperHRController extends Controller
         }
 
         // ✅ Eager loading ishlatyapmiz (department, group, holidays)
-        $employees = \App\Models\Employee::with(['department:id,name', 'group:id,name', 'holidays' => function ($q) use ($startDate, $endDate) {
+        $employees = \App\Models\Employee::with(['department:id,name', 'group:id,name', 'employeeHolidays' => function ($q) use ($startDate, $endDate) {
             $q->where(function ($sub) use ($startDate, $endDate) {
                 $sub->whereBetween('start_date', [$startDate, $endDate])
                     ->orWhereBetween('end_date', [$startDate, $endDate]);
