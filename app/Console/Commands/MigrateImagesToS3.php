@@ -9,12 +9,30 @@ use Illuminate\Support\Facades\Storage;
 
 class MigrateImagesToS3 extends Command
 {
-    protected $signature = 'images:migrate-to-s3 {--dry-run : Test without actual migration}';
+    protected $signature = 'images:migrate-to-s3 {--dry-run : Test without actual migration} {--scan : Scan all possible image locations}';
     protected $description = 'Migrate old images to S3 and update DB paths';
+
+    protected $imagePaths = [
+        'public/images/',
+        'public/',
+        'storage/app/public/images/',
+        'storage/app/public/',
+    ];
+
+    protected $hikvisionPaths = [
+        'public/hikvision/',
+        'storage/app/public/hikvision/',
+        'storage/app/public/hikvision_images/',
+    ];
 
     public function handle()
     {
         $dryRun = $this->option('dry-run');
+        $scan = $this->option('scan');
+
+        if ($scan) {
+            return $this->scanImages();
+        }
 
         if ($dryRun) {
             $this->warn('🧪 DRY RUN MODE - Hech narsa o\'zgartirilmaydi');
@@ -53,10 +71,10 @@ class MigrateImagesToS3 extends Command
                     // 🔹 Faqat fayl nomini olish
                     $filename = basename($oldUrl);
 
-                    // 🔹 public/images/ papkasidan qidirish
-                    $localPath = public_path('images/' . $filename);
+                    // 🔹 Bir nechta papkalardan qidirish
+                    $localPath = $this->findFile($filename, $this->imagePaths);
 
-                    if (file_exists($localPath)) {
+                    if ($localPath) {
                         $newPath = 'employees/' . $filename;
 
                         if (!$dryRun) {
@@ -116,10 +134,10 @@ class MigrateImagesToS3 extends Command
                     // 🔹 Faqat fayl nomini olish
                     $filename = basename($oldUrl);
 
-                    // 🔹 public/hikvision/ papkasidan qidirish
-                    $localPath = public_path('hikvision/' . $filename);
+                    // 🔹 Bir nechta papkalardan qidirish
+                    $localPath = $this->findFile($filename, $this->hikvisionPaths);
 
-                    if (file_exists($localPath)) {
+                    if ($localPath) {
                         $newPath = 'hikvisionImages/' . $filename;
 
                         if (!$dryRun) {
@@ -172,6 +190,88 @@ class MigrateImagesToS3 extends Command
             $this->newLine();
             $this->info('💡 Haqiqiy migratsiya uchun: php artisan images:migrate-to-s3');
         }
+
+        return 0;
+    }
+
+    /**
+     * Faylni bir nechta papkalardan qidirish
+     */
+    protected function findFile($filename, $paths)
+    {
+        foreach ($paths as $path) {
+            $fullPath = base_path($path . $filename);
+            if (file_exists($fullPath)) {
+                return $fullPath;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Barcha papkalarni scan qilish
+     */
+    protected function scanImages()
+    {
+        $this->info('🔍 Scanning image locations...');
+        $this->newLine();
+
+        // Employee images
+        $this->info('📸 Employee images scan:');
+        $employeeFiles = Employee::whereNotNull('img')
+            ->whereNotLike('img', '%s3.twcstorage.ru%')
+            ->whereNotLike('img', '%amazonaws.com%')
+            ->limit(10)
+            ->get();
+
+        foreach ($employeeFiles as $emp) {
+            $filename = basename($emp->getRawOriginal('img'));
+            $found = false;
+
+            foreach ($this->imagePaths as $path) {
+                $fullPath = base_path($path . $filename);
+                if (file_exists($fullPath)) {
+                    $this->info("✅ Found: {$filename} in {$path}");
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $this->warn("❌ Not found: {$filename}");
+            }
+        }
+
+        $this->newLine();
+
+        // Attendance images
+        $this->info('📷 Attendance images scan:');
+        $attFiles = Attendance::whereNotNull('check_in_image')
+            ->whereNotLike('check_in_image', '%s3.twcstorage.ru%')
+            ->whereNotLike('check_in_image', '%amazonaws.com%')
+            ->limit(10)
+            ->get();
+
+        foreach ($attFiles as $att) {
+            $filename = basename($att->check_in_image);
+            $found = false;
+
+            foreach ($this->hikvisionPaths as $path) {
+                $fullPath = base_path($path . $filename);
+                if (file_exists($fullPath)) {
+                    $this->info("✅ Found: {$filename} in {$path}");
+                    $found = true;
+                    break;
+                }
+            }
+
+            if (!$found) {
+                $this->warn("❌ Not found: {$filename}");
+            }
+        }
+
+        $this->newLine();
+        $this->info('💡 Run migration: php artisan images:migrate-to-s3');
 
         return 0;
     }

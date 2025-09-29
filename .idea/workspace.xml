@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Console/Commands/MigrateImagesToS3.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Console/Commands/MigrateImagesToS3.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -473,15 +470,7 @@
       <workItem from="1758774127700" duration="11612000" />
       <workItem from="1758864472510" duration="6523000" />
       <workItem from="1758949185635" duration="20545000" />
-      <workItem from="1759122279117" duration="9434000" />
-    </task>
-    <task id="LOCAL-01520" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1758886750940</created>
-      <option name="number" value="01520" />
-      <option name="presentableId" value="LOCAL-01520" />
-      <option name="project" value="LOCAL" />
-      <updated>1758886750940</updated>
+      <workItem from="1759122279117" duration="9823000" />
     </task>
     <task id="LOCAL-01521" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
@@ -867,7 +856,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759145915687</updated>
     </task>
-    <option name="localTasksCounter" value="1569" />
+    <task id="LOCAL-01569" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
+      <option name="closed" value="true" />
+      <created>1759146379827</created>
+      <option name="number" value="01569" />
+      <option name="presentableId" value="LOCAL-01569" />
+      <option name="project" value="LOCAL" />
+      <updated>1759146379827</updated>
+    </task>
+    <option name="localTasksCounter" value="1570" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
