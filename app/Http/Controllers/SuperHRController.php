@@ -697,11 +697,11 @@ class SuperHRController extends Controller
                     'present' => $present,
                     'absent' => $absent,
                 ],
-                'holidays' => $employee->holidays->map(fn($h) => [
-                    'start_date' => $h->start_date,
-                    'end_date' => $h->end_date,
-                    'comment' => $h->comment,
-                ])->toArray(),
+                'holidays' => optional($employee->holidays)->map(fn($h) => [
+                        'start_date' => $h->start_date,
+                        'end_date' => $h->end_date,
+                        'comment' => $h->comment,
+                    ])->toArray() ?? [],
             ];
         });
 
