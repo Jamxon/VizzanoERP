@@ -628,18 +628,28 @@ class SuperHRController extends Controller
             return response()->json(['message' => '❌ Sana noto‘g‘ri yoki to‘liq emas'], 422);
         }
 
-        $employees = \App\Models\Employee::where('branch_id', $branchId)
+        // ✅ Eager loading ishlatyapmiz (department, group, holidays)
+        $employees = \App\Models\Employee::with(['department:id,name', 'group:id,name', 'holidays' => function ($q) use ($startDate, $endDate) {
+            $q->where(function ($sub) use ($startDate, $endDate) {
+                $sub->whereBetween('start_date', [$startDate, $endDate])
+                    ->orWhereBetween('end_date', [$startDate, $endDate]);
+            })->select('id','employee_id','start_date','end_date','comment');
+        }])
+            ->where('branch_id', $branchId)
             ->where('status', '!=', 'kicked')
             ->when($groupId, fn($q) => $q->where('group_id', $groupId))
             ->when($departmentId, fn($q) => $q->where('department_id', $departmentId))
-            ->select('id', 'name', 'department_id', 'group_id')
+            ->select('id','name','department_id','group_id')
             ->get();
 
+        // ✅ Attendanceni faqat kerakli xodimlar uchun olib kelamiz
         $attendances = \App\Models\Attendance::whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id'))
+            ->select('id','employee_id','date','status','check_in','check_out','check_in_image')
             ->get()
             ->groupBy('employee_id');
 
+        // ✅ Sana oralig‘ini array qilib olish
         $dateRange = collect();
         $current = \Carbon\Carbon::parse($startDate);
         $end = \Carbon\Carbon::parse($endDate);
@@ -649,7 +659,8 @@ class SuperHRController extends Controller
             $current->addDay();
         }
 
-        $result = $employees->map(function ($employee) use ($attendances, $dateRange, $startDate, $endDate) {
+        // ✅ Barcha hisob-kitobni PHP tarafda bajarish
+        $result = $employees->map(function ($employee) use ($attendances, $dateRange) {
             $employeeAttendances = $attendances[$employee->id] ?? collect();
 
             $present = [];
@@ -666,7 +677,7 @@ class SuperHRController extends Controller
                         'check_out' => $att->check_out,
                         'check_in_image' => $att->check_in_image,
                     ];
-                } elseif($att && $att->status === 'absent') {
+                } elseif ($att && $att->status === 'absent') {
                     $absent[] = [
                         'date' => $date,
                         'status' => 'absent',
@@ -686,17 +697,11 @@ class SuperHRController extends Controller
                     'present' => $present,
                     'absent' => $absent,
                 ],
-                'holidays' => \App\Models\EmployeeHolidays::where('employee_id', $employee->id)
-                    ->whereBetween('start_date', [$startDate, $endDate])
-                    ->orWhereBetween('end_date', [$startDate, $endDate])
-                    ->get()
-                    ->map(function ($holiday) {
-                        return [
-                            'start_date' => $holiday->start_date,
-                            'end_date' => $holiday->end_date,
-                            'comment' => $holiday->comment,
-                        ];
-                    })->toArray(),
+                'holidays' => $employee->holidays->map(fn($h) => [
+                    'start_date' => $h->start_date,
+                    'end_date' => $h->end_date,
+                    'comment' => $h->comment,
+                ])->toArray(),
             ];
         });
 
