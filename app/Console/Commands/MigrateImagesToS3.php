@@ -52,7 +52,7 @@ class MigrateImagesToS3 extends Command
                     if ($oldPath && Storage::disk('public')->exists($oldPath)) {
                         $file = Storage::disk('public')->get($oldPath);
                         $filename = basename($oldPath);
-                        $newPath = 'employees/' . $filename;
+                        $newPath = 'employeeImages/' . $filename;
 
                         // S3 ga yuklash
                         Storage::disk('s3')->put($newPath, $file, 'public');
