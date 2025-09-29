@@ -9,25 +9,31 @@ use Illuminate\Support\Facades\Storage;
 
 class MigrateImagesToS3 extends Command
 {
-    protected $signature = 'images:migrate-to-s3';
-    protected $description = 'Migrate old storage images to S3 and update DB paths';
+    protected $signature = 'images:migrate-to-s3 {--dry-run : Test without actual migration}';
+    protected $description = 'Migrate old images to S3 and update DB paths';
 
     public function handle()
     {
+        $dryRun = $this->option('dry-run');
+
+        if ($dryRun) {
+            $this->warn('🧪 DRY RUN MODE - Hech narsa o\'zgartirilmaydi');
+            $this->newLine();
+        }
+
         $this->info('🚀 Starting migration process...');
-        $this->info('📌 Faqat local storage dagi fayllar ko\'chiriladi');
         $this->newLine();
 
         // ========================
         // 1️⃣ EMPLOYEE IMAGES
         // ========================
-        $this->info('📸 Migrating employee profile images...');
+        $this->info('📸 Migrating employee profile images from public/images/...');
 
         $employeeCount = 0;
         $employeeSkipped = 0;
         $employeeErrors = 0;
 
-        Employee::whereNotNull('img')->chunk(100, function ($employees) use (&$employeeCount, &$employeeSkipped, &$employeeErrors) {
+        Employee::whereNotNull('img')->chunk(100, function ($employees) use (&$employeeCount, &$employeeSkipped, &$employeeErrors, $dryRun) {
             foreach ($employees as $employee) {
                 $oldUrl = $employee->getRawOriginal('img');
 
@@ -36,42 +42,40 @@ class MigrateImagesToS3 extends Command
                 }
 
                 try {
-                    // 🔹 Agar S3 URL bo'lsa - o'tkazib yuborish
+                    // 🔹 Agar S3 URL bo'lsa - skip
                     if (strpos($oldUrl, 's3.twcstorage.ru') !== false ||
                         strpos($oldUrl, 'amazonaws.com') !== false) {
                         $employeeSkipped++;
-                        $this->line("⏭️  Employee #{$employee->id}: S3 da allaqachon bor, skip");
+                        $this->line("⏭️  Employee #{$employee->id}: Allaqachon S3 URL");
                         continue;
                     }
 
-                    // 🔹 Local path aniqlash
-                    if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
-                        $oldPath = parse_url($oldUrl, PHP_URL_PATH);
-                        $oldPath = preg_replace('#^/storage/#', '', $oldPath);
-                    } elseif (strpos($oldUrl, 'storage/') === 0) {
-                        $oldPath = str_replace('storage/', '', $oldUrl);
-                    } else {
-                        $oldPath = $oldUrl;
-                    }
+                    // 🔹 Faqat fayl nomini olish
+                    $filename = basename($oldUrl);
 
-                    // 🔹 Faylni tekshirish
-                    if ($oldPath && Storage::disk('public')->exists($oldPath)) {
-                        $file = Storage::disk('public')->get($oldPath);
-                        $filename = basename($oldPath);
+                    // 🔹 public/images/ papkasidan qidirish
+                    $localPath = public_path('images/' . $filename);
+
+                    if (file_exists($localPath)) {
                         $newPath = 'employees/' . $filename;
 
-                        // S3 ga yuklash
-                        Storage::disk('s3')->put($newPath, $file, 'public');
+                        if (!$dryRun) {
+                            // S3 ga yuklash
+                            $fileContents = file_get_contents($localPath);
+                            Storage::disk('s3')->put($newPath, $fileContents, 'public');
 
-                        // ✅ Database yangilash
-                        $employee->img = $newPath;
-                        $employee->save();
+                            // S3 URL olish va database yangilash
+                            $s3Url = Storage::disk('s3')->url($newPath);
+                            $employee->img = $s3Url;
+                            $employee->save();
+                        }
 
                         $employeeCount++;
-                        $this->info("✅ Employee #{$employee->id}: {$oldPath} → {$newPath}");
+                        $s3Url = Storage::disk('s3')->url($newPath);
+                        $this->info("✅ Employee #{$employee->id}: {$filename} → {$s3Url}");
                     } else {
                         $employeeErrors++;
-                        $this->warn("⚠️  Employee #{$employee->id}: Fayl topilmadi - {$oldPath}");
+                        $this->warn("⚠️  Employee #{$employee->id}: Fayl topilmadi - {$localPath}");
                     }
                 } catch (\Exception $e) {
                     $employeeErrors++;
@@ -87,13 +91,13 @@ class MigrateImagesToS3 extends Command
         // ========================
         // 2️⃣ ATTENDANCE IMAGES
         // ========================
-        $this->info('📷 Migrating attendance check-in images...');
+        $this->info('📷 Migrating attendance images from public/hikvision/...');
 
         $attendanceCount = 0;
         $attendanceSkipped = 0;
         $attendanceErrors = 0;
 
-        Attendance::whereNotNull('check_in_image')->chunk(100, function ($records) use (&$attendanceCount, &$attendanceSkipped, &$attendanceErrors) {
+        Attendance::whereNotNull('check_in_image')->chunk(100, function ($records) use (&$attendanceCount, &$attendanceSkipped, &$attendanceErrors, $dryRun) {
             foreach ($records as $att) {
                 $oldUrl = $att->check_in_image;
 
@@ -102,50 +106,40 @@ class MigrateImagesToS3 extends Command
                 }
 
                 try {
-                    // 🔹 Agar S3 URL bo'lsa - o'tkazib yuborish
+                    // 🔹 Agar allaqachon S3 URL bo'lsa - skip
                     if (strpos($oldUrl, 's3.twcstorage.ru') !== false ||
                         strpos($oldUrl, 'amazonaws.com') !== false) {
                         $attendanceSkipped++;
-                        continue; // Jim o'tkazib yuborish
+                        continue;
                     }
 
-                    $oldPath = null;
+                    // 🔹 Faqat fayl nomini olish
+                    $filename = basename($oldUrl);
 
-                    // 🔹 Local path aniqlash
-                    if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
-                        $oldPath = parse_url($oldUrl, PHP_URL_PATH);
-                        $oldPath = preg_replace('#^/storage/#', '', $oldPath);
-                    } elseif (strpos($oldUrl, 'storage/') === 0) {
-                        $oldPath = str_replace('storage/', '', $oldUrl);
-                    } elseif (preg_match('#^[a-f0-9\-]+/hikvisionImages/#', $oldUrl)) {
-                        // Bucket nomi bilan: 07258afc-.../hikvisionImages/file.jpg
-                        $oldPath = preg_replace('#^[a-f0-9\-]+/#', '', $oldUrl);
-                    } elseif (strpos($oldUrl, 'hikvisionImages/') === 0) {
-                        $oldPath = $oldUrl;
-                    } else {
-                        $oldPath = $oldUrl;
-                    }
+                    // 🔹 public/hikvision/ papkasidan qidirish
+                    $localPath = public_path('hikvision/' . $filename);
 
-                    // 🔹 Faylni tekshirish
-                    if ($oldPath && Storage::disk('public')->exists($oldPath)) {
-                        $file = Storage::disk('public')->get($oldPath);
-                        $filename = basename($oldPath);
+                    if (file_exists($localPath)) {
                         $newPath = 'hikvisionImages/' . $filename;
 
-                        // S3 ga yuklash
-                        Storage::disk('s3')->put($newPath, $file, 'public');
+                        if (!$dryRun) {
+                            // S3 ga yuklash
+                            $fileContents = file_get_contents($localPath);
+                            Storage::disk('s3')->put($newPath, $fileContents, 'public');
 
-                        // ✅ Database yangilash
-                        $att->check_in_image = $newPath;
-                        $att->save();
+                            // S3 URL olish va database yangilash
+                            $s3Url = Storage::disk('s3')->url($newPath);
+                            $att->check_in_image = $s3Url;
+                            $att->save();
+                        }
 
                         $attendanceCount++;
-                        $this->info("✅ Attendance #{$att->id}: {$oldPath} → {$newPath}");
+                        $s3Url = Storage::disk('s3')->url($newPath);
+                        $this->info("✅ Attendance #{$att->id}: {$filename} → {$s3Url}");
                     } else {
                         $attendanceErrors++;
-                        // Faqat muhim xatolarni ko'rsatish
                         if ($attendanceErrors <= 10) {
-                            $this->warn("⚠️  Attendance #{$att->id}: Local da topilmadi - {$oldPath}");
+                            $this->warn("⚠️  Attendance #{$att->id}: Fayl topilmadi - {$localPath}");
                         }
                     }
                 } catch (\Exception $e) {
@@ -158,15 +152,15 @@ class MigrateImagesToS3 extends Command
         });
 
         $this->newLine();
-        $this->info("✅ Attendance: {$attendanceCount} ko'chirildi, {$attendanceSkipped} S3 da bor, {$attendanceErrors} topilmadi");
+        $this->info("✅ Attendance: {$attendanceCount} ko'chirildi, {$attendanceSkipped} skip, {$attendanceErrors} topilmadi");
         $this->newLine();
 
         // ========================
         // 📊 FINAL SUMMARY
         // ========================
-        $this->info('🎉 Migration completed!');
+        $this->info($dryRun ? '🧪 DRY RUN tugadi!' : '🎉 Migration completed!');
         $this->table(
-            ['Type', 'Migrated', 'Skipped (S3)', 'Not Found'],
+            ['Type', 'Migrated', 'Skipped', 'Not Found'],
             [
                 ['Employees', $employeeCount, $employeeSkipped, $employeeErrors],
                 ['Attendances', $attendanceCount, $attendanceSkipped, $attendanceErrors],
@@ -174,9 +168,10 @@ class MigrateImagesToS3 extends Command
             ]
         );
 
-        $this->newLine();
-        $this->info('💡 S3 dagi o\'chgan rasmlar uchun check_in_image = NULL qilish kerakmi?');
-        $this->info('   Agar kerak bo\'lsa: UPDATE attendances SET check_in_image = NULL WHERE check_in_image LIKE "%s3.twcstorage.ru%"');
+        if ($dryRun) {
+            $this->newLine();
+            $this->info('💡 Haqiqiy migratsiya uchun: php artisan images:migrate-to-s3');
+        }
 
         return 0;
     }
