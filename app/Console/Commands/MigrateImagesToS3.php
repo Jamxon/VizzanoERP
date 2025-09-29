@@ -15,11 +15,11 @@ class MigrateImagesToS3 extends Command
     protected $description = 'Migrate old images (employees, attendance, models, absences, holidays, issues) to S3 and update DB paths';
 
     protected $imagePaths = [
-        'public/models/',
-        'models/',
-        'absences/',
-        'holidays/',
-        'issues/',
+        'storage/app/public/images/',
+        'storage/app/public/models/',
+        'storage/app/public/absences/',
+        'storage/app/public/holidays/',
+        'storage/app/public/issues/',
     ];
 
     public function handle()
