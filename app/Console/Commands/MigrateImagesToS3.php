@@ -14,75 +14,140 @@ class MigrateImagesToS3 extends Command
 
     public function handle()
     {
-        $this->info('Migrating profile images...');
+        $this->info('🚀 Starting migration process...');
+        $this->newLine();
 
-        Employee::whereNotNull('img')->chunk(100, function ($employees) {
+        // ========================
+        // 1️⃣ EMPLOYEE IMAGES
+        // ========================
+        $this->info('📸 Migrating employee profile images...');
+
+        $employeeCount = 0;
+        $employeeErrors = 0;
+
+        Employee::whereNotNull('img')->chunk(100, function ($employees) use (&$employeeCount, &$employeeErrors) {
             foreach ($employees as $employee) {
                 $oldUrl = $employee->img;
 
-                if (!$oldUrl) {
-                    return; // hech narsa qilmaymiz
+                if (empty($oldUrl)) {
+                    continue; // ❌ return emas, continue bo'lishi kerak!
                 }
 
-// 🔹 Agar URL bo‘lsa (http bilan boshlansa) → nisbiy pathni ajratib olamiz
-                if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
-                    $oldPath = str_replace(url('storage').'/', '', $oldUrl);
-                } else {
-                    // 🔹 Aks holda (faqat path saqlangan bo‘lsa) → shuni ishlatamiz
-                    $oldPath = $oldUrl;
-                }
+                try {
+                    // 🔹 URL yoki path ekanligini aniqlash
+                    if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
+                        // To'liq URL: http://example.com/storage/employees/image.jpg
+                        $oldPath = parse_url($oldUrl, PHP_URL_PATH);
+                        $oldPath = ltrim(str_replace('/storage/', '', $oldPath), '/');
+                    } elseif (strpos($oldUrl, 'storage/') === 0) {
+                        // Nisbiy path: storage/employees/image.jpg
+                        $oldPath = str_replace('storage/', '', $oldUrl);
+                    } else {
+                        // Faqat path: employees/image.jpg
+                        $oldPath = $oldUrl;
+                    }
 
-                if ($oldPath && Storage::disk('public')->exists($oldPath)) {
-                    $file = Storage::disk('public')->get($oldPath);
-                    $newPath = 'employees/' . basename($oldPath);
+                    // 🔹 Faylni tekshirish va ko'chirish
+                    if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                        $file = Storage::disk('public')->get($oldPath);
+                        $newPath = 'employees/' . basename($oldPath);
 
-                    Storage::disk('s3')->put($newPath, $file);
-                    Storage::disk('s3')->setVisibility($newPath, 'public'); // 🔹 agar ochiq bo‘lishi kerak bo‘lsa
+                        // S3 ga yuklash
+                        Storage::disk('s3')->put($newPath, $file, 'public');
 
-                    $employee->update(['img' => $newPath]);
+                        // ✅ Database yangilash
+                        $employee->img = $newPath;
+                        $employee->save();
 
-                    $this->info("✅ Employee {$employee->id} moved: {$newPath}");
-                } else {
-                    $this->warn("⚠️ Fayl topilmadi: {$oldUrl}");
+                        $employeeCount++;
+                        $this->info("✅ Employee #{$employee->id}: {$newPath}");
+                    } else {
+                        $employeeErrors++;
+                        $this->warn("⚠️  Employee #{$employee->id}: Fayl topilmadi - {$oldPath}");
+                    }
+                } catch (\Exception $e) {
+                    $employeeErrors++;
+                    $this->error("❌ Employee #{$employee->id}: " . $e->getMessage());
                 }
             }
         });
 
-        $this->info('Profile images migration completed.');
+        $this->newLine();
+        $this->info("✅ Employee images: {$employeeCount} muvaffaqiyatli, {$employeeErrors} xato");
+        $this->newLine();
 
+        // ========================
+        // 2️⃣ ATTENDANCE IMAGES
+        // ========================
+        $this->info('📷 Migrating attendance check-in images...');
 
-        $this->info('Migrating Attendance check_in images...');
-        Attendance::whereNotNull('check_in_image')->chunk(100, function ($records) {
+        $attendanceCount = 0;
+        $attendanceErrors = 0;
+
+        Attendance::whereNotNull('check_in_image')->chunk(100, function ($records) use (&$attendanceCount, &$attendanceErrors) {
             foreach ($records as $att) {
                 $oldUrl = $att->check_in_image;
 
-                if (!$oldUrl) {
+                if (empty($oldUrl)) {
                     continue;
                 }
 
-                // 🔹 Agar to‘liq URL bo‘lsa → nisbiy pathni ajratib olamiz
-                if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
-                    $oldPath = str_replace(url('storage').'/', '', $oldUrl);
-                } else {
-                    // 🔹 Aks holda → o‘zini ishlatamiz
-                    $oldPath = $oldUrl;
-                }
+                try {
+                    // 🔹 URL yoki path ekanligini aniqlash
+                    if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
+                        // To'liq URL
+                        $oldPath = parse_url($oldUrl, PHP_URL_PATH);
+                        $oldPath = ltrim(str_replace('/storage/', '', $oldPath), '/');
+                    } elseif (strpos($oldUrl, 'storage/') === 0) {
+                        // Nisbiy path
+                        $oldPath = str_replace('storage/', '', $oldUrl);
+                    } else {
+                        // Faqat path
+                        $oldPath = $oldUrl;
+                    }
 
-                if ($oldPath && Storage::disk('public')->exists($oldPath)) {
-                    $file = Storage::disk('public')->get($oldPath);
-                    $newPath = 'hikvisionImages/' . basename($oldPath);
+                    // 🔹 Faylni tekshirish va ko'chirish
+                    if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                        $file = Storage::disk('public')->get($oldPath);
+                        $newPath = 'hikvisionImages/' . basename($oldPath);
 
-                    Storage::disk('s3')->put($newPath, $file);
-                    Storage::disk('s3')->setVisibility($newPath, 'public'); // agar umumiy bo‘lishi kerak bo‘lsa
+                        // S3 ga yuklash
+                        Storage::disk('s3')->put($newPath, $file, 'public');
 
-                    $att->update(['check_in_image' => $newPath]);
+                        // ✅ Database yangilash
+                        $att->check_in_image = $newPath;
+                        $att->save();
 
-                    $this->info("✅ Attendance {$att->id} ko‘chirildi: {$newPath}");
-                } else {
-                    $this->warn("⚠️ Fayl topilmadi: {$oldUrl}");
+                        $attendanceCount++;
+                        $this->info("✅ Attendance #{$att->id}: {$newPath}");
+                    } else {
+                        $attendanceErrors++;
+                        $this->warn("⚠️  Attendance #{$att->id}: Fayl topilmadi - {$oldPath}");
+                    }
+                } catch (\Exception $e) {
+                    $attendanceErrors++;
+                    $this->error("❌ Attendance #{$att->id}: " . $e->getMessage());
                 }
             }
         });
-        $this->info('✅ Migration completed!');
+
+        $this->newLine();
+        $this->info("✅ Attendance images: {$attendanceCount} muvaffaqiyatli, {$attendanceErrors} xato");
+        $this->newLine();
+
+        // ========================
+        // 📊 FINAL SUMMARY
+        // ========================
+        $this->info('🎉 Migration completed!');
+        $this->table(
+            ['Type', 'Success', 'Errors'],
+            [
+                ['Employees', $employeeCount, $employeeErrors],
+                ['Attendances', $attendanceCount, $attendanceErrors],
+                ['Total', $employeeCount + $attendanceCount, $employeeErrors + $attendanceErrors],
+            ]
+        );
+
+        return 0;
     }
 }
