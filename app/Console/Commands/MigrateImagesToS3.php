@@ -18,24 +18,32 @@ class MigrateImagesToS3 extends Command
 
         Employee::whereNotNull('img')->chunk(100, function ($employees) {
             foreach ($employees as $employee) {
-                $oldPath = $employee->img;
+                $oldUrl = $employee->img;
 
-                if (Storage::disk('public')->exists($oldPath)) {
-                    // Faylni o‘qish
-                    $file = Storage::disk('public')->get($oldPath);
+                if (!$oldUrl) {
+                    return; // hech narsa qilmaymiz
+                }
 
-                    // S3 ga yozish
-                    $newPath = "images/" . basename($oldPath);
-                    Storage::disk('s3')->put($newPath, $file);
-
-                    // DB ni yangilash
-                    $employee->update([
-                        'img' => $newPath
-                    ]);
-
-                    $this->info("✅ {$employee->id} ko‘chirildi: {$newPath}");
+// 🔹 Agar URL bo‘lsa (http bilan boshlansa) → nisbiy pathni ajratib olamiz
+                if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
+                    $oldPath = str_replace(url('storage').'/', '', $oldUrl);
                 } else {
-                    $this->warn("⚠️ Fayl topilmadi: {$oldPath}");
+                    // 🔹 Aks holda (faqat path saqlangan bo‘lsa) → shuni ishlatamiz
+                    $oldPath = $oldUrl;
+                }
+
+                if ($oldPath && Storage::disk('public')->exists($oldPath)) {
+                    $file = Storage::disk('public')->get($oldPath);
+                    $newPath = 'employees/' . basename($oldPath);
+
+                    Storage::disk('s3')->put($newPath, $file);
+                    Storage::disk('s3')->setVisibility($newPath, 'public'); // 🔹 agar ochiq bo‘lishi kerak bo‘lsa
+
+                    $employee->update(['img' => $newPath]);
+
+                    $this->info("✅ Employee {$employee->id} moved: {$newPath}");
+                } else {
+                    $this->warn("⚠️ Fayl topilmadi: {$oldUrl}");
                 }
             }
         });
@@ -46,13 +54,32 @@ class MigrateImagesToS3 extends Command
         $this->info('Migrating Attendance check_in images...');
         Attendance::whereNotNull('check_in_image')->chunk(100, function ($records) {
             foreach ($records as $att) {
-                $oldPath = $att->check_in_image;
+                $oldUrl = $att->check_in_image;
+
+                if (!$oldUrl) {
+                    continue;
+                }
+
+                // 🔹 Agar to‘liq URL bo‘lsa → nisbiy pathni ajratib olamiz
+                if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
+                    $oldPath = str_replace(url('storage').'/', '', $oldUrl);
+                } else {
+                    // 🔹 Aks holda → o‘zini ishlatamiz
+                    $oldPath = $oldUrl;
+                }
+
                 if ($oldPath && Storage::disk('public')->exists($oldPath)) {
                     $file = Storage::disk('public')->get($oldPath);
                     $newPath = 'hikvisionImages/' . basename($oldPath);
+
                     Storage::disk('s3')->put($newPath, $file);
+                    Storage::disk('s3')->setVisibility($newPath, 'public'); // agar umumiy bo‘lishi kerak bo‘lsa
+
                     $att->update(['check_in_image' => $newPath]);
+
                     $this->info("✅ Attendance {$att->id} ko‘chirildi: {$newPath}");
+                } else {
+                    $this->warn("⚠️ Fayl topilmadi: {$oldUrl}");
                 }
             }
         });
