@@ -36,14 +36,14 @@ class MigrateImagesToS3 extends Command
 
         $summary = [];
 
-        // 3️⃣ Model Images
-        $summary[] = $this->migrateImages(ModelImages::class, 'image', 'modelImages', $this->imagePaths);
-
-        // 4️⃣ Employee Absences
-        $summary[] = $this->migrateImages(EmployeeAbsence::class, 'image', 'employeeAbsences', $this->imagePaths);
-
-        // 5️⃣ Employee Holidays
-        $summary[] = $this->migrateImages(EmployeeHolidays::class, 'image', 'employeeHolidays', $this->imagePaths);
+//        // 3️⃣ Model Images
+//        $summary[] = $this->migrateImages(ModelImages::class, 'image', 'modelImages', $this->imagePaths);
+//
+//        // 4️⃣ Employee Absences
+//        $summary[] = $this->migrateImages(EmployeeAbsence::class, 'image', 'employeeAbsences', $this->imagePaths);
+//
+//        // 5️⃣ Employee Holidays
+//        $summary[] = $this->migrateImages(EmployeeHolidays::class, 'image', 'employeeHolidays', $this->imagePaths);
 
         // 6️⃣ Issues
         $summary[] = $this->migrateImages(Issue::class, 'image', 'issues', $this->imagePaths);
