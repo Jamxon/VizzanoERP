@@ -27,43 +27,46 @@ class MigrateImagesToS3 extends Command
 
         Employee::whereNotNull('img')->chunk(100, function ($employees) use (&$employeeCount, &$employeeErrors) {
             foreach ($employees as $employee) {
-                $oldUrl = $employee->img;
+                $oldUrl = $employee->getRawOriginal('img'); // ⚠️ Accessor o'tkazib yuborish
 
                 if (empty($oldUrl)) {
-                    continue; // ❌ return emas, continue bo'lishi kerak!
+                    continue;
                 }
 
                 try {
-                    // 🔹 URL yoki path ekanligini aniqlash
+                    // 🔹 Har xil formatlarni aniqlash
                     if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
-                        // To'liq URL: http://example.com/storage/employees/image.jpg
+                        // To'liq URL: http://example.com/storage/images/123456.jpg
                         $oldPath = parse_url($oldUrl, PHP_URL_PATH);
-                        $oldPath = ltrim(str_replace('/storage/', '', $oldPath), '/');
+                        // "/storage/images/file.jpg" -> "images/file.jpg"
+                        $oldPath = preg_replace('#^/storage/#', '', $oldPath);
                     } elseif (strpos($oldUrl, 'storage/') === 0) {
-                        // Nisbiy path: storage/employees/image.jpg
+                        // Nisbiy: storage/images/file.jpg
                         $oldPath = str_replace('storage/', '', $oldUrl);
                     } else {
-                        // Faqat path: employees/image.jpg
+                        // Oddiy: images/123456.jpg
                         $oldPath = $oldUrl;
                     }
 
-                    // 🔹 Faylni tekshirish va ko'chirish
+                    // 🔹 Faylni tekshirish
                     if ($oldPath && Storage::disk('public')->exists($oldPath)) {
                         $file = Storage::disk('public')->get($oldPath);
-                        $newPath = 'employees/' . basename($oldPath);
+                        $filename = basename($oldPath);
+                        $newPath = 'employees/' . $filename;
 
                         // S3 ga yuklash
                         Storage::disk('s3')->put($newPath, $file, 'public');
 
-                        // ✅ Database yangilash
+                        // ✅ Database yangilash (faqat path, accessor keyin URL ga aylantiradi)
                         $employee->img = $newPath;
                         $employee->save();
 
                         $employeeCount++;
-                        $this->info("✅ Employee #{$employee->id}: {$newPath}");
+                        $this->info("✅ Employee #{$employee->id}: {$oldPath} → {$newPath}");
                     } else {
                         $employeeErrors++;
                         $this->warn("⚠️  Employee #{$employee->id}: Fayl topilmadi - {$oldPath}");
+                        $this->line("   Original: {$oldUrl}");
                     }
                 } catch (\Exception $e) {
                     $employeeErrors++;
@@ -93,23 +96,33 @@ class MigrateImagesToS3 extends Command
                 }
 
                 try {
-                    // 🔹 URL yoki path ekanligini aniqlash
+                    $oldPath = null;
+
+                    // 🔹 Turli formatlarni aniqlash
                     if (filter_var($oldUrl, FILTER_VALIDATE_URL)) {
                         // To'liq URL
                         $oldPath = parse_url($oldUrl, PHP_URL_PATH);
-                        $oldPath = ltrim(str_replace('/storage/', '', $oldPath), '/');
+                        $oldPath = preg_replace('#^/storage/#', '', $oldPath);
                     } elseif (strpos($oldUrl, 'storage/') === 0) {
-                        // Nisbiy path
+                        // storage/hikvisionImages/...
                         $oldPath = str_replace('storage/', '', $oldUrl);
+                    } elseif (preg_match('#^[a-f0-9\-]+/hikvisionImages/#', $oldUrl)) {
+                        // ⚠️ S3 bucket nomi bilan: 07258afc-45d27b4b-.../hikvisionImages/...
+                        // Faqat hikvisionImages/ dan keyingi qismni olish
+                        $oldPath = preg_replace('#^[a-f0-9\-]+/#', '', $oldUrl);
+                    } elseif (strpos($oldUrl, 'hikvisionImages/') === 0) {
+                        // hikvisionImages/file.jpg
+                        $oldPath = $oldUrl;
                     } else {
-                        // Faqat path
+                        // Oddiy path
                         $oldPath = $oldUrl;
                     }
 
-                    // 🔹 Faylni tekshirish va ko'chirish
+                    // 🔹 Faylni tekshirish
                     if ($oldPath && Storage::disk('public')->exists($oldPath)) {
                         $file = Storage::disk('public')->get($oldPath);
-                        $newPath = 'hikvisionImages/' . basename($oldPath);
+                        $filename = basename($oldPath);
+                        $newPath = 'hikvisionImages/' . $filename;
 
                         // S3 ga yuklash
                         Storage::disk('s3')->put($newPath, $file, 'public');
@@ -119,10 +132,11 @@ class MigrateImagesToS3 extends Command
                         $att->save();
 
                         $attendanceCount++;
-                        $this->info("✅ Attendance #{$att->id}: {$newPath}");
+                        $this->info("✅ Attendance #{$att->id}: {$oldPath} → {$newPath}");
                     } else {
                         $attendanceErrors++;
                         $this->warn("⚠️  Attendance #{$att->id}: Fayl topilmadi - {$oldPath}");
+                        $this->line("   Original: {$oldUrl}");
                     }
                 } catch (\Exception $e) {
                     $attendanceErrors++;
