@@ -77,7 +77,7 @@ class EmployeeMonthlyController extends Controller
             return response()->json(['error' => 'Salary record not found'], 404);
         }
 
-        $salaryRecord->update($request->all());
+        $salaryRecord->update($request->only(['amount', 'status']));
 
         return response()->json(['message' => 'Salary record updated successfully', 'data' => $salaryRecord], 200);
     }
