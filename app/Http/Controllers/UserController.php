@@ -361,17 +361,23 @@ class UserController extends Controller
                 'for_admins' => ['required', 'in:true,false,1,0,yes,no'],
             ]);
 
-            $filename = null;
+            $imageUrl = null;
+
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/public/issues/', $filename);
+                $filename = 'issues/' . time() . '.' . $file->getClientOriginalExtension();
+
+                // 👉 Faylni S3 ga yuklash
+                Storage::disk('s3')->put($filename, file_get_contents($file), 'public');
+
+                // 👉 Public URL olish
+                $imageUrl = Storage::disk('s3')->url($filename);
             }
 
             $issue = Issue::create([
                 'user_id' => auth()->id(),
                 'description' => $request->description,
-                'image' => 'issues/' . ($filename ?? null),
+                'image' => $imageUrl, // endi to‘g‘ridan-to‘g‘ri S3 url saqlanadi
             ]);
 
             Log::add(
@@ -381,7 +387,7 @@ class UserController extends Controller
                 [],
                 [
                     'description' => $request->description,
-                    'image' => $filename ? 'issues/' . $filename : null,
+                    'image' => $imageUrl,
                 ]
             );
 
@@ -395,7 +401,6 @@ class UserController extends Controller
                 "👤 Foydalanuvchi: " . ($user->employee->name ?? 'Noma\'lum') . " (" . ($user->role?->name ?? '—') . ")",
             ];
 
-            // Agar employee guruhga tegishli bo'lsa
             if (!empty($user->employee->group?->name)) {
                 $messageLines[] = "👥 Guruh: " . $user->employee->group->name;
             }
@@ -409,24 +414,19 @@ class UserController extends Controller
             $botToken = "8120915071:AAGVvrYz8WBfhABMJWtlDzdFgUELUUKTj5Q";
             $chatId = "-1002877502358";
 
-            // Agar adminlar uchun bo‘lsa — boshqa bot va group
             if ($request->for_admins === 'true') {
                 $botToken = "8325344740:AAECc5ej6v0XVXcPUA5prQYo9HAli8VzkxI";
                 $chatId = "-1002731783863";
             }
 
             // Telegramga yuborish
-            if ($filename) {
-                $photoPath = storage_path("app/public/issues/" . $filename);
-
-                $response = Http::attach(
-                    'photo', file_get_contents($photoPath), $filename
-                )->post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+            if ($imageUrl) {
+                $response = Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
                     'chat_id' => $chatId,
+                    'photo' => $imageUrl, // 👈 S3 URL yuborilyapti
                     'caption' => $message,
                     'parse_mode' => 'HTML',
                 ]);
-
             } else {
                 $response = Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                     'chat_id' => $chatId,
