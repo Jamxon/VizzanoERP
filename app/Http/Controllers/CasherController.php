@@ -1304,7 +1304,27 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // 4. Extra orders data if needed
+        // 4. Monthly Pieceworks - BULK
+        $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
+            ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
+            ->leftJoin('employees as e', 'u.employee_id', '=', 'e.id')
+            ->whereIn('emp.employee_id', $employeeIds)
+            ->where('emp.month', $monthDate)
+            ->select('emp.employee_id', 'emp.amount', 'emp.status', 'e.name as created_by_name')
+            ->get()
+            ->keyBy('employee_id');
+
+        // 5. Monthly Salaries - BULK
+        $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
+            ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
+            ->leftJoin('employees as e', 'u.employee_id', '=', 'e.id')
+            ->whereIn('ems.employee_id', $employeeIds)
+            ->where('ems.month', $monthDate)
+            ->select('ems.employee_id', 'ems.amount', 'ems.status', 'e.name as created_by_name')
+            ->get()
+            ->keyBy('employee_id');
+
+        // 6. Extra orders data if needed
         $extraOrdersData = [];
         if (!empty($addOrderIds)) {
             $extraOrdersData = Order::whereIn('id', $addOrderIds)
@@ -1334,6 +1354,28 @@ class CasherController extends Controller
             $empTarificationLogs = $tarificationData->get($employee->id, collect());
             $tarificationTotal = $empTarificationLogs->sum('amount_earned');
             $orderIds = $empTarificationLogs->pluck('order_id')->unique()->merge($extraOrdersData)->unique()->values();
+
+            // Monthly Piecework
+            $monthlyPiecework = $monthlyPieceworksData->get($employee->id);
+            $monthlyPieceworkData = null;
+            if ($monthlyPiecework) {
+                $monthlyPieceworkData = [
+                    'amount' => (float) $monthlyPiecework->amount,
+                    'status' => (bool) $monthlyPiecework->status,
+                    'created_by' => $monthlyPiecework->created_by_name,
+                ];
+            }
+
+            // Monthly Salary
+            $monthlySalary = $monthlySalariesData->get($employee->id);
+            $monthlySalaryData = null;
+            if ($monthlySalary) {
+                $monthlySalaryData = [
+                    'amount' => (float) $monthlySalary->amount,
+                    'status' => (bool) $monthlySalary->status,
+                    'created_by' => $monthlySalary->created_by_name,
+                ];
+            }
 
             $totalEarned = $tarificationTotal + $attendanceTotal;
 
@@ -1382,6 +1424,8 @@ class CasherController extends Controller
                 'total_paid' => round($paidTotal, 2),
                 'net_balance' => round($totalEarned - $paidTotal, 2),
                 'orders' => $orderIds->toArray(),
+                'monthly_piecework' => $monthlyPieceworkData,
+                'monthly_salary' => $monthlySalaryData,
             ];
         }
 
@@ -1410,7 +1454,6 @@ class CasherController extends Controller
 
         return response()->json(array_values($result));
     }
-
     //2-usul excel
 
     public function exportGroupsOrdersEarnings(Request $request)
