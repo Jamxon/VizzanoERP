@@ -10,7 +10,7 @@ class EmployeeMonthlyController extends Controller
     {
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
-            'month' => 'required|date_format:Y-m',
+            'month' => 'required|date_format:Y-m-d',
             'amount' => 'required|numeric|min:0',
         ]);
 
