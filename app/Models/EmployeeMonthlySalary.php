@@ -14,6 +14,11 @@ class EmployeeMonthlySalary extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'month' => 'date:Y-m-d',
+        'status' => 'boolean',
+    ];
+
     public function employee()
     {
         return $this->belongsTo(Employee::class);
