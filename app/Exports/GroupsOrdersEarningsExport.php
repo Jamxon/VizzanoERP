@@ -26,35 +26,53 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
             foreach ($group['employees'] as $emp) {
                 // payment_type ni tarjima qilish
                 $paymentType = match ($emp['payment_type']) {
-                    'piece_work'             => 'Ishbay',
-                    'monthly'                => 'Oylik',
-                    'hourly'                 => 'Soatbay',
-                    'daily'                  => 'Kunlik',
-                    'fixed_cutted_bonus'     => 'Kesilgan bonus',
-                    'fixed_percentage_bonus' => 'Foizli bonus',
-                    'fixed_tailored_bonus_group' => 'Guruh bonus',
-                    default                  => ucfirst($emp['payment_type'] ?? 'Oylik'),
+                    'piece_work'                     => 'Ishbay',
+                    'monthly'                        => 'Oylik',
+                    'hourly'                         => 'Soatbay',
+                    'daily'                          => 'Kunlik',
+                    'fixed_cutted_bonus'             => 'Kesilgan bonus',
+                    'fixed_percentage_bonus'         => 'Foizli bonus',
+                    'fixed_tailored_bonus_group'     => 'Guruh bonus',
+                    default                          => ucfirst($emp['payment_type'] ?? 'Oylik'),
                 };
 
+                // Oylik va Ishbay uchun qiymatlarni aniqlash
+                $monthlySalary = 0;
+                $pieceworkSalary = 0;
+
+                // Agar monthly_salary mavjud va status = true bo'lsa, o'sha amountni ishlatamiz
+                if (isset($emp['monthly_salary']) && $emp['monthly_salary'] && $emp['monthly_salary']['status'] === true) {
+                    $monthlySalary = (int) $emp['monthly_salary']['amount'];
+                } else {
+                    // Aks holda attendance_salary ni ishlatamiz
+                    $monthlySalary = (int) $emp['attendance_salary'];
+                }
+
+                // Agar monthly_piecework mavjud va status = true bo'lsa, o'sha amountni ishlatamiz
+                if (isset($emp['monthly_piecework']) && $emp['monthly_piecework'] && $emp['monthly_piecework']['status'] === true) {
+                    $pieceworkSalary = (int) $emp['monthly_piecework']['amount'];
+                } else {
+                    // Aks holda tarification_salary ni ishlatamiz
+                    $pieceworkSalary = (int) $emp['tarification_salary'];
+                }
 
                 $rows[] = [
                     $i++,
                     $emp['name'],
                     $emp['attendance_days'],
                     $paymentType,
-                    (int) $emp['attendance_salary'],   // oylik
-                    (int) $emp['tarification_salary'], // ishbay
+                    $monthlySalary,          // oylik (monthly_salary yoki attendance_salary)
+                    $pieceworkSalary,        // ishbay (monthly_piecework yoki tarification_salary)
                     (int) $emp['total_earned'],        // umumiy topgan puli
                     (int) $emp['total_paid'],          // avans
                     (int) $emp['net_balance'],         // qolgan summa
-                    '',                                // imzo uchun bo‘sh joy
+                    '',                                // imzo uchun bo'sh joy
                 ];
             }
         }
 
         return $rows;
     }
-
 
     public function headings(): array
     {
