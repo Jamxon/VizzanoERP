@@ -39,10 +39,13 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
                 // Oylik va Ishbay uchun qiymatlarni aniqlash
                 $monthlySalary = 0;
                 $pieceworkSalary = 0;
+                $usedMonthlySalary = false;
+                $usedMonthlyPiecework = false;
 
                 // Agar monthly_salary mavjud va status = true bo'lsa, o'sha amountni ishlatamiz
                 if (isset($emp['monthly_salary']) && $emp['monthly_salary'] && $emp['monthly_salary']['status'] === true) {
                     $monthlySalary = (int) $emp['monthly_salary']['amount'];
+                    $usedMonthlySalary = true;
                 } else {
                     // Aks holda attendance_salary ni ishlatamiz
                     $monthlySalary = (int) $emp['attendance_salary'];
@@ -51,10 +54,24 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
                 // Agar monthly_piecework mavjud va status = true bo'lsa, o'sha amountni ishlatamiz
                 if (isset($emp['monthly_piecework']) && $emp['monthly_piecework'] && $emp['monthly_piecework']['status'] === true) {
                     $pieceworkSalary = (int) $emp['monthly_piecework']['amount'];
+                    $usedMonthlyPiecework = true;
                 } else {
                     // Aks holda tarification_salary ni ishlatamiz
                     $pieceworkSalary = (int) $emp['tarification_salary'];
                 }
+
+                // Total earned ni qayta hisoblash
+                $totalEarned = 0;
+                if ($usedMonthlySalary || $usedMonthlyPiecework) {
+                    // Agar monthly ma'lumotlar ishlatilgan bo'lsa, ularni qo'shamiz
+                    $totalEarned = $monthlySalary + $pieceworkSalary;
+                } else {
+                    // Aks holda original total_earned ni ishlatamiz
+                    $totalEarned = (int) $emp['total_earned'];
+                }
+
+                // Net balance ni ham qayta hisoblash
+                $netBalance = $totalEarned - (int) $emp['total_paid'];
 
                 $rows[] = [
                     $i++,
@@ -63,10 +80,10 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
                     $paymentType,
                     $monthlySalary,          // oylik (monthly_salary yoki attendance_salary)
                     $pieceworkSalary,        // ishbay (monthly_piecework yoki tarification_salary)
-                    (int) $emp['total_earned'],        // umumiy topgan puli
+                    $totalEarned,            // umumiy topgan puli (qayta hisoblangan)
                     (int) $emp['total_paid'],          // avans
-                    (int) $emp['net_balance'],         // qolgan summa
-                    '',                                // imzo uchun bo'sh joy
+                    $netBalance,             // qolgan summa (qayta hisoblangan)
+                    '',                      // imzo uchun bo'sh joy
                 ];
             }
         }
