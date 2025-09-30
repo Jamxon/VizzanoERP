@@ -10,6 +10,7 @@ use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CuttingMasterController;
 use App\Http\Controllers\CuttingPlanController;
 use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\EmployeeMonthlyController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupHelperController;
 use App\Http\Controllers\GroupMasterController;
@@ -96,6 +97,10 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::delete('monthlySelectedOrders/{id}', [CeoController::class, 'destroyMonthlySelectedOrders']);
     Route::patch('monthlySelectedOrders/{id}', [CeoController::class, 'updateMonthlySelectedOrders']);
     Route::get('employeeEfficiency', [UserController::class, 'getEmployeeEfficiency']);
+    Route::post('employeeMonthlySalary', [EmployeeMonthlyController::class, 'employeeMonthlySalaryStore']);
+    Route::post('employeeMonthlyPiecework', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkStore']);
+    Route::patch('employeeMonthlySalary', [EmployeeMonthlyController::class, 'employeeMonthlySalaryUpdate']);
+    Route::patch('employeeMonthlyPiecework', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkUpdate']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
