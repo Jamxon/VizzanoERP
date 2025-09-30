@@ -73,13 +73,26 @@ class EmployeeMonthlyController extends Controller
     public function employeeMonthlySalaryUpdate(Request $request, $id)
     {
         $salaryRecord = \App\Models\EmployeeMonthlySalary::find($id);
+
         if (!$salaryRecord) {
-            return response()->json(['error' => 'Salary record not found'], 404);
+            return response()->json([
+                'error' => 'Salary record not found'
+            ], 404);
         }
 
-        $salaryRecord->update($request->only(['amount', 'status']));
+        // Faqat yuborilgan fieldlarni validatsiya qilamiz
+        $validated = $request->validate([
+            'amount' => 'sometimes|numeric|min:0',
+            'status' => 'sometimes|string|in:pending,approved,rejected',
+        ]);
 
-        return response()->json(['message' => 'Salary record updated successfully', 'data' => $salaryRecord], 200);
+        $salaryRecord->fill($validated);
+        $salaryRecord->save();
+
+        return response()->json([
+            'message' => 'Salary record updated successfully',
+            'data' => $salaryRecord
+        ], 200);
     }
 
     public function employeeMonthlyPieceworkUpdate(Request $request)
