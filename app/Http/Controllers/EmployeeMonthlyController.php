@@ -72,7 +72,7 @@ class EmployeeMonthlyController extends Controller
 
     public function employeeMonthlySalaryUpdate(Request $request, $id)
     {
-        $salaryRecord = \App\Models\EmployeeMonthlySalary::find($id);
+       return  $salaryRecord = \App\Models\EmployeeMonthlySalary::find($id);
 
         if (!$salaryRecord) {
             return response()->json([
