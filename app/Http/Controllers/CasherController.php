@@ -1360,6 +1360,7 @@ class CasherController extends Controller
             $monthlyPieceworkData = null;
             if ($monthlyPiecework) {
                 $monthlyPieceworkData = [
+                    'id' => $monthlyPiecework->id,
                     'amount' => (float) $monthlyPiecework->amount,
                     'status' => (bool) $monthlyPiecework->status,
                     'created_by' => $monthlyPiecework->created_by_name,
@@ -1371,6 +1372,7 @@ class CasherController extends Controller
             $monthlySalaryData = null;
             if ($monthlySalary) {
                 $monthlySalaryData = [
+                    'id' => $monthlySalary->id,
                     'amount' => (float) $monthlySalary->amount,
                     'status' => (bool) $monthlySalary->status,
                     'created_by' => $monthlySalary->created_by_name,
