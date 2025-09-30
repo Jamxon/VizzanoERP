@@ -72,7 +72,7 @@ class EmployeeMonthlyController extends Controller
 
     public function employeeMonthlySalaryUpdate(Request $request, $id)
     {
-       return  $salaryRecord = \App\Models\EmployeeMonthlySalary::find($id);
+        $salaryRecord = \App\Models\EmployeeMonthlySalary::find($id);
 
         if (!$salaryRecord) {
             return response()->json([
@@ -83,7 +83,7 @@ class EmployeeMonthlyController extends Controller
         // Faqat yuborilgan fieldlarni validatsiya qilamiz
         $validated = $request->validate([
             'amount' => 'sometimes|numeric|min:0',
-            'status' => 'sometimes|string|in:pending,approved,rejected',
+            'status' => 'sometimes|boolean',
         ]);
 
         $salaryRecord->fill($validated);
