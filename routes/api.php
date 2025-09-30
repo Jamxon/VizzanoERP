@@ -100,7 +100,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::post('employeeMonthlySalary', [EmployeeMonthlyController::class, 'employeeMonthlySalaryStore']);
     Route::post('employeeMonthlyPiecework', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkStore']);
     Route::patch('employeeMonthlySalary/{id}', [EmployeeMonthlyController::class, 'employeeMonthlySalaryUpdate']);
-    Route::patch('employeeMonthlyPiecework', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkUpdate']);
+    Route::patch('employeeMonthlyPiecework/{id}', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkUpdate']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {

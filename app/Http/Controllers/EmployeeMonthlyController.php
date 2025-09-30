@@ -95,24 +95,28 @@ class EmployeeMonthlyController extends Controller
         ], 200);
     }
 
-    public function employeeMonthlyPieceworkUpdate(Request $request)
+    public function employeeMonthlyPieceworkUpdate(Request $request, $id)
     {
-        $request->validate([
-            'id' => 'required|exists:employee_monthly_pieceworks,id',
-            'amount' => 'required|numeric|min:0',
-            'status' => 'required|in:paid,unpaid',
-        ]);
+        $pieceworkRecord = \App\Models\EmployeeMonthlyPiecework::find($id);
 
-        $pieceworkRecord = \App\Models\EmployeeMonthlyPiecework::find($request->id);
         if (!$pieceworkRecord) {
-            return response()->json(['error' => 'Piecework record not found'], 404);
+            return response()->json([
+                'error' => 'Piecework record not found'
+            ], 404);
         }
 
-        $pieceworkRecord->update([
-            'amount' => $request->amount,
-            'status' => $request->status,
+        // Faqat yuborilgan fieldlarni validatsiya qilamiz
+        $validated = $request->validate([
+            'amount' => 'sometimes|numeric|min:0',
+            'status' => 'sometimes|boolean',
         ]);
 
-        return response()->json(['message' => 'Piecework record updated successfully', 'data' => $pieceworkRecord], 200);
+        $pieceworkRecord->fill($validated);
+        $pieceworkRecord->save();
+
+        return response()->json([
+            'message' => 'Piecework record updated successfully',
+            'data' => $pieceworkRecord
+        ], 200);
     }
 }
