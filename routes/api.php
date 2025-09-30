@@ -99,7 +99,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('employeeEfficiency', [UserController::class, 'getEmployeeEfficiency']);
     Route::post('employeeMonthlySalary', [EmployeeMonthlyController::class, 'employeeMonthlySalaryStore']);
     Route::post('employeeMonthlyPiecework', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkStore']);
-    Route::patch('employeeMonthlySalary', [EmployeeMonthlyController::class, 'employeeMonthlySalaryUpdate']);
+    Route::patch('employeeMonthlySalary/{id}', [EmployeeMonthlyController::class, 'employeeMonthlySalaryUpdate']);
     Route::patch('employeeMonthlyPiecework', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkUpdate']);
 });
 

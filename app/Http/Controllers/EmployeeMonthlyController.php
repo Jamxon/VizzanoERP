@@ -70,23 +70,14 @@ class EmployeeMonthlyController extends Controller
         return response()->json(['message' => 'Piecework record created successfully', 'data' => $pieceworkRecord], 201);
     }
 
-    public function employeeMonthlySalaryUpdate(Request $request)
+    public function employeeMonthlySalaryUpdate(Request $request, $id)
     {
-        $request->validate([
-            'id' => 'required|exists:employee_monthly_salaries,id',
-            'amount' => 'required|numeric|min:0',
-            'status' => 'required|in:paid,unpaid',
-        ]);
-
-        $salaryRecord = \App\Models\EmployeeMonthlySalary::find($request->id);
+        $salaryRecord = \App\Models\EmployeeMonthlySalary::find($id);
         if (!$salaryRecord) {
             return response()->json(['error' => 'Salary record not found'], 404);
         }
 
-        $salaryRecord->update([
-            'amount' => $request->amount,
-            'status' => $request->status,
-        ]);
+        $salaryRecord->update($request->all());
 
         return response()->json(['message' => 'Salary record updated successfully', 'data' => $salaryRecord], 200);
     }
