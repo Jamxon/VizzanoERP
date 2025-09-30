@@ -31,7 +31,7 @@ class EmployeeMonthlyController extends Controller
             'employee_id' => $request->employee_id,
             'month' => $request->month,
             'amount' => $request->amount,
-            'status' => 'unpaid',
+            'status' => true,
             'created_by' => auth()->id(),
         ]);
 
