@@ -1061,9 +1061,12 @@ class SuperHRController extends Controller
             if ($request->hasFile('img')) {
                 $file = $request->file('img');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('/public/images/', $filename);
 
-                $img = 'images/' . $filename;
+                // S3 ga yuklaymiz
+                $path = $file->storeAs('images', $filename, 's3');
+
+                Storage::disk('s3')->setVisibility($path, 'public');
+                $img = Storage::disk('s3')->url($path);
             } else {
                 $img = null;
             }
