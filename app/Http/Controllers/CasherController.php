@@ -536,18 +536,25 @@ class CasherController extends Controller
                 $dailyExpenseMonthly, $transport, $aup, $isNotAup, $totalOutputQty, $monthlyExpenses
             ) {
                 $first = $items->first();
-                $orderModel = optional($first->orderSubmodel)->orderModel;
+
+                $orderModel = optional(optional($first)->orderSubmodel)->orderModel;
                 $order = optional($orderModel)->order;
+
                 $orderId = $order->id ?? null;
 
                 $totalQty = $items->sum('quantity');
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
-                $submodelSpendsSum = \DB::table('order_sub_models as osm')
-                    ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.submodel_id')
-                    ->where('osm.order_model_id', $orderModel->id)
-                    ->where('ss.region', 'uz')
-                    ->sum('ss.summa');
+
+                $submodelSpendsSum = 0;
+
+                if ($orderModel?->id) {
+                    $submodelSpendsSum = \DB::table('order_sub_models as osm')
+                        ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.submodel_id')
+                        ->where('osm.order_model_id', $orderModel->id)
+                        ->where('ss.region', 'uz')
+                        ->sum('ss.summa');
+                }
 
                 $remainder = $submodelSpendsSum * $totalQty;
 
