@@ -561,7 +561,7 @@ class CasherController extends Controller
                         ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.submodel_id')
                         ->where('osm.order_model_id', $orderModel->id)
                         ->where('ss.region', 'uz')
-                        ->value('ss.summa') // faqat bitta qiymat qaytaradi
+                        ->sum('ss.summa')
             );
 
                 $remainder = $submodelSpendsSum * $totalQty;
