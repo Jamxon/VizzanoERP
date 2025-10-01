@@ -557,13 +557,12 @@ class CasherController extends Controller
                 }
 
                 dd(
-                    $orderModel?->id,
-                    \DB::table('order_sub_models as osm')
+                    $submodelSpendsSum = \DB::table('order_sub_models as osm')
                         ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.submodel_id')
-                        ->where('osm.order_model_id', $orderModel?->id)
+                        ->where('osm.order_model_id', $orderModel->id)
                         ->where('ss.region', 'uz')
-                        ->pluck('ss.summa')
-                );
+                        ->value('ss.summa') // faqat bitta qiymat qaytaradi
+            );
 
                 $remainder = $submodelSpendsSum * $totalQty;
 
