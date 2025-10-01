@@ -550,7 +550,7 @@ class CasherController extends Controller
 
                 if ($orderModel?->id) {
                     $submodelSpendsSum = \DB::table('order_sub_models as osm')
-                        ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.submodel_id')
+                        ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.id')
                         ->where('osm.order_model_id', $orderModel->id)
                         ->where('ss.region', 'uz')
                         ->sum('ss.summa');
