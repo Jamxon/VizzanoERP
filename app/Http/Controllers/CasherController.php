@@ -546,8 +546,6 @@ class CasherController extends Controller
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
 
-                $submodelSpendsSum = 0;
-
                 $submodelSpendsSum = \DB::table('order_sub_models as osm')
                     ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.id')
                     ->where('osm.order_model_id', $orderModel->id)
