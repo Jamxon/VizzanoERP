@@ -543,7 +543,14 @@ class CasherController extends Controller
                 $totalQty = $items->sum('quantity');
                 $priceUSD = $order->price ?? 0;
                 $priceUZS = $priceUSD * $dollarRate;
-                $remainder = ($orderModel->rasxod ?? 0) * $totalQty;
+                $submodelSpendsSum = \DB::table('order_sub_models as osm')
+                    ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.submodel_id')
+                    ->where('osm.order_model_id', $orderModel->id)
+                    ->where('ss.region', 'uz')
+                    ->sum('ss.summa');
+
+                $remainder = $submodelSpendsSum * $totalQty;
+
 
                 $bonus = DB::table('bonuses')
                     ->whereDate('created_at', $date)
