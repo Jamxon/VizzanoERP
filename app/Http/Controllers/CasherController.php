@@ -604,7 +604,7 @@ class CasherController extends Controller
                 })->filter()->unique('id')->values();
 
                 $rasxodPercentOfPrice = $priceUZS > 0
-                    ? round((($orderModel->rasxod ?? 0) / $priceUZS) * 100, 2)
+                    ? round((($submodelSpendsSum ?? 0) / $priceUZS) * 100, 2)
                     : null;
 
                 return [
