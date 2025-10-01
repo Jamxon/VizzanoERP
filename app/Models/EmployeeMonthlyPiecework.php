@@ -12,6 +12,7 @@ class EmployeeMonthlyPiecework extends Model
         'amount',
         'status',
         'created_by',
+        'comment'
     ];
 
     public function employee()

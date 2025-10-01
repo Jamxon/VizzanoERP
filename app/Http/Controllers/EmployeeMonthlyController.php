@@ -12,6 +12,7 @@ class EmployeeMonthlyController extends Controller
             'employee_id' => 'required|exists:employees,id',
             'month' => 'required|date_format:Y-m-d',
             'amount' => 'required|numeric|min:0',
+            'comment' => "nullable|string",
         ]);
 
         $employee = \App\Models\Employee::find($request->employee_id);
@@ -31,6 +32,7 @@ class EmployeeMonthlyController extends Controller
             'employee_id' => $request->employee_id,
             'month' => $request->month,
             'amount' => $request->amount,
+            'comment' => $request->comment,
             'status' => true,
             'created_by' => auth()->id(),
         ]);
@@ -44,6 +46,7 @@ class EmployeeMonthlyController extends Controller
             'employee_id' => 'required|exists:employees,id',
             'month' => 'required|date_format:Y-m-d',
             'amount' => 'required|numeric|min:0',
+            'comment' => "nullable|string",
         ]);
 
         $employee = \App\Models\Employee::find($request->employee_id);
@@ -63,6 +66,7 @@ class EmployeeMonthlyController extends Controller
             'employee_id' => $request->employee_id,
             'month' => $request->month,
             'amount' => $request->amount,
+            'comment' => $request->comment,
             'status' => true,
             'created_by' => auth()->id(),
         ]);
@@ -84,6 +88,7 @@ class EmployeeMonthlyController extends Controller
         $validated = $request->validate([
             'amount' => 'sometimes|numeric|min:0',
             'status' => 'sometimes|boolean',
+            'comment' => 'sometimes|string'
         ]);
 
         $salaryRecord->fill($validated);
@@ -109,6 +114,7 @@ class EmployeeMonthlyController extends Controller
         $validated = $request->validate([
             'amount' => 'sometimes|numeric|min:0',
             'status' => 'sometimes|boolean',
+            'comment' => 'sometimes|string'
         ]);
 
         $pieceworkRecord->fill($validated);

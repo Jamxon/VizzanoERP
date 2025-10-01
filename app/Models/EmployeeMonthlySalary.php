@@ -12,6 +12,7 @@ class EmployeeMonthlySalary extends Model
         'amount',
         'status',
         'created_by',
+        'comment'
     ];
 
     protected $casts = [
