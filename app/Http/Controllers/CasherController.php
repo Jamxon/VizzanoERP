@@ -1476,8 +1476,14 @@ class CasherController extends Controller
         // Avval xuddi getGroupsOrdersEarnings dagi $result ni hisoblaymiz
         $data = $this->getGroupsOrdersEarnings($request)->getData(true);
 
-        $department = Department::findOrFail($request->input('department_id'));
-        $group = Group::findOrFail($request->input('group_id'));
+        $department = DB::table('departments')
+            ->select('name')
+            ->where('id', $request->input('department_id'))
+            ->first();
+        $group = DB::table('groups')
+            ->select('name')
+            ->where('id', $request->input('group_id'))
+            ->first();
         $month = $request->input('month', date('Y-m'));
 
 
