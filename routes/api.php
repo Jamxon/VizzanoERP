@@ -184,6 +184,10 @@ Route::prefix('casher')->middleware('role:casher')->group(function () {
     Route::get('purposes', [CasherController::class, 'getLatestPurposes']);
     Route::get('comments', [CasherController::class, 'getLatestComments']);
     Route::get('sources', [CasherController::class, 'getLatestSources']);
+    Route::post('employeeMonthlySalary', [EmployeeMonthlyController::class, 'employeeMonthlySalaryStore']);
+    Route::post('employeeMonthlyPiecework', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkStore']);
+    Route::patch('employeeMonthlySalary/{id}', [EmployeeMonthlyController::class, 'employeeMonthlySalaryUpdate']);
+    Route::patch('employeeMonthlyPiecework/{id}', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkUpdate']);
 });
 
 Route::prefix('supplier')->middleware('role:supplier')->group(function () {
