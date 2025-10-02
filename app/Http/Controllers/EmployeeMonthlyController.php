@@ -88,7 +88,7 @@ class EmployeeMonthlyController extends Controller
         $validated = $request->validate([
             'amount' => 'sometimes|numeric|min:0',
             'status' => 'sometimes|boolean',
-            'comment' => 'sometimes|string'
+            'comment' => 'sometimes|nullable|string'
         ]);
 
         $salaryRecord->fill($validated);
@@ -114,7 +114,7 @@ class EmployeeMonthlyController extends Controller
         $validated = $request->validate([
             'amount' => 'sometimes|numeric|min:0',
             'status' => 'sometimes|boolean',
-            'comment' => 'sometimes|string'
+            'comment' => 'sometimes|nullable|string'
         ]);
 
         $pieceworkRecord->fill($validated);
