@@ -1473,7 +1473,6 @@ class CasherController extends Controller
 
     public function exportGroupsOrdersEarnings(Request $request)
     {
-        // Avval xuddi getGroupsOrdersEarnings dagi $result ni hisoblaymiz
         $data = $this->getGroupsOrdersEarnings($request)->getData(true);
 
         $department = DB::table('departments')
@@ -1486,11 +1485,15 @@ class CasherController extends Controller
             ->first();
         $month = $request->input('month', date('Y-m'));
 
+        $departmentName = $department->name ?? '';
+        $groupName = $group->name ?? '';
 
-        // Excel export qilish
         $fileName = 'groups_orders_earnings_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
 
-        return Excel::download(new GroupsOrdersEarningsExport($data,$department,$group,$month), $fileName);
+        return Excel::download(
+            new GroupsOrdersEarningsExport($data, $departmentName, $groupName, $month),
+            $fileName
+        );
     }
 
     /**
