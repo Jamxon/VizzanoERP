@@ -305,7 +305,7 @@ class UserController extends Controller
                 $filename = time() . '.' . $file->getClientOriginalExtension();
 
                 // S3 ga yuklaymiz
-                $path = $file->storeAs('images', $filename, 's3');
+                $path = $file->storeAs('employees', $filename, 's3');
 
                 Storage::disk('s3')->setVisibility($path, 'public');
 
