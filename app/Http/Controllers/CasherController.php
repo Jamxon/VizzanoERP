@@ -9,6 +9,7 @@ use App\Exports\MonthlyCostPdf;
 use App\Http\Resources\GroupPlanResource;
 use App\Models\Attendance;
 use App\Models\Cashbox;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Group;
 use App\Models\CashboxBalance;
@@ -1475,10 +1476,15 @@ class CasherController extends Controller
         // Avval xuddi getGroupsOrdersEarnings dagi $result ni hisoblaymiz
         $data = $this->getGroupsOrdersEarnings($request)->getData(true);
 
+        $department = Department::findOrFail($request->input('department_id'));
+        $group = Group::findOrFail($request->input('group_id'));
+        $month = $request->input('month', date('Y-m'));
+
+
         // Excel export qilish
         $fileName = 'groups_orders_earnings_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
 
-        return Excel::download(new GroupsOrdersEarningsExport($data), $fileName);
+        return Excel::download(new GroupsOrdersEarningsExport($data,$department,$group,$month), $fileName);
     }
 
     /**

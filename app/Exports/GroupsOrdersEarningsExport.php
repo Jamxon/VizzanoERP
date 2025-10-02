@@ -7,14 +7,21 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles, WithColumnWidths
 {
     protected array $data;
+    protected string $department;
+    protected string $group;
+    protected string $month;
 
-    public function __construct(array $data)
+    public function __construct(array $data, string $department, string $group, string $month)
     {
         $this->data = $data;
+        $this->department = $department;
+        $this->group = $group;
+        $this->month = $month;
     }
 
     public function array(): array
@@ -23,110 +30,129 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
         $i = 1;
 
         foreach ($this->data as $group) {
+            // sort employees by name before looping
+            usort($group['employees'], fn($a, $b) => strcmp($a['name'], $b['name']));
+
             foreach ($group['employees'] as $emp) {
-                // payment_type ni tarjima qilish
                 $paymentType = match ($emp['payment_type']) {
-                    'piece_work'                     => 'Ishbay',
-                    'monthly'                        => 'Oylik',
-                    'hourly'                         => 'Soatbay',
-                    'daily'                          => 'Kunlik',
-                    'fixed_cutted_bonus'             => 'Kesilgan bonus',
-                    'fixed_percentage_bonus'         => 'Foizli bonus',
-                    'fixed_tailored_bonus_group'     => 'Guruh bonus',
-                    default                          => ucfirst($emp['payment_type'] ?? 'Oylik'),
+                    'piece_work'                 => 'Ishbay',
+                    'monthly'                    => 'Oylik',
+                    'hourly'                     => 'Soatbay',
+                    'daily'                      => 'Kunlik',
+                    'fixed_cutted_bonus'         => 'Kesilgan bonus',
+                    'fixed_percentage_bonus'     => 'Foizli bonus',
+                    'fixed_tailored_bonus_group' => 'Guruh bonus',
+                    default                      => ucfirst($emp['payment_type'] ?? 'Oylik'),
                 };
 
-                // Oylik va Ishbay uchun qiymatlarni aniqlash
                 $monthlySalary = 0;
                 $pieceworkSalary = 0;
                 $usedMonthlySalary = false;
                 $usedMonthlyPiecework = false;
 
-                // Agar monthly_salary mavjud va status = true bo'lsa, o'sha amountni ishlatamiz
                 if (isset($emp['monthly_salary']) && $emp['monthly_salary'] && $emp['monthly_salary']['status'] === true) {
                     $monthlySalary = (int) $emp['monthly_salary']['amount'];
                     $usedMonthlySalary = true;
                 } else {
-                    // Aks holda attendance_salary ni ishlatamiz
                     $monthlySalary = (int) $emp['attendance_salary'];
                 }
 
-                // Agar monthly_piecework mavjud va status = true bo'lsa, o'sha amountni ishlatamiz
                 if (isset($emp['monthly_piecework']) && $emp['monthly_piecework'] && $emp['monthly_piecework']['status'] === true) {
                     $pieceworkSalary = (int) $emp['monthly_piecework']['amount'];
                     $usedMonthlyPiecework = true;
                 } else {
-                    // Aks holda tarification_salary ni ishlatamiz
                     $pieceworkSalary = (int) $emp['tarification_salary'];
                 }
 
-                // Total earned ni qayta hisoblash
-                $totalEarned = 0;
-                if ($usedMonthlySalary || $usedMonthlyPiecework) {
-                    // Agar monthly ma'lumotlar ishlatilgan bo'lsa, ularni qo'shamiz
-                    $totalEarned = $monthlySalary + $pieceworkSalary;
-                } else {
-                    // Aks holda original total_earned ni ishlatamiz
-                    $totalEarned = (int) $emp['total_earned'];
-                }
+                $totalEarned = ($usedMonthlySalary || $usedMonthlyPiecework)
+                    ? $monthlySalary + $pieceworkSalary
+                    : (int) $emp['total_earned'];
 
-                // Net balance ni ham qayta hisoblash
                 $netBalance = $totalEarned - (int) $emp['total_paid'];
 
                 $rows[] = [
                     $i++,
                     $emp['name'],
-                    $emp['attendance_days'],
+                    (int) $emp['attendance_days'],
                     $paymentType,
-                    $monthlySalary,          // oylik (monthly_salary yoki attendance_salary)
-                    $pieceworkSalary,        // ishbay (monthly_piecework yoki tarification_salary)
-                    $totalEarned,            // umumiy topgan puli (qayta hisoblangan)
-                    (int) $emp['total_paid'],          // avans
-                    $netBalance,             // qolgan summa (qayta hisoblangan)
-                    '',                      // imzo uchun bo'sh joy
+                    $monthlySalary,
+                    $pieceworkSalary,
+                    $totalEarned,
+                    (int) $emp['total_paid'],
+                    $netBalance,
+                    '',
                 ];
             }
         }
+
+        // totals row
+        $totals = [
+            '', 'Jami',
+            array_sum(array_column($rows, 2)), // attendance_days
+            '',
+            array_sum(array_column($rows, 4)), // monthly
+            array_sum(array_column($rows, 5)), // piecework
+            array_sum(array_column($rows, 6)), // total earned
+            array_sum(array_column($rows, 7)), // total paid
+            array_sum(array_column($rows, 8)), // net balance
+            '',
+        ];
+
+        $rows[] = $totals;
 
         return $rows;
     }
 
     public function headings(): array
     {
+        // Empty row for merged title, then actual headings
         return [
-            'No',
-            'FIO',
-            'Ish kunlari',
-            "To'lov turi",
-            "Ish haqi (oylik)",
-            "Ish haqi (ishbay)",
-            "Topgan puli",
-            "Avans",
-            "Qolgan summa",
-            "Imzo",
+            [$this->department . ' - ' . $this->group . ' (' . $this->month . ')'],
+            [
+                'No',
+                'FIO',
+                'Ish kunlari',
+                "To'lov turi",
+                "Ish haqi (oylik)",
+                "Ish haqi (ishbay)",
+                "Topgan puli",
+                "Avans",
+                "Qolgan summa",
+                "Imzo",
+            ]
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        return [
-            1 => ['font' => ['bold' => true]], // header bold
-        ];
+        // Merge first row across all columns
+        $sheet->mergeCells('A1:J1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Bold headings
+        $sheet->getStyle('A2:J2')->getFont()->setBold(true);
+
+        // Bold totals row
+        $lastRow = $sheet->getHighestRow();
+        $sheet->getStyle('A' . $lastRow . ':J' . $lastRow)->getFont()->setBold(true);
+
+        return [];
     }
 
     public function columnWidths(): array
     {
         return [
-            'A' => 5,   // No
-            'B' => 35,  // FIO
-            'C' => 12,  // Ish kunlari
-            'D' => 15,  // To'lov turi
-            'E' => 20,  // Ish haqi (oylik)
-            'F' => 20,  // Ish haqi (ishbay)
-            'G' => 20,  // Topgan puli
-            'H' => 15,  // Avans
-            'I' => 18,  // Qolgan summa
-            'J' => 15,  // Imzo
+            'A' => 5,
+            'B' => 35,
+            'C' => 12,
+            'D' => 15,
+            'E' => 20,
+            'F' => 20,
+            'G' => 20,
+            'H' => 15,
+            'I' => 18,
+            'J' => 15,
         ];
     }
 }
