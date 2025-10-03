@@ -10,6 +10,7 @@ use App\Models\QualityCheck;
 use App\Models\QualityCheckDescription;
 use App\Models\QualityDescription;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class QualityController extends Controller
@@ -195,8 +196,9 @@ class QualityController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $fileName = time() . '_' . $image->getClientOriginalName();
-            $image->storeAs('/images/', $fileName);
-            $imageName = "images/" . $fileName;
+            $path = $image->storeAs('lids', $fileName, 's3');
+            Storage::disk('s3')->setVisibility($path, 'public');
+            $imageName = Storage::disk('s3')->url($path);
         }
 
         // Bazaga yozish

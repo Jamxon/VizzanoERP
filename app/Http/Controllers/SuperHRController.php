@@ -1517,8 +1517,10 @@ class SuperHRController extends Controller
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $fileName = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('/public/images/', $fileName);
-                $lid->image = 'images/' . $fileName;
+                $path = $image->storeAs('lids', $fileName, 's3');
+                Storage::disk('s3')->setVisibility($path, 'public');
+
+                $lid->image = Storage::disk('s3')->url($path);
             }
 
             $lid->save();
@@ -1561,8 +1563,9 @@ class SuperHRController extends Controller
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $fileName = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('/public/images/', $fileName);
-                $lid->image = 'images/' . $fileName;
+                $path = $image->storeAs('lids', $fileName, 's3');
+                Storage::disk('s3')->setVisibility($path, 'public');
+                $lid->image = Storage::disk('s3')->url($path);
             }
 
             $lid->name = $request->name ?? $lid->name;
