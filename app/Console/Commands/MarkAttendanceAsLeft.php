@@ -44,7 +44,7 @@ class MarkAttendanceAsLeft extends Command
                     $salaryToAdd = $employee->salary;
                 } elseif ($employee->payment_type === 'hourly') {
                     $checkIn = Carbon::parse($attendance->check_in);
-                    $checkOut = $now;
+                    $checkOut  = $now->copy()->setTime(17, 30, 0);
 
                     // 🔎 Agar 08:00 gacha bo‘lsa → 07:30 qilib qo‘yamiz
                     if ($checkIn->lt($checkIn->copy()->setTime(8, 0))) {
