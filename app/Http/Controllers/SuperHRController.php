@@ -47,7 +47,7 @@ class SuperHRController extends Controller
                 $file = $request->file('image');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
 
-                $path = $file->storeAs('absence', $filename, 's3');
+                $path = $file->storeAs('employeeAbsences', $filename, 's3');
 
                 Storage::disk('s3')->setVisibility($path, 'public');
             }
@@ -416,7 +416,7 @@ class SuperHRController extends Controller
 
             if ($request->hasFile('image')) {
                 $file = $request->file('image');
-                $path = $file->store('holidays', 's3'); // faylni joylaymiz
+                $path = $file->store('employeeHolidays', 's3'); // faylni joylaymiz
                 Storage::disk('s3')->setVisibility($path, 'public'); // umumiy qilish
                 $fileUrl = Storage::disk('s3')->url($path); // URL ni olish
             }
