@@ -1078,7 +1078,7 @@ class SuperHRController extends Controller
             $oldData = $employee->toArray();
             $user = User::findOrFail($employee->user_id);
             $user->update([
-                'role_id' => $request->role_id ?? $user->role_id,
+                'role_id' => $request->filled('role_id') ? (int) $request->role_id : null,
             ]);
 
             if ($request->status === 'kicked') {
