@@ -218,6 +218,16 @@ class UserController extends Controller
                     if ($start && $end) {
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
+                },
+                'monthlySalary' => function ($query) use ($startDate, $endDate) {
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('month', [$startDate, $endDate]);
+                    }
+                },
+                'monthlyPiecework' => function ($query) use ($startDate, $endDate) {
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('month', [$startDate, $endDate]);
+                    }
                 }
             ]);
         } else {
@@ -266,8 +276,17 @@ class UserController extends Controller
                     if ($start && $end) {
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
+                },
+                'monthlySalary' => function ($query) use ($startDate, $endDate) {
+                if ($startDate && $endDate) {
+                        $query->whereBetween('month', [$startDate, $endDate]);
+                    }
+                },
+                'monthlyPiecework' => function ($query) use ($startDate, $endDate) {
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('month', [$startDate, $endDate]);
+                    }
                 }
-
             ]);
         }
 
