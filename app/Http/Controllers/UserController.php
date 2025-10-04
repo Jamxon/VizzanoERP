@@ -219,12 +219,12 @@ class UserController extends Controller
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
                 },
-                'monthlySalary' => function ($query) use ($startDate, $endDate) {
+                'monthlySalaries' => function ($query) use ($startDate, $endDate) {
                     if ($startDate && $endDate) {
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
                 },
-                'monthlyPiecework' => function ($query) use ($startDate, $endDate) {
+                'monthlyPieceworks' => function ($query) use ($startDate, $endDate) {
                     if ($startDate && $endDate) {
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
