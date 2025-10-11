@@ -243,6 +243,34 @@ class ChatController extends Controller
         ], 201);
     }
 
+    public function removeGroup(Request $request)
+    {
+        $user = Auth::user();
+
+        if ($user->role->name !== 'ceo') {
+            return response()->json(['error' => 'Only CEO can delete groups'], 403);
+        }
+
+        $request->validate([
+            'chat_id' => 'required|exists:chats,id',
+        ]);
+
+        $chat = Chat::find($request->chat_id);
+
+        if ($chat->type !== 'group') {
+            return response()->json(['error' => 'Not a group chat'], 400);
+        }
+
+        // Chat va unga bog‘liq yozuvlarni o‘chirish
+        DB::transaction(function () use ($chat) {
+            DB::table('chat_users')->where('chat_id', $chat->id)->delete();
+            DB::table('messages')->where('chat_id', $chat->id)->delete();
+            $chat->delete();
+        });
+
+        return response()->json(['message' => 'Group deleted successfully']);    
+    }
+
 
     /**
      * POST /chats/{chat}/users
