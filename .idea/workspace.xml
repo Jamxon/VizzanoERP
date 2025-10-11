@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -483,7 +481,7 @@
       <workItem from="1759655189323" duration="947000" />
       <workItem from="1760109865663" duration="35000" />
       <workItem from="1760109909440" duration="170000" />
-      <workItem from="1760156044319" duration="2469000" />
+      <workItem from="1760156044319" duration="3064000" />
     </task>
     <task id="LOCAL-01576" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
