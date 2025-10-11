@@ -120,7 +120,7 @@ class ChatController extends Controller
                         'message' => $chat->last_message,
                         'newMessageCount' => $newMessageCount,
                         'time' => $chat->last_message_time
-                            ? \Carbon\Carbon::parse($chat->last_message_time)->format('H:i')
+                            ? \Carbon\Carbon::parse($chat->last_message_time)->format('Y-m-d H:i')
                             : null,
                         'type' => $chat->type,
                     ];
