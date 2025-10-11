@@ -30,87 +30,89 @@ class ChatController extends Controller
 
         $chats = \DB::table('chats')
             ->join('chat_users', 'chats.id', '=', 'chat_users.chat_id')
+            
+            // Oxirgi xabarni JOIN orqali olish
+            ->leftJoin(\DB::raw('(
+                SELECT 
+                    chat_id,
+                    content as last_message,
+                    created_at as last_message_time,
+                    sender_id as last_sender_id
+                FROM messages m1
+                WHERE created_at = (
+                    SELECT MAX(created_at) 
+                    FROM messages m2 
+                    WHERE m2.chat_id = m1.chat_id
+                )
+            ) as last_messages'), 'chats.id', '=', 'last_messages.chat_id')
+            
+            // O'qilmagan xabarlar sonini olish
+            ->leftJoin(\DB::raw("(
+                SELECT 
+                    m.chat_id,
+                    COUNT(*) as unread_count
+                FROM messages m
+                LEFT JOIN message_reads r ON r.message_id = m.id AND r.user_id = {$userId}
+                WHERE r.read_at IS NULL AND m.sender_id != {$userId}
+                GROUP BY m.chat_id
+            ) as unread_messages"), 'chats.id', '=', 'unread_messages.chat_id')
+            
+            // O'zi yuborgan o'qilmagan xabarlar sonini olish
+            ->leftJoin(\DB::raw("(
+                SELECT 
+                    m.chat_id,
+                    COUNT(*) as self_unread_count
+                FROM messages m
+                JOIN message_reads r ON r.message_id = m.id
+                WHERE m.sender_id = {$userId} AND r.read_at IS NULL
+                GROUP BY m.chat_id
+            ) as self_unread_messages"), 'chats.id', '=', 'self_unread_messages.chat_id')
+            
+            // Personal chatdagi boshqa user ma'lumotlarini olish
+            ->leftJoin(\DB::raw("(
+                SELECT 
+                    cu.chat_id,
+                    e.name as other_user_name,
+                    e.img as other_user_image
+                FROM chat_users cu
+                JOIN users u ON u.id = cu.user_id
+                JOIN employees e ON e.user_id = u.id
+                WHERE u.id != {$userId}
+            ) as other_users"), 'chats.id', '=', 'other_users.chat_id')
+            
             ->where('chat_users.user_id', $userId)
             ->whereNull('chat_users.left_at')
+            
             ->select([
                 'chats.id',
                 'chats.type',
                 'chats.name',
                 'chats.image',
                 'chats.updated_at',
-
-                // oxirgi xabar
-                \DB::raw("(SELECT content FROM messages m WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1) as last_message"),
-                \DB::raw("(SELECT created_at FROM messages m WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1) as last_message_time"),
-
-                // o‘qilmagan xabarlar soni
-                \DB::raw("(
-                    SELECT COUNT(*)
-                    FROM messages m
-                    LEFT JOIN message_reads r ON r.message_id = m.id AND r.user_id = $userId
-                    WHERE m.chat_id = chats.id AND r.read_at IS NULL AND m.sender_id != $userId
-                ) as unread_count"),
-
-                // personal chatda boshqa userning employee.name olish
-                \DB::raw("(
-                    CASE
-                        WHEN chats.type = 'personal' THEN (
-                            SELECT e.name
-                            FROM chat_users cu
-                            JOIN users u ON u.id = cu.user_id
-                            JOIN employees e ON e.user_id = u.id
-                            WHERE cu.chat_id = chats.id AND u.id != $userId
-                            LIMIT 1
-                        )
-                        ELSE chats.name
-                    END
-                ) as chat_name"),
-
-                // personal chatda boshqa userning employee.image olish
-                \DB::raw("(
-                    CASE
-                        WHEN chats.type = 'personal' THEN (
-                            SELECT e.img
-                            FROM chat_users cu
-                            JOIN users u ON u.id = cu.user_id
-                            JOIN employees e ON e.user_id = u.id
-                            WHERE cu.chat_id = chats.id AND u.id != $userId
-                            LIMIT 1
-                        )
-                        ELSE chats.image
-                    END
-                ) as chat_image"),
-
-                // o‘zi yuborgan lekin hali o‘qilmagan xabar bo‘lsa -1
-                \DB::raw("(
-                    CASE
-                        WHEN (
-                            SELECT m.sender_id FROM messages m
-                            WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1
-                        ) = $userId
-                        AND (
-                            SELECT COUNT(*) FROM message_reads r
-                            JOIN messages m2 ON r.message_id = m2.id
-                            WHERE m2.chat_id = chats.id AND m2.sender_id = $userId AND r.read_at IS NULL
-                        ) > 0
-                        THEN -1
-                        ELSE 0
-                    END
-                ) as self_unread_flag"),
+                'last_messages.last_message',
+                'last_messages.last_message_time',
+                'last_messages.last_sender_id',
+                \DB::raw('COALESCE(unread_messages.unread_count, 0) as unread_count'),
+                \DB::raw('COALESCE(self_unread_messages.self_unread_count, 0) as self_unread_count'),
+                'other_users.other_user_name',
+                'other_users.other_user_image'
             ])
             ->orderByDesc('chats.updated_at')
             ->get()
-            ->map(function ($chat) {
-                // unread_count + self_unread_flag kombinatsiyasi
-                $chat->newMessageCount = (int)$chat->self_unread_flag !== 0
-                    ? -1
-                    : (int)$chat->unread_count;
-
+            ->map(function ($chat) use ($userId) {
+                // newMessageCount hisoblash
+                $newMessageCount = 0;
+                if ($chat->last_sender_id == $userId && $chat->self_unread_count > 0) {
+                    $newMessageCount = -1;
+                } else {
+                    $newMessageCount = (int)$chat->unread_count;
+                }
+                
                 return [
-                    'name' => $chat->chat_name,
-                    'image' => $chat->chat_image,
+                    'name' => $chat->type === 'personal' ? $chat->other_user_name : $chat->name,
+                    'image' => $chat->type === 'personal' ? $chat->other_user_image : $chat->image,
                     'message' => $chat->last_message,
-                    'newMessageCount' => $chat->newMessageCount,
+                    'newMessageCount' => $newMessageCount,
                     'time' => $chat->last_message_time
                         ? \Carbon\Carbon::parse($chat->last_message_time)->format('H:i')
                         : null,
