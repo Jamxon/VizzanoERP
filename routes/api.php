@@ -44,6 +44,8 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\TailorMasterController;
 use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controller\ChatController;
+use App\Http\Controller\MessageController;
 
 Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('groupsOrders', [\App\Http\Controllers\CeoController::class, 'getGroupOrder']);
