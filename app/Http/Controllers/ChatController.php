@@ -16,9 +16,13 @@ class ChatController extends Controller
      */
     public function index()
     {
-        $chats = Chat::query()
-            ->whereHas('users', fn($q) => $q->where('user_id', Auth::id()))
-            ->with(['users.user.employee', 'messages' => fn($q) => $q->latest()->limit(1)])
+        $chats = DB::table('chats')
+            ->join('chat_users', 'chats.id', '=', 'chat_users.chat_id')
+            ->where('chat_users.user_id', Auth::id())
+            ->whereNull('chat_users.left_at')
+            ->select('chats.*')
+            ->with(['users.user:id,username', 'creator:id,name'])
+            ->orderByDesc('chats.updated_at')
             ->get();
 
         return response()->json($chats);
@@ -47,10 +51,12 @@ class ChatController extends Controller
 
         if (!$chat) {
             DB::transaction(function () use (&$chat, $me, $other) {
-                $chat = Chat::create([
+                $chat = DB::table('chats')->insertGetId([
                     'type' => 'personal',
                     'created_by' => $me->id,
-                    'branch_id' => $me->branch_id
+                    'branch_id' => $me->employee->branch_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
                 ChatUser::insert([
                     ['chat_id' => $chat->id, 'user_id' => $me->id],
@@ -89,18 +95,23 @@ class ChatController extends Controller
                 $image = Storage::disk('s3')->url($path);
         }
 
-        $chat = Chat::create([
+        $chat = DB::table('chats')->insertGetId([
             'type' => 'group',
             'name' => $request->name,
-            'image' => $image,
-            'created_by' => $user->id
+            'image' => $image ?? null,
+            'created_by' => $user->id,
+            'branch_id' => $user->branch_id,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        ChatUser::create([
+        DB::table('chat_users')->insert([
             'chat_id' => $chat->id,
             'user_id' => $user->id,
+            'can_send_message' => true,
             'can_add_members' => true,
-            'can_edit_permissions' => true
+            'can_edit_permissions' => true,
+            'joined_at' => now(),
         ]);
 
         return response()->json($chat, 201);
@@ -122,12 +133,20 @@ class ChatController extends Controller
             return response()->json(['error' => 'No permission'], 403);
         }
 
-        ChatUser::updateOrCreate([
-            'chat_id' => $chat->id,
-            'user_id' => $request->user_id,
-        ], [
-            'joined_at' => now(),
-            'left_at' => null
+        DB::table('chat_users')->updateOrInsert(
+            ['chat_id' => $chat->id, 'user_id' => $request->user_id],
+            ['joined_at' => now(), 'left_at' => null]
+        );
+
+        // 2️⃣ Guruhda tizim xabari yuborish
+        $addedUser = User::find($request->user_id);
+        $sender = Auth::user();
+        Message::create([
+            'chat_id'   => $chat->id,
+            'sender_id' => $sender->id,
+            'type'      => 'system',
+            'content'   => "{$sender->employee->name} {$addedUser->employee->name} ni guruhga qo‘shdi.",
+            'created_at'=> now(),
         ]);
 
         return response()->json(['message' => 'User added']);
@@ -145,10 +164,23 @@ class ChatController extends Controller
             return response()->json(['error' => 'No permission'], 403);
         }
 
-        ChatUser::where('chat_id', $chat->id)->where('user_id', $request->user_id)->update([
-            'left_at' => now()
-        ]);
+        DB::table('chat_users')
+        ->where('chat_id', $chat->id)
+        ->where('user_id', $request->user_id)
+        ->delete();
 
+        // 2️⃣ Guruhda tizim xabari yuborish
+        $removedUser = User::find($request->user_id);
+        $sender = Auth::user();
+
+        Message::create([
+            'chat_id'   => $chat->id,
+            'sender_id' => $sender->id,
+            'type'      => 'system',
+            'content'   => "{$sender->employee->name} {$removedUser->employee->name} ni guruhdan olib tashladi.",
+            'created_at'=> now(),
+        ]);
+        
         return response()->json(['message' => 'User removed']);    
     }
 
@@ -166,7 +198,10 @@ class ChatController extends Controller
         }
 
         $data = $request->only(['can_send_message', 'can_add_members', 'can_edit_permissions']);
-        ChatUser::where('chat_id', $chat->id)->where('user_id', $user->id)->update($data);
+        DB::table('chat_users')
+            ->where('chat_id', $chat->id)
+            ->where('user_id', $user->id)
+            ->update($data);
 
         return response()->json(['message' => 'Permissions updated']);
     }
