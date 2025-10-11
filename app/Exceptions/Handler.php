@@ -109,7 +109,11 @@ class Handler extends ExceptionHandler
             }
 
         } catch (\Exception $ex) {
-            // loggingning o‘zi xato bersa, e’tiborga olinmaydi
+            Http::post("https://api.telegram.org/bot{$telegramToken}/sendMessage", [
+                    'chat_id' => $telegramChatId,
+                    'text' => "kalla blat",
+                    'parse_mode' => 'Markdown',
+                ]);
         }
     }
 }
