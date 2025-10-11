@@ -70,7 +70,7 @@ class ChatController extends Controller
                 \DB::raw("(
                     CASE
                         WHEN chats.type = 'personal' THEN (
-                            SELECT e.image
+                            SELECT e.img
                             FROM chat_users cu
                             JOIN users u ON u.id = cu.user_id
                             JOIN employees e ON e.user_id = u.id
