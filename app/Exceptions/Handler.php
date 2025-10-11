@@ -64,7 +64,7 @@ class Handler extends ExceptionHandler
         try {
             $user = Auth::user();
             $userId = $user->id ?? null;
-            $userName = $user->name ?? 'Guest';
+            $userName = $user->employee->name ?? 'Guest';
 
             $ip = Request::ip();
             $userAgent = Request::header('User-Agent');
