@@ -18,6 +18,15 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        MessageSent::class => [
+            [ClearChatCacheListener::class, 'handleMessageSent'],
+        ],
+        MessageRead::class => [
+            [ClearChatCacheListener::class, 'handleMessageRead'],
+        ],
+        ChatUpdated::class => [
+            [ClearChatCacheListener::class, 'handleChatUpdated'],
+        ],
     ];
 
     /**
