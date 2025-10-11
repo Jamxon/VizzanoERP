@@ -91,8 +91,8 @@ class ChatController extends Controller
 
         $chat = Chat::create([
             'type' => 'group',
-            'name' => $image,
-            'image' => $request->image,
+            'name' => $request->name,
+            'image' => $image,
             'created_by' => $user->id
         ]);
 
