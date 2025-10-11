@@ -133,6 +133,25 @@ class ChatController extends Controller
         return response()->json(['message' => 'User added']);
     }
 
+    public function removeUser(Chat $chat, Request $request)
+    {
+        $me = Auth::user();
+        if ($chat->type !== 'group') return response()->json(['error' => 'Not a group'], 400);
+
+        $request->validate(['user_id' => 'required|exists:users,id']);
+
+        $perm = ChatUser::where('chat_id', $chat->id)->where('user_id', $me->id)->first();
+        if (!$perm || !$perm->can_add_members) {
+            return response()->json(['error' => 'No permission'], 403);
+        }
+
+        ChatUser::where('chat_id', $chat->id)->where('user_id', $request->user_id)->update([
+            'left_at' => now()
+        ]);
+
+        return response()->json(['message' => 'User removed']);    
+    }
+
     /**
      * PATCH /chats/{chat}/permissions/{user}
      * Group ichida ruxsatni o‘zgartirish
