@@ -243,7 +243,7 @@ class ChatController extends Controller
         ], 201);
     }
 
-    public function removeGroup(Request $request)
+    public function removeGroup($id)
     {
         $user = Auth::user();
 
@@ -255,7 +255,7 @@ class ChatController extends Controller
             'chat_id' => 'required|exists:chats,id',
         ]);
 
-        $chat = Chat::find($request->chat_id);
+        $chat = Chat::find($id);
 
         if ($chat->type !== 'group') {
             return response()->json(['error' => 'Not a group chat'], 400);

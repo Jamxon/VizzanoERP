@@ -583,7 +583,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/chats', [ChatController::class, 'index']);
     Route::post('/chats/personal', [ChatController::class, 'createPersonal']);
     Route::post('/chats/group', [ChatController::class, 'createGroup']);
-    Route::delete('/chats/group', [ChatController::class, 'removeGroup']);
+    Route::delete('/chats/group{$id}', [ChatController::class, 'removeGroup']);
     Route::post('/chats/{chat}/users', [ChatController::class, 'addUser']);
     Route::patch('/chats/{chat}/users', [ChatController::class, 'removeUser']);
     Route::patch('/chats/{chat}/permissions/{user}', [ChatController::class, 'updatePermission']);
