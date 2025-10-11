@@ -74,12 +74,23 @@ class ChatController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'image' => 'nullable|string'
+            'image' => 'nullable|image|max:20480',
         ]);
+
+        if ($request->hasFile('image')) {
+                $file = $request->file('image');
+                $filename = time() . '.' . $file->getClientOriginalExtension();
+
+                $path = $file->storeAs('groupImages', $filename, 's3');
+
+                Storage::disk('s3')->setVisibility($path, 'public');
+
+                $image = Storage::disk('s3')->url($path);
+        }
 
         $chat = Chat::create([
             'type' => 'group',
-            'name' => $request->name,
+            'name' => $image,
             'image' => $request->image,
             'created_by' => $user->id
         ]);
