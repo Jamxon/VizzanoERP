@@ -193,6 +193,7 @@ class ChatController extends Controller
     public function createGroup(Request $request)
     {
         $user = Auth::user();
+
         if ($user->role->name !== 'ceo') {
             return response()->json(['error' => 'Only CEO can create groups'], 403);
         }
@@ -202,29 +203,32 @@ class ChatController extends Controller
             'image' => 'nullable|image|max:20480',
         ]);
 
+        $image = null;
+
         if ($request->hasFile('image')) {
-                $file = $request->file('image');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file = $request->file('image');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
 
-                $path = $file->storeAs('groupImages', $filename, 's3');
+            $path = $file->storeAs('groupImages', $filename, 's3');
+            Storage::disk('s3')->setVisibility($path, 'public');
 
-                Storage::disk('s3')->setVisibility($path, 'public');
-
-                $image = Storage::disk('s3')->url($path);
+            $image = Storage::disk('s3')->url($path);
         }
 
-        $chat = DB::table('chats')->insertGetId([
+        // Chat yozuvini yaratish
+        $chatId = DB::table('chats')->insertGetId([
             'type' => 'group',
             'name' => $request->name,
-            'image' => $image ?? null,
+            'image' => $image,
             'created_by' => $user->id,
             'branch_id' => $user->branch_id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
+        // Chatga user qo‘shish
         DB::table('chat_users')->insert([
-            'chat_id' => $chat->id,
+            'chat_id' => $chatId,
             'user_id' => $user->id,
             'can_send_message' => true,
             'can_add_members' => true,
@@ -232,8 +236,13 @@ class ChatController extends Controller
             'joined_at' => now(),
         ]);
 
-        return response()->json($chat, 201);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Group created successfully',
+            'chat_id' => $chatId,
+        ], 201);
     }
+
 
     /**
      * POST /chats/{chat}/users
