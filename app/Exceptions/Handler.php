@@ -56,8 +56,8 @@ class Handler extends ExceptionHandler
                 ]);
 
                 // 2️⃣ Telegramga yuborish
-                $telegramToken = env('TELEGRAM_BOT_TOKEN');
-                $telegramChatId = env('TELEGRAM_CHAT_ID');
+                $telegramToken = env('ERROR_HANDLER_TELEGRAM_BOT');
+                $telegramChatId = env('ERROR_HANDLER_CHAT_ID');
 
                 if ($telegramToken && $telegramChatId) {
                     $text = "🚨 *Laravel Error Report*\n"
