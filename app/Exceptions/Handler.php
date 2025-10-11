@@ -24,7 +24,37 @@ class Handler extends ExceptionHandler
     public function register(): void
     {
         $this->reportable(function (Throwable $e) {
-            //
+             $user = Auth::user();
+            $userId = $user->id ?? null;
+            $userName = $user->name ?? 'Guest';
+
+            $ip = Request::ip();
+            $userAgent = Request::header('User-Agent');
+            $url = Request::fullUrl();
+            $method = Request::method();
+            $requestData = json_encode(Request::all(), JSON_UNESCAPED_UNICODE);
+
+            $errorMessage = $e->getMessage();
+            $errorFile = $e->getFile();
+            $errorLine = $e->getLine();
+            $errorTrace = substr($e->getTraceAsString(), 0, 1000);
+
+            // ✅ Bazaga yozish
+            DB::table('error_logs')->insert([
+                'user_id' => $userId,
+                'user_name' => $userName,
+                'ip' => $ip,
+                'user_agent' => $userAgent,
+                'url' => $url,
+                'method' => $method,
+                'request_data' => $requestData,
+                'error_message' => $errorMessage,
+                'error_file' => $errorFile,
+                'error_line' => $errorLine,
+                'error_trace' => $errorTrace,
+                'status_code' => $statusCode,
+                'created_at' => now(),
+            ]);
         });
     }
 }
