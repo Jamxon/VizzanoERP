@@ -18,71 +18,74 @@ class ChatController extends Controller
     {
         $userId = Auth::id();
 
-        // Foydalanuvchiga tegishli chatlar
         $chats = DB::table('chats')
             ->join('chat_users', 'chats.id', '=', 'chat_users.chat_id')
             ->where('chat_users.user_id', $userId)
             ->whereNull('chat_users.left_at')
-            ->select('chats.*')
+            ->select([
+                'chats.id',
+                'chats.type',
+                'chats.name',
+                'chats.image',
+                'chats.updated_at',
+
+                // Oxirgi xabar (subquery orqali)
+                DB::raw("(SELECT content FROM messages m WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1) as last_message"),
+                DB::raw("(SELECT created_at FROM messages m WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1) as last_message_time"),
+
+                // O‘qilmagan xabarlar soni
+                DB::raw("(
+                    SELECT COUNT(*)
+                    FROM messages m
+                    LEFT JOIN message_reads r 
+                        ON r.message_id = m.id AND r.user_id = {$userId}
+                    WHERE m.chat_id = chats.id AND r.read_at IS NULL
+                ) as unread_count"),
+
+                // Personal chatda boshqa foydalanuvchini topish
+                DB::raw("CASE 
+                    WHEN chats.type = 'personal' THEN (
+                        SELECT u.name 
+                        FROM chat_users cu
+                        JOIN users u ON u.id = cu.user_id
+                        WHERE cu.chat_id = chats.id AND u.id != {$userId}
+                        LIMIT 1
+                    )
+                    ELSE chats.name
+                END as chat_name"),
+
+                DB::raw("CASE 
+                    WHEN chats.type = 'personal' THEN (
+                        SELECT u.image 
+                        FROM chat_users cu
+                        JOIN users u ON u.id = cu.user_id
+                        WHERE cu.chat_id = chats.id AND u.id != {$userId}
+                        LIMIT 1
+                    )
+                    ELSE chats.image
+                END as chat_image")
+            ])
             ->orderByDesc('chats.updated_at')
             ->get();
 
-        $result = [];
-
-        foreach ($chats as $chat) {
-            // Chat turi: group yoki personal
-            $type = $chat->type;
-
-            // Oxirgi xabar
-            $lastMessage = DB::table('messages')
-                ->where('chat_id', $chat->id)
-                ->orderByDesc('created_at')
-                ->first();
-
-            // O‘qilmagan xabarlar soni
-            $unreadCount = DB::table('messages')
-                ->leftJoin('message_reads', function ($join) use ($userId) {
-                    $join->on('messages.id', '=', 'message_reads.message_id')
-                        ->where('message_reads.user_id', '=', $userId);
-                })
-                ->where('messages.chat_id', $chat->id)
-                ->whereNull('message_reads.read_at')
-                ->count();
-
-            // Chat rasmi va nomi
-            if ($type === 'group') {
-                $chatName = $chat->name;
-                $chatImage = $chat->image;
-            } else {
-                // Personal chat: boshqa foydalanuvchini topamiz
-                $partner = DB::table('chat_users')
-                    ->join('users', 'chat_users.user_id', '=', 'users.id')
-                    ->where('chat_users.chat_id', $chat->id)
-                    ->where('users.id', '!=', $userId)
-                    ->select('users.id', 'users.name', 'users.image')
-                    ->first();
-
-                $chatName = $partner->name ?? 'No name';
-                $chatImage = $partner->image ?? null;
-            }
-
-            // Vaqt formatlash
-            $time = $lastMessage ? $lastMessage->created_at : $chat->updated_at;
-            $formattedTime = \Carbon\Carbon::parse($time)->format('H:i');
-
-            $result[] = [
+        // 🔹 Front uchun formatlab yuboramiz
+        $data = $chats->map(function ($chat) {
+            return [
                 'id' => $chat->id,
-                'name' => $chatName,
-                'image' => $chatImage,
-                'message' => $lastMessage->content ?? null,
-                'newMessageCount' => $unreadCount,
-                'time' => $formattedTime,
-                'type' => $type,
+                'name' => $chat->chat_name,
+                'image' => $chat->chat_image,
+                'message' => $chat->last_message,
+                'newMessageCount' => (int) $chat->unread_count,
+                'time' => $chat->last_message_time
+                    ? \Carbon\Carbon::parse($chat->last_message_time)->format('H:i')
+                    : \Carbon\Carbon::parse($chat->updated_at)->format('H:i'),
+                'type' => $chat->type,
             ];
-        }
+        });
 
-        return response()->json($result);
+        return response()->json($data);
     }
+
 
     /**
      * POST /chats/personal
