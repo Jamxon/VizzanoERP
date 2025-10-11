@@ -68,7 +68,7 @@ class ChatController extends Controller
     public function createGroup(Request $request)
     {
         $user = Auth::user();
-        if ($user->role !== 'ceo') {
+        if ($user->role->name !== 'ceo') {
             return response()->json(['error' => 'Only CEO can create groups'], 403);
         }
 
