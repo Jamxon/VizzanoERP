@@ -34,7 +34,7 @@ class ChatController extends Controller
         $other = User::find($request->user_id);
 
         // branch cheklovi (ceo har kimga yozoladi)
-        if ($me->role !== 'ceo' && $me->branch_id !== $other->branch_id) {
+        if ($me->role->name !== 'ceo' && $me->employee->branch_id !== $other->employee->branch_id) {
             return response()->json(['error' => 'Not allowed'], 403);
         }
 
@@ -58,7 +58,7 @@ class ChatController extends Controller
             });
         }
 
-        return response()->json($chat->load('users.user:id,name'));
+        return response()->json($chat->load('users.user:id,username'));
     }
 
     /**
