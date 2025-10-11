@@ -251,10 +251,6 @@ class ChatController extends Controller
             return response()->json(['error' => 'Only CEO can delete groups'], 403);
         }
 
-        $request->validate([
-            'chat_id' => 'required|exists:chats,id',
-        ]);
-
         $chat = Chat::find($id);
 
         if ($chat->type !== 'group') {
