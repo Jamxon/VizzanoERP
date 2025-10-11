@@ -482,6 +482,7 @@
       <workItem from="1760109865663" duration="35000" />
       <workItem from="1760109909440" duration="170000" />
       <workItem from="1760156044319" duration="3064000" />
+      <workItem from="1760178268095" duration="345000" />
     </task>
     <task id="LOCAL-01576" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
