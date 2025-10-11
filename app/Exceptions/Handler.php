@@ -95,8 +95,8 @@ class Handler extends ExceptionHandler
             ]);
 
             // ✅ Telegramga yuborish
-            $telegramToken = env('ERROR_HANDLER_TELEGRAM_BOT');
-            $telegramChatId = env('ERROR_HANDLER_CHAT_ID');
+            $telegramToken = "8446855967:AAHp0rSXhJml8G1qnqNU7eo_MqstBk5GVf4";
+            $telegramChatId = -1003130385940;
 
             if ($telegramToken && $telegramChatId) {
                 $text = "🚨 *Error Detected*\n"
