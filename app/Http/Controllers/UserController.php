@@ -295,63 +295,54 @@ class UserController extends Controller
         return response()->json($resource);
     }
 
-    public function updateProfile(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
-    {
-        try {
-            $request->validate([
-                'username' => 'required|string|max:255|unique:users,username,' . $employee->user_id,
-                'password' => 'sometimes|nullable|string|min:6',
-            ]);
+   public function updateProfile(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
+{
+    $request->validate([
+        'username' => 'required|string|max:255|unique:users,username,' . $employee->user_id,
+        'password' => 'sometimes|nullable|string|min:6',
+    ]);
 
-            $user = User::where('id', $employee->user_id)->first();
+    $user = User::where('id', $employee->user_id)->first();
 
-            $oldUserData = $user->only(['username', 'password']);
-            $oldEmployeeData = $employee->only(['img']);
+    $oldUserData = $user->only(['username', 'password']);
+    $oldEmployeeData = $employee->only(['img']);
 
-            $updateData = [
-                'username' => $request->username,
-            ];
+    $updateData = [
+        'username' => $request->username,
+    ];
 
-            // Password faqat kelsa va bo'sh bo'lmasa hash qilamiz
-            if ($request->filled('password')) {
-                $updateData['password'] = $this->hashPassword($request->password);
-            }
-
-            $user->update($updateData);
-
-            if ($request->hasFile('img')) {
-                $file = $request->file('img');
-                $filename = time() . '.' . $file->getClientOriginalExtension();
-
-                // S3 ga yuklaymiz
-                $path = $file->storeAs('employees', $filename, 's3');
-
-                Storage::disk('s3')->setVisibility($path, 'public');
-
-                $employee->img = Storage::disk('s3')->url($path);
-                $employee->save();
-            }
-
-            Log::add(
-                auth()->id(),
-                "Profil ma'lumotlari yangilandi",
-                'edit',
-                [
-                    'username' => $oldUserData['username'],
-                    'img' => $oldEmployeeData['img'],
-                ],
-                [
-                    'username' => $user->username,
-                    'img' => $employee->img,
-                ]
-            );
-
-            return response()->json(['message' => 'Profile updated successfully']);
-        } catch (\Exception $exception) {
-            return response()->json(['error' => 'Failed to update profile: ' . $exception->getMessage()], 500);
-        }
+    if ($request->filled('password')) {
+        $updateData['password'] = $this->hashPassword($request->password);
     }
 
+    $user->update($updateData);
+
+    if ($request->hasFile('img')) {
+        $file = $request->file('img');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('employees', $filename, 's3');
+        Storage::disk('s3')->setVisibility($path, 'public');
+
+        $employee->img = Storage::disk('s3')->url($path);
+        $employee->save();
+    }
+
+    Log::add(
+        auth()->id(),
+        "Profil ma'lumotlari yangilandi",
+        'edit',
+        [
+            'username' => $oldUserData['username'],
+            'img' => $oldEmployeeData['img'],
+        ],
+        [
+            'username' => $user->username,
+            'img' => $employee->img,
+        ]
+    );
+
+    return response()->json(['message' => 'Profile updated successfully']);
+}
     protected function hashPassword($password): string
     {
         $options = ['cost' => 12];
