@@ -146,13 +146,15 @@ class ChatController extends Controller
 
         if (!$chat) {
             DB::transaction(function () use (&$chat, $me, $other) {
-                $chat = DB::table('chats')->insertGetId([
+                // Chat yaratamiz model orqali
+                $chat = Chat::create([
                     'type' => 'personal',
                     'created_by' => $me->id,
                     'branch_id' => $me->employee->branch_id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+
                 ChatUser::insert([
                     ['chat_id' => $chat->id, 'user_id' => $me->id],
                     ['chat_id' => $chat->id, 'user_id' => $other->id],
@@ -160,7 +162,14 @@ class ChatController extends Controller
             });
         }
 
-        return response()->json($chat->load('users.user:id,username'));
+        // agar transaction ichida yaratgan bo‘lsak, u global scope’da qayta topiladi
+        if (is_int($chat)) {
+            $chat = Chat::find($chat);
+        }
+
+        return response()->json(
+            $chat->load(['users.user:id,username'])
+        );
     }
 
     /**
