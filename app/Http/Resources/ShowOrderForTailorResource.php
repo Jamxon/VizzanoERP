@@ -17,6 +17,7 @@ class ShowOrderForTailorResource extends JsonResource
         return [
             'id' => $this->id,
             'order_id' => $this->order->id,
+            'order' => $this->order,
             'model' => $this->order->orderModel->model,
             'submodel' => $this->orderSubmodel->submodel,
             'group' => $this->group,
