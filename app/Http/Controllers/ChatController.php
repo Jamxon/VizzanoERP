@@ -38,39 +38,50 @@ class ChatController extends Controller
                 'chats.name',
                 'chats.image',
                 'chats.updated_at',
+
                 // oxirgi xabar
                 \DB::raw("(SELECT content FROM messages m WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1) as last_message"),
                 \DB::raw("(SELECT created_at FROM messages m WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1) as last_message_time"),
+
                 // o‘qilmagan xabarlar soni
                 \DB::raw("(
-                    SELECT COUNT(*) FROM messages m
+                    SELECT COUNT(*)
+                    FROM messages m
                     LEFT JOIN message_reads r ON r.message_id = m.id AND r.user_id = $userId
                     WHERE m.chat_id = chats.id AND r.read_at IS NULL AND m.sender_id != $userId
                 ) as unread_count"),
-                // personal chatda boshqa userni olish
+
+                // personal chatda boshqa userning employee.name olish
                 \DB::raw("(
                     CASE
                         WHEN chats.type = 'personal' THEN (
-                            SELECT u.name FROM chat_users cu
+                            SELECT e.name
+                            FROM chat_users cu
                             JOIN users u ON u.id = cu.user_id
+                            JOIN employees e ON e.user_id = u.id
                             WHERE cu.chat_id = chats.id AND u.id != $userId
                             LIMIT 1
                         )
                         ELSE chats.name
                     END
                 ) as chat_name"),
+
+                // personal chatda boshqa userning employee.image olish
                 \DB::raw("(
                     CASE
                         WHEN chats.type = 'personal' THEN (
-                            SELECT u.image FROM chat_users cu
+                            SELECT e.image
+                            FROM chat_users cu
                             JOIN users u ON u.id = cu.user_id
+                            JOIN employees e ON e.user_id = u.id
                             WHERE cu.chat_id = chats.id AND u.id != $userId
                             LIMIT 1
                         )
                         ELSE chats.image
                     END
                 ) as chat_image"),
-                // agar oxirgi xabar ushbu user tomonidan yuborilgan bo‘lsa lekin o‘qilmagan bo‘lsa -1
+
+                // o‘zi yuborgan lekin hali o‘qilmagan xabar bo‘lsa -1
                 \DB::raw("(
                     CASE
                         WHEN (
@@ -85,17 +96,16 @@ class ChatController extends Controller
                         THEN -1
                         ELSE 0
                     END
-                ) as self_unread_flag")
+                ) as self_unread_flag"),
             ])
             ->orderByDesc('chats.updated_at')
             ->get()
             ->map(function ($chat) {
-                // oldingi unread_count va self_unread_flag birlashtiriladi
-                $chat->newMessageCount = (int) $chat->self_unread_flag !== 0
+                // unread_count + self_unread_flag kombinatsiyasi
+                $chat->newMessageCount = (int)$chat->self_unread_flag !== 0
                     ? -1
-                    : (int) $chat->unread_count;
+                    : (int)$chat->unread_count;
 
-                // frontendga kerakli format
                 return [
                     'name' => $chat->chat_name,
                     'image' => $chat->chat_image,
@@ -110,6 +120,7 @@ class ChatController extends Controller
 
         return response()->json($chats);
     }
+
 
 
     /**
