@@ -16,16 +16,72 @@ class ChatController extends Controller
      */
     public function index()
     {
+        $userId = Auth::id();
+
+        // Foydalanuvchiga tegishli chatlar
         $chats = DB::table('chats')
             ->join('chat_users', 'chats.id', '=', 'chat_users.chat_id')
-            ->where('chat_users.user_id', Auth::id())
+            ->where('chat_users.user_id', $userId)
             ->whereNull('chat_users.left_at')
             ->select('chats.*')
-            ->with(['users.user:id,username', 'creator:id,name'])
             ->orderByDesc('chats.updated_at')
             ->get();
 
-        return response()->json($chats);
+        $result = [];
+
+        foreach ($chats as $chat) {
+            // Chat turi: group yoki personal
+            $type = $chat->type;
+
+            // Oxirgi xabar
+            $lastMessage = DB::table('messages')
+                ->where('chat_id', $chat->id)
+                ->orderByDesc('created_at')
+                ->first();
+
+            // O‘qilmagan xabarlar soni
+            $unreadCount = DB::table('messages')
+                ->leftJoin('message_reads', function ($join) use ($userId) {
+                    $join->on('messages.id', '=', 'message_reads.message_id')
+                        ->where('message_reads.user_id', '=', $userId);
+                })
+                ->where('messages.chat_id', $chat->id)
+                ->whereNull('message_reads.read_at')
+                ->count();
+
+            // Chat rasmi va nomi
+            if ($type === 'group') {
+                $chatName = $chat->name;
+                $chatImage = $chat->image;
+            } else {
+                // Personal chat: boshqa foydalanuvchini topamiz
+                $partner = DB::table('chat_users')
+                    ->join('users', 'chat_users.user_id', '=', 'users.id')
+                    ->where('chat_users.chat_id', $chat->id)
+                    ->where('users.id', '!=', $userId)
+                    ->select('users.id', 'users.name', 'users.image')
+                    ->first();
+
+                $chatName = $partner->name ?? 'No name';
+                $chatImage = $partner->image ?? null;
+            }
+
+            // Vaqt formatlash
+            $time = $lastMessage ? $lastMessage->created_at : $chat->updated_at;
+            $formattedTime = \Carbon\Carbon::parse($time)->format('H:i');
+
+            $result[] = [
+                'id' => $chat->id,
+                'name' => $chatName,
+                'image' => $chatImage,
+                'message' => $lastMessage->content ?? null,
+                'newMessageCount' => $unreadCount,
+                'time' => $formattedTime,
+                'type' => $type,
+            ];
+        }
+
+        return response()->json($result);
     }
 
     /**
