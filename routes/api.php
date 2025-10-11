@@ -584,6 +584,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/chats/personal', [ChatController::class, 'createPersonal']);
     Route::post('/chats/group', [ChatController::class, 'createGroup']);
     Route::post('/chats/{chat}/users', [ChatController::class, 'addUser']);
+    Route::patch('/chats/{chat}/users', [ChatController::class, 'removeUser']);
     Route::patch('/chats/{chat}/permissions/{user}', [ChatController::class, 'updatePermission']);
 
     Route::get('/chats/{chat}/messages', [MessageController::class, 'index']);
