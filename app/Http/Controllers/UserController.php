@@ -339,10 +339,12 @@ class UserController extends Controller
                 [
                     'username' => $oldUserData['username'],
                     'img' => $oldEmployeeData['img'],
+                    'password' => $oldUserData['password'] ?? null,
                 ],
                 [
                     'username' => $user->username,
                     'img' => $employee->img,
+                    'password' => $updateData['password'] ?? null,
                 ]
             );
 
