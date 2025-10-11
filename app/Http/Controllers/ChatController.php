@@ -17,7 +17,7 @@ class ChatController extends Controller
     {
         $chats = Chat::query()
             ->whereHas('users', fn($q) => $q->where('user_id', Auth::id()))
-            ->with(['users.user', 'users.employee', 'messages' => fn($q) => $q->latest()->limit(1)])
+            ->with(['users.user.employee', 'messages' => fn($q) => $q->latest()->limit(1)])
             ->get();
 
         return response()->json($chats);
