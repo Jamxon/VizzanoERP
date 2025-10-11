@@ -114,6 +114,7 @@ class ChatController extends Controller
                     }
                     
                     return [
+                        'id' => $chat->id,
                         'name' => $chat->type === 'personal' ? $chat->other_user_name : $chat->name,
                         'image' => $chat->type === 'personal' ? $chat->other_user_image : $chat->image,
                         'message' => $chat->last_message,
