@@ -16,81 +16,13 @@ class ChatController extends Controller
      */
     public function index()
     {
-        $userId = Auth::id();
-
-        $chats = DB::table('chats')
-            ->join('chat_users', 'chats.id', '=', 'chat_users.chat_id')
-            ->where('chat_users.user_id', $userId)
-            ->whereNull('chat_users.left_at')
-            ->select([
-                'chats.id',
-                'chats.type',
-                'chats.name',
-                'chats.image',
-                'chats.updated_at',
-
-                // Oxirgi xabar (subquery)
-                DB::raw("(SELECT m.content FROM messages AS m WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1) AS last_message"),
-                DB::raw("(SELECT m.created_at FROM messages AS m WHERE m.chat_id = chats.id ORDER BY m.created_at DESC LIMIT 1) AS last_message_time"),
-
-                // O‘qilmagan xabarlar soni
-                DB::raw("(
-                    SELECT COUNT(*)
-                    FROM messages AS m
-                    LEFT JOIN message_reads AS r 
-                        ON r.message_id = m.id AND r.user_id = {$userId}
-                    WHERE m.chat_id = chats.id AND r.read_at IS NULL
-                ) AS unread_count"),
-
-                // Personal chat uchun boshqa userni topish (ism)
-                DB::raw("(
-                    CASE 
-                        WHEN chats.type = 'personal' THEN (
-                            SELECT users.name
-                            FROM chat_users AS cu
-                            INNER JOIN users ON users.id = cu.user_id
-                            WHERE cu.chat_id = chats.id AND users.id != {$userId}
-                            LIMIT 1
-                        )
-                        ELSE chats.name
-                    END
-                ) AS chat_name"),
-
-                // Personal chat uchun boshqa user rasmi
-                DB::raw("(
-                    CASE 
-                        WHEN chats.type = 'personal' THEN (
-                            SELECT users.image
-                            FROM chat_users AS cu
-                            INNER JOIN users ON users.id = cu.user_id
-                            WHERE cu.chat_id = chats.id AND users.id != {$userId}
-                            LIMIT 1
-                        )
-                        ELSE chats.image
-                    END
-                ) AS chat_image"),
-            ])
-            ->orderByDesc('chats.updated_at')
+        $chats = Chat::query()
+            ->whereHas('users', fn($q) => $q->where('user_id', Auth::id()))
+            ->with(['users.user.employee', 'messages' => fn($q) => $q->latest()->limit(1)])
             ->get();
 
-        // 🔹 JSON formatlash
-        $data = $chats->map(function ($chat) {
-            return [
-                'id' => $chat->id,
-                'name' => $chat->chat_name,
-                'image' => $chat->chat_image,
-                'message' => $chat->last_message,
-                'newMessageCount' => (int) $chat->unread_count,
-                'time' => $chat->last_message_time
-                    ? \Carbon\Carbon::parse($chat->last_message_time)->format('H:i')
-                    : \Carbon\Carbon::parse($chat->updated_at)->format('H:i'),
-                'type' => $chat->type,
-            ];
-        });
-
-        return response()->json($data);
+        return response()->json($chats);
     }
-
 
     /**
      * POST /chats/personal
