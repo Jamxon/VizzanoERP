@@ -578,6 +578,16 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/todos/{id}', [TodoListController::class, 'update']);
     Route::delete('/todos/{id}', [TodoListController::class, 'destroy']);
     Route::get('employeeEfficiency', [UserController::class, 'getEmployeeEfficiency']);
+    Route::get('/chats', [ChatController::class, 'index']);
+    Route::post('/chats/personal', [ChatController::class, 'createPersonal']);
+    Route::post('/chats/group', [ChatController::class, 'createGroup']);
+    Route::post('/chats/{chat}/users', [ChatController::class, 'addUser']);
+    Route::patch('/chats/{chat}/permissions/{user}', [ChatController::class, 'updatePermission']);
+
+    Route::get('/chats/{chat}/messages', [MessageController::class, 'index']);
+    Route::post('/chats/{chat}/messages', [MessageController::class, 'store']);
+    Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead']);
+    Route::post('/messages/{message}/reply', [MessageController::class, 'reply']);
 });
 
 Route::post('register', [AuthController::class, 'register']);
