@@ -78,7 +78,7 @@ class SuperHRController extends Controller
                 . "*Sanalar:* {$request->start_date} - {$request->end_date}\n"
                 . "*Izoh:* " . ($request->comment ?? 'Yo‘q');
 
-// 🔽 Guruh va masʼul shaxs haqida qo‘shimcha
+            // 🔽 Guruh va masʼul shaxs haqida qo‘shimcha
             if ($employee->group_id) {
                 $group = \App\Models\Group::with('responsibleUser')->find($employee->group_id);
                 if ($group) {
@@ -1065,7 +1065,6 @@ class SuperHRController extends Controller
                 $file = $request->file('img');
                 $filename = time() . '.' . $file->getClientOriginalExtension();
 
-                // S3 ga yuklaymiz
                 $path = $file->storeAs('employees', $filename, 's3');
 
                 Storage::disk('s3')->setVisibility($path, 'public');
