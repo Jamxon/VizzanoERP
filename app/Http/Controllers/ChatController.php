@@ -383,32 +383,7 @@ class ChatController extends Controller
             )
             ->where('employees.status', 'working')
             ->where('employees.user_id', '!=', $user->id)
-            ->leftJoin('employee_absences as ea', function ($join) use ($oneMonthAgo) {
-                $join->on('ea.employee_id', '=', 'employees.id')
-                    ->where(function ($q) use ($oneMonthAgo) {
-                        $q->whereDate('ea.start_date', '>=', $oneMonthAgo)
-                            ->orWhereDate('ea.end_date', '>=', $oneMonthAgo);
-                    });
-            })
-            ->leftJoin('employee_holidays as eh', function ($join) use ($oneMonthAgo) {
-                $join->on('eh.employee_id', '=', 'employees.id')
-                    ->where(function ($q) use ($oneMonthAgo) {
-                        $q->whereDate('eh.start_date', '>=', $oneMonthAgo)
-                            ->orWhereDate('eh.end_date', '>=', $oneMonthAgo);
-                    });
-            })
-            ->leftJoin('attendance as a', function ($join) use ($oneMonthAgo) {
-                $join->on('a.employee_id', '=', 'employees.id')
-                    ->where('a.status', 'absent')
-                    ->whereDate('a.date', '>=', $oneMonthAgo)
-                    ->whereRaw('EXTRACT(DOW FROM a.date) != 0');
-            })
-            ->select('employees.*')
-            ->selectRaw('COUNT(DISTINCT ea.id) as absence_count')
-            ->selectRaw('COUNT(DISTINCT eh.id) as holidays_count')
-            ->selectRaw('COUNT(DISTINCT a.id) as attendance_absent_count')
-            ->groupBy('employees.id')
-            ->orderByRaw('(COUNT(DISTINCT a.id) - COUNT(DISTINCT eh.id)) DESC');
+            
 
 
         if (!empty($filters['search'])) {
@@ -433,28 +408,6 @@ class ChatController extends Controller
             });
         }
 
-
-        $query->when($filters['department_id'] ?? false, fn($q) => $q->where('employees.department_id', $filters['department_id']))
-            ->when(
-                true,
-                function ($q) use ($user, $filters) {
-                    if ($user->role->name === 'groupMaster') {
-                        // group_id ni user->employee ichidan olish kerak
-                        $q->where('employees.group_id', $user->employee->group_id);
-                    } elseif (!empty($filters['group_id'])) {
-                        $q->where('employees.group_id', $filters['group_id']);
-                    }
-                }
-            )
-            //            ->when($filters['group_id'] ?? false, fn($q) => $q->where('group_id', $filters['group_id']))
-            // ->when($filters['status'] ?? false, fn($q) => $q->where('employees.status', $filters['status']))
-            ->when($filters['type'] ?? false, fn($q) => $q->where('employees.type', $filters['type']))
-            ->when($filters['role_id'] ?? false, function ($q) use ($filters) {
-                $q->whereHas('user', fn($q) => $q->where('role_id', $filters['role_id']));
-            })
-            ->when($filters['payment_type'] ?? false, function ($q) use ($filters) {
-                $q->where('employees.payment_type', $filters['payment_type']);
-            });
 
         $employees = $query->orderBy('name')->paginate(50);
 
