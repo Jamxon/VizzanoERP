@@ -40,6 +40,7 @@ class CheckRole
             // 2. Bugungi davomat mavjud emasmi?
             $hasAttendance = \App\Models\Attendance::where('employee_id', $employee->id)
                 ->whereDate('date', $now->toDateString())
+                ->where('status', 'present')
                 ->exists();
 
             if (!$hasAttendance) {
