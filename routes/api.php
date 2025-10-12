@@ -581,7 +581,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/todos/{id}', [TodoListController::class, 'destroy']);
     Route::get('employeeEfficiency', [UserController::class, 'getEmployeeEfficiency']);
     Route::get('/chats', [ChatController::class, 'index']);
-    Route::get('/chats/personal/{targetUserId}')
+    Route::get('/chats/personal/{targetUserId}');
     Route::post('/chats/personal', [ChatController::class, 'createPersonal']);
     Route::post('/chats/group', [ChatController::class, 'createGroup']);
     Route::delete('/chats/group/{id}', [ChatController::class, 'removeGroup']);
