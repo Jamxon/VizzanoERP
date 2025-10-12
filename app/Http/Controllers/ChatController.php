@@ -209,7 +209,7 @@ class ChatController extends Controller
         // 4. Oxirgi xabarlar
         $messages = \DB::table('messages')
             ->where('chat_id', $chatId)
-            ->orderByDesc('created_at')
+            ->orderByDesc('id')
             ->limit(30)
             ->get(['id', 'sender_id', 'content', 'created_at']);
 
