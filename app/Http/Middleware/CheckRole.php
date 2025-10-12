@@ -28,7 +28,7 @@ class CheckRole
         }
 
         // Qo‘shimcha shartlar: agar rol 'tailor' bo‘lsa
-        if ($role === 'tailor') {
+        if ($role === 'tailor' || $role === 'universalTailor') {
             $employee = $user->employee;
 
             // 1. Soat 20:00 dan keyin bo‘lsa
