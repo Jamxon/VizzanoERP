@@ -69,10 +69,13 @@ class ChatController extends Controller
                         m.chat_id,
                         COUNT(*) as self_unread_count
                     FROM messages m
-                    JOIN message_reads r ON r.message_id = m.id
-                    WHERE m.sender_id = {$userId} AND r.read_at IS NULL
+                    LEFT JOIN message_reads r 
+                        ON r.message_id = m.id AND r.user_id != {$userId}
+                    WHERE m.sender_id = {$userId} 
+                    AND (r.read_at IS NULL OR r.message_id IS NULL)
                     GROUP BY m.chat_id
                 ) as self_unread_messages"), 'chats.id', '=', 'self_unread_messages.chat_id')
+
                 
                 // Personal chatdagi boshqa user ma'lumotlarini olish
                 ->leftJoin(\DB::raw("(
