@@ -505,22 +505,7 @@ class ChatController extends Controller
 
         $employees = $query->orderBy('employees.name')->paginate(50);
 
-        return response()->json([
-            'data' => $employees->map(function ($employee) {
-                return [
-                    'id' => $employee->id,
-                    'name' => $employee->name,
-                    'img' => $employee->img,
-                    'phone' => $employee->phone,
-                    'position' => $employee->position?->name,
-                    'attendance_status' => $employee->attendance_status ?? 'absent', // default
-                ];
-            }),
-            'meta' => [
-                'total' => $employees->total(),
-                'page' => $employees->currentPage(),
-            ],
-        ]);
+        return (new GetEmployeeResourceCollection($employees))->response();
     }
 
 
