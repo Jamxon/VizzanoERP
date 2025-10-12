@@ -99,8 +99,7 @@ class MessageController extends Controller
 
         // 5️⃣ Oxirida javob
         return response()->json([
-            'chat' => $chat->load(['users.user:id,username']),
-            'message' => $message->load('sender:id,name'),
+            'status' => 'success',
         ], 201);
     }
 
