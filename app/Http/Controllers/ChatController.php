@@ -155,10 +155,30 @@ class ChatController extends Controller
             ->select('chats.id')
             ->first();
 
+        // 4. Qarshi foydalanuvchi ma’lumotini olish
+        $otherUser = \DB::table('users')
+            ->join('employees', 'employees.user_id', '=', 'users.id')
+            ->join('departments', 'departments.id', '=', 'employees.department_id')
+            ->join('groups', 'groups.id', '=', 'employees.group_id')
+            ->join('positions', 'positions.id', '=', 'employees.position_id')
+            ->where('users.id', $targetUserId)
+            ->select(
+                'users.id',
+                 'employees.id',
+                 'employees.name',
+                  'employees.img',
+                  'employees.phone',
+                   'employees.departments.name',
+                   'employees.groups.name',
+                   'employees.positions.name',
+                   )
+            ->first();
+
         // 2. Agar mavjud bo‘lmasa — bo‘sh natija qaytaramiz
         if (!$chat) {
             return response()->json([
                 'exists' => false,
+                'other_user' => $otherUser,
                 'messages' => [],
                 'chat' => null
             ]);
@@ -173,13 +193,6 @@ class ChatController extends Controller
             ->limit(30)
             ->get(['id', 'sender_id', 'content', 'created_at']);
 
-        // 4. Qarshi foydalanuvchi ma’lumotini olish
-        $otherUser = \DB::table('users')
-            ->join('employees', 'employees.user_id', '=', 'users.id')
-            ->where('users.id', $targetUserId)
-            ->select('users.id', 'employees.name', 'employees.img')
-            ->first();
-            
         // 6. Yakuniy javob
         return response()->json([
             'exists' => true,
