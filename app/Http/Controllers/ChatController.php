@@ -139,6 +139,58 @@ class ChatController extends Controller
     }
 
 
+    //Get Personal chat 
+
+    public function getPersonalChat($targetUserId)
+    {
+        $authId = Auth::id();
+
+        // 1. Avvalo, shu ikki user orasida personal chat bormi?
+        $chat = \DB::table('chats')
+            ->join('chat_users as cu1', 'chats.id', '=', 'cu1.chat_id')
+            ->join('chat_users as cu2', 'chats.id', '=', 'cu2.chat_id')
+            ->where('chats.type', 'personal')
+            ->where('cu1.user_id', $authId)
+            ->where('cu2.user_id', $targetUserId)
+            ->select('chats.id')
+            ->first();
+
+        // 2. Agar mavjud bo‘lmasa — bo‘sh natija qaytaramiz
+        if (!$chat) {
+            return response()->json([
+                'exists' => false,
+                'messages' => [],
+                'chat' => null
+            ]);
+        }
+
+        $chatId = $chat->id;
+
+        // 3. Oxirgi xabarlar va qarshi foydalanuvchi ma’lumotlari
+        $messages = \DB::table('messages')
+            ->where('chat_id', $chatId)
+            ->orderByDesc('created_at')
+            ->limit(30)
+            ->get(['id', 'sender_id', 'content', 'created_at']);
+
+        // 4. Qarshi foydalanuvchi ma’lumotini olish
+        $otherUser = \DB::table('users')
+            ->join('employees', 'employees.user_id', '=', 'users.id')
+            ->where('users.id', $targetUserId)
+            ->select('users.id', 'employees.name', 'employees.img')
+            ->first();
+            
+        // 6. Yakuniy javob
+        return response()->json([
+            'exists' => true,
+            'chat_id' => $chatId,
+            'other_user' => $otherUser,
+            'messages' => $messages->reverse()->values(), // eski -> yangi tartibda
+        ]);
+    }
+
+
+
 
     /**
      * POST /chats/personal
@@ -407,4 +459,5 @@ class ChatController extends Controller
 
         return (new GetEmployeeResourceCollection($employees))->response();
     }
+
 }
