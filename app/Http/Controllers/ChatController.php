@@ -462,7 +462,7 @@ class ChatController extends Controller
         $today = Carbon::today()->toDateString(); // bugungi sana
 
         // Bugungi attendance subquery
-        $todayAttendance = DB::table('attendances')
+        $todayAttendance = DB::table('attendance')
             ->select('employee_id', 'status')
             ->whereDate('date', $today);
 
