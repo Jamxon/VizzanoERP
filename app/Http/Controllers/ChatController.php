@@ -158,9 +158,9 @@ class ChatController extends Controller
         // 4. Qarshi foydalanuvchi ma’lumotini olish
         $otherUser = \DB::table('users')
             ->join('employees', 'employees.user_id', '=', 'users.id')
-            ->join('departments', 'departments.id', '=', 'employees.department_id')
-            ->join('groups', 'groups.id', '=', 'employees.group_id')
-            ->join('positions', 'positions.id', '=', 'employees.position_id')
+            ->leftJoin('departments', 'departments.id', '=', 'employees.department_id')
+            ->leftJoin('groups', 'groups.id', '=', 'employees.group_id')
+            ->leftJoin('positions', 'positions.id', '=', 'employees.position_id')
             ->where('users.id', $targetUserId)
             ->select(
                 'users.id as user_id',
