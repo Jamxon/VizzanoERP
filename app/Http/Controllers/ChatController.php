@@ -364,15 +364,9 @@ class ChatController extends Controller
     {
         $request->validate([
             'search' => 'nullable|string',
-            'department_id' => 'nullable|integer|exists:departments,id',
-            'group_id' => 'nullable|integer|exists:groups,id',
-            // 'status' => 'nullable|string|in:working,kicked,reserv',
-            'role_id' => 'nullable|integer|exists:roles,id',
-            'type' => 'nullable|string|in:simple,aup', // <-- type validatsiyasi
-            'payment_type' => 'nullable|string', // <-- payment_type validatsiyasi
         ]);
 
-        $filters = $request->only(['search', 'payment_type','department_id', 'group_id', 'role_id', 'type']);
+        $filters = $request->only(['search']);
         $user = auth()->user();
         $oneMonthAgo = Carbon::now()->subMonth();
 
@@ -382,8 +376,8 @@ class ChatController extends Controller
                 fn($q) => $q->where('employees.branch_id', $user->employee->branch_id)
             )
             ->where('employees.status', 'working')
-            ->where('employees.user_id', '!=', $user->id)
-            
+            ->where('employees.user_id', '!=', $user->id);
+
 
 
         if (!empty($filters['search'])) {
