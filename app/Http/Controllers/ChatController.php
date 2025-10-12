@@ -366,13 +366,13 @@ class ChatController extends Controller
             'search' => 'nullable|string',
             'department_id' => 'nullable|integer|exists:departments,id',
             'group_id' => 'nullable|integer|exists:groups,id',
-            'status' => 'nullable|string|in:working,kicked,reserv',
+            // 'status' => 'nullable|string|in:working,kicked,reserv',
             'role_id' => 'nullable|integer|exists:roles,id',
             'type' => 'nullable|string|in:simple,aup', // <-- type validatsiyasi
             'payment_type' => 'nullable|string', // <-- payment_type validatsiyasi
         ]);
 
-        $filters = $request->only(['search', 'payment_type','department_id', 'group_id', 'status', 'role_id', 'type']);
+        $filters = $request->only(['search', 'payment_type','department_id', 'group_id', 'role_id', 'type']);
         $user = auth()->user();
         $oneMonthAgo = Carbon::now()->subMonth();
 
@@ -445,7 +445,7 @@ class ChatController extends Controller
                 }
             )
             //            ->when($filters['group_id'] ?? false, fn($q) => $q->where('group_id', $filters['group_id']))
-            ->when($filters['status'] ?? false, fn($q) => $q->where('employees.status', $filters['status']))
+            // ->when($filters['status'] ?? false, fn($q) => $q->where('employees.status', $filters['status']))
             ->when($filters['type'] ?? false, fn($q) => $q->where('employees.type', $filters['type']))
             ->when($filters['role_id'] ?? false, function ($q) use ($filters) {
                 $q->whereHas('user', fn($q) => $q->where('role_id', $filters['role_id']));
