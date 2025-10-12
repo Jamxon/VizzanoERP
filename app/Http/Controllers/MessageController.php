@@ -144,6 +144,25 @@ class MessageController extends Controller
         }
     }
 
+    public function edit(Request $request, $id)
+    {
+        $message = Message::findOrFail($id);
+        $this->authorizeChat($message->chat);
+
+        if ($message->sender_id !== Auth::id()) {
+            return response()->json(['error' => 'You can only edit your own messages'], 500);
+        }
+
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+
+        $message->content = $request->content;
+        $message->save();
+
+        return response()->json(['status' => 'Message updated', 'message' => $message]);
+    }
+
     public function delete($id)
     {
         $message = Message::findOrFail($id);

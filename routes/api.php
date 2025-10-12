@@ -597,6 +597,8 @@ Route::middleware('auth:api')->group(function () {
     // Yangi personal chatga (agar yo‘q bo‘lsa) avtomatik yaratib yuborish
     Route::post('/chats/personal/send', [MessageController::class, 'store']);
 
+    Route::patch('/messages/{message}', [MessageController::class, 'edit']);
+
     Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead']);
     Route::post('/messages/{message}/reply', [MessageController::class, 'reply']);
     Route::delete('/messages/{id}', [MessageController::class, 'delete']);
