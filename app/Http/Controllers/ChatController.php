@@ -155,7 +155,7 @@ class ChatController extends Controller
             ->select('chats.id')
             ->first();
 
-        // 4. Qarshi foydalanuvchi ma’lumotini olish
+        // 2. Qarshi foydalanuvchi ma’lumotini olish
         $otherUser = \DB::table('users')
             ->join('employees', 'employees.user_id', '=', 'users.id')
             ->leftJoin('departments', 'departments.id', '=', 'employees.department_id')
@@ -172,10 +172,23 @@ class ChatController extends Controller
                 'groups.name as group_name',
                 'positions.name as position_name'
             )
-
             ->first();
 
-        // 2. Agar mavjud bo‘lmasa — bo‘sh natija qaytaramiz
+        // 🔹 Bugungi attendance holatini olish
+        if ($otherUser) {
+            $today = now()->toDateString();
+
+            $attendance = \DB::table('attendances')
+                ->where('employee_id', $otherUser->employee_id)
+                ->whereDate('date', $today)
+                ->select('status')
+                ->first();
+
+            // Agar topilmasa, "absent" deb qaytaramiz
+            $otherUser->attendance_status = $attendance->status ?? 'absent';
+        }
+
+        // 3. Agar mavjud bo‘lmasa — bo‘sh natija qaytaramiz
         if (!$chat) {
             return response()->json([
                 'exists' => false,
@@ -187,21 +200,22 @@ class ChatController extends Controller
 
         $chatId = $chat->id;
 
-        // 3. Oxirgi xabarlar va qarshi foydalanuvchi ma’lumotlari
+        // 4. Oxirgi xabarlar
         $messages = \DB::table('messages')
             ->where('chat_id', $chatId)
             ->orderByDesc('created_at')
             ->limit(30)
             ->get(['id', 'sender_id', 'content', 'created_at']);
 
-        // 6. Yakuniy javob
+        // 5. Yakuniy javob
         return response()->json([
             'exists' => true,
             'chat_id' => $chatId,
             'other_user' => $otherUser,
-            'messages' => $messages->reverse()->values(), // eski -> yangi tartibda
+            'messages' => $messages->reverse()->values(),
         ]);
     }
+
 
 
 
