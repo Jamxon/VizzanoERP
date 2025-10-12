@@ -163,15 +163,16 @@ class ChatController extends Controller
             ->join('positions', 'positions.id', '=', 'employees.position_id')
             ->where('users.id', $targetUserId)
             ->select(
-                'users.id',
-                 'employees.id',
-                 'employees.name',
-                  'employees.img',
-                  'employees.phone',
-                   'employees.departments.name',
-                   'employees.groups.name',
-                   'employees.positions.name',
-                   )
+                'users.id as user_id',
+                'employees.id as employee_id',
+                'employees.name',
+                'employees.img',
+                'employees.phone',
+                'departments.name as department_name',
+                'groups.name as group_name',
+                'positions.name as position_name'
+            )
+
             ->first();
 
         // 2. Agar mavjud bo‘lmasa — bo‘sh natija qaytaramiz
