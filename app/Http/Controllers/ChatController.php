@@ -31,13 +31,12 @@ class ChatController extends Controller
     {
         $userId = Auth::id();
         $cacheKey = "user_chats:{$userId}";
-        
-        // Cache'dan olish (30 soniya)
+
         $chats = Cache::remember($cacheKey, 30, function () use ($userId) {
             return \DB::table('chats')
                 ->join('chat_users', 'chats.id', '=', 'chat_users.chat_id')
-                
-                // Oxirgi xabarni JOIN orqali olish
+
+                // Oxirgi xabar
                 ->leftJoin(\DB::raw('(
                     SELECT 
                         chat_id,
@@ -46,13 +45,13 @@ class ChatController extends Controller
                         sender_id as last_sender_id
                     FROM messages m1
                     WHERE created_at = (
-                        SELECT MAX(created_at) 
-                        FROM messages m2 
+                        SELECT MAX(created_at)
+                        FROM messages m2
                         WHERE m2.chat_id = m1.chat_id
                     )
                 ) as last_messages'), 'chats.id', '=', 'last_messages.chat_id')
-                
-                // O'qilmagan xabarlar sonini olish
+
+                // O‘qilmagan xabarlar
                 ->leftJoin(\DB::raw("(
                     SELECT 
                         m.chat_id,
@@ -62,8 +61,8 @@ class ChatController extends Controller
                     WHERE r.read_at IS NULL AND m.sender_id != {$userId}
                     GROUP BY m.chat_id
                 ) as unread_messages"), 'chats.id', '=', 'unread_messages.chat_id')
-                
-                // O'zi yuborgan o'qilmagan xabarlar sonini olish
+
+                // O‘zi yuborgan, lekin o‘qilmaganlar
                 ->leftJoin(\DB::raw("(
                     SELECT 
                         m.chat_id,
@@ -76,11 +75,11 @@ class ChatController extends Controller
                     GROUP BY m.chat_id
                 ) as self_unread_messages"), 'chats.id', '=', 'self_unread_messages.chat_id')
 
-                
-                // Personal chatdagi boshqa user ma'lumotlarini olish
+                // Personal chatdagi boshqa user
                 ->leftJoin(\DB::raw("(
                     SELECT 
                         cu.chat_id,
+                        u.id as other_user_id,
                         e.name as other_user_name,
                         e.img as other_user_image
                     FROM chat_users cu
@@ -88,10 +87,10 @@ class ChatController extends Controller
                     JOIN employees e ON e.user_id = u.id
                     WHERE u.id != {$userId}
                 ) as other_users"), 'chats.id', '=', 'other_users.chat_id')
-                
+
                 ->where('chat_users.user_id', $userId)
                 ->whereNull('chat_users.left_at')
-                
+
                 ->select([
                     'chats.id',
                     'chats.type',
@@ -103,23 +102,23 @@ class ChatController extends Controller
                     'last_messages.last_sender_id',
                     \DB::raw('COALESCE(unread_messages.unread_count, 0) as unread_count'),
                     \DB::raw('COALESCE(self_unread_messages.self_unread_count, 0) as self_unread_count'),
+                    'other_users.other_user_id',
                     'other_users.other_user_name',
                     'other_users.other_user_image'
                 ])
                 ->orderByDesc('chats.updated_at')
-                ->limit(50) // Faqat oxirgi 50 ta chat
+                ->limit(50)
                 ->get()
                 ->map(function ($chat) use ($userId) {
-                    $newMessageCount = 0;
-
+                    // newMessageCount hisoblash
                     if ($chat->last_sender_id == $userId && $chat->self_unread_count > 0) {
                         $newMessageCount = -1;
                     } elseif ($chat->last_sender_id != $userId) {
                         $newMessageCount = (int)$chat->unread_count;
+                    } else {
+                        $newMessageCount = 0;
                     }
 
-
-                    
                     return [
                         'id' => $chat->id,
                         'name' => $chat->type === 'personal' ? $chat->other_user_name : $chat->name,
@@ -130,12 +129,14 @@ class ChatController extends Controller
                             ? \Carbon\Carbon::parse($chat->last_message_time)->format('Y-m-d H:i')
                             : null,
                         'type' => $chat->type,
+                        'otherUserId' => $chat->type === 'personal' ? $chat->other_user_id : null,
                     ];
                 });
         });
 
         return response()->json($chats);
     }
+
 
     // Cache'ni tozalash uchun helper method
     public function clearChatCache($userId)
