@@ -107,7 +107,8 @@ class ChatController extends Controller
                 ->limit(50) // Faqat oxirgi 50 ta chat
                 ->get()
                 ->map(function ($chat) use ($userId) {
-                    
+                    $newMessageCount = 0;
+
                     if ($chat->last_sender_id == $userId && $chat->self_unread_count > 0) {
                         $newMessageCount = -1;
                     } elseif ($chat->last_sender_id != $userId) {
