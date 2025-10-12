@@ -381,6 +381,8 @@ class ChatController extends Controller
                 $user->role->name !== 'ceo',
                 fn($q) => $q->where('employees.branch_id', $user->employee->branch_id)
             )
+            ->where('employees.status', 'working')
+            ->where('employees.user_id', '!=', $user->id)
             ->leftJoin('employee_absences as ea', function ($join) use ($oneMonthAgo) {
                 $join->on('ea.employee_id', '=', 'employees.id')
                     ->where(function ($q) use ($oneMonthAgo) {
