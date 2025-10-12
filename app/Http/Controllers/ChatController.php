@@ -446,6 +446,11 @@ class ChatController extends Controller
         return response()->json(['message' => 'Permissions updated']);
     }
 
+    /**
+     * GET /contacts
+     * Foydalanuvchi ro‘yxatini olish (chat uchun)
+     */
+
     public function getContacts(Request $request): \Illuminate\Http\JsonResponse
     {
         $request->validate([
@@ -454,17 +459,27 @@ class ChatController extends Controller
 
         $filters = $request->only(['search']);
         $user = auth()->user();
-        $oneMonthAgo = Carbon::now()->subMonth();
+        $today = Carbon::today()->toDateString(); // bugungi sana
+
+        // Bugungi attendance subquery
+        $todayAttendance = DB::table('attendances')
+            ->select('employee_id', 'status')
+            ->whereDate('date', $today);
 
         $query = Employee::with('user.role', 'position')
+            ->leftJoinSub($todayAttendance, 'today_attendance', function ($join) {
+                $join->on('employees.id', '=', 'today_attendance.employee_id');
+            })
             ->when(
                 $user->role->name !== 'ceo',
                 fn($q) => $q->where('employees.branch_id', $user->employee->branch_id)
             )
             ->where('employees.status', 'working')
-            ->where('employees.user_id', '!=', $user->id);
-
-
+            ->where('employees.user_id', '!=', $user->id)
+            ->select(
+                'employees.*',
+                'today_attendance.status as attendance_status' // bugungi holat
+            );
 
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
@@ -488,10 +503,25 @@ class ChatController extends Controller
             });
         }
 
+        $employees = $query->orderBy('employees.name')->paginate(50);
 
-        $employees = $query->orderBy('name')->paginate(50);
-
-        return (new GetEmployeeResourceCollection($employees))->response();
+        return response()->json([
+            'data' => $employees->map(function ($employee) {
+                return [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'img' => $employee->img,
+                    'phone' => $employee->phone,
+                    'position' => $employee->position?->name,
+                    'attendance_status' => $employee->attendance_status ?? 'absent', // default
+                ];
+            }),
+            'meta' => [
+                'total' => $employees->total(),
+                'page' => $employees->currentPage(),
+            ],
+        ]);
     }
+
 
 }
