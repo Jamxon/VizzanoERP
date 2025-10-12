@@ -140,7 +140,22 @@ class MessageController extends Controller
     private function authorizeChat(Chat $chat)
     {
         if (!$chat->users()->where('user_id', Auth::id())->exists()) {
-            abort(403, 'Access denied');
+            abort(500, 'Access denied');
         }
+    }
+
+    public function delete($id)
+    {
+        $message = Message::findOrFail($id);
+        $this->authorizeChat($message->chat);
+
+        if ($message->sender_id !== Auth::id()) {
+            return response()->json(['error' => 'You can only delete your own messages'], 500);
+        }
+
+        $message->delete();
+
+        return response()->json(['status' => 'Message deleted']);
+        
     }
 }
