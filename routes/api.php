@@ -599,6 +599,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead']);
     Route::post('/messages/{message}/reply', [MessageController::class, 'reply']);
+    Route::delete('/messages/{id}', [MessageController::class, 'delete']);
 });
 
 Route::post('register', [AuthController::class, 'register']);
