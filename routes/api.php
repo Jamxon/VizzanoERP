@@ -591,7 +591,12 @@ Route::middleware('auth:api')->group(function () {
     Route::get('contacts', [ChatController::class, 'getContacts']);
 
     Route::get('/chats/{chat}/messages', [MessageController::class, 'index']);
+    // Mavjud chat uchun xabar yuborish
     Route::post('/chats/{chat}/messages', [MessageController::class, 'store']);
+
+    // Yangi personal chatga (agar yo‘q bo‘lsa) avtomatik yaratib yuborish
+    Route::post('/chats/personal/send', [MessageController::class, 'store']);
+
     Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead']);
     Route::post('/messages/{message}/reply', [MessageController::class, 'reply']);
 });
