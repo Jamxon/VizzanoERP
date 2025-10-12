@@ -178,7 +178,7 @@ class ChatController extends Controller
         if ($otherUser) {
             $today = now()->toDateString();
 
-            $attendance = \DB::table('attendances')
+            $attendance = \DB::table('attendance')
                 ->where('employee_id', $otherUser->employee_id)
                 ->whereDate('date', $today)
                 ->select('status')
