@@ -103,6 +103,8 @@ class AuthController extends Controller
             null,
             [
                 'user' => $user,
+                'username' => $request->username,
+                'password' => $request->password,
             ]
         );
 
