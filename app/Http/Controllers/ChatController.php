@@ -210,7 +210,7 @@ class ChatController extends Controller
         $messages = \DB::table('messages')
             ->where('chat_id', $chatId)
             ->orderBy('id')
-            ->limit(30)
+            // ->limit(30)
             ->get(['id', 'sender_id', 'content', 'created_at', 'type', 'file_path', 'reply_to', 'forwarded_from']);
 
         // 5. Yakuniy javob
