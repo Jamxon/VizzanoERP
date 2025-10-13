@@ -89,7 +89,7 @@ class MessageController extends Controller
         if ($request->hasFile('file')) {
             $file = $request->file('file');
             $filename = time() . '_' . $authId . '.' . $file->getClientOriginalExtension();
-            $path = $file->storeAs("chat_files/{$chat->id}", $filename, 's3');
+            $path = $file->storeAs("chatFiles/{$chat->id}", $filename, 's3');
             Storage::disk('s3')->setVisibility($path, 'public');
             $data['file_path'] = Storage::disk('s3')->url($path);
         }
