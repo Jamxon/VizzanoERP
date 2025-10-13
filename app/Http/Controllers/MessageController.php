@@ -137,6 +137,33 @@ class MessageController extends Controller
         return response()->json($reply, 201);
     }
 
+    /**
+     * POST /messages/{message}/forward
+     */
+    public function forward(Message $message, Request $request)
+    {
+        $request->validate([
+            'chat_id' => 'required|exists:chats,id',
+        ]);
+
+        $chat = \App\Models\Chat::findOrFail($request->chat_id);
+        $this->authorizeChat($chat);
+
+        $newMessage = Message::create([
+            'chat_id' => $chat->id,
+            'sender_id' => Auth::id(),
+            'type' => $message->type,
+            'content' => $message->content,
+            'file_path' => $message->file_path,
+            'forwarded_from' => $message->id,
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => $newMessage
+        ], 201);
+    }
+
     private function authorizeChat(Chat $chat)
     {
         if (!$chat->users()->where('user_id', Auth::id())->exists()) {

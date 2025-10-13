@@ -601,6 +601,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::post('/messages/{message}/read', [MessageController::class, 'markAsRead']);
     Route::post('/messages/{message}/reply', [MessageController::class, 'reply']);
+    Route::post('/messages/{message}/forward', [MessageController::class, 'forward']);
     Route::delete('/messages/{id}', [MessageController::class, 'delete']);
 });
 

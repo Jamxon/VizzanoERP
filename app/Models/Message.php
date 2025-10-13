@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Message extends Model
 {
     protected $fillable = [
-        'chat_id', 'sender_id', 'type', 'content', 'file_path', 'reply_to', 'from_id'
+        'chat_id', 'sender_id', 'type', 'content', 'file_path', 'reply_to', 'forwarded_from'
     ];
 
     public function chat(): BelongsTo
@@ -30,5 +30,10 @@ class Message extends Model
     public function reads(): HasMany
     {
         return $this->hasMany(MessageRead::class);
+    }
+
+    public function forwardedFrom()
+    {
+        return $this->belongsTo(Message::class, 'forwarded_from');
     }
 }
