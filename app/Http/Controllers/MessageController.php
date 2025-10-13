@@ -31,7 +31,7 @@ class MessageController extends Controller
     {
         $request->validate([
             'type' => 'required|in:text,image,voice',
-            'content' => 'nullable|string',
+            'content' => 'nullable|string|max:4096',
             'file' => 'nullable|file|max:5120',
             'reply_to' => 'nullable|exists:messages,id',
             'user_id' => 'nullable|exists:users,id', // personal chat uchun
