@@ -17,7 +17,7 @@ class MessageController extends Controller
         $this->authorizeChat($chat);
 
         $messages = $chat->messages()
-            ->with(['sender:id,name', 'reply:id,content'])
+            ->with(['sender:id,name', 'reply:id,content', 'forwardedFrom:id,content'])
             ->orderByDesc('id')
             ->paginate(30);
 
