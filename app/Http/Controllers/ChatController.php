@@ -211,7 +211,7 @@ class ChatController extends Controller
             ->where('chat_id', $chatId)
             ->orderBy('id')
             // ->limit(30)
-            ->get(['id', 'sender_id', 'content', 'created_at', 'type', 'file_path', 'reply_to', 'forwarded_from']);
+            ->get(['id', 'sender_id', 'content', 'created_at', 'type', 'file_path', 'reply_to', 'forwarded_from', 'updated_at']);
 
         // 5. Yakuniy javob
         return response()->json([
