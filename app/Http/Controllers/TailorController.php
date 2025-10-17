@@ -28,7 +28,10 @@ class TailorController extends Controller
                 'typewriter',
                 'tarificationLogs' => function ($query) {
                     $query->whereDate('date', now()->format('Y-m-d'));
-                }
+                },
+                'tarificationCategory.submodel.orderModel.order' => function ($query) {
+                    $query->where('branch_id', auth()->user()->employee->branch_id);
+                },
             ])
             ->get();
 
