@@ -580,6 +580,7 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/todos/{id}', [TodoListController::class, 'update']);
     Route::delete('/todos/{id}', [TodoListController::class, 'destroy']);
     Route::get('employeeEfficiency', [UserController::class, 'getEmployeeEfficiency']);
+    Route::get('attendances/history', [AttendanceController::class, 'getAttendanceHistory']);
     Route::get('/chats', [ChatController::class, 'index']);
     Route::get('/chats/personal/{targetUserId}', [ChatController::class, 'getPersonalChat']);
     Route::post('/chats/personal', [ChatController::class, 'createPersonal']);
