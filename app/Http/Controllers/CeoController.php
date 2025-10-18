@@ -142,7 +142,7 @@ class CeoController extends Controller
                         $submodelData['outputs'][] = [
                             'id' => $output->id,
                             'quantity' => $output->quantity,
-                            'created_at' => $output->created_at->format('Y-m-d H:i:s')
+                            'created_at' => $output->created_at
                         ];
                     }
 
