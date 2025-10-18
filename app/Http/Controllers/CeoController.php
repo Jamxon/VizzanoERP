@@ -82,17 +82,20 @@ class CeoController extends Controller
         $startDate = $request->start_date;
         $endDate = $request->end_date;
 
+        // ✅ Faqat MonthlySelectedOrder jadvalidagi order_id larni olish
+        $selectedOrderIds = \App\Models\MonthlySelectedOrder::pluck('order_id')->toArray();
+
         $groups = \App\Models\Group::where('department_id', $request->department_id)
-            ->with(['orders' => function ($query) use ($startDate, $endDate) {
-                $query->whereHas('order.orderModel.submodels.sewingOutputs', function ($q) use ($startDate, $endDate) {
-                    $q->whereBetween('created_at', [$startDate, $endDate]);
-                })
+            ->with(['orders' => function ($query) use ($startDate, $endDate, $selectedOrderIds) {
+                $query->whereIn('order_id', $selectedOrderIds) // ✅ faqat selected orderlar
+                    ->whereHas('order.orderModel.submodels.sewingOutputs', function ($q) use ($startDate, $endDate) {
+                        $q->whereBetween('created_at', [$startDate, $endDate]);
+                    })
                     ->with([
                         'order:id,name',
                         'order.orderModel.submodels' => function ($q) {
                             $q->select('id', 'order_model_id', 'submodel_id')
                                 ->with([
-                                    // ⚡ bu yerda filtr qo‘ymaymiz
                                     'sewingOutputs:id,order_submodel_id,quantity,created_at',
                                     'submodel:id,name'
                                 ]);
@@ -157,6 +160,7 @@ class CeoController extends Controller
             'groups' => $result
         ]);
     }
+
 
     public function storeMonthlySelectedOrders(Request $request)
     {
