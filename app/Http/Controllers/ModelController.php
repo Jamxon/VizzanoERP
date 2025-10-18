@@ -107,11 +107,14 @@ class ModelController extends Controller
                     while ($request->hasFile('images' . $index)) {
                         $image = $request->file('images' . $index);
                         $fileName = time() . '_' . $image->getClientOriginalName();
-                        $image->storeAs('/public/images/', $fileName);
+
+                        $path = $image->storeAs('modelImages', $fileName, 'S3');
+
+                        Storage::disk('s3')->setVisibility($path, 'public');
 
                         ModelImages::create([
                             'model_id' => $model->id,
-                            'image' => 'images/' . $fileName,
+                            'image' => Storage::disk('s3')->url($path)
                         ]);
 
                         $index++;
@@ -203,11 +206,14 @@ class ModelController extends Controller
             while ($request->hasFile('images' . $index)) {
                 $image = $request->file('images' . $index);
                 $fileName = time() . '_' . $image->getClientOriginalName();
-                $image->storeAs('/public/images/', $fileName);
+
+                $path = $image->storeAs('modelImages', $fileName, 'S3');
+
+                Storage::disk('s3')->setVisibility($path, 'public');
 
                 ModelImages::create([
                     'model_id' => $model->id,
-                    'image' => 'images/' . $fileName,
+                    'image' => Storage::disk('S3')->url($path)
                 ]);
 
                 $index++;
@@ -280,6 +286,9 @@ class ModelController extends Controller
         Log::add(auth()->id(), 'Image o‘chirishga urinish qilindi', 'attempt', ['image_id' => $modelImage->id]);
 
         try {
+            //s3 image delete
+            $imagePath = str_replace(Storage::disk('s3')->url(''), '', $modelImage->image);
+            Storage::disk('s3')->delete($imagePath);
             $modelImage->delete();
         } catch (\Exception $e) {
             return response()->json([
