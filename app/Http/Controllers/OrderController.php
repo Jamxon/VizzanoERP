@@ -194,6 +194,8 @@ class OrderController extends Controller
                 'end_date' => 'nullable|date',
                 'rasxod' => 'nullable|numeric',
                 'comment' => 'nullable|string',
+                'season_year' => 'nullable|integer',
+                'season_type' => 'nullable|string|in:summer,winter',
                 'model' => 'required|array',
                 'model.id' => 'required|integer',
                 'model.material_id' => 'nullable|integer|exists:items,id',
@@ -248,6 +250,8 @@ class OrderController extends Controller
                 'contragent_id' => $contragent->id ?? null,
                 'comment' => $request->comment ?? null,
                 'price' => $request->price ?? 0,
+                'season_year' => $request->season_year ?? null,
+                'season_type' => $request->season_type ?? null,
             ]);
 
             $modelRasxod = Models::find($request->model['id'])->rasxod;
@@ -370,6 +374,8 @@ class OrderController extends Controller
                 'end_date' => 'sometimes|date',
                 'rasxod' => 'sometimes|numeric',
                 'comment' => 'nullable|string',
+                'season_year' => 'sometimes|integer',
+                'season_type' => 'sometimes|string|in:summer,winter',
                 'contragent_id' => 'sometimes|integer|exists:contragent,id',
                 'contragent_name' => 'sometimes|string',
                 'contragent_description' => 'sometimes|string',
@@ -416,6 +422,8 @@ class OrderController extends Controller
                 'comment' => $request->input('comment', $order->comment),
                 'contragent_id' => isset($contragent) ? $contragent->id : $order->contragent_id,
                 'price' => $request->input('price', $order->price) ?? $order->price,
+                'season_year' => $request->input('season_year', $order->season_year),
+                'season_type' => $request->input('season_type', $order->season_type)
             ]);
 
             if ($request->has('model')) {

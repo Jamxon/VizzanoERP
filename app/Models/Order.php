@@ -52,7 +52,9 @@ class Order extends Model
         'branch_id',
         'comment',
         'contragent_id',
-        'price'
+        'price',
+        'season_year',
+        'season_type',
     ];
 
     protected $hidden = ['created_at', 'updated_at', 'branch_id', 'contragent_id'];
