@@ -83,7 +83,14 @@ class CeoController extends Controller
         $endDate = $request->end_date;
 
         // ✅ Faqat MonthlySelectedOrder jadvalidagi order_id larni olish
-        $selectedOrderIds = \App\Models\MonthlySelectedOrder::pluck('order_id')->toArray();
+        $selectedOrderIds = \App\Models\MonthlySelectedOrder::query()
+        ->when($request->filled('month'), function ($q) use ($request) {
+            $q->whereMonth('month', date('m', strtotime($request->month)))
+            ->whereYear('month', date('Y', strtotime($request->month)));
+        })
+        ->pluck('order_id')
+        ->toArray();
+
 
         $groups = \App\Models\Group::where('department_id', $request->department_id)
             ->with(['orders' => function ($query) use ($startDate, $endDate, $selectedOrderIds) {
