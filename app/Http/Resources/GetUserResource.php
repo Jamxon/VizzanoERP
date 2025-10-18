@@ -56,7 +56,7 @@ class GetUserResource extends JsonResource
             'passport_code' => $this->passport_code,
             'birthday' => $this->birthday,
             'position' => $this->position->name ?? null,
-            'dutie' => $this->position->dutie ?? null,
+            'dutie' => $this->position->duties ?? null,
             'payment_type' => $this->payment_type,
             'user_id' => $this->user_id,
             'gender' => $this->gender,
