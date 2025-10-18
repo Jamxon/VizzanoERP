@@ -8,9 +8,11 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterSheet;
 use Carbon\Carbon;
 
-class TransactionsExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize
+class TransactionsExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents
 {
     protected $request;
     protected $looping = 0;
@@ -50,11 +52,13 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping, S
 
         $transactions = $query->orderBy('date', 'desc')->get();
 
-        // Umumiy yig‘indi va valyuta nomini olish
-        $this->totalAmount = $transactions->sum('amount');
+        // Summani hisoblash (float konvert bilan)
+        $this->totalAmount = $transactions->sum(function ($t) {
+            return floatval($t->amount);
+        });
+
         $this->currencyName = optional($transactions->first()?->currency)->name ?? '';
-        
-        // Vaqt oralig‘ini matnga aylantirish
+
         if ($this->request->filled('start_date') && $this->request->filled('end_date')) {
             $this->periodText = "Davr: {$this->request->start_date} dan {$this->request->end_date} gacha";
         } elseif ($this->request->filled('date')) {
@@ -73,7 +77,7 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping, S
         return [
             $this->looping,
             $tx->date ? Carbon::parse($tx->date)->format('Y-m-d') : '',
-            number_format($tx->amount, 2) . ' ' . ($tx->currency?->name ?? '-'),
+            number_format(floatval($tx->amount), 2) . ' ' . ($tx->currency?->name ?? '-'),
             $tx->purpose ?? '',
             $tx->comment ?? '',
             $tx->via?->name ?? '',
@@ -86,8 +90,31 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping, S
             ["Kassa tranzaksiyalari ro'yxati"],
             [$this->periodText],
             ["Umumiy miqdor: " . number_format($this->totalAmount, 2) . ' ' . $this->currencyName],
-            [], // bo‘sh qatordan keyin sarlavha
+            [],
             ['No', 'Sana', 'Miqdor', 'Mahsulot yoki shaxs ismi', 'Ochiqlama', 'Chiqim qiluvchi'],
+        ];
+    }
+
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                // Har bir title qatori uchun ustunlarni birlashtirish (A1:F1, A2:F2, A3:F3)
+                foreach ([1, 2, 3] as $row) {
+                    $event->sheet->mergeCells("A{$row}:F{$row}");
+                    $event->sheet->getStyle("A{$row}")
+                        ->getAlignment()
+                        ->setHorizontal('center')
+                        ->setVertical('center');
+                    $event->sheet->getStyle("A{$row}")
+                        ->getFont()
+                        ->setBold(true)
+                        ->setSize(12);
+                }
+
+                // Jadval ustunlari (5-qator) bold qilish
+                $event->sheet->getStyle('A5:F5')->getFont()->setBold(true);
+            },
         ];
     }
 }
