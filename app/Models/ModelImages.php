@@ -19,14 +19,21 @@ class ModelImages extends Model
 
     protected $hidden = ['created_at', 'updated_at', 'model_id'];
 
-    public function getImageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application
+    public function getImageAttribute($value): \Illuminate\Contracts\Routing\UrlGenerator|string
     {
-        if (filter_var($value, FILTER_VALIDATE_URL)) {
+        if (empty($value)) {
+            return null;
+        }
+
+        // Agar bu to‘liq URL bo‘lsa (S3 yoki boshqa tashqi manba)
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
             return $value;
         }
 
-        return url('storage/' . $value);
+        // Aks holda, storage papkasidagi faylni qaytar
+        return url('storage/' . ltrim($value, '/'));
     }
+
 
     public function model(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
