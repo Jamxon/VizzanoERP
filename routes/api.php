@@ -53,6 +53,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::post('expenses', [CasherController::class, 'storeExpense']);
     Route::get('balances', [CasherController::class, 'getBalances']);
     Route::get('transactions', [CasherController::class, 'getTransactions']);
+    Route::get('exportTransactions/excel', [CasherController::class, 'exportTransactions']);
     Route::post('transfers', [CasherController::class, 'transferBetweenCashboxes']);
     Route::get('currencies', [CurrencyController::class, 'index']);
     Route::post('requestForm', [CasherController::class, 'storeRequestForm']);

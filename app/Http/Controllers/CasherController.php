@@ -31,6 +31,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use App\Exports\TransactionsExport;
 
 class CasherController extends Controller
 {
@@ -1831,6 +1832,12 @@ class CasherController extends Controller
                 ];
             })
         ]);
+    }
+
+    public function exportTransactions(Request $request)
+    {
+        $fileName = 'transactions_' . now()->format('Y-m-d_His') . '.xlsx';
+        return Excel::download(new TransactionsExport($request), $fileName);
     }
 
     public function transferBetweenCashboxes(Request $request): \Illuminate\Http\JsonResponse
