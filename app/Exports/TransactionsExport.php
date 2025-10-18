@@ -7,6 +7,7 @@ use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
+use Carbon\Carbon;
 
 class TransactionsExport implements FromCollection, WithHeadings, WithMapping
 {
@@ -53,8 +54,8 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
 
         return [
             $this->looping,
-            $tx->date?->format('Y-m-d'),
-            $tx->amount . $tx->currency?->name ?? '-',
+            $tx->date ? Carbon::parse($tx->date)->format('Y-m-d') : '',
+            ($tx->amount ?? 0) . ' ' . ($tx->currency?->name ?? '-'),
             $tx->purpose ?? '',
             $tx->comment ?? '',
             $tx->via?->name ?? '',
