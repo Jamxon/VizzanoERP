@@ -1834,7 +1834,7 @@ class CasherController extends Controller
         ]);
     }
 
-    public function exportTransactions(Request $request)
+    public function exportTransactions1(Request $request)
     {
         $fileName = 'transactions_' . now()->format('Y-m-d_His') . '.xlsx';
         return Excel::download(new TransactionsExport($request), $fileName);
