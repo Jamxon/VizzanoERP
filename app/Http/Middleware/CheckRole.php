@@ -33,9 +33,9 @@ class CheckRole
 
             // 1. Soat 20:00 dan keyin bo‘lsa
             $now = now(); // Carbon instance
-            if ($now->hour >= 20) {
-                return response('Kech bo‘ldi! Soat 20:00 dan keyin tizimga kira olmaysiz.', 403);
-            }
+            // if ($now->hour >= 20) {
+            //     return response('Kech bo‘ldi! Soat 20:00 dan keyin tizimga kira olmaysiz.', 403);
+            // }
 
             // 2. Bugungi davomat mavjud emasmi?
             $hasAttendance = \App\Models\Attendance::where('employee_id', $employee->id)

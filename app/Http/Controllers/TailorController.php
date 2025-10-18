@@ -74,6 +74,14 @@ class TailorController extends Controller
 
     public function storeTarificationLog(Request $request): \Illuminate\Http\JsonResponse
     {
+
+        $now = now(); // Carbon instance
+        if ($now->hour >= 21) {
+            return response()->json([
+                'message' => 'Kech bo‘ldi! Soat 21:00 dan keyin ish bosa olmaysiz.'
+            ], 500);
+        }
+
         $validated = $request->validate([
             'tarification_id' => 'required|exists:tarifications,id',
         ]);
