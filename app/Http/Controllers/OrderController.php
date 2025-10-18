@@ -250,8 +250,8 @@ class OrderController extends Controller
                 'contragent_id' => $contragent->id ?? null,
                 'comment' => $request->comment ?? null,
                 'price' => $request->price ?? 0,
-                'season_year' => $request->season_year ?? null,
-                'season_type' => $request->season_type ?? null,
+                'season_year' => $request->season_year ?? 2025,
+                'season_type' => $request->season_type ?? 'winter',
             ]);
 
             $modelRasxod = Models::find($request->model['id'])->rasxod;
