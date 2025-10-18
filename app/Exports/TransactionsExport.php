@@ -3,16 +3,16 @@
 namespace App\Exports;
 
 use App\Models\CashboxTransaction;
-use Illuminate\Contracts\View\View;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\ShouldAutoSize;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Events\AfterSheet;
 use Carbon\Carbon;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithMapping;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Events\AfterSheet;
 
-class TransactionsExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithEvents
+class TransactionsExport implements FromCollection, WithMapping, WithEvents, ShouldAutoSize, WithCustomStartCell, WithHeadings
 {
     protected $request;
     protected $looping = 0;
@@ -52,13 +52,11 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping, S
 
         $transactions = $query->orderBy('date', 'desc')->get();
 
-        // Summani hisoblash (float konvert bilan)
-        $this->totalAmount = $transactions->sum(function ($t) {
-            return floatval($t->amount);
-        });
+        // Umumiy summa
+        $this->totalAmount = $transactions->sum(fn($t) => floatval($t->amount));
+        $this->currencyName = optional($transactions->first()?->currency)->name ?? '-';
 
-        $this->currencyName = optional($transactions->first()?->currency)->name ?? '';
-
+        // Davr matni
         if ($this->request->filled('start_date') && $this->request->filled('end_date')) {
             $this->periodText = "Davr: {$this->request->start_date} dan {$this->request->end_date} gacha";
         } elseif ($this->request->filled('date')) {
@@ -84,13 +82,15 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping, S
         ];
     }
 
+    public function startCell(): string
+    {
+        // Jadval 5-qator (No, Sana...) dan boshlansin
+        return 'A5';
+    }
+
     public function headings(): array
     {
         return [
-            ["Kassa tranzaksiyalari ro'yxati"],
-            [$this->periodText],
-            ["Umumiy miqdor: " . number_format($this->totalAmount, 2) . ' ' . $this->currencyName],
-            [],
             ['No', 'Sana', 'Miqdor', 'Mahsulot yoki shaxs ismi', 'Ochiqlama', 'Chiqim qiluvchi'],
         ];
     }
@@ -99,21 +99,29 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping, S
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                // Har bir title qatori uchun ustunlarni birlashtirish (A1:F1, A2:F2, A3:F3)
+
+                // Yuqoriga 3 ta sarlavha yozamiz
+                $sheet = $event->sheet->getDelegate();
+
+                $sheet->mergeCells('A1:F1');
+                $sheet->setCellValue('A1', "Kassa tranzaksiyalari ro'yxati");
+
+                $sheet->mergeCells('A2:F2');
+                $sheet->setCellValue('A2', $this->periodText);
+
+                $sheet->mergeCells('A3:F3');
+                $sheet->setCellValue('A3', "Umumiy miqdor: " . number_format($this->totalAmount, 2) . ' ' . $this->currencyName);
+
+                // Markazda va bold qilib
                 foreach ([1, 2, 3] as $row) {
-                    $event->sheet->mergeCells("A{$row}:F{$row}");
-                    $event->sheet->getStyle("A{$row}")
-                        ->getAlignment()
-                        ->setHorizontal('center')
-                        ->setVertical('center');
-                    $event->sheet->getStyle("A{$row}")
-                        ->getFont()
-                        ->setBold(true)
-                        ->setSize(12);
+                    $sheet->getStyle("A{$row}")
+                        ->getAlignment()->setHorizontal('center');
+                    $sheet->getStyle("A{$row}")
+                        ->getFont()->setBold(true)->setSize(12);
                 }
 
-                // Jadval ustunlari (5-qator) bold qilish
-                $event->sheet->getStyle('A5:F5')->getFont()->setBold(true);
+                // Ustun sarlavhalarni bold qilish
+                $sheet->getStyle('A5:F5')->getFont()->setBold(true);
             },
         ];
     }
