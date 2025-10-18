@@ -355,8 +355,8 @@ class CasherController extends Controller
 
         $workingDays = collect($period)->filter(fn($date) => !$date->isSunday())->count();
         $averageEmployeeCount = round($monthlyStats['employee_count_sum'] / max($workingDays, 1));
-//        $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
-// per_employee_cost_uzs breakdown
+        //        $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
+        // per_employee_cost_uzs breakdown
         $employeeCount = max($monthlyStats['employee_count_sum'], 1);
 
         $rasxodLimit = $monthlyStats['rasxod_limit_uzs'] / $employeeCount;
@@ -1647,7 +1647,7 @@ class CasherController extends Controller
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
             'source' => 'nullable|string|max:255',
-//            'via_id' => 'required|exists:employees,id',
+        //            'via_id' => 'required|exists:employees,id',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
             'purpose' => 'nullable|string|max:1000',
@@ -1698,8 +1698,8 @@ class CasherController extends Controller
         $data = $request->validate([
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
-//            'destination_id' => 'nullable|exists:employees,id',
-//            'via_id' => 'required|exists:employees,id',
+            //            'destination_id' => 'nullable|exists:employees,id',
+            //            'via_id' => 'required|exists:employees,id',
             'purpose' => 'nullable|string|max:1000',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
