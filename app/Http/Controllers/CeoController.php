@@ -90,9 +90,6 @@ class CeoController extends Controller
         ->pluck('order_id')
         ->toArray();
 
-        return response()->json($selectedOrderIds);
-
-
         $groups = \App\Models\Group::where('department_id', $request->department_id)
             ->with(['orders' => function ($query) use ($startDate, $endDate, $selectedOrderIds) {
                 $query->whereIn('order_id', $selectedOrderIds) // ✅ faqat selected orderlar
