@@ -71,6 +71,7 @@ class GetUserResource extends JsonResource
                     'is_own' => $log->is_own,
                     'amount_earned' => $log->amount_earned,
                     'box_tarification_id' => $log->box_tarification_id,
+                    'order' => $log->tarification->tarificationCategory->submodel->orderModel->order ?? null,
                     'model' => $log->tarification->tarificationCategory->submodel->orderModel->model ?? null,
                     'submodel' => $log->tarification->tarificationCategory->submodel->submodel ?? null,
                     'tarification' => $log->tarification,

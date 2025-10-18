@@ -45,7 +45,7 @@ class UserController extends Controller
                     \DB::raw('SUM(etl.amount_earned) as tarification_earned')
                 )
                 ->where('e.branch_id', $branchId)
-//                ->where('payment_type', 'piece_work')
+     //                ->where('payment_type', 'piece_work')
                 ->when(
                     auth()->user()->role->name === 'groupMaster' && auth()->user()->employee->group_id,
                     fn($q) => $q->where('e.group_id', auth()->user()->employee->group_id)
@@ -170,8 +170,8 @@ class UserController extends Controller
                                                     $q3->select('id', 'order_model_id', 'submodel_id')
                                                         ->with([
                                                             'orderModel' => function ($q4) {
-                                                                $q4->select('id', 'model_id')
-                                                                    ->with('model:id,name');
+                                                                $q4->select('id', 'model_id', 'order_id')
+                                                                    ->with('model:id,name', 'order:id,name');
                                                             },
                                                             'submodel' => function ($q5) {
                                                                 $q5->select('id', 'name');
@@ -255,8 +255,8 @@ class UserController extends Controller
                                                     $q3->select('id', 'order_model_id', 'submodel_id')
                                                         ->with([
                                                             'orderModel' => function ($q4) {
-                                                                $q4->select('id', 'model_id')
-                                                                    ->with('model:id,name');
+                                                                $q4->select('id', 'model_id', 'order_id')
+                                                                    ->with('model:id,name', 'order:id,name');
                                                             },
                                                             'submodel' => function ($q5) {
                                                                 $q5->select('id', 'name');
