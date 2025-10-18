@@ -12,6 +12,8 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
 {
     protected $request;
 
+    protected $looping;
+
     public function __construct($request)
     {
         $this->request = $request;
@@ -47,8 +49,10 @@ class TransactionsExport implements FromCollection, WithHeadings, WithMapping
 
     public function map($tx): array
     {
+        $this->looping++;
+
         return [
-            $looping->iteration,
+            $this->looping,
             $tx->date?->format('Y-m-d'),
             $tx->amount . $tx->currency?->name ?? '-',
             $tx->purpose ?? '',
