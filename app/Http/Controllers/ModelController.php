@@ -109,7 +109,7 @@ class ModelController extends Controller
                         $image = $request->file('images' . $index);
                         $fileName = time() . '_' . $image->getClientOriginalName();
 
-                        $path = $image->storeAs('modelImages', $fileName, 'S3');
+                        $path = $image->storeAs('modelImages', $fileName, 's3');
 
                         Storage::disk('s3')->setVisibility($path, 'public');
 
@@ -208,13 +208,13 @@ class ModelController extends Controller
                 $image = $request->file('images' . $index);
                 $fileName = time() . '_' . $image->getClientOriginalName();
 
-                $path = $image->storeAs('modelImages', $fileName, 'S3');
+                $path = $image->storeAs('modelImages', $fileName, 's3');
 
                 Storage::disk('s3')->setVisibility($path, 'public');
 
                 ModelImages::create([
                     'model_id' => $model->id,
-                    'image' => Storage::disk('S3')->url($path)
+                    'image' => Storage::disk('s3')->url($path)
                 ]);
 
                 $index++;
