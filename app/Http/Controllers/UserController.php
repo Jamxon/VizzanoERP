@@ -533,8 +533,8 @@ class UserController extends Controller
                                                 $q3->select('id', 'order_model_id', 'submodel_id')
                                                     ->with([
                                                         'orderModel' => function ($q4) {
-                                                            $q4->select('id', 'model_id')
-                                                                ->with('model:id,name');
+                                                            $q4->select('id', 'model_id', 'order_id')
+                                                                ->with('model:id,name', 'order:id,name');
                                                         },
                                                         'submodel' => function ($q5) {
                                                             $q5->select('id', 'name');
@@ -574,8 +574,8 @@ class UserController extends Controller
                                                 $q3->select('id', 'order_model_id', 'submodel_id')
                                                     ->with([
                                                         'orderModel' => function ($q4) {
-                                                            $q4->select('id', 'model_id')
-                                                                ->with('model:id,name');
+                                                            $q4->select('id', 'model_id', 'order_id')
+                                                                ->with('model:id,name', 'order:id,name');
                                                         },
                                                         'submodel' => function ($q5) {
                                                             $q5->select('id', 'name');
@@ -662,6 +662,7 @@ class UserController extends Controller
                         'quantity' => $log->quantity,
                         'amount_earned' => $log->amount_earned,
                         'is_own' => $log->is_own,
+                        'order' => $log->tarification?->tarificationCategory?->submodel?->orderModel?->order ?? null,
                         'model' => $log->tarification?->tarificationCategory?->submodel?->orderModel?->model ?? null,
                         'submodel' => $log->tarification?->tarificationCategory?->submodel?->submodel ?? null,
                         'tarification' => [
