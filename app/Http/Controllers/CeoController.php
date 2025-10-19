@@ -97,7 +97,7 @@ class CeoController extends Controller
                         $q->whereBetween('created_at', [$startDate, $endDate]);
                     })
                     ->with([
-                        'order:id,name',
+                        'order:id,name,quantity',
                         'order.orderModel.submodels' => function ($q) {
                             $q->select('id', 'order_model_id', 'submodel_id')
                                 ->with([
@@ -124,7 +124,8 @@ class CeoController extends Controller
                     'order_name' => $order->order->name,
                     'status' => $order->status,
                     'submodels' => [],
-                    'total_sewn' => 0
+                    'total_sewn' => 0,
+                    'order_quantity' => $order->order->quantity,
                 ];
 
                 foreach ($order->order->orderModel->submodels as $submodel) {
