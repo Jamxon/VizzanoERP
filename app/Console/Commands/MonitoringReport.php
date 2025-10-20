@@ -81,6 +81,9 @@ class MonitoringReport extends Command
         ]);
 
         $this->info("✅ Hisobot yuborildi!");
+
+        // 🔹 7. Eski loglarni avtomatik tozalash
+        $this->cleanOldLogs($logFile);
     }
 
     // 🔹 CPU, RAM va Diskni aniq hisoblovchi funksiya
