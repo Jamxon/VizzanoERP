@@ -12,8 +12,8 @@ class MonitoringReport extends Command
 
     public function handle()
     {
-        $botToken = 'YOUR_TELEGRAM_BOT_TOKEN';
-        $chatId = '-100YOUR_CHAT_ID';
+        $botToken = '8443951014:AAHMmbRm5bgFCRk1h4GjFP5WUg9H1rMsiIk';
+        $chatId = '5228018221';
 
         $cpu = trim(shell_exec("top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"));
         $ram = trim(shell_exec("free -m | awk 'NR==2{printf \"%s/%sMB (%.2f%%)\", $3,$2,$3*100/$2 }'"));
