@@ -1146,6 +1146,7 @@ class SuperHRController extends Controller
                     'new_salary' => $request->salary,
                     'created_at' => now(),
                     'updated_at' => now(),
+                    'ip' => $request->ip()
                 ]);
 
                 // 2. Telegramga yuborish
@@ -1157,6 +1158,7 @@ class SuperHRController extends Controller
                     . "💵 Eski: {$oldData['salary']} so‘m\n"
                     . "💵 Yangi: {$request->salary} so‘m\n"
                     . "👤 O‘zgartirgan: *" . auth()->user()->employee->name . "*\n"
+                    . "🌐 IP: " . $request->ip() . "\n"
                     . "🕒 " . now()->format('Y-m-d H:i');
 
                 try {
