@@ -14,7 +14,8 @@ class SalaryChange extends Model
         'changed_by',
         'old_salary',
         'new_salary',
-        'ip'
+        'ip',
+        'device'
     ];
 
     public function employee()
