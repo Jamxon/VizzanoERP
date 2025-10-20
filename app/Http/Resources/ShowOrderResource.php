@@ -36,6 +36,8 @@ class ShowOrderResource extends JsonResource
             'rasxod' => $this->rasxod,
             'comment' => $this->comment,
             'price' => $this->price,
+            'season_year' => $this->season_year,
+            'seaspon_type' => $this->season_type,
             'order_model' => $this->orderModel ? [
                 'id' => $this->orderModel->id,
                 'model' => $this->orderModel->model ? [
