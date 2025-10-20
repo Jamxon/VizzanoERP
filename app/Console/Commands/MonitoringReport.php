@@ -3,153 +3,102 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Models\Log;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 
 class MonitoringReport extends Command
 {
     protected $signature = 'monitoring:report';
-    protected $description = 'Server va so‘rov monitoring hisobotini chiqaradi';
+    protected $description = 'Server va foydalanuvchi faoliyati haqida jonli hisobot';
 
     public function handle()
     {
-        $now = Carbon::now();
-        $oneHourAgo = $now->copy()->subHour();
-        $oneDayAgo = $now->copy()->subDay();
+        $botToken = 'YOUR_TELEGRAM_BOT_TOKEN';
+        $chatId = 'YOUR_CHAT_ID';
+        $logFile = storage_path('logs/requests.log');
 
-        // 💾 Server resurslari
-        $cpuUsage = shell_exec("top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'");
-        $ram = shell_exec("free -m | awk 'NR==2{printf \"%s/%sMB (%.2f%%)\", \$3,\$2,\$3*100/\$2 }'");
-        $disk = shell_exec("df -h / | awk 'NR==2{print \$3\"/\"\$2\" (\"\$5\")\"}'");
-
-        // 📊 So‘rov statistikasi (1 soat)
-        $totalRequests = Log::where('created_at', '>=', $oneHourAgo)->count();
-        $deviceRequests = Log::where('created_at', '>=', $oneHourAgo)
-            ->where(function ($q) {
-                $q->where('user_agent', 'like', '%Hikvision%')
-                  ->orWhere('path', 'like', '%device%')
-                  ->orWhere('path', 'like', '%bridge%');
-            })
-            ->count();
-        $userRequests = $totalRequests - $deviceRequests;
-
-        // 🔝 Eng ko‘p urilgan endpointlar
-        $topEndpoints = Log::selectRaw('path, COUNT(*) as total')
-            ->where('created_at', '>=', $oneHourAgo)
-            ->groupBy('path')
-            ->orderByDesc('total')
-            ->take(5)
-            ->get();
-
-        // ⚡ Eng tez endpointlar
-        $fastestEndpoints = Log::selectRaw('path, AVG(duration) as avg_time')
-            ->where('created_at', '>=', $oneHourAgo)
-            ->groupBy('path')
-            ->orderBy('avg_time', 'asc')
-            ->take(5)
-            ->get();
-
-        // 🐢 Eng sekin endpointlar
-        $slowestEndpoints = Log::selectRaw('path, AVG(duration) as avg_time')
-            ->where('created_at', '>=', $oneHourAgo)
-            ->groupBy('path')
-            ->orderByDesc('avg_time')
-            ->take(5)
-            ->get();
-
-        // ⚠️ Eng ko‘p xato bergan endpointlar
-        $errorEndpoints = Log::selectRaw('path, COUNT(*) as total')
-            ->where('status', '>=', 400)
-            ->where('created_at', '>=', $oneHourAgo)
-            ->groupBy('path')
-            ->orderByDesc('total')
-            ->take(5)
-            ->get();
-
-        // 👨‍💻 Eng faol foydalanuvchilar
-        $activeUsers = Log::with(['user.employee'])
-            ->selectRaw('user_id, COUNT(*) as total')
-            ->whereNotNull('user_id')
-            ->where('created_at', '>=', $oneHourAgo)
-            ->groupBy('user_id')
-            ->orderByDesc('total')
-            ->take(5)
-            ->get();
-
-        // 😴 Eng sust foydalanuvchilar (1 kun ichida eng kam urilgan)
-        $inactiveUsers = Log::with(['user.employee'])
-            ->selectRaw('user_id, COUNT(*) as total')
-            ->whereNotNull('user_id')
-            ->where('created_at', '>=', $oneDayAgo)
-            ->groupBy('user_id')
-            ->orderBy('total', 'asc')
-            ->take(5)
-            ->get();
-
-        // 🧠 Yakuniy hisobot
-        $report = "😎 Server tinch, hammasi joyida!\n";
-        $report .= "🧠 Server Monitoring (So‘nggi 1 soat)\n";
-        $report .= "🕒 " . $now->format('Y-m-d H:i:s') . "\n\n";
-
-        $report .= "🟢 CPU: " . trim($cpuUsage) . "%\n";
-        $report .= "🟢 RAM: " . trim($ram) . "\n";
-        $report .= "🟢 Disk: " . trim($disk) . "\n\n";
-
-        $report .= "📈 So‘rov statistikasi\n";
-        $report .= "🔹 Jami so‘rovlar: {$totalRequests} ta\n";
-        $report .= "🤖 Qurilmadan kelganlar: {$deviceRequests} ta\n";
-        $report .= "👨‍💻 Foydalanuvchilardan kelganlar: {$userRequests} ta\n\n";
-
-        $report .= "🔝 Eng ko‘p urilgan endpointlar:\n";
-        foreach ($topEndpoints as $e) {
-            $report .= "• {$e->path} — {$e->total} ta\n";
+        if (!File::exists($logFile)) {
+            $this->error("❌ Log fayl topilmadi!");
+            return;
         }
 
-        $report .= "⚡ Eng tez endpointlar:\n";
-        foreach ($fastestEndpoints as $e) {
-            $report .= "⚡ {$e->path} — " . round($e->avg_time, 2) . " ms\n";
+        $lines = collect(File::lines($logFile))
+            ->map(fn($line) => json_decode(substr($line, strpos($line, '{')), true))
+            ->filter(fn($data) => isset($data['time']) && Carbon::parse($data['time'])->greaterThan(Carbon::now()->subHour()));
+
+        if ($lines->isEmpty()) {
+            $this->info("⚠️ So‘nggi 1 soatda so‘rovlar yo‘q.");
+            return;
         }
 
-        $report .= "🐢 Eng sekin endpointlar:\n";
-        foreach ($slowestEndpoints as $e) {
-            $report .= "🐢 {$e->path} — " . round($e->avg_time, 2) . " ms\n";
-        }
+        $total = $lines->count();
+        $deviceCount = $lines->filter(fn($x) => str_contains($x['path'] ?? '', 'hikvision/event'))->count();
+        $userCount = $total - $deviceCount;
 
-        $report .= "⚠️ Eng ko‘p xato bergan endpointlar:\n";
-        if ($errorEndpoints->isEmpty()) {
-            $report .= "Hech narsa topilmadi\n";
-        } else {
-            foreach ($errorEndpoints as $e) {
-                $report .= "• {$e->path} — {$e->total} ta\n";
-            }
-        }
+        $topEndpoints = $lines->groupBy('path')->map->count()->sortDesc()->take(5);
+        $fastest = $lines->sortBy('duration_ms')->take(5);
+        $slowest = $lines->sortByDesc('duration_ms')->take(5);
+        $errors = $lines->where('status', '>=', 400)->groupBy('path')->map->count()->sortDesc()->take(5);
 
-        // 👨‍💻 Eng faol foydalanuvchilar
-        $report .= "\n👨‍💻 Eng faol foydalanuvchilar:\n";
-        if ($activeUsers->isEmpty()) {
-            $report .= "Hech narsa topilmadi\n";
-        } else {
-            foreach ($activeUsers as $u) {
-                $name = optional($u->user->employee)->fullname ?? $u->user->name ?? 'Noma’lum';
-                $report .= "• {$name} — {$u->total} ta so‘rov\n";
-            }
-        }
+        // 🔹 Server load
+        $cpu = (float) trim(shell_exec("top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"));
+        $ramUsed = shell_exec("free -m | awk 'NR==2{print $3}'");
+        $ramTotal = shell_exec("free -m | awk 'NR==2{print $2}'");
+        $ramPercent = round(($ramUsed / $ramTotal) * 100, 2);
+        $diskInfo = trim(shell_exec("df -h / | awk 'NR==2{print $3\"/\"$2\" (\"$5\")\"}'"));
 
-        // 😴 Eng sust foydalanuvchilar
-        $report .= "\n😴 Eng sust foydalanuvchilar:\n";
-        if ($inactiveUsers->isEmpty()) {
-            $report .= "Hech narsa topilmadi\n";
-        } else {
-            foreach ($inactiveUsers as $u) {
-                $name = optional($u->user->employee)->fullname ?? $u->user->name ?? 'Noma’lum';
-                $report .= "• {$name} — {$u->total} ta so‘rov\n";
-            }
-        }
+        $cpuEmoji = $this->getLoadEmoji($cpu);
+        $ramEmoji = $this->getLoadEmoji($ramPercent);
 
-        $report .= "\n\n🎯 Monitoring by VizzanoERP Bot\n";
+        $message = "😎 *Server tinch, hammasi joyida!*\n"
+            . "🧠 *Server Monitoring (So‘nggi 1 soat)*\n"
+            . "🕒 " . now()->toDateTimeString() . "\n\n"
+            . "{$cpuEmoji} CPU: {$cpu}%\n"
+            . "{$ramEmoji} RAM: {$ramUsed}/{$ramTotal}MB ({$ramPercent}%)\n"
+            . "🟢 Disk: {$diskInfo}\n\n"
+            . "📈 *So‘rov statistikasi*\n"
+            . "🔹 Jami: {$total} ta\n"
+            . "🤖 Qurilmadan: {$deviceCount} ta\n"
+            . "👨‍💻 Foydalanuvchilardan: {$userCount} ta\n\n"
+            . "🔝 *Eng ko‘p urilgan endpointlar:*\n" . $this->formatList($topEndpoints)
+            . "\n⚡ *Eng tez endpointlar:*\n" . $this->formatSpeedList($fastest, true)
+            . "\n🐢 *Eng sekin endpointlar:*\n" . $this->formatSpeedList($slowest)
+            . "\n⚠️ *Xato bergan endpointlar:*\n" . $this->formatList($errors)
+            . "\n\n🎯 Monitoring by *VizzanoERP Bot*";
 
-        $this->info($report);
-        \Log::channel('daily')->info($report);
+        // Telegramga yuborish
+        Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+            'chat_id' => $chatId,
+            'text' => $message,
+            'parse_mode' => 'Markdown'
+        ]);
+
+        $this->info("✅ Hisobot yuborildi!");
+    }
+
+    private function getLoadEmoji($percent)
+    {
+        return match (true) {
+            $percent < 50 => "🟢",
+            $percent < 75 => "🟡",
+            $percent < 90 => "🟠",
+            default => "🔴"
+        };
+    }
+
+    private function formatList($collection)
+    {
+        return $collection->isEmpty()
+            ? "_Hech narsa topilmadi_\n"
+            : $collection->map(fn($count, $path) => "• {$path} — {$count} ta")->join("\n");
+    }
+
+    private function formatSpeedList($logs, $fastest = false)
+    {
+        $emoji = $fastest ? "⚡" : "🐢";
+        return $logs->isEmpty()
+            ? "_Hech narsa topilmadi_\n"
+            : $logs->map(fn($log) => "{$emoji} {$log['path']} — {$log['duration_ms']} ms")->join("\n");
     }
 }
