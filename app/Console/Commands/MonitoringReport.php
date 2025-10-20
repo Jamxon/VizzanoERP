@@ -9,19 +9,27 @@ use Illuminate\Support\Facades\Http;
 class MonitoringReport extends Command
 {
     protected $signature = 'monitoring:report';
-    protected $description = 'Server, foydalanuvchi va endpoint statistikasi haqida batafsil Telegram hisobot';
+    protected $description = 'Server va foydalanuvchi faoliyati haqida jonli Telegram hisobot';
 
     public function handle()
     {
         $botToken = '8443951014:AAHMmbRm5bgFCRk1h4GjFP5WUg9H1rMsiIk';
         $chatId = '5228018221';
 
-        // 🔹 Tizim resurslari
-        $cpu = trim(shell_exec("top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"));
-        $ram = trim(shell_exec("free -m | awk 'NR==2{printf \"%s/%sMB (%.2f%%)\", $3,$2,$3*100/$2 }'"));
-        $disk = trim(shell_exec("df -h / | awk 'NR==2{printf \"%d/%dGB (%s)\", $3,$2,$5}'"));
+        // 🔹 Server ma’lumotlari
+        $cpu = (float) trim(shell_exec("top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"));
+        $ramUsed = shell_exec("free -m | awk 'NR==2{print $3}'");
+        $ramTotal = shell_exec("free -m | awk 'NR==2{print $2}'");
+        $ramPercent = round(($ramUsed / $ramTotal) * 100, 2);
+        $diskInfo = shell_exec("df -h / | awk 'NR==2{print $3\"/\"$2\" (\"$5\")\"}'");
+        $diskPercent = (int) trim(shell_exec("df / | awk 'NR==2 {print $5}' | tr -d '%'"));
 
-        // 🔹 Loglarni o‘qish (so‘nggi 1 soat)
+        // 🔹 Emoji holatlari
+        $cpuEmoji = $this->getLoadEmoji($cpu);
+        $ramEmoji = $this->getLoadEmoji($ramPercent);
+        $diskEmoji = $this->getLoadEmoji($diskPercent);
+
+        // 🔹 Loglarni o‘qish
         $logFile = storage_path('logs/requests.log');
         if (!file_exists($logFile)) {
             $this->sendMessage($botToken, $chatId, "🚫 Log fayl topilmadi: `requests.log`");
@@ -38,16 +46,21 @@ class MonitoringReport extends Command
         $fastest = $logs->where('duration_ms', '>', 0)->sortBy('duration_ms')->take(3);
         $errors = $logs->where('status', '>=', 400)->groupBy('path')->map->count()->sortDesc()->take(3);
 
-        // 🔹 Eng faol va sust foydalanuvchilar
         $userActivity = $logs->groupBy('user_id')->map->count();
         $mostActive = $this->getUsersInfo($userActivity->sortDesc()->take(3));
         $leastActive = $this->getUsersInfo($userActivity->sort()->take(3));
 
+        // 🔹 Stiker holat
+        $sticker = $this->getStatusSticker($cpu, $ramPercent, $diskPercent);
+
         // 🔹 Xabarni tayyorlash
-        $message = "🧠 *Server Monitoring (So‘nggi 1 soat)*\n"
+        $message = "{$sticker}\n"
+            . "🧠 *Server Monitoring (So‘nggi 1 soat)*\n"
             . "🕒 " . now()->toDateTimeString() . "\n\n"
-            . "🔥 CPU: {$cpu}%\n💾 RAM: {$ram}\n📂 Disk: {$disk}\n\n"
-            . "📈 *So‘rovlar statistikasi*\n"
+            . "{$cpuEmoji} CPU: {$cpu}%\n"
+            . "{$ramEmoji} RAM: {$ramUsed}/{$ramTotal}MB ({$ramPercent}%)\n"
+            . "{$diskEmoji} Disk: {$diskInfo}\n\n"
+            . "📈 *So‘rov statistikasi*\n"
             . "Jami so‘rovlar: {$total}\n\n"
             . "🔝 Eng ko‘p urilgan endpointlar:\n" . $this->formatList($topEndpoints)
             . "\n⚡ Eng tez endpointlar:\n" . $this->formatSpeedList($fastest, true)
@@ -58,6 +71,27 @@ class MonitoringReport extends Command
             . "\n\n🎯 Monitoring by *VizzanoERP Bot*";
 
         $this->sendMessage($botToken, $chatId, $message);
+    }
+
+    private function getLoadEmoji($percent)
+    {
+        return match (true) {
+            $percent < 50 => "🟢",
+            $percent < 75 => "🟡",
+            $percent < 90 => "🟠",
+            default => "🔴"
+        };
+    }
+
+    private function getStatusSticker($cpu, $ram, $disk)
+    {
+        $avg = ($cpu + $ram + $disk) / 3;
+        return match (true) {
+            $avg < 50 => "😎 Server tinch, hammasi joyida!",
+            $avg < 75 => "🙂 Ozgina yuk bor, lekin nazorat ostida.",
+            $avg < 90 => "😬 Yuklanish ortmoqda, ehtiyot bo‘ling!",
+            default => "💀 Server zo‘riqmoqda! Tezda tekshirish kerak!"
+        };
     }
 
     private function formatList($collection)
@@ -79,11 +113,10 @@ class MonitoringReport extends Command
 
         return $userActivity->map(function ($count, $userId) {
             $user = User::with('employee')->find($userId);
-            if (!$user) return "• [Unknown user] — {$count} so‘rov";
-
+            if (!$user) return "• [Unknown] — {$count} so‘rov";
             $name = $user->employee->name ?? $user->name ?? 'Noma’lum';
-            $position = $user->employee->position ?? '-';
-            return "• {$name} ({$position}) — {$count} ta so‘rov";
+            $pos = $user->employee->position ?? '-';
+            return "• {$name} ({$pos}) — {$count} ta";
         })->join("\n");
     }
 
