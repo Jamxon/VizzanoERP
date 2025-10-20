@@ -172,62 +172,43 @@ class TailorController extends Controller
 
    
     
-    public function getModelWithTarification(): \Illuminate\Http\JsonResponse
+     public function getModelWithTarification(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
         $group = $user->employee->group ?? null;
-        $branchId = $user->employee->branch_id;
-        $roleName = $user->role->name;
 
-        $startDate = now()->subDays(14)->startOfDay();
-        $endDate = now()->addDay()->endOfDay();
-        $statuses = ['tailoring', 'tailored', 'pending', 'cutting'];
+        $startDate = now()->subDays(14)->toDateString();
+        $endDate = now()->addDay()->toDateString();
 
-        // STEP 1: Faqat kerakli Order ID'larni olamiz (tez!)
-        $orderIds = \DB::table('orders')
-            ->select('orders.id')
-            ->whereIn('status', $statuses)
-            ->where('branch_id', $branchId)
-            ->pluck('id');
-
-        if ($orderIds->isEmpty()) {
-            return response()->json([]);
-        }
-
-        // STEP 2: OrderGroup'larni olamiz (tez!)
-        $query = OrderGroup::query()
-            ->when($roleName === 'tailor' && $group, fn($q) => $q->where('group_id', $group->id))
-            ->whereIn('order_id', $orderIds)
+        $order = OrderGroup::query()
+            ->when($user->role->name === 'tailor' && $group, function ($q) use ($group) {
+                // 👷‍♂️ Agar role = tailor bo‘lsa, group filter ishlaydi
+                $q->where('group_id', $group->id);
+            })
+            // universalTailor bo‘lsa, bu filter umuman qo‘shilmaydi
+            ->whereHas('order', function ($query) use ($user) {
+                $query->whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting']);
+                $query->where('branch_id', $user->employee->branch_id);
+            })
+            ->where(function ($q) use ($startDate, $endDate) {
+                $q->whereHas('order.orderModel.submodels.sewingOutputs', function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                })
+                    ->whereHas('order.orderModel.submodels.tarificationCategories', function ($query) {
+                        $query->where('region', 'uz');
+                    })
+                    ->orWhereDoesntHave('order.orderModel.submodels.sewingOutputs');
+            })
             ->with([
-                'order:id,branch_id,status',
-                'order.orderModel:id,order_id,model_id',
-                'order.orderModel.model:id,name',
-                'order.orderModel.submodels' => function($q) use ($startDate, $endDate) {
-                    // Submodel darajasida filter
-                    $q->select('id', 'order_model_id', 'submodel_id')
-                        ->where(function($subQuery) use ($startDate, $endDate) {
-                            $subQuery->whereHas('sewingOutputs', function($sewQ) use ($startDate, $endDate) {
-                                $sewQ->whereBetween('created_at', [$startDate, $endDate]);
-                            })
-                            ->whereHas('tarificationCategories', fn($tarQ) => $tarQ->where('region', 'uz'))
-                            ->orDoesntHave('sewingOutputs');
-                        });
-                },
-                'order.orderModel.submodels.submodel:id,name',
-            ]);
-
-        $order = $query->get();
-
-        // Bo'sh submodel'larni filter qilamiz
-        $order = $order->filter(function($orderGroup) {
-            return $orderGroup->order?->orderModel?->submodels?->isNotEmpty();
-        })->values();
+                'order.orderModel.model',
+                'order.orderModel.submodels.submodel'
+            ])
+            ->get();
 
         $resource = ShowOrderForTailorResource::collection($order);
 
         return response()->json($resource);
     }
-
 
     public function getTopEarners(Request $request): \Illuminate\Http\JsonResponse
     {
