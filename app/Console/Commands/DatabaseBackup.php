@@ -18,14 +18,13 @@ class DatabaseBackup extends Command
 
         // pg_dump orqali backup olish
         $command = sprintf(
-            'PGPASSWORD=%s pg_dump -U %s -h %s -d %s > %s',
+            'PGPASSWORD=%s pg_dump -U %s -h %s -d %s -F c -f %s',
             "vizzanopro",    // parol
             "vizzano",       // user
             "176.124.208.61", // host
             "vizzano",       // db
             $filePath
         );
-
         exec($command, $output, $resultCode);
 
         if ($resultCode !== 0) {
