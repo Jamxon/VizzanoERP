@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
+use App\Models\User;
 
 class MonitoringReport extends Command
 {
