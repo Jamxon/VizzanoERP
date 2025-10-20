@@ -46,7 +46,11 @@ class MonitoringReport extends Command
         $fastest = $logs->where('duration_ms', '>', 0)->sortBy('duration_ms')->take(3);
         $errors = $logs->where('status', '>=', 400)->groupBy('path')->map->count()->sortDesc()->take(3);
 
-        $userActivity = $logs->groupBy('user_id')->map->count();
+        $userActivity = $logs
+            ->filter(fn($log) => isset($log['user_id']) && !empty($log['user_id']))
+            ->groupBy('user_id')
+            ->map->count();
+
         $mostActive = $this->getUsersInfo($userActivity->sortDesc()->take(3));
         $leastActive = $this->getUsersInfo($userActivity->sort()->take(3));
 
@@ -111,14 +115,19 @@ class MonitoringReport extends Command
     {
         if ($userActivity->isEmpty()) return "_Hech narsa topilmadi_\n";
 
-        return $userActivity->map(function ($count, $userId) {
-            $user = User::with('employee')->find($userId);
-            if (!$user) return "• [Unknown] — {$count} so‘rov";
-            $name = $user->employee->name ?? $user->name ?? 'Noma’lum';
-            $pos = $user->employee->position ?? '-';
-            return "• {$name} ({$pos}) — {$count} ta";
-        })->join("\n");
+        return $userActivity
+            ->filter(fn($count, $userId) => !empty($userId) && is_numeric($userId)) // ✅ bo‘sh yoki noto‘g‘ri idlarni olib tashlaymiz
+            ->map(function ($count, $userId) {
+                $user = User::with('employee')->find($userId);
+                if (!$user) return "• [Unknown] — {$count} so‘rov";
+                $name = $user->employee->name ?? $user->name ?? 'Noma’lum';
+                $pos = $user->employee->position ?? '-';
+                return "• {$name} ({$pos}) — {$count} ta";
+            })
+            ->values() // indeksni tozalaydi
+            ->join("\n");
     }
+
 
     private function sendMessage($botToken, $chatId, $text)
     {
