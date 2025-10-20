@@ -171,6 +171,7 @@ class TailorController extends Controller
     }
 
    
+    
     public function getModelWithTarification(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
@@ -178,58 +179,47 @@ class TailorController extends Controller
         $branchId = $user->employee->branch_id;
         $roleName = $user->role->name;
 
-        $startDate = now()->subDays(14)->toDateString();
-        $endDate = now()->addDay()->toDateString();
+        $startDate = now()->subDays(14)->startOfDay();
+        $endDate = now()->addDay()->endOfDay();
 
-        // Index'lar kerak:
-        // orders: (branch_id, status), created_at
-        // order_groups: group_id, order_id
-        // sewing_outputs: (submodel_id, created_at)
-        // tarification_categories: (submodel_id, region)
+        // Statuslarni alohida o'zgaruvchiga olamiz
+        $statuses = ['tailoring', 'tailored', 'pending', 'cutting'];
 
         $query = OrderGroup::query()
-            ->select('order_groups.*')
-            // Role-based filter (index ishlatadi)
+            // Role-based filter
             ->when($roleName === 'tailor' && $group, fn($q) => $q->where('group_id', $group->id))
-            // Order filter (bitta join orqali)
-            ->join('orders', 'order_groups.order_id', '=', 'orders.id')
-            ->whereIn('orders.status', ['tailoring', 'tailored', 'pending', 'cutting'])
-            ->where('orders.branch_id', $branchId)
-            // Order model join
-            ->join('order_models', 'orders.id', '=', 'order_models.order_id')
-            // Submodel filter (LEFT JOIN optimal)
-            ->leftJoin('submodels', 'order_models.id', '=', 'submodels.order_model_id')
-            // Complex condition optimized
-            ->where(function ($q) use ($startDate, $endDate) {
-                // Sewing outputs mavjud bo'lsa va sana oralig'ida
-                $q->whereExists(function ($query) use ($startDate, $endDate) {
-                    $query->select(\DB::raw(1))
-                        ->from('sewing_outputs')
-                        ->whereColumn('sewing_outputs.submodel_id', 'submodels.id')
-                        ->whereBetween('sewing_outputs.created_at', [$startDate, $endDate])
-                        // Tarification ham bor bo'lishi kerak
-                        ->whereExists(function ($subQuery) {
-                            $subQuery->select(\DB::raw(1))
-                                ->from('tarification_categories')
-                                ->whereColumn('tarification_categories.submodel_id', 'submodels.id')
-                                ->where('tarification_categories.region', 'uz');
-                        });
+            // Order filter - optimized whereHas
+            ->whereHas('order', function ($query) use ($branchId, $statuses) {
+                $query->select('id') // Faqat ID kerak
+                    ->whereIn('status', $statuses)
+                    ->where('branch_id', $branchId);
+            })
+            // Complex condition - split qilib optimizatsiya
+            ->where(function ($mainQuery) use ($startDate, $endDate) {
+                // Variant 1: Sewing outputs bor VA tarification bor
+                $mainQuery->whereHas('order.orderModel.submodels', function ($submodelQuery) use ($startDate, $endDate) {
+                    $submodelQuery->whereHas('sewingOutputs', function ($sewingQuery) use ($startDate, $endDate) {
+                        $sewingQuery->whereBetween('created_at', [$startDate, $endDate]);
+                    })
+                    ->whereHas('tarificationCategories', function ($tarifQuery) {
+                        $tarifQuery->where('region', 'uz');
+                    });
                 })
-                // Yoki sewing outputs yo'q
-                ->orWhereNotExists(function ($query) {
-                    $query->select(\DB::raw(1))
-                        ->from('sewing_outputs')
-                        ->whereColumn('sewing_outputs.submodel_id', 'submodels.id');
+                // Variant 2: Sewing outputs yo'q
+                ->orWhereHas('order.orderModel.submodels', function ($submodelQuery) {
+                    $submodelQuery->doesntHave('sewingOutputs');
                 });
             })
-            // Eager loading optimized
+            // Optimized eager loading - faqat kerakli ma'lumotlar
             ->with([
-                'order' => fn($q) => $q->select('id', 'branch_id', 'status'),
-                'order.orderModel' => fn($q) => $q->select('id', 'order_id', 'model_id'),
-                'order.orderModel.model' => fn($q) => $q->select('id', 'name'), // kerakli fieldlar
-                'order.orderModel.submodels' => fn($q) => $q->select('id', 'order_model_id', 'submodel_id'),
-                'order.orderModel.submodels.submodel' => fn($q) => $q->select('id', 'name'),
-            ]);
+                'order:id,branch_id,status', // Faqat kerakli ustunlar
+                'order.orderModel:id,order_id,model_id',
+                'order.orderModel.model:id,name',
+                'order.orderModel.submodels:id,order_model_id,submodel_id',
+                'order.orderModel.submodels.submodel:id,name',
+            ])
+            // Agar juda ko'p ma'lumot bo'lsa, chunk ishlatish mumkin
+            ->limit(1000); // Safety limit
 
         $order = $query->get();
 
