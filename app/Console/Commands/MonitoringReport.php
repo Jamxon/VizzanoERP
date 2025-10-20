@@ -165,4 +165,24 @@ class MonitoringReport extends Command
             ? "_Hech narsa topilmadi_\n"
             : $logs->map(fn($log) => "{$emoji} {$log['path']} — {$log['duration_ms']} ms")->join("\n");
     }
+
+    private function cleanOldLogs($logFile)
+    {
+        $lines = File::lines($logFile);
+        $filtered = collect($lines)
+            ->filter(function ($line) {
+                $jsonStart = strpos($line, '{');
+                if ($jsonStart === false) return false;
+
+                $data = json_decode(substr($line, $jsonStart), true);
+                if (!isset($data['time'])) return false;
+
+                $time = Carbon::parse($data['time']);
+                return $time->greaterThan(Carbon::now()->subDay());
+            })
+            ->values()
+            ->all();
+
+        File::put($logFile, implode("\n", $filtered));
+    }
 }
