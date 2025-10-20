@@ -181,47 +181,47 @@ class TailorController extends Controller
 
         $startDate = now()->subDays(14)->startOfDay();
         $endDate = now()->addDay()->endOfDay();
-
-        // Statuslarni alohida o'zgaruvchiga olamiz
         $statuses = ['tailoring', 'tailored', 'pending', 'cutting'];
 
+        // STEP 1: Faqat kerakli Order ID'larni olamiz (tez!)
+        $orderIds = \DB::table('orders')
+            ->select('orders.id')
+            ->whereIn('status', $statuses)
+            ->where('branch_id', $branchId)
+            ->pluck('id');
+
+        if ($orderIds->isEmpty()) {
+            return response()->json([]);
+        }
+
+        // STEP 2: OrderGroup'larni olamiz (tez!)
         $query = OrderGroup::query()
-            // Role-based filter
             ->when($roleName === 'tailor' && $group, fn($q) => $q->where('group_id', $group->id))
-            // Order filter - optimized whereHas
-            ->whereHas('order', function ($query) use ($branchId, $statuses) {
-                $query->select('id') // Faqat ID kerak
-                    ->whereIn('status', $statuses)
-                    ->where('branch_id', $branchId);
-            })
-            // Complex condition - split qilib optimizatsiya
-            ->where(function ($mainQuery) use ($startDate, $endDate) {
-                // Variant 1: Sewing outputs bor VA tarification bor
-                $mainQuery->whereHas('order.orderModel.submodels', function ($submodelQuery) use ($startDate, $endDate) {
-                    $submodelQuery->whereHas('sewingOutputs', function ($sewingQuery) use ($startDate, $endDate) {
-                        $sewingQuery->whereBetween('created_at', [$startDate, $endDate]);
-                    })
-                    ->whereHas('tarificationCategories', function ($tarifQuery) {
-                        $tarifQuery->where('region', 'uz');
-                    });
-                })
-                // Variant 2: Sewing outputs yo'q
-                ->orWhereHas('order.orderModel.submodels', function ($submodelQuery) {
-                    $submodelQuery->doesntHave('sewingOutputs');
-                });
-            })
-            // Optimized eager loading - faqat kerakli ma'lumotlar
+            ->whereIn('order_id', $orderIds)
             ->with([
-                'order:id,branch_id,status', // Faqat kerakli ustunlar
+                'order:id,branch_id,status',
                 'order.orderModel:id,order_id,model_id',
                 'order.orderModel.model:id,name',
-                'order.orderModel.submodels:id,order_model_id,submodel_id',
+                'order.orderModel.submodels' => function($q) use ($startDate, $endDate) {
+                    // Submodel darajasida filter
+                    $q->select('id', 'order_model_id', 'submodel_id')
+                        ->where(function($subQuery) use ($startDate, $endDate) {
+                            $subQuery->whereHas('sewingOutputs', function($sewQ) use ($startDate, $endDate) {
+                                $sewQ->whereBetween('created_at', [$startDate, $endDate]);
+                            })
+                            ->whereHas('tarificationCategories', fn($tarQ) => $tarQ->where('region', 'uz'))
+                            ->orDoesntHave('sewingOutputs');
+                        });
+                },
                 'order.orderModel.submodels.submodel:id,name',
-            ])
-            // Agar juda ko'p ma'lumot bo'lsa, chunk ishlatish mumkin
-            ->limit(1000); // Safety limit
+            ]);
 
         $order = $query->get();
+
+        // Bo'sh submodel'larni filter qilamiz
+        $order = $order->filter(function($orderGroup) {
+            return $orderGroup->order?->orderModel?->submodels?->isNotEmpty();
+        })->values();
 
         $resource = ShowOrderForTailorResource::collection($order);
 
