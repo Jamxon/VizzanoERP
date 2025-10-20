@@ -54,7 +54,7 @@ class MonitoringReport extends Command
         $leastActive = $userActivity->reverse()->take(5);
 
         // Foydalanuvchi ma’lumotlarini olish
-        $users = User::with('employee:id,user_id,name,position')
+        $users = User::with('employee:id,user_id,name,phone')
             ->whereIn('id', $userActivity->keys())
             ->get()
             ->keyBy('id');
