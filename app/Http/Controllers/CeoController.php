@@ -103,7 +103,7 @@ class CeoController extends Controller
                                 ->with([
                                     // 'sewingOutputs:id,order_submodel_id,quantity,created_at',
                                     'submodel:id,name',
-                                    'sewingOutputs.time:id,name',
+                                    'sewingOutputs.time:id,time',
                                 ]);
                         },
                     ]);
