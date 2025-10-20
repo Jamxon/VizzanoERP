@@ -1156,7 +1156,7 @@ class SuperHRController extends Controller
                     . "📞 Tel: {$employee->phone}\n"
                     . "💵 Eski: {$oldData['salary']} so‘m\n"
                     . "💵 Yangi: {$request->salary} so‘m\n"
-                    . "👤 O‘zgartirgan: *" . auth()->user()->name . "*\n"
+                    . "👤 O‘zgartirgan: *" . auth()->user()->employee->name . "*\n"
                     . "🕒 " . now()->format('Y-m-d H:i');
 
                 try {
