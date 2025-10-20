@@ -88,7 +88,7 @@ class MonitoringReport extends Command
             . "\n\n🧍‍♂️ *Eng faol foydalanuvchilar:*\n" . $this->formatUserList($mostActive, $users)
             . "\n😴 *Eng sust foydalanuvchilar:*\n" . $this->formatUserList($leastActive, $users)
             . "\n\n🎯 Monitoring by *VizzanoERP Bot*";
-            
+
         // Telegramga yuborish
         Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
             'chat_id' => $chatId,
@@ -201,4 +201,24 @@ class MonitoringReport extends Command
 
         File::put($logFile, implode("\n", $filtered));
     }
+
+    private function formatUserList($collection, $users)
+    {
+        if ($collection->isEmpty()) {
+            return "_Topilmadi_\n";
+        }
+
+        return $collection->map(function ($count, $userId) use ($users) {
+            $user = $users[$userId] ?? null;
+
+            if ($user && $user->employee) {
+                return "• {$user->employee->name} ({$user->employee->position}) — {$count} ta so‘rov";
+            } elseif ($user) {
+                return "• User #{$user->id} — {$count} ta so‘rov";
+            } else {
+                return "• Noma’lum foydalanuvchi — {$count} ta so‘rov";
+            }
+        })->join("\n");
+    }
+
 }
