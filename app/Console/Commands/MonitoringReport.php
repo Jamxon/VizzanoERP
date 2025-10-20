@@ -46,14 +46,6 @@ class MonitoringReport extends Command
         $fastest = $logs->where('duration_ms', '>', 0)->sortBy('duration_ms')->take(3);
         $errors = $logs->where('status', '>=', 400)->groupBy('path')->map->count()->sortDesc()->take(3);
 
-        $userActivity = $logs
-            ->filter(fn($log) => isset($log['user_id']) && !empty($log['user_id']))
-            ->groupBy('user_id')
-            ->map->count();
-
-        $mostActive = $this->getUsersInfo($userActivity->sortDesc()->take(3));
-        $leastActive = $this->getUsersInfo($userActivity->sort()->take(3));
-
         // 🔹 Stiker holat
         $sticker = $this->getStatusSticker($cpu, $ramPercent, $diskPercent);
 
@@ -70,8 +62,6 @@ class MonitoringReport extends Command
             . "\n⚡ Eng tez endpointlar:\n" . $this->formatSpeedList($fastest, true)
             . "\n🐢 Eng sekin endpointlar:\n" . $this->formatSpeedList($slowest)
             . "\n⚠️ Eng ko‘p xato bergan endpointlar:\n" . $this->formatList($errors)
-            . "\n👨‍💻 *Eng faol foydalanuvchilar:*\n" . $mostActive
-            . "\n😴 *Eng sust foydalanuvchilar:*\n" . $leastActive
             . "\n\n🎯 Monitoring by *VizzanoERP Bot*";
 
         $this->sendMessage($botToken, $chatId, $message);
@@ -109,23 +99,6 @@ class MonitoringReport extends Command
         if ($logs->isEmpty()) return "_Hech narsa topilmadi_\n";
         $emoji = $isFastest ? "⚡" : "🐢";
         return $logs->map(fn($log) => "{$emoji} {$log['path']} — {$log['duration_ms']} ms")->join("\n");
-    }
-
-    private function getUsersInfo($userActivity)
-    {
-        if ($userActivity->isEmpty()) return "_Hech narsa topilmadi_\n";
-
-        return $userActivity
-            ->filter(fn($count, $userId) => !empty($userId) && is_numeric($userId)) // ✅ bo‘sh yoki noto‘g‘ri idlarni olib tashlaymiz
-            ->map(function ($count, $userId) {
-                $user = User::with('employee')->find($userId);
-                if (!$user) return "• [Unknown] — {$count} so‘rov";
-                $name = $user->employee->name ?? $user->name ?? 'Noma’lum';
-                $pos = $user->employee->position ?? '-';
-                return "• {$name} ({$pos}) — {$count} ta";
-            })
-            ->values() // indeksni tozalaydi
-            ->join("\n");
     }
 
 
