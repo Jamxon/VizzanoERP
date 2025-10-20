@@ -54,7 +54,7 @@ class MonitoringReport extends Command
             . "🧠 *Server Monitoring (So‘nggi 1 soat)*\n"
             . "🕒 " . now()->toDateTimeString() . "\n\n"
             . "{$cpuEmoji} CPU: {$cpu}%\n"
-            . "{$ramEmoji} RAM: {$ramUsed}/{$ramTotal}MB ({$ramPercent}%)\n"
+            . "{$ramEmoji} RAM: {$ramUsed} / {$ramTotal}MB ({$ramPercent}%)\n"
             . "{$diskEmoji} Disk: {$diskInfo}\n\n"
             . "📈 *So‘rov statistikasi*\n"
             . "Jami so‘rovlar: {$total}\n\n"
