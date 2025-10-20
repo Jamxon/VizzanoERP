@@ -93,9 +93,9 @@ class CeoController extends Controller
         $groups = \App\Models\Group::where('department_id', $request->department_id)
             ->with(['orders' => function ($query) use ($startDate, $endDate, $selectedOrderIds) {
                 $query->whereIn('order_id', $selectedOrderIds) // ✅ faqat selected orderlar
-                    ->whereHas('order.orderModel.submodels.sewingOutputs', function ($q) use ($startDate, $endDate) {
-                        $q->whereBetween('created_at', [$startDate, $endDate]);
-                    })
+                    // ->whereHas('order.orderModel.submodels.sewingOutputs', function ($q) use ($startDate, $endDate) {
+                    //     $q->whereBetween('created_at', [$startDate, $endDate]);
+                    // })
                     ->with([
                         'order:id,name,quantity',
                         'order.orderModel.submodels' => function ($q) {
