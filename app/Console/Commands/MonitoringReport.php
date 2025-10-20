@@ -25,7 +25,15 @@ class MonitoringReport extends Command
 
         $lines = collect(File::lines($logFile))
             ->map(fn($line) => json_decode(substr($line, strpos($line, '{')), true))
-            ->filter(fn($data) => isset($data['time']) && Carbon::parse($data['time'])->greaterThan(Carbon::now()->subHour()));
+            ->filter(fn($data) => isset($data['time']) && Carbon::parse($data['time'])->greaterThan(Carbon::now()->subHour()))
+            ->map(function ($data) {
+                // agar path yo‘q bo‘lsa, uni 'unknown' deb belgilaymiz
+                $data['path'] = $data['path'] ?? 'Noma’lum endpoint';
+                if ($data['path'] === '/' || $data['path'] === '') {
+                    $data['path'] = 'Noma’lum endpoint';
+                }
+                return $data;
+            });
 
         if ($lines->isEmpty()) {
             $this->info("⚠️ So‘nggi 1 soatda so‘rovlar yo‘q.");
@@ -36,10 +44,15 @@ class MonitoringReport extends Command
         $deviceCount = $lines->filter(fn($x) => str_contains($x['path'] ?? '', 'hikvision/event'))->count();
         $userCount = $total - $deviceCount;
 
-        $topEndpoints = $lines->groupBy('path')->map->count()->sortDesc()->take(5);
-        $fastest = $lines->sortBy('duration_ms')->take(5);
-        $slowest = $lines->sortByDesc('duration_ms')->take(5);
-        $errors = $lines->where('status', '>=', 400)->groupBy('path')->map->count()->sortDesc()->take(5);
+        $topEndpoints = $lines->where('path', '!=', 'Noma’lum endpoint')
+            ->groupBy('path')->map->count()->sortDesc()->take(5);
+        $fastest = $lines->where('path', '!=', 'Noma’lum endpoint')
+            ->sortBy('duration_ms')->take(5);
+        $slowest = $lines->where('path', '!=', 'Noma’lum endpoint')
+            ->sortByDesc('duration_ms')->take(5);
+        $errors = $lines->where('status', '>=', 400)
+            ->where('path', '!=', 'Noma’lum endpoint')
+            ->groupBy('path')->map->count()->sortDesc()->take(5);
 
         // 🔹 Server yuklanishi (to‘g‘ri hisoblash)
         $usage = $this->getSystemUsage();
