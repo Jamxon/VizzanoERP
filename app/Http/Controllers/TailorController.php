@@ -170,38 +170,68 @@ class TailorController extends Controller
         }
     }
 
+   
     public function getModelWithTarification(): \Illuminate\Http\JsonResponse
     {
         $user = auth()->user();
         $group = $user->employee->group ?? null;
+        $branchId = $user->employee->branch_id;
+        $roleName = $user->role->name;
 
         $startDate = now()->subDays(14)->toDateString();
         $endDate = now()->addDay()->toDateString();
 
-        $order = OrderGroup::query()
-            ->when($user->role->name === 'tailor' && $group, function ($q) use ($group) {
-                // 👷‍♂️ Agar role = tailor bo‘lsa, group filter ishlaydi
-                $q->where('group_id', $group->id);
-            })
-            // universalTailor bo‘lsa, bu filter umuman qo‘shilmaydi
-            ->whereHas('order', function ($query) use ($user) {
-                $query->whereIn('status', ['tailoring', 'tailored', 'pending', 'cutting']);
-                $query->where('branch_id', $user->employee->branch_id);
-            })
+        // Index'lar kerak:
+        // orders: (branch_id, status), created_at
+        // order_groups: group_id, order_id
+        // sewing_outputs: (submodel_id, created_at)
+        // tarification_categories: (submodel_id, region)
+
+        $query = OrderGroup::query()
+            ->select('order_groups.*')
+            // Role-based filter (index ishlatadi)
+            ->when($roleName === 'tailor' && $group, fn($q) => $q->where('group_id', $group->id))
+            // Order filter (bitta join orqali)
+            ->join('orders', 'order_groups.order_id', '=', 'orders.id')
+            ->whereIn('orders.status', ['tailoring', 'tailored', 'pending', 'cutting'])
+            ->where('orders.branch_id', $branchId)
+            // Order model join
+            ->join('order_models', 'orders.id', '=', 'order_models.order_id')
+            // Submodel filter (LEFT JOIN optimal)
+            ->leftJoin('submodels', 'order_models.id', '=', 'submodels.order_model_id')
+            // Complex condition optimized
             ->where(function ($q) use ($startDate, $endDate) {
-                $q->whereHas('order.orderModel.submodels.sewingOutputs', function ($query) use ($startDate, $endDate) {
-                    $query->whereBetween('created_at', [$startDate, $endDate]);
+                // Sewing outputs mavjud bo'lsa va sana oralig'ida
+                $q->whereExists(function ($query) use ($startDate, $endDate) {
+                    $query->select(\DB::raw(1))
+                        ->from('sewing_outputs')
+                        ->whereColumn('sewing_outputs.submodel_id', 'submodels.id')
+                        ->whereBetween('sewing_outputs.created_at', [$startDate, $endDate])
+                        // Tarification ham bor bo'lishi kerak
+                        ->whereExists(function ($subQuery) {
+                            $subQuery->select(\DB::raw(1))
+                                ->from('tarification_categories')
+                                ->whereColumn('tarification_categories.submodel_id', 'submodels.id')
+                                ->where('tarification_categories.region', 'uz');
+                        });
                 })
-                    ->whereHas('order.orderModel.submodels.tarificationCategories', function ($query) {
-                        $query->where('region', 'uz');
-                    })
-                    ->orWhereDoesntHave('order.orderModel.submodels.sewingOutputs');
+                // Yoki sewing outputs yo'q
+                ->orWhereNotExists(function ($query) {
+                    $query->select(\DB::raw(1))
+                        ->from('sewing_outputs')
+                        ->whereColumn('sewing_outputs.submodel_id', 'submodels.id');
+                });
             })
+            // Eager loading optimized
             ->with([
-                'order.orderModel.model',
-                'order.orderModel.submodels.submodel'
-            ])
-            ->get();
+                'order' => fn($q) => $q->select('id', 'branch_id', 'status'),
+                'order.orderModel' => fn($q) => $q->select('id', 'order_id', 'model_id'),
+                'order.orderModel.model' => fn($q) => $q->select('id', 'name'), // kerakli fieldlar
+                'order.orderModel.submodels' => fn($q) => $q->select('id', 'order_model_id', 'submodel_id'),
+                'order.orderModel.submodels.submodel' => fn($q) => $q->select('id', 'name'),
+            ]);
+
+        $order = $query->get();
 
         $resource = ShowOrderForTailorResource::collection($order);
 
