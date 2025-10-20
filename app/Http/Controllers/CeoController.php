@@ -101,7 +101,7 @@ class CeoController extends Controller
                         'order.orderModel.submodels' => function ($q) {
                             $q->select('id', 'order_model_id', 'submodel_id')
                                 ->with([
-                                    'sewingOutputs:id,order_submodel_id,quantity,created_at, time_id',
+                                    'sewingOutputs:id,order_submodel_id,quantity,created_at',
                                     'submodel:id,name',
                                     'sewingOutputs.time:id,name',
                                 ]);
