@@ -41,22 +41,15 @@ class MonitoringReport extends Command
         $slowest = $lines->sortByDesc('duration_ms')->take(5);
         $errors = $lines->where('status', '>=', 400)->groupBy('path')->map->count()->sortDesc()->take(5);
 
-        // 🔹 Server load
-        $cpu = (float) trim(shell_exec("top -bn1 | grep 'Cpu(s)' | awk '{print $2 + $4}'"));
-        $ramUsed = shell_exec("free -m | awk 'NR==2{print $3}'");
-        $ramTotal = shell_exec("free -m | awk 'NR==2{print $2}'");
-        $ramPercent = round(($ramUsed / $ramTotal) * 100, 2);
-        $diskInfo = trim(shell_exec("df -h / | awk 'NR==2{print $3\"/\"$2\" (\"$5\")\"}'"));
-
-        $cpuEmoji = $this->getLoadEmoji($cpu);
-        $ramEmoji = $this->getLoadEmoji($ramPercent);
+        // 🔹 Server yuklanishi (to‘g‘ri hisoblash)
+        $usage = $this->getSystemUsage();
 
         $message = "😎 *Server tinch, hammasi joyida!*\n"
             . "🧠 *Server Monitoring (So‘nggi 1 soat)*\n"
             . "🕒 " . now()->toDateTimeString() . "\n\n"
-            . "{$cpuEmoji} CPU: {$cpu}%\n"
-            . "{$ramEmoji} RAM: {$ramUsed}/{$ramTotal}MB ({$ramPercent}%)\n"
-            . "🟢 Disk: {$diskInfo}\n\n"
+            . "{$usage['cpu']['status']} CPU: {$usage['cpu']['percent']}%\n"
+            . "{$usage['ram']['status']} RAM: {$usage['ram']['used']} / {$usage['ram']['total']} ({$usage['ram']['percent']}%)\n"
+            . "{$usage['disk']['status']} Disk: {$usage['disk']['used']} / {$usage['disk']['total']} ({$usage['disk']['percent']}%)\n\n"
             . "📈 *So‘rov statistikasi*\n"
             . "🔹 Jami: {$total} ta\n"
             . "🤖 Qurilmadan: {$deviceCount} ta\n"
@@ -75,6 +68,61 @@ class MonitoringReport extends Command
         ]);
 
         $this->info("✅ Hisobot yuborildi!");
+    }
+
+    // 🔹 CPU, RAM va Diskni aniq hisoblovchi funksiya
+    private function getSystemUsage()
+    {
+        // CPU
+        $cpuLoad = sys_getloadavg();
+        $cpuCores = (int)shell_exec('nproc');
+        $cpuPercent = isset($cpuLoad[0]) ? round($cpuLoad[0] * 100 / $cpuCores, 2) : 0;
+
+        // RAM
+        $memInfo = file_get_contents('/proc/meminfo');
+        preg_match('/MemTotal:\s+(\d+)/', $memInfo, $totalMem);
+        preg_match('/MemAvailable:\s+(\d+)/', $memInfo, $freeMem);
+
+        $totalMemKB = (int)$totalMem[1];
+        $freeMemKB = (int)$freeMem[1];
+        $usedMemKB = $totalMemKB - $freeMemKB;
+
+        $ramPercent = round(($usedMemKB / $totalMemKB) * 100, 2);
+
+        // Disk
+        $totalDisk = disk_total_space("/");
+        $freeDisk = disk_free_space("/");
+        $usedDisk = $totalDisk - $freeDisk;
+        $diskPercent = round(($usedDisk / $totalDisk) * 100, 2);
+
+        return [
+            'cpu' => [
+                'percent' => $cpuPercent,
+                'status' => $this->getLoadEmoji($cpuPercent),
+            ],
+            'ram' => [
+                'percent' => $ramPercent,
+                'used' => $this->formatBytes($usedMemKB * 1024),
+                'total' => $this->formatBytes($totalMemKB * 1024),
+                'status' => $this->getLoadEmoji($ramPercent),
+            ],
+            'disk' => [
+                'percent' => $diskPercent,
+                'used' => $this->formatBytes($usedDisk),
+                'total' => $this->formatBytes($totalDisk),
+                'status' => $this->getLoadEmoji($diskPercent),
+            ],
+        ];
+    }
+
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision) . ' ' . $units[$pow];
     }
 
     private function getLoadEmoji($percent)
