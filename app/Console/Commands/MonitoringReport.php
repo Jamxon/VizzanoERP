@@ -14,8 +14,8 @@ class MonitoringReport extends Command
 
     public function handle()
     {
-        $botToken = 'YOUR_TELEGRAM_BOT_TOKEN';
-        $chatId = 'YOUR_CHAT_ID';
+        $botToken = '8443951014:AAHMmbRm5bgFCRk1h4GjFP5WUg9H1rMsiIk';
+        $chatId = '5228018221';
         $logFile = storage_path('logs/requests.log');
 
         if (!File::exists($logFile)) {
