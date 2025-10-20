@@ -15,6 +15,7 @@ class RequestLogger
         $duration = round((microtime(true) - $start) * 1000, 2); // ms
 
         Log::channel('requests')->info(json_encode([
+            'user_id' => optional(auth()->user())->id,
             'method' => $request->method(),
             'path' => $request->path(),
             'status' => $response->status(),

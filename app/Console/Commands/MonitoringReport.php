@@ -44,6 +44,20 @@ class MonitoringReport extends Command
         $deviceCount = $lines->filter(fn($x) => str_contains($x['path'] ?? '', 'hikvision/event'))->count();
         $userCount = $total - $deviceCount;
 
+        $userActivity = $lines->whereNotNull('user_id')
+            ->groupBy('user_id')
+            ->map->count()
+            ->sortDesc();
+
+        $mostActive = $userActivity->take(5);
+        $leastActive = $userActivity->reverse()->take(5);
+
+        // Foydalanuvchi ma’lumotlarini olish
+        $users = User::with('employee:id,user_id,name,position')
+            ->whereIn('id', $userActivity->keys())
+            ->get()
+            ->keyBy('id');
+
         $topEndpoints = $lines->where('path', '!=', 'Noma’lum endpoint')
             ->groupBy('path')->map->count()->sortDesc()->take(5);
         $fastest = $lines->where('path', '!=', 'Noma’lum endpoint')
@@ -71,8 +85,10 @@ class MonitoringReport extends Command
             . "\n⚡ *Eng tez endpointlar:*\n" . $this->formatSpeedList($fastest, true)
             . "\n🐢 *Eng sekin endpointlar:*\n" . $this->formatSpeedList($slowest)
             . "\n⚠️ *Xato bergan endpointlar:*\n" . $this->formatList($errors)
+            . "\n\n🧍‍♂️ *Eng faol foydalanuvchilar:*\n" . $this->formatUserList($mostActive, $users)
+            . "\n😴 *Eng sust foydalanuvchilar:*\n" . $this->formatUserList($leastActive, $users)
             . "\n\n🎯 Monitoring by *VizzanoERP Bot*";
-
+            
         // Telegramga yuborish
         Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
             'chat_id' => $chatId,
