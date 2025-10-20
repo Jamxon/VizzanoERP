@@ -1136,6 +1136,41 @@ class SuperHRController extends Controller
             }
 
 
+                        // 🔹 Salary o‘zgarganini tekshiramiz
+            if ($request->filled('salary') && $request->salary != $oldData['salary']) {
+                // 1. Jadvalga yozish
+                \DB::table('salary_changes')->insert([
+                    'employee_id' => $employee->id,
+                    'changed_by' => auth()->id(),
+                    'old_salary' => $oldData['salary'],
+                    'new_salary' => $request->salary,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // 2. Telegramga yuborish
+                $botToken = '8356632904:AAGNr0sI2ClfY7-J76tPMEeC1KP1UO_ZdGU';
+                $chatId = '5228018221';
+                $message = "💰 *Ish haqi o‘zgartirildi!*\n"
+                    . "👨‍🏭 Xodim: *{$employee->name}*\n"
+                    . "📞 Tel: {$employee->phone}\n"
+                    . "💵 Eski: {$oldData['salary']} so‘m\n"
+                    . "💵 Yangi: {$request->salary} so‘m\n"
+                    . "👤 O‘zgartirgan: *" . auth()->user()->name . "*\n"
+                    . "🕒 " . now()->format('Y-m-d H:i');
+
+                try {
+                    \Illuminate\Support\Facades\Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                        'chat_id' => $chatId,
+                        'text' => $message,
+                        'parse_mode' => 'Markdown'
+                    ]);
+                } catch (\Throwable $e) {
+                    \Log::error("Telegramga yuborishda xato: " . $e->getMessage());
+                }
+            }
+
+
 
             DB::commit();
 
