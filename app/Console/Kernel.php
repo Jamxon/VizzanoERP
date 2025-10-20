@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('attendance:mark-absent')->dailyAt('23:50');
         $schedule->command('attendance:mark-left')->dailyAt('17:30');
         $schedule->command('kpi:calculate')->monthlyOn(Carbon::now()->endOfMonth()->day, '23:55');
+        $schedule->command('monitoring:report')->hourly();
     }
 
     /**
