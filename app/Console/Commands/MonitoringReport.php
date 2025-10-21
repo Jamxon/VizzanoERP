@@ -90,12 +90,9 @@ class MonitoringReport extends Command
             . "\n😴 *Eng sust foydalanuvchilar:*\n" . $this->formatUserList($leastActive, $users)
             . "\n\n🎯 Monitoring by *VizzanoERP Bot*";
 
-        // Telegramga yuborish
-        Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-            'chat_id' => $chatId,
-            'text' => $message,
-            'parse_mode' => 'Markdown'
-        ]);
+        // Telegramga yuborish (450 belgidan oshsa, bo‘lib yuboradi)
+        $this->sendLongMessage($botToken, $chatId, $message);
+
 
         $this->info("✅ Hisobot yuborildi!");
 
@@ -221,5 +218,22 @@ class MonitoringReport extends Command
             }
         })->join("\n");
     }
+
+    private function sendLongMessage($botToken, $chatId, $message)
+    {
+        $chunks = str_split($message, 450);
+    
+        foreach ($chunks as $chunk) {
+            Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                'chat_id' => $chatId,
+                'text' => $chunk,
+                'parse_mode' => 'Markdown'
+            ]);
+    
+            // Telegram flood-limitdan qochish uchun ozgina pauza
+            usleep(300000); // 0.3 soniya
+        }
+    }
+
 
 }
