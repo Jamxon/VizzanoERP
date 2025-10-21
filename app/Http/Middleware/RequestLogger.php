@@ -14,11 +14,15 @@ class RequestLogger
         $response = $next($request);
         $duration = round((microtime(true) - $start) * 1000, 2); // ms
 
+        $status = method_exists($response, 'getStatusCode')
+            ? $response->getStatusCode()
+            : null;
+
         Log::channel('requests')->info(json_encode([
             'user_id' => optional(auth()->user())->id,
             'method' => $request->method(),
             'path' => $request->path(),
-            'status' => $response->status(),
+            'status' => $status,
             'ip' => $request->ip(),
             'agent' => $request->userAgent(),
             'time' => now()->toDateTimeString(),
