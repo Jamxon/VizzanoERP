@@ -24,17 +24,17 @@ class MonitoringReport extends Command
             return;
         }
 
-        $lines = collect(File::lines($logFile))
-            ->map(fn($line) => json_decode(substr($line, strpos($line, '{')), true))
-            ->filter(fn($data) => isset($data['time']) && Carbon::parse($data['time'])->greaterThan(Carbon::now()->subHour()))
-            ->map(function ($data) {
-                // agar path yo‘q bo‘lsa, uni 'unknown' deb belgilaymiz
-                $data['path'] = $data['path'] ?? 'Noma’lum endpoint';
-                if ($data['path'] === '/' || $data['path'] === '') {
-                    $data['path'] = 'Noma’lum endpoint';
-                }
-                return $data;
-            });
+        $lines = collect($this->readLogFile($logFile))
+        ->map(fn($line) => json_decode(substr($line, strpos($line, '{')), true))
+        ->filter(fn($data) => isset($data['time']) && \Carbon\Carbon::parse($data['time'])->greaterThan(\Carbon\Carbon::now()->subHour()))
+        ->map(function ($data) {
+            $data['path'] = $data['path'] ?? 'Noma’lum endpoint';
+            if ($data['path'] === '/' || $data['path'] === '') {
+                $data['path'] = 'Noma’lum endpoint';
+            }
+            return $data;
+        });
+
 
         if ($lines->isEmpty()) {
             $this->info("⚠️ So‘nggi 1 soatda so‘rovlar yo‘q.");
@@ -233,6 +233,19 @@ class MonitoringReport extends Command
             // Telegram flood-limitdan qochish uchun ozgina pauza
             usleep(300000); // 0.3 soniya
         }
+    }
+    private function readLogFile($path)
+    {
+        $handle = fopen($path, 'r');
+        if (!$handle) {
+            return [];
+        }
+    
+        while (($line = fgets($handle)) !== false) {
+            yield trim($line);
+        }
+    
+        fclose($handle);
     }
 
 
