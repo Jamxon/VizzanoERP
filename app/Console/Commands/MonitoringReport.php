@@ -24,16 +24,34 @@ class MonitoringReport extends Command
             return;
         }
 
-        $lines = collect($this->readLogFile($logFile))
-        ->map(fn($line) => json_decode(substr($line, strpos($line, '{')), true))
-        ->filter(fn($data) => isset($data['time']) && \Carbon\Carbon::parse($data['time'])->greaterThan(\Carbon\Carbon::now()->subHour()))
-        ->map(function ($data) {
-            $data['path'] = $data['path'] ?? 'Noma’lum endpoint';
-            if ($data['path'] === '/' || $data['path'] === '') {
-                $data['path'] = 'Noma’lum endpoint';
+        $lines = [];
+    $handle = fopen($logFile, 'r');
+    if ($handle) {
+        while (($line = fgets($handle)) !== false) {
+            $jsonStart = strpos($line, '{');
+            if ($jsonStart === false) continue;
+
+            $data = json_decode(substr($line, $jsonStart), true);
+            if (!$data || !isset($data['time'])) continue;
+
+            // faqat so‘nggi 1 soatliklarini olamiz
+            if (\Carbon\Carbon::parse($data['time'])->greaterThan(\Carbon\Carbon::now()->subHour())) {
+                $data['path'] = $data['path'] ?? 'Noma’lum endpoint';
+                if ($data['path'] === '/' || $data['path'] === '') {
+                    $data['path'] = 'Noma’lum endpoint';
+                }
+                $lines[] = $data;
             }
-            return $data;
-        });
+        }
+        fclose($handle);
+    }
+
+    if (empty($lines)) {
+        $this->info("⚠️ So‘nggi 1 soatda so‘rovlar yo‘q.");
+        return;
+    }
+
+    $lines = collect($lines); // endi faqat 1 soatlik ma’lumotni yig‘adi
 
 
         if ($lines->isEmpty()) {
