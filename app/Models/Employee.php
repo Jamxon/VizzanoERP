@@ -157,4 +157,14 @@ class Employee extends Model
         return $this->hasMany(EmployeeMonthlyPiecework::class);
     }
 
+    public function salaryChanges()
+    {
+        return $this->hasMany(SalaryChanges::class);    
+    }
+
+    public function groupChanges()
+    {
+        return $this->hasMany(GroupChanges::class);    
+    }
+
 }

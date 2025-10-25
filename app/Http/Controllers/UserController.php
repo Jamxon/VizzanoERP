@@ -230,7 +230,9 @@ class UserController extends Controller
                     if ($startDate && $endDate) {
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
-                }
+                },
+                'salaryChanges',
+                'groupChanges'
             ]);
         } else {
             $employee->load([
@@ -288,7 +290,9 @@ class UserController extends Controller
                     if ($startDate && $endDate) {
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
-                }
+                },
+                'salaryChanges',
+                'groupChanges'
             ]);
         }
 
