@@ -783,11 +783,11 @@ class UserController extends Controller
                 'old_department' => [
                     'id' => optional($item->oldDepartment)->id,
                     'name' => optional($item->oldDepartment)->name
-                ]
+                ],
                 'new_department' => [
                     'id' => optional($item->newDepartment)->id,
                     'name' => optional($item->newDepartment)->name
-                ]
+                ],
                 'changed_by' => $item->changed_by,
                 'ip' => $item->ip,
                 'device' => $item->device,
