@@ -1144,6 +1144,8 @@ class SuperHRController extends Controller
                     'changed_by' => auth()->id(),
                     'old_salary' => $oldData['salary'],
                     'new_salary' => $request->salary,
+                    'old_type' => $oldData['payment_type'],
+                    'new_type' => $employee->payment_type,
                     'created_at' => now(),
                     'updated_at' => now(),
                     'ip' => $request->ip(),
