@@ -194,10 +194,17 @@ class MonitoringReport extends Command
 
     private function sendMessage(string $text)
     {
-        Http::post("https://api.telegram.org/bot{$this->telegramToken}/sendMessage", [
-            'chat_id' => $this->chatId,
-            'text' => $text,
-            'parse_mode' => 'Markdown',
-        ]);
+        try {
+            $response = Http::post("https://api.telegram.org/bot{$this->telegramToken}/sendMessage", [
+                'chat_id' => $this->chatId,
+                'text' => $text,
+                'parse_mode' => 'Markdown',
+            ]);
+
+            Log::info('Telegram response: ' . $response->body());
+        } catch (\Throwable $e) {
+            Log::error('Telegram send error: ' . $e->getMessage());
+        }
     }
+
 }
