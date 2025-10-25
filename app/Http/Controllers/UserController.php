@@ -699,7 +699,7 @@ class UserController extends Controller
 
     public function getSalaryChangesAll(Request $request): \Illuminate\Http\JsonResponse
     {
-        $salaryChanges = SalaryChange::whereHas('employee', function($q) {
+        $salaryChanges = SalaryChange::whereHas('employee', function($q, $request) {
                 $q->where('branch_id', auth()->user()->employee->branch_id);
                 $q->when($request->search, function($q2) use ($request) {
                     $q2->where('name', 'ilike', '%' . $request->search . '%');
