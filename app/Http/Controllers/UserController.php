@@ -512,7 +512,7 @@ class UserController extends Controller
             if ($start_date && $end_date) {
                 $query->whereBetween('created_at', [$start_date, $end_date])
             }
-        }
+        };
 
         $relations['attendanceSalaries'] = function ($query) use ($start_date, $end_date) {
             if ($start_date && $end_date) {
