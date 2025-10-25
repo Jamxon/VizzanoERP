@@ -14,6 +14,8 @@ class GroupChange extends Model
         'changed_by',
         'old_group_id',
         'new_group_id',
+        'old_department_id',
+        'new_department_id',
         'ip',
         'device'
     ];
@@ -36,5 +38,15 @@ class GroupChange extends Model
     public function newGroup()
     {
         return $this->belongsTo(Group::class, 'new_group_id');
+    }
+    
+    public function oldDepartment()
+    {
+        return $this->belongsTo(Department::class, 'old_department_id');    
+    }
+
+    public function newDeparmtent()
+    {
+        return $this->belongsTo(Deparmtent::class, 'new_department_id');    
     }
 }

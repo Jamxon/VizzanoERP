@@ -763,6 +763,8 @@ class UserController extends Controller
                 'user.employee:id,name,user_id',
                 'oldGroup:id,name',
                 'newGroup:id,name',
+                'oldDepartment:id,name',
+                'newDepartment:id,name'
             ])
             ->orderByDesc('created_at')
             ->paginate(20);
@@ -778,6 +780,14 @@ class UserController extends Controller
                     'id' => optional($item->newGroup)->id,
                     'name' => optional($item->newGroup)->name,
                 ],
+                'old_department' => [
+                    'id' => optional($item->oldDepartment)->id,
+                    'name' => optional($item->oldDepartment)->name
+                ]
+                'new_department' => [
+                    'id' => optional($item->newDepartment)->id,
+                    'name' => optional($item->newDepartment)->name
+                ]
                 'changed_by' => $item->changed_by,
                 'ip' => $item->ip,
                 'device' => $item->device,

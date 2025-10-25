@@ -1135,12 +1135,14 @@ class SuperHRController extends Controller
                 ]);
             }
             // endi groupChanges jadvaliga yozish kerak
-            if ($request->filled('group_id') && $request->group_id != $oldData['group_id']) {
+            if ($request->group_id != $oldData['group_id'] || $request->department_id != $oldData['department_id']) {
                 DB::table('group_changes')->insert([
                     'employee_id' => $employee->id,
                     'changed_by' => auth()->id(),
                     'old_group_id' => $oldData['group_id'],
                     'new_group_id' => $request->group_id,
+                    'old_department_id' => $oldData['department_id'],
+                    'new_department_id' => $request->department_id,
                     'created_at' => now(),
                     'updated_at' => now(),
                     'ip' => $request->ip(),
@@ -1148,7 +1150,7 @@ class SuperHRController extends Controller
                 ]);
             }
 
-                        // 🔹 Salary o‘zgarganini tekshiramiz
+            // 🔹 Salary o‘zgarganini tekshiramiz
             if ($request->filled('salary') && $request->salary != $oldData['salary']) {
                 // 1. Jadvalga yozish
                 \DB::table('salary_changes')->insert([
