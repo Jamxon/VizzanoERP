@@ -113,6 +113,7 @@ class HikvisionEventController extends Controller
                     // === AUP kechikish tekshiruvi ===
                     if ($employee->type === 'aup') {
                         $lateTime = Carbon::createFromTime(7, 30, 0, 'Asia/Tashkent');
+
                         if ($eventCarbon->gt($lateTime)) {
                             $lateChatId = -4832517980;
                             $botToken = '8466233197:AAFpW34maMs_2y5-Ro_2FQNxniLBaWwLRD8';
@@ -130,21 +131,30 @@ class HikvisionEventController extends Controller
                                 $employee->group->name ?? '-'
                             );
 
+                            // Employee rasmi (to‘liq URL shaklida)
+                            $imageUrl = !empty($employee->img)
+                                ? (str_starts_with($employee->img, 'http') ? $employee->img : url($employee->img))
+                                : null;
 
-                            // fon jarayon sifatida yuborish
-                            dispatch(function () use ($botToken, $lateChatId, $msg, $imagePath) {
+                            // Agar eventda ham rasm (masalan, qurilmadan olingan surat) bo‘lsa — ustunlik beramiz
+                            if (!empty($imagePath)) {
+                                $imageUrl = $imagePath;
+                            }
+
+                            // Fon jarayon sifatida yuborish
+                            dispatch(function () use ($botToken, $lateChatId, $msg, $imageUrl) {
                                 try {
-                                    Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-                                        'chat_id' => $lateChatId,
-                                        'text' => $msg,
-                                        'parse_mode' => 'Markdown',
-                                    ]);
-
-                                    if (!empty($imagePath)) {
-                                        Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                                    if ($imageUrl) {
+                                        \Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
                                             'chat_id' => $lateChatId,
-                                            'photo' => $imagePath,
+                                            'photo' => $imageUrl,
                                             'caption' => $msg,
+                                            'parse_mode' => 'Markdown',
+                                        ]);
+                                    } else {
+                                        \Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                                            'chat_id' => $lateChatId,
+                                            'text' => $msg,
                                             'parse_mode' => 'Markdown',
                                         ]);
                                     }
@@ -154,6 +164,7 @@ class HikvisionEventController extends Controller
                             });
                         }
                     }
+
 
                     Log::add($employee->user_id ?? null, 'Hodim ishga keldi', 'Check In', null, [
                         'employee_id' => $employee->id,
