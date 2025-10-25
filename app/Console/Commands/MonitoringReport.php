@@ -10,7 +10,7 @@ use App\Models\User;
 
 class MonitoringReport extends Command
 {
-    protected $signature = 'monitoring:report {--hours=1 : So‘nggi necha soatlik ma’lumot olinadi}';
+    protected $signature = 'monitoring:report';
     protected $description = 'Server va foydalanuvchi faoliyati haqida jonli hisobot';
 
     public function handle()
