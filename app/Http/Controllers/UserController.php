@@ -697,9 +697,15 @@ class UserController extends Controller
         ]);
     }
 
-    public function getSalaryChangesAll()
+    public function getSalaryChangesAll(Request $request): \Illuminate\Http\JsonResponse
     {
-        $salaryChanges = SalaryChange::with([
+        $salaryChanges = SalaryChange::whereHas('employee', function($q) {
+                $q->where('branch_id', auth()->user()->employee->branch_id);
+                $q->when($request->search, function($q2) use ($request) {
+                    $q2->where('name', 'ilike', '%' . $request->search . '%');
+                });
+            })
+            ->with([
                 'employee:id,name',
                 'user:id',
                 'user.employee:id,name,user_id'
