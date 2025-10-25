@@ -1151,7 +1151,7 @@ class SuperHRController extends Controller
             }
 
             // 🔹 Salary o‘zgarganini tekshiramiz
-            if ($request->filled('salary') && $request->salary != $oldData['salary']) {
+            if ($request->salary != $oldData['salary']) {
             // 1. Jadvalga yozish
             \DB::table('salary_changes')->insert([
                 'employee_id' => $employee->id,
