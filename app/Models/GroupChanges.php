@@ -27,4 +27,14 @@ class GroupChange extends Model
     {
         return $this->belongsTo(User::class, 'changed_by');
     }
+
+    public function oldGroup()
+    {
+        return $this->belongsTo(Group::class, 'old_group_id');
+    }
+
+    public function newGroup()
+    {
+        return $this->belongsTo(Group::class, 'new_group_id');
+    }
 }

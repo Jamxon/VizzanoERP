@@ -8,6 +8,7 @@ use App\Models\Log;
 use App\Models\User;
 use App\Models\Issue;
 use App\Models\SalaryChange;
+use App\Models\GroupChange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -740,6 +741,56 @@ class UserController extends Controller
         });
 
         return response()->json($salaryChanges);
+    }
+
+    public function getGroupChangesAll(Request $request)
+    {
+        $groupChanges = GroupChange::whereHas('employee', function($q) use ($request) {
+                $q->where('branch_id', auth()->user()->employee->branch_id);
+                $q->when($request->search, function($q2) use ($request) {
+                    $q2->where('name', 'ilike', '%' . $request->search . '%');
+                });
+            })
+            ->with([
+                'employee:id,name',
+                'user:id',
+                'user.employee:id,name,user_id',
+                'oldGroup:id,name',
+                'newGroup:id,name',
+            ])
+            ->orderByDesc('created_at')
+            ->paginate(20);
+
+        $groupChanges->getCollection()->transform(function ($item) {
+            return [
+                'id' => $item->id,
+                'old_group' => [
+                    'id' => optional($item->oldGroup)->id,
+                    'name' => optional($item->oldGroup)->name,
+                ],
+                'new_group' => [
+                    'id' => optional($item->newGroup)->id,
+                    'name' => optional($item->newGroup)->name,
+                ],
+                'changed_by' => $item->changed_by,
+                'ip' => $item->ip,
+                'device' => $item->device,
+                'created_at' => $item->created_at,
+                'employee' => [
+                    'id' => optional($item->employee)->id,
+                    'name' => optional($item->employee)->name,
+                ],
+                'user' => [
+                    'id' => optional($item->user)->id,
+                    'employee' => [
+                        'id' => optional(optional($item->user)->employee)->id,
+                        'name' => optional(optional($item->user)->employee)->name,
+                    ],
+                ],
+            ];
+        });
+
+        return response()->json($groupChanges);    
     }
 
 
