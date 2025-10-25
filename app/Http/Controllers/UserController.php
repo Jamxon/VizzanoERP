@@ -236,6 +236,13 @@ class UserController extends Controller
                     if ($startDate && $endDate) {
                         $query->whereBetween('created_at', [$startDate, $endDate]);
                     }
+
+                    $query->with([
+                        'oldGroup:id,name',
+                        'newGroup:id,name',
+                        'oldDepartment:id,name',
+                        'newDepartment:id,name',
+                    ]);
                 }
             ]);
         } else {
@@ -300,6 +307,13 @@ class UserController extends Controller
                     if ($startDate && $endDate) {
                         $query->whereBetween('created_at', [$startDate, $endDate]);
                     }
+
+                    $query->with([
+                        'oldGroup:id,name',
+                        'newGroup:id,name',
+                        'oldDepartment:id,name',
+                        'newDepartment:id,name',
+                    ]);
                 }
             ]);
         }
@@ -512,6 +526,13 @@ class UserController extends Controller
             if ($start_date && $end_date) {
                 $query->whereBetween('created_at', [$start_date, $end_date]);
             }
+
+            $query->with([
+                'oldGroup:id,name',
+                'newGroup:id,name',
+                'oldDepartment:id,name',
+                'newDepartment:id,name',
+            ]);
         };
 
         $relations['attendanceSalaries'] = function ($query) use ($start_date, $end_date) {
