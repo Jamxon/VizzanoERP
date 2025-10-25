@@ -131,30 +131,21 @@ class HikvisionEventController extends Controller
                                 $employee->group->name ?? '-'
                             );
 
-                            // Employee rasmi (to‘liq URL yoki local path bo‘lishi mumkin)
+                            // Default employee rasmi
                             $imageUrl = !empty($employee->img)
                                 ? (str_starts_with($employee->img, 'http') ? $employee->img : url($employee->img))
                                 : null;
 
-                            // Hikvisiondan kelgan rasm bo‘lsa, ustunlik beramiz
+                            // Hikvision eventdan kelgan rasm (S3 dan)
                             if (!empty($imagePath)) {
-                                // Agar rasm Base64 bo‘lsa, vaqtincha saqlab, file URL qilib yuboramiz
-                                if (str_starts_with($imagePath, 'data:image')) {
-                                    $imageData = explode(',', $imagePath)[1] ?? null;
-                                    if ($imageData) {
-                                        $tempFile = storage_path('app/public/hikvision_' . uniqid() . '.jpg');
-                                        file_put_contents($tempFile, base64_decode($imageData));
-                                        $imageUrl = url('storage/' . basename($tempFile));
-                                    }
-                                } else {
-                                    $imageUrl = $imagePath;
-                                }
+                                $imageUrl = $imagePath; // bu allaqachon to‘liq public URL
                             }
 
                             // Fon jarayon sifatida yuborish
                             dispatch(function () use ($botToken, $lateChatId, $msg, $imageUrl) {
                                 try {
                                     if ($imageUrl) {
+                                        // Telegramga rasm bilan yuborish
                                         \Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
                                             'chat_id' => $lateChatId,
                                             'photo' => $imageUrl,
@@ -162,18 +153,20 @@ class HikvisionEventController extends Controller
                                             'parse_mode' => 'Markdown',
                                         ]);
                                     } else {
+                                        // Agar rasm yo‘q bo‘lsa, faqat matn yuborish
                                         \Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                                             'chat_id' => $lateChatId,
                                             'text' => $msg,
                                             'parse_mode' => 'Markdown',
                                         ]);
                                     }
-                                } catch (\Exception $e) {
+                                } catch (\Throwable $e) {
                                     \Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
                                 }
                             });
                         }
                     }
+
 
 
 
