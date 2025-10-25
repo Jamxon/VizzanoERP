@@ -135,9 +135,9 @@ class MonitoringReport extends Command
 
             // Faqat so'nggi 1 soatlik ma'lumotlar
             if (Carbon::parse($data['time'])->greaterThan(Carbon::now()->subHour())) {
-                $data['path'] = $data['path'] ?? 'Noma'lum endpoint';
+                $data['path'] = $data['path'] ?? 'Nomalum endpoint';
                 if ($data['path'] === '/' || $data['path'] === '') {
-                    $data['path'] = 'Noma'lum endpoint';
+                    $data['path'] = 'Nomalum endpoint';
                 }
                 $lines[] = $data;
             }
