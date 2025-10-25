@@ -485,7 +485,7 @@ class UserController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-        $relations = ['department', 'position', 'group'];
+        $relations = ['department', 'position', 'group', 'salaryChanges', 'groupChanges'];
 
         // 🔹 KPI, avans va boshqa maosh ma'lumotlari uchun employeeSalaries
         $relations['employeeSalaries'] = function ($query) use ($start_date, $end_date) {
@@ -680,6 +680,8 @@ class UserController extends Controller
                         ]
                     ];
                 }),
+                'salaryChanges' => $employee->salaryChanges,
+                'groupChanges' => $employee->groupChanges
             ],
             'absences' => $absences->map(function ($absence) {
                 return [
