@@ -117,7 +117,7 @@ class AttendanceController extends Controller
                     $botToken = '8466233197:AAFpW34maMs_2y5-Ro_2FQNxniLBaWwLRD8';
 
                     $msg = sprintf(
-`                        "⚠️ *%s* (AUP) kechikib keldi.\n\n" .
+                        "⚠️ *%s* (AUP) kechikib keldi.\n\n" .
                         "📱 *Telefon:* %s\n" .
                         "🕒 *Kirish vaqti:* %s\n" .
                         "🏢 *Bo‘lim:* %s\n" .
@@ -128,7 +128,7 @@ class AttendanceController extends Controller
                         $employee->department->name ?? '-',
                         $employee->group->name ?? '-'
                     );
-`
+
 
                     // fon jarayon sifatida yuborish
                     dispatch(function () use ($botToken, $lateChatId, $msg) {
