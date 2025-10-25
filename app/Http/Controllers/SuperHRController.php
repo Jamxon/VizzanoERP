@@ -1160,6 +1160,8 @@ class SuperHRController extends Controller
                     . "📞 Tel: {$employee->phone}\n"
                     . "💵 Eski: {$oldData['salary']} so‘m\n"
                     . "💵 Yangi: {$request->salary} so‘m\n"
+                    . "🔄 Eski to‘lov turi: {$oldData['payment_type']}\n"
+                    . "🔄 Yangi to‘lov turi: {$employee->payment_type}\n"
                     . "👤 O‘zgartirgan: *" . auth()->user()->employee->name . "*\n"
                     . "🌐 IP: " . $request->ip() . "\n"
                     . "💻 Qurilma: " . $request->header('User-Agent') . "\n"
