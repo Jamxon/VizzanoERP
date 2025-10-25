@@ -129,6 +129,50 @@ class HikvisionEventController extends Controller
                         }
                     }
 
+                        if ($employee->type === 'aup') {
+                        $lateTime = Carbon::createFromTime(7, 30, 0);
+                        if ($eventCarbon->gt($lateTime)) {
+                            $lateChatId = -4832517980; // AUP kechikishlar uchun maxsus chat
+                            $botToken = '8466233197:AAFpW34maMs_2y5-Ro_2FQNxniLBaWwLRD8'; // bot token
+
+                            $msg = sprintf(
+                                "⚠️ *%s %s* (AUP) kechikib keldi.\n🕒 %s\n🏢 Bo‘lim: %s\n👥 Guruh: %s",
+                                $employee->first_name,
+                                $employee->last_name,
+                                $eventCarbon->format('H:i:s'),
+                                $employee->department->name ?? '-',
+                                $employee->group->name ?? '-'
+                            );
+
+                            // ✅ Backgroundda (queue ishlatmasdan) xabar yuborish
+                            dispatch(function () use ($botToken, $lateChatId, $msg, $imagePath) {
+                                try {
+                                    $url = "https://api.telegram.org/bot{$botToken}/sendMessage";
+                                    $payload = [
+                                        'chat_id' => $lateChatId,
+                                        'text' => $msg,
+                                        'parse_mode' => 'Markdown'
+                                    ];
+
+                                    // Xabar yuborish
+                                    Http::post($url, $payload);
+
+                                    // Agar rasm ham bo‘lsa, yuboramiz
+                                    if (!empty($imagePath)) {
+                                        Http::attach('photo', file_get_contents($imagePath), basename($imagePath))
+                                            ->post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                                                'chat_id' => $lateChatId,
+                                                'caption' => $msg,
+                                                'parse_mode' => 'Markdown'
+                                            ]);
+                                    }
+                                } catch (\Exception $e) {
+                                    \Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
+                                }
+                            });
+                        }
+                    }
+
                     Log::add($employee->user_id ?? null, 'Hodim ishga keldi', 'Check In', null, [
                         'employee_id' => $employee->id,
                         'image_path' => $imagePath,
