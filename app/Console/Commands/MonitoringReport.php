@@ -71,37 +71,37 @@ class MonitoringReport extends Command
         // 4️⃣ Xabarlarni tayyorlash (5 ta alohida xabar)
         $messages = [
             // Xabar 1: Server holati va asosiy statistika
-            "📊 <b>VizzanoERP Monitoring Report</b>\n"
+            "📊 VizzanoERP Monitoring Report\n"
             . "🕒 " . now()->toDateTimeString() . "\n\n"
             . "{$usage['cpu']['status']} CPU: {$usage['cpu']['percent']}%\n"
             . "{$usage['ram']['status']} RAM: {$usage['ram']['used']} / {$usage['ram']['total']} ({$usage['ram']['percent']}%)\n"
             . "{$usage['disk']['status']} Disk: {$usage['disk']['used']} / {$usage['disk']['total']} ({$usage['disk']['percent']}%)\n\n"
             . $this->getServerStatusText(max($usage['cpu']['percent'], $usage['ram']['percent'], $usage['disk']['percent']))
-            . "\n\n📈 <b>So'rov statistikasi (So'nggi 1 soat)</b>\n"
+            . "\n\n📈 So'rov statistikasi (So'nggi 1 soat)\n"
             . "🔹 Jami: {$total} ta\n"
             . "🤖 Qurilmadan: {$deviceCount} ta\n"
             . "👨‍💻 Foydalanuvchilardan: {$userCount} ta",
 
             // Xabar 2: Eng ko'p urilgan endpointlar
-            "🔝 <b>Eng ko'p urilgan endpointlar:</b>\n"
+            "🔝 Eng ko'p urilgan endpointlar:\n"
             . $this->formatList($topEndpoints),
 
             // Xabar 3: Tez va sekin endpointlar
-            "⚡ <b>Eng tez ishlagan 5 ta endpoint:</b>\n"
+            "⚡ Eng tez ishlagan 5 ta endpoint:\n"
             . $this->formatSpeedList($fastest, true)
-            . "\n\n🐢 <b>Eng sekin ishlagan 5 ta endpoint:</b>\n"
+            . "\n\n🐢 Eng sekin ishlagan 5 ta endpoint:\n"
             . $this->formatSpeedList($slowest),
 
             // Xabar 4: Xatolar
-            "❌ <b>Xato bergan endpointlar:</b>\n"
+            "❌ Xato bergan endpointlar:\n"
             . $this->formatList($errors),
 
             // Xabar 5: Foydalanuvchilar
-            "🟢 <b>Eng faol foydalanuvchilar:</b>\n"
+            "🟢 Eng faol foydalanuvchilar:\n"
             . $this->formatUserList($mostActive, $users)
-            . "\n\n🔴 <b>Eng sust foydalanuvchilar:</b>\n"
+            . "\n\n🔴 Eng sust foydalanuvchilar:\n"
             . $this->formatUserList($leastActive, $users)
-            . "\n\n🛰 <b>Monitoring by VizzanoERP Bot</b>"
+            . "\n\n🛰 Monitoring by VizzanoERP Bot"
         ];
 
         // 5️⃣ Telegramga yuborish
