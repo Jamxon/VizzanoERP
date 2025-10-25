@@ -696,4 +696,13 @@ class UserController extends Controller
         ]);
     }
 
+    public function getSalaryChangesAll()
+    {
+        $salaryChanges = SalaryChange::with(['employee:id,name', 'user.employee:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($salaryChanges);
+    }
+
 }
