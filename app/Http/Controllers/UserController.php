@@ -699,11 +699,50 @@ class UserController extends Controller
 
     public function getSalaryChangesAll()
     {
-        $salaryChanges = SalaryChange::with(['employee:id,name', 'user.employee:id,name'])
-            ->orderBy('created_at', 'desc')
+        $salaryChanges = SalaryChange::with([
+                'employee:id,name',
+                'user:id,username,role_id,group_id,employee_id',
+                'user.role:id,name,description',
+                'user.group:id,name',
+                'user.employee:id,name'
+            ])
+            ->orderByDesc('created_at')
             ->paginate(20);
+
+        $salaryChanges->getCollection()->transform(function ($item) {
+            return [
+                'id' => $item->id,
+                'employee_id' => $item->employee_id,
+                'changed_by' => $item->changed_by,
+                'old_salary' => $item->old_salary,
+                'new_salary' => $item->new_salary,
+                'old_type' => $item->old_type,
+                'new_type' => $item->new_type,
+                'ip' => $item->ip,
+                'device' => $item->device,
+                'created_at' => $item->created_at,
+                'employee' => [
+                    'id' => optional($item->employee)->id,
+                    'name' => optional($item->employee)->name,
+                ],
+                'user' => [
+                    'id' => optional($item->user)->id,
+                    'username' => optional($item->user)->username,
+                    'role' => [
+                        'id' => optional(optional($item->user)->role)->id,
+                        'name' => optional(optional($item->user)->role)->name,
+                        'description' => optional(optional($item->user)->role)->description,
+                    ],
+                    'employee' => [
+                        'id' => optional(optional($item->user)->employee)->id,
+                        'name' => optional(optional($item->user)->employee)->name,
+                    ],
+                ],
+            ];
+        });
 
         return response()->json($salaryChanges);
     }
+
 
 }
