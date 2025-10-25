@@ -508,9 +508,9 @@ class UserController extends Controller
             }
         };
 
-        $relations['groupChanges'] = function ($query) use ($start_date, $end_date){
+        $relations['groupChanges'] = function ($query) use ($start_date, $end_date) {
             if ($start_date && $end_date) {
-                $query->whereBetween('created_at', [$start_date, $end_date])
+                $query->whereBetween('created_at', [$start_date, $end_date]);
             }
         };
 
