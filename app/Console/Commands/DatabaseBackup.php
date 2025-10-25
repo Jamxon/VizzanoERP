@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Http;
 class DatabaseBackup extends Command
 {
     protected $signature = 'database:backup';
-    protected $description = 'Har kuni 02:00 da database backup yaratib Telegramga yuboradi va o‘chiradi';
+    protected $description = 'Har kuni database backup yaratib Telegramga yuboradi va fayllarni o‘chiradi';
 
     public function handle()
     {
@@ -16,7 +16,7 @@ class DatabaseBackup extends Command
         $fileName = "backup_{$date}.sql";
         $filePath = storage_path("app/{$fileName}");
 
-        // pg_dump orqali backup olish
+        // 1️⃣ Backup yaratish
         $command = sprintf(
             'PGPASSWORD=%s pg_dump -U %s -h %s -d %s -F c -f %s',
             "vizzanopro",    // parol
@@ -26,44 +26,37 @@ class DatabaseBackup extends Command
             $filePath
         );
         exec($command, $output, $resultCode);
-
         if ($resultCode !== 0) {
-            $this->error("Database backup yaratishda xatolik yuz berdi! Xatolik kodi: $resultCode : $command");
+            $this->error("Database backupda xatolik: kod {$resultCode}");
             return;
         }
 
-        $this->info("Database backup yaratildi: $fileName");
-
-        // .sql faylni zip qilamiz
         $zipFileName = "{$fileName}.zip";
         $zipPath = storage_path("app/{$zipFileName}");
 
+        // 2️⃣ Zip yaratish
         $zip = new \ZipArchive();
         if ($zip->open($zipPath, \ZipArchive::CREATE) === TRUE) {
             $zip->addFile($filePath, $fileName);
             $zip->close();
         } else {
-            $this->error("Zip fayl yaratilmadi.");
+            $this->error("Zip fayl yaratilmadi");
             return;
         }
 
-        $this->info("Zip fayl yaratildi: $zipFileName");
+        unlink($filePath); // sqlni o‘chiramiz
 
-        // Faylni bo‘laklash (50 MB dan katta bo‘lsa)
+        // 3️⃣ Bo‘laklab yuborish
         $this->sendFileInChunks($zipPath, $zipFileName);
 
-        // Tozalash
-        unlink($filePath);   // .sql
-        unlink($zipPath);    // .zip
-
-        $this->info("Backup fayllar serverdan o‘chirildi.");
+        unlink($zipPath); // zipni o‘chiramiz
     }
 
     private function sendFileInChunks($filePath, $originalName)
     {
         $botToken = "7905618693:AAFsNBRPGOA5TFVWr8gORlyH_rtXzCYhLS8";
         $chatId = "-1002476073696";
-        $chunkSize = 48 * 1024 * 1024; // 48 MB (Telegram limiti xavfsiz bo‘lsin)
+        $chunkSize = 45 * 1024 * 1024; // 45 MB
 
         $handle = fopen($filePath, 'rb');
         if (!$handle) {
@@ -74,25 +67,33 @@ class DatabaseBackup extends Command
         $part = 1;
         while (!feof($handle)) {
             $chunkData = fread($handle, $chunkSize);
-            $chunkName = $originalName . ".part{$part}";
+            if ($chunkData === false) break;
 
-            $this->info("Yuborilmoqda: {$chunkName}");
+            $chunkName = "{$originalName}.part{$part}";
+            $this->info("📦 Yuborilmoqda: {$chunkName}");
 
-            $response = Http::attach('document', $chunkData, $chunkName)
+            // So‘rovni yuboramiz (retry bilan)
+            $response = Http::timeout(120)
+                ->retry(3, 5) // har 5 soniyada 3 marta urinadi
+                ->attach('document', $chunkData, $chunkName)
                 ->post("https://api.telegram.org/bot{$botToken}/sendDocument", [
                     'chat_id' => $chatId,
                     'caption' => "Backup bo‘lak #{$part}"
                 ]);
 
             if ($response->successful()) {
-                $this->info("{$chunkName} yuborildi.");
+                $this->info("✅ {$chunkName} yuborildi.");
             } else {
-                $this->error("{$chunkName} yuborilmadi: " . $response->body());
+                $this->error("❌ {$chunkName} yuborilmadi: " . $response->body());
             }
 
             $part++;
+
+            // flood-limit uchun kutish
+            sleep(3);
         }
 
         fclose($handle);
+        $this->info("🎉 Barcha bo‘laklar yuborildi.");
     }
 }
