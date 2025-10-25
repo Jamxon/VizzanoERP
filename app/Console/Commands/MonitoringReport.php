@@ -20,253 +20,170 @@ class MonitoringReport extends Command
         $logFile = storage_path('logs/requests.log');
         $hours = (int) $this->option('hours');
 
-        if (!File::exists($logFile)) {
-            $this->error("❌ Log fayl topilmadi!");
-            return;
-        }
-
-        $lines = collect();
-        foreach ($this->readLogFile($logFile) as $line) {
-            $jsonStart = strpos($line, '{');
-            if ($jsonStart === false) continue;
-
-            $json = substr($line, $jsonStart);
-            try {
-                $data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
-            } catch (\Throwable $e) {
-                continue;
+        if (!$telegramToken || !$chatId) {
+                $this->error('Telegram token or chat_id not set in config.');
+                return;
             }
 
-            if (!isset($data['time'])) continue;
+            $this->info('Monitoring started...');
 
-            $time = Carbon::parse($data['time']);
-            if ($time->greaterThan(now()->subHours($hours))) {
-                $data['path'] = $data['path'] ?? 'Noma’lum endpoint';
-                $lines->push($data);
-            }
+            // === 1. SYSTEM USAGE ===
+            $cpuUsage = $this->getCpuUsage();
+            $ramUsage = $this->getRamUsage();
+
+            $systemMessage = "🖥 *SYSTEM MONITORING (Vizzano ERP)*\n\n" .
+                "CPU Usage: *{$cpuUsage}%*\n" .
+                "RAM Usage: *{$ramUsage}%*\n" .
+                "Date: " . now()->format('Y-m-d H:i:s');
+
+            $this->sendTelegramMessage($telegramToken, $chatId, $systemMessage);
+
+            // === 2. USER COUNT ===
+            $usersCount = DB::table('users')->count();
+            $employeesCount = DB::table('employees')->count();
+            $branchesCount = DB::table('branches')->count();
+
+            $usersMessage = "👥 *Foydalanuvchilar statistikasi*\n\n" .
+                "Umumiy userlar soni: *{$usersCount}*\n" .
+                "Xodimlar soni: *{$employeesCount}*\n" .
+                "Filiallar soni: *{$branchesCount}*";
+
+            $this->sendTelegramMessage($telegramToken, $chatId, $usersMessage);
+
+            // === 3. API STATISTICS ===
+            $endpointStats = $this->getEndpointStatistics();
+
+            // Eng ko‘p va eng kam urilgan endpointlar
+            $mostUsed = $endpointStats['most_used'];
+            $leastUsed = $endpointStats['least_used'];
+
+            $endpointMessage1 = "📊 *Endpoint statistika*\n\n" .
+                "🔝 Eng ko‘p ishlatilgan endpointlar:\n" .
+                $this->formatList($mostUsed) . "\n\n" .
+                "🔻 Eng kam ishlatilgan endpointlar:\n" .
+                $this->formatList($leastUsed);
+
+            $this->sendTelegramMessage($telegramToken, $chatId, $endpointMessage1);
+
+            // Eng tez, eng sekin, va xato bergan endpointlar
+            $fastest = $endpointStats['fastest'];
+            $slowest = $endpointStats['slowest'];
+            $errorEndpoints = $endpointStats['error_endpoints'];
+
+            $endpointMessage2 = "⚙️ *Endpoint performance*\n\n" .
+                "⚡️ Eng tez (5 ta):\n" . $this->formatList($fastest, 'avg_duration', 'ms') . "\n\n" .
+                "🐢 Eng sekin (5 ta):\n" . $this->formatList($slowest, 'avg_duration', 'ms') . "\n\n" .
+                "❌ Xato bergan endpointlar:\n" . $this->formatList($errorEndpoints, 'error_count', 'xato');
+
+            $this->sendTelegramMessage($telegramToken, $chatId, $endpointMessage2);
+
+            // === 4. USER ACTIVITY ===
+            $activity = $this->getUserActivity();
+            $activeUsers = $activity['active'];
+            $inactiveUsers = $activity['inactive'];
+
+            $usersMessage2 = "👤 *Foydalanuvchilar faolligi*\n\n" .
+                "🔥 Eng faol foydalanuvchilar:\n" . $this->formatList($activeUsers, 'request_count', 'ta') . "\n\n" .
+                "😴 Eng sust foydalanuvchilar:\n" . $this->formatList($inactiveUsers, 'request_count', 'ta');
+
+            $this->sendTelegramMessage($telegramToken, $chatId, $usersMessage2);
+
+            // === 5. FOOTER ===
+            $footer = "✅ *Monitoring by Vizzano ERP Bot*";
+            $this->sendTelegramMessage($telegramToken, $chatId, $footer);
+
+            $this->info('Monitoring report sent successfully.');
+
+        } catch (\Throwable $e) {
+            Log::error("Monitoring report error: " . $e->getMessage());
+            $this->error($e->getMessage());
         }
-
-        if ($lines->isEmpty()) {
-            $this->info("⚠️ So‘nggi {$hours} soatda so‘rovlar yo‘q.");
-            return;
-        }
-
-        // === STATISTIKA ===
-        $total = $lines->count();
-        $deviceCount = $lines->filter(fn($x) => str_contains($x['path'], 'hikvision/event'))->count();
-        $userCount = $total - $deviceCount;
-
-        $userActivity = $lines->whereNotNull('user_id')
-            ->groupBy('user_id')->map->count()->sortDesc();
-
-        $mostActive = $userActivity->take(5);
-        $leastActive = $userActivity->reverse()->take(5);
-
-        $users = User::with('employee:id,user_id,name,position')
-            ->whereIn('id', $userActivity->keys())
-            ->get()->keyBy('id');
-
-        $topEndpoints = $lines->groupBy('path')->map->count()->sortDesc()->take(5);
-        $fastest = $lines->where('path', '!=', 'Noma’lum endpoint')->sortBy('duration_ms')->take(5);
-        $slowest = $lines->where('path', '!=', 'Noma’lum endpoint')->sortByDesc('duration_ms')->take(5);
-        $errors = $lines->where('status', '>=', 400)->groupBy('path')->map->count()->sortDesc()->take(5);
-
-        // === SERVER USAGE ===
-        $usage = $this->getSystemUsage();
-
-        // === Xabar bo‘limlari ===
-        $messages = [];
-
-        $messages[] = "😎 *Server Monitoring Report*\n🕒 " . now()->toDateTimeString() . "\n\n"
-            . "{$usage['cpu']['status']} CPU: {$usage['cpu']['percent']}%\n"
-            . "{$usage['ram']['status']} RAM: {$usage['ram']['used']} / {$usage['ram']['total']} ({$usage['ram']['percent']}%)\n"
-            . "{$usage['disk']['status']} Disk: {$usage['disk']['used']} / {$usage['disk']['total']} ({$usage['disk']['percent']}%)\n\n"
-            . "📊 *So‘rovlar statistikasi*\n"
-            . "🔹 Jami: {$total} ta\n"
-            . "🤖 Qurilmadan: {$deviceCount} ta\n"
-            . "👨‍💻 Foydalanuvchilardan: {$userCount} ta\n"
-            . "🧍‍♂️ Foydalanuvchilar soni: " . $userActivity->count();
-
-        $messages[] = "🔝 *Eng ko‘p urilgan endpointlar:*\n" . $this->formatList($topEndpoints);
-
-        $messages[] = "⚡ *Eng tez endpointlar:*\n" . $this->formatSpeedList($fastest, true)
-            . "\n🐢 *Eng sekin endpointlar:*\n" . $this->formatSpeedList($slowest)
-            . "\n⚠️ *Xato bergan endpointlar:*\n" . $this->formatList($errors);
-
-        $messages[] = "🧍‍♂️ *Eng faol foydalanuvchilar:*\n" . $this->formatUserList($mostActive, $users)
-            . "\n😴 *Eng sust foydalanuvchilar:*\n" . $this->formatUserList($leastActive, $users);
-
-        $messages[] = "🎯 Monitoring by *VizzanoERP Bot*";
-
-        // === Yuborish ===
-        foreach ($messages as $msg) {
-            $this->sendTelegram($botToken, $chatId, $msg);
-            sleep(1); // Telegram flood-limitdan qochish
-        }
-
-        // === Ogohlantirish ===
-        if ($usage['cpu']['percent'] > 90 || $usage['ram']['percent'] > 90 || $usage['disk']['percent'] > 90) {
-            $alert = "🚨 *Server yuklanmoqda!*\nCPU: {$usage['cpu']['percent']}%\nRAM: {$usage['ram']['percent']}%\nDisk: {$usage['disk']['percent']}%";
-            $this->sendTelegram($botToken, $chatId, $alert);
-        }
-
-        $this->cleanOldLogs($logFile);
-        $this->info("✅ Hisobot yuborildi!");
     }
 
-    // === System usage: to‘g‘ri hisoblash ===
-    private function getSystemUsage()
+    private function getCpuUsage()
     {
-        // CPU: Linux uchun /proc/stat
-        $stat1 = $this->readCpuStat();
-        usleep(100000); // 0.1s
-        $stat2 = $this->readCpuStat();
-
-        $cpuPercent = $this->calculateCpuUsage($stat1, $stat2);
-
-        // RAM
-        $memInfo = file('/proc/meminfo', FILE_IGNORE_NEW_LINES);
-        $mem = [];
-        foreach ($memInfo as $line) {
-            [$key, $val] = explode(':', $line);
-            $mem[$key] = trim(str_replace('kB', '', $val));
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $cpuLoad = shell_exec('wmic cpu get loadpercentage /value');
+            preg_match('/LoadPercentage=(\d+)/', $cpuLoad, $matches);
+            return $matches[1] ?? 0;
+        } else {
+            $load = sys_getloadavg();
+            $cpuCores = (int) trim(shell_exec('nproc'));
+            $usage = ($load[0] / $cpuCores) * 100;
+            return round($usage, 2);
         }
-        $total = (int)$mem['MemTotal'];
-        $free = (int)$mem['MemFree'] + (int)($mem['Buffers'] ?? 0) + (int)($mem['Cached'] ?? 0);
-        $used = $total - $free;
-        $ramPercent = round(($used / $total) * 100, 2);
+    }
 
-        // Disk
-        $totalDisk = disk_total_space("/");
-        $freeDisk = disk_free_space("/");
-        $usedDisk = $totalDisk - $freeDisk;
-        $diskPercent = round(($usedDisk / $totalDisk) * 100, 2);
+    private function getRamUsage()
+    {
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            $free = shell_exec('wmic OS get FreePhysicalMemory /Value');
+            $total = shell_exec('wmic ComputerSystem get TotalPhysicalMemory /Value');
+            preg_match('/FreePhysicalMemory=(\d+)/', $free, $freeMatches);
+            preg_match('/TotalPhysicalMemory=(\d+)/', $total, $totalMatches);
+            if (!empty($freeMatches) && !empty($totalMatches)) {
+                $freeMem = (float)$freeMatches[1] * 1024;
+                $totalMem = (float)$totalMatches[1];
+                return round((1 - $freeMem / $totalMem) * 100, 2);
+            }
+            return 0;
+        } else {
+            $free = (int) shell_exec("free -m | awk '/Mem:/ {print $4+$6+$7}'");
+            $total = (int) shell_exec("free -m | awk '/Mem:/ {print $2}'");
+            return $total > 0 ? round((1 - $free / $total) * 100, 2) : 0;
+        }
+    }
+
+    private function getEndpointStatistics()
+    {
+        $logs = DB::table('request_logs')
+            ->select('endpoint', DB::raw('COUNT(*) as request_count, AVG(duration) as avg_duration, SUM(is_error)::int as error_count'))
+            ->groupBy('endpoint')
+            ->get();
 
         return [
-            'cpu' => ['percent' => $cpuPercent, 'status' => $this->getLoadEmoji($cpuPercent)],
-            'ram' => [
-                'percent' => $ramPercent,
-                'used' => $this->formatBytes($used * 1024),
-                'total' => $this->formatBytes($total * 1024),
-                'status' => $this->getLoadEmoji($ramPercent),
-            ],
-            'disk' => [
-                'percent' => $diskPercent,
-                'used' => $this->formatBytes($usedDisk),
-                'total' => $this->formatBytes($totalDisk),
-                'status' => $this->getLoadEmoji($diskPercent),
-            ],
+            'most_used' => $logs->sortByDesc('request_count')->take(5)->values(),
+            'least_used' => $logs->sortBy('request_count')->take(5)->values(),
+            'fastest' => $logs->sortBy('avg_duration')->take(5)->values(),
+            'slowest' => $logs->sortByDesc('avg_duration')->take(5)->values(),
+            'error_endpoints' => $logs->sortByDesc('error_count')->take(5)->values(),
         ];
     }
 
-    private function readCpuStat()
+    private function getUserActivity()
     {
-        $data = file('/proc/stat');
-        foreach ($data as $line) {
-            if (strpos($line, 'cpu ') === 0) {
-                $parts = preg_split('/\s+/', trim($line));
-                return array_slice($parts, 1, 8);
-            }
-        }
-        return [];
+        $userStats = DB::table('request_logs')
+            ->select('user_id', DB::raw('COUNT(*) as request_count'))
+            ->groupBy('user_id')
+            ->get();
+
+        $active = $userStats->sortByDesc('request_count')->take(5)->values();
+        $inactive = $userStats->sortBy('request_count')->take(5)->values();
+
+        return [
+            'active' => $active,
+            'inactive' => $inactive,
+        ];
     }
 
-    private function calculateCpuUsage($stat1, $stat2)
+    private function formatList($collection, $key = 'request_count', $suffix = 'ta')
     {
-        if (count($stat1) < 4 || count($stat2) < 4) return 0;
+        if ($collection->isEmpty()) return "_Maʼlumot yoʻq_";
 
-        $diff = array_map(fn($a, $b) => $b - $a, $stat1, $stat2);
-        $total = array_sum($diff);
-        $idle = $diff[3] ?? 0;
-
-        return round((1 - $idle / $total) * 100, 2);
+        return $collection->map(function ($item) use ($key, $suffix) {
+            $name = $item->endpoint ?? ('User #' . ($item->user_id ?? '-'));
+            $count = round($item->{$key}, 2);
+            return "- {$name} — *{$count} {$suffix}*";
+        })->implode("\n");
     }
 
-    private function formatBytes($bytes)
+    private function sendTelegramMessage($token, $chatId, $text)
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes, 1024) : 0));
-        $pow = min($pow, count($units) - 1);
-        $bytes /= pow(1024, $pow);
-        return round($bytes, 2) . ' ' . $units[$pow];
-    }
-
-    private function getLoadEmoji($percent)
-    {
-        return match (true) {
-            $percent < 50 => "🟢",
-            $percent < 75 => "🟡",
-            $percent < 90 => "🟠",
-            default => "🔴",
-        };
-    }
-
-    private function formatList($collection)
-    {
-        return $collection->isEmpty()
-            ? "_Hech narsa topilmadi_"
-            : $collection->map(fn($count, $path) => "• {$path} — {$count} ta")->join("\n");
-    }
-
-    private function formatSpeedList($logs, $fastest = false)
-    {
-        $emoji = $fastest ? "⚡" : "🐢";
-        return $logs->isEmpty()
-            ? "_Hech narsa topilmadi_"
-            : $logs->map(fn($log) => "{$emoji} {$log['path']} — {$log['duration_ms']} ms")->join("\n");
-    }
-
-    private function formatUserList($collection, $users)
-    {
-        if ($collection->isEmpty()) {
-            return "_Topilmadi_";
-        }
-        return $collection->map(function ($count, $userId) use ($users) {
-            $user = $users[$userId] ?? null;
-            if ($user && $user->employee) {
-                return "• {$user->employee->name} ({$user->employee->position}) — {$count} ta so‘rov";
-            } elseif ($user) {
-                return "• User #{$user->id} — {$count} ta so‘rov";
-            } else {
-                return "• Noma’lum foydalanuvchi — {$count} ta so‘rov";
-            }
-        })->join("\n");
-    }
-
-    private function readLogFile($path)
-    {
-        $handle = fopen($path, 'r');
-        if (!$handle) return;
-        while (($line = fgets($handle)) !== false) {
-            yield trim($line);
-        }
-        fclose($handle);
-    }
-
-    private function sendTelegram($botToken, $chatId, $message)
-    {
-        Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+        Http::post("https://api.telegram.org/bot{$token}/sendMessage", [
             'chat_id' => $chatId,
-            'text' => $message,
+            'text' => $text,
             'parse_mode' => 'Markdown',
         ]);
-    }
-
-    private function cleanOldLogs($logFile)
-    {
-        $filtered = collect($this->readLogFile($logFile))
-            ->filter(function ($line) {
-                $jsonStart = strpos($line, '{');
-                if ($jsonStart === false) return false;
-                $data = json_decode(substr($line, $jsonStart), true);
-                if (!isset($data['time'])) return false;
-                $time = Carbon::parse($data['time']);
-                return $time->greaterThan(Carbon::now()->subDay());
-            })
-            ->values()
-            ->all();
-
-        File::put($logFile, implode("\n", $filtered));
+        sleep(1); // Telegram rate-limit uchun
     }
 }
