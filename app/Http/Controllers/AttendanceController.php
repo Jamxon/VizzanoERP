@@ -129,21 +129,37 @@ class AttendanceController extends Controller
                         $employee->group->name ?? '-'
                     );
 
+                    // Rasm URL (to‘liq linkga aylantiramiz)
+                    $imageUrl = !empty($employee->img)
+                        ? (str_starts_with($employee->img, 'http') ? $employee->img : url($employee->img))
+                        : null;
 
-                    // fon jarayon sifatida yuborish
-                    dispatch(function () use ($botToken, $lateChatId, $msg) {
+                    // Fon jarayon sifatida yuborish
+                    dispatch(function () use ($botToken, $lateChatId, $msg, $imageUrl) {
                         try {
-                            \Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-                                'chat_id' => $lateChatId,
-                                'text' => $msg,
-                                'parse_mode' => 'Markdown',
-                            ]);
+                            if ($imageUrl) {
+                                // Agar rasm bo‘lsa — rasm bilan yuboriladi
+                                \Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                                    'chat_id' => $lateChatId,
+                                    'photo' => $imageUrl,
+                                    'caption' => $msg,
+                                    'parse_mode' => 'Markdown',
+                                ]);
+                            } else {
+                                // Aks holda faqat text yuboriladi
+                                \Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                                    'chat_id' => $lateChatId,
+                                    'text' => $msg,
+                                    'parse_mode' => 'Markdown',
+                                ]);
+                            }
                         } catch (\Exception $e) {
                             \Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
                         }
                     });
                 }
             }
+
         }
 
 
