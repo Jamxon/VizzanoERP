@@ -17,7 +17,7 @@ class MonitoringReport extends Command
     public function handle()
     {
         try {
-            $botToken = '8443951014:AAHMmbRm5bgFCRk1h4GjFP5WUg9H1rMsiIk';
+            $telegramToken = '8443951014:AAHMmbRm5bgFCRk1h4GjFP5WUg9H1rMsiIk';
             $chatId = '5228018221';
 
             if (!$telegramToken || !$chatId) {
