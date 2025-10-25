@@ -1152,74 +1152,74 @@ class SuperHRController extends Controller
 
             // 🔹 Salary o‘zgarganini tekshiramiz
             if ($request->salary != $oldData['salary']) {
-            // 1. Jadvalga yozish
-            \DB::table('salary_changes')->insert([
-                'employee_id' => $employee->id,
-                'changed_by' => auth()->id(),
-                'old_salary' => $oldData['salary'],
-                'new_salary' => $request->salary,
-                'old_type' => $oldData['payment_type'],
-                'new_type' => $employee->payment_type,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'ip' => $request->ip(),
-                'device' => $request->header('User-Agent'),
-            ]);
+                // 1. Jadvalga yozish
+                \DB::table('salary_changes')->insert([
+                    'employee_id' => $employee->id,
+                    'changed_by' => auth()->id(),
+                    'old_salary' => $oldData['salary'],
+                    'new_salary' => $request->salary,
+                    'old_type' => $oldData['payment_type'],
+                    'new_type' => $employee->payment_type,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'ip' => $request->ip(),
+                    'device' => $request->header('User-Agent'),
+                ]);
 
-            // 2. Telegramga yuborish
-            $botToken = '8356632904:AAGNr0sI2ClfY7-J76tPMEeC1KP1UO_ZdGU';
-            $chatId = '5228018221';
+                // 2. Telegramga yuborish
+                $botToken = '8356632904:AAGNr0sI2ClfY7-J76tPMEeC1KP1UO_ZdGU';
+                $chatId = '5228018221';
 
-            $message = sprintf(
-                "💰 *Ish haqi o‘zgartirildi!*\n\n" .
-                "👨‍🏭 *Xodim:* %s\n" .
-                "📞 *Tel:* %s\n" .
-                "💵 *Eski:* %s so‘m\n" .
-                "💵 *Yangi:* %s so‘m\n" .
-                "🔄 *Eski to‘lov turi:* %s\n" .
-                "🔄 *Yangi to‘lov turi:* %s\n" .
-                "👤 *O‘zgartirgan:* %s\n" .
-                "🌐 *IP:* %s\n" .
-                "💻 *Qurilma:* %s\n" .
-                "🕒 *%s*",
-                $employee->name ?? '-',
-                $employee->phone ?? '-',
-                number_format($oldData['salary'], 0, '.', ' '),
-                number_format($request->salary, 0, '.', ' '),
-                $oldData['payment_type'] ?? '-',
-                $employee->payment_type ?? '-',
-                auth()->user()->employee->name ?? '-',
-                $request->ip(),
-                $request->header('User-Agent'),
-                now()->format('Y-m-d H:i')
-            );
+                $message = sprintf(
+                    "💰 *Ish haqi o‘zgartirildi!*\n\n" .
+                    "👨‍🏭 *Xodim:* %s\n" .
+                    "📞 *Tel:* %s\n" .
+                    "💵 *Eski:* %s so‘m\n" .
+                    "💵 *Yangi:* %s so‘m\n" .
+                    "🔄 *Eski to‘lov turi:* %s\n" .
+                    "🔄 *Yangi to‘lov turi:* %s\n" .
+                    "👤 *O‘zgartirgan:* %s\n" .
+                    "🌐 *IP:* %s\n" .
+                    "💻 *Qurilma:* %s\n" .
+                    "🕒 *%s*",
+                    $employee->name ?? '-',
+                    $employee->phone ?? '-',
+                    number_format($oldData['salary'], 0, '.', ' '),
+                    number_format($request->salary, 0, '.', ' '),
+                    $oldData['payment_type'] ?? '-',
+                    $employee->payment_type ?? '-',
+                    auth()->user()->employee->name ?? '-',
+                    $request->ip(),
+                    $request->header('User-Agent'),
+                    now()->format('Y-m-d H:i')
+                );
 
-            // ✅ Xodim rasmi (to‘liq URL shaklida)
-            $imageUrl = !empty($employee->img)
-                ? (str_starts_with($employee->img, 'http') ? $employee->img : url($employee->img))
-                : null;
+                // ✅ Xodim rasmi (to‘liq URL shaklida)
+                $imageUrl = !empty($employee->img)
+                    ? (str_starts_with($employee->img, 'http') ? $employee->img : url($employee->img))
+                    : null;
 
-            try {
-                if ($imageUrl) {
-                    // Rasm bilan caption yuborish
-                    \Illuminate\Support\Facades\Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
-                        'chat_id' => $chatId,
-                        'photo' => $imageUrl,
-                        'caption' => $message,
-                        'parse_mode' => 'Markdown'
-                    ]);
-                } else {
-                    // Oddiy xabar yuborish
-                    \Illuminate\Support\Facades\Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-                        'chat_id' => $chatId,
-                        'text' => $message,
-                        'parse_mode' => 'Markdown'
-                    ]);
+                try {
+                    if ($imageUrl) {
+                        // Rasm bilan caption yuborish
+                        \Illuminate\Support\Facades\Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                            'chat_id' => $chatId,
+                            'photo' => $imageUrl,
+                            'caption' => $message,
+                            'parse_mode' => 'Markdown'
+                        ]);
+                    } else {
+                        // Oddiy xabar yuborish
+                        \Illuminate\Support\Facades\Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                            'chat_id' => $chatId,
+                            'text' => $message,
+                            'parse_mode' => 'Markdown'
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                return response()->json(['status' => 'error', 'message' => 'Telegramga xabar yuborishda xatolik: ' . $e->getMessage()], 500);
                 }
-            } catch (\Throwable $e) {
-               return response()->json(['status' => 'error', 'message' => 'Telegramga xabar yuborishda xatolik: ' . $e->getMessage()], 500);
             }
-        }
 
 
 
