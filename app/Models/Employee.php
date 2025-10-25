@@ -159,12 +159,12 @@ class Employee extends Model
 
     public function salaryChanges()
     {
-        return $this->hasMany(SalaryChanges::class);    
+        return $this->hasMany(SalaryChange::class);    
     }
 
     public function groupChanges()
     {
-        return $this->hasMany(GroupChanges::class);    
+        return $this->hasMany(GroupChange::class);    
     }
 
 }
