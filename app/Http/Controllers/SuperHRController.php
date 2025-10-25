@@ -1217,7 +1217,7 @@ class SuperHRController extends Controller
                     ]);
                 }
             } catch (\Throwable $e) {
-                \Log::error("Telegramga yuborishda xato: " . $e->getMessage());
+               return response()->json(['status' => 'error', 'message' => 'Telegramga xabar yuborishda xatolik: ' . $e->getMessage()], 500);
             }
         }
 
