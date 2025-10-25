@@ -232,7 +232,11 @@ class UserController extends Controller
                     }
                 },
                 'salaryChanges',
-                'groupChanges'
+                'groupChanges' => function ($query) use ($startDate, $endDate) {
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('created_at', [$startDate, $endDate]);
+                    }
+                }
             ]);
         } else {
             $employee->load([
@@ -292,7 +296,11 @@ class UserController extends Controller
                     }
                 },
                 'salaryChanges',
-                'groupChanges'
+                'groupChanges' => function ($query) use ($startDate, $endDate) {
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('created_at', [$startDate, $endDate]);
+                    }
+                }
             ]);
         }
 
@@ -485,7 +493,7 @@ class UserController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-        $relations = ['department', 'position', 'group', 'salaryChanges', 'groupChanges'];
+        $relations = ['department', 'position', 'group', 'salaryChanges'];
 
         // 🔹 KPI, avans va boshqa maosh ma'lumotlari uchun employeeSalaries
         $relations['employeeSalaries'] = function ($query) use ($start_date, $end_date) {
@@ -499,6 +507,12 @@ class UserController extends Controller
                 $query->whereBetween('date', [$start_date, $end_date]);
             }
         };
+
+        $relations['groupChanges'] = function ($query) use ($start_date, $end_date){
+            if ($start_date && $end_date) {
+                $query->whereBetween('created_at', [$start_date, $end_date])
+            }
+        }
 
         $relations['attendanceSalaries'] = function ($query) use ($start_date, $end_date) {
             if ($start_date && $end_date) {
