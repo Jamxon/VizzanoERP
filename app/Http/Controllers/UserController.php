@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Log;
 use App\Models\User;
 use App\Models\Issue;
+use App\Models\SalaryChange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
