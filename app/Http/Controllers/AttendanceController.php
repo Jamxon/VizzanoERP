@@ -118,11 +118,11 @@ class AttendanceController extends Controller
 
                     $msg = sprintf(
                         "⚠️ *%s %s* (AUP) kechikib keldi.\n🕒 %s\n🏢 Bo‘lim: %s\n👥 Guruh: %s",
-                        $employee->name ?? '',
-                        $employee->phone ?? '',
-                        $checkInTime->format('H:i:s'),
-                        $employee->department->name ?? '-',
-                        $employee->group->name ?? '-'
+                        $employee->name ?? '' . "\n",
+                        $employee->phone ?? '' . "\n",
+                        $checkInTime->format('H:i:s') . "\n",
+                        $employee->department->name ?? '-' . "\n",
+                        $employee->group->name ?? '-' . "\n"
                     );
 
                     // fon jarayon sifatida yuborish
