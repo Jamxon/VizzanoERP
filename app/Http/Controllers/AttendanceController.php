@@ -107,6 +107,38 @@ class AttendanceController extends Controller
                     ]);
                 }
             }
+
+            if ($employee && $employee->type === 'aup' && $attendance->check_in) {
+                $checkInTime = Carbon::parse($attendance->check_in, 'Asia/Tashkent');
+                $lateTime = Carbon::createFromTime(7, 30, 0, 'Asia/Tashkent');
+
+                if ($checkInTime->gt($lateTime)) {
+                    $lateChatId = -4832517980; // AUP kechikishlar uchun chat ID
+                    $botToken = '8466233197:AAFpW34maMs_2y5-Ro_2FQNxniLBaWwLRD8';
+
+                    $msg = sprintf(
+                        "⚠️ *%s %s* (AUP) kechikib keldi.\n🕒 %s\n🏢 Bo‘lim: %s\n👥 Guruh: %s",
+                        $employee->name ?? '',
+                        $employee->phone ?? '',
+                        $checkInTime->format('H:i:s'),
+                        $employee->department->name ?? '-',
+                        $employee->group->name ?? '-'
+                    );
+
+                    // fon jarayon sifatida yuborish
+                    dispatch(function () use ($botToken, $lateChatId, $msg) {
+                        try {
+                            \Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                                'chat_id' => $lateChatId,
+                                'text' => $msg,
+                                'parse_mode' => 'Markdown',
+                            ]);
+                        } catch (\Exception $e) {
+                            \Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
+                        }
+                    });
+                }
+            }
         }
 
 
