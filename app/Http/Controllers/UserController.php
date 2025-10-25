@@ -231,7 +231,16 @@ class UserController extends Controller
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
                 },
-                'salaryChanges',
+                'salaryChanges' => function ($query) use ($startDate, $endDate) {
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('created_at', [$startDate, $endDate]);
+                    }
+
+                    $query->with([
+                        'employee:id,name',
+                        'user.employee:id,name',
+                    ]);
+                },
                 'groupChanges' => function ($query) use ($startDate, $endDate) {
                     if ($startDate && $endDate) {
                         $query->whereBetween('created_at', [$startDate, $endDate]);
@@ -302,7 +311,16 @@ class UserController extends Controller
                         $query->whereBetween('month', [$startDate, $endDate]);
                     }
                 },
-                'salaryChanges',
+                'salaryChanges' => function ($query) use ($startDate, $endDate) {
+                    if ($startDate && $endDate) {
+                        $query->whereBetween('created_at', [$startDate, $endDate]);
+                    }
+
+                    $query->with([
+                        'employee:id,name',
+                        'user.employee:id,name',
+                    ]);
+                },
                 'groupChanges' => function ($query) use ($startDate, $endDate) {
                     if ($startDate && $endDate) {
                         $query->whereBetween('created_at', [$startDate, $endDate]);
@@ -507,7 +525,7 @@ class UserController extends Controller
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-        $relations = ['department', 'position', 'group', 'salaryChanges'];
+        $relations = ['department', 'position', 'group'];
 
         // 🔹 KPI, avans va boshqa maosh ma'lumotlari uchun employeeSalaries
         $relations['employeeSalaries'] = function ($query) use ($start_date, $end_date) {
@@ -532,6 +550,17 @@ class UserController extends Controller
                 'newGroup:id,name',
                 'oldDepartment:id,name',
                 'newDepartment:id,name',
+            ]);
+        };
+
+        $relations['salaryChanges'] = function ($query) use ($start_date, $end_date) {
+            if ($start_date && $end_date) {
+                $query->whereBetween('created_at', [$start_date, $end_date]);
+            }
+
+            $query->with([
+                'employee:id,name',
+                'user.employee:id,name',
             ]);
         };
 
