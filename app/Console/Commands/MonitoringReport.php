@@ -52,17 +52,17 @@ class MonitoringReport extends Command
             ->get()
             ->keyBy('id');
 
-        $topEndpoints = $lines->where('path', '!=', 'Noma'lum endpoint')
+        $topEndpoints = $lines->where('path', '!=', 'Nomalum endpoint')
             ->groupBy('path')->map->count()->sortDesc()->take(5);
         
-        $fastest = $lines->where('path', '!=', 'Noma'lum endpoint')
+        $fastest = $lines->where('path', '!=', 'Nomalum endpoint')
             ->sortBy('duration_ms')->take(5);
         
-        $slowest = $lines->where('path', '!=', 'Noma'lum endpoint')
+        $slowest = $lines->where('path', '!=', 'Nomalum endpoint')
             ->sortByDesc('duration_ms')->take(5);
         
         $errors = $lines->where('status', '>=', 400)
-            ->where('path', '!=', 'Noma'lum endpoint')
+            ->where('path', '!=', 'Nomalum endpoint')
             ->groupBy('path')->map->count()->sortDesc()->take(5);
 
         // 3️⃣ Server yuklanishi
