@@ -702,7 +702,7 @@ class UserController extends Controller
         $salaryChanges = SalaryChange::with([
                 'employee:id,name',
                 'user:id',
-                'user.employee:id,name'
+                'user.employee:id,name,user_id'
             ])
             ->orderByDesc('created_at')
             ->paginate(20);
