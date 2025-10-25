@@ -701,9 +701,7 @@ class UserController extends Controller
     {
         $salaryChanges = SalaryChange::with([
                 'employee:id,name',
-                'user:id,username,role_id,group_id,employee_id',
-                'user.role:id,name,description',
-                'user.group:id,name',
+                'user:id,',
                 'user.employee:id,name'
             ])
             ->orderByDesc('created_at')
