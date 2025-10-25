@@ -131,14 +131,24 @@ class HikvisionEventController extends Controller
                                 $employee->group->name ?? '-'
                             );
 
-                            // Employee rasmi (to‘liq URL shaklida)
+                            // Employee rasmi (to‘liq URL yoki local path bo‘lishi mumkin)
                             $imageUrl = !empty($employee->img)
                                 ? (str_starts_with($employee->img, 'http') ? $employee->img : url($employee->img))
                                 : null;
 
-                            // Agar eventda ham rasm (masalan, qurilmadan olingan surat) bo‘lsa — ustunlik beramiz
+                            // Hikvisiondan kelgan rasm bo‘lsa, ustunlik beramiz
                             if (!empty($imagePath)) {
-                                $imageUrl = $imagePath;
+                                // Agar rasm Base64 bo‘lsa, vaqtincha saqlab, file URL qilib yuboramiz
+                                if (str_starts_with($imagePath, 'data:image')) {
+                                    $imageData = explode(',', $imagePath)[1] ?? null;
+                                    if ($imageData) {
+                                        $tempFile = storage_path('app/public/hikvision_' . uniqid() . '.jpg');
+                                        file_put_contents($tempFile, base64_decode($imageData));
+                                        $imageUrl = url('storage/' . basename($tempFile));
+                                    }
+                                } else {
+                                    $imageUrl = $imagePath;
+                                }
                             }
 
                             // Fon jarayon sifatida yuborish
@@ -164,6 +174,7 @@ class HikvisionEventController extends Controller
                             });
                         }
                     }
+
 
 
                     Log::add($employee->user_id ?? null, 'Hodim ishga keldi', 'Check In', null, [
