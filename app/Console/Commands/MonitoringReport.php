@@ -71,12 +71,12 @@ class MonitoringReport extends Command
         // 4️⃣ Xabarlarni tayyorlash (5 ta alohida xabar)
         $messages = [
             // Xabar 1: Server holati va asosiy statistika
-            "📊 VizzanoERP Monitoring Report\n"
+            "$this->getServerStatusText(max($usage['cpu']['percent'], $usage['ram']['percent'], $usage['disk']['percent']))"
+            . "📊 VizzanoERP Monitoring Report\n"
             . "🕒 " . now()->toDateTimeString() . "\n\n"
             . "{$usage['cpu']['status']} CPU: {$usage['cpu']['percent']}%\n"
             . "{$usage['ram']['status']} RAM: {$usage['ram']['used']} / {$usage['ram']['total']} ({$usage['ram']['percent']}%)\n"
             . "{$usage['disk']['status']} Disk: {$usage['disk']['used']} / {$usage['disk']['total']} ({$usage['disk']['percent']}%)\n\n"
-            . $this->getServerStatusText(max($usage['cpu']['percent'], $usage['ram']['percent'], $usage['disk']['percent']))
             . "\n\n📈 So'rov statistikasi (So'nggi 1 soat)\n"
             . "🔹 Jami: {$total} ta\n"
             . "🤖 Qurilmadan: {$deviceCount} ta\n"
