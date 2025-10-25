@@ -105,6 +105,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::patch('employeeMonthlySalary/{id}', [EmployeeMonthlyController::class, 'employeeMonthlySalaryUpdate']);
     Route::patch('employeeMonthlyPiecework/{id}', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkUpdate']);
     Route::get('salaryChanges', [UserController::class, "getSalaryChangesAll"]);
+    Route::get('groupChanges', [UserController::class, 'getGroupChangesAll'])
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
