@@ -727,12 +727,6 @@ class UserController extends Controller
                 ],
                 'user' => [
                     'id' => optional($item->user)->id,
-                    'username' => optional($item->user)->username,
-                    'role' => [
-                        'id' => optional(optional($item->user)->role)->id,
-                        'name' => optional(optional($item->user)->role)->name,
-                        'description' => optional(optional($item->user)->role)->description,
-                    ],
                     'employee' => [
                         'id' => optional(optional($item->user)->employee)->id,
                         'name' => optional(optional($item->user)->employee)->name,
