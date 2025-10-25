@@ -1134,7 +1134,19 @@ class SuperHRController extends Controller
                     'salary_visible' => $request->salary_visible ?? $employee->salary_visible,
                 ]);
             }
-
+            // endi groupChanges jadvaliga yozish kerak
+            if ($request->filled('group_id') && $request->group_id != $oldData['group_id']) {
+                DB::table('group_changes')->insert([
+                    'employee_id' => $employee->id,
+                    'changed_by' => auth()->id(),
+                    'old_group_id' => $oldData['group_id'],
+                    'new_group_id' => $request->group_id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'ip' => $request->ip(),
+                    'device' => $request->header('User-Agent'),
+                ]);
+            }
 
                         // 🔹 Salary o‘zgarganini tekshiramiz
             if ($request->filled('salary') && $request->salary != $oldData['salary']) {
