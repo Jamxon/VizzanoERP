@@ -47,7 +47,7 @@ class MonitoringReport extends Command
         $leastActive = $userActivity->reverse()->take(5);
 
         // Foydalanuvchi ma'lumotlarini olish
-        $users = User::with(['employee:id,user_id,name,position_id', 'employee.position:id,name'])
+        $users = User::with('employee:id,user_id,name')
             ->whereIn('id', $userActivity->keys())
             ->get()
             ->keyBy('id');
@@ -71,37 +71,37 @@ class MonitoringReport extends Command
         // 4️⃣ Xabarlarni tayyorlash (5 ta alohida xabar)
         $messages = [
             // Xabar 1: Server holati va asosiy statistika
-            "📊 *VizzanoERP Monitoring Report*\n"
+            "📊 <b>VizzanoERP Monitoring Report</b>\n"
             . "🕒 " . now()->toDateTimeString() . "\n\n"
             . "{$usage['cpu']['status']} CPU: {$usage['cpu']['percent']}%\n"
             . "{$usage['ram']['status']} RAM: {$usage['ram']['used']} / {$usage['ram']['total']} ({$usage['ram']['percent']}%)\n"
             . "{$usage['disk']['status']} Disk: {$usage['disk']['used']} / {$usage['disk']['total']} ({$usage['disk']['percent']}%)\n\n"
             . $this->getServerStatusText(max($usage['cpu']['percent'], $usage['ram']['percent'], $usage['disk']['percent']))
-            . "\n\n📈 *So'rov statistikasi (So'nggi 1 soat)*\n"
+            . "\n\n📈 <b>So'rov statistikasi (So'nggi 1 soat)</b>\n"
             . "🔹 Jami: {$total} ta\n"
             . "🤖 Qurilmadan: {$deviceCount} ta\n"
             . "👨‍💻 Foydalanuvchilardan: {$userCount} ta",
 
             // Xabar 2: Eng ko'p urilgan endpointlar
-            "🔝 *Eng ko'p urilgan endpointlar:*\n"
+            "🔝 <b>Eng ko'p urilgan endpointlar:</b>\n"
             . $this->formatList($topEndpoints),
 
             // Xabar 3: Tez va sekin endpointlar
-            "⚡ *Eng tez ishlagan 5 ta endpoint:*\n"
+            "⚡ <b>Eng tez ishlagan 5 ta endpoint:</b>\n"
             . $this->formatSpeedList($fastest, true)
-            . "\n\n🐢 *Eng sekin ishlagan 5 ta endpoint:*\n"
+            . "\n\n🐢 <b>Eng sekin ishlagan 5 ta endpoint:</b>\n"
             . $this->formatSpeedList($slowest),
 
             // Xabar 4: Xatolar
-            "❌ *Xato bergan endpointlar:*\n"
+            "❌ <b>Xato bergan endpointlar:</b>\n"
             . $this->formatList($errors),
 
             // Xabar 5: Foydalanuvchilar
-            "🟢 *Eng faol foydalanuvchilar:*\n"
+            "🟢 <b>Eng faol foydalanuvchilar:</b>\n"
             . $this->formatUserList($mostActive, $users)
-            . "\n\n🔴 *Eng sust foydalanuvchilar:*\n"
+            . "\n\n🔴 <b>Eng sust foydalanuvchilar:</b>\n"
             . $this->formatUserList($leastActive, $users)
-            . "\n\n🛰 *Monitoring by VizzanoERP Bot*"
+            . "\n\n🛰 <b>Monitoring by VizzanoERP Bot</b>"
         ];
 
         // 5️⃣ Telegramga yuborish
@@ -257,10 +257,7 @@ class MonitoringReport extends Command
 
             if ($user && $user->employee) {
                 $name = $user->employee->name;
-                $position = $user->employee->position ?? '';
-                return $position 
-                    ? "• {$name} ({$position}) — {$count} ta"
-                    : "• {$name} — {$count} ta";
+                return "• {$name} — {$count} ta";
             } elseif ($user) {
                 return "• User #{$user->id} — {$count} ta";
             } else {
@@ -298,10 +295,13 @@ class MonitoringReport extends Command
     private function sendMessage(string $text)
     {
         try {
+            // Markdown maxsus belgilarini escape qilish
+            $text = $this->escapeMarkdown($text);
+            
             $response = Http::timeout(10)->post("https://api.telegram.org/bot{$this->botToken}/sendMessage", [
                 'chat_id' => $this->chatId,
                 'text' => $text,
-                'parse_mode' => 'Markdown',
+                'parse_mode' => 'MarkdownV2',
             ]);
 
             if (!$response->successful()) {
@@ -310,5 +310,19 @@ class MonitoringReport extends Command
         } catch (\Throwable $e) {
             $this->error("❌ Yuborishda xatolik: " . $e->getMessage());
         }
+    }
+
+    // 🔸 Markdown V2 uchun maxsus belgilarni escape qilish
+    private function escapeMarkdown(string $text): string
+    {
+        // MarkdownV2 da escape qilish kerak bo'lgan belgilar
+        $specialChars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
+        
+        // Har bir maxsus belgini \ bilan escape qilamiz
+        foreach ($specialChars as $char) {
+            $text = str_replace($char, '\\' . $char, $text);
+        }
+        
+        return $text;
     }
 }
