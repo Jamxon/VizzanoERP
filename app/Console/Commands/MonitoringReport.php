@@ -3,24 +3,24 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-use App\Models\User;
 
 class MonitoringReport extends Command
 {
     protected $signature = 'monitoring:report';
-    protected $description = 'Server va foydalanuvchi faoliyati haqida jonli hisobot';
+    protected $description = 'Send system and API monitoring report to Telegram bot';
 
     public function handle()
     {
-        $botToken = '8443951014:AAHMmbRm5bgFCRk1h4GjFP5WUg9H1rMsiIk';
-        $chatId = '5228018221';
-        $logFile = storage_path('logs/requests.log');
-        $hours = (int) $this->option('hours');
+        try {
+            $botToken = '8443951014:AAHMmbRm5bgFCRk1h4GjFP5WUg9H1rMsiIk';
+            $chatId = '5228018221';
 
-        if (!$telegramToken || !$chatId) {
+            if (!$telegramToken || !$chatId) {
                 $this->error('Telegram token or chat_id not set in config.');
                 return;
             }
