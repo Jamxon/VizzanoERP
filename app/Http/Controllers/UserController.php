@@ -806,8 +806,7 @@ class UserController extends Controller
             ];
         });
 
-        return response()->json($groupChanges);    
+        return response()->json($groupChanges);
     }
-
-
+    
 }
