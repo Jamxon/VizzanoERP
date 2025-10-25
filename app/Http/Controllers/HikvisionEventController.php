@@ -118,13 +118,18 @@ class HikvisionEventController extends Controller
                             $botToken = '8466233197:AAFpW34maMs_2y5-Ro_2FQNxniLBaWwLRD8';
 
                             $msg = sprintf(
-                                "⚠️ *%s %s* (AUP) kechikib keldi.\n🕒 %s\n🏢 Bo‘lim: %s\n👥 Guruh: %s",
-                                $employee->name,
-                                $employee->phone,
-                                $eventCarbon->format('H:i:s'),
+                                "⚠️ *%s* (AUP) kechikib keldi.\n\n" .
+                                "📱 *Telefon:* %s\n" .
+                                "🕒 *Kirish vaqti:* %s\n" .
+                                "🏢 *Bo‘lim:* %s\n" .
+                                "👥 *Guruh:* %s",
+                                $employee->name ?? '-',
+                                $employee->phone ?? '-',
+                                $checkInTime->format('H:i:s'),
                                 $employee->department->name ?? '-',
                                 $employee->group->name ?? '-'
                             );
+
 
                             // fon jarayon sifatida yuborish
                             dispatch(function () use ($botToken, $lateChatId, $msg, $imagePath) {
