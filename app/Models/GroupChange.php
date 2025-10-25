@@ -45,8 +45,8 @@ class GroupChange extends Model
         return $this->belongsTo(Department::class, 'old_department_id');    
     }
 
-    public function newDeparmtent()
+    public function newDepartment()
     {
-        return $this->belongsTo(Deparmtent::class, 'new_department_id');    
+        return $this->belongsTo(Department::class, 'new_department_id');    
     }
 }
