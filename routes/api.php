@@ -510,7 +510,7 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
 
     Route::post('videos', [TechnologController::class, 'storeVideo']);
     Route::get('videos', [TechnologController::class, 'getVideos']);
-    Route::get('videos/{id}', [TechnologController::class, 'showVideo']);
+    Route::get('videos/{video}', [TechnologController::class, 'showVideo']);
 });
 
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
