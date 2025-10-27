@@ -1370,7 +1370,7 @@ class TechnologController extends Controller
                                 ->with('tarifications')
                                 ->paginate(20);
 
-        return response()->json($videos)
+        return response()->json($videos);
     }
 
 }
