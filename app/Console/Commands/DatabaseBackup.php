@@ -72,28 +72,36 @@ class DatabaseBackup extends Command
             $chunkName = "{$originalName}.part{$part}";
             $this->info("📦 Yuborilmoqda: {$chunkName}");
 
-            // So‘rovni yuboramiz (retry bilan)
-            $response = Http::timeout(120)
-                ->retry(3, 5) // har 5 soniyada 3 marta urinadi
-                ->attach('document', $chunkData, $chunkName)
-                ->post("https://api.telegram.org/bot{$botToken}/sendDocument", [
-                    'chat_id' => $chatId,
-                    'caption' => "Backup bo‘lak #{$part}"
-                ]);
+            try {
+                $response = Http::timeout(300)
+                    ->attach('document', $chunkData, $chunkName)
+                    ->post("https://api.telegram.org/bot{$botToken}/sendDocument", [
+                        'chat_id' => $chatId,
+                        'caption' => "Backup bo‘lak #{$part}"
+                    ]);
 
-            if ($response->successful()) {
-                $this->info("✅ {$chunkName} yuborildi.");
-            } else {
-                $this->error("❌ {$chunkName} yuborilmadi: " . $response->body());
+                if ($response->successful()) {
+                    $this->info("✅ {$chunkName} yuborildi.");
+                } else {
+                    $this->error("❌ {$chunkName} yuborilmadi: " . $response->body());
+                }
+
+                // 🔹 Flood-limit uchun katta interval (60–90 soniya)
+                if (!feof($handle)) {
+                    $this->info("⏳ 1 daqiqa kutilyapti (flood-limit uchun)...");
+                    sleep(65);
+                }
+
+            } catch (\Exception $e) {
+                $this->error("❌ {$chunkName} yuborishda xatolik: " . $e->getMessage());
+                sleep(120); // 2 daqiqa kutib keyingisiga o‘tish
             }
 
             $part++;
-
-            // flood-limit uchun kutish
-            sleep(3);
         }
 
         fclose($handle);
         $this->info("🎉 Barcha bo‘laklar yuborildi.");
-    }
+}
+
 }
