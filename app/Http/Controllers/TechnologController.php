@@ -18,6 +18,7 @@ use App\Models\SubmodelSpend;
 use App\Models\Tarification;
 use App\Models\TarificationCategory;
 use App\Models\TypeWriter;
+use \App\Models\Video;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -1372,6 +1373,11 @@ class TechnologController extends Controller
                                 ->paginate(20);
 
         return response()->json($videos);
+    }
+
+    public function showVideo(Video $video)
+    {
+        return response()->json($video);    
     }
 
 }
