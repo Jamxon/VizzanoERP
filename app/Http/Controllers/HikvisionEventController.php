@@ -117,6 +117,7 @@ class HikvisionEventController extends Controller
                         if ($eventCarbon->gt($lateTime)) {
                             $lateChatId = -4832517980;
                             $botToken = '8466233197:AAFpW34maMs_2y5-Ro_2FQNxniLBaWwLRD8';
+                            $checkInTime = $eventCarbon; // ✅ Shu qatorda aniqlaymiz
 
                             $msg = sprintf(
                                 "⚠️ *%s* (AUP) kechikib keldi.\n\n" .
