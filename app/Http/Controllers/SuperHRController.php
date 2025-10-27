@@ -1221,9 +1221,6 @@ class SuperHRController extends Controller
                 }
             }
 
-
-
-
             DB::commit();
 
              Log::add(
