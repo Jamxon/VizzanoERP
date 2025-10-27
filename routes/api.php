@@ -119,6 +119,7 @@ Route::prefix('tailor')->middleware('role:tailor')->group(function () {
     Route::delete('packets/{id}', [TailorController::class, 'deleteTarificationPacket']);
     Route::delete('packets/item/{id}', [TailorController::class, 'deleteTarificationPacketItem']);
     Route::get('myWorks', [TailorController::class, 'getMyWorks']);
+    Route::get('videos/{video}', [TechnologController::class, 'showVideo']);
 });
 
 Route::prefix('universalTailor')->middleware('role:universalTailor')->group(function () {
@@ -132,6 +133,7 @@ Route::prefix('universalTailor')->middleware('role:universalTailor')->group(func
     Route::delete('packets/{id}', [TailorController::class, 'deleteTarificationPacket']);
     Route::delete('packets/item/{id}', [TailorController::class, 'deleteTarificationPacketItem']);
     Route::get('myWorks', [TailorController::class, 'getMyWorks']);
+    Route::get('videos/{video}', [TechnologController::class, 'showVideo']);
 });
 
 Route::prefix('resultChecker')->middleware('role:resultChecker')->group(function () {
