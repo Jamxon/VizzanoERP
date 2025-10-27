@@ -504,7 +504,10 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::get('nakladnoy', [InternalAccountantController::class, 'generateAttendanceNakladnoy']);
     Route::get('groups', [InternalAccountantController::class, 'getGroups']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
-
+    Route::get('employees/{id}', [SuperHRController::class, 'showEmployee'])->whereNumber('id');
+    Route::get('employees', [SuperHRController::class, 'getEmployees']);
+    Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
+    Route::patch('employees/{employee}', [SuperHRController::class, 'updateEmployees']);
 });
 
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {
