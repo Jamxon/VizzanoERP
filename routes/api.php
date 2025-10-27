@@ -507,6 +507,9 @@ Route::prefix('technologist')->middleware('role:technologist')->group(function (
     Route::get('employees', [SuperHRController::class, 'getEmployees']);
     Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
     Route::patch('employees/{employee}', [SuperHRController::class, 'updateEmployees']);
+
+    Route::post('videos', [TechnologController::class, 'storeVideo']);
+    Route::get('videos', [TechnologController::class, 'getVideos']);
 });
 
 Route::prefix('constructor')->middleware('role:constructor')->group(function () {

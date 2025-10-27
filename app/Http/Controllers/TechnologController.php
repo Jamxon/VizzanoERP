@@ -402,6 +402,7 @@ class TechnologController extends Controller
             '*.tarifications.*.razryad_id' => 'required|integer|exists:razryads,id',
             '*.tarifications.*.typewriter_id' => 'nullable|integer|exists:type_writers,id',
             '*.tarifications.*.second' => 'required|numeric|min:0',
+            '*.tarifications.*.video_id' => 'nullable|integer|exists:videos,id'
         ]);
 
         if ($validator->fails()) {
@@ -455,6 +456,7 @@ class TechnologController extends Controller
                     'second' => $tarification['second'],
                     'summa' => $summa,
                     'code' => $this->generateSequentialCode(),
+                    'video_id' => $tarification['video_id']
                 ]);
 
                 $tarifications[] = $tarif;
@@ -553,6 +555,7 @@ class TechnologController extends Controller
                             $existing->razryad_id != $tarification['razryad_id'] ||
                             $existing->typewriter_id != $tarification['typewriter_id'] ||
                             $existing->second != $tarification['second'] ||
+                            $existing->video_id != $tarification['video_id'] ||
                             $existing->user_id != ($tarification['employee_id'] ?? null);
 
                         if ($hasChanges) {
@@ -566,6 +569,7 @@ class TechnologController extends Controller
                                 'second' => $tarification['second'],
                                 'summa' => $summa,
                                 'code' => $tarification['code'] ?? $this->generateSequentialCode(),
+                                'video_id' => $tarification['video_id']
                             ]);
 
                             $newTarificationsChanged[] = $existing->fresh()->toArray();
@@ -586,6 +590,7 @@ class TechnologController extends Controller
                             'second' => $tarification['second'],
                             'summa' => $summa,
                             'code' => $tarification['code'] ?? $this->generateSequentialCode(),
+                            'video_id' => $tarification['video_id']
                         ]);
 
                         $newTarificationsChanged[] = $created->toArray();
@@ -1165,7 +1170,7 @@ class TechnologController extends Controller
             $totalSecond = 0;
             $totalSumma = 0;
 
-// Iterate through all rows
+            // Iterate through all rows
             for ($rowNum = 1; $rowNum <= $maxRow; $rowNum++) {
                 $row = $sheet[$rowNum] ?? [];
 
@@ -1336,4 +1341,36 @@ class TechnologController extends Controller
 
         return $pdf->download("tarifikatsiya_ro'yxati.pdf");
     }
+
+    public function storeVideo(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:mp4,mov,avi|max:512000', // o'lcham MB bilan (512000 KB = 500MB)
+            'title' => 'nullable|string',
+        ]);
+
+        $file = $request->file('file');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $path = $file->storeAs('videos', $filename, 's3');
+        Storage::disk('s3')->setVisibility($path, 'public');
+        $url = Storage::disk('s3')->url($path);
+
+        $video = \App\Models\Video::create([
+            'title' => $request->title,
+            'link' => $url,
+            'branch_id' => auth()->user()->employee->branch_id
+        ]);
+
+        return response()->json($video, 201);
+    }
+
+    public function getVideos()
+    {
+        $videos = \App\Models\Video::where('branch_id', auth()->user()->employee->branch_id)
+                                ->with('tarifications')
+                                ->paginate(20);
+
+        return response()->json($videos)
+    }
+
 }

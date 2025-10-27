@@ -32,6 +32,7 @@ class Tarification extends Model
         'second',
         'summa',
         'code',
+        'video_id',
     ];
 
     protected $hidden = [
@@ -69,6 +70,11 @@ class Tarification extends Model
     public function tarificationLogs(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(EmployeeTarificationLog::class);
+    }
+
+    public function video()
+    {
+        return $this->belongsTo(Video::class, 'video_id');
     }
 
 }
