@@ -28,7 +28,7 @@ class TechnologController extends Controller
 {
     public function getLastTarifications()
     {
-        return Tarification::select('id', 'name', 'razryad_id', 'typewriter_id', 'second',)
+        return Tarification::select('id', 'name', 'razryad_id', 'typewriter_id', 'second', 'video_id')
             ->orderBy('id', 'desc')
             ->take(1000)
             ->get();
@@ -373,7 +373,7 @@ class TechnologController extends Controller
     }
 
     public function storeTarification(Request $request): \Illuminate\Http\JsonResponse
-    {
+    { 
         $data = json_decode($request->getContent(), true);
 
         // Kiruvchi so‘rovni loglash
