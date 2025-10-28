@@ -998,6 +998,25 @@ class CasherController extends Controller
                 $cashboxBalance->decrement('amount', $difference);
             }
 
+            // ✅ Telegram xabarini tranzaksiya tugagandan keyin yuborish
+            DB::afterCommit(function () use ($employee, $validated) {
+                $text = "💸 *To‘lov amalga oshirildi!*\n"
+                    . "👤 Xodim: {$employee->name}\n"
+                    . "👤 Bajardi: {auth()->user()->employee->name}\n"
+                    . "💰 Miqdor: " . number_format($validated['amount'], 0, '.', ' ') . " so‘m\n"
+                    . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
+                    . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik');
+    
+                $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
+                $chatId = -979504247; // .env ichida saqlang
+    
+                Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $text,
+                    'parse_mode' => 'Markdown',
+                ]);
+            });
+
             return $payment;
         });
     }
