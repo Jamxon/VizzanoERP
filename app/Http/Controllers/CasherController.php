@@ -1002,7 +1002,7 @@ class CasherController extends Controller
             // ✅ Telegram xabarini tranzaksiya tugagandan keyin yuborish
             DB::afterCommit(function () use ($employee, $validated) {
                 $text = "💸 *To‘lov amalga oshirildi!*\n"
-                    . "🏢 Filial: " . auth()->user->employee->branch->name . "\n"
+                    . "🏢 Filial: " . auth()->user()->employee->branch->name . "\n"
                     . "👤 Xodim: {$employee->name}\n"
                     . "👤 Bajardi: " .auth()->user()->employee->name . "\n"
                     . "💰 Miqdor: " . number_format($validated['amount'], 0, '.', ' ') . " so‘m\n"
