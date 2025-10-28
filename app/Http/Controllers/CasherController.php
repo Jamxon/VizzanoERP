@@ -32,6 +32,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use App\Exports\TransactionsExport;
+use Illuminate\Support\Facades\Http;
 
 class CasherController extends Controller
 {
