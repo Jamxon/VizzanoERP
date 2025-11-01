@@ -413,36 +413,6 @@ class GroupMasterController extends Controller
             $order->update(['status' => 'tailored']);
         }
 
-        // ============================================
-        // TO'LOVLARNI HISOBLASH
-        // ============================================
-        try {
-            $paymentService = new \App\Services\PaymentCalculationService();
-            $paymentResult = $paymentService->calculatePaymentsForSewingOutput(
-                $validatedData['order_submodel_id'],
-                $newQuantity
-            );
-
-            // Agar to'lovlar hisoblashda xatolik bo'lsa, faqat log qilib, davom etamiz
-            if (!$paymentResult['success']) {
-                \Log::warning('To\'lovlar hisoblashda xatolik', [
-                    'order_submodel_id' => $validatedData['order_submodel_id'],
-                    'quantity' => $newQuantity,
-                    'error' => $paymentResult['message']
-                ]);
-            }
-        } catch (\Exception $e) {
-            // Service'da xatolik bo'lsa ham, SewingOutput saqlangan
-            \Log::error('Payment service exception', [
-                'order_submodel_id' => $validatedData['order_submodel_id'],
-                'error' => $e->getMessage()
-            ]);
-            $paymentResult = [
-                'success' => false,
-                'message' => 'Xatolik: ' . $e->getMessage()
-            ];
-        }
-
         // Telegram xabarini yuborish
         $time = Time::find($validatedData['time_id']);
         $user = auth()->user();
@@ -460,12 +430,6 @@ class GroupMasterController extends Controller
         $newEntryMessage .= "🧶 <b>Submodel:</b> {$submodelName}\n";
         $newEntryMessage .= "👥 <b>Guruh:</b> {$groupName}\n";
         $newEntryMessage .= "🧑‍💼 <b>Mas'ul:</b> {$responsible}\n";
-        
-        // To'lov hisob-kitobi ma'lumotini qo'shish
-        if ($paymentResult['success']) {
-            $newEntryMessage .= "💰 <b>Hisoblangan to'lovlar:</b> {$paymentResult['payments_count']} ta\n";
-            $newEntryMessage .= "💵 <b>Umumiy summa:</b> " . number_format($paymentResult['total_amount'], 0, '.', ' ') . " so'm\n";
-        }
         $newEntryMessage .= "\n";
 
         $today = now()->toDateString();
@@ -535,16 +499,9 @@ class GroupMasterController extends Controller
 
         // Response'da to'lov ma'lumotlarini ham qaytarish
         $responseMessage = "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity);
-        
-        if ($paymentResult['success']) {
-            $responseMessage .= " | To'lovlar hisoblandi: {$paymentResult['payments_count']} ta ishchi";
-        } else {
-            $responseMessage .= " | To'lovlar hisoblashda xatolik: " . $paymentResult['message'];
-        }
 
         return response()->json([
             'message' => $responseMessage,
-            'payment_calculation' => $paymentResult
         ]);
     }
     private function sendTelegramMessageWithEditSupport(string $message, string $timeName, int $timeId, int $branchId)
