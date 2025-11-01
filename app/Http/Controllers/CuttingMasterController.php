@@ -246,7 +246,7 @@ class CuttingMasterController extends Controller
 
                 $earned = round(($totalEarned * $percentage) / 100, 2);
 
-                if ($earned == 0) {
+                if ($earned == 0 || $percentage == 0 || $remaining == 0) {
                     continue;
                 }
 
