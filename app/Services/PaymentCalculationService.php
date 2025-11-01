@@ -396,7 +396,7 @@ class PaymentCalculationService
 
         // Master expense'dan tashqari boshqa xarajatlar
         $expenses = DB::table('expenses')
-            ->whereNotILike('name', '%master%')
+            ->where('name', 'NOT ILIKE', '%master%')
             ->get();
 
         foreach ($expenses as $expense) {
