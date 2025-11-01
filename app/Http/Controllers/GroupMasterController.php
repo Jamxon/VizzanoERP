@@ -516,6 +516,8 @@ class GroupMasterController extends Controller
                     $q->where('branch_id', $branchId);
                 })->first();
 
+            dd($department);
+
             if (!$department) continue;
 
             $budget = DB::table('department_budgets')
