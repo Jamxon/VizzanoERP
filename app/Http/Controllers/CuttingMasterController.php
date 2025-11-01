@@ -204,7 +204,6 @@ class CuttingMasterController extends Controller
                 ['new' => 'pending']
             );
 
-            DB::commit();
 
             /** 📌 Daily Payment Calculation */
             $departmentId = auth()->user()->employee->department_id ?? null;
@@ -262,6 +261,8 @@ class CuttingMasterController extends Controller
                     'updated_at' => now(),
                 ]);
             }
+
+            DB::commit();
 
             return response()->json([
                 'message' => 'Kesish yakunlandi ✅',
