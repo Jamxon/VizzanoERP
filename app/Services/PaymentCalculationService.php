@@ -345,10 +345,10 @@ class PaymentCalculationService
 
         // Kesuv va Tikuvdan tashqari bo'limlar
        $departments = DB::table('departments')
+       ->join('department_budgets as db', 'departments.id', '=', 'db.department_id')
         ->where('name', 'NOT ILIKE', '%kesuv%')
         ->where('name', 'NOT ILIKE', '%tikuv%')
-        ->whereNotNull('rasxod')
-        ->where('rasxod', '>', 0)
+        ->select('departments.*', 'db.quantity as rasxod')
         ->get();
 
 
