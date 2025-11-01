@@ -129,7 +129,7 @@ class DailyPaymentController extends Controller
         )
             ->with([
                 'model:id,name,minute',
-                'order:id,name,quantity'
+                'order:id,name,quantity,price',
             ])
             ->when($start, fn($q) => $q->where('payment_date', '>=', $start))
             ->when($end, fn($q) => $q->where('payment_date', '<=', $end))
@@ -180,6 +180,7 @@ class DailyPaymentController extends Controller
                             'id' => $row->order?->id,
                             'name' => $row->order?->name,
                             'quantity' => $row->order?->quantity,
+                            'price' => $row->order?->price,
                         ],
                         'produced_quantity' => $produced,
                         'minutes' => $minutes,
