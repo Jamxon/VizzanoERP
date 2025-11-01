@@ -11,10 +11,10 @@ class DailyPaymentController extends Controller
     public function index(Request $request)
     {
         $query = DailyPayment::with([
-            'employee.user:id,name',
+            'employee:id,name',
             'employee.position:id,name',
             'model:id,name',
-            'order:id,order_no',
+            'order:id,name',
             'department:id,name',
         ]);
 
