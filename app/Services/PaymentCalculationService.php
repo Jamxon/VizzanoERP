@@ -33,6 +33,7 @@ class PaymentCalculationService
 
             // 1. Kesuvchilar uchun hisoblash
             $cuttingPayments = $this->calculateCuttingPayments($data, $quantity);
+            dd($cuttingPayments);
             $payments = array_merge($payments, $cuttingPayments);
 
             // 2. Tikuvchilar uchun hisoblash
