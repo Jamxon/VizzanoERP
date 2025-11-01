@@ -14,7 +14,7 @@ class DailyPaymentController extends Controller
             'employee:id,name',
             'employee.position:id,name',
             'model:id,name',
-            'order:id,name',
+            'order',
             'department:id,name',
         ]);
 

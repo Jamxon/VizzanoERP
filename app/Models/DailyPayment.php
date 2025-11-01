@@ -30,7 +30,7 @@ class DailyPayment extends Model
 
     public function model()
     {
-        return $this->belongsTo(\App\Models\Model::class);
+        return $this->belongsTo(\App\Models\Models::class);
     }
 
     public function order()
