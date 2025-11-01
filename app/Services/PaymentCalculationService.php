@@ -33,7 +33,6 @@ class PaymentCalculationService
 
             // 1. Kesuvchilar uchun hisoblash
             $cuttingPayments = $this->calculateCuttingPayments($data, $quantity);
-            dd($data);
             $payments = array_merge($payments, $cuttingPayments);
 
             // 2. Tikuvchilar uchun hisoblash
@@ -149,6 +148,8 @@ class PaymentCalculationService
         
         // Umumiy summa: model daqiqasi * bo'lim rasxodi * soni
         $totalAmount = $modelMinute * $deptRasxod * $quantity;
+
+        dd($totalAmount);
 
         if ($totalAmount <= 0) return $payments;
 
