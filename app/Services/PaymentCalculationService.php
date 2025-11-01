@@ -92,7 +92,8 @@ class PaymentCalculationService
             ->join('order_models as om', 'osm.order_model_id', '=', 'om.id')
             ->join('orders as o', 'om.order_id', '=', 'o.id')
             ->join('models as m', 'om.model_id', '=', 'm.id')
-            ->leftJoin('order_model_groups as omg', 'osm.order_model_group_id', '=', 'omg.id')
+            ->join('submodels as sm', 'osm.submodel_id', '=', 'sm.id')
+            ->leftJoin('order_groups as omg', 'osm.id', '=', 'omg.submodel_id')
             ->leftJoin('groups as g', 'omg.group_id', '=', 'g.id')
             ->select(
                 'o.id as order_id',
