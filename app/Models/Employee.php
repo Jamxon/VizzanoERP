@@ -41,7 +41,8 @@ class Employee extends Model
         'kicked_date',
         'balance',
         'bonus',
-        'salary_visible'
+        'salary_visible',
+        'percentage'
     ];
 
     public function getImgAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null

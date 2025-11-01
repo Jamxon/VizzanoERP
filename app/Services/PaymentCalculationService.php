@@ -226,7 +226,7 @@ class PaymentCalculationService
             // Group ishchilarini olish (faqat tikuvchilar, payment_type piece bo'lganlar)
             $groupEmployees = DB::table('employees as e')
                 ->join('users as u', 'e.user_id', '=', 'u.id')
-                ->where('u.group_id', $groupId)
+                ->where('e.group_id', $groupId)
                 ->where('e.department_id', $sewingDept->id)
                 ->where('e.percentage', '>', 0)
                 ->where('e.status', 'active')
