@@ -267,7 +267,7 @@ class CuttingMasterController extends Controller
 
             return response()->json([
                 'message' => 'Kesish yakunlandi ✅',
-                'remaining_cut_added' => $employees
+                'remaining_cut_added' => $remaining
             ]);
 
         } catch (\Throwable $e) {
