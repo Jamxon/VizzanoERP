@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/DailyPaymentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/DailyPaymentController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -495,39 +492,7 @@
       <workItem from="1761992451897" duration="292000" />
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
-      <workItem from="1761994438958" duration="16479000" />
-    </task>
-    <task id="LOCAL-01620" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759584075634</created>
-      <option name="number" value="01620" />
-      <option name="presentableId" value="LOCAL-01620" />
-      <option name="project" value="LOCAL" />
-      <updated>1759584075635</updated>
-    </task>
-    <task id="LOCAL-01621" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759584145210</created>
-      <option name="number" value="01621" />
-      <option name="presentableId" value="LOCAL-01621" />
-      <option name="project" value="LOCAL" />
-      <updated>1759584145211</updated>
-    </task>
-    <task id="LOCAL-01622" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759584205512</created>
-      <option name="number" value="01622" />
-      <option name="presentableId" value="LOCAL-01622" />
-      <option name="project" value="LOCAL" />
-      <updated>1759584205512</updated>
-    </task>
-    <task id="LOCAL-01623" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759638323913</created>
-      <option name="number" value="01623" />
-      <option name="presentableId" value="LOCAL-01623" />
-      <option name="project" value="LOCAL" />
-      <updated>1759638323914</updated>
+      <workItem from="1761994438958" duration="16825000" />
     </task>
     <task id="LOCAL-01624" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
@@ -889,7 +854,39 @@
       <option name="project" value="LOCAL" />
       <updated>1762015191501</updated>
     </task>
-    <option name="localTasksCounter" value="1669" />
+    <task id="LOCAL-01669" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762016049919</created>
+      <option name="number" value="01669" />
+      <option name="presentableId" value="LOCAL-01669" />
+      <option name="project" value="LOCAL" />
+      <updated>1762016049919</updated>
+    </task>
+    <task id="LOCAL-01670" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762016202557</created>
+      <option name="number" value="01670" />
+      <option name="presentableId" value="LOCAL-01670" />
+      <option name="project" value="LOCAL" />
+      <updated>1762016202557</updated>
+    </task>
+    <task id="LOCAL-01671" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762016254605</created>
+      <option name="number" value="01671" />
+      <option name="presentableId" value="LOCAL-01671" />
+      <option name="project" value="LOCAL" />
+      <updated>1762016254605</updated>
+    </task>
+    <task id="LOCAL-01672" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762016314067</created>
+      <option name="number" value="01672" />
+      <option name="presentableId" value="LOCAL-01672" />
+      <option name="project" value="LOCAL" />
+      <updated>1762016314067</updated>
+    </task>
+    <option name="localTasksCounter" value="1673" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

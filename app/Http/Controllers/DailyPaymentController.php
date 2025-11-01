@@ -72,21 +72,25 @@ class DailyPaymentController extends Controller
             ->with('order')
             ->get();
 
-        /* ✅ SewingOutputs orqali umumiy daqiqalar */
-        $sewingSecondsTotal = SewingOutputs::when($start, fn($q) => $q->where('created_at', '>=', $start))
-            ->when($end, fn($q) => $q->where('created_at', '<=', $end))
-            ->where('branch_id', $branchId)
-            ->sum(DB::raw('seconds * quantity'));
-
-        $totalMinutes = $sewingSecondsTotal / 60;
+        /* ✅ SewingOutputs orqali umumiy daqiqalar — TO‘G‘RI HISOB */
+        $sewingMinutesTotal = SewingOutputs::select(
+            DB::raw('SUM(sewing_outputs.quantity * models.minute) as total_minutes')
+        )
+            ->join('order_submodels', 'order_submodels.id', '=', 'sewing_outputs.order_submodel_id')
+            ->join('order_models', 'order_models.id', '=', 'order_submodels.order_model_id')
+            ->join('models', 'models.id', '=', 'order_models.model_id')
+            ->when($start, fn($q) => $q->where('sewing_outputs.created_at', '>=', $start))
+            ->when($end, fn($q) => $q->where('sewing_outputs.created_at', '<=', $end))
+            ->where('sewing_outputs.branch_id', $branchId)
+            ->value('total_minutes') ?? 0;
 
         /* ✅ Expenses hisoblash (type bo‘yicha) */
 //        $expenses = Expense::where('branch_id', $branchId)->get()->map(function ($exp) use ($totalMinutes, $totalWorkerCost) {
-            $expenses = DB::table('expenses')->where('branch_id', $branchId)->get()->map(function ($exp) use ($totalMinutes, $totalWorkerCost) {
+            $expenses = DB::table('expenses')->where('branch_id', $branchId)->get()->map(function ($exp) use ($sewingMinutesTotal, $totalWorkerCost) {
             if ($exp->type === 'minute_based') {
-                $exp->total_amount = $totalMinutes * $exp->quantity;
+                $exp->total_amount = $sewingMinutesTotal * $exp->quantity;
             } elseif ($exp->type === 'percent_based') {
-                $exp->total_amount = ($totalWorkerCost / 100) * $exp->quantity;
+                $exp->total_amount = ($sewingMinutesTotal / 100) * $exp->quantity;
             } elseif ($exp->type === 'fixed') {
                 $exp->total_amount = $exp->quantity;
             } else {
