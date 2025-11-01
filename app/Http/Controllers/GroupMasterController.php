@@ -516,7 +516,6 @@ class GroupMasterController extends Controller
                     $q->where('branch_id', $branchId);
                 })->first();
 
-            dd($department);
 
             if (!$department) continue;
 
@@ -531,6 +530,8 @@ class GroupMasterController extends Controller
             $usdRate = getUsdRate();
             $orderUsdPrice = $order->price ?? 0;
             $orderUzsPrice = $orderUsdPrice * $usdRate;
+
+            dd($usdRate);
 
             if ($budget->type == 'minute_based' && $modelMinute > 0) {
                 $totalAmount = $modelMinute * $newQuantity * $budget->quantity;
