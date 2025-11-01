@@ -238,7 +238,7 @@ class CuttingMasterController extends Controller
                 ->whereHas('attendances', function ($q) {
                     $q->whereDate('date', Carbon::today())->where('status', 'present');
                 })
-                ->where('status', 'active')
+                ->where('status', 'working')
                 ->get();
 
             foreach ($employees as $emp) {
