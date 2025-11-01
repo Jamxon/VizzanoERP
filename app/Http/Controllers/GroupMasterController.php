@@ -549,8 +549,6 @@ class GroupMasterController extends Controller
                 })
                 ->get();
 
-            dd($totalAmount);
-
             foreach ($employees as $emp) {
 
                 $percentage = $emp->percentage ?? 0;
