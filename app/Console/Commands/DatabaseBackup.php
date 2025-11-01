@@ -66,8 +66,13 @@ class DatabaseBackup extends Command
 
         $part = 1;
         while (!feof($handle)) {
+
             $chunkData = fread($handle, $chunkSize);
-            if ($chunkData === false) break;
+
+            // ❗ Bo‘sh chunk bo‘lsa — siklni to‘xtatamiz
+            if ($chunkData === false || strlen($chunkData) === 0) {
+                break;
+            }
 
             $chunkName = "{$originalName}.part{$part}";
             $this->info("📦 Yuborilmoqda: {$chunkName}");
@@ -86,22 +91,23 @@ class DatabaseBackup extends Command
                     $this->error("❌ {$chunkName} yuborilmadi: " . $response->body());
                 }
 
-                // 🔹 Flood-limit uchun katta interval (60–90 soniya)
+                // 🔄 Faqat tugamagan bo‘lsa kutamiz
                 if (!feof($handle)) {
-                    $this->info("⏳ 1 daqiqa kutilyapti (flood-limit uchun)...");
+                    $this->info("⏳ 65 soniya kutilyapti...");
                     sleep(65);
                 }
 
             } catch (\Exception $e) {
-                $this->error("❌ {$chunkName} yuborishda xatolik: " . $e->getMessage());
-                sleep(120); // 2 daqiqa kutib keyingisiga o‘tish
+                $this->error("❌ Yuborishda xatolik: " . $e->getMessage());
+                sleep(120);
             }
 
             $part++;
         }
 
         fclose($handle);
-        $this->info("🎉 Barcha bo‘laklar yuborildi.");
-}
+        $this->info("🎉 HAMMASI YUBORILDI ✅");
+    }
+
 
 }
