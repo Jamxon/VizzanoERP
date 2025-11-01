@@ -344,12 +344,13 @@ class PaymentCalculationService
         $payments = [];
 
         // Kesuv va Tikuvdan tashqari bo'limlar
-        $departments = DB::table('departments')
-            ->whereNotILike('name', 'kesuv')
-            ->whereNotILike('name', 'tikuv')
-            ->whereNotNull('rasxod')
-            ->where('rasxod', '>', 0)
-            ->get();
+       $departments = DB::table('departments')
+        ->where('name', 'NOT ILIKE', '%kesuv%')
+        ->where('name', 'NOT ILIKE', '%tikuv%')
+        ->whereNotNull('rasxod')
+        ->where('rasxod', '>', 0)
+        ->get();
+
 
         $modelMinute = $data->model_minute ?? 0;
 
