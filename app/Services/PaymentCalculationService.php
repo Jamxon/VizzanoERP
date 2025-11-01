@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
@@ -118,13 +119,13 @@ class PaymentCalculationService
             return null;
         }
 
-        // Faqat 2025 yil va Summer uchun ishlaydi
+        // Faqat 2026 yil va Summer uchun ishlaydi
         if ($data->season_year != 2026 || strtolower($data->season_type) != 'summer') {
             Log::info('Payment calculation skipped - season filter', [
                 'order_id' => $data->order_id,
                 'season_year' => $data->season_year,
                 'season_type' => $data->season_type,
-                'required' => '2025 Summer'
+                'required' => '2026 Summer'
             ]);
             return null;
         }
@@ -142,8 +143,8 @@ class PaymentCalculationService
 
         $cuttingDept = DB::table('departments')
             ->join('department_budgets', 'departments.id', '=', 'department_budgets.department_id')
-            ->where('name', 'ILIKE', 'Крой')
-            ->select('department_budgets.quantity as quantity')
+            ->where('departments.name', 'ILIKE', '%Крой%') // wildcard
+            ->select('departments.id', 'department_budgets.quantity as quantity')
             ->first();
         if (!$cuttingDept) return $payments;
 
@@ -189,25 +190,28 @@ class PaymentCalculationService
     {
         $payments = [];
 
-        $sewingDept = DB::table('departments')->where('name', 'ILIKE', 'tikuv')->first();
-        if (!$sewingDept) return $payments;
+        $sewingDept = DB::table('departments')->where('name', 'ILIKE', '%tikuv%')->first();
+        if (!$sewingDept) {
+            Log::debug('Sewing department not found');
+            return $payments;
+        }
 
-        // Department budget'dan foizni olish
         $deptBudget = DB::table('department_budgets')
             ->where('department_id', $sewingDept->id)
+            ->where('type', 'percent') // aniqroq filter
             ->first();
 
-        if (!$deptBudget || $deptBudget->type !== 'percent') return $payments;
+        if (!$deptBudget) return $payments;
 
-        // Order narxini so'mga o'tkazish
-        $orderPriceInSum = $data->order_price * self::DEFAULT_DOLLAR_RATE;
-        
-        // Umumiy tikuv summasi: order narxining foizi * miqdor
+        $orderPriceInSum = ($data->order_price ?? 0) * self::DEFAULT_DOLLAR_RATE;
         $totalSewingAmount = ($orderPriceInSum * $deptBudget->quantity / 100) * $quantity;
+        if ($totalSewingAmount <= 0) {
+            Log::debug('Total sewing amount zero', ['order_price' => $data->order_price, 'budget_qty' => $deptBudget->quantity]);
+            return $payments;
+        }
 
-        if ($totalSewingAmount <= 0) return $payments;
+        $today = Carbon::today()->toDateString();
 
-        // Bugungi tikish natijalarini olish (group asosida)
         $todayOutputs = DB::table('sewing_outputs as so')
             ->join('order_sub_models as osm', 'so.order_submodel_id', '=', 'osm.id')
             ->where('osm.order_model_id', function($query) use ($data) {
@@ -216,7 +220,7 @@ class PaymentCalculationService
                     ->where('id', $data->order_submodel_id)
                     ->limit(1);
             })
-            ->whereDate('so.created_at', now()->toDateString())
+            ->whereDate('so.created_at', $today)
             ->select('osm.order_model_group_id', DB::raw('SUM(so.quantity) as total_sewn'))
             ->groupBy('osm.order_model_group_id')
             ->get()
@@ -348,12 +352,13 @@ class PaymentCalculationService
         $payments = [];
 
         // Kesuv va Tikuvdan tashqari bo'limlar
-       $departments = DB::table('departments')
-       ->join('department_budgets as db', 'departments.id', '=', 'db.department_id')
-        ->where('name', 'NOT ILIKE', '%kesuv%')
-        ->where('name', 'NOT ILIKE', '%tikuv%')
-        ->select('departments.*', 'db.quantity as rasxod')
-        ->get();
+        $departments = DB::table('departments')
+            ->join('department_budgets as db', 'departments.id', '=', 'db.department_id')
+            ->where('departments.name', 'NOT ILIKE', '%kesuv%')
+            ->where('departments.name', 'NOT ILIKE', '%tikuv%')
+            ->whereNotNull('db.quantity')
+            ->select('departments.id', 'departments.name', 'db.quantity as rasxod')
+            ->get();
 
 
         $modelMinute = $data->model_minute ?? 0;
@@ -405,26 +410,30 @@ class PaymentCalculationService
 
         foreach ($expenses as $expense) {
             $totalAmount = 0;
-
             if ($expense->type === 'sum') {
-                // Model daqiqasi * expense quantity * order quantity
                 $modelMinute = $data->model_minute ?? 0;
                 $totalAmount = $modelMinute * $expense->quantity * $quantity;
             } elseif ($expense->type === 'percent') {
-                // Order narxining foizidan
-                $orderPriceInSum = $data->order_price * self::DEFAULT_DOLLAR_RATE;
+                $orderPriceInSum = ($data->order_price ?? 0) * self::DEFAULT_DOLLAR_RATE;
                 $totalAmount = ($orderPriceInSum * $expense->quantity / 100) * $quantity;
             }
 
             if ($totalAmount <= 0) continue;
 
-            // Expense'ni alohida log qilish
-            Log::info('Expense calculated', [
-                'expense_name' => $expense->name,
+            // Agar expenses uchun to'lovlar qo'shilishi kerak bo'lsa:
+            $payments[] = [
+                'employee_id' => null, // expense to'g'ridan-to'g'ri bo'limga ketsa null yoki specific employee_id
+                'model_id' => $data->model_id,
                 'order_id' => $data->order_id,
-                'amount' => $totalAmount,
-                'quantity' => $quantity
-            ]);
+                'department_id' => $expense->department_id ?? null,
+                'payment_date' => now()->toDateString(),
+                'quantity_produced' => $quantity,
+                'calculated_amount' => round($totalAmount, 2),
+                'employee_percentage' => 100,
+                'created_at' => now()
+            ];
+
+            Log::info('Expense calculated', ['expense' => $expense->name, 'amount' => $totalAmount]);
         }
 
         return $payments;
