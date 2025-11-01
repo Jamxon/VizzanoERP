@@ -351,7 +351,6 @@ class CuttingMasterController extends Controller
                                         'calculated_amount' => $earned,
                                         'employee_percentage' => $percentage,
                                         'created_at' => now(),
-                                        'updated_at' => now(),
                                     ]);
                                 }
                             }
