@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update payment calculation logic for 2026 summer season and improve department queries" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update payment calculation logic for 2026 summer season and improve department queries">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Services/PaymentCalculationService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Services/PaymentCalculationService.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -491,15 +495,7 @@
       <workItem from="1761992451897" duration="292000" />
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
-      <workItem from="1761994438958" duration="668000" />
-    </task>
-    <task id="LOCAL-01587" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759213272681</created>
-      <option name="number" value="01587" />
-      <option name="presentableId" value="LOCAL-01587" />
-      <option name="project" value="LOCAL" />
-      <updated>1759213272681</updated>
+      <workItem from="1761994438958" duration="2875000" />
     </task>
     <task id="LOCAL-01588" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
@@ -885,7 +881,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761995031360</updated>
     </task>
-    <option name="localTasksCounter" value="1636" />
+    <task id="LOCAL-01636" summary="fix: update payment calculation logic for 2026 summer season and improve department queries">
+      <option name="closed" value="true" />
+      <created>1761995381880</created>
+      <option name="number" value="01636" />
+      <option name="presentableId" value="LOCAL-01636" />
+      <option name="project" value="LOCAL" />
+      <updated>1761995381880</updated>
+    </task>
+    <option name="localTasksCounter" value="1637" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

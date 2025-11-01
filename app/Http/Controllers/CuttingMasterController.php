@@ -213,6 +213,46 @@ class CuttingMasterController extends Controller
             );
 
             DB::commit();
+
+            $departmentId = auth()->user()->employee->department_id ?? 'Noma\'lum';
+
+            $departmentBudget = DB::table('department_budgets')
+                ->where('department_id', $departmentId)
+                ->first();
+
+            $modelMinute = $order->orderModel->model->minute;
+
+            if ($departmentBudget->type === 'minute_based' && $modelMinute) {
+                $totalMinutes = $modelMinute * $order->quantity;
+                $totalEarned = $departmentBudget->quantity * $totalMinutes;
+
+                $departmentEmployees = Employee::where('department_id', $departmentId)
+                    ->whereHas('attendances', function ($query) {
+                        $query->whereDate('date', Carbon::today()->toDateString());
+                        $query->where('status', 'present');
+                    })
+                    ->where('status', '!=', 'kicked')
+                    ->get();
+
+                foreach ($departmentEmployees as $employee) {
+                    $employeePercentage = $employee->percentage;
+                    $employeeEarned = $totalEarned / 100 * $employeePercentage;
+
+                    DB::insert('INSERT INTO daily_payments (employee_id, model_id, order_id, department_id, payment_date, quantity_produced, calculated_amount, employee_percentage, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                        [
+                        $employee->id,
+                        $order->orderModel->model->id,
+                        $order->id,
+                        $departmentId,
+                        Carbon::today()->toDateString(),
+                        $order->quantity,
+                        $employeeEarned,
+                        $employeePercentage,
+                        now(),
+                    ]);
+                }
+            }
+
             return response()->json([
                 'message' => 'Order cutting finished',
                 'remaining_cut_added' => $remaining > 0 ? $remaining : 0
