@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
+      <change beforePath="$PROJECT_DIR$/routes/api.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/api.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -492,15 +494,7 @@
       <workItem from="1761992451897" duration="292000" />
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
-      <workItem from="1761994438958" duration="14979000" />
-    </task>
-    <task id="LOCAL-01614" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759396227579</created>
-      <option name="number" value="01614" />
-      <option name="presentableId" value="LOCAL-01614" />
-      <option name="project" value="LOCAL" />
-      <updated>1759396227579</updated>
+      <workItem from="1761994438958" duration="15283000" />
     </task>
     <task id="LOCAL-01615" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
@@ -886,7 +880,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762013964564</updated>
     </task>
-    <option name="localTasksCounter" value="1663" />
+    <task id="LOCAL-01663" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762014745005</created>
+      <option name="number" value="01663" />
+      <option name="presentableId" value="LOCAL-01663" />
+      <option name="project" value="LOCAL" />
+      <updated>1762014745005</updated>
+    </task>
+    <option name="localTasksCounter" value="1664" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -916,7 +918,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update chat ID in SupplierController for Telegram notifications" />
     <MESSAGE value="fix: update supplier name retrieval in SupplierController for order notifications" />
     <MESSAGE value="fix: enhance order data structure in CeoController to include submodel sewing outputs" />
     <MESSAGE value="fix: add route for retrieving employee tarification logs in InternalAccountantController" />
@@ -941,7 +942,8 @@
     <MESSAGE value="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
     <MESSAGE value="fix: update payment calculation logic for 2026 summer season and improve department queries" />
     <MESSAGE value="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService" />
+    <MESSAGE value="feat: add DailyPayment model and controller for managing daily payment records" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add DailyPayment model and controller for managing daily payment records" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

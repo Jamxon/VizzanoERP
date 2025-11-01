@@ -9,6 +9,7 @@ use App\Http\Controllers\ConstructorController;
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\CuttingMasterController;
 use App\Http\Controllers\CuttingPlanController;
+use App\Http\Controllers\DailyPaymentController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\EmployeeMonthlyController;
 use App\Http\Controllers\GroupController;
@@ -106,6 +107,8 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::patch('employeeMonthlyPiecework/{id}', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkUpdate']);
     Route::get('salaryChanges', [UserController::class, "getSalaryChangesAll"]);
     Route::get('groupChanges', [UserController::class, 'getGroupChangesAll']);
+    Route::get('daily-payments', [DailyPaymentController::class, 'index']);
+
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
