@@ -149,7 +149,7 @@ class PaymentCalculationService
         // Umumiy summa: model daqiqasi * bo'lim rasxodi * soni
         $totalAmount = $modelMinute * $deptRasxod * $quantity;
 
-        dd($totalAmount);
+        dd($deptRasxod);
 
         if ($totalAmount <= 0) return $payments;
 
