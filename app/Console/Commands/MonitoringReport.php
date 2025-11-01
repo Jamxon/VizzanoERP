@@ -232,16 +232,16 @@ class MonitoringReport extends Command
     private function sendMessage($text)
     {
         try {
-            $text = $this->escapeMarkdown($text);
             Http::timeout(10)->post("https://api.telegram.org/bot{$this->botToken}/sendMessage", [
                 'chat_id' => $this->chatId,
                 'text' => $text,
-                'parse_mode' => 'MarkdownV2',
+                'parse_mode' => null, // ❌ parse_mode ishlatilmaydi
             ]);
         } catch (\Throwable $e) {
             $this->error("❌ Telegram yuborishda xatolik: " . $e->getMessage());
         }
     }
+
 
     private function escapeMarkdown($text)
     {
