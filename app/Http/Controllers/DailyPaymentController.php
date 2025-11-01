@@ -119,15 +119,14 @@ class DailyPaymentController extends Controller
     public function index(Request $request)
     {
         $branchId = auth()->user()->employee->branch_id ?? null;
-
         $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
         $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
 
-        /* ✅ Model → Order → DailyPayment grouped result */
+        /* ✅ Model + Order bo‘yicha DailyPayment */
         $modelData = DailyPayment::select(
-            'daily_payments.model_id',
-            'daily_payments.order_id',
-            DB::raw('SUM(daily_payments.calculated_amount) as total_worker_cost')
+            'model_id',
+            'order_id',
+            DB::raw('SUM(calculated_amount) as worker_cost')
         )
             ->with([
                 'model:id,name,minute',
@@ -136,16 +135,16 @@ class DailyPaymentController extends Controller
             ->when($start, fn($q) => $q->where('payment_date', '>=', $start))
             ->when($end, fn($q) => $q->where('payment_date', '<=', $end))
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
-            ->groupBy('daily_payments.model_id', 'daily_payments.order_id')
+            ->groupBy('model_id', 'order_id')
             ->get()
             ->groupBy('model_id')
-            ->map(function ($itemsByModel) use ($start, $end, $branchId) {
+            ->map(function ($rowsByModel) use ($start, $end, $branchId) {
 
-                $model = $itemsByModel->first()->model;
+                $model = $rowsByModel->first()->model;
 
-                $orders = $itemsByModel->map(function ($row) use ($start, $end, $branchId) {
+                $orders = $rowsByModel->map(function ($row) use ($start, $end, $branchId) {
 
-                    /* ✅ Tegishli model va orderga qarab tikilgan son */
+                    /* ✅ Tikilgan quantity (fact) */
                     $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
                         ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                         ->where('order_models.order_id', $row->order_id)
@@ -156,6 +155,20 @@ class DailyPaymentController extends Controller
 
                     $minutes = $produced * ($row->model->minute ?? 0);
 
+                    /* ✅ Department xarajatlarini qo‘shish */
+                    $departmentCost = DailyPayment::where('order_id', $row->order_id)
+                        ->where('model_id', $row->model_id)
+                        ->whereNotNull('department_id') // ✅ Bu bo‘limdan kelganlar
+                        ->sum('calculated_amount');
+
+                    /* ✅ Expense (faqat Master & Texnolog) */
+                    $expenseCost = DailyPayment::where('order_id', $row->order_id)
+                        ->where('model_id', $row->model_id)
+                        ->whereNotNull('expense_id') // ✅ Expense bo‘limi
+                        ->sum('calculated_amount');
+
+                    $totalCost = $row->worker_cost + $departmentCost + $expenseCost;
+
                     return [
                         'order' => [
                             'id' => $row->order?->id,
@@ -164,7 +177,10 @@ class DailyPaymentController extends Controller
                         ],
                         'produced_quantity' => $produced,
                         'minutes' => $minutes,
-                        'worker_cost' => $row->total_worker_cost,
+                        'worker_cost' => $row->worker_cost,
+                        'department_cost' => $departmentCost,
+                        'expense_cost' => $expenseCost,
+                        'total_cost' => $totalCost
                     ];
                 });
 
@@ -179,15 +195,14 @@ class DailyPaymentController extends Controller
             })
             ->values();
 
-        /* ✅ Umumiy ishchi xarajatlar */
-        $totalWorkerCost = $modelData->sum(
-            fn($m) => collect($m['orders'])->sum(fn($o) => $o['worker_cost'])
+        $grandTotal = $modelData->sum(
+            fn($m) => collect($m['orders'])->sum(fn($o) => $o['total_cost'])
         );
 
         return response()->json([
             'success' => true,
             'models' => $modelData,
-            'total_worker_cost' => $totalWorkerCost
+            'total_cost' => $grandTotal,
         ]);
     }
 
