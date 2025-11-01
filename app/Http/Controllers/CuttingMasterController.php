@@ -297,6 +297,8 @@ class CuttingMasterController extends Controller
                     })
                     ->first();
 
+                dd($warehouseDepartment);
+
 
                 if ($warehouseDepartment) {
                     $warehouseBudget = DB::table('department_budgets')
