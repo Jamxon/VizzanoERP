@@ -6,6 +6,7 @@ use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
 use App\Models\Bonus;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Group;
 use App\Models\Order;
@@ -497,6 +498,150 @@ class GroupMasterController extends Controller
             $sewingOutput->toArray()
         );
 
+        /** ✅ Payment calculation for Sewing Output based departments **/
+        $sewingDepartments = [
+            'Сифат назорати ва қадоқлаш бўлими',
+            'Маъмурий бошқарув',
+            'Хўжалик ишлари бўлими',
+            'Режалаштириш ва иқтисод бўлими',
+            'Тикув бўлими',
+        ];
+
+        $branchId = auth()->user()->employee->branch_id;
+
+        foreach ($sewingDepartments as $deptName) {
+
+            $department = Department::where('name', $deptName)
+                ->whereHas('mainDepartment', function($q) use($branchId) {
+                    $q->where('branch_id', $branchId);
+                })->first();
+
+            if (!$department) continue;
+
+            $budget = DB::table('department_budgets')
+                ->where('department_id', $department->id)
+                ->first();
+
+            if (!$budget) continue;
+
+            $modelMinute = $orderModel->model->minute ?? 0;
+
+            $usdRate = getUsdRate();
+            $orderUsdPrice = $order->price ?? 0;
+            $orderUzsPrice = $orderUsdPrice * $usdRate;
+
+            if ($budget->type == 'minute_based' && $modelMinute > 0) {
+                $totalAmount = $modelMinute * $newQuantity * $budget->quantity;
+            } elseif ($budget->type == 'percentage_based') {
+                $percentage = $budget->quantity ?? 0; // Bu yerda type = %, quantity = foiz
+
+                $totalAmount = round(($orderUzsPrice * $percentage) / 100, 2);
+            } else {
+                $totalAmount = $newQuantity * $budget->quantity;
+            }
+
+            $employees = Employee::where('department_id', $department->id)
+                ->where('status', 'working')
+                ->whereHas('attendances', function ($q) {
+                    $q->whereDate('date', Carbon::today())
+                        ->where('status', 'present');
+                })
+                ->get();
+
+            foreach ($employees as $emp) {
+
+                $percentage = $emp->percentage ?? 0;
+                if ($percentage == 0) continue;
+
+                $earned = round(($totalAmount * $percentage) / 100, 2);
+                if ($earned == 0) continue;
+
+                $existing = DB::table('daily_payments')
+                    ->where('employee_id', $emp->id)
+                    ->where('order_id', $order->id)
+                    ->where('model_id', $orderModel->model->id)
+                    ->first();
+
+                if ($existing) {
+                    DB::table('daily_payments')->where('id', $existing->id)
+                        ->update([
+                            'quantity_produced' => $existing->quantity_produced + $newQuantity,
+                            'calculated_amount' => $existing->calculated_amount + $earned,
+                            'updated_at' => now(),
+                        ]);
+                } else {
+                    DB::table('daily_payments')->insert([
+                        'employee_id' => $emp->id,
+                        'model_id' => $orderModel->model->id,
+                        'order_id' => $order->id,
+                        'department_id' => $department->id,
+                        'payment_date' => Carbon::today(),
+                        'quantity_produced' => $newQuantity,
+                        'calculated_amount' => $earned,
+                        'employee_percentage' => $percentage,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        $usdRate = getUsdRate();
+        $orderUsdPrice = $order->total_price_usd ?? 0;
+        $orderUzsPrice = $orderUsdPrice * $usdRate;
+
+        $expenses = DB::table('expenses')
+            ->where('branch_id', $branchId)
+            ->get();
+
+        foreach ($expenses as $expense) {
+
+            // ✅ faqat master va texnolog
+            if (!in_array(strtolower($expense->name), ['master', 'texnolog'])) {
+                continue; // ✅ qolgan expense ni SKIP
+            }
+
+            if ($expense->type !== 'percentage_based') continue;
+
+            $expenseAmount = round(($orderUzsPrice * $expense->quantity) / 100, 2);
+
+            $employees = Employee::whereHas('position', function($q) use ($expense) {
+                $q->whereIn('name', [
+                    'master', 'Master', 'MASTer',
+                    'texnolog', 'Texnolog', 'TEXNOLOG'
+                ]);
+            })
+                ->where('branch_id', $branchId)
+                ->whereHas('attendances', function ($q) {
+                    $q->whereDate('date', Carbon::today())
+                        ->where('status', 'present');
+                })
+                ->where('status', 'working')
+                ->get();
+
+            foreach ($employees as $emp) {
+
+                $percentage = $emp->percentage ?? 0;
+                $earned = round(($expenseAmount * $percentage) / 100, 2);
+
+                if ($earned <= 0) continue;
+
+                DB::table('daily_payments')->insert([
+                    'employee_id' => $emp->id,
+                    'order_id' => $order->id,
+                    'model_id' => $order->orderModel->model->id,
+                    'department_id' => null,
+                    'expense_id' => $expense->id,
+                    'payment_date' => Carbon::today(),
+                    'quantity_produced' => $order->quantity,
+                    'calculated_amount' => $earned,
+                    'employee_percentage' => $percentage,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        }
+
         // Response'da to'lov ma'lumotlarini ham qaytarish
         $responseMessage = "Natija muvaffaqiyatli qo'shildi. Qolgan miqdor: " . ($orderQuantity - $combinedQuantity);
 
@@ -504,6 +649,7 @@ class GroupMasterController extends Controller
             'message' => $responseMessage,
         ]);
     }
+
     private function sendTelegramMessageWithEditSupport(string $message, string $timeName, int $timeId, int $branchId)
     {
         try {

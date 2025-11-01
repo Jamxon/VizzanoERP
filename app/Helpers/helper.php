@@ -91,6 +91,19 @@ if (!function_exists('transliterate')) {
 }
 
 
+    function getUsdRate(): float|int
+    {
+        try {
+            $response = Http::get('https://cbu.uz/uz/arkhiv-kursov-valyut/json/');
+            $rates = $response->json();
+
+            $usd = collect($rates)->firstWhere('Ccy', 'USD');
+
+            return $usd ? floatval($usd['Rate']) : 12000; // fallback
+        } catch (\Exception $e) {
+            return 12000; // xatoda default
+        }
+    }
 
 
 }
