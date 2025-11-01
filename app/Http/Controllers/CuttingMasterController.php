@@ -250,6 +250,25 @@ class CuttingMasterController extends Controller
                     continue;
                 }
 
+                //agar shu model shu order shu employee uchun oldin daily payment bo'lsa, edit qilib umumiy kesilganiga summa yozib qo'yamiz
+
+                $existingPayment = DB::table('daily_payments')
+                    ->where('employee_id', $emp->id)
+                    ->where('order_id', $order->id)
+                    ->where('model_id', $order->orderModel->model->id)
+                    ->first();
+
+                if ($existingPayment) {
+                    DB::table('daily_payments')
+                        ->where('id', $existingPayment->id)
+                        ->update([
+                            'quantity_produced' => $existingPayment->quantity_produced + $orderQuantity,
+                            'calculated_amount' => $existingPayment->calculated_amount + $earned,
+                            'updated_at' => now(),
+                        ]);
+                    continue;
+                }
+
                 DB::table('daily_payments')->insert([
                     'employee_id' => $emp->id,
                     'model_id' => $order->orderModel->model->id ?? null,
