@@ -2,13 +2,12 @@
 
 namespace App\Models;
 
-/**
- * @method belongsTo(string $class)
- * @method static with(string[] $array)
- */
-class DailyPayment
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class DailyPayment extends Model
 {
-    protected $table = 'daily_payments';
+    use HasFactory;
 
     protected $fillable = [
         'employee_id',
@@ -21,6 +20,9 @@ class DailyPayment
         'employee_percentage',
     ];
 
+    protected $table = 'daily_payments';
+
+    // ✅ Relationships
     public function employee()
     {
         return $this->belongsTo(Employee::class);
@@ -28,7 +30,7 @@ class DailyPayment
 
     public function model()
     {
-        return $this->belongsTo(Models::class);
+        return $this->belongsTo(\App\Models\Model::class);
     }
 
     public function order()
@@ -40,5 +42,4 @@ class DailyPayment
     {
         return $this->belongsTo(Department::class);
     }
-
 }
