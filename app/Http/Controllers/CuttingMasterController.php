@@ -290,14 +290,14 @@ class CuttingMasterController extends Controller
 
             if ($authBranchId) {
 
-                $warehouseDepartment = Department::where('name', 'ILIKE', '%омбор%')
-                    ->orWhere('name', 'ILIKE', '%ombor%')
+                $warehouseDepartment = Department::where(function($q) {
+                        $q->where('name', 'ILIKE', '%омбор%')
+                            ->orWhere('name', 'ILIKE', '%ombor%');
+                    })
                     ->whereHas('mainDepartment', function ($q) use ($authBranchId) {
                         $q->where('branch_id', $authBranchId);
                     })
                     ->first();
-
-                dd($warehouseDepartment);
 
 
                 if ($warehouseDepartment) {
