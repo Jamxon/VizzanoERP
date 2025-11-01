@@ -28,7 +28,7 @@ class DailyPaymentController extends Controller
             ->when($end, fn($q) => $q->where('payment_date', '<=', $end))
             ->where('employees.branch_id', $branchId)
             ->whereNotIn('positions.name', ['Master', 'Texnolog'])
-            ->groupBy('department_id')
+            ->groupBy('daily_payments.department_id')
             ->with('department:id,name')
             ->get();
 
