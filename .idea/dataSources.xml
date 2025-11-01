@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="vizzano@176.124.208.61" uuid="de1e4679-3154-4b85-94ec-068d67b4feee">
-      <driver-ref>postgresql</driver-ref>
-      <synchronize>true</synchronize>
-      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://176.124.208.61:5432/vizzano</jdbc-url>
-      <working-dir>$ProjectFileDir$</working-dir>
-    </data-source>
-    <data-source source="LOCAL" name="vizzano@176.124.208.61 [2]" uuid="1fbc92b5-812d-4c47-90ee-79b7fb0a9008">
+    <data-source source="LOCAL" name="vizzano@176.124.208.61 [2]" uuid="e6cf56dc-6987-40b1-a4db-d4b70804e1ba">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>

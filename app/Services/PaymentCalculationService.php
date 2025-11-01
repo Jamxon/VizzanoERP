@@ -140,7 +140,7 @@ class PaymentCalculationService
     {
         $payments = [];
 
-        $cuttingDept = DB::table('departments')->where('name', 'ILIKE', 'kesuv')->first();
+        $cuttingDept = DB::table('departments')->where('name', 'ILIKE', 'Крой')->first();
         if (!$cuttingDept) return $payments;
 
         $modelMinute = $data->model_minute ?? 0;
