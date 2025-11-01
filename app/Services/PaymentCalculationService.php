@@ -117,7 +117,7 @@ class PaymentCalculationService
         }
 
         // Faqat 2025 yil va Summer uchun ishlaydi
-        if ($data->season_year != 2025 || strtolower($data->season_type) != 'summer') {
+        if ($data->season_year != 2026 || strtolower($data->season_type) != 'summer') {
             Log::info('Payment calculation skipped - season filter', [
                 'order_id' => $data->order_id,
                 'season_year' => $data->season_year,
