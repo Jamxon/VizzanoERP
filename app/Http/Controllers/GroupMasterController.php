@@ -531,8 +531,6 @@ class GroupMasterController extends Controller
             $orderUsdPrice = $order->price ?? 0;
             $orderUzsPrice = $orderUsdPrice * $usdRate;
 
-            dd($usdRate);
-
             if ($budget->type == 'minute_based' && $modelMinute > 0) {
                 $totalAmount = $modelMinute * $newQuantity * $budget->quantity;
             } elseif ($budget->type == 'percentage_based') {
@@ -550,6 +548,8 @@ class GroupMasterController extends Controller
                         ->where('status', 'present');
                 })
                 ->get();
+
+            dd($totalAmount);
 
             foreach ($employees as $emp) {
 
