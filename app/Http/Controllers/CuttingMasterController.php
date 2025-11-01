@@ -241,8 +241,6 @@ class CuttingMasterController extends Controller
                 ->where('status', 'active')
                 ->get();
 
-            return $employees;
-
             foreach ($employees as $emp) {
                 $percentage = $emp->percentage ?? 0;
 
@@ -266,7 +264,7 @@ class CuttingMasterController extends Controller
 
             return response()->json([
                 'message' => 'Kesish yakunlandi ✅',
-                'remaining_cut_added' => $remaining
+                'remaining_cut_added' => $employees
             ]);
 
         } catch (\Throwable $e) {
