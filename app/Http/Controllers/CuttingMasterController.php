@@ -246,6 +246,10 @@ class CuttingMasterController extends Controller
 
                 $earned = round(($totalEarned * $percentage) / 100, 2);
 
+                if ($earned == 0) {
+                    continue;
+                }
+
                 DB::table('daily_payments')->insert([
                     'employee_id' => $emp->id,
                     'model_id' => $order->orderModel->model->id ?? null,
