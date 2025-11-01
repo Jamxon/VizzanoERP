@@ -84,11 +84,11 @@ class PaymentCalculationService
     }
 
     /**
-     * Order ma'lumotlarini olish
+     * Order ma'lumotlarini olish va filtrlash
      */
     private function getOrderData(int $orderSubmodelId)
     {
-        return DB::table('order_sub_models as osm')
+        $data = DB::table('order_sub_models as osm')
             ->join('order_models as om', 'osm.order_model_id', '=', 'om.id')
             ->join('orders as o', 'om.order_id', '=', 'o.id')
             ->join('models as m', 'om.model_id', '=', 'm.id')
@@ -98,6 +98,9 @@ class PaymentCalculationService
                 'o.id as order_id',
                 'o.price as order_price',
                 'o.quantity as order_quantity',
+                'o.branch_id as branch_id',
+                'o.season_year as season_year',
+                'o.season_type as season_type',
                 'm.id as model_id',
                 'm.minute as model_minute',
                 'm.rasxod as model_rasxod',
@@ -106,6 +109,24 @@ class PaymentCalculationService
             )
             ->where('osm.id', $orderSubmodelId)
             ->first();
+
+        // Filtrlarni tekshirish
+        if (!$data) {
+            return null;
+        }
+
+        // Faqat 2025 yil va Summer uchun ishlaydi
+        if ($data->season_year != 2025 || strtolower($data->season_type) != 'summer') {
+            Log::info('Payment calculation skipped - season filter', [
+                'order_id' => $data->order_id,
+                'season_year' => $data->season_year,
+                'season_type' => $data->season_type,
+                'required' => '2025 Summer'
+            ]);
+            return null;
+        }
+
+        return $data;
     }
 
     /**
