@@ -122,7 +122,6 @@ class DailyPaymentController extends Controller
         $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
         $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
 
-        /* ✅ Model + Order bo‘yicha DailyPayment */
         $modelData = DailyPayment::select(
             'model_id',
             'order_id',
@@ -144,7 +143,7 @@ class DailyPaymentController extends Controller
 
                 $orders = $rowsByModel->map(function ($row) use ($start, $end, $branchId) {
 
-                    /* ✅ Tikilgan quantity (fact) */
+                    /* ✅ Tikilgan quantity */
                     $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
                         ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                         ->where('order_models.order_id', $row->order_id)
@@ -155,13 +154,26 @@ class DailyPaymentController extends Controller
 
                     $minutes = $produced * ($row->model->minute ?? 0);
 
-                    /* ✅ Department xarajatlari */
-                    $departmentCost = DailyPayment::where('order_id', $row->order_id)
+                    /* ✅ Department bo‘yicha xarajatlar */
+                    $departmentCosts = DailyPayment::select(
+                        'department_id',
+                        DB::raw('SUM(calculated_amount) as cost')
+                    )
+                        ->with('department:id,name')
+                        ->where('order_id', $row->order_id)
                         ->where('model_id', $row->model_id)
                         ->whereNotNull('department_id')
-                        ->sum('calculated_amount');
+                        ->groupBy('department_id')
+                        ->get()
+                        ->map(fn($d) => [
+                            'department_id' => $d->department_id,
+                            'department_name' => $d->department?->name,
+                            'cost' => $d->cost,
+                        ]);
 
-                    $totalCost = $row->worker_cost + $departmentCost;
+                    $departmentTotal = collect($departmentCosts)->sum('cost');
+
+                    $totalCost = $row->worker_cost + $departmentTotal;
 
                     return [
                         'order' => [
@@ -172,7 +184,7 @@ class DailyPaymentController extends Controller
                         'produced_quantity' => $produced,
                         'minutes' => $minutes,
                         'worker_cost' => $row->worker_cost,
-                        'department_cost' => $departmentCost,
+                        'department_costs' => $departmentCosts,
                         'total_cost' => $totalCost,
                     ];
                 });
@@ -188,7 +200,6 @@ class DailyPaymentController extends Controller
             })
             ->values();
 
-        /* ✅ Umumiy total cost */
         $grandTotal = $modelData->sum(
             fn($m) => collect($m['orders'])->sum(fn($o) => $o['total_cost'])
         );
