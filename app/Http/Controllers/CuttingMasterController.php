@@ -7,6 +7,7 @@ use App\Models\BoxTarification;
 use App\Http\Resources\GetOrderCutResource;
 use App\Http\Resources\GetSpecificationResource;
 use App\Http\Resources\showOrderCuttingMasterResource;
+use App\Models\Department;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\Order;
@@ -280,6 +281,83 @@ class CuttingMasterController extends Controller
                     'employee_percentage' => $percentage,
                     'created_at' => now(),
                 ]);
+            }
+
+            /** ✅ Ombor Department uchun ham hisob-kitob */
+
+            $authBranchId = auth()->user()->employee->branch_id ?? null;
+
+            if ($authBranchId) {
+
+                $warehouseDepartment = Department::where('name', 'ILIKE', '%омбор%')
+                    ->orWhere('name', 'ILIKE', '%ombor%')
+                    ->whereHas('mainDepartment', function ($q) use ($authBranchId) {
+                        $q->where('branch_id', $authBranchId);
+                    })
+                    ->first();
+
+                if ($warehouseDepartment) {
+                    $warehouseBudget = DB::table('department_budgets')
+                        ->where('department_id', $warehouseDepartment->id)
+                        ->where('type', 'minute_based')
+                        ->first();
+
+                    if ($warehouseBudget) {
+                        $modelMinute = $order->orderModel->model->minute ?? 0;
+
+                        if ($modelMinute > 0 && $remaining > 0) {
+
+                            $totalMinutes = $modelMinute * $remaining;
+                            $totalEarnedWarehouse = $warehouseBudget->quantity * $totalMinutes;
+
+                            $warehouseEmployees = Employee::where('department_id', $warehouseDepartment->id)
+                                ->whereHas('attendances', function ($q) {
+                                    $q->whereDate('date', Carbon::today())
+                                        ->where('status', 'present');
+                                })
+                                ->where('status', 'working')
+                                ->get();
+
+                            foreach ($warehouseEmployees as $wEmp) {
+
+                                $percentage = $wEmp->percentage ?? 0;
+                                if ($percentage == 0) continue;
+
+                                $earned = round(($totalEarnedWarehouse * $percentage) / 100, 2);
+                                if ($earned == 0) continue;
+
+                                $existing = DB::table('daily_payments')
+                                    ->where('employee_id', $wEmp->id)
+                                    ->where('order_id', $order->id)
+                                    ->where('model_id', $order->orderModel->model->id)
+                                    ->first();
+
+                                if ($existing) {
+                                    DB::table('daily_payments')
+                                        ->where('id', $existing->id)
+                                        ->update([
+                                            'quantity_produced' => $existing->quantity_produced + $remaining,
+                                            'calculated_amount' => $existing->calculated_amount + $earned,
+                                            'updated_at' => now(),
+                                        ]);
+                                } else {
+                                    DB::table('daily_payments')->insert([
+                                        'employee_id' => $wEmp->id,
+                                        'model_id' => $order->orderModel->model->id,
+                                        'order_id' => $order->id,
+                                        'department_id' => $warehouseDepartment->id,
+                                        'payment_date' => Carbon::today(),
+                                        'quantity_produced' => $remaining,
+                                        'calculated_amount' => $earned,
+                                        'employee_percentage' => $percentage,
+                                        'created_at' => now(),
+                                        'updated_at' => now(),
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             DB::commit();
