@@ -403,16 +403,15 @@ class PaymentCalculationService
     {
         $payments = [];
 
-        // Master expense'dan tashqari boshqa xarajatlar
         $expenses = DB::table('expenses')
             ->where('name', 'NOT ILIKE', '%master%')
             ->get();
 
         foreach ($expenses as $expense) {
             $totalAmount = 0;
+
             if ($expense->type === 'sum') {
-                $modelMinute = $data->model_minute ?? 0;
-                $totalAmount = $modelMinute * $expense->quantity * $quantity;
+                $totalAmount = ($data->model_minute ?? 0) * $expense->quantity * $quantity;
             } elseif ($expense->type === 'percent') {
                 $orderPriceInSum = ($data->order_price ?? 0) * self::DEFAULT_DOLLAR_RATE;
                 $totalAmount = ($orderPriceInSum * $expense->quantity / 100) * $quantity;
@@ -420,20 +419,63 @@ class PaymentCalculationService
 
             if ($totalAmount <= 0) continue;
 
-            // Agar expenses uchun to'lovlar qo'shilishi kerak bo'lsa:
-            $payments[] = [
-                'employee_id' => null, // expense to'g'ridan-to'g'ri bo'limga ketsa null yoki specific employee_id
-                'model_id' => $data->model_id,
-                'order_id' => $data->order_id,
-                'department_id' => $expense->department_id ?? null,
-                'payment_date' => now()->toDateString(),
-                'quantity_produced' => $quantity,
-                'calculated_amount' => round($totalAmount, 2),
-                'employee_percentage' => 100,
-                'created_at' => now()
-            ];
+            // Agar expense bir bo‘limga tegishli bo‘lsa — shu bo‘limdagi ishchilarga taqsimlanadi
+            if ($expense->department_id) {
 
-            Log::info('Expense calculated', ['expense' => $expense->name, 'amount' => $totalAmount]);
+                $employees = DB::table('employees')
+                    ->where('department_id', $expense->department_id)
+                    ->where('percentage', '>', 0)
+                    ->where('status', 'active')
+                    ->get();
+
+                foreach ($employees as $employee) {
+
+                    $employeeAmount = ($totalAmount * $employee->percentage) / 100;
+
+                    $payments[] = [
+                        'employee_id' => $employee->id,
+                        'model_id' => $data->model_id,
+                        'order_id' => $data->order_id,
+                        'department_id' => $expense->department_id,
+                        'payment_date' => now()->toDateString(),
+                        'quantity_produced' => $quantity,
+                        'calculated_amount' => round($employeeAmount, 2),
+                        'employee_percentage' => $employee->percentage,
+                        'created_at' => now(),
+                    ];
+                }
+
+            } else {
+                // Department belgilanmagan Expense → Group Master yoki Admin oladi
+                $groupMaster = DB::table('employees as e')
+                    ->join('users as u', 'e.user_id', '=', 'u.id')
+                    ->join('roles as r', 'u.role_id', '=', 'r.id')
+                    ->where('r.name', 'groupMaster')
+                    ->where('e.group_id', $data->group_id)
+                    ->where('e.status', 'active')
+                    ->select('e.*')
+                    ->first();
+
+                if ($groupMaster) {
+                    $payments[] = [
+                        'employee_id' => $groupMaster->id,
+                        'model_id' => $data->model_id,
+                        'order_id' => $data->order_id,
+                        'department_id' => $groupMaster->department_id,
+                        'payment_date' => now()->toDateString(),
+                        'quantity_produced' => $quantity,
+                        'calculated_amount' => round($totalAmount, 2),
+                        'employee_percentage' => 100,
+                        'created_at' => now(),
+                    ];
+                } else {
+                    // Shu yerni logga yozib qo'yamiz
+                    Log::warning('Expense could not be assigned', [
+                        'expense' => $expense->name,
+                        'order_id' => $data->order_id,
+                    ]);
+                }
+            }
         }
 
         return $payments;
