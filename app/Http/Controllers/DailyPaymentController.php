@@ -155,19 +155,13 @@ class DailyPaymentController extends Controller
 
                     $minutes = $produced * ($row->model->minute ?? 0);
 
-                    /* ✅ Department xarajatlarini qo‘shish */
+                    /* ✅ Department xarajatlari */
                     $departmentCost = DailyPayment::where('order_id', $row->order_id)
                         ->where('model_id', $row->model_id)
-                        ->whereNotNull('department_id') // ✅ Bu bo‘limdan kelganlar
+                        ->whereNotNull('department_id')
                         ->sum('calculated_amount');
 
-                    /* ✅ Expense (faqat Master & Texnolog) */
-                    $expenseCost = DailyPayment::where('order_id', $row->order_id)
-                        ->where('model_id', $row->model_id)
-                        ->whereNotNull('expense_id') // ✅ Expense bo‘limi
-                        ->sum('calculated_amount');
-
-                    $totalCost = $row->worker_cost + $departmentCost + $expenseCost;
+                    $totalCost = $row->worker_cost + $departmentCost;
 
                     return [
                         'order' => [
@@ -179,8 +173,7 @@ class DailyPaymentController extends Controller
                         'minutes' => $minutes,
                         'worker_cost' => $row->worker_cost,
                         'department_cost' => $departmentCost,
-                        'expense_cost' => $expenseCost,
-                        'total_cost' => $totalCost
+                        'total_cost' => $totalCost,
                     ];
                 });
 
@@ -195,6 +188,7 @@ class DailyPaymentController extends Controller
             })
             ->values();
 
+        /* ✅ Umumiy total cost */
         $grandTotal = $modelData->sum(
             fn($m) => collect($m['orders'])->sum(fn($o) => $o['total_cost'])
         );

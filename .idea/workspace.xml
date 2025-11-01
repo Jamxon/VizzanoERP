@@ -492,15 +492,7 @@
       <workItem from="1761992451897" duration="292000" />
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
-      <workItem from="1761994438958" duration="17969000" />
-    </task>
-    <task id="LOCAL-01629" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1761994022731</created>
-      <option name="number" value="01629" />
-      <option name="presentableId" value="LOCAL-01629" />
-      <option name="project" value="LOCAL" />
-      <updated>1761994022731</updated>
+      <workItem from="1761994438958" duration="18312000" />
     </task>
     <task id="LOCAL-01630" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
@@ -886,7 +878,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762017462772</updated>
     </task>
-    <option name="localTasksCounter" value="1678" />
+    <task id="LOCAL-01678" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762017682980</created>
+      <option name="number" value="01678" />
+      <option name="presentableId" value="LOCAL-01678" />
+      <option name="project" value="LOCAL" />
+      <updated>1762017682980</updated>
+    </task>
+    <option name="localTasksCounter" value="1679" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
