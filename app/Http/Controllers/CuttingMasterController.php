@@ -163,105 +163,115 @@ class CuttingMasterController extends Controller
     {
         DB::beginTransaction();
         try {
-            $order = Order::find($id);
+            $order = Order::with(['orderModel.model', 'orderPrintingTime'])->find($id);
+
             if (!$order) {
                 return response()->json(['error' => 'Order not found'], 404);
             }
 
             $oldStatus = $order->status;
+            $orderQuantity = $order->quantity;
 
-            // Kesilgan umumiy quantity ni hisoblash
             $totalCutQuantity = DB::table('order_cuts')
                 ->where('order_id', $id)
                 ->sum('quantity');
 
-            $orderQuantity = $order->quantity;
-
-            // Agar hali kesilmagan quantity mavjud bo‘lsa
-            $remaining = $orderQuantity - $totalCutQuantity;
+            $remaining = max(0, $orderQuantity - $totalCutQuantity);
 
             if ($remaining > 0) {
-                // qolganini saqlash uchun OrderCut yozuvi qo‘shish
                 DB::table('order_cuts')->insert([
                     'order_id' => $order->id,
                     'user_id' => auth()->id(),
                     'cut_at' => now(),
                     'quantity' => $remaining,
-                    'status' => false, // yoki boshqa maqbul status
+                    'status' => false,
                     'created_at' => now(),
                     'updated_at' => now()
                 ]);
             }
 
-            // Order statusini yangilash
-            $order->update([
-                'status' => 'pending'
-            ]);
+            $order->update(['status' => 'pending']);
 
-            // Printing time statusini yangilash
-            $order->orderPrintingTime->update([
-                'status' => 'completed'
-            ]);
+            if ($order->orderPrintingTime) {
+                $order->orderPrintingTime->update(['status' => 'completed']);
+            }
 
-            // Log yozish
             Log::add(
-                auth()->user()->id,
-                "Buyurtmani kesish yakunlandi (Order ID: $id)",
+                auth()->id(),
+                "Buyurtma kesish yakunlandi (Order ID: $id)",
                 'cut',
-                ['old_data' => $oldStatus, 'order_id' => $id],
-                ['new_data' => 'pending']
+                ['old' => $oldStatus],
+                ['new' => 'pending']
             );
 
             DB::commit();
 
-            $departmentId = auth()->user()->employee->department_id ?? 'Noma\'lum';
+            /** 📌 Daily Payment Calculation */
+            $departmentId = auth()->user()->employee->department_id ?? null;
+
+            if (!$departmentId) {
+                return response()->json([
+                    'message' => 'Kesish yakunlandi (Ishchilar bo‘limi topilmadi)',
+                    'remaining_cut_added' => $remaining
+                ]);
+            }
 
             $departmentBudget = DB::table('department_budgets')
                 ->where('department_id', $departmentId)
                 ->first();
 
-            $modelMinute = $order->orderModel->model->minute;
+            if (!$departmentBudget || $departmentBudget->type !== 'minute_based') {
+                return response()->json([
+                    'message' => 'Kesish yakunlandi',
+                    'remaining_cut_added' => $remaining
+                ]);
+            }
 
-            if ($departmentBudget->type === 'minute_based' && $modelMinute) {
-                $totalMinutes = $modelMinute * $order->quantity;
-                $totalEarned = $departmentBudget->quantity * $totalMinutes;
+            $modelMinute = $order->orderModel->model->minute ?? 0;
+            if ($modelMinute <= 0) {
+                return response()->json(['message' => 'Kesish yakunlandi (modelMinute yo‘q)']);
+            }
 
-                $departmentEmployees = Employee::where('department_id', $departmentId)
-                    ->whereHas('attendances', function ($query) {
-                        $query->whereDate('date', Carbon::today()->toDateString());
-                        $query->where('status', 'present');
-                    })
-                    ->where('status', '!=', 'kicked')
-                    ->get();
+            $totalMinutes = $modelMinute * $orderQuantity;
+            $totalEarned = $departmentBudget->quantity * $totalMinutes;
 
-                foreach ($departmentEmployees as $employee) {
-                    $employeePercentage = $employee->percentage;
-                    $employeeEarned = $totalEarned / 100 * $employeePercentage;
+            $employees = Employee::where('department_id', $departmentId)
+                ->whereHas('attendances', function ($q) {
+                    $q->whereDate('date', Carbon::today())->where('status', 'present');
+                })
+                ->where('status', 'active')
+                ->get();
 
-                    DB::insert('INSERT INTO daily_payments (employee_id, model_id, order_id, department_id, payment_date, quantity_produced, calculated_amount, employee_percentage, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                        [
-                        $employee->id,
-                        $order->orderModel->model->id,
-                        $order->id,
-                        $departmentId,
-                        Carbon::today()->toDateString(),
-                        $order->quantity,
-                        $employeeEarned,
-                        $employeePercentage,
-                        now(),
-                    ]);
-                }
+            foreach ($employees as $emp) {
+                $percentage = $emp->percentage ?? 0;
+
+                $earned = round(($totalEarned * $percentage) / 100, 2);
+
+                DB::table('daily_payments')->insert([
+                    'employee_id' => $emp->id,
+                    'model_id' => $order->orderModel->model->id ?? null,
+                    'order_id' => $order->id,
+                    'department_id' => $departmentId,
+                    'payment_date' => Carbon::today(),
+                    'quantity_produced' => $orderQuantity,
+                    'calculated_amount' => $earned,
+                    'employee_percentage' => $percentage,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
 
             return response()->json([
-                'message' => 'Order cutting finished',
-                'remaining_cut_added' => $remaining > 0 ? $remaining : 0
+                'message' => 'Kesish yakunlandi ✅',
+                'remaining_cut_added' => $remaining
             ]);
-        } catch (\Exception $e) {
+
+        } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json([
-                'error' => $e->getMessage()
-            ], 400);
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ], 500);
         }
     }
 

@@ -4,11 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: update payment calculation logic for 2026 summer season and improve department queries">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Services/PaymentCalculationService.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Services/PaymentCalculationService.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -495,15 +491,7 @@
       <workItem from="1761992451897" duration="292000" />
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
-      <workItem from="1761994438958" duration="2875000" />
-    </task>
-    <task id="LOCAL-01588" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759213395660</created>
-      <option name="number" value="01588" />
-      <option name="presentableId" value="LOCAL-01588" />
-      <option name="project" value="LOCAL" />
-      <updated>1759213395660</updated>
+      <workItem from="1761994438958" duration="3415000" />
     </task>
     <task id="LOCAL-01589" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
@@ -889,7 +877,15 @@
       <option name="project" value="LOCAL" />
       <updated>1761995381880</updated>
     </task>
-    <option name="localTasksCounter" value="1637" />
+    <task id="LOCAL-01637" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
+      <option name="closed" value="true" />
+      <created>1761997398709</created>
+      <option name="number" value="01637" />
+      <option name="presentableId" value="LOCAL-01637" />
+      <option name="project" value="LOCAL" />
+      <updated>1761997398709</updated>
+    </task>
+    <option name="localTasksCounter" value="1638" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -919,7 +915,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: enhance InternalAccountantController to include order date in salary calculations" />
     <MESSAGE value="fix: update chat ID in SupplierController for Telegram notifications" />
     <MESSAGE value="fix: update supplier name retrieval in SupplierController for order notifications" />
     <MESSAGE value="fix: enhance order data structure in CeoController to include submodel sewing outputs" />
@@ -944,7 +939,8 @@
     <MESSAGE value="fix: enhance order data structure in CeoController by adding outputs to submodels" />
     <MESSAGE value="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
     <MESSAGE value="fix: update payment calculation logic for 2026 summer season and improve department queries" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update payment calculation logic for 2026 summer season and improve department queries" />
+    <MESSAGE value="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
