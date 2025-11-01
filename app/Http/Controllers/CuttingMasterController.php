@@ -205,7 +205,7 @@ class CuttingMasterController extends Controller
             );
 
 
-            /** Daily Payment Calculation */
+            /** 📌 Daily Payment Calculation */
             $departmentId = auth()->user()->employee->department_id ?? null;
 
             if (!$departmentId) {
