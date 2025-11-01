@@ -111,6 +111,8 @@ class PaymentCalculationService
             ->where('osm.id', $orderSubmodelId)
             ->first();
 
+            dd($data);
+
         // Filtrlarni tekshirish
         if (!$data) {
             return null;
