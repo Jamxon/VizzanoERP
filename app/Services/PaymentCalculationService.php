@@ -255,7 +255,7 @@ class PaymentCalculationService
             // Universal ishchilar (payment_type = universal)
             $universalEmployees = DB::table('employees as e')
                 ->join('users as u', 'e.user_id', '=', 'u.id')
-                ->where('u.group_id', $groupId)
+                ->where('e.group_id', $groupId)
                 ->where('e.department_id', $sewingDept->id)
                 ->where('e.percentage', '>', 0)
                 ->where('e.status', 'active')
@@ -306,7 +306,7 @@ class PaymentCalculationService
             ->join('users as u', 'e.user_id', '=', 'u.id')
             ->join('roles as r', 'u.role_id', '=', 'r.id')
             ->where('r.name', 'groupMaster')
-            ->where('u.group_id', $data->group_id)
+            ->where('e.group_id', $data->group_id)
             ->where('e.status', 'active')
             ->select('e.*')
             ->first();
