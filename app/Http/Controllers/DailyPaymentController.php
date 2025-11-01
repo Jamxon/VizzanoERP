@@ -19,8 +19,8 @@ class DailyPaymentController extends Controller
 
         /* ✅ Worker expenses (Master & Texnolog bo‘lmagan ishchilar) */
         $workers = DailyPayment::select(
-            'department_id',
-            DB::raw('SUM(calculated_amount) as total_amount')
+            'daily_payments.department_id',
+            DB::raw('SUM(daily_payments.calculated_amount) as total_amount')
         )
             ->join('employees', 'employees.id', 'daily_payments.employee_id')
             ->join('positions', 'positions.id', 'employees.position_id')
