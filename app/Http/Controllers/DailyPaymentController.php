@@ -69,7 +69,7 @@ class DailyPaymentController extends Controller
             ->when($end, fn($q) => $q->where('payment_date', '<=', $end))
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
             ->groupBy('order_id')
-            ->with('order:id,order_no')
+            ->with('order')
             ->get();
 
         /* ✅ SewingOutputs orqali umumiy daqiqalar */
@@ -85,7 +85,7 @@ class DailyPaymentController extends Controller
             $expenses = DB::table('expenses')->where('branch_id', $branchId)->get()->map(function ($exp) use ($totalMinutes, $totalWorkerCost) {
             if ($exp->type === 'minute_based') {
                 $exp->total_amount = $totalMinutes * $exp->quantity;
-            } elseif ($exp->type === 'percentage') {
+            } elseif ($exp->type === 'percent_based') {
                 $exp->total_amount = ($totalWorkerCost / 100) * $exp->quantity;
             } elseif ($exp->type === 'fixed') {
                 $exp->total_amount = $exp->quantity;
