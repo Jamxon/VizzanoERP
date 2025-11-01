@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class DailyPaymentController extends Controller
 {
-    public function index(Request $request)
+    public function index1(Request $request)
     {
         $branchId = auth()->user()->employee->branch_id ?? null;
 
@@ -115,4 +115,80 @@ class DailyPaymentController extends Controller
             ]
         ]);
     }
+
+    public function index(Request $request)
+    {
+        $branchId = auth()->user()->employee->branch_id ?? null;
+
+        $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
+        $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
+
+        /* ✅ Model → Order → DailyPayment grouped result */
+        $modelData = DailyPayment::select(
+            'daily_payments.model_id',
+            'daily_payments.order_id',
+            DB::raw('SUM(daily_payments.calculated_amount) as total_worker_cost')
+        )
+            ->with([
+                'model:id,name,minute',
+                'order:id,name,quantity'
+            ])
+            ->when($start, fn($q) => $q->where('payment_date', '>=', $start))
+            ->when($end, fn($q) => $q->where('payment_date', '<=', $end))
+            ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
+            ->groupBy('daily_payments.model_id', 'daily_payments.order_id')
+            ->get()
+            ->groupBy('model_id')
+            ->map(function ($itemsByModel) use ($start, $end, $branchId) {
+
+                $model = $itemsByModel->first()->model;
+
+                $orders = $itemsByModel->map(function ($row) use ($start, $end, $branchId) {
+
+                    /* ✅ Tegishli model va orderga qarab tikilgan son */
+                    $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
+                        ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
+                        ->where('order_models.order_id', $row->order_id)
+                        ->where('order_models.model_id', $row->model_id)
+                        ->when($start, fn($q) => $q->where('sewing_outputs.created_at', '>=', $start))
+                        ->when($end, fn($q) => $q->where('sewing_outputs.created_at', '<=', $end))
+                        ->sum('sewing_outputs.quantity');
+
+                    $minutes = $produced * ($row->model->minute ?? 0);
+
+                    return [
+                        'order' => [
+                            'id' => $row->order?->id,
+                            'name' => $row->order?->name,
+                            'quantity' => $row->order?->quantity,
+                        ],
+                        'produced_quantity' => $produced,
+                        'minutes' => $minutes,
+                        'worker_cost' => $row->total_worker_cost,
+                    ];
+                });
+
+                return [
+                    'model' => [
+                        'id' => $model->id,
+                        'name' => $model->name,
+                        'minute' => $model->minute,
+                    ],
+                    'orders' => $orders->values()
+                ];
+            })
+            ->values();
+
+        /* ✅ Umumiy ishchi xarajatlar */
+        $totalWorkerCost = $modelData->sum(
+            fn($m) => collect($m['orders'])->sum(fn($o) => $o['worker_cost'])
+        );
+
+        return response()->json([
+            'success' => true,
+            'models' => $modelData,
+            'total_worker_cost' => $totalWorkerCost
+        ]);
+    }
+
 }
