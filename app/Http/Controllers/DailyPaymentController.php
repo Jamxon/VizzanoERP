@@ -77,7 +77,7 @@ class DailyPaymentController extends Controller
             DB::raw('SUM(sewing_outputs.quantity * models.minute) as total_minutes')
         )
             ->join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
-            ->join('order_models', 'order_models.id', '=', 'order_submodels.order_model_id')
+            ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
             ->join('models', 'models.id', '=', 'order_models.model_id')
             ->when($start, fn($q) => $q->where('sewing_outputs.created_at', '>=', $start))
             ->when($end, fn($q) => $q->where('sewing_outputs.created_at', '<=', $end))
