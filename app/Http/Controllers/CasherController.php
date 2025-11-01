@@ -32,6 +32,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use App\Exports\TransactionsExport;
+use Illuminate\Support\Facades\Http;
 
 class CasherController extends Controller
 {
@@ -998,6 +999,26 @@ class CasherController extends Controller
                 $cashboxBalance->decrement('amount', $difference);
             }
 
+            // ✅ Telegram xabarini tranzaksiya tugagandan keyin yuborish
+            DB::afterCommit(function () use ($employee, $validated) {
+                $text = "💸 *To‘lov amalga oshirildi!*\n"
+                    . "🏢 Filial: " . auth()->user()->employee->branch->name . "\n"
+                    . "👤 Xodim: {$employee->name}\n"
+                    . "👤 Bajardi: " .auth()->user()->employee->name . "\n"
+                    . "💰 Miqdor: " . number_format($validated['amount'], 0, '.', ' ') . " so‘m\n"
+                    . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
+                    . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik');
+    
+                $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
+                $chatId = -979504247; // .env ichida saqlang
+    
+                Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $text,
+                    'parse_mode' => 'Markdown',
+                ]);
+            });
+
             return $payment;
         });
     }
@@ -1684,6 +1705,30 @@ class CasherController extends Controller
                 );
 
                 $balance->increment('amount', $data['amount']);
+
+                // ✅ 4. Telegramga xabar yuborish (faqat transaction commit bo‘lgandan so‘ng)
+                DB::afterCommit(function () use ($data) {
+                    $currency = \App\Models\Currency::find($data['currency_id']);
+                    $branch = \App\Models\Branch::find($data['branch_id']);
+                    $user = auth()->user()->employee;
+    
+                    $text = "💰 *Kirim qo‘shildi!*\n"
+                        . "🏢 Filial: {$branch->name}\n"
+                        . "👤 Xodim: {$user->name}\n"
+                        . "💵 Miqdor: " . number_format($data['amount'], 0, '.', ' ') . " {$currency->name}\n"
+                        . "📅 Sana: {$data['date']}\n"
+                        . "📘 Maqsad: " . ($data['purpose'] ?? 'Noma’lum') . "\n"
+                        . "💬 Izoh: " . ($data['comment'] ?? '-');
+    
+                    $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
+                    $chatId = -979504247;
+    
+                    Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                        'chat_id' => $chatId,
+                        'text' => $text,
+                        'parse_mode' => 'Markdown',
+                    ]);
+                });
             });
 
         } catch (\Exception $e) {
@@ -1741,6 +1786,29 @@ class CasherController extends Controller
 
                 // ✅ Balansni kamaytiramiz
                 $balance->decrement('amount', $data['amount']);
+
+                DB::afterCommit(function () use ($data) {
+                    $currency = \App\Models\Currency::find($data['currency_id']);
+                    $branch = \App\Models\Branch::find($data['branch_id']);
+                    $user = auth()->user()->employee;
+    
+                    $text = "📤 *Chiqim amalga oshirildi!*\n"
+                        . "🏢 Filial: {$branch->name}\n"
+                        . "👤 Xodim: {$user->name}\n"
+                        . "💸 Miqdor: " . number_format($data['amount'], 0, '.', ' ') . " {$currency->name}\n"
+                        . "📅 Sana: {$data['date']}\n"
+                        . "📘 Maqsad: " . ($data['purpose'] ?? 'Noma’lum') . "\n"
+                        . "💬 Izoh: " . ($data['comment'] ?? '-');
+    
+                    $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
+                    $chatId = -979504247;
+    
+                    Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                        'chat_id' => $chatId,
+                        'text' => $text,
+                        'parse_mode' => 'Markdown',
+                    ]);
+                });
             });
 
         } catch (\Exception $e) {
