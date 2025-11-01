@@ -144,7 +144,7 @@ class PaymentCalculationService
         if (!$cuttingDept) return $payments;
 
         $modelMinute = $data->model_minute ?? 0;
-        $deptRasxod = $cuttingDept->rasxod ?? 0;
+        $deptRasxod = $cuttingDept->quantity ?? 0;
         
         // Umumiy summa: model daqiqasi * bo'lim rasxodi * soni
         $totalAmount = $modelMinute * $deptRasxod * $quantity;
