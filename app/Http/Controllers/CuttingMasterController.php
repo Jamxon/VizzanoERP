@@ -242,6 +242,8 @@ class CuttingMasterController extends Controller
                 ->where('status', 'active')
                 ->get();
 
+            dd($employees);
+
             foreach ($employees as $emp) {
                 $percentage = $emp->percentage ?? 0;
 
