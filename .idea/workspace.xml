@@ -209,38 +209,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;PHPUnit.Main.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;com.laravel_idea.eloquent_global_unguard&quot;: &quot;0&quot;,
-    &quot;database.data.extractors.current.export.id&quot;: &quot;Excel (xlsx)&quot;,
-    &quot;database.data.extractors.current.id&quot;: &quot;CSV-Groovy.csv.groovy&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/BEK/Desktop/VizzanoERP&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;php.override.implement.member.chooser.php.doc&quot;: &quot;NONE&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "PHPUnit.Main.executor": "Debug",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "com.laravel_idea.eloquent_global_unguard": "0",
+    "database.data.extractors.current.export.id": "Excel (xlsx)",
+    "database.data.extractors.current.id": "CSV-Groovy.csv.groovy",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/BEK/Desktop/VizzanoERP",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "php.override.implement.member.chooser.php.doc": "NONE",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/storage/fonts" />
@@ -491,23 +492,7 @@
       <workItem from="1761992451897" duration="292000" />
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
-      <workItem from="1761994438958" duration="4048000" />
-    </task>
-    <task id="LOCAL-01592" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759221381334</created>
-      <option name="number" value="01592" />
-      <option name="presentableId" value="LOCAL-01592" />
-      <option name="project" value="LOCAL" />
-      <updated>1759221381335</updated>
-    </task>
-    <task id="LOCAL-01593" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
-      <option name="closed" value="true" />
-      <created>1759224829924</created>
-      <option name="number" value="01593" />
-      <option name="presentableId" value="LOCAL-01593" />
-      <option name="project" value="LOCAL" />
-      <updated>1759224829924</updated>
+      <workItem from="1761994438958" duration="4460000" />
     </task>
     <task id="LOCAL-01594" summary="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels">
       <option name="closed" value="true" />
@@ -885,7 +870,23 @@
       <option name="project" value="LOCAL" />
       <updated>1761998463584</updated>
     </task>
-    <option name="localTasksCounter" value="1641" />
+    <task id="LOCAL-01641" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
+      <option name="closed" value="true" />
+      <created>1761998551772</created>
+      <option name="number" value="01641" />
+      <option name="presentableId" value="LOCAL-01641" />
+      <option name="project" value="LOCAL" />
+      <updated>1761998551772</updated>
+    </task>
+    <task id="LOCAL-01642" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
+      <option name="closed" value="true" />
+      <created>1761998709496</created>
+      <option name="number" value="01642" />
+      <option name="presentableId" value="LOCAL-01642" />
+      <option name="project" value="LOCAL" />
+      <updated>1761998709496</updated>
+    </task>
+    <option name="localTasksCounter" value="1643" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
