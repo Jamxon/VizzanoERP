@@ -107,7 +107,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::patch('employeeMonthlyPiecework/{id}', [EmployeeMonthlyController::class, 'employeeMonthlyPieceworkUpdate']);
     Route::get('salaryChanges', [UserController::class, "getSalaryChangesAll"]);
     Route::get('groupChanges', [UserController::class, 'getGroupChangesAll']);
-    Route::get('daily-payments', [DailyPaymentController::class, 'index']);
+    Route::get('dailyPayments', [DailyPaymentController::class, 'index']);
 
 });
 
