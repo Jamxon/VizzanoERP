@@ -400,7 +400,7 @@ class DailyPaymentController extends Controller
         // ✅ Qaysi maydonlar yuborilgan bo‘lsa, faqat o‘sha tekshiriladi
         $validated = $request->validate([
             'quantity' => 'sometimes|numeric|min:0',
-            'type' => 'sometimes|string|in:minute_based,percent_based',
+            'type' => 'sometimes|string|in:minute_based,percentage_based',
         ]);
 
         // ✅ Faqat yuborilgan maydonlarni yangilash
