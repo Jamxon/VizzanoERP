@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Department;
 use App\Models\DepartmentBudget;
+use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\SewingOutputs;
 use Illuminate\Http\RedirectResponse;
@@ -315,46 +316,83 @@ class DailyPaymentController extends Controller
 
     public function storeDepartmentBudget(Request $request): \Illuminate\Http\JsonResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'department_id' => 'required|integer|exists:departments,id',
             'quantity' => 'required|numeric|min:0',
             'type' => 'required|string|in:minute_based,percent_based',
         ]);
 
-        $branchId = auth()->user()->employee->branch_id ?? null;
+        $branchId = auth()->user()->employee->branch_id;
 
-        $department = Department::where('id', $request->department_id)
+        $department = Department::where('id', $validated['department_id'])
             ->whereHas('mainDepartment', fn($q) => $q->where('branch_id', $branchId))
             ->firstOrFail();
 
-        $exist = DepartmentBudget::where('department_id', $department->id)
-            ->first();
-
-        if ($exist) {
-            return response()->json(['message' => 'Budget for this department already exists.'], 409);
+        // ✅ Duplicate-check
+        if ($department->departmentBudget) {
+            return response()->json(['message' => 'Budget already exists for this department.'], 409);
         }
 
         $department->departmentBudget()->create([
-            'quantity' => $request->quantity,
-            'type' => $request->type,
+            'quantity' => $validated['quantity'],
+            'type' => $validated['type'],
         ]);
 
         return response()->json(['message' => 'Department budget saved successfully.'], 201);
     }
 
-
-    public function editDepartmentBudget(DepartmentBudget $departmentBudget, Request $request): \Illuminate\Http\JsonResponse
+    public function editDepartmentBudget(Request $request, DepartmentBudget $departmentBudget): \Illuminate\Http\JsonResponse
     {
-        $branchId = auth()->user()->employee->branch_id ?? null;
+        $branchId = auth()->user()->employee->branch_id;
 
+        // ✅ Branch security
         if ($departmentBudget->department->mainDepartment->branch_id !== $branchId) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
-        DepartmentBudget::update($request->all());
+        // ✅ Qaysi maydonlar yuborilgan bo‘lsa, faqat o‘sha tekshiriladi
+        $validated = $request->validate([
+            'quantity' => 'sometimes|numeric|min:0',
+            'type' => 'sometimes|string|in:minute_based,percent_based',
+        ]);
+
+        // ✅ Faqat yuborilgan maydonlarni yangilash
+        $departmentBudget->update($validated);
 
         return response()->json([
             'message' => 'Department budget updated successfully.',
+            'department_budget' => $departmentBudget
+        ]);
+    }
+
+    public function updatePercentage(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
+    {
+        $branchId = auth()->user()->employee->branch_id;
+
+        // ✅ Branch security
+        if ($employee->branch_id !== $branchId) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        // ✅ Only validate if sent
+        $validated = $request->validate([
+            'percentage' => 'sometimes|numeric|min:0|max:100',
+        ]);
+
+        if (!isset($validated['percentage'])) {
+            return response()->json([
+                'message' => 'No data provided to update.'
+            ], 422);
+        }
+
+        // ✅ O‘zgartirish
+        $employee->update([
+            'percentage' => $validated['percentage'],
+        ]);
+
+        return response()->json([
+            'message' => 'Employee percentage updated successfully.',
+            'employee' => $employee
         ]);
     }
 

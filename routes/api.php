@@ -42,7 +42,6 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VizzanoReportTvController;
 use App\Http\Controllers\WarehouseController;
-use App\Http\Controllers\TailorMasterController;
 use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
@@ -110,6 +109,9 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('dailyPayments', [DailyPaymentController::class, 'index']);
     Route::get('departmentsWithBudgets', [DailyPaymentController::class, 'getDepartmentsWithBudgetsAndEmployeeCount']);
     Route::get('departmentPayments', [DailyPaymentController::class, 'getDepartmentPayments']);
+    Route::post('departmentBudgets', [DailyPaymentController::class, 'storeDepartmentBudget']);
+    Route::patch('departmentBudgets/{departmentBudget}', [DailyPaymentController::class, 'editDepartmentBudget']);
+    Route::patch('employeePercentage/{employee}', [DailyPaymentController::class, 'updatePercentage']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
