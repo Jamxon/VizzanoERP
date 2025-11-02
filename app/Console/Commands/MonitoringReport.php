@@ -26,14 +26,12 @@ class MonitoringReport extends Command
             return;
         }
 
-        // 1️⃣ So'nggi 1 soatlik loglar
         $lines = $this->readRecentLogs($logFile);
         if ($lines->isEmpty()) {
             $this->info("⚠️ So'nggi 1 soatda so'rovlar yo'q.");
             return;
         }
 
-        // 2️⃣ Statistika
         $total = $lines->count();
         $deviceCount = $lines->filter(fn($x) => str_contains($x['path'] ?? '', 'hikvision/event'))->count();
         $userCount = $total - $deviceCount;
@@ -53,10 +51,8 @@ class MonitoringReport extends Command
         $slowest = $lines->sortByDesc('duration_ms')->take(5);
         $errors = $lines->where('status', '>=', 400)->groupBy('path')->map->count()->sortDesc()->take(5);
 
-        // 3️⃣ Server holati
         $usage = $this->getSystemUsage();
 
-        // 4️⃣ Telegram xabarlari
         $messages = [
             $this->getServerStatusText(max(
                 $usage['cpu']['percent'],
@@ -75,7 +71,7 @@ class MonitoringReport extends Command
 
             "🔝 *Eng ko‘p ishlatilgan endpointlar:*\n" . $this->formatList($topEndpoints),
 
-            "⚡ *Eng tez endpointlar:*\n" . $this->formatSpeedList($fastest, true)
+            "⚡ *Eng tez endpointlar:*\n" . $this->formatSpeedList($fastest)
             . "\n\n🐢 *Eng sekin endpointlar:*\n" . $this->formatSpeedList($slowest),
 
             "❌ *Xato bergan endpointlar:*\n" . $this->formatList($errors),
@@ -86,12 +82,7 @@ class MonitoringReport extends Command
         ];
 
         foreach ($messages as $msg) {
-            $ok = $this->sendMessage($msg);
-            if (!$ok) {
-                $this->error("❌ Xatolik: telegramga xabar yuborilmadi. Debug logni tekshiring: storage/logs/monitoring_debug.log");
-            } else {
-                $this->info("✅ Xabar yuborildi (qism).");
-            }
+            $this->sendMessage($msg);
             sleep(1);
         }
 
@@ -99,91 +90,51 @@ class MonitoringReport extends Command
         $this->cleanOldLogs($logFile);
     }
 
-    // 🔹 So‘nggi 1 soatlik loglar
-    // 🔹 So‘nggi 1 soatlik loglar — STREAMING
     private function readRecentLogs($file)
     {
-        $handle = fopen($file, 'r');
-        if (!$handle) return collect();
+        if (!is_readable($file)) return collect();
 
-        $lines = collect();
-        $oneHourAgo = Carbon::now()->subHour();
-
-        while (!feof($handle)) {
-            $line = fgets($handle);
-
+        $lines = [];
+        foreach (file($file) as $line) {
             $pos = strpos($line, '{');
             if ($pos === false) continue;
 
-            $json = json_decode(substr($line, $pos), true);
-            if (!$json) continue;
+            $data = json_decode(substr($line, $pos), true);
+            if (!$data || empty($data['time'])) continue;
 
-            if (!empty($json['time']) && Carbon::parse($json['time'])->greaterThan($oneHourAgo)) {
-                $json['path'] = $json['path'] ?? 'Unknown';
-                $lines->push($json);
-
-                if ($lines->count() > 5000) { // ✅ Limit qo‘ydik
-                    break;
-                }
+            if (Carbon::parse($data['time'])->greaterThan(Carbon::now()->subHour())) {
+                $data['path'] = $data['path'] ?? 'Unknown';
+                $lines[] = $data;
             }
         }
 
-        fclose($handle);
-        return $lines;
+        return collect($lines)->take(5000);
     }
 
-    // 🔹 CPU, RAM, Disk
     private function getSystemUsage()
     {
-        // CPU — 4 yadroga moslashtirilgan
         $cpuLoad = sys_getloadavg();
         $cpuCores = (int)shell_exec('nproc 2>/dev/null') ?: 4;
-        $load = $cpuLoad[0] ?? 0;
-        $cpuPercent = round(($load / $cpuCores) * 100, 2);
+        $cpuPercent = round(($cpuLoad[0] / $cpuCores) * 100, 2);
 
-        // RAM
         $mem = @file_get_contents('/proc/meminfo');
         preg_match('/MemTotal:\s+(\d+)/', $mem, $t);
         preg_match('/MemAvailable:\s+(\d+)/', $mem, $a);
         $total = (int)($t[1] ?? 0);
         $avail = (int)($a[1] ?? 0);
         $used = $total - $avail;
-        $ramPercent = $total ? round(($used / $total) * 100, 2) : 0;
+        $ramPercent = round(($used / $total) * 100, 2);
 
-        // Disk
         $diskTotal = @disk_total_space("/") ?: 1;
         $diskFree = @disk_free_space("/") ?: 0;
         $diskUsed = $diskTotal - $diskFree;
         $diskPercent = round(($diskUsed / $diskTotal) * 100, 2);
 
         return [
-            'cpu' => [
-                'percent' => $cpuPercent,
-                'status' => $this->getLoadEmoji($cpuPercent),
-            ],
-            'ram' => [
-                'percent' => $ramPercent,
-                'used' => $this->formatBytes($used * 1024),
-                'total' => $this->formatBytes($total * 1024),
-                'status' => $this->getLoadEmoji($ramPercent),
-            ],
-            'disk' => [
-                'percent' => $diskPercent,
-                'used' => $this->formatBytes($diskUsed),
-                'total' => $this->formatBytes($diskTotal),
-                'status' => $this->getLoadEmoji($diskPercent),
-            ],
+            'cpu' => [ 'percent' => $cpuPercent, 'status' => $this->getLoadEmoji($cpuPercent) ],
+            'ram' => [ 'percent' => $ramPercent, 'used' => $this->formatBytes($used*1024), 'total' => $this->formatBytes($total*1024), 'status' => $this->getLoadEmoji($ramPercent) ],
+            'disk' => [ 'percent' => $diskPercent, 'used' => $this->formatBytes($diskUsed), 'total' => $this->formatBytes($diskTotal), 'status' => $this->getLoadEmoji($diskPercent) ],
         ];
-    }
-
-    private function getServerStatusText($p): string
-    {
-        return match (true) {
-            $p < 50 => "😎 *Server tinch, hammasi joyida!*",
-            $p < 75 => "🙂 *Server biroz yuk ostida, lekin barqaror.*",
-            $p < 90 => "⚠️ *Server yuklanmoqda, tekshirish kerak!*",
-            default => "🚨 *Server haddan tashqari band!*",
-        };
     }
 
     private function getLoadEmoji($p)
@@ -196,133 +147,79 @@ class MonitoringReport extends Command
         };
     }
 
+    private function getServerStatusText($p)
+    {
+        return match (true) {
+            $p < 50 => "😎 *Server tinch, hammasi joyida!*",
+            $p < 75 => "🙂 *Server biroz yuk ostida*",
+            $p < 90 => "⚠️ *Server yuklanmoqda!*",
+            default => "🚨 *SOS — Server haddan tashqari band!*",
+        };
+    }
+
     private function formatBytes($bytes)
     {
-        $u = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $i = floor(log(max($bytes, 1), 1024));
-        return round($bytes / pow(1024, $i), 2) . ' ' . $u[$i];
+        $u = ['B','KB','MB','GB','TB'];
+        $i = floor(log(max($bytes,1),1024));
+        return round($bytes/pow(1024,$i),2).' '.$u[$i];
     }
 
     private function formatList($c)
     {
         return $c->isEmpty()
-            ? "_Hech narsa topilmadi_"
-            : $c->map(fn($v, $k) => "• {$k} — {$v} ta")->join("\n");
+            ? "_Hech narsa yo‘q_"
+            : $c->map(fn($v,$k)=>"• `$k` — *{$v}* ta")->join("\n");
     }
 
-    private function formatSpeedList($c, $fast = false)
+    private function formatSpeedList($rows)
     {
-        return $c->isEmpty()
-            ? "_Hech narsa topilmadi_"
-            : $c->map(fn($x) => "• {$x['path']} — {$x['duration_ms']} ms")->join("\n");
+        return $rows->isEmpty()
+            ? "_Topilmadi_"
+            : $rows->map(fn($x) => "• `{$x['path']}` — *{$x['duration_ms']} ms*")->join("\n");
     }
 
     private function formatUserList($c, $users)
     {
         return $c->isEmpty()
-            ? "_Topilmadi_"
-            : $c->map(function ($cnt, $id) use ($users) {
-                $u = $users[$id] ?? null;
+            ? "_Hech narsa yo‘q_"
+            : $c->map(function($count,$id)use($users){
+                $u=$users[$id]??null;
                 return $u && $u->employee
-                    ? "• {$u->employee->name} — {$cnt} ta"
-                    : "• User #{$id} — {$cnt} ta";
+                    ? "• *{$u->employee->name}* — *{$count}* ta"
+                    : "• User *#{$id}* — *{$count}* ta";
             })->join("\n");
     }
 
-    // 🔹 Eski loglarni xavfsiz tozalash
     private function cleanOldLogs($file)
     {
-        $tempFile = $file . '.tmp';
-        $handle = fopen($file, 'r');
-        $tempHandle = fopen($tempFile, 'w');
-
-        $oneDayAgo = Carbon::now()->subDay();
-
-        while (!feof($handle)) {
-            $line = fgets($handle);
-
-            $pos = strpos($line, '{');
-            if ($pos === false) continue;
-
-            $json = json_decode(substr($line, $pos), true);
-            if (!$json) continue;
-
-            if (!empty($json['time']) && Carbon::parse($json['time'])->greaterThan($oneDayAgo)) {
-                fwrite($tempHandle, $line);
+        $new = collect();
+        foreach (file($file) as $line) {
+            $pos = strpos($line,'{');
+            if ($pos===false) continue;
+            $data = json_decode(substr($line,$pos),true);
+            if (!$data || empty($data['time'])) continue;
+            if (Carbon::parse($data['time'])->greaterThan(Carbon::now()->subDay())) {
+                $new->push($line);
             }
         }
+        file_put_contents($file, implode("", $new->toArray()));
 
-        fclose($handle);
-        fclose($tempHandle);
-
-        rename($tempFile, $file);
-
-        $this->info("🧹 Eski loglar xavfsiz tozalandi!");
+        $this->info("🧹 Eski loglar tozalandi!");
     }
 
-    private function sendMessage(string $text): bool
+    private function sendMessage($text): void
     {
-        // Har bo'lak maksimal 3500 belgi (xavfsiz)
         $chunks = mb_str_split($text, 3500);
-        $botUrl = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
-        $debugLog = storage_path('logs/monitoring_debug.log');
-
-        foreach ($chunks as $idx => $chunk) {
-            $attempt = 0;
-            $sent = false;
-
-            // Retry 2 marta
-            while ($attempt < 2 && !$sent) {
-                try {
-                    $resp = Http::timeout(10)
-                        ->post($botUrl, [
-                            'chat_id' => $this->chatId,
-                            'text' => $chunk,
-                            'parse_mode' => null, // plain text — hech qanday markdown parse bilan xato kelmasin
-                        ]);
-
-                    // Agar HTTP muvaffaqiyatli bo'lsa ham Telegram JSON ichida ok=true bo'lishi kerak
-                    if ($resp->successful()) {
-                        $json = $resp->json();
-                        if (isset($json['ok']) && $json['ok'] === true) {
-                            $sent = true;
-                            break;
-                        } else {
-                            // Telegram qaytgan xato mesajini debug logga yozamiz
-                            file_put_contents($debugLog, "[".now()."] Telegram API returned not ok: " . $resp->body() . PHP_EOL, FILE_APPEND);
-                        }
-                    } else {
-                        file_put_contents($debugLog, "[".now()."] HTTP error sending Telegram message: HTTP " . $resp->status() . " - " . $resp->body() . PHP_EOL, FILE_APPEND);
-                    }
-                } catch (\Throwable $e) {
-                    file_put_contents($debugLog, "[".now()."] Exception sending Telegram: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
-                }
-
-                $attempt++;
-                // kichik kutish urinishlar orasida
-                sleep(1);
-            }
-
-            if (!$sent) {
-                // agar bo'lak yuborilmadi desa — xatolikni logga yozamiz va false qaytaramiz
-                file_put_contents($debugLog, "[".now()."] Failed to send chunk #".($idx+1)." for monitoring report." . PHP_EOL, FILE_APPEND);
-                return false;
-            }
-
-            // Har bo'lak orasida ozgina kutish (flood control)
+        foreach ($chunks as $chunk) {
+            Http::timeout(10)->post(
+                "https://api.telegram.org/bot{$this->botToken}/sendMessage",
+                [
+                    'chat_id' => $this->chatId,
+                    'text' => $chunk,
+                    'parse_mode' => 'Markdown'
+                ]
+            );
             sleep(1);
         }
-
-        return true;
-    }
-
-
-    private function escapeMarkdown($text)
-    {
-        $specials = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'];
-        foreach ($specials as $s) {
-            $text = str_replace($s, '\\' . $s, $text);
-        }
-        return $text;
     }
 }
