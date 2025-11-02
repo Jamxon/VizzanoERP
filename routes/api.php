@@ -108,6 +108,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('salaryChanges', [UserController::class, "getSalaryChangesAll"]);
     Route::get('groupChanges', [UserController::class, 'getGroupChangesAll']);
     Route::get('dailyPayments', [DailyPaymentController::class, 'index']);
+    Route::get('departmentsWithBudgets', [DailyPaymentController::class, 'getDepartmentsWithBudgetsAndEmployeeCount']);
 
 });
 

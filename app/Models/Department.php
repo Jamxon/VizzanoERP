@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static where(string $string, $id)
  * @method static findOrFail($id)
  * @method static create(array $array)
+ * @method static whereHas(string $string, $branchId)
  */
 class Department extends Model
 {
@@ -63,5 +64,10 @@ class Department extends Model
     public function employees(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(Employee::class, 'department_id');
+    }
+
+    public function departmentBudget(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(DepartmentBudget::class, 'department_id');
     }
 }
