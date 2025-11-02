@@ -366,7 +366,7 @@ class DailyPaymentController extends Controller
         $validated = $request->validate([
             'department_id' => 'required|integer|exists:departments,id',
             'quantity' => 'required|numeric|min:0',
-            'type' => 'required|string|in:minute_based,percent_based',
+            'type' => 'required|string|in:minute_based,percentage_based',
         ]);
 
         $branchId = auth()->user()->employee->branch_id;
