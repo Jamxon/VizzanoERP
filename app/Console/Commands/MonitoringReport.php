@@ -86,7 +86,12 @@ class MonitoringReport extends Command
         ];
 
         foreach ($messages as $msg) {
-            $this->sendMessage($msg);
+            $ok = $this->sendMessage($msg);
+            if (!$ok) {
+                $this->error("❌ Xatolik: telegramga xabar yuborilmadi. Debug logni tekshiring: storage/logs/monitoring_debug.log");
+            } else {
+                $this->info("✅ Xabar yuborildi (qism).");
+            }
             sleep(1);
         }
 
@@ -255,17 +260,60 @@ class MonitoringReport extends Command
         $this->info("🧹 Eski loglar xavfsiz tozalandi!");
     }
 
-    private function sendMessage($text)
+    private function sendMessage(string $text): bool
     {
-        try {
-            Http::timeout(10)->post("https://api.telegram.org/bot{$this->botToken}/sendMessage", [
-                'chat_id' => $this->chatId,
-                'text' => $text,
-                'parse_mode' => null, // ❌ parse_mode ishlatilmaydi
-            ]);
-        } catch (\Throwable $e) {
-            $this->error("❌ Telegram yuborishda xatolik: " . $e->getMessage());
+        // Har bo'lak maksimal 3500 belgi (xavfsiz)
+        $chunks = mb_str_split($text, 3500);
+        $botUrl = "https://api.telegram.org/bot{$this->botToken}/sendMessage";
+        $debugLog = storage_path('logs/monitoring_debug.log');
+
+        foreach ($chunks as $idx => $chunk) {
+            $attempt = 0;
+            $sent = false;
+
+            // Retry 2 marta
+            while ($attempt < 2 && !$sent) {
+                try {
+                    $resp = Http::timeout(10)
+                        ->post($botUrl, [
+                            'chat_id' => $this->chatId,
+                            'text' => $chunk,
+                            'parse_mode' => null, // plain text — hech qanday markdown parse bilan xato kelmasin
+                        ]);
+
+                    // Agar HTTP muvaffaqiyatli bo'lsa ham Telegram JSON ichida ok=true bo'lishi kerak
+                    if ($resp->successful()) {
+                        $json = $resp->json();
+                        if (isset($json['ok']) && $json['ok'] === true) {
+                            $sent = true;
+                            break;
+                        } else {
+                            // Telegram qaytgan xato mesajini debug logga yozamiz
+                            file_put_contents($debugLog, "[".now()."] Telegram API returned not ok: " . $resp->body() . PHP_EOL, FILE_APPEND);
+                        }
+                    } else {
+                        file_put_contents($debugLog, "[".now()."] HTTP error sending Telegram message: HTTP " . $resp->status() . " - " . $resp->body() . PHP_EOL, FILE_APPEND);
+                    }
+                } catch (\Throwable $e) {
+                    file_put_contents($debugLog, "[".now()."] Exception sending Telegram: " . $e->getMessage() . PHP_EOL, FILE_APPEND);
+                }
+
+                $attempt++;
+                // kichik kutish urinishlar orasida
+                sleep(1);
+            }
+
+            if (!$sent) {
+                // agar bo'lak yuborilmadi desa — xatolikni logga yozamiz va false qaytaramiz
+                file_put_contents($debugLog, "[".now()."] Failed to send chunk #".($idx+1)." for monitoring report." . PHP_EOL, FILE_APPEND);
+                return false;
+            }
+
+            // Har bo'lak orasida ozgina kutish (flood control)
+            sleep(1);
         }
+
+        return true;
     }
 
 
