@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -493,15 +495,7 @@
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
       <workItem from="1761994438958" duration="21001000" />
-      <workItem from="1762063784746" duration="9928000" />
-    </task>
-    <task id="LOCAL-01649" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
-      <option name="closed" value="true" />
-      <created>1762000896253</created>
-      <option name="number" value="01649" />
-      <option name="presentableId" value="LOCAL-01649" />
-      <option name="project" value="LOCAL" />
-      <updated>1762000896253</updated>
+      <workItem from="1762063784746" duration="10387000" />
     </task>
     <task id="LOCAL-01650" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
       <option name="closed" value="true" />
@@ -887,7 +881,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762081585845</updated>
     </task>
-    <option name="localTasksCounter" value="1698" />
+    <task id="LOCAL-01698" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762082263197</created>
+      <option name="number" value="01698" />
+      <option name="presentableId" value="LOCAL-01698" />
+      <option name="project" value="LOCAL" />
+      <updated>1762082263197</updated>
+    </task>
+    <option name="localTasksCounter" value="1699" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

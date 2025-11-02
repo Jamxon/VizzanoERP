@@ -964,8 +964,8 @@ class CasherController extends Controller
                     . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
                     . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik');
 
-                Http::post("https://api.telegram.org/bot" . env('TELEGRAM_BOT_TOKEN') . "/sendMessage", [
-                    'chat_id' => env('TELEGRAM_CHAT_ID'),
+                Http::post("https://api.telegram.org/bot" . '7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms' . "/sendMessage", [
+                    'chat_id' => -979504247,
                     'text' => $text,
                     'parse_mode' => 'Markdown',
                 ]);
