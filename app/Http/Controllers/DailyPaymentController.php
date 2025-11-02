@@ -331,8 +331,7 @@ class DailyPaymentController extends Controller
         $department->load([
             'departmentBudget',
             'employees' => function ($q) {
-                $q->where('status', 'working')
-                  ->where('percentage', '>', 0);
+                $q->where('status', 'working');
                 $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id')
                     ->with('position:id,name');
             }
