@@ -495,15 +495,7 @@
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
       <workItem from="1761994438958" duration="21001000" />
-      <workItem from="1762063784746" duration="6822000" />
-    </task>
-    <task id="LOCAL-01643" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
-      <option name="closed" value="true" />
-      <created>1761999190894</created>
-      <option name="number" value="01643" />
-      <option name="presentableId" value="LOCAL-01643" />
-      <option name="project" value="LOCAL" />
-      <updated>1761999190894</updated>
+      <workItem from="1762063784746" duration="7889000" />
     </task>
     <task id="LOCAL-01644" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
       <option name="closed" value="true" />
@@ -889,7 +881,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762073170086</updated>
     </task>
-    <option name="localTasksCounter" value="1692" />
+    <task id="LOCAL-01692" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762074777640</created>
+      <option name="number" value="01692" />
+      <option name="presentableId" value="LOCAL-01692" />
+      <option name="project" value="LOCAL" />
+      <updated>1762074777640</updated>
+    </task>
+    <option name="localTasksCounter" value="1693" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
