@@ -12,6 +12,7 @@ class DatabaseBackup extends Command
 
     public function handle()
     {
+        ini_set('memory_limit', '4096M');
         $date = now()->format('Y-m-d_H-i-s');
         $fileName = "backup_{$date}.sql";
         $filePath = storage_path("app/{$fileName}");
@@ -69,54 +70,48 @@ class DatabaseBackup extends Command
         while (!feof($handle)) {
 
             $chunkData = fread($handle, $chunkSize);
-
-            if (!$chunkData) {
-                break;
-            }
+            if (!$chunkData) break;
 
             $chunkName = "{$originalName}.part{$part}";
             $this->info("📦 Yuborilmoqda: {$chunkName}");
 
             try {
-
-                // ✅ Chunkni vaqtinchalik faylga yozish
                 $tmpFile = tmpfile();
                 fwrite($tmpFile, $chunkData);
-                fseek($tmpFile, 0); // boshidan o‘qish uchun
+                fseek($tmpFile, 0);
 
-                $response = Http::timeout(300)
-                    ->attach('document', $tmpFile, $chunkName)
+                $response = Http::timeout(600) // 10 minutes
+                ->attach('document', $tmpFile, $chunkName)
                     ->post("https://api.telegram.org/bot{$botToken}/sendDocument", [
                         'chat_id' => $chatId,
                         'caption' => "Backup bo‘lak #{$part}"
                     ]);
 
-                // ✅ Yopib, diskni tozalash
                 fclose($tmpFile);
 
-                if ($response->successful()) {
-                    $this->info("✅ {$chunkName} yuborildi.");
-                } else {
-                    $this->error("❌ {$chunkName} yuborilmadi: " . $response->body());
+                if (!$response->successful()) {
+                    $this->error("❌ Telegram javobi: " . $response->body());
+                    sleep(180); // ❗ Katta delay
+                    continue;
                 }
 
+                $this->info("✅ {$chunkName} yuborildi.");
+
                 if (!feof($handle)) {
-                    $this->info("⏳ 65 soniya kutilyapti...");
-                    sleep(65);
+                    $this->info("⏳ Telegram ratelimit kutilyapti (90s)...");
+                    sleep(90);
                 }
 
             } catch (\Exception $e) {
-                $this->error("❌ Xatolik: " . $e->getMessage());
-
-                // ❗ Xatolik bo‘lsa kutib qayta urinadi
-                sleep(120);
+                $this->error("🔥 Xatolik: " . $e->getMessage());
+                sleep(180);
             }
 
             $part++;
         }
 
         fclose($handle);
-        $this->info("🎉 HAMMASI YUBORILDI ✅");
+        $this->info("🎉 HAMMA BO‘LAKLAR JO‘NATILDI ✅");
 
     }
 
