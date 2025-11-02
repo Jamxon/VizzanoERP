@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -495,15 +493,7 @@
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
       <workItem from="1761994438958" duration="21001000" />
-      <workItem from="1762063784746" duration="11447000" />
-    </task>
-    <task id="LOCAL-01651" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
-      <option name="closed" value="true" />
-      <created>1762007882149</created>
-      <option name="number" value="01651" />
-      <option name="presentableId" value="LOCAL-01651" />
-      <option name="project" value="LOCAL" />
-      <updated>1762007882149</updated>
+      <workItem from="1762063784746" duration="11752000" />
     </task>
     <task id="LOCAL-01652" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
       <option name="closed" value="true" />
@@ -889,7 +879,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762082530961</updated>
     </task>
-    <option name="localTasksCounter" value="1700" />
+    <task id="LOCAL-01700" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762084004617</created>
+      <option name="number" value="01700" />
+      <option name="presentableId" value="LOCAL-01700" />
+      <option name="project" value="LOCAL" />
+      <updated>1762084004617</updated>
+    </task>
+    <option name="localTasksCounter" value="1701" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

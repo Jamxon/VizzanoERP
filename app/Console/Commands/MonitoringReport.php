@@ -18,6 +18,7 @@ class MonitoringReport extends Command
 
     public function handle()
     {
+        ini_set('memory_limit', '2048M');
         $logFile = storage_path('logs/requests.log');
 
         if (!File::exists($logFile)) {
@@ -94,29 +95,31 @@ class MonitoringReport extends Command
     }
 
     // 🔹 So‘nggi 1 soatlik loglar
+    // 🔹 So‘nggi 1 soatlik loglar — STREAMING
     private function readRecentLogs($file)
     {
-        if (!is_readable($file)) return collect();
-
         $handle = fopen($file, 'r');
         if (!$handle) return collect();
 
         $lines = collect();
         $oneHourAgo = Carbon::now()->subHour();
 
-        while (($line = fgets($handle)) !== false) {
+        while (!feof($handle)) {
+            $line = fgets($handle);
+
             $pos = strpos($line, '{');
             if ($pos === false) continue;
 
-            $data = json_decode(substr($line, $pos), true);
-            if (!$data) continue;
+            $json = json_decode(substr($line, $pos), true);
+            if (!$json) continue;
 
-            if (!empty($data['time']) && Carbon::parse($data['time'])->greaterThan($oneHourAgo)) {
-                $data['path'] = $data['path'] ?? 'Nomalum endpoint';
-                $lines->push($data);
+            if (!empty($json['time']) && Carbon::parse($json['time'])->greaterThan($oneHourAgo)) {
+                $json['path'] = $json['path'] ?? 'Unknown';
+                $lines->push($json);
 
-                // ⚠️ Maksimal 10,000 qator – xotira portlamasin
-                if ($lines->count() > 10000) break;
+                if ($lines->count() > 5000) { // ✅ Limit qo‘ydik
+                    break;
+                }
             }
         }
 
@@ -221,21 +224,35 @@ class MonitoringReport extends Command
             })->join("\n");
     }
 
+    // 🔹 Eski loglarni xavfsiz tozalash
     private function cleanOldLogs($file)
     {
-        try {
-            $keep = collect(file($file))->filter(function ($l) {
-                $p = strpos($l, '{');
-                if ($p === false) return false;
-                $d = json_decode(substr($l, $p), true);
-                return isset($d['time']) && Carbon::parse($d['time'])->greaterThan(Carbon::now()->subDay());
-            })->all();
+        $tempFile = $file . '.tmp';
+        $handle = fopen($file, 'r');
+        $tempHandle = fopen($tempFile, 'w');
 
-            File::put($file, implode('', $keep));
-            $this->info("🧹 Eski loglar tozalandi.");
-        } catch (\Throwable $e) {
-            $this->error("❌ Log tozalash xatosi: " . $e->getMessage());
+        $oneDayAgo = Carbon::now()->subDay();
+
+        while (!feof($handle)) {
+            $line = fgets($handle);
+
+            $pos = strpos($line, '{');
+            if ($pos === false) continue;
+
+            $json = json_decode(substr($line, $pos), true);
+            if (!$json) continue;
+
+            if (!empty($json['time']) && Carbon::parse($json['time'])->greaterThan($oneDayAgo)) {
+                fwrite($tempHandle, $line);
+            }
         }
+
+        fclose($handle);
+        fclose($tempHandle);
+
+        rename($tempFile, $file);
+
+        $this->info("🧹 Eski loglar xavfsiz tozalandi!");
     }
 
     private function sendMessage($text)
