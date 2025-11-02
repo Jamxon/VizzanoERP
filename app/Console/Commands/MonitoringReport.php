@@ -210,15 +210,28 @@ class MonitoringReport extends Command
     private function sendMessage($text): void
     {
         $chunks = mb_str_split($text, 3500);
+
         foreach ($chunks as $chunk) {
-            Http::timeout(10)->post(
-                "https://api.telegram.org/bot{$this->botToken}/sendMessage",
-                [
-                    'chat_id' => $this->chatId,
-                    'text' => $chunk,
-                    'parse_mode' => 'Markdown'
-                ]
-            );
+            try {
+                $response = Http::timeout(20)->post(
+                    "https://api.telegram.org/bot{$this->botToken}/sendMessage",
+                    [
+                        'chat_id' => $this->chatId,
+                        'text' => $chunk,
+                        'parse_mode' => 'Markdown'
+                    ]
+                );
+
+                if (!$response->successful()) {
+                    $this->error("❌ Telegramga yuborilmadi: " . $response->body());
+                } else {
+                    $this->info("✅ Xabar yuborildi");
+                }
+
+            } catch (\Exception $e) {
+                $this->error("🔥 Telegram API xatolik: " . $e->getMessage());
+            }
+
             sleep(1);
         }
     }
