@@ -65,12 +65,12 @@ class DatabaseBackup extends Command
         }
 
         $part = 1;
+
         while (!feof($handle)) {
 
             $chunkData = fread($handle, $chunkSize);
 
-            // ❗ Bo‘sh chunk bo‘lsa — siklni to‘xtatamiz
-            if ($chunkData === false || strlen($chunkData) === 0) {
+            if (!$chunkData) {
                 break;
             }
 
@@ -78,12 +78,21 @@ class DatabaseBackup extends Command
             $this->info("📦 Yuborilmoqda: {$chunkName}");
 
             try {
+
+                // ✅ Chunkni vaqtinchalik faylga yozish
+                $tmpFile = tmpfile();
+                fwrite($tmpFile, $chunkData);
+                fseek($tmpFile, 0); // boshidan o‘qish uchun
+
                 $response = Http::timeout(300)
-                    ->attach('document', $chunkData, $chunkName)
+                    ->attach('document', $tmpFile, $chunkName)
                     ->post("https://api.telegram.org/bot{$botToken}/sendDocument", [
                         'chat_id' => $chatId,
                         'caption' => "Backup bo‘lak #{$part}"
                     ]);
+
+                // ✅ Yopib, diskni tozalash
+                fclose($tmpFile);
 
                 if ($response->successful()) {
                     $this->info("✅ {$chunkName} yuborildi.");
@@ -91,14 +100,15 @@ class DatabaseBackup extends Command
                     $this->error("❌ {$chunkName} yuborilmadi: " . $response->body());
                 }
 
-                // 🔄 Faqat tugamagan bo‘lsa kutamiz
                 if (!feof($handle)) {
                     $this->info("⏳ 65 soniya kutilyapti...");
                     sleep(65);
                 }
 
             } catch (\Exception $e) {
-                $this->error("❌ Yuborishda xatolik: " . $e->getMessage());
+                $this->error("❌ Xatolik: " . $e->getMessage());
+
+                // ❗ Xatolik bo‘lsa kutib qayta urinadi
                 sleep(120);
             }
 
@@ -107,6 +117,7 @@ class DatabaseBackup extends Command
 
         fclose($handle);
         $this->info("🎉 HAMMASI YUBORILDI ✅");
+
     }
 
 

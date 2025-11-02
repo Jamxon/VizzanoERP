@@ -97,22 +97,31 @@ class MonitoringReport extends Command
     private function readRecentLogs($file)
     {
         if (!is_readable($file)) return collect();
-        $lines = [];
 
-        foreach (file($file) as $line) {
+        $handle = fopen($file, 'r');
+        if (!$handle) return collect();
+
+        $lines = collect();
+        $oneHourAgo = Carbon::now()->subHour();
+
+        while (($line = fgets($handle)) !== false) {
             $pos = strpos($line, '{');
             if ($pos === false) continue;
 
             $data = json_decode(substr($line, $pos), true);
-            if (!$data || empty($data['time'])) continue;
+            if (!$data) continue;
 
-            if (Carbon::parse($data['time'])->greaterThan(Carbon::now()->subHour())) {
-                $data['path'] = $data['path'] ?: 'Nomalum endpoint';
-                $lines[] = $data;
+            if (!empty($data['time']) && Carbon::parse($data['time'])->greaterThan($oneHourAgo)) {
+                $data['path'] = $data['path'] ?? 'Nomalum endpoint';
+                $lines->push($data);
+
+                // ⚠️ Maksimal 10,000 qator – xotira portlamasin
+                if ($lines->count() > 10000) break;
             }
         }
 
-        return collect($lines);
+        fclose($handle);
+        return $lines;
     }
 
     // 🔹 CPU, RAM, Disk

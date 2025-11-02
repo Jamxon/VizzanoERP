@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -495,15 +495,7 @@
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
       <workItem from="1761994438958" duration="21001000" />
-      <workItem from="1762063784746" duration="10387000" />
-    </task>
-    <task id="LOCAL-01650" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
-      <option name="closed" value="true" />
-      <created>1762001058946</created>
-      <option name="number" value="01650" />
-      <option name="presentableId" value="LOCAL-01650" />
-      <option name="project" value="LOCAL" />
-      <updated>1762001058946</updated>
+      <workItem from="1762063784746" duration="11447000" />
     </task>
     <task id="LOCAL-01651" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
       <option name="closed" value="true" />
@@ -889,7 +881,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762082263197</updated>
     </task>
-    <option name="localTasksCounter" value="1699" />
+    <task id="LOCAL-01699" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762082530961</created>
+      <option name="number" value="01699" />
+      <option name="presentableId" value="LOCAL-01699" />
+      <option name="project" value="LOCAL" />
+      <updated>1762082530961</updated>
+    </task>
+    <option name="localTasksCounter" value="1700" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
