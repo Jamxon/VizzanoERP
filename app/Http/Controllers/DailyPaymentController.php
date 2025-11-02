@@ -122,6 +122,8 @@ class DailyPaymentController extends Controller
         $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
         $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
 
+        $usdRate = getUsdRate(); // ✅ Bir marta olish kifoya
+
         $modelData = DailyPayment::select(
             'model_id',
             'order_id',
@@ -136,8 +138,11 @@ class DailyPaymentController extends Controller
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
             ->groupBy('model_id', 'order_id')
             ->get()
-            ->map(function ($row) use ($start, $end) {
+            ->map(function ($row) use ($start, $end, $usdRate, $branchId) {
 
+                /**
+                 * ✅ Produced Quantity
+                 */
                 $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
                     ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                     ->where('order_models.order_id', $row->order_id)
@@ -148,6 +153,9 @@ class DailyPaymentController extends Controller
 
                 $minutes = $produced * ($row->model->minute ?? 0);
 
+                /**
+                 * ✅ Department Cost hisoblash
+                 */
                 $departmentCosts = DailyPayment::select(
                     'department_id',
                     DB::raw('SUM(calculated_amount) as cost')
@@ -163,6 +171,33 @@ class DailyPaymentController extends Controller
                         'department_name' => $d->department?->name,
                         'cost' => $d->cost,
                     ]);
+
+                /**
+                 * ✅ Master / Texnolog / Expense hisoblash
+                 */
+                $expenses = Expense::where('branch_id', $branchId)
+                    ->get()
+                    ->map(function ($exp) use ($row, $produced, $usdRate) {
+
+                        if ($exp->type === 'minute_based') {
+                            $cost = ($row->model->minute ?? 0) * $exp->quantity * $produced;
+                        } elseif ($exp->type === 'percent_based') {
+                            $priceUzs = ($row->order->price ?? 0) * $usdRate;
+                            $cost = $priceUzs * ($exp->quantity / 100) * $produced;
+                        } else {
+                            $cost = 0;
+                        }
+
+                        return [
+                            'expense_id' => $exp->id,
+                            'expense_name' => $exp->name,
+                            'expense_type' => $exp->type,
+                            'cost' => round($cost, 2),
+                        ];
+                    });
+
+                $expensesTotal = collect($expenses)->sum('cost');
+                $departmentTotal = collect($departmentCosts)->sum('cost');
 
                 return [
                     'order' => [
@@ -180,7 +215,8 @@ class DailyPaymentController extends Controller
                     'minutes' => $minutes,
                     'worker_cost' => $row->worker_cost,
                     'department_costs' => $departmentCosts,
-                    'total_cost' => $row->worker_cost + collect($departmentCosts)->sum('cost'),
+                    'expenses_costs' => $expenses,
+                    'total_cost' => $row->worker_cost + $departmentTotal + $expensesTotal,
                 ];
             })
             ->values();

@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -493,15 +495,7 @@
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
       <workItem from="1761994438958" duration="21001000" />
-      <workItem from="1762063784746" duration="1269000" />
-    </task>
-    <task id="LOCAL-01636" summary="fix: update payment calculation logic for 2026 summer season and improve department queries">
-      <option name="closed" value="true" />
-      <created>1761995381880</created>
-      <option name="number" value="01636" />
-      <option name="presentableId" value="LOCAL-01636" />
-      <option name="project" value="LOCAL" />
-      <updated>1761995381880</updated>
+      <workItem from="1762063784746" duration="2470000" />
     </task>
     <task id="LOCAL-01637" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
       <option name="closed" value="true" />
@@ -887,7 +881,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762064662376</updated>
     </task>
-    <option name="localTasksCounter" value="1685" />
+    <task id="LOCAL-01685" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762065131906</created>
+      <option name="number" value="01685" />
+      <option name="presentableId" value="LOCAL-01685" />
+      <option name="project" value="LOCAL" />
+      <updated>1762065131906</updated>
+    </task>
+    <option name="localTasksCounter" value="1686" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
