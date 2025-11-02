@@ -135,7 +135,7 @@ class DailyPaymentController extends Controller
             ->with(['employees' => function ($q) use ($start, $end) {
                 $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id')
                     ->withCount([
-                        'attendance as attendance_present_count' => function ($sub) use ($start, $end) {
+                        'attendances as attendance_present_count' => function ($sub) use ($start, $end) {
                             $sub->where('status', 'present')
                                 ->when($start, fn($q) => $q->where('date', '>=', $start))
                                 ->when($end, fn($q) => $q->where('date', '<=', $end));
