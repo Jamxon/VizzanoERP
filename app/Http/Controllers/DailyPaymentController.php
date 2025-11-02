@@ -18,7 +18,7 @@ class DailyPaymentController extends Controller
         $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
         $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
 
-        $usdRate = getUsdRate(); // ✅ Bir marta olish kifoya
+        $usdRate = getUsdRate();
 
         $modelData = DailyPayment::select(
             'model_id',
@@ -27,7 +27,7 @@ class DailyPaymentController extends Controller
         )
             ->with([
                 'model:id,name,minute',
-                'order:id,name,quantity,price',
+                'order:id,name,quantity,price'
             ])
             ->when($start, fn($q) => $q->where('payment_date', '>=', $start))
             ->when($end, fn($q) => $q->where('payment_date', '<=', $end))
@@ -50,7 +50,7 @@ class DailyPaymentController extends Controller
                 $minutes = $produced * ($row->model->minute ?? 0);
 
                 /**
-                 * ✅ Department Cost hisoblash
+                 * ✅ Department costs
                  */
                 $departmentCosts = DailyPayment::select(
                     'department_id',
@@ -69,7 +69,35 @@ class DailyPaymentController extends Controller
                     ]);
 
                 /**
-                 * ✅ Master / Texnolog / Expense hisoblash
+                 * ✅ Employees detail costs
+                 */
+                $employees = DailyPayment::select(
+                    'employee_id',
+                    'department_id',
+                    DB::raw('SUM(quantity_produced) as quantity'),
+                    DB::raw('SUM(calculated_amount) as salary'),
+                    DB::raw('AVG(employee_percentage) as percentage')
+                )
+                    ->with([
+                        'employee:id,name',
+                        'department:id,name'
+                    ])
+                    ->where('order_id', $row->order_id)
+                    ->where('model_id', $row->model_id)
+                    ->groupBy('employee_id', 'department_id')
+                    ->get()
+                    ->map(fn($e) => [
+                        'employee_id' => $e->employee_id,
+                        'employee_name' => $e->employee?->name,
+                        'department_id' => $e->department_id,
+                        'department_name' => $e->department?->name,
+                        'percentage' => round($e->percentage, 2),
+                        'quantity_produced' => $e->quantity,
+                        'salary' => round($e->salary, 2),
+                    ]);
+
+                /**
+                 * ✅ Expenses (Master/Texnolog etc)
                  */
                 $expenses = Expense::where('branch_id', $branchId)
                     ->get()
@@ -92,24 +120,25 @@ class DailyPaymentController extends Controller
                         ];
                     });
 
-                $expensesTotal = collect($expenses)->sum('cost');
                 $departmentTotal = collect($departmentCosts)->sum('cost');
+                $expensesTotal = collect($expenses)->sum('cost');
 
                 return [
                     'order' => [
-                        'id' => $row->order?->id,
-                        'name' => $row->order?->name,
-                        'quantity' => $row->order?->quantity,
-                        'price' => $row->order?->price,
+                        'id' => $row->order->id,
+                        'name' => $row->order->name,
+                        'quantity' => $row->order->quantity,
+                        'price' => $row->order->price,
                     ],
                     'model' => [
-                        'id' => $row->model?->id,
-                        'name' => $row->model?->name,
-                        'minute' => $row->model?->minute,
+                        'id' => $row->model->id,
+                        'name' => $row->model->name,
+                        'minute' => $row->model->minute,
                     ],
                     'produced_quantity' => $produced,
                     'minutes' => $minutes,
                     'worker_cost' => $row->worker_cost,
+                    'employee_details' => $employees,
                     'department_costs' => $departmentCosts,
                     'expenses_costs' => $expenses,
                     'total_cost' => $row->worker_cost + $departmentTotal + $expensesTotal,
