@@ -907,15 +907,42 @@ class CasherController extends Controller
 
             $validated = $request->validate([
                 'employee_id' => 'required|exists:employees,id',
-                'amount' => 'required|numeric', // ✅ manfiy bo‘lishi ham mumkin
+                'amount' => 'required|numeric',
                 'month' => 'required|date_format:Y-m',
                 'type' => 'required|in:salary,advance',
                 'comment' => 'nullable|string',
             ]);
 
             $validated['month'] = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
-
             $employee = Employee::findOrFail($validated['employee_id']);
+
+            // ⛔ ONLY If amount is negative — CONTROL RULES APPLY
+            if ($validated['amount'] < 0) {
+
+                $lastPayment = SalaryPayment::where('employee_id', $validated['employee_id'])
+                    ->orderByDesc('id')
+                    ->first();
+
+                if (!$lastPayment) {
+                    return response()->json([
+                        'message' => "Oldin to‘lov yo‘q — minus qilishga ruxsat yo‘q!"
+                    ], 500);
+                }
+
+                // QOIDA #2: 5 daqiqa o'tgan bo'lsa — Block
+                if ($lastPayment->created_at->lt(now()->subMinutes(5))) {
+                    return response()->json([
+                        'message' => "Oxirgi to‘lovdan 5 daqiqa o‘tib ketgan 😉"
+                    ], 500);
+                }
+
+                // QOIDA #3: Minus kattalik check
+                if (abs($validated['amount']) > abs($lastPayment->amount)) {
+                    return response()->json([
+                        'message' => "Minus miqdori oxirgi to‘lovni oshib ketmasin! (Limit: {$lastPayment->amount})"
+                    ], 403);
+                }
+            }
 
             $cashboxBalance = CashboxBalance::with('cashbox')
                 ->whereHas('cashbox', fn($q) =>
@@ -929,7 +956,7 @@ class CasherController extends Controller
             $cashboxId = $cashboxBalance->cashbox_id;
             $currency = Currency::where('name', "So'm")->firstOrFail();
 
-            // ✅ 1) Har safar yangi SalaryPayment yoziladi
+            // ✅ SalaryPayment yoziladi
             $payment = SalaryPayment::create([
                 'employee_id' => $validated['employee_id'],
                 'amount' => $validated['amount'],
@@ -938,23 +965,23 @@ class CasherController extends Controller
                 'comment' => $validated['comment'] ?? null,
             ]);
 
-            // ✅ 2) Har safar yangi CashboxTransaction yoziladi
+            // ✅ CashboxTransaction yoziladi
             CashboxTransaction::create([
                 'cashbox_id' => $cashboxId,
                 'currency_id' => $currency->id,
-                'type' => 'expense', // ✅ minus bo‘lsa ham expense qoladi
+                'type' => 'expense',
                 'amount' => $validated['amount'],
                 'date' => now()->toDateString(),
                 'destination_id' => $employee->id,
                 'via_id' => auth()->user()->employee->id,
                 'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
-                'comment' => $validated['type'] === 'advance' ? $employee->name . " uchun avans to'lovi ---" . $validated['comment'] ?? null : $employee->name . " uchun oylik to'lovi" . $validated['comment'] ?? null,
+                'comment' => $validated['comment'] ? ($validated['comment'] . " (Auto-created)") : "(Auto-created)",
                 'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
-            // ✅ 3) Balanslar darhol summaga qarab o‘zgaradi
-            $employee->decrement('balance', $validated['amount']); // ✅ minus bo‘lsa ➜ increment bo‘ladi
-            $cashboxBalance->decrement('amount', $validated['amount']); // ✅ minus bo‘lsa ➜ increment
+            // ✅ Balanslarni yangilash
+            $employee->decrement('balance', $validated['amount']);
+            $cashboxBalance->decrement('amount', $validated['amount']);
 
             // ✅ Telegram xabar
             DB::afterCommit(function () use ($employee, $validated) {
