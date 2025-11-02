@@ -156,17 +156,22 @@ class DailyPaymentController extends Controller
         $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
         $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
 
-        // ✅ Attendance present count for all employees
+        // ✅ Attendance counts with correct date filtering
         $attendanceCounts = DB::table('attendances')
             ->select('employee_id', DB::raw('COUNT(*) as present_count'))
-            ->where('status', 'present')
-            ->when($start, fn($q) => $q->where('date', '>=', $start))
-            ->when($end, fn($q) => $q->where('date', '<=', $end))
+            ->whereIn('employee_id', function ($q) use ($branchId) {
+                $q->select('id')->from('employees')->where('branch_id', $branchId);
+            })
+            ->where(function ($q) {
+                $q->where('status', 'present')->orWhere('status', 1);
+            })
+            ->when($start, fn($q) => $q->whereDate('date', '>=', $start))
+            ->when($end, fn($q) => $q->whereDate('date', '<=', $end))
             ->groupBy('employee_id')
             ->pluck('present_count', 'employee_id');
 
         $departments = Department::whereHas('mainDepartment', fn($q) => $q->where('branch_id', $branchId))
-            ->with(['departmentBudget'])
+            ->with('departmentBudget')
             ->withCount('employees')
             ->with(['employees' => function ($q) {
                 $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id')
@@ -175,17 +180,12 @@ class DailyPaymentController extends Controller
             ->get()
             ->map(function ($department) use ($attendanceCounts) {
 
-                // ✅ 0 bo‘lganlar filter qilinadi
-                $filteredEmployees = $department->employees->filter(function ($e) use ($attendanceCounts) {
-                    return ($attendanceCounts[$e->id] ?? 0) > 0;
-                });
-
                 return [
                     'id' => $department->id,
                     'name' => $department->name,
-                    'employee_count' => $filteredEmployees->count(), // ✅ faqat mavjudlar hisoblanadi
+                    'employee_count' => $department->employees_count,
                     'budget' => $department->departmentBudget,
-                    'employees' => $filteredEmployees->map(function ($e) use ($attendanceCounts) {
+                    'employees' => $department->employees->map(function ($e) use ($attendanceCounts) {
                         return [
                             'id' => $e->id,
                             'name' => $e->name,
@@ -194,7 +194,7 @@ class DailyPaymentController extends Controller
                             'percentage' => $e->percentage,
                             'attendance_present_count' => $attendanceCounts[$e->id] ?? 0,
                         ];
-                    })->values(), // index reset
+                    })->values(),
                 ];
             });
 
