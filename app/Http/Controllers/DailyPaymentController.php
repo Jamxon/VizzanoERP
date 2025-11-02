@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Department;
+use App\Models\DepartmentBudget;
 use App\Models\Expense;
 use App\Models\SewingOutputs;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\DailyPayment;
 use Carbon\Carbon;
@@ -309,6 +311,51 @@ class DailyPaymentController extends Controller
             });
 
         return response()->json($data);
+    }
+
+    public function storeDepartmentBudget(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'department_id' => 'required|integer|exists:departments,id',
+            'quantity' => 'required|numeric|min:0',
+            'type' => 'required|string|in:minute_based,percent_based',
+        ]);
+
+        $branchId = auth()->user()->employee->branch_id ?? null;
+
+        $department = Department::where('id', $request->department_id)
+            ->whereHas('mainDepartment', fn($q) => $q->where('branch_id', $branchId))
+            ->firstOrFail();
+
+        $exist = DepartmentBudget::where('department_id', $department->id)
+            ->first();
+
+        if ($exist) {
+            return response()->json(['message' => 'Budget for this department already exists.'], 409);
+        }
+
+        $department->departmentBudget()->create([
+            'quantity' => $request->quantity,
+            'type' => $request->type,
+        ]);
+
+        return response()->json(['message' => 'Department budget saved successfully.'], 201);
+    }
+
+
+    public function editDepartmentBudget(DepartmentBudget $departmentBudget, Request $request): \Illuminate\Http\JsonResponse
+    {
+        $branchId = auth()->user()->employee->branch_id ?? null;
+
+        if ($departmentBudget->department->mainDepartment->branch_id !== $branchId) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        DepartmentBudget::update($request->all());
+
+        return response()->json([
+            'message' => 'Department budget updated successfully.',
+        ]);
     }
 
 }

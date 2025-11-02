@@ -948,7 +948,7 @@ class CasherController extends Controller
                 'destination_id' => $employee->id,
                 'via_id' => auth()->user()->employee->id,
                 'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
-                'comment' => ($validated['comment'] ?? '') . " (Auto-created)",
+                'comment' => $validated['type'] === 'advance' ? $employee . " uchun avans to'lovi ---" . $validated['comment'] ?? null : $employee . " uchun oylik to'lovi" . $validated['comment'] ?? null,
                 'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
