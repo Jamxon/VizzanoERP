@@ -112,6 +112,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::post('departmentBudgets', [DailyPaymentController::class, 'storeDepartmentBudget']);
     Route::patch('departmentBudgets/{departmentBudget}', [DailyPaymentController::class, 'editDepartmentBudget']);
     Route::patch('employeePercentage/{employee}', [DailyPaymentController::class, 'updatePercentage']);
+    Route::get('departments/{department}', [DailyPaymentController::class, 'show']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
