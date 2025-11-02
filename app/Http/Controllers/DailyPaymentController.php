@@ -202,4 +202,70 @@ class DailyPaymentController extends Controller
 
         return response()->json($departments);
     }
+
+    public function getDepartmentPayments(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'department_id' => 'required|integer|exists:departments,id',
+            'order_id' => 'nullable|integer|exists:orders,id',
+        ]);
+
+        $branchId = auth()->user()->employee->branch_id ?? null;
+
+        $selectedSeasonYear = $request->season_year ?? 2026;
+        $selectedSeasonType = $request->season_type ?? 'summer';
+        $departmentId = $request->department_id;
+        $orderId = $request->order_id ?? null;
+
+        $data = DailyPayment::select(
+            'id',
+            'employee_id',
+            'model_id',
+            'order_id',
+            'department_id',
+            'quantity_produced',
+            'calculated_amount',
+            'employee_percentage'
+        )
+            ->with([
+                'employee:id,name',
+                'model:id,name',
+                'order:id,name,season_year,season_type'
+            ])
+            ->where('department_id', $departmentId)
+            ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
+            ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
+                $q->where('season_year', $selectedSeasonYear)
+                    ->where('season_type', $selectedSeasonType);
+            })
+            ->when($orderId, fn($q) => $q->where('order_id', $orderId))
+            ->orderBy('id', 'desc')
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'id' => $row->id,
+                    'employee' => [
+                        'id' => $row->employee_id,
+                        'name' => $row->employee?->name,
+                    ],
+                    'order' => [
+                        'id' => $row->order_id,
+                        'name' => $row->order?->name,
+                        'season_year' => $row->order?->season_year,
+                        'season_type' => $row->order?->season_type,
+                    ],
+                    'model' => [
+                        'id' => $row->model_id,
+                        'name' => $row->model?->name,
+                    ],
+                    'department_id' => $row->department_id,
+                    'quantity_produced' => $row->quantity_produced,
+                    'calculated_amount' => $row->calculated_amount,
+                    'employee_percentage' => round($row->employee_percentage, 2),
+                ];
+            });
+
+        return response()->json($data);
+    }
+
 }

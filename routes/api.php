@@ -109,7 +109,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('groupChanges', [UserController::class, 'getGroupChangesAll']);
     Route::get('dailyPayments', [DailyPaymentController::class, 'index']);
     Route::get('departmentsWithBudgets', [DailyPaymentController::class, 'getDepartmentsWithBudgetsAndEmployeeCount']);
-
+    Route::get('deoartmentPayments', [DailyPaymentController::class, 'getDepartmentPayments']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
