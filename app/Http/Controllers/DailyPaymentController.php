@@ -15,10 +15,10 @@ class DailyPaymentController extends Controller
     public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()->employee->branch_id ?? null;
-        $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
-        $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
-
         $usdRate = getUsdRate();
+
+        $selectedSeasonYear = $request->season_year ?? 2026;
+        $selectedSeasonType = $request->season_type ?? 'summer';
 
         $modelData = DailyPayment::select(
             'model_id',
@@ -27,14 +27,16 @@ class DailyPaymentController extends Controller
         )
             ->with([
                 'model:id,name,minute',
-                'order:id,name,quantity,price'
+                'order:id,name,quantity,price,season_year,season_type'
             ])
-            ->when($start, fn($q) => $q->where('payment_date', '>=', $start))
-            ->when($end, fn($q) => $q->where('payment_date', '<=', $end))
+            ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
+                $q->where('season_year', $selectedSeasonYear)
+                    ->where('season_type', $selectedSeasonType);
+            })
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
             ->groupBy('model_id', 'order_id')
             ->get()
-            ->map(function ($row) use ($start, $end, $usdRate, $branchId) {
+            ->map(function ($row) use ($usdRate, $branchId) {
 
                 /**
                  * ✅ Produced Quantity
@@ -43,14 +45,12 @@ class DailyPaymentController extends Controller
                     ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                     ->where('order_models.order_id', $row->order_id)
                     ->where('order_models.model_id', $row->model_id)
-                    ->when($start, fn($q) => $q->where('sewing_outputs.created_at', '>=', $start))
-                    ->when($end, fn($q) => $q->where('sewing_outputs.created_at', '<=', $end))
                     ->sum('sewing_outputs.quantity');
 
                 $minutes = $produced * ($row->model->minute ?? 0);
 
                 /**
-                 * ✅ Department costs
+                 * ✅ Department Costs
                  */
                 $departmentCosts = DailyPayment::select(
                     'department_id',
@@ -69,7 +69,7 @@ class DailyPaymentController extends Controller
                     ]);
 
                 /**
-                 * ✅ Employees detail costs
+                 * ✅ Employee-wise Details
                  */
                 $employees = DailyPayment::select(
                     'employee_id',
@@ -97,7 +97,7 @@ class DailyPaymentController extends Controller
                     ]);
 
                 /**
-                 * ✅ Expenses (Master/Texnolog etc)
+                 * ✅ Expenses costs (Master / Texnolog ...)
                  */
                 $expenses = Expense::where('branch_id', $branchId)
                     ->get()
@@ -129,6 +129,8 @@ class DailyPaymentController extends Controller
                         'name' => $row->order->name,
                         'quantity' => $row->order->quantity,
                         'price' => $row->order->price,
+                        'season_year' => $row->order->season_year,
+                        'season_type' => $row->order->season_type,
                     ],
                     'model' => [
                         'id' => $row->model->id,
