@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class DailyPaymentController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()->employee->branch_id ?? null;
         $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
@@ -127,18 +127,21 @@ class DailyPaymentController extends Controller
         $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
         $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
 
-        $departments = Department::whereHas('mainDepartment.branch_id', $branchId)
+        $departments = Department::whereHas('mainDepartment', function ($q) use ($branchId) {
+            $q->where('branch_id', $branchId);
+        })
             ->with(['departmentBudget'])
             ->withCount('employees')
             ->with(['employees' => function ($q) use ($start, $end) {
                 $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id')
-                    ->withCount(['attendance as attendance_present_count' => function ($sub) use ($start, $end) {
-                        $sub->where('status', 'present')
-                            ->when($start, fn($q) => $q->where('date', '>=', $start))
-                            ->when($end, fn($q) => $q->where('date', '<=', $end));
-                    }]);
-
-                $q->with('position:id,name');
+                    ->withCount([
+                        'attendance as attendance_present_count' => function ($sub) use ($start, $end) {
+                            $sub->where('status', 'present')
+                                ->when($start, fn($q) => $q->where('date', '>=', $start))
+                                ->when($end, fn($q) => $q->where('date', '<=', $end));
+                        }
+                    ])
+                    ->with('position:id,name');
             }])
             ->get()
             ->map(function ($department) {

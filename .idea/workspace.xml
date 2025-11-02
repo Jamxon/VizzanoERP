@@ -4,12 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
-      <change afterPath="$PROJECT_DIR$/app/Models/DepartmentBudget.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/DailyPaymentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/DailyPaymentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Department.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Department.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -498,15 +493,7 @@
       <workItem from="1761992767268" duration="213000" />
       <workItem from="1761992994939" duration="1407000" />
       <workItem from="1761994438958" duration="21001000" />
-      <workItem from="1762063784746" duration="4839000" />
-    </task>
-    <task id="LOCAL-01639" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
-      <option name="closed" value="true" />
-      <created>1761998109589</created>
-      <option name="number" value="01639" />
-      <option name="presentableId" value="LOCAL-01639" />
-      <option name="project" value="LOCAL" />
-      <updated>1761998109589</updated>
+      <workItem from="1762063784746" duration="5307000" />
     </task>
     <task id="LOCAL-01640" summary="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService">
       <option name="closed" value="true" />
@@ -892,7 +879,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762067393786</updated>
     </task>
-    <option name="localTasksCounter" value="1688" />
+    <task id="LOCAL-01688" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762072394686</created>
+      <option name="number" value="01688" />
+      <option name="presentableId" value="LOCAL-01688" />
+      <option name="project" value="LOCAL" />
+      <updated>1762072394686</updated>
+    </task>
+    <option name="localTasksCounter" value="1689" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
