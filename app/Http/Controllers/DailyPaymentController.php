@@ -182,6 +182,11 @@ class DailyPaymentController extends Controller
                             'quantity' => $row->order?->quantity,
                             'price' => $row->order?->price,
                         ],
+                        'model' => [
+                            'id' => $row->model?->id,
+                            'name' => $row->model?->name,
+                            'minute' => $row->model?->minute,
+                        ],
                         'produced_quantity' => $produced,
                         'minutes' => $minutes,
                         'worker_cost' => $row->worker_cost,
@@ -191,11 +196,6 @@ class DailyPaymentController extends Controller
                 });
 
                 return [
-                    'model' => [
-                        'id' => $model->id,
-                        'name' => $model->name,
-                        'minute' => $model->minute,
-                    ],
                     'orders' => $orders->values()
                 ];
             })

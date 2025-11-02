@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/e6cf56dc-6987-40b1-a4db-d4b70804e1ba/console.sql" dialect="PostgreSQL" />
     <file url="file://$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" dialect="GenericSQL" />
   </component>
 </project>
