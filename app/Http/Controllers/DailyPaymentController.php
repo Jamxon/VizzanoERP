@@ -205,11 +205,7 @@ class DailyPaymentController extends Controller
             fn($m) => collect($m['orders'])->sum(fn($o) => $o['total_cost'])
         );
 
-        return response()->json([
-            'success' => true,
-            'models' => $modelData,
-            'total_cost' => $grandTotal,
-        ]);
+        return response()->json($modelData);
     }
 
 }
