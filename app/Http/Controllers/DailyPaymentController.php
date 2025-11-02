@@ -50,6 +50,12 @@ class DailyPaymentController extends Controller
                 $minutes = $produced * ($row->model->minute ?? 0);
 
                 /**
+                 * ✅ Planned (Full Order) Calculation Base
+                 */
+                $orderedQuantity = $row->order->quantity;
+                $ratio = $produced > 0 ? ($orderedQuantity / $produced) : 0;
+
+                /**
                  * ✅ Department Costs
                  */
                 $departmentCosts = DailyPayment::select(
@@ -69,7 +75,18 @@ class DailyPaymentController extends Controller
                     ]);
 
                 /**
-                 * ✅ Employee-wise Details
+                 * ✅ Planned Department Costs
+                 */
+                $plannedDepartmentCosts = collect($departmentCosts)->map(function ($dc) use ($ratio) {
+                    return [
+                        'department_id' => $dc['department_id'],
+                        'department_name' => $dc['department_name'],
+                        'planned_cost' => round($dc['cost'] * $ratio, 2)
+                    ];
+                });
+
+                /**
+                 * ✅ Employee-wise Details (Existing)
                  */
                 $employees = DailyPayment::select(
                     'employee_id',
@@ -120,8 +137,24 @@ class DailyPaymentController extends Controller
                         ];
                     });
 
+                /**
+                 * ✅ Planned Expenses Costs
+                 */
+                $plannedExpenses = collect($expenses)->map(function ($ex) use ($ratio) {
+                    return [
+                        'expense_id' => $ex['expense_id'],
+                        'expense_name' => $ex['expense_name'],
+                        'expense_type' => $ex['expense_type'],
+                        'planned_cost' => round($ex['cost'] * $ratio, 2),
+                    ];
+                });
+
                 $departmentTotal = collect($departmentCosts)->sum('cost');
                 $expensesTotal = collect($expenses)->sum('cost');
+
+                $plannedWorkerCost = round($row->worker_cost * $ratio, 2);
+                $plannedDepartmentTotal = collect($plannedDepartmentCosts)->sum('planned_cost');
+                $plannedExpensesTotal = collect($plannedExpenses)->sum('planned_cost');
 
                 return [
                     'order' => [
@@ -139,11 +172,21 @@ class DailyPaymentController extends Controller
                     ],
                     'produced_quantity' => $produced,
                     'minutes' => $minutes,
-                    'worker_cost' => $row->worker_cost,
+                    'worker_cost' => round($row->worker_cost, 2),
                     'employee_details' => $employees,
                     'department_costs' => $departmentCosts,
                     'expenses_costs' => $expenses,
-                    'total_cost' => $row->worker_cost + $departmentTotal + $expensesTotal,
+                    'total_cost' => round($row->worker_cost + $departmentTotal + $expensesTotal, 2),
+
+                    /**
+                     * ✅ FULL ORDER PLANNED COST SECTION
+                     */
+                    'planned_costs' => [
+                        'worker_planned_cost' => $plannedWorkerCost,
+                        'department_planned_cost' => $plannedDepartmentTotal,
+                        'expenses_planned_cost' => $plannedExpensesTotal,
+                        'total_planned_cost' => round($plannedWorkerCost + $plannedDepartmentTotal + $plannedExpensesTotal, 2),
+                    ]
                 ];
             })
             ->values();
