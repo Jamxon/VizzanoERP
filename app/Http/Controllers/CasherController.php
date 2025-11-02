@@ -904,9 +904,10 @@ class CasherController extends Controller
     public function giveSalaryOrAdvance(Request $request)
     {
         return DB::transaction(function () use ($request) {
+
             $validated = $request->validate([
                 'employee_id' => 'required|exists:employees,id',
-                'amount' => 'required|numeric',
+                'amount' => 'required|numeric', // ✅ manfiy bo‘lishi ham mumkin
                 'month' => 'required|date_format:Y-m',
                 'type' => 'required|in:salary,advance',
                 'comment' => 'nullable|string',
@@ -917,109 +918,63 @@ class CasherController extends Controller
             $employee = Employee::findOrFail($validated['employee_id']);
 
             $cashboxBalance = CashboxBalance::with('cashbox')
-                ->whereHas('cashbox', function ($q) {
-                    $q->where('branch_id', auth()->user()->employee->branch_id);
-                })
-                ->whereHas('currency', function ($q) {
-                    $q->where('name', "So'm");
-                })
-                ->first();
-
-            if (!$cashboxBalance) {
-                throw new \Exception('So‘mda ishlovchi cashbox topilmadi.');
-            }
+                ->whereHas('cashbox', fn($q) =>
+                $q->where('branch_id', auth()->user()->employee->branch_id)
+                )
+                ->whereHas('currency', fn($q) =>
+                $q->where('name', "So'm")
+                )
+                ->firstOrFail();
 
             $cashboxId = $cashboxBalance->cashbox_id;
-            $currency = Currency::where('name', "So'm")->first();
+            $currency = Currency::where('name', "So'm")->firstOrFail();
 
-            // 🔎 Eski paymentni tekshirish
-            $existingPayment = SalaryPayment::where([
+            // ✅ 1) Har safar yangi SalaryPayment yoziladi
+            $payment = SalaryPayment::create([
                 'employee_id' => $validated['employee_id'],
+                'amount' => $validated['amount'],
                 'month' => $validated['month'],
                 'type' => $validated['type'],
-            ])->first();
+                'comment' => $validated['comment'] ?? null,
+            ]);
 
-            $oldAmount = $existingPayment?->amount ?? 0;
-
-            // 🔄 Payment update/create
-            $payment = SalaryPayment::updateOrCreate(
-                [
-                    'employee_id' => $validated['employee_id'],
-                    'month' => $validated['month'],
-                    'type' => $validated['type'],
-                ],
-                [
-                    'amount' => $validated['amount'],
-                    'comment' => $validated['comment'] ?? null,
-                ]
-            );
-
-            // 🔄 Transaction update/create
-            $transactionData = [
+            // ✅ 2) Har safar yangi CashboxTransaction yoziladi
+            CashboxTransaction::create([
                 'cashbox_id' => $cashboxId,
                 'currency_id' => $currency->id,
-                'type' => 'expense',
+                'type' => 'expense', // ✅ minus bo‘lsa ham expense qoladi
                 'amount' => $validated['amount'],
                 'date' => now()->toDateString(),
-                'source' => null,
                 'destination_id' => $employee->id,
                 'via_id' => auth()->user()->employee->id,
                 'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
-                'comment' => $employee->name . " uchun " . ($validated['type'] === 'advance' ? 'avans' : 'oylik') . " to'lovi" . " - " . ($validated['comment'] ?? ''),
-                'target_cashbox_id' => null,
-                'exchange_rate' => null,
-                'target_amount' => null,
+                'comment' => ($validated['comment'] ?? '') . " (Auto-created)",
                 'branch_id' => auth()->user()->employee->branch_id,
-            ];
+            ]);
 
-            if ($existingPayment) {
-                // eski transactionni topib yangilash
-                $existingTransaction = CashboxTransaction::where([
-                    'destination_id' => $employee->id,
-                    'purpose' => $transactionData['purpose'],
-                    'amount' => $oldAmount,
-                    'cashbox_id' => $cashboxId,
-                    'currency_id' => $currency->id,
-                ])->first();
+            // ✅ 3) Balanslar darhol summaga qarab o‘zgaradi
+            $employee->decrement('balance', $validated['amount']); // ✅ minus bo‘lsa ➜ increment bo‘ladi
+            $cashboxBalance->decrement('amount', $validated['amount']); // ✅ minus bo‘lsa ➜ increment
 
-                if ($existingTransaction) {
-                    $existingTransaction->update($transactionData);
-                } else {
-                    CashboxTransaction::create($transactionData);
-                }
-            } else {
-                CashboxTransaction::create($transactionData);
-            }
-
-            // 💰 Balans farqni hisoblash
-            $difference = $validated['amount'] - $oldAmount;
-
-            if ($difference !== 0) {
-                $employee->decrement('balance', $difference);
-                $cashboxBalance->decrement('amount', $difference);
-            }
-
-            // ✅ Telegram xabarini tranzaksiya tugagandan keyin yuborish
+            // ✅ Telegram xabar
             DB::afterCommit(function () use ($employee, $validated) {
                 $text = "💸 *To‘lov amalga oshirildi!*\n"
-                    . "🏢 Filial: " . auth()->user()->employee->branch->name . "\n"
                     . "👤 Xodim: {$employee->name}\n"
-                    . "👤 Bajardi: " .auth()->user()->employee->name . "\n"
                     . "💰 Miqdor: " . number_format($validated['amount'], 0, '.', ' ') . " so‘m\n"
                     . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
                     . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik');
-    
-                $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
-                $chatId = -979504247; // .env ichida saqlang
-    
-                Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-                    'chat_id' => $chatId,
+
+                Http::post("https://api.telegram.org/bot" . env('TELEGRAM_BOT_TOKEN') . "/sendMessage", [
+                    'chat_id' => env('TELEGRAM_CHAT_ID'),
                     'text' => $text,
                     'parse_mode' => 'Markdown',
                 ]);
             });
 
-            return $payment;
+            return response()->json([
+                'message' => 'Yangi to‘lov muvaffaqiyatli qo‘shildi!',
+                'payment' => $payment
+            ]);
         });
     }
 
