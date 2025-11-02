@@ -443,4 +443,71 @@ class DailyPaymentController extends Controller
         ]);
     }
 
+    public function storeExpense(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'quantity' => 'required|numeric|min:0',
+            'type' => 'required|string|in:minute_based,percent_based,fixed',
+        ]);
+
+        $branchId = auth()->user()->employee->branch_id;
+
+        $expense = Expense::create([
+            'name' => $validated['name'],
+            'quantity' => $validated['quantity'],
+            'type' => $validated['type'],
+            'branch_id' => $branchId,
+        ]);
+
+        return response()->json([
+            'message' => 'Expense saved successfully.',
+            'expense' => $expense,
+        ], 201);
+    }
+
+    public function updateExpense(Request $request, Expense $expense): \Illuminate\Http\JsonResponse
+    {
+        $branchId = auth()->user()->employee->branch_id;
+
+        // Unauthorized access check
+        if ($expense->branch_id !== $branchId) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'quantity' => 'sometimes|numeric|min:0',
+            'type' => 'sometimes|string|in:minute_based,percent_based,fixed',
+        ]);
+
+        if (empty($validated)) {
+            return response()->json(['message' => 'No fields provided to update.'], 422);
+        }
+
+        $expense->update($validated);
+
+        return response()->json([
+            'message' => 'Expense updated successfully.',
+            'expense' => $expense,
+        ]);
+    }
+
+    public function showExpense(Expense $expense): \Illuminate\Http\JsonResponse
+    {
+        $branchId = auth()->user()->employee->branch_id;
+
+        if ($expense->branch_id !== $branchId) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        return response()->json([
+            'id' => $expense->id,
+            'name' => $expense->name,
+            'quantity' => $expense->quantity,
+            'type' => $expense->type,
+            'created_at' => $expense->created_at,
+        ]);
+    }
+
 }

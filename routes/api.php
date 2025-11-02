@@ -113,6 +113,9 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::patch('departmentBudgets/{departmentBudget}', [DailyPaymentController::class, 'editDepartmentBudget']);
     Route::patch('employeePercentage/{employee}', [DailyPaymentController::class, 'updatePercentage']);
     Route::get('departments/{department}', [DailyPaymentController::class, 'show']);
+    Route::get('showExpenses/{expense}', [DailyPaymentController::class, 'showExpense']);
+    Route::post('storeExpenses', [DailyPaymentController::class, 'storeExpense']);
+    Route::patch('updateExpenses/{expense}', [DailyPaymentController::class, 'updateExpense']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
