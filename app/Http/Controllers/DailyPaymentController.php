@@ -136,66 +136,52 @@ class DailyPaymentController extends Controller
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
             ->groupBy('model_id', 'order_id')
             ->get()
-            ->groupBy('model_id')
-            ->map(function ($rowsByModel) use ($start, $end, $branchId) {
+            ->map(function ($row) use ($start, $end) {
 
-                $model = $rowsByModel->first()->model;
+                $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
+                    ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
+                    ->where('order_models.order_id', $row->order_id)
+                    ->where('order_models.model_id', $row->model_id)
+                    ->when($start, fn($q) => $q->where('sewing_outputs.created_at', '>=', $start))
+                    ->when($end, fn($q) => $q->where('sewing_outputs.created_at', '<=', $end))
+                    ->sum('sewing_outputs.quantity');
 
-                $orders = $rowsByModel->map(function ($row) use ($start, $end, $branchId) {
+                $minutes = $produced * ($row->model->minute ?? 0);
 
-                    /* ✅ Tikilgan quantity */
-                    $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
-                        ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
-                        ->where('order_models.order_id', $row->order_id)
-                        ->where('order_models.model_id', $row->model_id)
-                        ->when($start, fn($q) => $q->where('sewing_outputs.created_at', '>=', $start))
-                        ->when($end, fn($q) => $q->where('sewing_outputs.created_at', '<=', $end))
-                        ->sum('sewing_outputs.quantity');
+                $departmentCosts = DailyPayment::select(
+                    'department_id',
+                    DB::raw('SUM(calculated_amount) as cost')
+                )
+                    ->with('department:id,name')
+                    ->where('order_id', $row->order_id)
+                    ->where('model_id', $row->model_id)
+                    ->whereNotNull('department_id')
+                    ->groupBy('department_id')
+                    ->get()
+                    ->map(fn($d) => [
+                        'department_id' => $d->department_id,
+                        'department_name' => $d->department?->name,
+                        'cost' => $d->cost,
+                    ]);
 
-                    $minutes = $produced * ($row->model->minute ?? 0);
-
-                    /* ✅ Department bo‘yicha xarajatlar */
-                    $departmentCosts = DailyPayment::select(
-                        'department_id',
-                        DB::raw('SUM(calculated_amount) as cost')
-                    )
-                        ->with('department:id,name')
-                        ->where('order_id', $row->order_id)
-                        ->where('model_id', $row->model_id)
-                        ->whereNotNull('department_id')
-                        ->groupBy('department_id')
-                        ->get()
-                        ->map(fn($d) => [
-                            'department_id' => $d->department_id,
-                            'department_name' => $d->department?->name,
-                            'cost' => $d->cost,
-                        ]);
-
-                    $departmentTotal = collect($departmentCosts)->sum('cost');
-
-                    $totalCost = $row->worker_cost + $departmentTotal;
-
-                    return [
-                        'order' => [
-                            'id' => $row->order?->id,
-                            'name' => $row->order?->name,
-                            'quantity' => $row->order?->quantity,
-                            'price' => $row->order?->price,
-                        ],
-                        'model' => [
-                            'id' => $row->model?->id,
-                            'name' => $row->model?->name,
-                            'minute' => $row->model?->minute,
-                        ],
-                        'produced_quantity' => $produced,
-                        'minutes' => $minutes,
-                        'worker_cost' => $row->worker_cost,
-                        'department_costs' => $departmentCosts,
-                        'total_cost' => $totalCost,
-                    ];
-                });
-
-                return $orders->values();
+                return [
+                    'order' => [
+                        'id' => $row->order?->id,
+                        'name' => $row->order?->name,
+                        'quantity' => $row->order?->quantity,
+                        'price' => $row->order?->price,
+                    ],
+                    'model' => [
+                        'id' => $row->model?->id,
+                        'name' => $row->model?->name,
+                        'minute' => $row->model?->minute,
+                    ],
+                    'produced_quantity' => $produced,
+                    'minutes' => $minutes,
+                    'worker_cost' => $row->worker_cost,
+                    'department_costs' => $departmentCosts,
+                    'total_cost' => $row->worker_cost + collect($departmentCosts)->sum('cost'),
+                ];
             })
             ->values();
 
