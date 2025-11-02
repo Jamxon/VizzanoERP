@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Expense;
 use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
 use App\Models\DailyPayment;
