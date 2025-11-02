@@ -318,6 +318,49 @@ class DailyPaymentController extends Controller
         return response()->json($data);
     }
 
+    public function show(Department $department): \Illuminate\Http\JsonResponse
+    {
+        $branchId = auth()->user()->employee->branch_id ?? null;
+
+        // Branch-based authorization: faqat o'z filialidagi departmentlarga ruxsat
+        if ($department->mainDepartment->branch_id !== $branchId) {
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
+        // Eager load: budget va employees (position bilan). Select bilan faqat keraklilarni olamiz.
+        $department->load([
+            'departmentBudget',
+            'employees' => function ($q) {
+                $q->where('status', 'working')
+                  ->where('percentage', '>', 0);
+                $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id')
+                    ->with('position:id,name');
+            }
+        ]);
+
+        $employees = $department->employees->map(function ($e) {
+            return [
+                'id' => $e->id,
+                'name' => $e->name,
+                'phone' => $e->phone,
+                'position' => $e->position?->name,
+                'percentage' => $e->percentage,
+            ];
+        });
+
+        return response()->json([
+            'id' => $department->id,
+            'name' => $department->name,
+            'budget' => $department->departmentBudget ? [
+                'id' => $department->departmentBudget->id,
+                'quantity' => $department->departmentBudget->quantity,
+                'type' => $department->departmentBudget->type,
+            ] : null,
+            'employee_count' => $department->employees->count(),
+            'employees' => $employees,
+        ]);
+    }
+
     public function storeDepartmentBudget(Request $request): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
