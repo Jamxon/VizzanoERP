@@ -127,37 +127,41 @@ class DailyPaymentController extends Controller
         $start = $request->start_date ? Carbon::parse($request->start_date)->startOfDay() : null;
         $end = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : null;
 
+        // ✅ Bir marta hamma xodimlar uchun attendance present count
+        $attendanceCounts = DB::table('attendances')
+            ->select('employee_id', DB::raw('COUNT(*) as present_count'))
+            ->where('status', 'present')
+            ->when($start, fn($q) => $q->where('date', '>=', $start))
+            ->when($end, fn($q) => $q->where('date', '<=', $end))
+            ->groupBy('employee_id')
+            ->pluck('present_count', 'employee_id'); // key-value
+
         $departments = Department::whereHas('mainDepartment', function ($q) use ($branchId) {
             $q->where('branch_id', $branchId);
         })
             ->with(['departmentBudget'])
             ->withCount('employees')
-            ->with(['employees' => function ($q) use ($start, $end) {
-                $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id')
-                    ->withCount([
-                        'attendances as attendance_present_count' => function ($sub) use ($start, $end) {
-                            $sub->where('status', 'present')
-                                ->when($start, fn($q) => $q->where('date', '>=', $start))
-                                ->when($end, fn($q) => $q->where('date', '<=', $end));
-                        }
-                    ])
+            ->with(['employees' => function ($q) {
+                $q->select('id','name','phone','department_id','percentage','position_id')
                     ->with('position:id,name');
             }])
             ->get()
-            ->map(function ($department) {
+            ->map(function ($department) use ($attendanceCounts) {
                 return [
                     'id' => $department->id,
                     'name' => $department->name,
                     'employee_count' => $department->employees_count,
                     'budget' => $department->departmentBudget,
-                    'employees' => $department->employees->map(fn($e) => [
-                        'id' => $e->id,
-                        'name' => $e->name,
-                        'phone' => $e->phone,
-                        'position' => $e->position,
-                        'percentage' => $e->percentage,
-                        'attendance_present_count' => $e->attendance_present_count,
-                    ]),
+                    'employees' => $department->employees->map(function ($e) use ($attendanceCounts) {
+                        return [
+                            'id' => $e->id,
+                            'name' => $e->name,
+                            'phone' => $e->phone,
+                            'position' => $e->position,
+                            'percentage' => $e->percentage,
+                            'attendance_present_count' => $attendanceCounts[$e->id] ?? 0,
+                        ];
+                    }),
                 ];
             });
 
