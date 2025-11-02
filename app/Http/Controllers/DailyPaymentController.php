@@ -332,7 +332,7 @@ class DailyPaymentController extends Controller
             'departmentBudget',
             'employees' => function ($q) {
                 $q->where('status', 'working');
-                $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id')
+                $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id', 'img')
                     ->with('position:id,name');
             }
         ]);
@@ -344,6 +344,7 @@ class DailyPaymentController extends Controller
                 'phone' => $e->phone,
                 'position' => $e->position?->name,
                 'percentage' => $e->percentage,
+                'img' => $e->img,
             ];
         });
 
