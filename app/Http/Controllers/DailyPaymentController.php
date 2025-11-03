@@ -260,27 +260,29 @@ class DailyPaymentController extends Controller
             }
         }
 
-        $plannedDepartmentTotal = DepartmentBudget::where('department_id', $departmentId)
-            ->whereHas('department.mainDepartment', function ($q) use ($branchId) {
-                $q->where('branch_id', $branchId);
-            })
-            ->get()
-            ->map(function ($db) use ($orderId) {
+        $order = Order::find($orderId);
+        $usdRate = getUsdRate();
 
-                $order = Order::find($orderId);
+        $plannedDepartmentTotal = DepartmentBudget::whereHas('department.mainDepartment', function ($q) use ($branchId) {
+            $q->where('branch_id', $branchId);
+        })
+            ->where('department_id', $departmentId)
+            ->get()
+            ->map(function ($db) use ($order, $usdRate) {
+
                 if (!$order) return 0;
 
                 if ($db->type === 'minute_based') {
-                    return ($db->quantity * $order->quantity);
+                    // ✅ Model minutiga bog‘liq emas — quantity * minute_price
+                    return $db->quantity * ($order->quantity ?? 0);
                 }
 
                 if ($db->type === 'percentage_based') {
-                    $priceUzs = $order->price * getUsdRate();
-                    return ($priceUzs * ($db->quantity / 100) * $order->quantity);
+                    $priceUzs = ($order->price ?? 0) * $usdRate;
+                    return ($priceUzs * ($db->quantity / 100)) * ($order->quantity ?? 0);
                 }
 
                 return 0;
-
             })
             ->sum();
 
