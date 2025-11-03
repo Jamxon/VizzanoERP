@@ -65,8 +65,8 @@ class DailyPaymentController extends Controller
                     ->groupBy('department_id')
                     ->get()
                     ->map(fn($d) => [
-                        'department_id' => $d->department_id,
-                        'department_name' => $d->department?->name,
+                        'id' => $d->department_id,
+                        'name' => $d->department?->name,
                         'cost' => round($d->cost, 2)
                     ]);
                 $departmentRealTotal = $departmentRealCosts->sum('cost');
