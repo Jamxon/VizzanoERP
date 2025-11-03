@@ -41,152 +41,122 @@ class DailyPaymentController extends Controller
             ->get()
             ->map(function ($row) use ($usdRate, $branchId) {
 
+                $order = $row->order;
+                $model = $row->model;
+
                 $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
                     ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
-                    ->where('order_models.order_id', $row->order_id)
-                    ->where('order_models.model_id', $row->model_id)
+                    ->where('order_models.order_id', $order->id)
+                    ->where('order_models.model_id', $model->id)
                     ->sum('sewing_outputs.quantity');
 
-                $minutes = $produced * ($row->model->minute ?? 0);
+                $minutes = $produced * ($model->minute ?? 0);
 
-                $orderedQuantity = $row->order->quantity;
-                $ratio = $produced > 0 ? ($orderedQuantity / $produced) : 0;
+                $orderedQuantity = $order->quantity;
 
-                /**
-                 * ✅ Department COSTS
-                 */
-                $departmentCosts = DailyPayment::select(
+                // ✅ Department Budgetdan planned hisoblash
+                $plannedDepartmentCosts = DepartmentBudget::with('department:id,name')
+                    ->whereHas('department.mainDepartment', fn($q) => $q->where('branch_id', $branchId))
+                    ->get()
+                    ->map(function ($db) use ($order, $model, $usdRate) {
+
+                        if ($db->type === 'minute_based') {
+                            $planned = $db->quantity * ($model->minute ?? 0) * ($order->quantity ?? 0);
+                        } elseif ($db->type === 'percentage_based') {
+                            $priceUzs = ($order->price ?? 0) * $usdRate;
+                            $planned = $priceUzs * ($db->quantity / 100) * ($order->quantity ?? 0);
+                        } else {
+                            $planned = 0;
+                        }
+
+                        return [
+                            'department_id' => $db->department_id,
+                            'department_name' => $db->department?->name,
+                            'planned_cost' => round($planned, 2)
+                        ];
+                    });
+
+                $plannedDepartmentTotal = $plannedDepartmentCosts->sum('planned_cost');
+
+                // ✅ Real department costs
+                $departmentRealCosts = DailyPayment::select(
                     'department_id',
                     DB::raw('SUM(calculated_amount) as cost')
                 )
                     ->with('department:id,name')
-                    ->where('order_id', $row->order_id)
-                    ->where('model_id', $row->model_id)
+                    ->where('order_id', $order->id)
+                    ->where('model_id', $model->id)
                     ->whereNotNull('department_id')
                     ->groupBy('department_id')
                     ->get()
                     ->map(fn($d) => [
                         'department_id' => $d->department_id,
                         'department_name' => $d->department?->name,
-                        'cost' => $d->cost,
+                        'cost' => round($d->cost, 2)
                     ]);
 
-                /**
-                 * ✅ Planned Department COSTS (bitta mapda ham cost, ham planned_cost)
-                 */
-                $departmentCosts = collect($departmentCosts)->map(function ($dc) use ($ratio) {
-                    return [
-                        'department_id' => $dc['department_id'],
-                        'department_name' => $dc['department_name'],
-                        'cost' => $dc['cost'],
-                        'planned_cost' => round($dc['cost'] * $ratio, 2) // ✅ qo‘shildi
-                    ];
-                });
+                $departmentRealTotal = $departmentRealCosts->sum('cost');
 
-                /**
-                 * ✅ Employee Details
-                 */
-                $employees = DailyPayment::select(
-                    'employee_id',
-                    'department_id',
-                    DB::raw('SUM(quantity_produced) as quantity'),
-                    DB::raw('SUM(calculated_amount) as salary'),
-                    DB::raw('AVG(employee_percentage) as percentage')
-                )
-                    ->with([
-                        'employee:id,name',
-                        'department:id,name'
-                    ])
-                    ->where('order_id', $row->order_id)
-                    ->where('model_id', $row->model_id)
-                    ->groupBy('employee_id', 'department_id')
+                // ✅ Expenses planned hisoblash
+                $plannedExpenses = Expense::where('branch_id', $branchId)
                     ->get()
-                    ->map(fn($e) => [
-                        'employee_id' => $e->employee_id,
-                        'employee_name' => $e->employee?->name,
-                        'department_id' => $e->department_id,
-                        'department_name' => $e->department?->name,
-                        'percentage' => round($e->percentage, 2),
-                        'quantity_produced' => $e->quantity,
-                        'salary' => round($e->salary, 2),
-                    ]);
-
-                /**
-                 * ✅ Expenses COSTS
-                 */
-                $expenses = Expense::where('branch_id', $branchId)
-                    ->get()
-                    ->map(function ($exp) use ($row, $produced, $usdRate) {
+                    ->map(function ($exp) use ($order, $model, $usdRate) {
 
                         if ($exp->type === 'minute_based') {
-                            $cost = ($row->model->minute ?? 0) * $exp->quantity * $produced;
+                            $planned = ($model->minute ?? 0) * $exp->quantity * ($order->quantity ?? 0);
                         } elseif ($exp->type === 'percentage_based') {
-                            $priceUzs = ($row->order->price ?? 0) * $usdRate;
-                            $cost = $priceUzs * ($exp->quantity / 100) * $produced;
+                            $priceUzs = ($order->price ?? 0) * $usdRate;
+                            $planned = $priceUzs * ($exp->quantity / 100) * ($order->quantity ?? 0);
                         } else {
-                            $cost = 0;
+                            $planned = 0;
                         }
 
                         return [
                             'expense_id' => $exp->id,
                             'expense_name' => $exp->name,
                             'expense_type' => $exp->type,
-                            'cost' => round($cost, 2),
+                            'planned_cost' => round($planned, 2),
                         ];
                     });
 
-                $plannedExpenses = collect($expenses)->map(function ($ex) use ($ratio) {
-                    return [
-                        'expense_id' => $ex['expense_id'],
-                        'expense_name' => $ex['expense_name'],
-                        'expense_type' => $ex['expense_type'],
-                        'planned_cost' => round($ex['cost'] * $ratio, 2),
-                    ];
-                });
+                $plannedExpensesTotal = $plannedExpenses->sum('planned_cost');
 
-                $departmentTotal = collect($departmentCosts)->sum('cost');
-                $expensesTotal = collect($expenses)->sum('cost');
-
-                $plannedWorkerCost = round($row->worker_cost * $ratio, 2);
-                $plannedDepartmentTotal = collect($departmentCosts)->sum('planned_cost'); // ✅ endi shu ishlaydi
-                $plannedExpensesTotal = collect($plannedExpenses)->sum('planned_cost');
+                // ✅ Real Expense Costs (daily payment va boshqa real yo'q)
+                $expensesRealTotal = 0;
 
                 return [
                     'order' => [
-                        'id' => $row->order->id,
-                        'name' => $row->order->name,
-                        'quantity' => $row->order->quantity,
-                        'price' => $row->order->price,
-                        'season_year' => $row->order->season_year,
-                        'season_type' => $row->order->season_type,
+                        'id' => $order->id,
+                        'name' => $order->name,
+                        'quantity' => $order->quantity,
+                        'price' => $order->price,
+                        'season_year' => $order->season_year,
+                        'season_type' => $order->season_type,
                     ],
                     'model' => [
-                        'id' => $row->model->id,
-                        'name' => $row->model->name,
-                        'minute' => $row->model->minute,
+                        'id' => $model->id,
+                        'name' => $model->name,
+                        'minute' => $model->minute,
                     ],
                     'produced_quantity' => $produced,
                     'minutes' => $minutes,
-                    'worker_cost' => round($row->worker_cost, 2),
-                    'employee_details' => $employees,
-                    'department_costs' => $departmentCosts, // ✅ endi planned_cost ichida
-                    'expenses_costs' => $expenses,
-                    'total_cost' => round($row->worker_cost + $departmentTotal + $expensesTotal, 2),
+                    'worker_real_cost' => round($row->worker_cost, 2),
+                    'department_real_costs' => $departmentRealCosts,
+                    'expenses_real_cost' => $expensesRealTotal,
+                    'total_real_cost' => round($row->worker_cost + $departmentRealTotal + $expensesRealTotal, 2),
 
                     'planned_costs' => [
-                        'worker_planned_cost' => $plannedWorkerCost,
+                        'worker_planned_cost' => round(($model->minute * $order->quantity) * 0, 2), // ❗ Agar worker uchun ham budget bo‘lsa qo‘shib beraman
                         'department' => [
                             'total' => $plannedDepartmentTotal,
-                            'details' => $departmentCosts, // ✅ shu yerda ham planned_cost bor
+                            'details' => $plannedDepartmentCosts,
                         ],
                         'expenses' => [
                             'total' => $plannedExpensesTotal,
                             'details' => $plannedExpenses,
                         ],
                         'total_planned_cost' => round(
-                            $plannedWorkerCost +
-                            $plannedDepartmentTotal +
-                            $plannedExpensesTotal,
+                            $plannedDepartmentTotal + $plannedExpensesTotal,
                             2
                         ),
                     ]
