@@ -49,6 +49,7 @@ class DailyPaymentController extends Controller
                 $order = $row->order;
                 $model = $row->model;
 
+                // ✅ Produced quantity
                 $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
                     ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                     ->where('order_models.order_id', $order->id)
@@ -80,7 +81,6 @@ class DailyPaymentController extends Controller
                     ->whereHas('department.mainDepartment', fn($q) => $q->where('branch_id', $branchId))
                     ->get()
                     ->map(function ($db) use ($order, $model, $usdRate) {
-
                         if ($db->type === 'minute_based') {
                             $planned = $db->quantity * ($model->minute ?? 0) * $order->quantity;
                         } elseif ($db->type === 'percentage_based') {
@@ -98,38 +98,41 @@ class DailyPaymentController extends Controller
                     });
                 $plannedDepartmentTotal = $plannedDepartmentCosts->sum('planned_cost');
 
-                // ✅ Real Expense Costs
-                $expensesRealCosts = Expense::where('branch_id', $branchId)
-                    ->get()
-                    ->map(function ($exp) use ($order, $model, $usdRate, $produced) {
-                        $minutes = $produced * ($model->minute ?? 0);
+                // ✅ Expenses
+                $expenses = Expense::where('branch_id', $branchId)->get()->map(function ($exp) use ($order, $model, $usdRate, $produced) {
+                    $minutes = $produced * ($model->minute ?? 0);
+                    $priceUzs = ($order->price ?? 0) * $usdRate;
 
-                        if ($exp->type === 'minute_based') {
-                            $real_cost = $exp->quantity * $minutes * $produced;
-                        } elseif ($exp->type === 'percentage_based') {
-                            $priceUzs = ($order->price ?? 0) * $usdRate;
-                            $real_cost = $priceUzs * ($exp->quantity / 100) * $produced;
-                        } else {
-                            $real_cost = 0;
-                        }
+                    // Real qiymat: produced asosida
+                    if ($exp->type === 'minute_based') {
+                        $real_cost = $exp->quantity * $minutes;
+                    } elseif ($exp->type === 'percentage_based') {
+                        $real_cost = $priceUzs * ($exp->quantity / 100) * $produced;
+                    } else {
+                        $real_cost = 0;
+                    }
 
-                        return [
-                            'id' => $exp->id,
-                            'name' => $exp->name,
-                            'type' => $exp->type,
-                            'quantity' => $exp->quantity,
-                            'real_cost' => round($real_cost, 2),
-                        ];
-                    });
-                $expensesRealTotal = $expensesRealCosts->sum('real_cost');
+                    // Planned qiymat: order.quantity asosida
+                    if ($exp->type === 'minute_based') {
+                        $planned_cost = $exp->quantity * ($model->minute ?? 0) * $order->quantity;
+                    } elseif ($exp->type === 'percentage_based') {
+                        $planned_cost = $priceUzs * ($exp->quantity / 100) * $order->quantity;
+                    } else {
+                        $planned_cost = 0;
+                    }
 
-                // ✅ Planned Expense Costs (real asosida)
-                $plannedExpenses = $expensesRealCosts->map(fn($exp) => [
-                    'id' => $exp['id'],
-                    'name' => $exp['name'],
-                    'planned_cost' => $exp['real_cost'],
-                ]);
-                $plannedExpensesTotal = $plannedExpenses->sum('planned_cost');
+                    return [
+                        'id' => $exp->id,
+                        'name' => $exp->name,
+                        'type' => $exp->type,
+                        'quantity' => $exp->quantity,
+                        'real_cost' => round($real_cost, 2),
+                        'planned_cost' => round($planned_cost, 2)
+                    ];
+                });
+
+                $expensesRealTotal = $expenses->sum('real_cost');
+                $plannedExpensesTotal = $expenses->sum('planned_cost');
 
                 return [
                     'order' => [
@@ -149,7 +152,7 @@ class DailyPaymentController extends Controller
                     'minutes' => $minutes,
                     'worker_real_cost' => round($row->worker_cost, 2),
                     'department_real_costs' => $departmentRealCosts,
-                    'expenses_real_costs' => $expensesRealCosts,
+                    'expenses_real_costs' => $expenses,
                     'total_real_cost' => round($row->worker_cost + $departmentRealTotal + $expensesRealTotal, 2),
                     'planned_costs' => [
                         'worker_planned_cost' => round(($model->minute * $produced) * 0, 2),
@@ -159,7 +162,7 @@ class DailyPaymentController extends Controller
                         ],
                         'expenses' => [
                             'total' => $plannedExpensesTotal,
-                            'details' => $plannedExpenses,
+                            'details' => $expenses,
                         ],
                         'total_planned_cost' => round($plannedDepartmentTotal + $plannedExpensesTotal, 2),
                     ]
