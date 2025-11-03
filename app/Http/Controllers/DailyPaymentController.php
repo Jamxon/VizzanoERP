@@ -7,6 +7,7 @@ use App\Models\DepartmentBudget;
 use App\Models\Employee;
 use App\Models\Expense;
 use App\Models\Order;
+use App\Models\OrderModel;
 use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
 use App\Models\DailyPayment;
@@ -366,24 +367,171 @@ class DailyPaymentController extends Controller
     {
         $branchId = auth()->user()->employee->branch_id;
 
-        // ✅ Branch security
+        // Branch security
         if ($departmentBudget->department->mainDepartment->branch_id !== $branchId) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
-        // ✅ Qaysi maydonlar yuborilgan bo‘lsa, faqat o‘sha tekshiriladi
+        // Validate input (only fields provided will be validated)
         $validated = $request->validate([
             'quantity' => 'sometimes|numeric|min:0',
             'type' => 'sometimes|string|in:minute_based,percentage_based',
         ]);
 
-        // ✅ Faqat yuborilgan maydonlarni yangilash
-        $departmentBudget->update($validated);
+        // Use transaction for safety
+        DB::beginTransaction();
+        try {
+            // Update only provided fields
+            $departmentBudget->update($validated);
 
-        return response()->json([
-            'message' => 'Department budget updated successfully.',
-            'department_budget' => $departmentBudget
-        ]);
+            // Recalculate daily_payments for this department
+            $departmentId = $departmentBudget->department_id;
+            $usdRate = getUsdRate();
+
+            // Get all daily_payments for this department (could be many)
+            // We select fields needed to compute: id, employee_percentage, order_id, model_id, payment_date
+            $payments = DailyPayment::select(
+                'id',
+                'employee_id',
+                'order_id',
+                'model_id',
+                'payment_date',
+                'quantity_produced',
+                'employee_percentage'
+            )
+                ->where('department_id', $departmentId)
+                ->get();
+
+            if ($payments->isNotEmpty()) {
+                // Preload related orders/models to reduce queries
+                // Collect unique order_ids and model_ids
+                $orderIds = $payments->pluck('order_id')->unique()->filter()->values()->all();
+                $modelIds = $payments->pluck('model_id')->unique()->filter()->values()->all();
+
+                // Load orders (we need order->price)
+                $orders = Order::whereIn('id', $orderIds)->get()->keyBy('id');
+
+                // Load order_models and models minutes if needed (map order+model)
+                // If your app has OrderModel model linking order->model with quantity etc, adapt accordingly.
+                $orderModels = OrderModel::whereIn('order_id', $orderIds)
+                    ->whereIn('model_id', $modelIds)
+                    ->with('model:id,minute') // ensure model relation has minute field
+                    ->get();
+
+                // Build map for quick lookup: [order_id][model_id] => modelMinute (fallback 0)
+                $orderModelMinuteMap = [];
+                foreach ($orderModels as $om) {
+                    $minutes = $om->model?->minute ?? 0;
+                    $orderModelMinuteMap[$om->order_id][$om->model_id] = $minutes;
+                }
+
+                // We'll batch collect sewing outputs sums per (order_id, model_id, date)
+                // Build keys to query: array of ['order_id'=>..., 'model_id'=>..., 'date'=>...]
+                $keys = [];
+                foreach ($payments as $p) {
+                    // Normalize date to Y-m-d (payment_date may be datetime or date)
+                    $date = Carbon::parse($p->payment_date)->toDateString();
+                    $keys[$p->order_id . '|' . $p->model_id . '|' . $date] = [
+                        'order_id' => $p->order_id,
+                        'model_id' => $p->model_id,
+                        'date' => $date
+                    ];
+                }
+                $keys = array_values($keys);
+
+                // Query sewing_outputs sums grouped by order_model/model and date
+                // sewing_outputs -> order_sub_models -> order_models
+                // We need to join order_sub_models and order_models and filter by order_id and model_id and date(created_at) = date
+                $soQuery = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
+                    ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
+                    ->select(
+                        'order_models.order_id',
+                        'order_models.model_id',
+                        DB::raw("DATE(sewing_outputs.created_at) as date"),
+                        DB::raw('SUM(sewing_outputs.quantity) as qty')
+                    )
+                    ->groupBy('order_models.order_id', 'order_models.model_id', DB::raw("DATE(sewing_outputs.created_at)"));
+
+                // Build where clauses to cover all keys (use where combinations)
+                // To keep it efficient, filter by order_ids and model_ids
+                if (!empty($orderIds)) {
+                    $soQuery->whereIn('order_models.order_id', $orderIds);
+                }
+                if (!empty($modelIds)) {
+                    $soQuery->whereIn('order_models.model_id', $modelIds);
+                }
+
+                // Execute and map results into lookup
+                $soRows = $soQuery->get();
+                // lookup: map[order_id][model_id][date] => qty
+                $soMap = [];
+                foreach ($soRows as $r) {
+                    $soMap[$r->order_id][$r->model_id][$r->date] = (float)$r->qty;
+                }
+
+                // Now iterate payments and update calculated_amount
+                $now = Carbon::now()->toDateTimeString();
+                foreach ($payments as $p) {
+                    $orderId = $p->order_id;
+                    $modelId = $p->model_id;
+                    $paymentDate = Carbon::parse($p->payment_date)->toDateString(); // Y-m-d
+                    $employeePercent = (float)$p->employee_percentage; // e.g. 10 = 10%
+
+                    // produced quantity for that day
+                    $producedQty = $soMap[$orderId][$modelId][$paymentDate] ?? 0;
+
+                    // get order
+                    $order = $orders->get($orderId);
+
+                    // determine unitCost based on departmentBudget type
+                    $unitCost = 0.0;
+
+                    if ($departmentBudget->type === 'minute_based') {
+                        // get model minutes from map (orderModelMinuteMap)
+                        $minutes = $orderModelMinuteMap[$orderId][$modelId] ?? 0;
+                        // departmentBudget->quantity is minute price
+                        $unitCost = (float)$departmentBudget->quantity * $minutes;
+                    } elseif ($departmentBudget->type === 'percentage_based') {
+                        $priceUzs = ($order->price ?? 0) * $usdRate;
+                        $percent = ((float)$departmentBudget->quantity) / 100.0;
+                        $unitCost = $priceUzs * $percent;
+                    }
+
+                    // newTotal for that day for this department (before employee share)
+                    $newTotal = $producedQty * $unitCost;
+
+                    // employee share
+                    $employeeShare = 0.0;
+                    if ($newTotal > 0 && $employeePercent > 0) {
+                        $employeeShare = $newTotal * ($employeePercent / 100.0);
+                    }
+
+                    // round to 2 decimals (as your DB expects)
+                    $newCalculated = round($employeeShare, 2);
+
+                    // Update the daily_payment record (only calculated_amount)
+                    DailyPayment::where('id', $p->id)
+                        ->update([
+                            'calculated_amount' => $newCalculated,
+                            'updated_at' => $now
+                        ]);
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Department budget updated and related payments recalculated successfully.',
+                'department_budget' => $departmentBudget,
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            // rethrow or return error
+            return response()->json([
+                'message' => 'Failed to update department budget and recalculate payments.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function updatePercentage(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
