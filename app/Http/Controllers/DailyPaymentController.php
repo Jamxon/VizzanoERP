@@ -6,9 +6,7 @@ use App\Models\Department;
 use App\Models\DepartmentBudget;
 use App\Models\Employee;
 use App\Models\Expense;
-use App\Models\Order;
 use App\Models\SewingOutputs;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\DailyPayment;
 use Carbon\Carbon;
@@ -24,6 +22,8 @@ class DailyPaymentController extends Controller
         $selectedSeasonYear = $request->season_year;
         $selectedSeasonType = $request->season_type;
 
+        $selectedMonth = $request->month ?? now()->startOfMonth()->toDateString();
+
         $modelData = DailyPayment::select(
             'model_id',
             'order_id',
@@ -34,13 +34,16 @@ class DailyPaymentController extends Controller
                 'order.orderModel.submodels.submodel',
                 'order.orderModel.submodels.group.group.responsibleUser'
             ])
-            ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
+            ->whereHas('order', function ($q) use ($selectedMonth, $selectedSeasonYear, $selectedSeasonType) {
                 if ($selectedSeasonYear) {
                     $q->where('season_year', $selectedSeasonYear);
                 }
                 if ($selectedSeasonType) {
                     $q->where('season_type', $selectedSeasonType);
                 }
+                $q->whereHas('monthlySelectedOrder', function ($q2) use ($selectedMonth) {
+                    $q2->where('month', $selectedMonth);
+                });
             })
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
             ->groupBy('model_id', 'order_id')

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property mixed $orderRecipes
@@ -121,5 +122,10 @@ class Order extends Model
     public function stockBalance(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(StockBalance::class, 'order_id');
+    }
+
+    public function monthlySelectedOrder(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(MonthlySelectedOrder::class, 'order_id');
     }
 }

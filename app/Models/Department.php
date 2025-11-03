@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @method static where(string $string, $id)
@@ -24,7 +25,7 @@ class Department extends Model
         'break_time',
     ];
 
-    protected $hidden = ['created_at', 'updated_at','branch_id'];
+    protected $hidden = ['created_at', 'updated_at', 'branch_id'];
 
     public function groups(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
@@ -69,5 +70,10 @@ class Department extends Model
     public function departmentBudget(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(DepartmentBudget::class, 'department_id');
+    }
+
+    public function dailyPayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DailyPayment::class, 'department_id');
     }
 }
