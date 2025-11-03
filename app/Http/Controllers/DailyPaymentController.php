@@ -272,9 +272,11 @@ class DailyPaymentController extends Controller
 
                 if (!$order) return 0;
 
+                $model = $order->models()->first(); // ✅ shu orderning birinchi modeli
+                $minutes = $model?->minutes ?? 0;
+
                 if ($db->type === 'minute_based') {
-                    // ✅ Model minutiga bog‘liq emas — quantity * minute_price
-                    return $db->quantity * ($order->quantity ?? 0);
+                    return $db->quantity * $minutes * ($order->quantity ?? 0);
                 }
 
                 if ($db->type === 'percentage_based') {
