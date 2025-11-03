@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/DailyPaymentController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/DailyPaymentController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/DailyPayment.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/DailyPayment.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Department.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Department.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -499,15 +497,7 @@
       <workItem from="1761992994939" duration="1407000" />
       <workItem from="1761994438958" duration="21001000" />
       <workItem from="1762063784746" duration="22759000" />
-      <workItem from="1762142764178" duration="10976000" />
-    </task>
-    <task id="LOCAL-01699" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762082530961</created>
-      <option name="number" value="01699" />
-      <option name="presentableId" value="LOCAL-01699" />
-      <option name="project" value="LOCAL" />
-      <updated>1762082530961</updated>
+      <workItem from="1762142764178" duration="11300000" />
     </task>
     <task id="LOCAL-01700" summary="feat: add DailyPayment model and controller for managing daily payment records">
       <option name="closed" value="true" />
@@ -893,7 +883,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762158430718</updated>
     </task>
-    <option name="localTasksCounter" value="1748" />
+    <task id="LOCAL-01748" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762159421510</created>
+      <option name="number" value="01748" />
+      <option name="presentableId" value="LOCAL-01748" />
+      <option name="project" value="LOCAL" />
+      <updated>1762159421510</updated>
+    </task>
+    <option name="localTasksCounter" value="1749" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

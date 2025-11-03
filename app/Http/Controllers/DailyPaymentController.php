@@ -22,7 +22,7 @@ class DailyPaymentController extends Controller
         $selectedSeasonYear = $request->season_year;
         $selectedSeasonType = $request->season_type;
 
-        $selectedMonth = $request->month ?? now()->startOfMonth()->toDateString();
+        $selectedMonth = $request->month ?? now()->format('Y-m');
 
         $modelData = DailyPayment::select(
             'model_id',
