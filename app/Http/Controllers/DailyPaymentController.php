@@ -345,7 +345,8 @@ class DailyPaymentController extends Controller
                      * ✅ FOIZ ASOSIDA TAQSIMOT
                      */
                     'cost_share' => round($departmentTotal * $percentage, 2), // real cost ulush
-                    'planned_salary' => round($plannedDepartmentTotal * $percentage, 2), // reja asosida
+                    //'planned_salary' => round($plannedDepartmentTotal * $percentage, 2), // reja asosida
+                    'planned_salary' => round($plannedDepartmentTotal), // reja asosida
                 ];
             });
 
