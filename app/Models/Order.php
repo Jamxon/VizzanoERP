@@ -128,4 +128,9 @@ class Order extends Model
     {
         return $this->hasOne(MonthlySelectedOrder::class, 'order_id');
     }
+
+    public function dailyPayments(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(DailyPayment::class, 'order_id');
+    }
 }
