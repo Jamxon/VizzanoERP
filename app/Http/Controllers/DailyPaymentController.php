@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\DepartmentBudget;
 use App\Models\Employee;
 use App\Models\Expense;
+use App\Models\Order;
 use App\Models\SewingOutputs;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
