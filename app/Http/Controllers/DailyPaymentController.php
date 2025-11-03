@@ -6,6 +6,7 @@ use App\Models\Department;
 use App\Models\DepartmentBudget;
 use App\Models\Employee;
 use App\Models\Expense;
+use App\Models\Order;
 use App\Models\SewingOutputs;
 use Illuminate\Http\Request;
 use App\Models\DailyPayment;
@@ -33,7 +34,8 @@ class DailyPaymentController extends Controller
                 }
             ])
             ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
-                $q->whereRaw("to_char(month, 'YYYY-MM') = ?", [$selectedMonth]);
+                $q->whereMonth('month', date('m', strtotime($selectedMonth)))
+                    ->whereYear('month', date('Y', strtotime($selectedMonth)));
             })
             ->when($selectedSeasonYear, fn($q) =>
             $q->where('season_year', $selectedSeasonYear)
