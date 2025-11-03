@@ -31,6 +31,7 @@ class DailyPaymentController extends Controller
         )
             ->with([
                 'model:id,name,minute',
+                'order.orderModel.submodels.submodel',
                 'order.orderModel.submodels.group.group.responsibleUser'
             ])
             ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
