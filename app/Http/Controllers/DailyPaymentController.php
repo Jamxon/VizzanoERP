@@ -87,8 +87,8 @@ class DailyPaymentController extends Controller
                         }
 
                         return [
-                            'department_id' => $db->department_id,
-                            'department_name' => $db->department?->name,
+                            'id' => $db->department_id,
+                            'name' => $db->department?->name,
                             'planned_cost' => round($planned, 2)
                         ];
                     });
@@ -110,9 +110,10 @@ class DailyPaymentController extends Controller
                         }
 
                         return [
-                            'expense_id' => $exp->id,
-                            'expense_name' => $exp->name,
-                            'expense_type' => $exp->type,
+                            'id' => $exp->id,
+                            'name' => $exp->name,
+                            'type' => $exp->type,
+                            'quantity' => $exp->quantity,
                             'real_cost' => round($real_cost, 2),
                         ];
                     });
@@ -120,8 +121,8 @@ class DailyPaymentController extends Controller
 
                 // ✅ Planned Expense Costs (real asosida)
                 $plannedExpenses = $expensesRealCosts->map(fn($exp) => [
-                    'expense_id' => $exp['expense_id'],
-                    'expense_name' => $exp['expense_name'],
+                    'id' => $exp['id'],
+                    'name' => $exp['name'],
                     'planned_cost' => $exp['real_cost'],
                 ]);
                 $plannedExpensesTotal = $plannedExpenses->sum('planned_cost');
