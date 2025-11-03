@@ -260,7 +260,32 @@ class DailyPaymentController extends Controller
             }
         }
 
-        $plannedDepartmentTotal = round($departmentTotal * $ratio, 2);
+        $plannedDepartmentTotal = DepartmentBudget::whereHas('department.mainDepartment', function ($q) use ($branchId) {
+            $q->where('branch_id', $branchId);
+        })
+            ->where('department_id', $departmentId)
+            ->when($orderId, function($q) use ($orderId) {
+                $q->where('order_id', $orderId);
+            })
+            ->get()
+            ->map(function ($db) use ($orderId) {
+
+                $order = Order::find($orderId);
+                if (!$order) return 0;
+
+                if ($db->type === 'minute_based') {
+                    return ($db->quantity * $order->quantity);
+                }
+
+                if ($db->type === 'percentage_based') {
+                    $priceUzs = $order->price * getUsdRate();
+                    return ($priceUzs * ($db->quantity / 100) * $order->quantity);
+                }
+
+                return 0;
+
+            })
+            ->sum();
 
 
         $data = DailyPayment::select(
