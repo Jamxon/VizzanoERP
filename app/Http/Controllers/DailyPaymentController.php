@@ -105,7 +105,7 @@ class DailyPaymentController extends Controller
                         $minutes = $produced * ($model->minute ?? 0);
 
                         if ($exp->type === 'minute_based') {
-                            $real_cost = $exp->quantity * $minutes;
+                            $real_cost = $exp->quantity * $minutes * $produced;
                         } elseif ($exp->type === 'percentage_based') {
                             $priceUzs = ($order->price ?? 0) * $usdRate;
                             $real_cost = $priceUzs * ($exp->quantity / 100) * $produced;
