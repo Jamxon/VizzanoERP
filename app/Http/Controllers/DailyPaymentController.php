@@ -264,9 +264,6 @@ class DailyPaymentController extends Controller
             ->whereHas('department.mainDepartment', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
             })
-            ->when($orderId, function ($q) use ($orderId) {
-                $q->where('order_id', $orderId);
-            })
             ->get()
             ->map(function ($db) use ($orderId) {
 
