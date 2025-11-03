@@ -53,13 +53,13 @@ class DailyPaymentController extends Controller
                 $minutes = $produced * ($row->model->minute ?? 0);
 
                 /**
-                 * ✅ Planned (Full Order) Calculation Base
+                 * ✅ Planned Calculation base
                  */
                 $orderedQuantity = $row->order->quantity;
                 $ratio = $produced > 0 ? ($orderedQuantity / $produced) : 0;
 
                 /**
-                 * ✅ Department Costs
+                 * ✅ Department Actual Costs
                  */
                 $departmentCosts = DailyPayment::select(
                     'department_id',
@@ -78,7 +78,7 @@ class DailyPaymentController extends Controller
                     ]);
 
                 /**
-                 * ✅ Planned Department Costs
+                 * ✅ Planned Department Detailed Costs
                  */
                 $plannedDepartmentCosts = collect($departmentCosts)->map(function ($dc) use ($ratio) {
                     return [
@@ -89,7 +89,7 @@ class DailyPaymentController extends Controller
                 });
 
                 /**
-                 * ✅ Employee-wise Details (Existing)
+                 * ✅ Employee-wise Details
                  */
                 $employees = DailyPayment::select(
                     'employee_id',
@@ -117,7 +117,7 @@ class DailyPaymentController extends Controller
                     ]);
 
                 /**
-                 * ✅ Expenses costs (Master / Texnolog ...)
+                 * ✅ Expenses Calculation
                  */
                 $expenses = Expense::where('branch_id', $branchId)
                     ->get()
@@ -125,7 +125,7 @@ class DailyPaymentController extends Controller
 
                         if ($exp->type === 'minute_based') {
                             $cost = ($row->model->minute ?? 0) * $exp->quantity * $produced;
-                        } elseif ($exp->type === 'percent_based') {
+                        } elseif ($exp->type === 'percentage_based') {
                             $priceUzs = ($row->order->price ?? 0) * $usdRate;
                             $cost = $priceUzs * ($exp->quantity / 100) * $produced;
                         } else {
@@ -141,7 +141,7 @@ class DailyPaymentController extends Controller
                     });
 
                 /**
-                 * ✅ Planned Expenses Costs
+                 * ✅ Planned Expense Detailed Costs
                  */
                 $plannedExpenses = collect($expenses)->map(function ($ex) use ($ratio) {
                     return [
@@ -182,13 +182,26 @@ class DailyPaymentController extends Controller
                     'total_cost' => round($row->worker_cost + $departmentTotal + $expensesTotal, 2),
 
                     /**
-                     * ✅ FULL ORDER PLANNED COST SECTION
+                     * ✅ FULL ORDER PLANNED COST SECTION WITH DETAILS ✅
                      */
                     'planned_costs' => [
                         'worker_planned_cost' => $plannedWorkerCost,
-                        'department_planned_cost' => $plannedDepartmentTotal,
-                        'expenses_planned_cost' => $plannedExpensesTotal,
-                        'total_planned_cost' => round($plannedWorkerCost + $plannedDepartmentTotal + $plannedExpensesTotal, 2),
+
+                        'department' => [
+                            'total' => $plannedDepartmentTotal,
+                            'details' => $plannedDepartmentCosts,
+                        ],
+                        'expenses' => [
+                            'total' => $plannedExpensesTotal,
+                            'details' => $plannedExpenses,
+                        ],
+
+                        'total_planned_cost' => round(
+                            $plannedWorkerCost +
+                            $plannedDepartmentTotal +
+                            $plannedExpensesTotal,
+                            2
+                        ),
                     ]
                 ];
             })
@@ -448,7 +461,7 @@ class DailyPaymentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'quantity' => 'required|numeric|min:0',
-            'type' => 'required|string|in:minute_based,percent_based,fixed',
+            'type' => 'required|string|in:minute_based,percentage_based,fixed',
         ]);
 
         $branchId = auth()->user()->employee->branch_id;
@@ -478,7 +491,7 @@ class DailyPaymentController extends Controller
         $validated = $request->validate([
             'name' => 'sometimes|string|max:255',
             'quantity' => 'sometimes|numeric|min:0',
-            'type' => 'sometimes|string|in:minute_based,percent_based,fixed',
+            'type' => 'sometimes|string|in:minute_based,percentage_based,fixed',
         ]);
 
         if (empty($validated)) {
