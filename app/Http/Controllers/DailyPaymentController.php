@@ -283,6 +283,7 @@ class DailyPaymentController extends Controller
                 $q->where('branch_id', $branchId);
                 $q->where('status', 'working');
             })
+            ->where('calculated_amount', '>', 0)
             ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
                 $q->where('season_year', $selectedSeasonYear)
                     ->where('season_type', $selectedSeasonType);
