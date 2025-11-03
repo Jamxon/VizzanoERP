@@ -228,8 +228,8 @@ class DailyPaymentController extends Controller
 
         $branchId = auth()->user()->employee->branch_id ?? null;
 
-        $selectedSeasonYear = $request->season_year ?? 2026;
-        $selectedSeasonType = $request->season_type ?? 'summer';
+        $selectedSeasonYear = $request->season_year;
+        $selectedSeasonType = $request->season_type;
         $departmentId = $request->department_id;
         $orderId = $request->order_id ?? null;
 
@@ -254,8 +254,12 @@ class DailyPaymentController extends Controller
                 $q->where('status', 'working');
             })
             ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
-                $q->where('season_year', $selectedSeasonYear)
-                    ->where('season_type', $selectedSeasonType);
+                if ($selectedSeasonYear) {
+                    $q->where('season_year', $selectedSeasonYear);
+                }
+                if ($selectedSeasonType) {
+                    $q->where('season_type', $selectedSeasonType);
+                }
             })
             ->when($orderId, fn($q) => $q->where('order_id', $orderId))
             ->where('calculated_amount', '>', 0)
