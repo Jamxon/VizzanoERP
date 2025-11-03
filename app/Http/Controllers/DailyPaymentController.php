@@ -135,14 +135,7 @@ class DailyPaymentController extends Controller
                 $plannedExpensesTotal = $expenses->sum('planned_cost');
 
                 return [
-                    'order' => [
-                        'id' => $order->id,
-                        'name' => $order->name,
-                        'quantity' => $order->quantity,
-                        'price' => $order->price,
-                        'season_year' => $order->season_year,
-                        'season_type' => $order->season_type,
-                    ],
+                    'order' => $order,
                     'model' => [
                         'id' => $model->id,
                         'name' => $model->name,
