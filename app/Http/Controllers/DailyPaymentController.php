@@ -42,7 +42,8 @@ class DailyPaymentController extends Controller
                     $q->where('season_type', $selectedSeasonType);
                 }
                 $q->whereHas('monthlySelectedOrder', function ($q2) use ($selectedMonth) {
-                    $q2->where('month', $selectedMonth);
+                    $q2->whereMonth('month', date('m', strtotime($selectedMonth)))
+                        ->whereYear('month', date('Y', strtotime($selectedMonth)));
                 });
             })
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
