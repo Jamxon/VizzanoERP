@@ -57,7 +57,7 @@ class CeoController extends Controller
             'orderModel.submodels.group.group',
             ])
             ->where('branch_id', $branchId) // ✅ branch filter
-            ->whereIn('status', ['cutting', 'pending', 'tailoring', 'tailored']) // ✅ status filter
+//            ->whereIn('status', ['cutting', 'pending', 'tailoring', 'tailored']) // ✅ status filter
             ->whereNotIn('id', $allSelectedOrderIds) // ✅ ro‘yxatda yo‘q bo‘lganlarni olamiz
             ->get()
             ->map(function ($order) {
