@@ -34,8 +34,12 @@ class DailyPaymentController extends Controller
                 'order:id,name,quantity,price,season_year,season_type'
             ])
             ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
-                $q->when('season_year', $selectedSeasonYear);
-                $q->when('season_type', $selectedSeasonType);
+                if ($selectedSeasonYear) {
+                    $q->where('season_year', $selectedSeasonYear);
+                }
+                if ($selectedSeasonType) {
+                    $q->where('season_type', $selectedSeasonType);
+                }
             })
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
             ->groupBy('model_id', 'order_id')
