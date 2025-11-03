@@ -233,6 +233,35 @@ class DailyPaymentController extends Controller
         $departmentId = $request->department_id;
         $orderId = $request->order_id ?? null;
 
+        /**
+         * ✅ Department umumiy COST (real)
+         */
+        $departmentTotal = DailyPayment::where('department_id', $departmentId)
+            ->when($orderId, fn($q) => $q->where('order_id', $orderId))
+            ->sum('calculated_amount');
+
+        /**
+         * ✅ Department umumiy planned COST (planned)
+         * planned: barcha ishlab chiqarishdan keladigan reja (ratio asosida)
+         */
+        // Agar orderId bo’lsa, shu orderning zakaz va produce nisbatidan
+        $ratio = 0;
+        if ($orderId) {
+            $order = Order::find($orderId);
+
+            $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
+                ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
+                ->where('order_models.order_id', $orderId)
+                ->sum('sewing_outputs.quantity');
+
+            if ($produced > 0) {
+                $ratio = ($order->quantity / $produced);
+            }
+        }
+
+        $plannedDepartmentTotal = round($departmentTotal * $ratio, 2);
+
+
         $data = DailyPayment::select(
             'id',
             'employee_id',
@@ -253,15 +282,18 @@ class DailyPaymentController extends Controller
                 $q->where('branch_id', $branchId);
                 $q->where('status', 'working');
             })
-            ->where('calculated_amount', '>', 0)
             ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
                 $q->where('season_year', $selectedSeasonYear)
                     ->where('season_type', $selectedSeasonType);
             })
             ->when($orderId, fn($q) => $q->where('order_id', $orderId))
+            ->where('calculated_amount', '>', 0)
             ->orderBy('id', 'desc')
             ->get()
-            ->map(function ($row) {
+            ->map(function ($row) use ($departmentTotal, $plannedDepartmentTotal) {
+
+                $percentage = ($row->employee_percentage / 100);
+
                 return [
                     'id' => $row->id,
                     'employee' => [
@@ -280,8 +312,14 @@ class DailyPaymentController extends Controller
                     ],
                     'department_id' => $row->department_id,
                     'quantity_produced' => $row->quantity_produced,
-                    'calculated_amount' => $row->calculated_amount,
+                    'calculated_amount' => round($row->calculated_amount, 2),
                     'employee_percentage' => round($row->employee_percentage, 2),
+
+                    /**
+                     * ✅ FOIZ ASOSIDA TAQSIMOT
+                     */
+                    'cost_share' => round($departmentTotal * $percentage, 2), // real cost ulush
+                    'planned_salary' => round($plannedDepartmentTotal * $percentage, 2), // reja asosida
                 ];
             });
 
