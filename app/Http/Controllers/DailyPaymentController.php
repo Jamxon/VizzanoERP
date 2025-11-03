@@ -282,7 +282,6 @@ class DailyPaymentController extends Controller
             ->whereHas('employee', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
                 $q->where('status', 'working');
-                $q->where('percentage', '>', 0);
             })
             ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
                 $q->where('season_year', $selectedSeasonYear)
