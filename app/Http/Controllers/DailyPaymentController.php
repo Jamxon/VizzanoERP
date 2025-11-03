@@ -45,7 +45,7 @@ class DailyPaymentController extends Controller
             )
             ->get()
             ->flatMap(function ($order) use ($usdRate, $branchId) {
-                return $order->orderModel->map(function ($om) use ($order, $usdRate, $branchId) {
+                return collect($order->orderModel ? [$order->orderModel] : [])->map(function ($om) use ($order, $usdRate, $branchId) {
                     $model = $om->model;
 
                     // ✅ Worker costs (aggregated even if zero)
