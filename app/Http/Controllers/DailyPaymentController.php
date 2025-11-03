@@ -75,10 +75,10 @@ class DailyPaymentController extends Controller
                 $plannedDepartmentCosts = DepartmentBudget::with('department:id,name')
                     ->whereHas('department.mainDepartment', fn($q) => $q->where('branch_id', $branchId))
                     ->get()
-                    ->map(function ($db) use ($order, $model, $usdRate, $produced) {
+                    ->map(function ($db) use ($order, $model, $usdRate) {
 
                         if ($db->type === 'minute_based') {
-                            $planned = $db->quantity * ($model->minute ?? 0) * $produced;
+                            $planned = $db->quantity * ($model->minute ?? 0) * $order->quantity;
                         } elseif ($db->type === 'percentage_based') {
                             $priceUzs = ($order->price ?? 0) * $usdRate;
                             $planned = $priceUzs * ($db->quantity / 100) * ($order->quantity ?? 0);
