@@ -21,8 +21,8 @@ class DailyPaymentController extends Controller
         $branchId = auth()->user()->employee->branch_id ?? null;
         $usdRate = getUsdRate();
 
-        $selectedSeasonYear = $request->season_year ?? 2026;
-        $selectedSeasonType = $request->season_type ?? 'summer';
+        $selectedSeasonYear = $request->season_year;
+        $selectedSeasonType = $request->season_type;
 
         $modelData = DailyPayment::select(
             'model_id',
@@ -34,8 +34,8 @@ class DailyPaymentController extends Controller
                 'order:id,name,quantity,price,season_year,season_type'
             ])
             ->whereHas('order', function ($q) use ($selectedSeasonYear, $selectedSeasonType) {
-                $q->where('season_year', $selectedSeasonYear)
-                    ->where('season_type', $selectedSeasonType);
+                $q->when('season_year', $selectedSeasonYear);
+                $q->when('season_type', $selectedSeasonType);
             })
             ->whereHas('employee', fn($q) => $q->where('branch_id', $branchId))
             ->groupBy('model_id', 'order_id')
