@@ -24,7 +24,7 @@ class HikvisionEventController extends Controller
         ];
 
         $branchChatMap = [
-            4 => -1001457275928,
+            4 => -1003041140850,
             5 => -1001883536528,
         ];
 
