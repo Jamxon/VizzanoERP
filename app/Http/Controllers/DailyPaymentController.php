@@ -41,9 +41,6 @@ class DailyPaymentController extends Controller
             ->get()
             ->map(function ($row) use ($usdRate, $branchId) {
 
-                /**
-                 * ✅ Produced Quantity
-                 */
                 $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
                     ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                     ->where('order_models.order_id', $row->order_id)
@@ -52,14 +49,11 @@ class DailyPaymentController extends Controller
 
                 $minutes = $produced * ($row->model->minute ?? 0);
 
-                /**
-                 * ✅ Planned Calculation base
-                 */
                 $orderedQuantity = $row->order->quantity;
                 $ratio = $produced > 0 ? ($orderedQuantity / $produced) : 0;
 
                 /**
-                 * ✅ Department Actual Costs
+                 * ✅ Department COSTS
                  */
                 $departmentCosts = DailyPayment::select(
                     'department_id',
@@ -78,18 +72,19 @@ class DailyPaymentController extends Controller
                     ]);
 
                 /**
-                 * ✅ Planned Department Detailed Costs
+                 * ✅ Planned Department COSTS (bitta mapda ham cost, ham planned_cost)
                  */
-                $plannedDepartmentCosts = collect($departmentCosts)->map(function ($dc) use ($ratio) {
+                $departmentCosts = collect($departmentCosts)->map(function ($dc) use ($ratio) {
                     return [
                         'department_id' => $dc['department_id'],
                         'department_name' => $dc['department_name'],
-                        'planned_cost' => round($dc['cost'] * $ratio, 2)
+                        'cost' => $dc['cost'],
+                        'planned_cost' => round($dc['cost'] * $ratio, 2) // ✅ qo‘shildi
                     ];
                 });
 
                 /**
-                 * ✅ Employee-wise Details
+                 * ✅ Employee Details
                  */
                 $employees = DailyPayment::select(
                     'employee_id',
@@ -117,7 +112,7 @@ class DailyPaymentController extends Controller
                     ]);
 
                 /**
-                 * ✅ Expenses Calculation
+                 * ✅ Expenses COSTS
                  */
                 $expenses = Expense::where('branch_id', $branchId)
                     ->get()
@@ -140,9 +135,6 @@ class DailyPaymentController extends Controller
                         ];
                     });
 
-                /**
-                 * ✅ Planned Expense Detailed Costs
-                 */
                 $plannedExpenses = collect($expenses)->map(function ($ex) use ($ratio) {
                     return [
                         'expense_id' => $ex['expense_id'],
@@ -156,7 +148,7 @@ class DailyPaymentController extends Controller
                 $expensesTotal = collect($expenses)->sum('cost');
 
                 $plannedWorkerCost = round($row->worker_cost * $ratio, 2);
-                $plannedDepartmentTotal = collect($plannedDepartmentCosts)->sum('planned_cost');
+                $plannedDepartmentTotal = collect($departmentCosts)->sum('planned_cost'); // ✅ endi shu ishlaydi
                 $plannedExpensesTotal = collect($plannedExpenses)->sum('planned_cost');
 
                 return [
@@ -177,25 +169,20 @@ class DailyPaymentController extends Controller
                     'minutes' => $minutes,
                     'worker_cost' => round($row->worker_cost, 2),
                     'employee_details' => $employees,
-                    'department_costs' => $departmentCosts,
+                    'department_costs' => $departmentCosts, // ✅ endi planned_cost ichida
                     'expenses_costs' => $expenses,
                     'total_cost' => round($row->worker_cost + $departmentTotal + $expensesTotal, 2),
 
-                    /**
-                     * ✅ FULL ORDER PLANNED COST SECTION WITH DETAILS ✅
-                     */
                     'planned_costs' => [
                         'worker_planned_cost' => $plannedWorkerCost,
-
                         'department' => [
                             'total' => $plannedDepartmentTotal,
-                            'details' => $plannedDepartmentCosts,
+                            'details' => $departmentCosts, // ✅ shu yerda ham planned_cost bor
                         ],
                         'expenses' => [
                             'total' => $plannedExpensesTotal,
                             'details' => $plannedExpenses,
                         ],
-
                         'total_planned_cost' => round(
                             $plannedWorkerCost +
                             $plannedDepartmentTotal +
