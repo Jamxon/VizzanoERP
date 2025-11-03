@@ -182,7 +182,7 @@ class AttendanceController extends Controller
 
                 // Chat ID ni DB yoki configdan olish kerak (hozircha branchga bog‘lab yozaylik)
                 $chatId = match ($branchId) {
-                    4 => -1001457275928, // masalan 4-branch uchun chat_id
+                    4 => -1003041140850, // masalan 4-branch uchun chat_id
                     5 => -1001883536528, // misol uchun branch 5 gruppa ID
                     default => null,
                 };
