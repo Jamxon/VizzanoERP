@@ -260,11 +260,11 @@ class DailyPaymentController extends Controller
             }
         }
 
-        $plannedDepartmentTotal = DepartmentBudget::whereHas('department.mainDepartment', function ($q) use ($branchId) {
-            $q->where('branch_id', $branchId);
-        })
-            ->where('department_id', $departmentId)
-            ->when($orderId, function($q) use ($orderId) {
+        $plannedDepartmentTotal = DepartmentBudget::where('department_id', $departmentId)
+            ->whereHas('department.mainDepartment', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+            })
+            ->when($orderId, function ($q) use ($orderId) {
                 $q->where('order_id', $orderId);
             })
             ->get()
