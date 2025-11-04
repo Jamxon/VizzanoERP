@@ -240,7 +240,8 @@ class DailyPaymentController extends Controller
             'department_id',
             'quantity_produced',
             'calculated_amount',
-            'employee_percentage'
+            'employee_percentage',
+            'payment_date'
         )
             ->with([
                 'employee:id,name',
@@ -287,6 +288,7 @@ class DailyPaymentController extends Controller
                     'quantity_produced' => $row->quantity_produced,
                     'calculated_amount' => round($row->calculated_amount, 2),
                     'employee_percentage' => round($row->employee_percentage, 2),
+                    'payment_date' => $row->payment_date
                 ];
             });
 
