@@ -560,7 +560,7 @@ class GroupMasterController extends Controller
                 $existing = DB::table('daily_payments')
                     ->where('employee_id', $emp->id)
                     ->where('order_id', $order->id)
-                    ->where('payment_date', Carbon::today())
+                    ->whereDate('payment_date', Carbon::today())
                     ->where('model_id', $orderModel->model->id)
                     ->first();
 
