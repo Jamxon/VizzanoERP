@@ -355,7 +355,7 @@ Route::prefix('groupMaster')->middleware('role:groupMaster')->group(function (){
        Route::get('employees', [SuperHRController::class, 'getEmployees']);
        Route::get('employees/export-excel', [SuperHRController::class, 'exportToExcel']);
        Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
-
+       Route::get('myOrders', [GroupMasterController::class, 'getMyOrdersWithBudgets']);
 });
 
 Route::prefix('groupHelper')->middleware('role:groupHelper')->group(function () {
