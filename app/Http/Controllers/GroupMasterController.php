@@ -1129,7 +1129,7 @@ class GroupMasterController extends Controller
                     'quantity' => $order->quantity,
                     'model' => $order->orderModel->model,
                     'submodel' => $order->orderModel->submodels->submodel
-                ]
+                ],
                 'sewn_quantity' => $totalSewnQuantity,
                 'amount_from_sewing' => $amountFromSewing,
                 'amount_from_order_quantity' => $amountFromOrderQuantity
