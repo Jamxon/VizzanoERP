@@ -930,11 +930,11 @@ class CasherController extends Controller
                 }
 
                 // QOIDA #2: 5 daqiqa o'tgan bo'lsa — Block
-                if ($lastPayment->created_at->lt(now()->subMinutes(5))) {
-                    return response()->json([
-                        'message' => "Oxirgi to‘lovdan 5 daqiqa o‘tib ketgan 😉"
-                    ], 500);
-                }
+                // if ($lastPayment->created_at->lt(now()->subMinutes(5))) {
+                //     return response()->json([
+                //         'message' => "Oxirgi to‘lovdan 5 daqiqa o‘tib ketgan 😉"
+                //     ], 500);
+                // }
 
                 // QOIDA #3: Minus kattalik check
                 if (abs($validated['amount']) > abs($lastPayment->amount)) {
