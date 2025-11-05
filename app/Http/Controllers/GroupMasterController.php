@@ -1130,7 +1130,7 @@ class GroupMasterController extends Controller
                     'name' => $order->name,
                     'quantity' => $order->quantity,
                     'model' => $orderModel->model, // Directly accessing the model relationship
-                    'submodels' => $submodels->pluck('name') // Pluck submodel names
+                    'submodels' => $submodels->submodel->pluck('name') // Pluck submodel names
                 ],
                 'sewn_quantity' => $totalSewnQuantity,
                 'amount_from_sewing' => $amountFromSewing,
