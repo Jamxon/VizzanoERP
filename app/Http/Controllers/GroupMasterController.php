@@ -1093,7 +1093,7 @@ class GroupMasterController extends Controller
                 $q->whereMonth('month', date('m', strtotime($selectedMonth)))
                     ->whereYear('month', date('Y', strtotime($selectedMonth)));
             })
-            ->with('orderModel.submodels.sewingOutputs', 'orderModel.model')
+            ->with('orderModel.submodels.sewingOutputs', 'orderModel.model', 'orderModel.submodels.submodel')
             ->get();
     
         // Fetch expenses related to the master role and branch
@@ -1123,8 +1123,7 @@ class GroupMasterController extends Controller
     
             // Add the calculated details to the response array
             $orderDetails[] = [
-                'order_id' => $order->id,
-                'order_quantity' => $order->quantity,
+                'order' => $order,
                 'sewn_quantity' => $totalSewnQuantity,
                 'amount_from_sewing' => $amountFromSewing,
                 'amount_from_order_quantity' => $amountFromOrderQuantity
