@@ -1077,4 +1077,13 @@ class GroupMasterController extends Controller
             'top_earners'       => $topEarners, // TOP-3 + tarifikatsiyalari
         ]);
     }
+
+    public function getMyOrdersWithBudgets(Request $request){
+        $groupId = auth()->user()->employee->group_id;
+        $orders = Order::whereHas('orderGroups', function ($q) use ($groupId) {
+                $q->where('group_id', $groupId);
+            })->get();
+
+        return response()->json($orders);
+    }
 }
