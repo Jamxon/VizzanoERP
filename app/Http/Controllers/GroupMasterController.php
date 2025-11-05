@@ -1080,9 +1080,15 @@ class GroupMasterController extends Controller
 
     public function getMyOrdersWithBudgets(Request $request){
         $groupId = auth()->user()->employee->group_id;
+        $selectedMonth = $request->month;
         $orders = Order::whereHas('orderGroups', function ($q) use ($groupId) {
                 $q->where('group_id', $groupId);
-            })->get();
+            })
+            ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
+                $q->whereMonth('month', date('m', strtotime($selectedMonth)))
+                    ->whereYear('month', date('Y', strtotime($selectedMonth)));
+            })
+            ->get();
 
         return response()->json($orders);
     }
