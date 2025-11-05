@@ -1121,7 +1121,7 @@ class GroupMasterController extends Controller
             $amountFromSewing = $totalMinutes * $totalExpense;
         
             // Calculate the earnings from the order's quantity (order's quantity * expense quantity)
-            $amountFromOrderQuantity = $order->quantity * $totalExpense;
+            $amountFromOrderQuantity = $order->quantity * $totalExpense * $orderModel->model->minute;
         
             // Add the calculated details to the response array
             $orderDetails[] = [
