@@ -20,6 +20,7 @@ use App\Models\Tarification;
 use App\Models\TelegramSewingMessage;
 use App\Models\Time;
 use App\Models\Log;
+use App\Models\Expense;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
