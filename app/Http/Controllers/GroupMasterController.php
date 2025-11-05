@@ -1079,7 +1079,7 @@ class GroupMasterController extends Controller
         ]);
     }
     
-   public function getMyOrdersWithBudgets(Request $request)
+  public function getMyOrdersWithBudgets(Request $request)
     {
         // Get the group and selected month from the request
         $groupId = auth()->user()->employee->group_id;
@@ -1130,7 +1130,7 @@ class GroupMasterController extends Controller
                     'name' => $order->name,
                     'quantity' => $order->quantity,
                     'model' => $orderModel->model, // Directly accessing the model relationship
-                    'submodels' => $submodels->submodel->pluck('name') // Pluck submodel names
+                    'submodels' => $submodels->pluck('submodel.name') // Pluck the 'name' attribute from submodel relationship
                 ],
                 'sewn_quantity' => $totalSewnQuantity,
                 'amount_from_sewing' => $amountFromSewing,
