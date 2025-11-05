@@ -1123,7 +1123,13 @@ class GroupMasterController extends Controller
     
             // Add the calculated details to the response array
             $orderDetails[] = [
-                'order' => $order,
+                'order' => [
+                    'id' => $order->id,
+                    'name' => $order->name,
+                    'quantity' => $order->quantity,
+                    'model' => $order->orderModel->model,
+                    'submodel' => $order->orderModel->submodels->submodel
+                ]
                 'sewn_quantity' => $totalSewnQuantity,
                 'amount_from_sewing' => $amountFromSewing,
                 'amount_from_order_quantity' => $amountFromOrderQuantity
