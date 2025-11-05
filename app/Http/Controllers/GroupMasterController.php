@@ -1077,10 +1077,14 @@ class GroupMasterController extends Controller
             'top_earners'       => $topEarners, // TOP-3 + tarifikatsiyalari
         ]);
     }
-
-    public function getMyOrdersWithBudgets(Request $request){
+    
+    public function getMyOrdersWithBudgets(Request $request)
+    {
+        // Get the group and selected month from the request
         $groupId = auth()->user()->employee->group_id;
         $selectedMonth = $request->month;
+        
+        // Fetch the orders with their related data
         $orders = Order::whereHas('orderGroups', function ($q) use ($groupId) {
                 $q->where('group_id', $groupId);
             })
@@ -1088,8 +1092,45 @@ class GroupMasterController extends Controller
                 $q->whereMonth('month', date('m', strtotime($selectedMonth)))
                     ->whereYear('month', date('Y', strtotime($selectedMonth)));
             })
+            ->with('orderModel.submodels.sewingOutputs', 'orderModel.model')
             ->get();
-
-        return response()->json($orders);
+    
+        // Fetch expenses related to the master role and branch
+        $expenses = Expense::where('name', 'Master')->where('branch_id', auth()->user()->employee->branch_id)->get();
+        
+        $orderDetails = [];
+        
+        // Loop through each order to calculate the required values
+        foreach ($orders as $order) {
+            $orderModel = $order->orderModel;
+            $sewingOutputs = $orderModel->submodels->flatMap(function($submodel) {
+                return $submodel->sewingOutputs;
+            });
+            
+            // Calculate the total quantity sewn for this order
+            $totalSewnQuantity = $sewingOutputs->sum('quantity');
+            
+            // Calculate the total minutes worked and the total expense related to that
+            $totalMinutes = $orderModel->model->minute * $totalSewnQuantity;
+            $totalExpense = $expenses->sum('quantity'); // Assuming 'quantity' is the cost or the amount the master is paid
+            
+            // Calculate the total amount earned from sewing outputs (minutes * expense quantity)
+            $amountFromSewing = $totalMinutes * $totalExpense;
+    
+            // Calculate the earnings from the order's quantity (order's quantity * expense quantity)
+            $amountFromOrderQuantity = $order->quantity * $totalExpense;
+    
+            // Add the calculated details to the response array
+            $orderDetails[] = [
+                'order_id' => $order->id,
+                'order_quantity' => $order->quantity,
+                'sewn_quantity' => $totalSewnQuantity,
+                'amount_from_sewing' => $amountFromSewing,
+                'amount_from_order_quantity' => $amountFromOrderQuantity
+            ];
+        }
+        
+        return response()->json($orderDetails);
     }
+
 }
