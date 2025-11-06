@@ -306,7 +306,7 @@ class DailyPaymentController extends Controller
             'departmentBudget',
             'employees' => function ($q) {
                 $q->where('status', 'working')
-                    ->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id', 'img', 'branch_id')
+                    ->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id', 'img', 'branch_id', 'salary', 'payment_type')
                     ->with('position:id,name');
             }
         ]);
@@ -438,12 +438,21 @@ class DailyPaymentController extends Controller
 
             $monthlyTotal['total_possible_season'] = round($totalPossibleSeason, 2);
 
+            $salary = match ($employee->payment_type) {
+                'monthly' => $employee->salary,
+                'daily' => $employee->salary * 26,
+                'hourly' => $employee->salary * 260,
+                default => $employee->salary,
+            };
+
             return [
                 'id' => $employee->id,
                 'name' => $employee->name,
                 'percentage' => $employee->percentage,
                 'position' => $employee->position,
                 'img' => $employee->img,
+                'payment_type' => $employee->payment_type,
+                'salary' => $salary,
                 'orders' => $orders,
                 'totals' => $monthlyTotal,
             ];
