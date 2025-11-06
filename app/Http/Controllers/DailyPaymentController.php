@@ -377,8 +377,6 @@ class DailyPaymentController extends Controller
                 )
                 ->get();
 
-            dd($employee);
-
             $orders = $data->map(function ($row) use ($employee, $usdRate, $empPercent, $month, $year) {
                 $departmentBudget = DB::table('department_budgets')->where('department_id', $row->department_id)->first();
 
@@ -423,6 +421,8 @@ class DailyPaymentController extends Controller
                 ->where('orders.season_year',$seasonYear)
                 ->where('orders.season_type',$seasonType)
                 ->get();
+
+            dd($employee);
 
             $totalPossibleSeason = 0;
             foreach($seasonOrders as $row){
