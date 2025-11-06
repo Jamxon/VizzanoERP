@@ -424,6 +424,7 @@ class DailyPaymentController extends Controller
 
             dd($employee);
 
+
             $totalPossibleSeason = 0;
             foreach($seasonOrders as $row){
                 $departmentBudget = DB::table('department_budgets')->where('department_id',$employee->department_id)->first();
