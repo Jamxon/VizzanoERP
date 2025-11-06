@@ -15,6 +15,7 @@ use App\Models\SalaryChange;
 use App\Models\GroupChange;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -887,110 +888,122 @@ class UserController extends Controller
         $branchId = $employee->branch_id;
         $employeeId = $employee->id;
         $usdRate = getUsdRate();
-
         $selectedMonth = $request->month ?? now()->format('Y-m');
 
-        $orders = Order::query()
-            ->where('branch_id', $branchId)
-            ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
-                $q->whereMonth('month', date('m', strtotime($selectedMonth)))
-                    ->whereYear('month', date('Y', strtotime($selectedMonth)));
+        $month = date('m', strtotime($selectedMonth));
+        $year = date('Y', strtotime($selectedMonth));
+
+        // ✅ Orders + Model + DailyPayments + Earned + Produced → bitta join orqali
+        $data = DB::table('orders')
+            ->select(
+                'orders.id as order_id',
+                'orders.name as order_name',
+                'orders.quantity as planned_quantity',
+                'order_models.model_id',
+                'models.name as model_name',
+                'models.minute as model_minute',
+                DB::raw("COALESCE(SUM(daily_payments.calculated_amount),0) as earned_amount"),
+                DB::raw("COALESCE(SUM(daily_payments.quantity_produced),0) as produced_quantity"),
+                DB::raw("MAX(daily_payments.department_id) as department_id"),
+                'orders.price'
+            )
+            ->join('order_models', 'order_models.order_id', '=', 'orders.id')
+            ->join('models', 'models.id', '=', 'order_models.model_id')
+            ->leftJoin('daily_payments', function($q) use ($employeeId, $month, $year) {
+                $q->on('daily_payments.order_id', '=', 'orders.id')
+                    ->where('daily_payments.employee_id', '=', $employeeId)
+                    ->whereMonth('daily_payments.payment_date', $month)
+                    ->whereYear('daily_payments.payment_date', $year);
             })
-            ->with([
-                'orderModel.model:id,name,minute',
-                'dailyPayments' => function ($q) use ($employeeId, $selectedMonth) {
-                    $q->where('employee_id', $employeeId)
-                        ->whereMonth('payment_date', date('m', strtotime($selectedMonth)))
-                        ->whereYear('payment_date', date('Y', strtotime($selectedMonth)));
-                }
-            ])
-            ->get()
-            ->map(function ($order) use ($employee, $usdRate) {
-
-                $model = $order->orderModel?->model;
-                if (!$model) return null;
-
-                $earned = $order->dailyPayments->sum('calculated_amount');
-
-                $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
-                    ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
-                    ->where('order_models.order_id', $order->id)
-                    ->where('order_models.model_id', $model->id)
-                    ->sum('sewing_outputs.quantity');
-
-                $plannedQuantity = $order->quantity;
-                $remainingQuantity = max($plannedQuantity - $produced, 0);
-
-                // ✅ Department aniqlaymiz (Day Payment orqali)
-                $firstPayment = $order->dailyPayments->first();
-                $departmentId = $firstPayment?->department_id;
-
-                $departmentBudget = null;
-                $empPercent = $employee->percentage ?? 0;
-
-                if ($departmentId) {
-                    $departmentBudget = DepartmentBudget::where('department_id', $departmentId)->first();
-                }
-
-                $priceUzs = ($order->price ?? 0) * $usdRate;
-
-                $perPieceEarn = 0;
-
-                if ($departmentBudget && $departmentBudget->quantity > 0) {
-                    if ($departmentBudget->type == 'minute_based') {
-                        $perPieceEarn =
-                            $model->minute * $departmentBudget->quantity / 100 * $empPercent;
-                    } elseif ($departmentBudget->type == 'percentage_based') {
-                        $perPieceEarn =
-                            (($priceUzs * $departmentBudget->quantity) / 100)
-                            * ($empPercent / 100);
-                    }
-                }
-
-                $remainingEarn = round($remainingQuantity * $perPieceEarn, 2);
-                $possibleEarn = round($plannedQuantity * $perPieceEarn, 2);
-
-                return [
-                    "order" => [
-                        "id" => $order->id,
-                        "name" => $order->name,
-                    ],
-                    "model" => [
-                        "id" => $model->id,
-                        "name" => $model->name,
-                        "minute" => $model->minute
-                    ],
-                    "planned_quantity" => $plannedQuantity,
-                    "produced_quantity" => $produced,
-                    "remaining_quantity" => $remainingQuantity,
-                    "earned_amount" => round($earned, 2),
-                    "remaining_earn_amount" => $remainingEarn,
-                    "possible_full_earn_amount" => $possibleEarn,
-                    "per_piece_earn" => round($perPieceEarn, 4),
-                    "payments" => $order->dailyPayments->map(function ($p) {
-                        return [
-                            "id" => $p->id,
-                            "date" => $p->payment_date,
-                            "quantity_produced" => $p->quantity_produced,
-                            "calculated_amount" => round($p->calculated_amount, 2),
-                            "employee_percentage" => $p->employee_percentage,
-                        ];
-                    }),
-                ];
+            ->where('orders.branch_id', $branchId)
+            ->whereExists(function($query) use ($month, $year) {
+                $query->select(DB::raw(1))
+                    ->from('monthly_selected_orders')
+                    ->whereColumn('monthly_selected_orders.order_id', 'orders.id')
+                    ->whereMonth('monthly_selected_orders.month', $month)
+                    ->whereYear('monthly_selected_orders.month', $year);
             })
-            ->filter()
-            ->values();
+            ->groupBy(
+                'orders.id',
+                'order_models.model_id',
+                'models.name',
+                'models.minute',
+                'orders.code',
+                'orders.quantity',
+                'orders.price'
+            )
+            ->get();
+
+        $empPercent = $employee->percentage ?? 0;
+
+        $orders = $data->map(function ($row) use ($usdRate, $empPercent, $month, $year, $employeeId) {
+
+            $departmentBudget = null;
+            if ($row->department_id) {
+                $departmentBudget = DB::table('department_budgets')
+                    ->where('department_id', $row->department_id)
+                    ->first();
+            }
+
+            $perPieceEarn = 0;
+
+            if ($departmentBudget && $departmentBudget->quantity > 0) {
+                if ($departmentBudget->type == 'minute_based') {
+                    $perPieceEarn =
+                        $row->model_minute * $departmentBudget->quantity / 100 * $empPercent;
+                } elseif ($departmentBudget->type == 'percentage_based') {
+                    $priceUzs = ($row->price ?? 0) * $usdRate;
+                    $perPieceEarn =
+                        (($priceUzs * $departmentBudget->quantity) / 100)
+                        * ($empPercent / 100);
+                }
+            }
+
+            $remainingQuantity = max($row->planned_quantity - $row->produced_quantity, 0);
+
+            return [
+                "order" => [
+                    "id" => $row->order_id,
+                    "name" => $row->order_name,
+                ],
+                "model" => [
+                    "id" => $row->model_id,
+                    "name" => $row->model_name,
+                    "minute" => $row->model_minute,
+                ],
+                "planned_quantity" => $row->planned_quantity,
+                "produced_quantity" => $row->produced_quantity,
+                "remaining_quantity" => $remainingQuantity,
+                "earned_amount" => round($row->earned_amount, 2),
+                "remaining_earn_amount" => round($remainingQuantity * $perPieceEarn, 2),
+                "possible_full_earn_amount" => round($row->planned_quantity * $perPieceEarn, 2),
+                "per_piece_earn" => round($perPieceEarn, 4),
+
+                // ✅ faqat shu order employee bo‘yicha paymentlar
+                "payments" => DB::table('daily_payments')
+                    ->select(
+                        'id', 'payment_date', 'quantity_produced',
+                        DB::raw("ROUND(calculated_amount,2) as calculated_amount"),
+                        'employee_percentage'
+                    )
+                    ->where('order_id', $row->order_id)
+                    ->where('employee_id', $employeeId)
+                    ->whereMonth('payment_date', $month)
+                    ->whereYear('payment_date', $year)
+                    ->get(),
+            ];
+        });
 
         return response()->json([
             "employee" => [
                 "id" => $employeeId,
-                "name" => $employee->name
+                "name" => $employee->name,
             ],
             "month" => $selectedMonth,
             "total_earned" => round($orders->sum('earned_amount'), 2),
             "total_remaining" => round($orders->sum('remaining_earn_amount'), 2),
             "total_possible" => round($orders->sum('possible_full_earn_amount'), 2),
-            "orders" => $orders,
+            "orders" => $orders->values(),
         ]);
     }
 
