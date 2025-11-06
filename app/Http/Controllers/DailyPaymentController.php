@@ -444,6 +444,8 @@ class DailyPaymentController extends Controller
                 'id' => $employee->id,
                 'name' => $employee->name,
                 'percentage' => $employee->percentage,
+                'position' => $employee->position,
+                'img' => $employee->img,
                 'orders' => $orders,
                 'totals' => $monthlyTotal,
             ];
