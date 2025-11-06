@@ -300,31 +300,160 @@ class DailyPaymentController extends Controller
     {
         $branchId = auth()->user()->employee->branch_id ?? null;
 
-        // Branch-based authorization: faqat o'z filialidagi departmentlarga ruxsat
         if ($department->mainDepartment->branch_id !== $branchId) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
-        // Eager load: budget va employees (position bilan). Select bilan faqat keraklilarni olamiz.
         $department->load([
             'departmentBudget',
             'employees' => function ($q) {
-                $q->where('status', 'working');
-                $q->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id', 'img')
+                $q->where('status', 'working')
+                    ->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id', 'img')
                     ->with('position:id,name');
             }
         ]);
 
-        $employees = $department->employees->map(function ($e) {
+        $usdRate = getUsdRate();
+        $seasonYear = 2026;
+        $seasonType = 'summer';
+
+        $departmentTotal = [
+            'total_earned' => 0,
+            'total_remaining' => 0,
+            'total_possible' => 0,
+            'total_possible_season' => 0,
+        ];
+
+        $employeesData = $department->employees->map(function ($employee) use ($usdRate, $seasonYear, $seasonType, $departmentTotal) {
+            $branchId = $employee->branch_id;
+            $empPercent = $employee->percentage ?? 0;
+
+            // --- Monthly orders for this employee
+            $month = now()->format('m');
+            $year = now()->format('Y');
+
+            $data = DB::table('orders')
+                ->select(
+                    'orders.id as order_id',
+                    'orders.name as order_name',
+                    'orders.quantity as planned_quantity',
+                    'order_models.model_id',
+                    'models.name as model_name',
+                    'models.minute as model_minute',
+                    DB::raw("COALESCE(SUM(daily_payments.calculated_amount),0) as earned_amount"),
+                    DB::raw("COALESCE(SUM(daily_payments.quantity_produced),0) as produced_quantity"),
+                    DB::raw("MAX(daily_payments.department_id) as department_id"),
+                    'orders.price'
+                )
+                ->join('order_models', 'order_models.order_id', '=', 'orders.id')
+                ->join('models', 'models.id', '=', 'order_models.model_id')
+                ->leftJoin('daily_payments', function($q) use ($employee, $month, $year) {
+                    $q->on('daily_payments.order_id', '=', 'orders.id')
+                        ->where('daily_payments.employee_id', '=', $employee->id)
+                        ->whereMonth('daily_payments.payment_date', $month)
+                        ->whereYear('daily_payments.payment_date', $year);
+                })
+                ->leftJoin('monthly_selected_orders', function($q) use ($month, $year) {
+                    $q->on('monthly_selected_orders.order_id', '=', 'orders.id')
+                        ->whereMonth('monthly_selected_orders.month', $month)
+                        ->whereYear('monthly_selected_orders.month', $year);
+                })
+                ->where('orders.branch_id', $branchId)
+                ->whereExists(function($query) use ($month, $year) {
+                    $query->select(DB::raw(1))
+                        ->from('monthly_selected_orders')
+                        ->whereColumn('monthly_selected_orders.order_id', 'orders.id')
+                        ->whereMonth('monthly_selected_orders.month', $month)
+                        ->whereYear('monthly_selected_orders.month', $year);
+                })
+                ->groupBy(
+                    'orders.id',
+                    'order_models.model_id',
+                    'models.name',
+                    'models.minute',
+                    'orders.name',
+                    'orders.quantity',
+                    'orders.price'
+                )
+                ->get();
+
+            $orders = $data->map(function ($row) use ($employee, $usdRate, $empPercent, $month, $year) {
+                $departmentBudget = DB::table('department_budgets')->where('department_id', $row->department_id)->first();
+
+                $perPieceEarn = 0;
+                if ($departmentBudget && $departmentBudget->quantity > 0) {
+                    if ($departmentBudget->type === 'minute_based') {
+                        $perPieceEarn = $row->model_minute * $departmentBudget->quantity / 100 * $empPercent;
+                    } elseif ($departmentBudget->type === 'percentage_based') {
+                        $priceUzs = ($row->price ?? 0) * $usdRate;
+                        $perPieceEarn = (($priceUzs * $departmentBudget->quantity) / 100) * ($empPercent / 100);
+                    }
+                }
+
+                $remainingQuantity = max($row->planned_quantity - $row->produced_quantity, 0);
+
+                return [
+                    "order" => [
+                        "id" => $row->order_id,
+                        "name" => $row->order_name,
+                    ],
+                    "planned_quantity" => $row->planned_quantity,
+                    "produced_quantity" => $row->produced_quantity,
+                    "remaining_quantity" => $remainingQuantity,
+                    "earned_amount" => round($row->earned_amount, 2),
+                    "remaining_earn_amount" => round($remainingQuantity * $perPieceEarn, 2),
+                    "possible_full_earn_amount" => round($row->planned_quantity * $perPieceEarn, 2),
+                ];
+            });
+
+            $monthlyTotal = [
+                'total_earned' => round($orders->sum('earned_amount'), 2),
+                'total_remaining' => round($orders->sum('remaining_earn_amount'), 2),
+                'total_possible' => round($orders->sum('possible_full_earn_amount'), 2),
+            ];
+
+            // --- Season orders for this employee
+            $seasonOrders = DB::table('orders')
+                ->select('orders.id','orders.quantity','order_models.model_id','models.minute','orders.price')
+                ->join('order_models','order_models.order_id','=','orders.id')
+                ->join('models','models.id','=','order_models.model_id')
+                ->where('orders.branch_id',$employee->branch_id)
+                ->where('orders.season_year',$seasonYear)
+                ->where('orders.season_type',$seasonType)
+                ->get();
+
+            $totalPossibleSeason = 0;
+            foreach($seasonOrders as $row){
+                $departmentBudget = DB::table('department_budgets')->where('department_id',$employee->department_id)->first();
+                if(!$departmentBudget || $departmentBudget->quantity<=0) continue;
+
+                $perPieceEarn = 0;
+                if($departmentBudget->type==='minute_based'){
+                    $perPieceEarn = $row->minute * $departmentBudget->quantity /100 * $empPercent;
+                }elseif($departmentBudget->type==='percentage_based'){
+                    $priceUzs = ($row->price ?? 0) * $usdRate;
+                    $perPieceEarn = (($priceUzs * $departmentBudget->quantity)/100) * ($empPercent/100);
+                }
+                $totalPossibleSeason += $row->quantity * $perPieceEarn;
+            }
+
+            $monthlyTotal['total_possible_season'] = round($totalPossibleSeason,2);
+
             return [
-                'id' => $e->id,
-                'name' => $e->name,
-                'phone' => $e->phone,
-                'position' => $e->position?->name,
-                'percentage' => $e->percentage,
-                'img' => $e->img,
+                'id' => $employee->id,
+                'name' => $employee->name,
+                'orders' => $orders,
+                'totals' => $monthlyTotal,
             ];
         });
+
+        // --- Department totals
+        $departmentTotals = [
+            'total_earned' => round($employeesData->sum(fn($e) => $e['totals']['total_earned']),2),
+            'total_remaining' => round($employeesData->sum(fn($e) => $e['totals']['total_remaining']),2),
+            'total_possible' => round($employeesData->sum(fn($e) => $e['totals']['total_possible']),2),
+            'total_possible_season' => round($employeesData->sum(fn($e) => $e['totals']['total_possible_season']),2),
+        ];
 
         return response()->json([
             'id' => $department->id,
@@ -335,7 +464,8 @@ class DailyPaymentController extends Controller
                 'type' => $department->departmentBudget->type,
             ] : null,
             'employee_count' => $department->employees->count(),
-            'employees' => $employees,
+            'employees' => $employeesData,
+            'department_totals' => $departmentTotals,
         ]);
     }
 
