@@ -442,6 +442,7 @@ class DailyPaymentController extends Controller
             return [
                 'id' => $employee->id,
                 'name' => $employee->name,
+                'percentage' => $employee->percentage,
                 'orders' => $orders,
                 'totals' => $monthlyTotal,
             ];
