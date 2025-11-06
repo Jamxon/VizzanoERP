@@ -1126,7 +1126,8 @@ class GroupMasterController extends Controller
 
         // --- 2. Season orders (Summer 2026)
         $seasonOrders = Order::where('branch_id', $branchId)
-            ->where('season', 'Summer 2026')
+            ->where('season_year', 2026)
+            ->where('season_type', 'summer')
             ->whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
             ->with(['orderModel.model', 'orderModel.submodels'])
             ->get();
