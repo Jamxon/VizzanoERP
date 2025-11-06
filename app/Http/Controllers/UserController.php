@@ -939,8 +939,7 @@ class UserController extends Controller
                 if ($departmentBudget && $departmentBudget->quantity > 0) {
                     if ($departmentBudget->type == 'minute_based') {
                         $perPieceEarn =
-                            ($model->minute * $departmentBudget->quantity / 100)
-                            * ($empPercent / 100);
+                            $model->minute * $departmentBudget->quantity / 100 * $empPercent;
                     } elseif ($departmentBudget->type == 'percentage_based') {
                         $perPieceEarn =
                             (($priceUzs * $departmentBudget->quantity) / 100)
@@ -963,8 +962,6 @@ class UserController extends Controller
                     ],
                     "planned_quantity" => $plannedQuantity,
                     "produced_quantity" => $produced,
-                    'department_id' => $departmentId,
-                    'departmentBudget' => $departmentBudget,
                     "remaining_quantity" => $remainingQuantity,
                     "earned_amount" => round($earned, 2),
                     "remaining_earn_amount" => $remainingEarn,
