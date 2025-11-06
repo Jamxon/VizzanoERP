@@ -1158,8 +1158,6 @@ class GroupMasterController extends Controller
         return response()->json([
             'monthly_orders' => $monthlyDetails,
             'monthly_total' => $monthlyTotal,
-            'season_orders' => $seasonDetails,
-            'season_total' => $seasonTotal,
             'grand_total' => $grandTotal
         ]);
     }
