@@ -1005,6 +1005,50 @@ class UserController extends Controller
             ];
         });
 
+        // ✅ Additional SEASON earning calculation
+        $seasonYear = 2026;
+        $seasonType = 'summer';
+
+        $seasonOrders = DB::table('orders')
+            ->select(
+                'orders.id as order_id',
+                'orders.quantity as planned_quantity',
+                'order_models.model_id',
+                'models.minute as model_minute',
+                'orders.price'
+            )
+            ->join('order_models', 'order_models.order_id', '=', 'orders.id')
+            ->join('models', 'models.id', '=', 'order_models.model_id')
+            ->where('orders.branch_id', $branchId)
+            ->where('orders.season_year', $seasonYear)
+            ->where('orders.season_type', $seasonType)
+            ->get();
+
+        $totalPossibleSeason = 0;
+
+        foreach ($seasonOrders as $row) {
+            $departmentBudget = DB::table('department_budgets')
+                ->where('department_id', $employee->department_id)
+                ->first();
+
+            if (!$departmentBudget || $departmentBudget->quantity <= 0) {
+                continue;
+            }
+
+            $perPieceEarn = 0;
+            if ($departmentBudget->type === 'minute_based') {
+                $perPieceEarn =
+                    $row->model_minute * $departmentBudget->quantity / 100 * $empPercent;
+            } elseif ($departmentBudget->type === 'percentage_based') {
+                $priceUzs = ($row->price ?? 0) * $usdRate;
+                $perPieceEarn =
+                    (($priceUzs * $departmentBudget->quantity) / 100)
+                    * ($empPercent / 100);
+            }
+
+            $totalPossibleSeason += $row->planned_quantity * $perPieceEarn;
+        }
+
         return response()->json([
             "employee" => [
                 "id" => $employeeId,
@@ -1015,6 +1059,7 @@ class UserController extends Controller
             "total_remaining" => round($orders->sum('remaining_earn_amount'), 2),
             "total_possible" => round($orders->sum('possible_full_earn_amount'), 2),
             "orders" => $orders->values(),
+            "total_possible_season" => round($totalPossibleSeason, 2),
         ]);
     }
 
