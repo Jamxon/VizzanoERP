@@ -402,6 +402,7 @@ class DailyPaymentController extends Controller
                     "produced_quantity" => $row->produced_quantity,
                     "remaining_quantity" => $remainingQuantity,
                     'departmentBudget' => $departmentBudget,
+                    'department_id' => $row->department_id,
                     'empPercent' => $empPercent,
                     "earned_amount" => round($row->earned_amount, 2),
                     "remaining_earn_amount" => round($remainingQuantity * $perPieceEarn, 2),
