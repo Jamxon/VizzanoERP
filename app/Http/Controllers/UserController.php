@@ -6,6 +6,8 @@ use App\Http\Resources\GetUserResource;
 use App\Models\DailyPayment;
 use App\Models\Employee;
 use App\Models\Log;
+use App\Models\Order;
+use App\Models\SewingOutputs;
 use App\Models\User;
 use App\Models\Issue;
 use App\Models\SalaryChange;
@@ -877,47 +879,88 @@ class UserController extends Controller
     public function getDailyPayments(Request $request): \Illuminate\Http\JsonResponse
     {
         $employee = auth()->user()->employee;
+
         if (!$employee) {
             return response()->json(['message' => 'Employee not found'], 404);
         }
 
         $branchId = $employee->branch_id;
         $employeeId = $employee->id;
+        $usdRate = getUsdRate();
 
         $selectedMonth = $request->month ?? now()->format('Y-m');
 
-        $payments = DailyPayment::query()
-            ->where('employee_id', $employeeId)
-            ->whereYear('payment_date', date('Y', strtotime($selectedMonth)))
-            ->whereMonth('payment_date', date('m', strtotime($selectedMonth)))
+        $orders = Order::query()
+            ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
+                $q->whereMonth('month', date('m', strtotime($selectedMonth)))
+                    ->whereYear('month', date('Y', strtotime($selectedMonth)));
+            })
             ->with([
-                'order:id,code,price',
-                'model:id,name,minute',
-                'department:id,name'
+                'orderModel.model:id,name,minute',
+                'dailyPayments' => fn($q) =>
+                $q->where('employee_id', $employeeId)
+                    ->whereMonth('payment_date', date('m', strtotime($selectedMonth)))
+                    ->whereYear('payment_date', date('Y', strtotime($selectedMonth)))
             ])
             ->get()
-            ->map(function ($p) {
+            ->map(function ($order) use ($employeeId, $usdRate) {
+
+                $model = $order->orderModel?->model;
+                if (!$model) return null;
+
+                // ✅ Bu employee shu orderdan ishlab topgan summa (daily_payments orqali)
+                $earned = $order->dailyPayments->sum('calculated_amount');
+
+                // ✅ Produced Quantity (real ishlab chiqilgan)
+                $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
+                    ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
+                    ->where('order_models.order_id', $order->id)
+                    ->where('order_models.model_id', $model->id)
+                    ->sum('sewing_outputs.quantity');
+
+                $plannedQuantity = $order->quantity;
+                $remainingQuantity = max($plannedQuantity - $produced, 0);
+
+                // ✅ 1 dona uchun tikuvchi ulushi (oylik foizdan)
+                $employeePercentage = $order->monthlySelectedOrder?->employee_percentage ?? 0;
+                $priceUzs = ($order->price ?? 0) * $usdRate;
+                $unitEarn = ($priceUzs * ($employeePercentage / 100)); // 1 dona uchun $
+
+                // ✅ Hali olish kerak bo‘lgan summa
+                $remainingEarn = round($remainingQuantity * $unitEarn, 2);
+
                 return [
-                    "id" => $p->id,
-                    "date" => $p->payment_date,
                     "order" => [
-                        "id" => $p->order_id,
-                        "code" => $p->order?->code
+                        "id" => $order->id,
+                        "code" => $order->code,
+                        "price" => $order->price,
                     ],
                     "model" => [
-                        "id" => $p->model_id,
-                        "name" => $p->model?->name,
-                        "minute" => $p->model?->minute,
+                        "id" => $model->id,
+                        "name" => $model->name,
+                        "minute" => $model->minute
                     ],
-                    "department" => [
-                        "id" => $p->department_id,
-                        "name" => $p->department?->name
-                    ],
-                    "quantity_produced" => $p->quantity_produced,
-                    "employee_percentage" => $p->employee_percentage,
-                    "earned_amount" => round($p->calculated_amount, 2), // ✅ tayyor
+                    "planned_quantity" => $plannedQuantity,
+                    "produced_quantity" => $produced,
+                    "remaining_quantity" => $remainingQuantity,
+
+                    "employee_percentage" => $employeePercentage,
+                    "earned_amount" => round($earned, 2), // ✅ tugaganlari
+                    "remaining_earn_amount" => $remainingEarn, // ✅ hali tikilishi keraklaridan
+                    "unit_earn" => round($unitEarn, 2),
+
+                    "payments" => $order->dailyPayments->map(function ($p) {
+                        return [
+                            "id" => $p->id,
+                            "date" => $p->payment_date,
+                            "quantity_produced" => $p->quantity_produced,
+                            "earned_amount" => round($p->calculated_amount, 2)
+                        ];
+                    })
                 ];
-            });
+            })
+            ->filter()
+            ->values();
 
         return response()->json([
             "employee" => [
@@ -925,8 +968,9 @@ class UserController extends Controller
                 "name" => $employee->full_name
             ],
             "month" => $selectedMonth,
-            "total_earned" => round($payments->sum('earned_amount'), 2),
-            "payments" => $payments
+            "total_earned" => round($orders->sum('earned_amount'), 2),
+            "total_remaining" => round($orders->sum('remaining_earn_amount'), 2), // ✅ umumiy qolgan pul
+            "orders" => $orders
         ]);
     }
 
