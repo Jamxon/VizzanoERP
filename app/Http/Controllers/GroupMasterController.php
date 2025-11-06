@@ -1090,37 +1090,56 @@ class GroupMasterController extends Controller
         $groupId = $employee->group_id;
         $selectedMonth = $request->month;
 
-        // --- 1. Monthly-selected orders (avvalgi hisob)
-        $monthlyOrders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
-            ->whereHas('monthlySelectedOrder', fn($q) => $q->whereMonth('month', date('m', strtotime($selectedMonth)))
-                ->whereYear('month', date('Y', strtotime($selectedMonth))))
-            ->where('branch_id', $branchId)
-            ->with(['orderModel.submodels.sewingOutputs', 'orderModel.model', 'orderModel.submodels'])
+        $orders = Order::whereHas('orderGroups', function ($q) use ($groupId) {
+            $q->where('group_id', $groupId);
+        })
+            ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
+                $q->whereMonth('month', date('m', strtotime($selectedMonth)))
+                    ->whereYear('month', date('Y', strtotime($selectedMonth)));
+            })
+            ->where('branch_id', auth()->user()->employee->branch_id)
+            ->with('orderModel.submodels.sewingOutputs', 'orderModel.model', 'orderModel.submodels') // Fetch the submodels relationship correctly
             ->get();
 
-        $masterExpense = Expense::where('name', 'Master')
-            ->where('branch_id', $branchId)
-            ->sum('quantity'); // 1 minut uchun to‘lanadigan summa
+        // Fetch expenses related to the master role and branch
+        $expenses = Expense::where('name', 'Master')->where('branch_id', auth()->user()->employee->branch_id)->get();
 
-        $monthlyDetails = [];
-        $monthlyTotal = 0;
+        $orderDetails = [];
 
-        foreach ($monthlyOrders as $order) {
+        // Loop through each order to calculate the required values
+        foreach ($orders as $order) {
             $orderModel = $order->orderModel;
             $submodels = $orderModel->submodels;
 
-            $totalSewnQuantity = $submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
-            $totalMinutes = $orderModel->model->minute * $totalSewnQuantity;
-            $amountFromSewing = $totalMinutes * $masterExpense;
-            $monthlyTotal += $amountFromSewing;
+            // Calculate the total quantity sewn for this order using sewing outputs
+            $totalSewnQuantity = $submodels->flatMap(function ($submodel) {
+                return $submodel->sewingOutputs; // Access sewingOutputs within each submodel
+            })->sum('quantity');
 
-            $monthlyDetails[] = [
-                'order_id' => $order->id,
-                'order_name' => $order->name,
-                'quantity' => $order->quantity,
+            // Calculate the total minutes worked based on the model's minute * sewn quantity
+            $totalMinutes = $orderModel->model->minute * $totalSewnQuantity;
+
+            // Calculate the total expense for the master (assuming the expense is the quantity value per sewing minute)
+            $totalExpense = $expenses->sum('quantity'); // Assuming 'quantity' is the amount the master is paid
+
+            // Calculate the total amount earned from sewing outputs (minutes * expense quantity)
+            $amountFromSewing = $totalMinutes * $totalExpense;
+
+            // Calculate the earnings from the order's quantity (order's quantity * expense quantity)
+            $amountFromOrderQuantity = $order->quantity * $totalExpense * $orderModel->model->minute;
+
+            // Add the calculated details to the response array
+            $orderDetails[] = [
+                'order' => [
+                    'id' => $order->id,
+                    'name' => $order->name,
+                    'quantity' => $order->quantity,
+                    'model' => $orderModel->model, // Directly accessing the model relationship
+                    'submodels' => $submodels->pluck('submodel.name') // Pluck the 'name' attribute from submodel relationship
+                ],
                 'sewn_quantity' => $totalSewnQuantity,
-                'minute' => $orderModel->model->minute,
-                'amount_from_sewing' => $amountFromSewing
+                'amount_from_sewing' => $amountFromSewing,
+                'amount_from_order_quantity' => $amountFromOrderQuantity
             ];
         }
 
@@ -1139,7 +1158,7 @@ class GroupMasterController extends Controller
             $orderModel = $order->orderModel;
 
             $totalMinutes = $orderModel->model->minute * $order->quantity;
-            $amountFromSewing = $totalMinutes * $masterExpense;
+            $amountFromSewing = $totalMinutes * $expenses->sum('quantity');
             $seasonTotal += $amountFromSewing;
 
             $seasonDetails[] = [
@@ -1152,16 +1171,74 @@ class GroupMasterController extends Controller
             ];
         }
 
-        // --- Total sum
-        $grandTotal = $monthlyTotal + $seasonTotal;
-
         return response()->json([
-            'monthly_orders' => $monthlyDetails,
-            'monthly_total' => $monthlyTotal,
+            'orders' => $orderDetails,
             'season_orders' => $seasonDetails,
-            'season_total' => $seasonTotal,
-            'grand_total' => $grandTotal
+            'season_total' => $seasonTotal
         ]);
+    }
+
+    public function getMyOrdersWithBudgets(Request $request)
+    {
+        // Get the group and selected month from the request
+        $groupId = auth()->user()->employee->group_id;
+        $selectedMonth = $request->month;
+
+        // Fetch the orders with their related data
+        $orders = Order::whereHas('orderGroups', function ($q) use ($groupId) {
+            $q->where('group_id', $groupId);
+        })
+            ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
+                $q->whereMonth('month', date('m', strtotime($selectedMonth)))
+                    ->whereYear('month', date('Y', strtotime($selectedMonth)));
+            })
+            ->where('branch_id', auth()->user()->employee->branch_id)
+            ->with('orderModel.submodels.sewingOutputs', 'orderModel.model', 'orderModel.submodels') // Fetch the submodels relationship correctly
+            ->get();
+
+        // Fetch expenses related to the master role and branch
+        $expenses = Expense::where('name', 'Master')->where('branch_id', auth()->user()->employee->branch_id)->get();
+
+        $orderDetails = [];
+
+        // Loop through each order to calculate the required values
+        foreach ($orders as $order) {
+            $orderModel = $order->orderModel;
+            $submodels = $orderModel->submodels;
+
+            // Calculate the total quantity sewn for this order using sewing outputs
+            $totalSewnQuantity = $submodels->flatMap(function ($submodel) {
+                return $submodel->sewingOutputs; // Access sewingOutputs within each submodel
+            })->sum('quantity');
+
+            // Calculate the total minutes worked based on the model's minute * sewn quantity
+            $totalMinutes = $orderModel->model->minute * $totalSewnQuantity;
+
+            // Calculate the total expense for the master (assuming the expense is the quantity value per sewing minute)
+            $totalExpense = $expenses->sum('quantity'); // Assuming 'quantity' is the amount the master is paid
+
+            // Calculate the total amount earned from sewing outputs (minutes * expense quantity)
+            $amountFromSewing = $totalMinutes * $totalExpense;
+
+            // Calculate the earnings from the order's quantity (order's quantity * expense quantity)
+            $amountFromOrderQuantity = $order->quantity * $totalExpense * $orderModel->model->minute;
+
+            // Add the calculated details to the response array
+            $orderDetails[] = [
+                'order' => [
+                    'id' => $order->id,
+                    'name' => $order->name,
+                    'quantity' => $order->quantity,
+                    'model' => $orderModel->model, // Directly accessing the model relationship
+                    'submodels' => $submodels->pluck('submodel.name') // Pluck the 'name' attribute from submodel relationship
+                ],
+                'sewn_quantity' => $totalSewnQuantity,
+                'amount_from_sewing' => $amountFromSewing,
+                'amount_from_order_quantity' => $amountFromOrderQuantity
+            ];
+        }
+
+        return response()->json($orderDetails);
     }
 
 }
