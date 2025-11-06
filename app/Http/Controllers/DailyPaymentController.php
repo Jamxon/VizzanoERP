@@ -240,7 +240,8 @@ class DailyPaymentController extends Controller
             'department_id',
             'quantity_produced',
             'calculated_amount',
-            'employee_percentage'
+            'employee_percentage',
+            'payment_date'
         )
             ->with([
                 'employee:id,name',
@@ -287,6 +288,7 @@ class DailyPaymentController extends Controller
                     'quantity_produced' => $row->quantity_produced,
                     'calculated_amount' => round($row->calculated_amount, 2),
                     'employee_percentage' => round($row->employee_percentage, 2),
+                    'payment_date' => $row->payment_date
                 ];
             });
 
@@ -537,32 +539,69 @@ class DailyPaymentController extends Controller
     public function updatePercentage(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()->employee->branch_id;
-
+    
         // ✅ Branch security
         if ($employee->branch_id !== $branchId) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
-
-        // ✅ Only validate if sent
+    
+        // ✅ Validate
         $validated = $request->validate([
-            'percentage' => 'sometimes|numeric|min:0|max:100',
+            'percentage' => 'required|numeric|min:0|max:100',
         ]);
-
-        if (!isset($validated['percentage'])) {
+    
+        $newPercentage = (float) $validated['percentage'];
+    
+        DB::beginTransaction();
+        try {
+            // ✅ Update employee's main percentage
+            $employee->update(['percentage' => $newPercentage]);
+    
+            // ✅ Get all daily payments of this employee
+            $payments = DailyPayment::select('id', 'employee_percentage', 'calculated_amount')
+                ->where('employee_id', $employee->id)
+                ->get();
+    
+            if ($payments->isNotEmpty()) {
+                $now = now();
+    
+                foreach ($payments as $p) {
+                    $oldPercent = (float) $p->employee_percentage;
+                    $oldAmount  = (float) $p->calculated_amount;
+    
+                    // Skip if old percentage is 0 (avoid division by zero)
+                    if ($oldPercent <= 0) {
+                        continue;
+                    }
+    
+                    // 1% qiymatini topamiz
+                    $onePercentValue = $oldAmount / $oldPercent;
+    
+                    // Yangi qiymatni hisoblaymiz
+                    $newCalculated = round($onePercentValue * $newPercentage, 2);
+    
+                    // Yangilaymiz
+                    DailyPayment::where('id', $p->id)->update([
+                        'employee_percentage' => $newPercentage,
+                        'calculated_amount'   => $newCalculated,
+                        'updated_at'          => $now,
+                    ]);
+                }
+            }
+    
+            DB::commit();
+    
             return response()->json([
-                'message' => 'No data provided to update.'
-            ], 422);
+                'message' => 'Employee percentage updated and all related payments recalculated successfully.',
+                'employee' => $employee,
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed to update employee percentage and recalculate payments.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
-
-        // ✅ O‘zgartirish
-        $employee->update([
-            'percentage' => $validated['percentage'],
-        ]);
-
-        return response()->json([
-            'message' => 'Employee percentage updated successfully.',
-            'employee' => $employee
-        ]);
     }
 
     public function storeExpense(Request $request): \Illuminate\Http\JsonResponse
