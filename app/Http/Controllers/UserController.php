@@ -718,6 +718,7 @@ class UserController extends Controller
                 'position_id' => $employee->position_id,
                 'department_id' => $employee->department_id,
                 'group_id' => $employee->group_id,
+                'percentage' => $employee->percentage,
 
                 // Relations
                 'position' => $employee->position,

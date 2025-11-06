@@ -62,6 +62,7 @@ class GetUserResource extends JsonResource
             'gender' => $this->gender,
             'balance' => $this->balance,
             'attendance_salaries' => $this->attendanceSalaries,
+            'percentage' => $this->percentage,
             'employee_tarification_logs' => $this->employeeTarificationLogs->map(function (EmployeeTarificationLog $log) {
                 return [
                     'id' => $log->id,
