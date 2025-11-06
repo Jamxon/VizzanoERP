@@ -378,7 +378,7 @@ class DailyPaymentController extends Controller
                 ->get();
 
             $orders = $data->map(function ($row) use ($employee, $usdRate, $empPercent, $month, $year) {
-                $departmentBudget = DB::table('department_budgets')->where('department_id', $row->department_id)->first();
+                $departmentBudget = DB::table('department_budgets')->where('department_id', $employee->department_id)->first();
 
                 $perPieceEarn = 0;
                 if ($departmentBudget && $departmentBudget->quantity > 0) {
