@@ -937,7 +937,7 @@ class UserController extends Controller
                 $perPieceEarn = 0;
 
                 if ($departmentBudget && $departmentBudget->quantity > 0) {
-                    if ($departmentBudget->type == 'minute_percentage') {
+                    if ($departmentBudget->type == 'minute_based') {
                         $perPieceEarn =
                             ($model->minute * $departmentBudget->quantity / 100)
                             * ($empPercent / 100);
