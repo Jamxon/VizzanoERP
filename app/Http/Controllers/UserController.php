@@ -895,6 +895,7 @@ class UserController extends Controller
                 $q->whereMonth('month', date('m', strtotime($selectedMonth)))
                     ->whereYear('month', date('Y', strtotime($selectedMonth)));
             })
+            ->where('branch_id', $branchId)
             ->with([
                 'orderModel.model:id,name,minute',
                 'dailyPayments' => fn($q) =>
