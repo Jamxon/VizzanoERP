@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\GetUserResource;
+use App\Models\DailyPayment;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\User;
@@ -871,6 +872,62 @@ class UserController extends Controller
         });
 
         return response()->json($groupChanges);
+    }
+
+    public function getDailyPayments(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $employee = auth()->user()->employee;
+        if (!$employee) {
+            return response()->json(['message' => 'Employee not found'], 404);
+        }
+
+        $branchId = $employee->branch_id;
+        $employeeId = $employee->id;
+
+        $selectedMonth = $request->month ?? now()->format('Y-m');
+
+        $payments = DailyPayment::query()
+            ->where('employee_id', $employeeId)
+            ->whereYear('payment_date', date('Y', strtotime($selectedMonth)))
+            ->whereMonth('payment_date', date('m', strtotime($selectedMonth)))
+            ->with([
+                'order:id,code,price',
+                'model:id,name,minute',
+                'department:id,name'
+            ])
+            ->get()
+            ->map(function ($p) {
+                return [
+                    "id" => $p->id,
+                    "date" => $p->payment_date,
+                    "order" => [
+                        "id" => $p->order_id,
+                        "code" => $p->order?->code
+                    ],
+                    "model" => [
+                        "id" => $p->model_id,
+                        "name" => $p->model?->name,
+                        "minute" => $p->model?->minute,
+                    ],
+                    "department" => [
+                        "id" => $p->department_id,
+                        "name" => $p->department?->name
+                    ],
+                    "quantity_produced" => $p->quantity_produced,
+                    "employee_percentage" => $p->employee_percentage,
+                    "earned_amount" => round($p->calculated_amount, 2), // ✅ tayyor
+                ];
+            });
+
+        return response()->json([
+            "employee" => [
+                "id" => $employeeId,
+                "name" => $employee->full_name
+            ],
+            "month" => $selectedMonth,
+            "total_earned" => round($payments->sum('earned_amount'), 2),
+            "payments" => $payments
+        ]);
     }
 
 }
