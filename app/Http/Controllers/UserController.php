@@ -879,7 +879,6 @@ class UserController extends Controller
     public function getDailyPayments(Request $request): \Illuminate\Http\JsonResponse
     {
         $employee = auth()->user()->employee;
-
         if (!$employee) {
             return response()->json(['message' => 'Employee not found'], 404);
         }
@@ -898,7 +897,6 @@ class UserController extends Controller
             })
             ->with([
                 'orderModel.model:id,name,minute',
-                'department.departmentBudget',
                 'dailyPayments' => function ($q) use ($employeeId, $selectedMonth) {
                     $q->where('employee_id', $employeeId)
                         ->whereMonth('payment_date', date('m', strtotime($selectedMonth)))
@@ -922,8 +920,16 @@ class UserController extends Controller
                 $plannedQuantity = $order->quantity;
                 $remainingQuantity = max($plannedQuantity - $produced, 0);
 
-                $departmentBudget = $order->department?->departmentBudget;
+                // ✅ Department aniqlaymiz (Day Payment orqali)
+                $firstPayment = $order->dailyPayments->first();
+                $departmentId = $firstPayment?->department_id;
+
+                $departmentBudget = null;
                 $empPercent = $employee->percentage ?? 0;
+
+                if ($departmentId) {
+                    $departmentBudget = DepartmentBudget::where('department_id', $departmentId)->first();
+                }
 
                 $priceUzs = ($order->price ?? 0) * $usdRate;
 
@@ -949,23 +955,18 @@ class UserController extends Controller
                         "id" => $order->id,
                         "code" => $order->code,
                     ],
-
                     "model" => [
                         "id" => $model->id,
                         "name" => $model->name,
                         "minute" => $model->minute
                     ],
-
                     "planned_quantity" => $plannedQuantity,
                     "produced_quantity" => $produced,
                     "remaining_quantity" => $remainingQuantity,
-
                     "earned_amount" => round($earned, 2),
                     "remaining_earn_amount" => $remainingEarn,
                     "possible_full_earn_amount" => $possibleEarn,
-
                     "per_piece_earn" => round($perPieceEarn, 4),
-
                     "payments" => $order->dailyPayments->map(function ($p) {
                         return [
                             "id" => $p->id,
