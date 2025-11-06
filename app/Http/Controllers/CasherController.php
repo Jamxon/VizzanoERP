@@ -989,7 +989,8 @@ class CasherController extends Controller
                     . "👤 Xodim: {$employee->name}\n"
                     . "💰 Miqdor: " . number_format($validated['amount'], 0, '.', ' ') . " so‘m\n"
                     . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
-                    . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik');
+                    . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik') . "\n"
+                    . "\n📝 Izoh: " . ($validated['comment'] ?? '-');
 
                 Http::post("https://api.telegram.org/bot" . '7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms' . "/sendMessage", [
                     'chat_id' => -979504247,
