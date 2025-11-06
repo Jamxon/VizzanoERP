@@ -1093,6 +1093,7 @@ class GroupMasterController extends Controller
                 $q->whereMonth('month', date('m', strtotime($selectedMonth)))
                     ->whereYear('month', date('Y', strtotime($selectedMonth)));
             })
+            ->where('branch_id', auth()->user()->employee->branch_id)
             ->with('orderModel.submodels.sewingOutputs', 'orderModel.model', 'orderModel.submodels') // Fetch the submodels relationship correctly
             ->get();
         
