@@ -401,6 +401,7 @@ class DailyPaymentController extends Controller
                     "planned_quantity" => $row->planned_quantity,
                     "produced_quantity" => $row->produced_quantity,
                     "remaining_quantity" => $remainingQuantity,
+                    'departmentBudget' => $departmentBudget,
                     'empPercent' => $empPercent,
                     "earned_amount" => round($row->earned_amount, 2),
                     "remaining_earn_amount" => round($remainingQuantity * $perPieceEarn, 2),
