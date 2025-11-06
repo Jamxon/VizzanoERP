@@ -963,6 +963,7 @@ class UserController extends Controller
                     ],
                     "planned_quantity" => $plannedQuantity,
                     "produced_quantity" => $produced,
+                    'department_id' => $departmentId,
                     "remaining_quantity" => $remainingQuantity,
                     "earned_amount" => round($earned, 2),
                     "remaining_earn_amount" => $remainingEarn,
