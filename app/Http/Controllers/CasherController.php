@@ -1690,22 +1690,25 @@ class CasherController extends Controller
                 $balance->increment('amount', $data['amount']);
 
                 // ✅ 4. Telegramga xabar yuborish (faqat transaction commit bo‘lgandan so‘ng)
-                DB::afterCommit(function () use ($data) {
+                DB::afterCommit(function () use ($data, $balance) {
                     $currency = \App\Models\Currency::find($data['currency_id']);
                     $branch = \App\Models\Branch::find($data['branch_id']);
                     $user = auth()->user()->employee;
-    
+
+                    $remainingBalance = number_format($balance->amount, 0, '.', ' ');
+
                     $text = "💰 *Kirim qo‘shildi!*\n"
                         . "🏢 Filial: {$branch->name}\n"
                         . "👤 Xodim: {$user->name}\n"
                         . "💵 Miqdor: " . number_format($data['amount'], 0, '.', ' ') . " {$currency->name}\n"
                         . "📅 Sana: {$data['date']}\n"
+                        . "🏦 Qolgan balans: *{$remainingBalance} {$currency->name}*\n"
                         . "📘 Maqsad: " . ($data['purpose'] ?? 'Noma’lum') . "\n"
                         . "💬 Izoh: " . ($data['comment'] ?? '-');
-    
+
                     $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
                     $chatId = -979504247;
-    
+
                     Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                         'chat_id' => $chatId,
                         'text' => $text,
@@ -1770,22 +1773,25 @@ class CasherController extends Controller
                 // ✅ Balansni kamaytiramiz
                 $balance->decrement('amount', $data['amount']);
 
-                DB::afterCommit(function () use ($data) {
+                DB::afterCommit(function () use ($data, $balance) {
                     $currency = \App\Models\Currency::find($data['currency_id']);
                     $branch = \App\Models\Branch::find($data['branch_id']);
                     $user = auth()->user()->employee;
-    
+
+                    $remainingBalance = number_format($balance->amount, 0, '.', ' ');
+
                     $text = "📤 *Chiqim amalga oshirildi!*\n"
                         . "🏢 Filial: {$branch->name}\n"
                         . "👤 Xodim: {$user->name}\n"
                         . "💸 Miqdor: " . number_format($data['amount'], 0, '.', ' ') . " {$currency->name}\n"
                         . "📅 Sana: {$data['date']}\n"
+                        . "🏦 Qolgan balans: *{$remainingBalance} {$currency->name}*\n"
                         . "📘 Maqsad: " . ($data['purpose'] ?? 'Noma’lum') . "\n"
                         . "💬 Izoh: " . ($data['comment'] ?? '-');
-    
+
                     $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
                     $chatId = -979504247;
-    
+
                     Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                         'chat_id' => $chatId,
                         'text' => $text,
