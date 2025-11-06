@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\GetUserResource;
 use App\Models\DailyPayment;
+use App\Models\DepartmentBudget;
 use App\Models\Employee;
 use App\Models\Log;
 use App\Models\Order;
