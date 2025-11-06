@@ -915,6 +915,11 @@ class UserController extends Controller
                     ->whereMonth('daily_payments.payment_date', $month)
                     ->whereYear('daily_payments.payment_date', $year);
             })
+            ->leftJoin('monthly_selected_orders', function($q) use ($month, $year) {
+                $q->on('monthly_selected_orders.order_id', '=', 'orders.id')
+                    ->whereMonth('monthly_selected_orders.month', $month)
+                    ->whereYear('monthly_selected_orders.month', $year);
+            })
             ->where('orders.branch_id', $branchId)
             ->whereExists(function($query) use ($month, $year) {
                 $query->select(DB::raw(1))
