@@ -984,12 +984,17 @@ class CasherController extends Controller
             $cashboxBalance->decrement('amount', $validated['amount']);
 
             // ✅ Telegram xabar
-            DB::afterCommit(function () use ($employee, $validated) {
+            // ✅ Telegram xabar
+            DB::afterCommit(function () use ($employee, $validated, $cashboxBalance) {
+
+                $remainingBalance = number_format($cashboxBalance->amount, 0, '.', ' ');
+
                 $text = "💸 *To‘lov amalga oshirildi!*\n"
                     . "👤 Xodim: {$employee->name}\n"
                     . "💰 Miqdor: " . number_format($validated['amount'], 0, '.', ' ') . " so‘m\n"
                     . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
                     . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik') . "\n"
+                    . "🏦 Qolgan balans: *{$remainingBalance} so‘m*\n"
                     . "\n📝 Izoh: " . ($validated['comment'] ?? '-');
 
                 Http::post("https://api.telegram.org/bot" . '7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms' . "/sendMessage", [
@@ -998,11 +1003,6 @@ class CasherController extends Controller
                     'parse_mode' => 'Markdown',
                 ]);
             });
-
-            return response()->json([
-                'message' => 'Yangi to‘lov muvaffaqiyatli qo‘shildi!',
-                'payment' => $payment
-            ]);
         });
     }
 
