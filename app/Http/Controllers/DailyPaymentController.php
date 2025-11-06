@@ -38,6 +38,7 @@ class DailyPaymentController extends Controller
                 $q->whereMonth('month', date('m', strtotime($selectedMonth)))
                     ->whereYear('month', date('Y', strtotime($selectedMonth)));
             })
+            ->where('branch_id', $branchId)
             ->when($selectedSeasonYear, fn($q) =>
             $q->where('season_year', $selectedSeasonYear)
             )
