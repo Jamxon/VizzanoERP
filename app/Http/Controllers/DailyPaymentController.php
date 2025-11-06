@@ -396,6 +396,7 @@ class DailyPaymentController extends Controller
                     "order" => [
                         "id" => $row->order_id,
                         "name" => $row->order_name,
+                        'minute' => $row->model_minute,
                     ],
                     "planned_quantity" => $row->planned_quantity,
                     "produced_quantity" => $row->produced_quantity,
