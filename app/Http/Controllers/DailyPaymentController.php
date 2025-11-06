@@ -308,7 +308,7 @@ class DailyPaymentController extends Controller
             'departmentBudget',
             'employees' => function ($q) {
                 $q->where('status', 'working')
-                    ->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id', 'img')
+                    ->select('id', 'name', 'phone', 'department_id', 'percentage', 'position_id', 'img', 'branch_id')
                     ->with('position:id,name');
             }
         ]);
@@ -421,9 +421,6 @@ class DailyPaymentController extends Controller
                 ->where('orders.season_year',$seasonYear)
                 ->where('orders.season_type',$seasonType)
                 ->get();
-
-            dd($employee);
-
 
             $totalPossibleSeason = 0;
             foreach($seasonOrders as $row){
