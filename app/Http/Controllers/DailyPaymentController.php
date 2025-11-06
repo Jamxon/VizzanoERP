@@ -39,11 +39,9 @@ class DailyPaymentController extends Controller
                     ->whereYear('month', date('Y', strtotime($selectedMonth)));
             })
             ->where('branch_id', $branchId)
-            ->when($selectedSeasonYear, fn($q) =>
-            $q->where('season_year', $selectedSeasonYear)
+            ->when($selectedSeasonYear, fn($q) => $q->where('season_year', $selectedSeasonYear)
             )
-            ->when($selectedSeasonType, fn($q) =>
-            $q->where('season_type', $selectedSeasonType)
+            ->when($selectedSeasonType, fn($q) => $q->where('season_type', $selectedSeasonType)
             )
             ->get()
             ->flatMap(function ($order) use ($usdRate, $branchId) {
@@ -266,7 +264,7 @@ class DailyPaymentController extends Controller
             ->where('calculated_amount', '>', 0)
             ->orderBy('id', 'desc')
             ->get()
-            ->map(function ($row)  {
+            ->map(function ($row) {
 
 
                 return [
@@ -296,7 +294,7 @@ class DailyPaymentController extends Controller
         return response()->json($data);
     }
 
-    public function show(Department $department): \Illuminate\Http\JsonResponse
+    public function show(Department $department, Request $request): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()->employee->branch_id ?? null;
 
@@ -324,13 +322,13 @@ class DailyPaymentController extends Controller
             'total_possible_season' => 0,
         ];
 
-        $employeesData = $department->employees->map(function ($employee) use ($usdRate, $seasonYear, $seasonType, $departmentTotal) {
+        $employeesData = $department->employees->map(function ($employee) use ($request, $usdRate, $seasonYear, $seasonType, $departmentTotal) {
             $branchId = $employee->branch_id;
             $empPercent = floatval($employee->percentage ?? 0);
 
             // --- Monthly orders for this employee
-            $month = now()->format('m');
-            $year = now()->format('Y');
+            $month = $request->month ? Carbon::parse($request->month)->format('m') : now()->format('m');
+            $year = $request->month ? Carbon::parse($request->month)->format('Y') : now()->format('Y');
 
             $data = DB::table('orders')
                 ->select(
@@ -347,19 +345,19 @@ class DailyPaymentController extends Controller
                 )
                 ->join('order_models', 'order_models.order_id', '=', 'orders.id')
                 ->join('models', 'models.id', '=', 'order_models.model_id')
-                ->leftJoin('daily_payments', function($q) use ($employee, $month, $year) {
+                ->leftJoin('daily_payments', function ($q) use ($employee, $month, $year) {
                     $q->on('daily_payments.order_id', '=', 'orders.id')
                         ->where('daily_payments.employee_id', '=', $employee->id)
                         ->whereMonth('daily_payments.payment_date', $month)
                         ->whereYear('daily_payments.payment_date', $year);
                 })
-                ->leftJoin('monthly_selected_orders', function($q) use ($month, $year) {
+                ->leftJoin('monthly_selected_orders', function ($q) use ($month, $year) {
                     $q->on('monthly_selected_orders.order_id', '=', 'orders.id')
                         ->whereMonth('monthly_selected_orders.month', $month)
                         ->whereYear('monthly_selected_orders.month', $year);
                 })
                 ->where('orders.branch_id', $branchId)
-                ->whereExists(function($query) use ($month, $year) {
+                ->whereExists(function ($query) use ($month, $year) {
                     $query->select(DB::raw(1))
                         ->from('monthly_selected_orders')
                         ->whereColumn('monthly_selected_orders.order_id', 'orders.id')
@@ -415,30 +413,30 @@ class DailyPaymentController extends Controller
 
             // --- Season orders for this employee
             $seasonOrders = DB::table('orders')
-                ->select('orders.id','orders.quantity','order_models.model_id','models.minute','orders.price')
-                ->join('order_models','order_models.order_id','=','orders.id')
-                ->join('models','models.id','=','order_models.model_id')
-                ->where('orders.branch_id',$employee->branch_id)
-                ->where('orders.season_year',$seasonYear)
-                ->where('orders.season_type',$seasonType)
+                ->select('orders.id', 'orders.quantity', 'order_models.model_id', 'models.minute', 'orders.price')
+                ->join('order_models', 'order_models.order_id', '=', 'orders.id')
+                ->join('models', 'models.id', '=', 'order_models.model_id')
+                ->where('orders.branch_id', $employee->branch_id)
+                ->where('orders.season_year', $seasonYear)
+                ->where('orders.season_type', $seasonType)
                 ->get();
 
             $totalPossibleSeason = 0;
-            foreach($seasonOrders as $row){
-                $departmentBudget = DB::table('department_budgets')->where('department_id',$employee->department_id)->first();
-                if(!$departmentBudget || $departmentBudget->quantity<=0) continue;
+            foreach ($seasonOrders as $row) {
+                $departmentBudget = DB::table('department_budgets')->where('department_id', $employee->department_id)->first();
+                if (!$departmentBudget || $departmentBudget->quantity <= 0) continue;
 
                 $perPieceEarn = 0;
-                if($departmentBudget->type==='minute_based'){
-                    $perPieceEarn = $row->minute * $departmentBudget->quantity /100 * $empPercent;
-                }elseif($departmentBudget->type==='percentage_based'){
+                if ($departmentBudget->type === 'minute_based') {
+                    $perPieceEarn = $row->minute * $departmentBudget->quantity / 100 * $empPercent;
+                } elseif ($departmentBudget->type === 'percentage_based') {
                     $priceUzs = ($row->price ?? 0) * $usdRate;
-                    $perPieceEarn = (($priceUzs * $departmentBudget->quantity)/100) * ($empPercent/100);
+                    $perPieceEarn = (($priceUzs * $departmentBudget->quantity) / 100) * ($empPercent / 100);
                 }
                 $totalPossibleSeason += $row->quantity * $perPieceEarn;
             }
 
-            $monthlyTotal['total_possible_season'] = round($totalPossibleSeason,2);
+            $monthlyTotal['total_possible_season'] = round($totalPossibleSeason, 2);
 
             return [
                 'id' => $employee->id,
@@ -453,10 +451,10 @@ class DailyPaymentController extends Controller
 
         // --- Department totals
         $departmentTotals = [
-            'total_earned' => round($employeesData->sum(fn($e) => $e['totals']['total_earned']),2),
-            'total_remaining' => round($employeesData->sum(fn($e) => $e['totals']['total_remaining']),2),
-            'total_possible' => round($employeesData->sum(fn($e) => $e['totals']['total_possible']),2),
-            'total_possible_season' => round($employeesData->sum(fn($e) => $e['totals']['total_possible_season']),2),
+            'total_earned' => round($employeesData->sum(fn($e) => $e['totals']['total_earned']), 2),
+            'total_remaining' => round($employeesData->sum(fn($e) => $e['totals']['total_remaining']), 2),
+            'total_possible' => round($employeesData->sum(fn($e) => $e['totals']['total_possible']), 2),
+            'total_possible_season' => round($employeesData->sum(fn($e) => $e['totals']['total_possible_season']), 2),
         ];
 
         return response()->json([
@@ -674,58 +672,58 @@ class DailyPaymentController extends Controller
     public function updatePercentage(Request $request, Employee $employee): \Illuminate\Http\JsonResponse
     {
         $branchId = auth()->user()->employee->branch_id;
-    
+
         // ✅ Branch security
         if ($employee->branch_id !== $branchId) {
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
-    
+
         // ✅ Validate
         $validated = $request->validate([
             'percentage' => 'required|numeric|min:0|max:100',
         ]);
-    
-        $newPercentage = (float) $validated['percentage'];
-    
+
+        $newPercentage = (float)$validated['percentage'];
+
         DB::beginTransaction();
         try {
             // ✅ Update employee's main percentage
             $employee->update(['percentage' => $newPercentage]);
-    
+
             // ✅ Get all daily payments of this employee
             $payments = DailyPayment::select('id', 'employee_percentage', 'calculated_amount')
                 ->where('employee_id', $employee->id)
                 ->get();
-    
+
             if ($payments->isNotEmpty()) {
                 $now = now();
-    
+
                 foreach ($payments as $p) {
-                    $oldPercent = (float) $p->employee_percentage;
-                    $oldAmount  = (float) $p->calculated_amount;
-    
+                    $oldPercent = (float)$p->employee_percentage;
+                    $oldAmount = (float)$p->calculated_amount;
+
                     // Skip if old percentage is 0 (avoid division by zero)
                     if ($oldPercent <= 0) {
                         continue;
                     }
-    
+
                     // 1% qiymatini topamiz
                     $onePercentValue = $oldAmount / $oldPercent;
-    
+
                     // Yangi qiymatni hisoblaymiz
                     $newCalculated = round($onePercentValue * $newPercentage, 2);
-    
+
                     // Yangilaymiz
                     DailyPayment::where('id', $p->id)->update([
                         'employee_percentage' => $newPercentage,
-                        'calculated_amount'   => $newCalculated,
-                        'updated_at'          => $now,
+                        'calculated_amount' => $newCalculated,
+                        'updated_at' => $now,
                     ]);
                 }
             }
-    
+
             DB::commit();
-    
+
             return response()->json([
                 'message' => 'Employee percentage updated and all related payments recalculated successfully.',
                 'employee' => $employee,
