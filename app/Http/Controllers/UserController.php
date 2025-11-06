@@ -941,12 +941,16 @@ class UserController extends Controller
 
         $empPercent = $employee->percentage ?? 0;
 
-        $orders = $data->map(function ($row) use ($usdRate, $empPercent, $month, $year, $employeeId) {
+        $orders = $data->map(function ($row) use ($employee, $usdRate, $empPercent, $month, $year, $employeeId) {
 
             $departmentBudget = null;
             if ($row->department_id) {
                 $departmentBudget = DB::table('department_budgets')
                     ->where('department_id', $row->department_id)
+                    ->first();
+            } else {
+                $departmentBudget = DB::table('department_budgets')
+                    ->where('department_id', $employee->department_id)
                     ->first();
             }
 
