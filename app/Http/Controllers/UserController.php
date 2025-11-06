@@ -891,28 +891,28 @@ class UserController extends Controller
         $selectedMonth = $request->month ?? now()->format('Y-m');
 
         $orders = Order::query()
+            ->where('branch_id', $branchId)
             ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
                 $q->whereMonth('month', date('m', strtotime($selectedMonth)))
                     ->whereYear('month', date('Y', strtotime($selectedMonth)));
             })
-            ->where('branch_id', $branchId)
             ->with([
                 'orderModel.model:id,name,minute',
-                'dailyPayments' => fn($q) =>
-                $q->where('employee_id', $employeeId)
-                    ->whereMonth('payment_date', date('m', strtotime($selectedMonth)))
-                    ->whereYear('payment_date', date('Y', strtotime($selectedMonth)))
+                'department.departmentBudget',
+                'dailyPayments' => function ($q) use ($employeeId, $selectedMonth) {
+                    $q->where('employee_id', $employeeId)
+                        ->whereMonth('payment_date', date('m', strtotime($selectedMonth)))
+                        ->whereYear('payment_date', date('Y', strtotime($selectedMonth)));
+                }
             ])
             ->get()
-            ->map(function ($order) use ($employeeId, $usdRate) {
+            ->map(function ($order) use ($employee, $usdRate) {
 
                 $model = $order->orderModel?->model;
                 if (!$model) return null;
 
-                // ✅ Bu employee shu orderdan ishlab topgan summa (daily_payments orqali)
                 $earned = $order->dailyPayments->sum('calculated_amount');
 
-                // ✅ Produced Quantity (real ishlab chiqilgan)
                 $produced = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
                     ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                     ->where('order_models.order_id', $order->id)
@@ -922,41 +922,59 @@ class UserController extends Controller
                 $plannedQuantity = $order->quantity;
                 $remainingQuantity = max($plannedQuantity - $produced, 0);
 
-                // ✅ 1 dona uchun tikuvchi ulushi (oylik foizdan)
-                $employeePercentage = $order->monthlySelectedOrder?->employee_percentage ?? 0;
-                $priceUzs = ($order->price ?? 0) * $usdRate;
-                $unitEarn = ($priceUzs * ($employeePercentage / 100)); // 1 dona uchun $
+                $departmentBudget = $order->department?->departmentBudget;
+                $empPercent = $employee->percentage ?? 0;
 
-                // ✅ Hali olish kerak bo‘lgan summa
-                $remainingEarn = round($remainingQuantity * $unitEarn, 2);
+                $priceUzs = ($order->price ?? 0) * $usdRate;
+
+                $perPieceEarn = 0;
+
+                if ($departmentBudget && $departmentBudget->quantity > 0) {
+                    if ($departmentBudget->type == 'minute_percentage') {
+                        $perPieceEarn =
+                            ($model->minute * $departmentBudget->quantity / 100)
+                            * ($empPercent / 100);
+                    } elseif ($departmentBudget->type == 'percentage_based') {
+                        $perPieceEarn =
+                            (($priceUzs * $departmentBudget->quantity) / 100)
+                            * ($empPercent / 100);
+                    }
+                }
+
+                $remainingEarn = round($remainingQuantity * $perPieceEarn, 2);
+                $possibleEarn = round($plannedQuantity * $perPieceEarn, 2);
 
                 return [
                     "order" => [
                         "id" => $order->id,
-                        "name" => $order->name,
+                        "code" => $order->code,
                     ],
+
                     "model" => [
                         "id" => $model->id,
                         "name" => $model->name,
                         "minute" => $model->minute
                     ],
+
                     "planned_quantity" => $plannedQuantity,
                     "produced_quantity" => $produced,
                     "remaining_quantity" => $remainingQuantity,
 
-                    "employee_percentage" => $employeePercentage,
-                    "earned_amount" => round($earned, 2), // ✅ tugaganlari
-                    "remaining_earn_amount" => $remainingEarn, // ✅ hali tikilishi keraklaridan
-                    "unit_earn" => round($unitEarn, 2),
+                    "earned_amount" => round($earned, 2),
+                    "remaining_earn_amount" => $remainingEarn,
+                    "possible_full_earn_amount" => $possibleEarn,
+
+                    "per_piece_earn" => round($perPieceEarn, 4),
 
                     "payments" => $order->dailyPayments->map(function ($p) {
                         return [
                             "id" => $p->id,
                             "date" => $p->payment_date,
                             "quantity_produced" => $p->quantity_produced,
-                            "earned_amount" => round($p->calculated_amount, 2)
+                            "calculated_amount" => round($p->calculated_amount, 2),
+                            "employee_percentage" => $p->employee_percentage,
                         ];
-                    })
+                    }),
                 ];
             })
             ->filter()
@@ -965,13 +983,15 @@ class UserController extends Controller
         return response()->json([
             "employee" => [
                 "id" => $employeeId,
-                "name" => $employee->name
+                "name" => $employee->full_name
             ],
             "month" => $selectedMonth,
             "total_earned" => round($orders->sum('earned_amount'), 2),
-            "total_remaining" => round($orders->sum('remaining_earn_amount'), 2), // ✅ umumiy qolgan pul
-            "orders" => $orders
+            "total_remaining" => round($orders->sum('remaining_earn_amount'), 2),
+            "total_possible" => round($orders->sum('possible_full_earn_amount'), 2),
+            "orders" => $orders,
         ]);
     }
+
 
 }
