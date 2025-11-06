@@ -377,6 +377,8 @@ class DailyPaymentController extends Controller
                 )
                 ->get();
 
+            dd($data);
+
             $orders = $data->map(function ($row) use ($employee, $usdRate, $empPercent, $month, $year) {
                 $departmentBudget = DB::table('department_budgets')->where('department_id', $row->department_id)->first();
 
