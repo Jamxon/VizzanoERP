@@ -1079,7 +1079,7 @@ class GroupMasterController extends Controller
         ]);
     }
     
-  public function getMyOrdersWithBudgets(Request $request)
+    public function getMyOrdersWithBudgets(Request $request)
     {
         // Get the group and selected month from the request
         $groupId = auth()->user()->employee->group_id;
