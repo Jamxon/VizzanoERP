@@ -496,14 +496,7 @@
       <workItem from="1761994438958" duration="21001000" />
       <workItem from="1762063784746" duration="22759000" />
       <workItem from="1762142764178" duration="16574000" />
-    </task>
-    <task id="LOCAL-01709" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762093243259</created>
-      <option name="number" value="01709" />
-      <option name="presentableId" value="LOCAL-01709" />
-      <option name="project" value="LOCAL" />
-      <updated>1762093243259</updated>
+      <workItem from="1762425582395" duration="398000" />
     </task>
     <task id="LOCAL-01710" summary="feat: add DailyPayment model and controller for managing daily payment records">
       <option name="closed" value="true" />
@@ -889,7 +882,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762166124039</updated>
     </task>
-    <option name="localTasksCounter" value="1758" />
+    <task id="LOCAL-01758" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762425918052</created>
+      <option name="number" value="01758" />
+      <option name="presentableId" value="LOCAL-01758" />
+      <option name="project" value="LOCAL" />
+      <updated>1762425918053</updated>
+    </task>
+    <option name="localTasksCounter" value="1759" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
