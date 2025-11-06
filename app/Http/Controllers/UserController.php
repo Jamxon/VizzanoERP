@@ -932,8 +932,7 @@ class UserController extends Controller
                 return [
                     "order" => [
                         "id" => $order->id,
-                        "code" => $order->code,
-                        "price" => $order->price,
+                        "name" => $order->name,
                     ],
                     "model" => [
                         "id" => $model->id,
@@ -965,7 +964,7 @@ class UserController extends Controller
         return response()->json([
             "employee" => [
                 "id" => $employeeId,
-                "name" => $employee->full_name
+                "name" => $employee->name
             ],
             "month" => $selectedMonth,
             "total_earned" => round($orders->sum('earned_amount'), 2),
