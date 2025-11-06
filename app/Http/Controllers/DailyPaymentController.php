@@ -326,7 +326,7 @@ class DailyPaymentController extends Controller
 
         $employeesData = $department->employees->map(function ($employee) use ($usdRate, $seasonYear, $seasonType, $departmentTotal) {
             $branchId = $employee->branch_id;
-            $empPercent = $employee->percentage ?? 0;
+            $empPercent = floatval($employee->percentage ?? 0);
 
             // --- Monthly orders for this employee
             $month = now()->format('m');
