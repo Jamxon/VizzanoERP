@@ -9,7 +9,10 @@ use Carbon\Carbon;
 use App\Models\Employee;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http; // <— ⚠️ BU YO‘Q EDI, Telegram POST uchun kerak
+use Illuminate\Support\Facades\Http;
+use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
+
+// <— ⚠️ BU YO‘Q EDI, Telegram POST uchun kerak
 
 class HikvisionEventController extends Controller
 {
@@ -27,6 +30,14 @@ class HikvisionEventController extends Controller
             4 => -1003041140850,
             5 => -1001883536528,
         ];
+
+        Log::add(
+            null,
+            'Hikvision event qabul qilindi',
+            'info',
+            null,
+            ['headers' => $request->headers->all(), 'content_type' => $contentType]
+        );
 
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
