@@ -1128,8 +1128,6 @@ class GroupMasterController extends Controller
             // Calculate the earnings from the order's quantity (order's quantity * expense quantity)
             $amountFromOrderQuantity = $order->quantity * $totalExpense * $orderModel->model->minute;
 
-            $totalOrderMinutes = $orderModel->model->minute * $order->quantity;
-
             // Add the calculated details to the response array
             $orderDetails[] = [
                 'order' => [
