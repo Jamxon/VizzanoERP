@@ -918,4 +918,74 @@ class DailyPaymentController extends Controller
         ]);
     }
 
+    public function editDailyPayment(Request $request, DailyPayment $dailyPayment): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'quantity_produced' => 'nullable|numeric|min:0',
+            'employee_percentage' => 'nullable|numeric|min:0|max:100',
+        ]);
+
+        $oldProduced = $dailyPayment->quantity_produced;
+        $oldPercentage = $dailyPayment->employee_percentage;
+        $oldCalculated = $dailyPayment->calculated_amount;
+
+        $newProduced = $validated['quantity_produced'] ?? $oldProduced;
+        $newPercentage = $validated['employee_percentage'] ?? $oldPercentage;
+
+        if (isset($validated['quantity_produced']) && $oldProduced > 0) {
+            $newCalculated = ($oldCalculated / $oldProduced) * $newProduced;
+        } elseif (isset($validated['employee_percentage']) && $oldPercentage > 0) {
+            $newCalculated = ($oldCalculated / $oldPercentage) * $newPercentage;
+        } else {
+            return response()->json(['message' => 'Nothing to update'], 400);
+        }
+
+        $dailyPayment->update([
+            'quantity_produced' => $newProduced,
+            'employee_percentage' => $newPercentage,
+            'calculated_amount' => round($newCalculated, 2),
+        ]);
+
+        return response()->json([
+            'message' => 'DailyPayment updated successfully',
+            'updated' => $dailyPayment
+        ]);
+    }
+
+    public function storeDailyPayment(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'employee_id' => 'required|integer|exists:employees,id',
+            'model_id' => 'required|integer|exists:models,id',
+            'order_id' => 'required|integer|exists:orders,id',
+            'department_id' => 'required|integer|exists:departments,id',
+            'quantity_produced' => 'required|numeric|min:0',
+            'calculated_amount' => 'required|numeric|min:0',
+            'employee_percentage' => 'required|numeric|min:0|max:100',
+            'payment_date' => 'required|date',
+        ]);
+
+        $branchId = auth()->user()->employee->branch_id;
+
+        // ✅ Branch security
+        $employee = Employee::where('id', $validated['employee_id'])
+            ->where('branch_id', $branchId)
+            ->firstOrFail();
+
+        $dailyPayment = DailyPayment::create([
+            'employee_id' => $validated['employee_id'],
+            'model_id' => $validated['model_id'],
+            'order_id' => $validated['order_id'],
+            'department_id' => $validated['department_id'],
+            'quantity_produced' => $validated['quantity_produced'],
+            'calculated_amount' => $validated['calculated_amount'],
+            'employee_percentage' => $validated['employee_percentage'],
+            'payment_date' => $validated['payment_date'],
+        ]);
+
+        return response()->json([
+            'message' => 'DailyPayment created successfully',
+            'daily_payment' => $dailyPayment
+        ], 201);
+    }
 }
