@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
 use App\Models\Department;
 use App\Models\DepartmentBudget;
 use App\Models\Employee;
@@ -311,6 +312,8 @@ class DailyPaymentController extends Controller
                     ->with('position:id,name');
             }
         ]);
+        $month = $request->month ? Carbon::parse($request->month)->format('m') : now()->format('m');
+        $year = $request->month ? Carbon::parse($request->month)->format('Y') : now()->format('Y');
 
         $usdRate = getUsdRate();
         $seasonYear = 2026;
@@ -323,13 +326,27 @@ class DailyPaymentController extends Controller
             'total_possible_season' => 0,
         ];
 
-        $employeesData = $department->employees->map(function ($employee) use ($request, $usdRate, $seasonYear, $seasonType, $departmentTotal) {
+        $startOfMonth = Carbon::create($year, $month, 1);
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+        $totalWorkingDays = 0;
+
+        for ($dateIter = $startOfMonth->copy(); $dateIter <= $endOfMonth; $dateIter->addDay()) {
+            if (!$dateIter->isWeekend()) {
+                $totalWorkingDays++;
+            }
+        }
+
+        $employeesData = $department->employees->map(function ($employee) use ($totalWorkingDays, $year, $month, $request, $usdRate, $seasonYear, $seasonType, $departmentTotal) {
             $branchId = $employee->branch_id;
             $empPercent = floatval($employee->percentage ?? 0);
 
             // --- Monthly orders for this employee
-            $month = $request->month ? Carbon::parse($request->month)->format('m') : now()->format('m');
-            $year = $request->month ? Carbon::parse($request->month)->format('Y') : now()->format('Y');
+
+            $presentDays = Attendance::where('employee_id', $employee->id)
+                ->where('status', 'present')
+                ->whereMonth('date', $month)
+                ->whereYear('date', $year)
+                ->count();
 
             $data = DB::table('orders')
                 ->select(
@@ -455,6 +472,10 @@ class DailyPaymentController extends Controller
                 'img' => $employee->img,
                 'payment_type' => $employee->payment_type,
                 'salary' => $salary,
+                'attendance' => [
+                    'present_days' => $presentDays,
+                    'total_working_days' => $totalWorkingDays,
+                ],
                 'orders' => $orders,
                 'totals' => $monthlyTotal,
             ];
