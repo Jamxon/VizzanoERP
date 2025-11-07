@@ -861,7 +861,10 @@ class DailyPaymentController extends Controller
 
                     return [
                         'payment_id' => $payment->id,
-                        'order' => $payment->order,
+                        'order' => [
+                            'id' => $payment->order->id,
+                            'name' => $payment->order->name,
+                        ],
                         'model' => $payment->order->orderModel?->model,
                         'daily_quantity' => $payment->quantity_produced,
                         'day_output_quantity' => $dayOutputQuantity,
