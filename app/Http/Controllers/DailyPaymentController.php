@@ -407,6 +407,7 @@ class DailyPaymentController extends Controller
             });
 
             $monthlyTotal = [
+                'total_planned_quantity' => $orders->sum('planned_quantity'),
                 'total_earned' => round($orders->sum('earned_amount'), 2),
                 'total_remaining' => round($orders->sum('remaining_earn_amount'), 2),
                 'total_possible' => round($orders->sum('possible_full_earn_amount'), 2),
