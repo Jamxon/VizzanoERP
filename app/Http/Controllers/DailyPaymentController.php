@@ -841,7 +841,7 @@ class DailyPaymentController extends Controller
                     'details' => $group->map(function ($payment) {
                         return [
                             'payment_id' => $payment->id,
-                            'order' => $payment->order?->name,
+                            'order' => $payment->order,
                             'model' => $payment->model?->name,
                             'quantity_produced' => $payment->quantity_produced,
                             'calculated_amount' => round($payment->calculated_amount, 2),
