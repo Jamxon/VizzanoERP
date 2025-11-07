@@ -847,6 +847,7 @@ class DailyPaymentController extends Controller
                             'calculated_amount' => round($payment->calculated_amount, 2),
                             'employee_percentage' => round($payment->employee_percentage, 2),
                             'payment_date' => $payment->payment_date,
+                            'created_at' => $payment->created_at,
                         ];
                     })->values()
                 ];
