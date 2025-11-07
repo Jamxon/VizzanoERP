@@ -331,7 +331,7 @@ class DailyPaymentController extends Controller
         $totalWorkingDays = 0;
 
         for ($dateIter = $startOfMonth->copy(); $dateIter <= $endOfMonth; $dateIter->addDay()) {
-            if (!$dateIter->isWeekend()) {
+            if (!$dateIter->isSunday()) {
                 $totalWorkingDays++;
             }
         }
