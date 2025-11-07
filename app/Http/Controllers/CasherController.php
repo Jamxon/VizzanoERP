@@ -919,15 +919,15 @@ class CasherController extends Controller
             // ⛔ ONLY If amount is negative — CONTROL RULES APPLY
             if ($validated['amount'] < 0) {
 
-                $lastPayment = SalaryPayment::where('employee_id', $validated['employee_id'])
-                    ->orderByDesc('id')
-                    ->first();
+//                $lastPayment = SalaryPayment::where('employee_id', $validated['employee_id'])
+//                    ->orderByDesc('id')
+//                    ->first();
 
-                if (!$lastPayment) {
-                    return response()->json([
-                        'message' => "Oldin to‘lov yo‘q — minus qilishga ruxsat yo‘q!"
-                    ], 500);
-                }
+//                if (!$lastPayment) {
+//                    return response()->json([
+//                        'message' => "Oldin to‘lov yo‘q — minus qilishga ruxsat yo‘q!"
+//                    ], 500);
+//                }
 
                 // QOIDA #2: 5 daqiqa o'tgan bo'lsa — Block
                 // if ($lastPayment->created_at->lt(now()->subMinutes(5))) {
@@ -937,11 +937,11 @@ class CasherController extends Controller
                 // }
 
                 // QOIDA #3: Minus kattalik check
-                if (abs($validated['amount']) > abs($lastPayment->amount)) {
-                    return response()->json([
-                        'message' => "Minus miqdori oxirgi to‘lovni oshib ketmasin! (Limit: {$lastPayment->amount})"
-                    ], 403);
-                }
+//                if (abs($validated['amount']) > abs($lastPayment->amount)) {
+//                    return response()->json([
+//                        'message' => "Minus miqdori oxirgi to‘lovni oshib ketmasin! (Limit: {$lastPayment->amount})"
+//                    ], 403);
+//                }
             }
 
             $cashboxBalance = CashboxBalance::with('cashbox')
