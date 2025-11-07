@@ -140,7 +140,7 @@ class DailyPaymentController extends Controller
                             'name' => $model->name,
                             'minute' => $model->minute,
                         ],
-                        'rasxod' => $order->orderModel->rasxod ?? 0,
+                        'rasxod' => $order->orderModel->model->rasxod ?? 0,
                         "produced_quantity" => $produced,
                         "minutes" => $minutes,
                         "worker_real_cost" => round($workerCost, 2),
