@@ -820,7 +820,15 @@ class DailyPaymentController extends Controller
         $branchId = auth()->user()->employee->branch_id ?? null;
         $departmentId = $request->department_id ?? null;
 
-        $payments = DailyPayment::with(['employee:id,name', 'order:id,name', 'model:id,name'])
+        $payments = DailyPayment::with([
+            'employee:id,name',
+            'order:id,name,order_model_id',
+            'order.orderModel:id,name',
+            'order.orderModel.submodels:id,order_model_id',
+            'order.orderModel.submodels.sewingOutputs' => function ($q) use ($date) {
+                $q->whereDate('created_at', $date);
+            }
+        ])
             ->whereDate('payment_date', $date)
             ->whereHas('employee', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
@@ -831,27 +839,46 @@ class DailyPaymentController extends Controller
             ->get()
             ->groupBy('employee_id')
             ->map(function ($group) {
-
                 $employee = $group->first()->employee;
 
-                return [
-                    'id' => $employee->id,
-                    'name' => $employee->name,
-                    'total_calculated_amount' => round($group->sum('calculated_amount'), 2),
-                    'details' => $group->map(function ($payment) {
-                        return [
-                            'payment_id' => $payment->id,
-                            'order' => $payment->order,
-                            'model' => $payment->model?->name,
-                            'quantity_produced' => $payment->quantity_produced,
-                            'calculated_amount' => round($payment->calculated_amount, 2),
-                            'employee_percentage' => round($payment->employee_percentage, 2),
-                            'payment_date' => $payment->payment_date,
-                            'created_at' => $payment->created_at,
-                        ];
-                    })->values()
-                ];
+                $totalPotential = 0;
 
+                $details = $group->map(function ($payment) use (&$totalPotential) {
+
+                    // Shu order bo‘yicha shu kunda chiqgan quantity
+                    $dayOutputQuantity = $payment->order->orderModel->submodels->sum(function ($submodel) {
+                        return $submodel->sewingOutputs->sum('quantity');
+                    });
+
+                    // Agar mavjud bo‘lsa potensial daromadni hisoblash
+                    $potential = $payment->quantity_produced > 0
+                        ? ($payment->calculated_amount / $payment->quantity_produced) * $dayOutputQuantity
+                        : 0;
+
+                    $potential = round($potential, 2);
+
+                    $totalPotential += $potential;
+
+                    return [
+                        'payment_id' => $payment->id,
+                        'order_name' => $payment->order->name,
+                        'model_name' => $payment->order->orderModel?->name,
+                        'daily_quantity' => $payment->quantity_produced,
+                        'day_output_quantity' => $dayOutputQuantity,
+                        'calculated_amount' => round($payment->calculated_amount, 2),
+                        'potential_earn' => $potential,
+                        'employee_percentage' => round($payment->employee_percentage, 2),
+                        'payment_date' => $payment->payment_date,
+                    ];
+                })->values();
+
+                return [
+                    'employee_id' => $employee->id,
+                    'employee_name' => $employee->name,
+                    'total_calculated_amount' => round($group->sum('calculated_amount'), 2),
+                    'total_potential_earn' => round($totalPotential, 2),
+                    'details' => $details,
+                ];
             })->values();
 
         return response()->json($payments);
