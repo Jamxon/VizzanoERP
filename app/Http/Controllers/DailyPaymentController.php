@@ -814,4 +814,34 @@ class DailyPaymentController extends Controller
         ]);
     }
 
+    public function showDailyPaymentWithDay(Request $request)
+    {
+        $date = $request->date ?? now()->toDateString();
+        $branchId = auth()->user()->employee->branch_id ?? null;
+        $departmentId = $request->department_id ?? null;
+
+        $payments = DailyPayment::with(['employee:id,name', 'order:id,name', 'model:id,name'])
+            ->whereDate('payment_date', $date)
+            ->whereHas('employee', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+            })
+            ->when($departmentId, function ($q) use ($departmentId) {
+                $q->where('department_id', $departmentId);
+            })
+            ->get()
+            ->map(function ($payment) {
+                return [
+                    'id' => $payment->id,
+                    'employee' => $payment->employee,
+                    'order' => $payment->order,
+                    'model' => $payment->model,
+                    'quantity_produced' => $payment->quantity_produced,
+                    'calculated_amount' => round($payment->calculated_amount, 2),
+                    'employee_percentage' => round($payment->employee_percentage, 2),
+                    'payment_date' => $payment->payment_date,
+                ];
+            });
+
+        return response()->json($payments);
+    }
 }
