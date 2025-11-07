@@ -861,7 +861,7 @@ class DailyPaymentController extends Controller
             'employee:id,name',
             'order:id,name',
             'order.orderModel:id,model_id,order_id',
-            'order.orderModel.submodels:id,order_model_id',
+            'order.orderModel.submodels:id,order_model_id,submodel_id',
             'order.orderModel.submodels.sewingOutputs' => function ($q) use ($date) {
                 $q->whereDate('created_at', $date);
             }
@@ -903,6 +903,7 @@ class DailyPaymentController extends Controller
                             'name' => $payment->order->name,
                         ],
                         'model' => $payment->order->orderModel?->model,
+                        'submodel' => $payment->order->orderModel?->submodels->first()?->submodel,
                         'daily_quantity' => $payment->quantity_produced,
                         'day_output_quantity' => $dayOutputQuantity,
                         'calculated_amount' => round($payment->calculated_amount, 2),
