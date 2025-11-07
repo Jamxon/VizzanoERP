@@ -972,6 +972,10 @@ class DailyPaymentController extends Controller
             ->where('branch_id', $branchId)
             ->firstOrFail();
 
+        if (!$employee){
+            return response()->json(['message' => 'Unauthorized access.'], 403);
+        }
+
         $dailyPayment = DailyPayment::create([
             'employee_id' => $validated['employee_id'],
             'model_id' => $validated['model_id'],
