@@ -31,13 +31,13 @@ class HikvisionEventController extends Controller
             5 => -1001883536528,
         ];
 
-        Log::add(
-            null,
-            'Hikvision event qabul qilindi',
-            'info',
-            null,
-            ['event_log' => $request->event_log ?? $request->all()]
-        );
+//        Log::add(
+//            null,
+//            'Hikvision event qabul qilindi',
+//            'info',
+//            null,
+//            ['event_log' => $request->event_log ?? $request->all()]
+//        );
 
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
