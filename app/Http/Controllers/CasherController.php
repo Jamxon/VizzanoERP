@@ -917,7 +917,7 @@ class CasherController extends Controller
             $employee = Employee::findOrFail($validated['employee_id']);
 
             // ⛔ ONLY If amount is negative — CONTROL RULES APPLY
-            if ($validated['amount'] < 0) {
+//            if ($validated['amount'] < 0) {
 
 //                $lastPayment = SalaryPayment::where('employee_id', $validated['employee_id'])
 //                    ->orderByDesc('id')
@@ -942,7 +942,7 @@ class CasherController extends Controller
 //                        'message' => "Minus miqdori oxirgi to‘lovni oshib ketmasin! (Limit: {$lastPayment->amount})"
 //                    ], 403);
 //                }
-            }
+//            }
 
             $cashboxBalance = CashboxBalance::with('cashbox')
                 ->whereHas('cashbox', fn($q) =>
