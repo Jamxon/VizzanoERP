@@ -822,8 +822,8 @@ class DailyPaymentController extends Controller
 
         $payments = DailyPayment::with([
             'employee:id,name',
-            'order:id,name,order_model_id',
-            'order.orderModel:id,name',
+            'order:id,name',
+            'order.orderModel:id,order_model_id',
             'order.orderModel.submodels:id,order_model_id',
             'order.orderModel.submodels.sewingOutputs' => function ($q) use ($date) {
                 $q->whereDate('created_at', $date);
