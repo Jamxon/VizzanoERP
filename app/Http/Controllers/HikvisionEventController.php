@@ -36,7 +36,7 @@ class HikvisionEventController extends Controller
             'Hikvision event qabul qilindi',
             'info',
             null,
-            ['headers' => $request->headers->all(), 'content_type' => $contentType]
+            ['event_log' => $request->event_log ?? $request->all()]
         );
 
         if (str_contains($contentType, 'multipart/form-data')) {
