@@ -108,11 +108,9 @@ class ManufactuterController extends Controller
 
             // --- Ma’lumotlarni yig‘ish
             $result[] = [
-                'group_id' => $groupId,
-                'group_name' => $group->name,
-                'responsible' => optional($group->responsibleUser->employee)->name,
-                'department' => optional($group->department)->name,
-                'main_department' => optional($group->department->mainDepartment)->name,
+                'id' => $groupId,
+                'name' => $group->name,
+                'responsibleUser' => $group->responsibleUser->employee,
                 'avgWorkersLast30Days' => round($avgWorkers, 2),
                 'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
                 'monthlyOrdersCount' => $monthlyOrders->count(),
