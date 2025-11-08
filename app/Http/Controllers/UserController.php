@@ -983,7 +983,7 @@ class UserController extends Controller
                     "name" => $row->model_name,
                     "minute" => $row->model_minute,
                 ],
-                'submdodel' => $row->map(function ($sub) {
+                'submodel' => $row->map(function ($sub) {
                     return [
                         'id' => $sub->id,
                         'name' => $sub->name,
