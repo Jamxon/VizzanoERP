@@ -46,7 +46,6 @@ class ManufactuterController extends Controller
                 ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
                 ->get();
 
-            // Oy bo‘yicha daily sewingOutputs, quantity > 0
             $dailySewingOutputs = $monthlyOrders->flatMap(function($order) {
                 return $order->orderModel->submodels->flatMap(function($sub) use ($order) {
                     return $sub->sewingOutputs->map(fn($output) => [
@@ -55,9 +54,14 @@ class ManufactuterController extends Controller
                         'quantity' => $output->quantity,
                     ]);
                 });
-            })->filter(fn($item) => $item['quantity'] > 0);
+            })->filter(fn($item) => $item['quantity'] > 0)
+                ->values(); // <-- values() array indekslarini reset qiladi
 
             $monthlySewingOutputsSum = $dailySewingOutputs->sum('quantity');
+
+            if ($monthlySewingOutputsSum <= 0) {
+                continue;
+            }
 
             // Agar oylik sewingOutputs 0 bo‘lsa, groupni qo‘shma
             if ($monthlySewingOutputsSum <= 0) {
