@@ -55,7 +55,12 @@ class ManufactuterController extends Controller
                     ]);
                 });
             })->filter(fn($item) => $item['quantity'] > 0)
-                ->values(); // <-- array indekslarini reset qiladi
+                ->groupBy('date') // kun bo‘yicha guruhlash
+                ->map(fn($items, $date) => [
+                    'date' => $date,
+                    'quantity' => $items->sum('quantity'),
+                ])
+                ->values(); // indeksi reset qiladi
 
             $monthlySewingOutputsSum = $dailySewingOutputs->sum('quantity');
 
@@ -67,10 +72,6 @@ class ManufactuterController extends Controller
             if ($monthlySewingOutputsSum <= 0) {
                 continue;
             }
-
-            $dailySewingGrouped = $dailySewingOutputs
-                ->groupBy('date')
-                ->map(fn($items) => $items->sum('quantity'));
 
             // So‘nggi 30 ish kunidagi attendance
             $last30Workdays = collect();
