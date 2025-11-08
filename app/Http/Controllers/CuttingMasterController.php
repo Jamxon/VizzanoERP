@@ -257,6 +257,7 @@ class CuttingMasterController extends Controller
                     ->where('employee_id', $emp->id)
                     ->where('order_id', $order->id)
                     ->where('model_id', $order->orderModel->model->id)
+                    ->whereDate('payment_date', Carbon::today())
                     ->first();
 
                 if ($existingPayment) {
@@ -334,6 +335,7 @@ class CuttingMasterController extends Controller
                                     ->where('employee_id', $wEmp->id)
                                     ->where('order_id', $order->id)
                                     ->where('model_id', $order->orderModel->model->id)
+                                    ->whereDate('payment_date', Carbon::today())
                                     ->first();
 
                                 if ($existing) {
