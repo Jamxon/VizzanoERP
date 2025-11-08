@@ -502,11 +502,11 @@ class GroupMasterController extends Controller
 
         /** ✅ Payment calculation for Sewing Output based departments **/
         $sewingDepartments = [
-            'Сифат назорати ва қадоқлаш бўлими',
-            'Маъмурий бошқарув',
-            'Хўжалик ишлари бўлими',
-            'Режалаштириш ва иқтисод бўлими',
-            'Тикув бўлими',
+            "Sifat nazorati va qadoqlash bo'limi",
+            "Texnik bo'lim",
+            "Ho'jalik ishlari bo'limi",
+            "Rejalashtirish va iqtisod bo'limi",
+            "Ma'muriy boshqaruv"
         ];
 
         $branchId = auth()->user()->employee->branch_id;
