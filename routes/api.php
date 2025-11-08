@@ -19,6 +19,7 @@ use App\Http\Controllers\HikvisionEventController;
 use App\Http\Controllers\InternalAccountantController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemTypeController;
+use App\Http\Controllers\ManufactuterController;
 use App\Http\Controllers\ModelController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\OrderImportController;
@@ -46,6 +47,9 @@ use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\MessageController;
+Route::prefix('manufacturer')->middleware('role:manufacturer')->group(function () {
+    Route::get('groups', [ManufactuterController::class, 'getBranchGroupsWithBudgets']);
+});
 
 Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('groupsOrders', [\App\Http\Controllers\CeoController::class, 'getGroupOrder']);
