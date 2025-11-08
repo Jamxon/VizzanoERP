@@ -983,12 +983,12 @@ class UserController extends Controller
                     "name" => $row->model_name,
                     "minute" => $row->model_minute,
                 ],
-                'submodel' => $row->map(function ($sub) {
-                    return [
-                        'id' => $sub->id,
-                        'name' => $sub->name,
-                    ];
-                }),
+                'submodels' => DB::table('sub_models')
+                    ->join('order_sub_models', 'order_sub_models.submodel_id', '=', 'sub_models.id')
+                    ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
+                    ->where('order_models.order_id', $row->order_id)
+                    ->select('sub_models.id', 'sub_models.name')
+                    ->get(),
                 "planned_quantity" => $row->planned_quantity,
                 "produced_quantity" => $row->produced_quantity,
                 "remaining_quantity" => $remainingQuantity,
