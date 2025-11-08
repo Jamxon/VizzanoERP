@@ -46,13 +46,12 @@ class ManufactuterController extends Controller
                 ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
                 ->get();
 
-            // Oy bo‘yicha har bir orderning daily sewingOutputs
             $dailySewingOutputs = $monthlyOrders->flatMap(function($order) {
                 return $order->orderModel->submodels->flatMap(function($sub) use ($order) {
                     return $sub->sewingOutputs->map(function($output) use ($order) {
                         return [
                             'order_id' => $order->id,
-                            'date' => $output->date,
+                            'date' => \Carbon\Carbon::parse($output->created_at)->toDateString(), // <-- created_at ishlatiladi
                             'quantity' => $output->quantity,
                         ];
                     });
