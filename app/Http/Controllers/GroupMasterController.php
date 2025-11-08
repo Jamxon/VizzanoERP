@@ -1162,40 +1162,88 @@ class GroupMasterController extends Controller
 
         $seasonDailyQuantityNeeded = $seasonDaysToFinish > 0 ? round($seasonTotalQuantity / $seasonDaysToFinish) : 0;
 
-        // --- NEW: Calculate deadline date and required workers for season orders
-        $deadlineDate = '2026-01-15'; // 10 yanvar
         $today = now();
-        $deadline = \Carbon\Carbon::parse($deadlineDate);
+
+        // --- MONTHLY ORDERS DEADLINE CALCULATION ---
+        // Monthly deadline: oxirgi kuni - tanlangan oyning oxirgi kuni
+        $selectedMonthDate = \Carbon\Carbon::parse($selectedMonth);
+        $monthlyDeadlineDate = $selectedMonthDate->endOfMonth()->format('Y-m-d');
+        $monthlyDeadline = \Carbon\Carbon::parse($monthlyDeadlineDate);
 
         // Ish kunlarini hisoblash (yakshanbasiz)
-        $workingDaysUntilDeadline = 0;
+        $monthlyWorkingDaysUntilDeadline = 0;
         $tempDate = $today->copy();
-        while ($tempDate->lessThanOrEqualTo($deadline)) {
+        while ($tempDate->lessThanOrEqualTo($monthlyDeadline)) {
             if (!$tempDate->isSunday()) {
-                $workingDaysUntilDeadline++;
+                $monthlyWorkingDaysUntilDeadline++;
             }
             $tempDate->addDay();
         }
 
         // Agar hozirgi ishchilar bilan deadline oshib ketsa
-        $seasonDeadlineExceeded = $seasonDaysToFinish > $workingDaysUntilDeadline;
-        $requiredWorkersForDeadline = null;
-        $requiredDailyProductionMinutes = null;
-        $requiredDailyQuantityForDeadline = null;
+        $monthlyDeadlineExceeded = $monthlyDaysToFinish > $monthlyWorkingDaysUntilDeadline;
+        $monthlyRequiredWorkersForDeadline = null;
+        $monthlyRequiredDailyProductionMinutes = null;
+        $monthlyRequiredDailyQuantityForDeadline = null;
 
-        if ($seasonDeadlineExceeded && $workingDaysUntilDeadline > 0) {
-            // 10 yanvargacha tugash uchun kerakli kunlik ishlab chiqarish daqiqalari
-            $requiredDailyProductionMinutes = ceil($seasonMinutesTotal / $workingDaysUntilDeadline);
+        if ($monthlyDeadlineExceeded && $monthlyWorkingDaysUntilDeadline > 0) {
+            // Oyning oxirigacha tugash uchun kerakli kunlik ishlab chiqarish daqiqalari
+            $monthlyRequiredDailyProductionMinutes = ceil($monthlyMinutesTotal / $monthlyWorkingDaysUntilDeadline);
 
             // Kerakli ishchilar soni (har bir ishchi 500 daqiqa ishlaydi)
-            $requiredWorkersForDeadline = ceil($requiredDailyProductionMinutes / 500);
+            $monthlyRequiredWorkersForDeadline = ceil($monthlyRequiredDailyProductionMinutes / 500);
 
-            // 10 yanvargacha tugash uchun kuniga kerakli son (quantity)
-            $requiredDailyQuantityForDeadline = $workingDaysUntilDeadline > 0 ? round($seasonTotalQuantity / $workingDaysUntilDeadline) : 0;
+            // Oyning oxirigacha tugash uchun kuniga kerakli son (quantity)
+            $monthlyRequiredDailyQuantityForDeadline = $monthlyWorkingDaysUntilDeadline > 0 ? round($monthlyTotalQuantity / $monthlyWorkingDaysUntilDeadline) : 0;
         }
 
-        // Joriy ishchilar bilan deadline sanasi
-        $estimatedDeadlineDate = null;
+        // Joriy ishchilar bilan monthly deadline sanasi
+        $monthlyEstimatedDeadlineDate = null;
+        if ($monthlyDaysToFinish !== null) {
+            $estimatedDate = $today->copy();
+            $daysAdded = 0;
+            while ($daysAdded < $monthlyDaysToFinish) {
+                $estimatedDate->addDay();
+                if (!$estimatedDate->isSunday()) {
+                    $daysAdded++;
+                }
+            }
+            $monthlyEstimatedDeadlineDate = $estimatedDate->format('Y-m-d');
+        }
+
+        // --- SEASON ORDERS DEADLINE CALCULATION ---
+        $seasonDeadlineDate = '2026-01-15';
+        $seasonDeadline = \Carbon\Carbon::parse($seasonDeadlineDate);
+
+        // Ish kunlarini hisoblash (yakshanbasiz)
+        $seasonWorkingDaysUntilDeadline = 0;
+        $tempDate = $today->copy();
+        while ($tempDate->lessThanOrEqualTo($seasonDeadline)) {
+            if (!$tempDate->isSunday()) {
+                $seasonWorkingDaysUntilDeadline++;
+            }
+            $tempDate->addDay();
+        }
+
+        // Agar hozirgi ishchilar bilan deadline oshib ketsa
+        $seasonDeadlineExceeded = $seasonDaysToFinish > $seasonWorkingDaysUntilDeadline;
+        $seasonRequiredWorkersForDeadline = null;
+        $seasonRequiredDailyProductionMinutes = null;
+        $seasonRequiredDailyQuantityForDeadline = null;
+
+        if ($seasonDeadlineExceeded && $seasonWorkingDaysUntilDeadline > 0) {
+            // 15 yanvargacha tugash uchun kerakli kunlik ishlab chiqarish daqiqalari
+            $seasonRequiredDailyProductionMinutes = ceil($seasonMinutesTotal / $seasonWorkingDaysUntilDeadline);
+
+            // Kerakli ishchilar soni (har bir ishchi 500 daqiqa ishlaydi)
+            $seasonRequiredWorkersForDeadline = ceil($seasonRequiredDailyProductionMinutes / 500);
+
+            // 15 yanvargacha tugash uchun kuniga kerakli son (quantity)
+            $seasonRequiredDailyQuantityForDeadline = $seasonWorkingDaysUntilDeadline > 0 ? round($seasonTotalQuantity / $seasonWorkingDaysUntilDeadline) : 0;
+        }
+
+        // Joriy ishchilar bilan season deadline sanasi
+        $seasonEstimatedDeadlineDate = null;
         if ($seasonDaysToFinish !== null) {
             $estimatedDate = $today->copy();
             $daysAdded = 0;
@@ -1205,7 +1253,7 @@ class GroupMasterController extends Controller
                     $daysAdded++;
                 }
             }
-            $estimatedDeadlineDate = $estimatedDate->format('Y-m-d');
+            $seasonEstimatedDeadlineDate = $estimatedDate->format('Y-m-d');
         }
 
         // --- Original order details with sewing outputs
@@ -1264,7 +1312,17 @@ class GroupMasterController extends Controller
                 'count' => $monthlyOrders->count(),
                 'totalMinutes' => $monthlyMinutesTotal,
                 'daysToFinish' => $monthlyDaysToFinish,
-                'dailyQuantityNeeded' => $monthlyDailyQuantityNeeded
+                'dailyQuantityNeeded' => $monthlyDailyQuantityNeeded,
+                'deadline' => [
+                    'target_date' => $monthlyDeadlineDate, // Tanlangan oyning oxirgi kuni
+                    'working_days_until_deadline' => $monthlyWorkingDaysUntilDeadline,
+                    'estimated_completion_date' => $monthlyEstimatedDeadlineDate, // Hozirgi ishchilar bilan qachon tugaydi
+                    'deadline_exceeded' => $monthlyDeadlineExceeded,
+                    'required_workers_for_deadline' => $monthlyRequiredWorkersForDeadline, // Oyning oxirigacha tugash uchun kerak bo'lgan ishchilar
+                    'required_daily_minutes' => $monthlyRequiredDailyProductionMinutes, // Oyning oxirigacha tugash uchun kunlik kerak bo'lgan daqiqalar
+                    'required_daily_quantity_for_deadline' => $monthlyRequiredDailyQuantityForDeadline, // Oyning oxirigacha tugash uchun kuniga kerakli son
+                    'current_avg_workers' => round($avgWorkers, 2)
+                ]
             ],
             'seasonOrders' => [
                 'count' => $seasonOrders->count(),
@@ -1272,13 +1330,13 @@ class GroupMasterController extends Controller
                 'daysToFinish' => $seasonDaysToFinish,
                 'dailyQuantityNeeded' => $seasonDailyQuantityNeeded,
                 'deadline' => [
-                    'target_date' => $deadlineDate, // 10 yanvar
-                    'working_days_until_deadline' => $workingDaysUntilDeadline,
-                    'estimated_completion_date' => $estimatedDeadlineDate, // Hozirgi ishchilar bilan qachon tugaydi
+                    'target_date' => $seasonDeadlineDate, // 15 yanvar
+                    'working_days_until_deadline' => $seasonWorkingDaysUntilDeadline,
+                    'estimated_completion_date' => $seasonEstimatedDeadlineDate, // Hozirgi ishchilar bilan qachon tugaydi
                     'deadline_exceeded' => $seasonDeadlineExceeded,
-                    'required_workers_for_deadline' => $requiredWorkersForDeadline, // 10 yanvargacha tugash uchun kerak bo'lgan ishchilar
-                    'required_daily_minutes' => $requiredDailyProductionMinutes, // 10 yanvargacha tugash uchun kunlik kerak bo'lgan daqiqalar
-                    'required_daily_quantity_for_deadline' => $requiredDailyQuantityForDeadline, // 10 yanvargacha tugash uchun kuniga kerakli son
+                    'required_workers_for_deadline' => $seasonRequiredWorkersForDeadline, // 15 yanvargacha tugash uchun kerak bo'lgan ishchilar
+                    'required_daily_minutes' => $seasonRequiredDailyProductionMinutes, // 15 yanvargacha tugash uchun kunlik kerak bo'lgan daqiqalar
+                    'required_daily_quantity_for_deadline' => $seasonRequiredDailyQuantityForDeadline, // 15 yanvargacha tugash uchun kuniga kerakli son
                     'current_avg_workers' => round($avgWorkers, 2)
                 ]
             ],
