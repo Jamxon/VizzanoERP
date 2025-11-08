@@ -46,12 +46,25 @@ class ManufactuterController extends Controller
                 ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
                 ->get();
 
-            // --- Shu oy ichidagi barcha sewingOutputs quantity yig'indisi
-            $monthlySewingOutputsSum = $monthlyOrders->sum(function($order) {
-                return $order->orderModel->submodels
-                    ->flatMap(fn($sub) => $sub->sewingOutputs)
-                    ->sum('quantity');
+            // Oy bo‘yicha har bir orderning daily sewingOutputs
+            $dailySewingOutputs = $monthlyOrders->flatMap(function($order) {
+                return $order->orderModel->submodels->flatMap(function($sub) use ($order) {
+                    return $sub->sewingOutputs->map(function($output) use ($order) {
+                        return [
+                            'order_id' => $order->id,
+                            'date' => $output->date,
+                            'quantity' => $output->quantity,
+                        ];
+                    });
+                });
             });
+
+            $dailySewingSum = $dailySewingOutputs->groupBy('date')->map(function($items) {
+                return $items->sum('quantity');
+            });
+
+            $monthlySewingOutputsSum = $dailySewingSum->sum();
+
 
             $last30Workdays = collect();
             $date = now();
