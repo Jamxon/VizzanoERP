@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\GetOrderGroupMasterResource;
 use App\Http\Resources\GetTarificationGroupMasterResource;
 use App\Http\Resources\ShowOrderGroupMaster;
+use App\Models\Attendance;
 use App\Models\Bonus;
 use App\Models\Department;
 use App\Models\Employee;
@@ -1171,10 +1172,76 @@ class GroupMasterController extends Controller
             ];
         }
 
+        $branchId = $employee->branch_id;
+        $groupId = $employee->group_id;
+        $selectedMonth = $request->month;
+
+        // --- Monthly Selected Orders
+        $monthlyOrders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
+            ->whereHas('monthlySelectedOrder', fn($q) => $q
+                ->whereMonth('month', date('m', strtotime($selectedMonth)))
+                ->whereYear('month', date('Y', strtotime($selectedMonth))))
+            ->where('branch_id', $branchId)
+            ->with('orderModel.model')
+            ->get();
+
+        // --- Season Orders
+        $seasonOrders = Order::where('branch_id', $branchId)
+            ->where('season_year', 2026)
+            ->where('season_type', 'summer')
+            ->whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
+            ->with('orderModel.model')
+            ->get();
+
+        // --- Attendance: last 30 working days
+        $date = now();
+        $last30Workdays = collect();
+        while ($last30Workdays->count() < 30) {
+            if (!$date->isWeekend()) { // faqat yakshanba hisoblamaymiz
+                $last30Workdays->push($date->toDateString());
+            }
+            $date->subDay();
+        }
+
+        $attendanceCount = Attendance::where('branch_id', $branchId)
+            ->whereIn('date', $last30Workdays)
+            ->where('status', 'present')
+            ->count();
+
+        $avgWorkers = $attendanceCount / 30;
+        $dailyProductionMinutes = $avgWorkers * 500; // kunlik har bir ishchi 500 minut
+
+        // --- Monthly Orders deadline
+        $monthlyMinutesTotal = $monthlyOrders->sum(fn($order) => $order->orderModel->model->minute * $order->quantity);
+        $monthlyDaysToFinish = $dailyProductionMinutes > 0 ? ceil($monthlyMinutesTotal / $dailyProductionMinutes) : null;
+        $monthlyTotalQuantity = $monthlyOrders->sum('quantity');
+        $monthlyDailyQuantityNeeded = $monthlyDaysToFinish > 0 ? round($monthlyTotalQuantity / $monthlyDaysToFinish) : 0;
+
+        // --- Season Orders deadline
+        $seasonMinutesTotal = $seasonOrders->sum(fn($order) => $order->orderModel->model->minute * $order->quantity);
+        $seasonDaysToFinish = $dailyProductionMinutes > 0 ? ceil($seasonMinutesTotal / $dailyProductionMinutes) : null;
+        $seasonTotalQuantity = $seasonOrders->sum('quantity');
+        $seasonDailyQuantityNeeded = $seasonDaysToFinish > 0 ? round($seasonTotalQuantity / $seasonDaysToFinish) : 0;
+
+
         return response()->json([
             'orders' => $orderDetails,
             'season_orders' => $seasonDetails,
-            'season_total' => $seasonTotal
+            'season_total' => $seasonTotal,
+            'monthlyOrders' => [
+                'count' => $monthlyOrders->count(),
+                'totalMinutes' => $monthlyMinutesTotal,
+                'daysToFinish' => $monthlyDaysToFinish,
+                'dailyQuantityNeeded' => $monthlyDailyQuantityNeeded
+            ],
+            'seasonOrders' => [
+                'count' => $seasonOrders->count(),
+                'totalMinutes' => $seasonMinutesTotal,
+                'daysToFinish' => $seasonDaysToFinish,
+                'dailyQuantityNeeded' => $seasonDailyQuantityNeeded
+            ],
+            'avgWorkersLast30Days' => round($avgWorkers, 2),
+            'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
         ]);
     }
 
