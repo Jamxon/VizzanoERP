@@ -845,17 +845,23 @@ class DailyPaymentController extends Controller
         $attendance = Attendance::where('date', $date)
             ->whereHas('employee', function ($q) use ($branchId, $departmentId) {
                 $q->where('branch_id', $branchId);
+                if ($departmentId) {
+                    $q->where('department_id', $departmentId);
+                }
             })
             ->get()
             ->map(function ($att) {
                 return [
+                    'id' => $att->id,
                     'employee_id' => $att->employee_id,
                     'status' => $att->status,
                     'check_in' => $att->check_in,
                     'check_out' => $att->check_out,
                     'check_in_image' => $att->check_in_image,
+                    'check_out_image' => $att->check_out_image,
                 ];
-            })->keyBy('employee_id');
+            })
+            ->values();
 
         $payments = DailyPayment::with([
             'employee:id,name',
@@ -931,7 +937,7 @@ class DailyPaymentController extends Controller
         return response()->json([
             'payments' => $payments,
             'working_employees' => $workingEmployees,
-            'attendance' => $attendance,
+            'attendances' => $attendance,
         ]);
     }
 
