@@ -535,12 +535,6 @@ class GroupMasterController extends Controller
 
             if ($budget->type == 'minute_based' && $modelMinute > 0) {
                 $totalAmount = $modelMinute * $newQuantity * $budget->quantity;
-            } elseif ($budget->type == 'percentage_based') {
-                $percentage = $budget->quantity ?? 0; // Bu yerda type = %, quantity = foiz
-
-                $totalAmount = round(($orderUzsPrice * $percentage) / 100, 2);
-            } else {
-                $totalAmount = $newQuantity * $budget->quantity;
             }
 
             $employees = Employee::where('department_id', $department->id)
