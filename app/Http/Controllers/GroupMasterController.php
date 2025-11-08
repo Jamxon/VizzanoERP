@@ -1163,7 +1163,7 @@ class GroupMasterController extends Controller
         $seasonDailyQuantityNeeded = $seasonDaysToFinish > 0 ? round($seasonTotalQuantity / $seasonDaysToFinish) : 0;
 
         // --- NEW: Calculate deadline date and required workers for season orders
-        $deadlineDate = '2026-01-10'; // 10 yanvar
+        $deadlineDate = '2026-01-15'; // 10 yanvar
         $today = now();
         $deadline = \Carbon\Carbon::parse($deadlineDate);
 
@@ -1181,6 +1181,7 @@ class GroupMasterController extends Controller
         $seasonDeadlineExceeded = $seasonDaysToFinish > $workingDaysUntilDeadline;
         $requiredWorkersForDeadline = null;
         $requiredDailyProductionMinutes = null;
+        $requiredDailyQuantityForDeadline = null;
 
         if ($seasonDeadlineExceeded && $workingDaysUntilDeadline > 0) {
             // 10 yanvargacha tugash uchun kerakli kunlik ishlab chiqarish daqiqalari
@@ -1188,6 +1189,9 @@ class GroupMasterController extends Controller
 
             // Kerakli ishchilar soni (har bir ishchi 500 daqiqa ishlaydi)
             $requiredWorkersForDeadline = ceil($requiredDailyProductionMinutes / 500);
+
+            // 10 yanvargacha tugash uchun kuniga kerakli son (quantity)
+            $requiredDailyQuantityForDeadline = $workingDaysUntilDeadline > 0 ? round($seasonTotalQuantity / $workingDaysUntilDeadline) : 0;
         }
 
         // Joriy ishchilar bilan deadline sanasi
@@ -1274,6 +1278,7 @@ class GroupMasterController extends Controller
                     'deadline_exceeded' => $seasonDeadlineExceeded,
                     'required_workers_for_deadline' => $requiredWorkersForDeadline, // 10 yanvargacha tugash uchun kerak bo'lgan ishchilar
                     'required_daily_minutes' => $requiredDailyProductionMinutes, // 10 yanvargacha tugash uchun kunlik kerak bo'lgan daqiqalar
+                    'required_daily_quantity_for_deadline' => $requiredDailyQuantityForDeadline, // 10 yanvargacha tugash uchun kuniga kerakli son
                     'current_avg_workers' => round($avgWorkers, 2)
                 ]
             ],
