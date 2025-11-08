@@ -128,7 +128,7 @@ class ManufactuterController extends Controller
                 'monthlyOrdersCount' => $monthlyOrders->count(),
                 'monthlySewingOutputsSum' => $monthlySewingOutputsSum,
                 'monthlyMinutesTotal' => $monthlyMinutesTotal,
-                'dailySewingOutputs' => $dailySewingGrouped,
+                'dailySewingOutputs' => $dailySewingOutputs,
                 'monthlyDaysToFinish' => $monthlyDaysToFinish,
                 'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded,
                 'monthlyDeadline' => [
