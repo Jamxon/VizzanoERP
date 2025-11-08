@@ -132,6 +132,7 @@ class ManufactuterController extends Controller
                     'working_days_until_deadline' => $monthlyWorkingDaysUntilDeadline,
                     'deadline_exceeded' => $monthlyDeadlineExceeded,
                     'required_workers_for_deadline' => $monthlyRequiredWorkersForDeadline,
+                    'required_daily_quantity_to_finish' => $monthlyDeadlineExceeded ? $monthlyTotalQuantity / $monthlyWorkingDaysUntilDeadline : null,
                 ],
             ];
         }
