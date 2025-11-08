@@ -18,16 +18,13 @@ class ManufactuterController extends Controller
         $branchId = $employee->branch_id;
         $selectedMonth = $request->month ?? now()->format('Y-m-01');
 
-        // --- Branchdagi barcha mainDepartmentlar orqali department → grouplarni olish
         $groups = Group::whereHas('department.mainDepartment', function($q) use ($branchId) {
             $q->where('branch_id', $branchId);
         })
             ->with([
                 'department.mainDepartment',
                 'responsibleUser.employee',
-                'employees' => function($q) {
-                    $q->where('status', 'working');
-                }
+                'employees' => fn($q) => $q->where('status', 'working')
             ])
             ->get();
 
@@ -41,7 +38,6 @@ class ManufactuterController extends Controller
         foreach ($groups as $group) {
             $groupId = $group->id;
 
-            // --- Guruh bo‘yicha buyurtmalar
             $monthlyOrders = Order::where('branch_id', $branchId)
                 ->whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
                 ->whereHas('monthlySelectedOrder', fn($q) => $q
@@ -50,36 +46,32 @@ class ManufactuterController extends Controller
                 ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
                 ->get();
 
-            $seasonOrders = Order::where('branch_id', $branchId)
-                ->where('season_year', 2026)
-                ->where('season_type', 'summer')
-                ->whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
-                ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
-                ->get();
-
-            // --- So‘nggi 30 ish kunidagi o‘rtacha ishchilar soni
-            $date = now();
-            $last30Workdays = collect();
-            while ($last30Workdays->count() < 30) {
-                if (!$date->isSunday()) $last30Workdays->push($date->toDateString());
-                $date->subDay();
-            }
+            // --- Shu oy ichidagi barcha sewingOutputs quantity yig'indisi
+            $monthlySewingOutputsSum = $monthlyOrders->sum(function($order) {
+                return $order->orderModel->submodels
+                    ->flatMap(fn($sub) => $sub->sewingOutputs)
+                    ->sum('quantity');
+            });
 
             $attendanceCount = Attendance::whereHas('employee', fn($q) =>
             $q->where('branch_id', $branchId)->where('group_id', $groupId)
-            )->whereIn('date', $last30Workdays)
-                ->where('status', 'present')
-                ->count();
+            )->whereIn('date', function() use ($today) {
+                $dates = collect();
+                $date = now();
+                while ($dates->count() < 30) {
+                    if (!$date->isSunday()) $dates->push($date->toDateString());
+                    $date->subDay();
+                }
+                return $dates;
+            })->where('status', 'present')->count();
 
             $avgWorkers = $attendanceCount / 30;
             $dailyProductionMinutes = $avgWorkers * 500;
 
-            // --- Hisob-kitob (oylik)
             $monthlyMinutesTotal = $monthlyOrders->sum(function($order) {
-                $orderModel = $order->orderModel;
-                $produced = $orderModel->submodels->flatMap(fn($s) => $s->sewingOutputs)->sum('quantity');
+                $produced = $order->orderModel->submodels->flatMap(fn($s) => $s->sewingOutputs)->sum('quantity');
                 $remaining = max($order->quantity - $produced, 0);
-                return $orderModel->model->minute * $remaining;
+                return $order->orderModel->model->minute * $remaining;
             });
 
             $monthlyDaysToFinish = $dailyProductionMinutes > 0 ? ceil($monthlyMinutesTotal / $dailyProductionMinutes) : null;
@@ -87,9 +79,9 @@ class ManufactuterController extends Controller
                 $produced = $order->orderModel->submodels->flatMap(fn($s) => $s->sewingOutputs)->sum('quantity');
                 return max($order->quantity - $produced, 0);
             });
+
             $monthlyDailyQuantityNeeded = $monthlyDaysToFinish > 0 ? round($monthlyTotalQuantity / $monthlyDaysToFinish) : 0;
 
-            // --- Tugash muddati hisoblash
             $selectedMonthDate = \Carbon\Carbon::parse($selectedMonth);
             $monthlyDeadline = $selectedMonthDate->endOfMonth();
             $monthlyWorkingDaysUntilDeadline = 0;
@@ -106,7 +98,6 @@ class ManufactuterController extends Controller
                 $monthlyRequiredWorkersForDeadline = ceil($requiredMinutes / 500);
             }
 
-            // --- Ma’lumotlarni yig‘ish
             $result[] = [
                 'id' => $groupId,
                 'name' => $group->name,
@@ -114,6 +105,7 @@ class ManufactuterController extends Controller
                 'avgWorkersLast30Days' => round($avgWorkers, 2),
                 'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
                 'monthlyOrdersCount' => $monthlyOrders->count(),
+                'monthlySewingOutputsSum' => $monthlySewingOutputsSum, // <-- Shu oy ichidagi sewingOutputs summasi
                 'monthlyMinutesTotal' => $monthlyMinutesTotal,
                 'monthlyDaysToFinish' => $monthlyDaysToFinish,
                 'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded,
@@ -123,7 +115,6 @@ class ManufactuterController extends Controller
                     'deadline_exceeded' => $monthlyDeadlineExceeded,
                     'required_workers_for_deadline' => $monthlyRequiredWorkersForDeadline,
                 ],
-                'seasonOrdersCount' => $seasonOrders->count(),
             ];
         }
 
