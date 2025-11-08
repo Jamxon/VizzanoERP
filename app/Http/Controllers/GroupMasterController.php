@@ -1348,4 +1348,27 @@ class GroupMasterController extends Controller
             'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
         ]);
     }
+
+    public function getModelImages(Request $request) {
+        $query = $request->query('q');
+
+        if (!$query) {
+            return response()->json(['error' => 'Missing query'], 400);
+        }
+
+        try {
+            $response = Http::get('https://www.nikastyle.ru/catalog/', [
+                'q' => $query,
+                'how' => 'r',
+            ]);
+
+            return response($response->body(), 200)
+                ->header('Content-Type', 'text/html');
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch HTML',
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
