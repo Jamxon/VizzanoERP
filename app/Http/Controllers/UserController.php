@@ -910,7 +910,7 @@ class UserController extends Controller
             )
             ->join('order_models', 'order_models.order_id', '=', 'orders.id')
             ->join('order_sub_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
-            ->join('sub_models', 'sub_models.id', '=', 'order_sub_models.sub_model_id')
+            ->join('sub_models', 'sub_models.id', '=', 'order_sub_models.submodel_id')
             ->join('models', 'models.id', '=', 'order_models.model_id')
             ->leftJoin('daily_payments', function($q) use ($employeeId, $month, $year) {
                 $q->on('daily_payments.order_id', '=', 'orders.id')
