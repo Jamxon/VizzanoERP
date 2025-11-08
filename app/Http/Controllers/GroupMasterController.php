@@ -1176,27 +1176,30 @@ class GroupMasterController extends Controller
         }
 
         // --- Determine actual deadline date for season orders
+        // --- Season orders 10-yanvar deadline bilan
+        $seasonTotalQuantity = $seasonRemaining['totalQuantity'];
         $today = now()->startOfDay();
-        $remainingQuantity = $seasonRemaining['totalQuantity'];
-        $dailyQty = $seasonDailyQuantityNeeded;
-        $deadlineDate = $today->copy();
-
-        while ($remainingQuantity > 0) {
-            // skip Sundays
-            if (!$deadlineDate->isSunday()) {
-                $remainingQuantity -= $dailyQty;
-            }
-            $deadlineDate->addDay();
-        }
-
-// Oxirgi deadline sanasi
-        $seasonDeadlineDate = $deadlineDate->subDay(); // oxirgi ish kuni, chunki while oxirgi iteratsiyada 1 kun ortadi
-
-// Cheklash: agar 10-yanvardan oshsa, 10-yanvar
         $endDate = now()->setDate($today->year, 1, 10)->startOfDay();
-        if ($seasonDeadlineDate->gt($endDate)) {
-            $seasonDeadlineDate = $endDate;
+
+// 10-yanvargacha ish kunlari sonini hisoblash
+        $workingDays = 0;
+        $tempDate = $today->copy();
+        while ($tempDate->lte($endDate)) {
+            if (!$tempDate->isSunday()) {
+                $workingDays++;
+            }
+            $tempDate->addDay();
         }
+
+// Kunlik kerakli miqdor
+        $seasonDailyQuantityNeeded = $workingDays > 0 ? ceil($seasonTotalQuantity / $workingDays) : $seasonTotalQuantity;
+
+// Kunlik ishchi sonini hisoblash
+        $requiredWorkers = $dailyProductionMinutes > 0 ? ceil($seasonDailyQuantityNeeded * 500 / $dailyProductionMinutes) : 1;
+
+// Deadline sanasi (10-yanvardan oshmaydi)
+        $seasonDeadlineDate = $endDate;
+
 
 
         // --- Expenses
@@ -1251,7 +1254,7 @@ class GroupMasterController extends Controller
             'seasonOrders' => [
                 'count' => $seasonOrders->count(),
                 'totalMinutes' => $seasonRemaining['minutesTotal'],
-                'daysToFinish' => $seasonDaysToFinish,
+                'daysToFinish' => $workingDays,
                 'dailyQuantityNeeded' => $seasonDailyQuantityNeeded,
                 'requiredWorkers' => $requiredWorkers,
                 'deadlineDate' => $seasonDeadlineDate->toDateString(),
