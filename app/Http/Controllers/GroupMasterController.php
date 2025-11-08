@@ -1294,11 +1294,15 @@ class GroupMasterController extends Controller
         // --- Season order details
         $seasonDetails = $seasonOrders->map(function ($order) use ($totalExpense) {
             $orderModel = $order->orderModel;
-            $totalMinutes = $orderModel->model->minute * $order->quantity;
+            $producedQuantity = $orderModel->submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
+            $remainingQuantity = max($order->quantity - $producedQuantity, 0);
+            $totalMinutes = $orderModel->model->minute * $remainingQuantity;
             return [
                 'order_id' => $order->id,
                 'order_name' => $order->name,
                 'quantity' => $order->quantity,
+                'produced_quantity' => $producedQuantity,
+                'remaining_quantity' => $remainingQuantity,
                 'minute' => $orderModel->model->minute,
                 'amount_from_sewing' => $totalMinutes * $totalExpense
             ];
