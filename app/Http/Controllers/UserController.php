@@ -909,6 +909,8 @@ class UserController extends Controller
                 'orders.price'
             )
             ->join('order_models', 'order_models.order_id', '=', 'orders.id')
+            ->join('order_sub_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+            ->join('sub_models', 'sub_models.id', '=', 'order_sub_models.sub_model_id')
             ->join('models', 'models.id', '=', 'order_models.model_id')
             ->leftJoin('daily_payments', function($q) use ($employeeId, $month, $year) {
                 $q->on('daily_payments.order_id', '=', 'orders.id')
@@ -981,6 +983,12 @@ class UserController extends Controller
                     "name" => $row->model_name,
                     "minute" => $row->model_minute,
                 ],
+                'submdodel' => $row->map(function ($sub) {
+                    return [
+                        'id' => $sub->id,
+                        'name' => $sub->name,
+                    ];
+                }),
                 "planned_quantity" => $row->planned_quantity,
                 "produced_quantity" => $row->produced_quantity,
                 "remaining_quantity" => $remainingQuantity,
