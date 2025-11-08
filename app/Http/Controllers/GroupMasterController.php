@@ -529,10 +529,6 @@ class GroupMasterController extends Controller
 
             $modelMinute = $orderModel->model->minute ?? 0;
 
-            $usdRate = getUsdRate();
-            $orderUsdPrice = $order->price ?? 0;
-            $orderUzsPrice = $orderUsdPrice * $usdRate;
-
             if ($budget->type == 'minute_based' && $modelMinute > 0) {
                 $totalAmount = $modelMinute * $newQuantity * $budget->quantity;
             }
