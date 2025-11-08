@@ -46,39 +46,40 @@ class ManufactuterController extends Controller
                 ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
                 ->get();
 
+            // Oy bo‘yicha daily sewingOutputs, quantity > 0
             $dailySewingOutputs = $monthlyOrders->flatMap(function($order) {
                 return $order->orderModel->submodels->flatMap(function($sub) use ($order) {
-                    return $sub->sewingOutputs->map(function($output) use ($order) {
-                        return [
-                            'order_id' => $order->id,
-                            'date' => \Carbon\Carbon::parse($output->created_at)->toDateString(), // <-- created_at ishlatiladi
-                            'quantity' => $output->quantity,
-                        ];
-                    });
+                    return $sub->sewingOutputs->map(fn($output) => [
+                        'order_id' => $order->id,
+                        'date' => \Carbon\Carbon::parse($output->created_at)->toDateString(),
+                        'quantity' => $output->quantity,
+                    ]);
                 });
-            });
+            })->filter(fn($item) => $item['quantity'] > 0);
 
-            $dailySewingSum = collect($dailySewingOutputs)
+            $monthlySewingOutputsSum = $dailySewingOutputs->sum('quantity');
+
+            // Agar oylik sewingOutputs 0 bo‘lsa, groupni qo‘shma
+            if ($monthlySewingOutputsSum <= 0) {
+                continue;
+            }
+
+            $dailySewingGrouped = $dailySewingOutputs
                 ->groupBy('date')
                 ->map(fn($items) => $items->sum('quantity'));
 
-            $monthlySewingOutputsSum = collect($dailySewingOutputs)
-                ->sum('quantity'); // Bu yerda 130 + 20 + ... butun oy summasi chiqadi
-
-
+            // So‘nggi 30 ish kunidagi attendance
             $last30Workdays = collect();
             $date = now();
             while ($last30Workdays->count() < 30) {
-                if (!$date->isSunday()) {
-                    $last30Workdays->push($date->toDateString());
-                }
+                if (!$date->isSunday()) $last30Workdays->push($date->toDateString());
                 $date->subDay();
             }
 
             $attendanceCount = Attendance::whereHas('employee', fn($q) =>
             $q->where('branch_id', $branchId)->where('group_id', $groupId)
-            )->whereIn('date', $last30Workdays->toArray()) // <-- toArray() qo‘shildi
-            ->where('status', 'present')
+            )->whereIn('date', $last30Workdays->toArray())
+                ->where('status', 'present')
                 ->count();
 
             $avgWorkers = $attendanceCount / 30;
@@ -114,25 +115,25 @@ class ManufactuterController extends Controller
                 $monthlyRequiredWorkersForDeadline = ceil($requiredMinutes / 500);
             }
 
-            $result[] = array_filter([
+            $result[] = [
                 'id' => $groupId,
                 'name' => $group->name,
                 'responsibleUser' => $group->responsibleUser->employee,
-                'avgWorkersLast30Days' => round($avgWorkers, 2) ?: null,
-                'dailyProductionMinutes' => round($dailyProductionMinutes, 2) ?: null,
-                'monthlyOrdersCount' => $monthlyOrders->count() ?: null,
-                'monthlySewingOutputsSum' => $monthlySewingOutputsSum ?: null,
-                'monthlyMinutesTotal' => $monthlyMinutesTotal ?: null,
-                'dailySewingOutputs' => count($dailySewingOutputs) ? $dailySewingOutputs : null,
-                'monthlyDaysToFinish' => $monthlyDaysToFinish ?: null,
-                'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded ?: null,
+                'avgWorkersLast30Days' => round($avgWorkers, 2),
+                'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
+                'monthlyOrdersCount' => $monthlyOrders->count(),
+                'monthlySewingOutputsSum' => $monthlySewingOutputsSum,
+                'monthlyMinutesTotal' => $monthlyMinutesTotal,
+                'dailySewingOutputs' => $dailySewingGrouped,
+                'monthlyDaysToFinish' => $monthlyDaysToFinish,
+                'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded,
                 'monthlyDeadline' => [
                     'target_date' => $monthlyDeadline->toDateString(),
-                    'working_days_until_deadline' => $monthlyWorkingDaysUntilDeadline ?: null,
-                    'deadline_exceeded' => $monthlyDeadlineExceeded ?: null,
-                    'required_workers_for_deadline' => $monthlyRequiredWorkersForDeadline ?: null,
+                    'working_days_until_deadline' => $monthlyWorkingDaysUntilDeadline,
+                    'deadline_exceeded' => $monthlyDeadlineExceeded,
+                    'required_workers_for_deadline' => $monthlyRequiredWorkersForDeadline,
                 ],
-            ], fn($value) => $value !== null && $value !== 0 && $value !== []);
+            ];
         }
 
         return response()->json($result);
