@@ -123,6 +123,7 @@ class ManufactuterController extends Controller
                 'monthlyOrdersCount' => $monthlyOrders->count(),
                 'monthlySewingOutputsSum' => $monthlySewingOutputsSum, // <-- Shu oy ichidagi sewingOutputs summasi
                 'monthlyMinutesTotal' => $monthlyMinutesTotal,
+                'dailySewingOutputs' => $dailySewingOutputs,
                 'monthlyDaysToFinish' => $monthlyDaysToFinish,
                 'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded,
                 'monthlyDeadline' => [
