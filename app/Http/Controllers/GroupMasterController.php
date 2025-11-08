@@ -1175,6 +1175,30 @@ class GroupMasterController extends Controller
             $requiredWorkers = $avgWorkers;
         }
 
+        // --- Determine actual deadline date for season orders
+        $today = now()->startOfDay();
+        $remainingQuantity = $seasonRemaining['totalQuantity'];
+        $dailyQty = $seasonDailyQuantityNeeded;
+        $deadlineDate = $today->copy();
+
+        while ($remainingQuantity > 0) {
+            // skip Sundays
+            if (!$deadlineDate->isSunday()) {
+                $remainingQuantity -= $dailyQty;
+            }
+            $deadlineDate->addDay();
+        }
+
+// Oxirgi deadline sanasi
+        $seasonDeadlineDate = $deadlineDate->subDay(); // oxirgi ish kuni, chunki while oxirgi iteratsiyada 1 kun ortadi
+
+// Cheklash: agar 10-yanvardan oshsa, 10-yanvar
+        $endDate = now()->setDate($today->year, 1, 10)->startOfDay();
+        if ($seasonDeadlineDate->gt($endDate)) {
+            $seasonDeadlineDate = $endDate;
+        }
+
+
         // --- Expenses
         $expenses = Expense::where('name', 'Master')->where('branch_id', $branchId)->get();
         $totalExpense = $expenses->sum('quantity');
@@ -1229,7 +1253,8 @@ class GroupMasterController extends Controller
                 'totalMinutes' => $seasonRemaining['minutesTotal'],
                 'daysToFinish' => $seasonDaysToFinish,
                 'dailyQuantityNeeded' => $seasonDailyQuantityNeeded,
-                'requiredWorkers' => $requiredWorkers
+                'requiredWorkers' => $requiredWorkers,
+                'deadlineDate' => $seasonDeadlineDate->toDateString(),
             ],
             'avgWorkersLast30Days' => round($avgWorkers, 2),
             'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
