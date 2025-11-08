@@ -1145,7 +1145,7 @@ class GroupMasterController extends Controller
 
         $monthlyDailyQuantityNeeded = $monthlyDaysToFinish > 0 ? round($monthlyTotalQuantity / $monthlyDaysToFinish) : 0;
 
-// --- Calculate season orders deadline
+        // --- Calculate season orders deadline
         $seasonMinutesTotal = $seasonOrders->sum(function($order) {
             $orderModel = $order->orderModel;
             $producedQuantity = $orderModel->submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
@@ -1161,6 +1161,48 @@ class GroupMasterController extends Controller
         });
 
         $seasonDailyQuantityNeeded = $seasonDaysToFinish > 0 ? round($seasonTotalQuantity / $seasonDaysToFinish) : 0;
+
+        // --- NEW: Calculate deadline date and required workers for season orders
+        $deadlineDate = '2026-01-10'; // 10 yanvar
+        $today = now();
+        $deadline = \Carbon\Carbon::parse($deadlineDate);
+
+        // Ish kunlarini hisoblash (yakshanbasiz)
+        $workingDaysUntilDeadline = 0;
+        $tempDate = $today->copy();
+        while ($tempDate->lessThanOrEqualTo($deadline)) {
+            if (!$tempDate->isSunday()) {
+                $workingDaysUntilDeadline++;
+            }
+            $tempDate->addDay();
+        }
+
+        // Agar hozirgi ishchilar bilan deadline oshib ketsa
+        $seasonDeadlineExceeded = $seasonDaysToFinish > $workingDaysUntilDeadline;
+        $requiredWorkersForDeadline = null;
+        $requiredDailyProductionMinutes = null;
+
+        if ($seasonDeadlineExceeded && $workingDaysUntilDeadline > 0) {
+            // 10 yanvargacha tugash uchun kerakli kunlik ishlab chiqarish daqiqalari
+            $requiredDailyProductionMinutes = ceil($seasonMinutesTotal / $workingDaysUntilDeadline);
+
+            // Kerakli ishchilar soni (har bir ishchi 500 daqiqa ishlaydi)
+            $requiredWorkersForDeadline = ceil($requiredDailyProductionMinutes / 500);
+        }
+
+        // Joriy ishchilar bilan deadline sanasi
+        $estimatedDeadlineDate = null;
+        if ($seasonDaysToFinish !== null) {
+            $estimatedDate = $today->copy();
+            $daysAdded = 0;
+            while ($daysAdded < $seasonDaysToFinish) {
+                $estimatedDate->addDay();
+                if (!$estimatedDate->isSunday()) {
+                    $daysAdded++;
+                }
+            }
+            $estimatedDeadlineDate = $estimatedDate->format('Y-m-d');
+        }
 
         // --- Original order details with sewing outputs
         $orders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
@@ -1224,11 +1266,19 @@ class GroupMasterController extends Controller
                 'count' => $seasonOrders->count(),
                 'totalMinutes' => $seasonMinutesTotal,
                 'daysToFinish' => $seasonDaysToFinish,
-                'dailyQuantityNeeded' => $seasonDailyQuantityNeeded
+                'dailyQuantityNeeded' => $seasonDailyQuantityNeeded,
+                'deadline' => [
+                    'target_date' => $deadlineDate, // 10 yanvar
+                    'working_days_until_deadline' => $workingDaysUntilDeadline,
+                    'estimated_completion_date' => $estimatedDeadlineDate, // Hozirgi ishchilar bilan qachon tugaydi
+                    'deadline_exceeded' => $seasonDeadlineExceeded,
+                    'required_workers_for_deadline' => $requiredWorkersForDeadline, // 10 yanvargacha tugash uchun kerak bo'lgan ishchilar
+                    'required_daily_minutes' => $requiredDailyProductionMinutes, // 10 yanvargacha tugash uchun kunlik kerak bo'lgan daqiqalar
+                    'current_avg_workers' => round($avgWorkers, 2)
+                ]
             ],
             'avgWorkersLast30Days' => round($avgWorkers, 2),
             'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
         ]);
     }
-
 }
