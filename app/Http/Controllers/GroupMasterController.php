@@ -551,9 +551,32 @@ class GroupMasterController extends Controller
                 })
                 ->get();
 
+            $totalPercent = $employees->sum('percentage');
+            $nonZeroEmployees = $employees->where('percentage', '>', 0);
+            $nonZeroCount = $nonZeroEmployees->count();
+
+            if ($totalPercent != 100 && $nonZeroCount > 0) {
+                $remaining = 100 - $totalPercent;
+                $equalShare = $remaining / $nonZeroCount;
+
+                // Har bir employee uchun yangi “effective percentage” ni hisoblab qo‘yamiz
+                $employees = $employees->map(function ($emp) use ($equalShare) {
+                    $emp->effective_percentage = $emp->percentage > 0
+                        ? $emp->percentage + $equalShare
+                        : 0;
+                    return $emp;
+                });
+            } else {
+                // 100 bo‘lsa — aynan o‘zini olamiz
+                $employees = $employees->map(function ($emp) {
+                    $emp->effective_percentage = $emp->percentage ?? 0;
+                    return $emp;
+                });
+            }
+
             foreach ($employees as $emp) {
 
-                $percentage = $emp->percentage ?? 0;
+                $percentage = $emp->effective_percentage ?? 0;
                 if ($percentage == 0) continue;
 
                 $earned = round(($totalAmount * $percentage) / 100, 2);
@@ -587,62 +610,6 @@ class GroupMasterController extends Controller
                         'updated_at' => now(),
                     ]);
                 }
-            }
-        }
-
-        $usdRate = getUsdRate();
-        $orderUsdPrice = $order->total_price_usd ?? 0;
-        $orderUzsPrice = $orderUsdPrice * $usdRate;
-
-        $expenses = DB::table('expenses')
-            ->where('branch_id', $branchId)
-            ->get();
-
-        foreach ($expenses as $expense) {
-
-            // ✅ faqat master va texnolog
-            if (!in_array(strtolower($expense->name), ['master', 'texnolog'])) {
-                continue; // ✅ qolgan expense ni SKIP
-            }
-
-            if ($expense->type !== 'percentage_based') continue;
-
-            $expenseAmount = round(($orderUzsPrice * $expense->quantity) / 100, 2);
-
-            $employees = Employee::whereHas('position', function($q) use ($expense) {
-                $q->whereIn('name', [
-                    'master', 'Master', 'MASTer',
-                    'texnolog', 'Texnolog', 'TEXNOLOG'
-                ]);
-            })
-                ->where('branch_id', $branchId)
-                ->whereHas('attendances', function ($q) {
-                    $q->whereDate('date', Carbon::today())
-                        ->where('status', 'present');
-                })
-                ->where('status', 'working')
-                ->get();
-
-            foreach ($employees as $emp) {
-
-                $percentage = $emp->percentage ?? 0;
-                $earned = round(($expenseAmount * $percentage) / 100, 2);
-
-                if ($earned <= 0) continue;
-
-                DB::table('daily_payments')->insert([
-                    'employee_id' => $emp->id,
-                    'order_id' => $order->id,
-                    'model_id' => $order->orderModel->model->id,
-                    'department_id' => null,
-                    'expense_id' => $expense->id,
-                    'payment_date' => Carbon::today(),
-                    'quantity_produced' => $order->quantity,
-                    'calculated_amount' => $earned,
-                    'employee_percentage' => $percentage,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
             }
         }
 
