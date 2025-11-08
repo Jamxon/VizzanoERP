@@ -55,7 +55,7 @@ class ManufactuterController extends Controller
                     ]);
                 });
             })->filter(fn($item) => $item['quantity'] > 0)
-                ->values(); // <-- values() array indekslarini reset qiladi
+                ->values(); // <-- array indekslarini reset qiladi
 
             $monthlySewingOutputsSum = $dailySewingOutputs->sum('quantity');
 
