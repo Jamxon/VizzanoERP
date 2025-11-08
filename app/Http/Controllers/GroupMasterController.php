@@ -1224,6 +1224,7 @@ class GroupMasterController extends Controller
             ];
         });
 
+        $seasonDaysToFinish = $workingDays;
         return response()->json([
             'orders' => $orderDetails,
             'season_orders' => $seasonDetails,
