@@ -1091,88 +1091,7 @@ class GroupMasterController extends Controller
         $groupId = $employee->group_id;
         $selectedMonth = $request->month;
 
-        $orders = Order::whereHas('orderGroups', function ($q) use ($groupId) {
-            $q->where('group_id', $groupId);
-        })
-            ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
-                $q->whereMonth('month', date('m', strtotime($selectedMonth)))
-                    ->whereYear('month', date('Y', strtotime($selectedMonth)));
-            })
-            ->where('branch_id', auth()->user()->employee->branch_id)
-            ->with('orderModel.submodels.sewingOutputs', 'orderModel.model', 'orderModel.submodels') // Fetch the submodels relationship correctly
-            ->get();
-
-        // Fetch expenses related to the master role and branch
-        $expenses = Expense::where('name', 'Master')->where('branch_id', auth()->user()->employee->branch_id)->get();
-
-        $orderDetails = [];
-
-        // Loop through each order to calculate the required values
-        foreach ($orders as $order) {
-            $orderModel = $order->orderModel;
-            $submodels = $orderModel->submodels;
-
-            // Calculate the total quantity sewn for this order using sewing outputs
-            $totalSewnQuantity = $submodels->flatMap(function ($submodel) {
-                return $submodel->sewingOutputs; // Access sewingOutputs within each submodel
-            })->sum('quantity');
-
-            // Calculate the total minutes worked based on the model's minute * sewn quantity
-            $totalMinutes = $orderModel->model->minute * $totalSewnQuantity;
-
-            // Calculate the total expense for the master (assuming the expense is the quantity value per sewing minute)
-            $totalExpense = $expenses->sum('quantity'); // Assuming 'quantity' is the amount the master is paid
-
-            // Calculate the total amount earned from sewing outputs (minutes * expense quantity)
-            $amountFromSewing = $totalMinutes * $totalExpense;
-
-            // Calculate the earnings from the order's quantity (order's quantity * expense quantity)
-            $amountFromOrderQuantity = $order->quantity * $totalExpense * $orderModel->model->minute;
-
-            // Add the calculated details to the response array
-            $orderDetails[] = [
-                'order' => [
-                    'id' => $order->id,
-                    'name' => $order->name,
-                    'quantity' => $order->quantity,
-                    'model' => $orderModel->model, // Directly accessing the model relationship
-                    'submodels' => $submodels->pluck('submodel.name') // Pluck the 'name' attribute from submodel relationship
-                ],
-                'sewn_quantity' => $totalSewnQuantity,
-                'amount_from_sewing' => $amountFromSewing,
-                'amount_from_order_quantity' => $amountFromOrderQuantity
-            ];
-        }
-
-        // --- 2. Season orders (Summer 2026)
-        $seasonOrders = Order::where('branch_id', $branchId)
-            ->where('season_year', 2026)
-            ->where('season_type', 'summer')
-            ->whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
-            ->with(['orderModel.model', 'orderModel.submodels'])
-            ->get();
-
-        $seasonDetails = [];
-        $seasonTotal = 0;
-
-        foreach ($seasonOrders as $order) {
-            $orderModel = $order->orderModel;
-
-            $totalMinutes = $orderModel->model->minute * $order->quantity;
-            $amountFromSewing = $totalMinutes * $expenses->sum('quantity');
-            $seasonTotal += $amountFromSewing;
-
-            $seasonDetails[] = [
-                'order_id' => $order->id,
-                'order_name' => $order->name,
-                'quantity' => $order->quantity,
-                'sewn_quantity' => $totalSewnQuantity,
-                'minute' => $orderModel->model->minute,
-                'amount_from_sewing' => $amountFromSewing
-            ];
-        }
-
-        // --- Monthly Selected Orders
+        // --- Fetch monthly selected orders with submodels and model minutes
         $monthlyOrders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
             ->whereHas('monthlySelectedOrder', fn($q) => $q
                 ->whereMonth('month', date('m', strtotime($selectedMonth)))
@@ -1181,7 +1100,7 @@ class GroupMasterController extends Controller
             ->with('orderModel.model')
             ->get();
 
-        // --- Season Orders
+        // --- Fetch season orders
         $seasonOrders = Order::where('branch_id', $branchId)
             ->where('season_year', 2026)
             ->where('season_type', 'summer')
@@ -1189,44 +1108,90 @@ class GroupMasterController extends Controller
             ->with('orderModel.model')
             ->get();
 
-        // --- Attendance: last 30 working days
+        // --- Attendance: last 30 working days (exclude Sundays)
         $date = now();
         $last30Workdays = collect();
         while ($last30Workdays->count() < 30) {
-            if (!$date->isSunday()) { // faqat yakshanba hisoblamaymiz
+            if (!$date->isSunday()) {
                 $last30Workdays->push($date->toDateString());
             }
             $date->subDay();
         }
 
-        $attendanceCount = Attendance::whereHas('employee',function  ($q) use ($branchId, $groupId) {
-                    $q->where('branch_id', $branchId)
-                        ->where('group_id', $groupId);
-            })
-            ->whereIn('date', $last30Workdays)
+        $attendanceCount = Attendance::whereHas('employee', fn($q) =>
+        $q->where('branch_id', $branchId)
+            ->where('group_id', $groupId)
+        )->whereIn('date', $last30Workdays)
             ->where('status', 'present')
             ->count();
 
         $avgWorkers = $attendanceCount / 30;
         $dailyProductionMinutes = $avgWorkers * 500; // kunlik har bir ishchi 500 minut
 
-        // --- Monthly Orders deadline
+        // --- Calculate monthly orders deadline
         $monthlyMinutesTotal = $monthlyOrders->sum(fn($order) => $order->orderModel->model->minute * $order->quantity);
         $monthlyDaysToFinish = $dailyProductionMinutes > 0 ? ceil($monthlyMinutesTotal / $dailyProductionMinutes) : null;
         $monthlyTotalQuantity = $monthlyOrders->sum('quantity');
         $monthlyDailyQuantityNeeded = $monthlyDaysToFinish > 0 ? round($monthlyTotalQuantity / $monthlyDaysToFinish) : 0;
 
-        // --- Season Orders deadline
+        // --- Calculate season orders deadline
         $seasonMinutesTotal = $seasonOrders->sum(fn($order) => $order->orderModel->model->minute * $order->quantity);
         $seasonDaysToFinish = $dailyProductionMinutes > 0 ? ceil($seasonMinutesTotal / $dailyProductionMinutes) : null;
         $seasonTotalQuantity = $seasonOrders->sum('quantity');
         $seasonDailyQuantityNeeded = $seasonDaysToFinish > 0 ? round($seasonTotalQuantity / $seasonDaysToFinish) : 0;
 
+        // --- Original order details with sewing outputs
+        $orders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
+            ->whereHas('monthlySelectedOrder', fn($q) => $q
+                ->whereMonth('month', date('m', strtotime($selectedMonth)))
+                ->whereYear('month', date('Y', strtotime($selectedMonth))))
+            ->where('branch_id', $branchId)
+            ->with('orderModel.submodels.sewingOutputs', 'orderModel.model', 'orderModel.submodels')
+            ->get();
+
+        $expenses = Expense::where('name', 'Master')->where('branch_id', $branchId)->get();
+        $totalExpense = $expenses->sum('quantity');
+
+        $orderDetails = $orders->map(function ($order) use ($totalExpense) {
+            $orderModel = $order->orderModel;
+            $submodels = $orderModel->submodels;
+
+            $totalSewnQuantity = $submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
+            $totalMinutes = $orderModel->model->minute * $totalSewnQuantity;
+            $amountFromSewing = $totalMinutes * $totalExpense;
+            $amountFromOrderQuantity = $order->quantity * $orderModel->model->minute * $totalExpense;
+
+            return [
+                'order' => [
+                    'id' => $order->id,
+                    'name' => $order->name,
+                    'quantity' => $order->quantity,
+                    'model' => $orderModel->model,
+                    'submodels' => $submodels->pluck('submodel.name')
+                ],
+                'sewn_quantity' => $totalSewnQuantity,
+                'amount_from_sewing' => $amountFromSewing,
+                'amount_from_order_quantity' => $amountFromOrderQuantity
+            ];
+        });
+
+        // --- Season order details
+        $seasonDetails = $seasonOrders->map(function ($order) use ($totalExpense) {
+            $orderModel = $order->orderModel;
+            $totalMinutes = $orderModel->model->minute * $order->quantity;
+            return [
+                'order_id' => $order->id,
+                'order_name' => $order->name,
+                'quantity' => $order->quantity,
+                'minute' => $orderModel->model->minute,
+                'amount_from_sewing' => $totalMinutes * $totalExpense
+            ];
+        });
 
         return response()->json([
             'orders' => $orderDetails,
             'season_orders' => $seasonDetails,
-            'season_total' => $seasonTotal,
+            'season_total' => $seasonDetails->sum('amount_from_sewing'),
             'monthlyOrders' => [
                 'count' => $monthlyOrders->count(),
                 'totalMinutes' => $monthlyMinutesTotal,
