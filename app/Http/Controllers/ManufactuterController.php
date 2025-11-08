@@ -58,11 +58,12 @@ class ManufactuterController extends Controller
                 });
             });
 
-            $dailySewingSum = $dailySewingOutputs->groupBy('date')->map(function($items) {
-                return $items->sum('quantity');
-            });
+            $dailySewingSum = collect($dailySewingOutputs)
+                ->groupBy('date')
+                ->map(fn($items) => $items->sum('quantity'));
 
-            $monthlySewingOutputsSum = $dailySewingSum->sum();
+            $monthlySewingOutputsSum = collect($dailySewingOutputs)
+                ->sum('quantity'); // Bu yerda 130 + 20 + ... butun oy summasi chiqadi
 
 
             $last30Workdays = collect();
@@ -122,7 +123,7 @@ class ManufactuterController extends Controller
                 'monthlyOrdersCount' => $monthlyOrders->count(),
                 'monthlySewingOutputsSum' => $monthlySewingOutputsSum, // <-- Shu oy ichidagi sewingOutputs summasi
                 'monthlyMinutesTotal' => $monthlyMinutesTotal,
-                'dailySewingOutputs' => $dailySewingOutputs,
+                'dailySewingOutputs' => $dailySewingSum,
                 'monthlyDaysToFinish' => $monthlyDaysToFinish,
                 'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded,
                 'monthlyDeadline' => [
