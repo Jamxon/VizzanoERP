@@ -1172,10 +1172,6 @@ class GroupMasterController extends Controller
             ];
         }
 
-        $branchId = $employee->branch_id;
-        $groupId = $employee->group_id;
-        $selectedMonth = $request->month;
-
         // --- Monthly Selected Orders
         $monthlyOrders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
             ->whereHas('monthlySelectedOrder', fn($q) => $q
@@ -1197,13 +1193,16 @@ class GroupMasterController extends Controller
         $date = now();
         $last30Workdays = collect();
         while ($last30Workdays->count() < 30) {
-            if (!$date->isWeekend()) { // faqat yakshanba hisoblamaymiz
+            if (!$date->isSunday()) { // faqat yakshanba hisoblamaymiz
                 $last30Workdays->push($date->toDateString());
             }
             $date->subDay();
         }
 
-        $attendanceCount = Attendance::where('branch_id', $branchId)
+        $attendanceCount = Attendance::whereHas('employee',function  ($q) use ($branchId, $groupId) {
+                    $q->where('branch_id', $branchId)
+                        ->where('group_id', $groupId);
+            })
             ->whereIn('date', $last30Workdays)
             ->where('status', 'present')
             ->count();
