@@ -1097,7 +1097,7 @@ class GroupMasterController extends Controller
                 ->whereMonth('month', date('m', strtotime($selectedMonth)))
                 ->whereYear('month', date('Y', strtotime($selectedMonth))))
             ->where('branch_id', $branchId)
-            ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
+            ->with('orderModel.model')
             ->get();
 
         // --- Fetch season orders
@@ -1105,7 +1105,7 @@ class GroupMasterController extends Controller
             ->where('season_year', 2026)
             ->where('season_type', 'summer')
             ->whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
-            ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
+            ->with('orderModel.model')
             ->get();
 
         // --- Attendance: last 30 working days (exclude Sundays)
@@ -1128,88 +1128,56 @@ class GroupMasterController extends Controller
         $avgWorkers = $attendanceCount / 30;
         $dailyProductionMinutes = $avgWorkers * 500; // kunlik har bir ishchi 500 minut
 
-        // --- Helper to calculate remaining minutes and quantity
-        $calculateRemaining = fn($orders) => [
-            'minutesTotal' => $orders->sum(function($order) {
-                $orderModel = $order->orderModel;
-                $producedQuantity = $orderModel->submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
-                $remainingQuantity = max($order->quantity - $producedQuantity, 0);
-                return $orderModel->model->minute * $remainingQuantity;
-            }),
-            'totalQuantity' => $orders->sum(function($order) {
-                $orderModel = $order->orderModel;
-                $producedQuantity = $orderModel->submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
-                return max($order->quantity - $producedQuantity, 0);
-            })
-        ];
+        // --- Calculate monthly orders deadline
+        $monthlyMinutesTotal = $monthlyOrders->sum(function($order) {
+            $orderModel = $order->orderModel;
+            $producedQuantity = $orderModel->submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
+            $remainingQuantity = max($order->quantity - $producedQuantity, 0);
+            return $orderModel->model->minute * $remainingQuantity;
+        });
 
-        $monthlyRemaining = $calculateRemaining($monthlyOrders);
-        $seasonRemaining = $calculateRemaining($seasonOrders);
+        $monthlyDaysToFinish = $dailyProductionMinutes > 0 ? ceil($monthlyMinutesTotal / $dailyProductionMinutes) : null;
 
-        // --- Monthly orders deadline
-        $monthlyDaysToFinish = $dailyProductionMinutes > 0 ? ceil($monthlyRemaining['minutesTotal'] / $dailyProductionMinutes) : null;
-        $monthlyDailyQuantityNeeded = $monthlyDaysToFinish > 0 ? round($monthlyRemaining['totalQuantity'] / $monthlyDaysToFinish) : 0;
+        $monthlyTotalQuantity = $monthlyOrders->sum(function($order) {
+            $producedQuantity = $order->orderModel->submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
+            return max($order->quantity - $producedQuantity, 0);
+        });
 
-        // --- Season orders deadline
-        $seasonDaysToFinish = $dailyProductionMinutes > 0 ? ceil($seasonRemaining['minutesTotal'] / $dailyProductionMinutes) : null;
-        $seasonDailyQuantityNeeded = $seasonDaysToFinish > 0 ? round($seasonRemaining['totalQuantity'] / $seasonDaysToFinish) : 0;
+        $monthlyDailyQuantityNeeded = $monthlyDaysToFinish > 0 ? round($monthlyTotalQuantity / $monthlyDaysToFinish) : 0;
 
-        // --- Adjust if seasonDailyQuantityNeeded exceeds 10th January
-        $today = now();
-        $endDate = now()->setDate($today->year, 1, 10); // 10-yanvar
-        $workingDays = 0;
-        $tempDate = $today->copy();
+// --- Calculate season orders deadline
+        $seasonMinutesTotal = $seasonOrders->sum(function($order) {
+            $orderModel = $order->orderModel;
+            $producedQuantity = $orderModel->submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
+            $remainingQuantity = max($order->quantity - $producedQuantity, 0);
+            return $orderModel->model->minute * $remainingQuantity;
+        });
 
-        while ($tempDate->lte($endDate)) {
-            if (!$tempDate->isSunday()) {
-                $workingDays++;
-            }
-            $tempDate->addDay();
-        }
+        $seasonDaysToFinish = $dailyProductionMinutes > 0 ? ceil($seasonMinutesTotal / $dailyProductionMinutes) : null;
 
-        $totalSeasonQuantity = $seasonRemaining['totalQuantity'];
-        if ($workingDays > 0 && $seasonDailyQuantityNeeded * $seasonDaysToFinish > $totalSeasonQuantity) {
-            $seasonDailyQuantityNeeded = round($totalSeasonQuantity / $workingDays);
-            $requiredWorkers = $dailyProductionMinutes > 0 ? ceil($seasonDailyQuantityNeeded * $seasonDaysToFinish / $dailyProductionMinutes) : 1;
-        } else {
-            $requiredWorkers = $avgWorkers;
-        }
+        $seasonTotalQuantity = $seasonOrders->sum(function($order) {
+            $producedQuantity = $order->orderModel->submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
+            return max($order->quantity - $producedQuantity, 0);
+        });
 
-        // --- Determine actual deadline date for season orders
-        // --- Season orders 10-yanvar deadline bilan
-        $seasonTotalQuantity = $seasonRemaining['totalQuantity'];
-        $today = now()->startOfDay();
-        $endDate = now()->setDate($today->year, 1, 10)->startOfDay();
+        $seasonDailyQuantityNeeded = $seasonDaysToFinish > 0 ? round($seasonTotalQuantity / $seasonDaysToFinish) : 0;
 
-// 10-yanvargacha ish kunlari sonini hisoblash
-        $workingDays = 0;
-        $tempDate = $today->copy();
-        while ($tempDate->lte($endDate)) {
-            if (!$tempDate->isSunday()) {
-                $workingDays++;
-            }
-            $tempDate->addDay();
-        }
+        // --- Original order details with sewing outputs
+        $orders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
+            ->whereHas('monthlySelectedOrder', fn($q) => $q
+                ->whereMonth('month', date('m', strtotime($selectedMonth)))
+                ->whereYear('month', date('Y', strtotime($selectedMonth))))
+            ->where('branch_id', $branchId)
+            ->with('orderModel.submodels.sewingOutputs', 'orderModel.model', 'orderModel.submodels')
+            ->get();
 
-// Kunlik kerakli miqdor
-        $seasonDailyQuantityNeeded = $workingDays > 0 ? ceil($seasonTotalQuantity / $workingDays) : $seasonTotalQuantity;
-
-// Kunlik ishchi sonini hisoblash
-        $requiredWorkers = $dailyProductionMinutes > 0 ? ceil($seasonDailyQuantityNeeded * 500 / $dailyProductionMinutes) : 1;
-
-// Deadline sanasi (10-yanvardan oshmaydi)
-        $seasonDeadlineDate = $endDate;
-
-
-
-        // --- Expenses
         $expenses = Expense::where('name', 'Master')->where('branch_id', $branchId)->get();
         $totalExpense = $expenses->sum('quantity');
 
-        // --- Order details
-        $orderDetails = $monthlyOrders->map(function ($order) use ($totalExpense) {
+        $orderDetails = $orders->map(function ($order) use ($totalExpense) {
             $orderModel = $order->orderModel;
             $submodels = $orderModel->submodels;
+
             $totalSewnQuantity = $submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
             $totalMinutes = $orderModel->model->minute * $totalSewnQuantity;
             $amountFromSewing = $totalMinutes * $totalExpense;
@@ -1229,6 +1197,7 @@ class GroupMasterController extends Controller
             ];
         });
 
+        // --- Season order details
         $seasonDetails = $seasonOrders->map(function ($order) use ($totalExpense) {
             $orderModel = $order->orderModel;
             $totalMinutes = $orderModel->model->minute * $order->quantity;
@@ -1247,17 +1216,15 @@ class GroupMasterController extends Controller
             'season_total' => $seasonDetails->sum('amount_from_sewing'),
             'monthlyOrders' => [
                 'count' => $monthlyOrders->count(),
-                'totalMinutes' => $monthlyRemaining['minutesTotal'],
+                'totalMinutes' => $monthlyMinutesTotal,
                 'daysToFinish' => $monthlyDaysToFinish,
                 'dailyQuantityNeeded' => $monthlyDailyQuantityNeeded
             ],
             'seasonOrders' => [
                 'count' => $seasonOrders->count(),
-                'totalMinutes' => $seasonRemaining['minutesTotal'],
-                'daysToFinish' => $workingDays,
-                'dailyQuantityNeeded' => $seasonDailyQuantityNeeded,
-                'requiredWorkers' => $requiredWorkers,
-                'deadlineDate' => $seasonDeadlineDate->toDateString(),
+                'totalMinutes' => $seasonMinutesTotal,
+                'daysToFinish' => $seasonDaysToFinish,
+                'dailyQuantityNeeded' => $seasonDailyQuantityNeeded
             ],
             'avgWorkersLast30Days' => round($avgWorkers, 2),
             'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
