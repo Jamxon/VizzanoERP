@@ -232,7 +232,7 @@ class CuttingMasterController extends Controller
                 return response()->json(['message' => 'Kesish yakunlandi (modelMinute yo‘q)']);
             }
 
-            $totalMinutes = $modelMinute * $orderQuantity;
+            $totalMinutes = $modelMinute * $remaining;
             $totalEarned = $departmentBudget->quantity * $totalMinutes;
 
             $employees = Employee::where('department_id', $departmentId)
