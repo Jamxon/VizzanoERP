@@ -114,25 +114,25 @@ class ManufactuterController extends Controller
                 $monthlyRequiredWorkersForDeadline = ceil($requiredMinutes / 500);
             }
 
-            $result[] = [
+            $result[] = array_filter([
                 'id' => $groupId,
                 'name' => $group->name,
                 'responsibleUser' => $group->responsibleUser->employee,
-                'avgWorkersLast30Days' => round($avgWorkers, 2),
-                'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
-                'monthlyOrdersCount' => $monthlyOrders->count(),
-                'monthlySewingOutputsSum' => $monthlySewingOutputsSum, // <-- Shu oy ichidagi sewingOutputs summasi
-                'monthlyMinutesTotal' => $monthlyMinutesTotal,
-                'dailySewingOutputs' => $dailySewingSum,
-                'monthlyDaysToFinish' => $monthlyDaysToFinish,
-                'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded,
+                'avgWorkersLast30Days' => round($avgWorkers, 2) ?: null,
+                'dailyProductionMinutes' => round($dailyProductionMinutes, 2) ?: null,
+                'monthlyOrdersCount' => $monthlyOrders->count() ?: null,
+                'monthlySewingOutputsSum' => $monthlySewingOutputsSum ?: null,
+                'monthlyMinutesTotal' => $monthlyMinutesTotal ?: null,
+                'dailySewingOutputs' => count($dailySewingOutputs) ? $dailySewingOutputs : null,
+                'monthlyDaysToFinish' => $monthlyDaysToFinish ?: null,
+                'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded ?: null,
                 'monthlyDeadline' => [
                     'target_date' => $monthlyDeadline->toDateString(),
-                    'working_days_until_deadline' => $monthlyWorkingDaysUntilDeadline,
-                    'deadline_exceeded' => $monthlyDeadlineExceeded,
-                    'required_workers_for_deadline' => $monthlyRequiredWorkersForDeadline,
+                    'working_days_until_deadline' => $monthlyWorkingDaysUntilDeadline ?: null,
+                    'deadline_exceeded' => $monthlyDeadlineExceeded ?: null,
+                    'required_workers_for_deadline' => $monthlyRequiredWorkersForDeadline ?: null,
                 ],
-            ];
+            ], fn($value) => $value !== null && $value !== 0 && $value !== []);
         }
 
         return response()->json($result);
