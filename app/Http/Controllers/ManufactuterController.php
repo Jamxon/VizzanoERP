@@ -53,17 +53,20 @@ class ManufactuterController extends Controller
                     ->sum('quantity');
             });
 
+            $last30Workdays = collect();
+            $date = now();
+            while ($last30Workdays->count() < 30) {
+                if (!$date->isSunday()) {
+                    $last30Workdays->push($date->toDateString());
+                }
+                $date->subDay();
+            }
+
             $attendanceCount = Attendance::whereHas('employee', fn($q) =>
             $q->where('branch_id', $branchId)->where('group_id', $groupId)
-            )->whereIn('date', function() use ($today) {
-                $dates = collect();
-                $date = now();
-                while ($dates->count() < 30) {
-                    if (!$date->isSunday()) $dates->push($date->toDateString());
-                    $date->subDay();
-                }
-                return $dates;
-            })->where('status', 'present')->count();
+            )->whereIn('date', $last30Workdays->toArray()) // <-- toArray() qo‘shildi
+            ->where('status', 'present')
+                ->count();
 
             $avgWorkers = $attendanceCount / 30;
             $dailyProductionMinutes = $avgWorkers * 500;
