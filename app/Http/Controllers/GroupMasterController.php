@@ -1098,6 +1098,7 @@ class GroupMasterController extends Controller
                 ->whereYear('month', date('Y', strtotime($selectedMonth))))
             ->where('branch_id', $branchId)
             ->with('orderModel.model')
+            ->orderBy('orders.name')
             ->get();
 
         // --- Fetch season orders
