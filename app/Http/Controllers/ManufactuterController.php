@@ -54,7 +54,10 @@ class ManufactuterController extends Controller
                 ->get();
 
             $presentTodayCount = $todayAttendance->where('status', 'present')->count();
-            $absentTodayCount = $todayAttendance->where('status', 'absent')->count();
+
+            $workingEmployeesCount = $group->employees->count();
+
+            $absentTodayCount = $workingEmployeesCount - $presentTodayCount;
 
             $dailySewingOutputs = $monthlyOrders->flatMap(function($order) {
                 return $order->orderModel->submodels->flatMap(function($sub) use ($order) {
