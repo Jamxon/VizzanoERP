@@ -40,6 +40,7 @@ class VizzanoReportTvController extends Controller
         }
 
         $aup = Attendance::whereDate('date', $today)
+            ->where('status', 'present')
             ->whereHas('employee', function ($q) use ($branchId)  {
             $q->where('status', '!=', 'kicked');
             $q->where('type', 'aup');
@@ -47,6 +48,7 @@ class VizzanoReportTvController extends Controller
         })->count();
 
         $simple = Attendance::whereDate('date', $today)
+            ->where('status', 'present')
             ->whereHas('employee', function ($q) use ($branchId)  {
                 $q->where('status', '!=', 'kicked');
                 $q->where('type', 'simple');
