@@ -90,7 +90,7 @@ class VizzanoReportTvController extends Controller
         });
 
         $employeeCounts = \App\Models\Attendance::whereDate('attendance.date', $today)
-            ->where('attendance.status', '!=', 'ABSENT')
+            ->where('attendance.status', 'present')
             ->join('employees', 'attendance.employee_id', '=', 'employees.id')
             ->whereIn('employees.group_id', $groupIds)
             ->whereHas('employee', function ($q) {
