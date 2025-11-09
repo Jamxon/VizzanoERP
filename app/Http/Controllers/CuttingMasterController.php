@@ -387,10 +387,10 @@ class CuttingMasterController extends Controller
         $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
             'quantity' => 'required|integer|min:1',
-            'submodel_id' => 'required|integer|exists:order_sub_models,id',
-            'size_id' => 'required|integer|exists:order_sizes,id',
-            'box_capacity' => 'required|integer|min:1',
-            'region' => 'required|string|max:255',
+//            'submodel_id' => 'required|integer|exists:order_sub_models,id',
+//            'size_id' => 'required|integer|exists:order_sizes,id',
+//            'box_capacity' => 'required|integer|min:1',
+//            'region' => 'required|string|max:255',
         ]);
 
         ini_set('memory_limit', '2G');
@@ -401,7 +401,7 @@ class CuttingMasterController extends Controller
             $order = Order::with(['orderModel.model'])->findOrFail($data['order_id']);
 
             $existingCutForSubmodel = OrderCut::where('order_id', $data['order_id'])
-                ->where('submodel_id', $data['submodel_id'])
+//                ->where('submodel_id', $data['submodel_id'])
                 ->sum('quantity');
 
             $remainingForSubmodel = $order->quantity - $existingCutForSubmodel;
@@ -418,8 +418,8 @@ class CuttingMasterController extends Controller
                 'cut_at' => now()->format('Y-m-d H:i:s'),
                 'quantity' => $data['quantity'],
                 'status' => false,
-                'submodel_id' => $data['submodel_id'],
-                'size_id' => $data['size_id'],
+                'submodel_id' => $data['submodel_id'] ?? null,
+                'size_id' => $data['size_id'] ?? null,
             ]);
 
             /** ✅ BONUS hisoblash (avvalgi qismi) */
