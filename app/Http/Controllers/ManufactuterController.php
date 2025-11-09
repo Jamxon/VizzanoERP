@@ -46,6 +46,16 @@ class ManufactuterController extends Controller
                 ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
                 ->get();
 
+            $todayDate = now()->toDateString();
+
+            $todayAttendance = Attendance::whereHas('employee', fn($q) =>
+            $q->where('branch_id', $branchId)->where('group_id', $groupId)
+            )->where('date', $todayDate)
+                ->get();
+
+            $presentTodayCount = $todayAttendance->where('status', 'present')->count();
+            $absentTodayCount = $todayAttendance->where('status', 'absent')->count();
+
             $dailySewingOutputs = $monthlyOrders->flatMap(function($order) {
                 return $order->orderModel->submodels->flatMap(function($sub) use ($order) {
                     return $sub->sewingOutputs->map(fn($output) => [
@@ -132,6 +142,8 @@ class ManufactuterController extends Controller
                 'dailySewingOutputs' => $dailySewingOutputs,
                 'monthlyDaysToFinish' => $monthlyDaysToFinish,
                 'monthlyDailyQuantityNeeded' => $monthlyDailyQuantityNeeded,
+                'todayPresentCount' => $presentTodayCount,
+                'todayAbsentCount' => $absentTodayCount,
                 'monthlyDeadline' => [
                     'target_date' => $monthlyDeadline->toDateString(),
                     'working_days_until_deadline' => $monthlyWorkingDaysUntilDeadline,
