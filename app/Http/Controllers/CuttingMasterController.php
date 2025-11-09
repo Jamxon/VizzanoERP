@@ -289,82 +289,82 @@ class CuttingMasterController extends Controller
 
             $authBranchId = auth()->user()->employee->branch_id ?? null;
 
-            if ($authBranchId) {
-
-                $warehouseDepartment = Department::where(function($q) {
-                        $q->where('name', 'ILIKE', '%омбор%')
-                            ->orWhere('name', 'ILIKE', '%ombor%');
-                    })
-                    ->whereHas('mainDepartment', function ($q) use ($authBranchId) {
-                        $q->where('branch_id', $authBranchId);
-                    })
-                    ->first();
-
-
-                if ($warehouseDepartment) {
-                    $warehouseBudget = DB::table('department_budgets')
-                        ->where('department_id', $warehouseDepartment->id)
-                        ->where('type', 'minute_based')
-                        ->first();
-
-                    if ($warehouseBudget) {
-                        $modelMinute = $order->orderModel->model->minute ?? 0;
-
-                        if ($modelMinute > 0 && $remaining > 0) {
-
-                            $totalMinutes = $modelMinute * $remaining;
-                            $totalEarnedWarehouse = $warehouseBudget->quantity * $totalMinutes;
-
-                            $warehouseEmployees = Employee::where('department_id', $warehouseDepartment->id)
-                                ->whereHas('attendances', function ($q) {
-                                    $q->whereDate('date', Carbon::today())
-                                        ->where('status', 'present');
-                                })
-                                ->where('status', 'working')
-                                ->get();
-
-                            foreach ($warehouseEmployees as $wEmp) {
-
-                                $percentage = $wEmp->percentage ?? 0;
-                                if ($percentage == 0) continue;
-
-                                $earned = round(($totalEarnedWarehouse * $percentage) / 100, 2);
-                                if ($earned == 0) continue;
-
-                                $existing = DB::table('daily_payments')
-                                    ->where('employee_id', $wEmp->id)
-                                    ->where('order_id', $order->id)
-                                    ->where('model_id', $order->orderModel->model->id)
-                                    ->whereDate('payment_date', Carbon::today())
-                                    ->first();
-
-                                if ($existing) {
-                                    DB::table('daily_payments')
-                                        ->where('id', $existing->id)
-                                        ->update([
-                                            'quantity_produced' => $existing->quantity_produced + $remaining,
-                                            'calculated_amount' => $existing->calculated_amount + $earned,
-                                            'updated_at' => now(),
-                                        ]);
-                                } else {
-                                    DB::table('daily_payments')->insert([
-                                        'employee_id' => $wEmp->id,
-                                        'model_id' => $order->orderModel->model->id,
-                                        'order_id' => $order->id,
-                                        'department_id' => $warehouseDepartment->id,
-                                        'payment_date' => Carbon::today(),
-                                        'quantity_produced' => $remaining,
-                                        'calculated_amount' => $earned,
-                                        'employee_percentage' => $percentage,
-                                        'created_at' => now(),
-                                        'updated_at' => now(),
-                                    ]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+//            if ($authBranchId) {
+//
+//                $warehouseDepartment = Department::where(function($q) {
+//                        $q->where('name', 'ILIKE', '%омбор%')
+//                            ->orWhere('name', 'ILIKE', '%ombor%');
+//                    })
+//                    ->whereHas('mainDepartment', function ($q) use ($authBranchId) {
+//                        $q->where('branch_id', $authBranchId);
+//                    })
+//                    ->first();
+//
+//
+//                if ($warehouseDepartment) {
+//                    $warehouseBudget = DB::table('department_budgets')
+//                        ->where('department_id', $warehouseDepartment->id)
+//                        ->where('type', 'minute_based')
+//                        ->first();
+//
+//                    if ($warehouseBudget) {
+//                        $modelMinute = $order->orderModel->model->minute ?? 0;
+//
+//                        if ($modelMinute > 0 && $remaining > 0) {
+//
+//                            $totalMinutes = $modelMinute * $remaining;
+//                            $totalEarnedWarehouse = $warehouseBudget->quantity * $totalMinutes;
+//
+//                            $warehouseEmployees = Employee::where('department_id', $warehouseDepartment->id)
+//                                ->whereHas('attendances', function ($q) {
+//                                    $q->whereDate('date', Carbon::today())
+//                                        ->where('status', 'present');
+//                                })
+//                                ->where('status', 'working')
+//                                ->get();
+//
+//                            foreach ($warehouseEmployees as $wEmp) {
+//
+//                                $percentage = $wEmp->percentage ?? 0;
+//                                if ($percentage == 0) continue;
+//
+//                                $earned = round(($totalEarnedWarehouse * $percentage) / 100, 2);
+//                                if ($earned == 0) continue;
+//
+//                                $existing = DB::table('daily_payments')
+//                                    ->where('employee_id', $wEmp->id)
+//                                    ->where('order_id', $order->id)
+//                                    ->where('model_id', $order->orderModel->model->id)
+//                                    ->whereDate('payment_date', Carbon::today())
+//                                    ->first();
+//
+//                                if ($existing) {
+//                                    DB::table('daily_payments')
+//                                        ->where('id', $existing->id)
+//                                        ->update([
+//                                            'quantity_produced' => $existing->quantity_produced + $remaining,
+//                                            'calculated_amount' => $existing->calculated_amount + $earned,
+//                                            'updated_at' => now(),
+//                                        ]);
+//                                } else {
+//                                    DB::table('daily_payments')->insert([
+//                                        'employee_id' => $wEmp->id,
+//                                        'model_id' => $order->orderModel->model->id,
+//                                        'order_id' => $order->id,
+//                                        'department_id' => $warehouseDepartment->id,
+//                                        'payment_date' => Carbon::today(),
+//                                        'quantity_produced' => $remaining,
+//                                        'calculated_amount' => $earned,
+//                                        'employee_percentage' => $percentage,
+//                                        'created_at' => now(),
+//                                        'updated_at' => now(),
+//                                    ]);
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
 
             DB::commit();
 
@@ -382,7 +382,7 @@ class CuttingMasterController extends Controller
         }
     }
 
-    public function markAsCutAndExportMultiplePdfs(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+    public function markAsCut(Request $request): \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
@@ -396,123 +396,145 @@ class CuttingMasterController extends Controller
         ini_set('memory_limit', '2G');
         set_time_limit(0);
 
-        $order = Order::findOrFail($data['order_id']);
+        DB::beginTransaction();
+        try {
+            $order = Order::with(['orderModel.model'])->findOrFail($data['order_id']);
 
-        $existingCutForSubmodel = OrderCut::where('order_id', $data['order_id'])
-            ->where('submodel_id', $data['submodel_id'])
-            ->sum('quantity');
+            $existingCutForSubmodel = OrderCut::where('order_id', $data['order_id'])
+                ->where('submodel_id', $data['submodel_id'])
+                ->sum('quantity');
 
-        $remainingForSubmodel = $order->quantity - $existingCutForSubmodel;
+            $remainingForSubmodel = $order->quantity - $existingCutForSubmodel;
 
-        if ($data['quantity'] > $remainingForSubmodel) {
-            return response()->json([
-                'message' => 'Submodel uchun kesish miqdori ortiqcha. Qolgan: ' . $remainingForSubmodel
-            ], 422);
-        }
+            if ($data['quantity'] > $remainingForSubmodel) {
+                return response()->json([
+                    'message' => 'Submodel uchun kesish miqdori ortiqcha. Qolgan: ' . $remainingForSubmodel
+                ], 422);
+            }
 
-        OrderCut::create([
-            'order_id' => $data['order_id'],
-            'user_id' => auth()->user()->id,
-            'cut_at' => now()->format('Y-m-d H:i:s'),
-            'quantity' => $data['quantity'],
-            'status' => false,
-            'submodel_id' => $data['submodel_id'],
-            'size_id' => $data['size_id'],
-        ]);
-
-        $minutesPerUnit = $order->orderModel->rasxod / 250;
-
-        $employees = Employee::where('payment_type', 'fixed_cutted_bonus')
-            ->where('status', '!=', 'kicked')
-            ->where('branch_id', $order->branch_id)
-            ->get();
-
-        foreach ($employees as $employee) {
-            $bonusAmount = $employee->bonus * $minutesPerUnit * $data['quantity'];
-            $oldBalance = $employee->balance;
-            $employee->balance += $bonusAmount;
-            $employee->save();
-
-            // Bonus log entry
-            Log::add(
-                auth()->id(),
-                'Qadoqlovchiga bonus qo‘shildi',
-                'packaging_bonus',
-                $oldBalance,
-                $employee->balance,
-                request()->ip(),
-                request()->userAgent()
-            );
-
-            // Bonus modelga yozish
-            Bonus::create([
-                'employee_id' => $employee->id,
-                'amount' => $bonusAmount,
-                'type' => 'packaging',
-                'description' => 'Qadoqlash bonusi',
-                'date' => now(),
-                'order_id' => $order->id,
+            OrderCut::create([
+                'order_id' => $data['order_id'],
+                'user_id' => auth()->user()->id,
+                'cut_at' => now()->format('Y-m-d H:i:s'),
+                'quantity' => $data['quantity'],
+                'status' => false,
+                'submodel_id' => $data['submodel_id'],
+                'size_id' => $data['size_id'],
             ]);
+
+            /** ✅ BONUS hisoblash (avvalgi qismi) */
+            $minutesPerUnit = $order->orderModel->rasxod / 250;
+
+            $employees = Employee::where('payment_type', 'fixed_cutted_bonus')
+                ->where('status', '!=', 'kicked')
+                ->where('branch_id', $order->branch_id)
+                ->get();
+
+            foreach ($employees as $employee) {
+                $bonusAmount = $employee->bonus * $minutesPerUnit * $data['quantity'];
+                $oldBalance = $employee->balance;
+                $employee->balance += $bonusAmount;
+                $employee->save();
+
+                Log::add(
+                    auth()->id(),
+                    'Qadoqlovchiga bonus qo‘shildi',
+                    'packaging_bonus',
+                    $oldBalance,
+                    $employee->balance,
+                    request()->ip(),
+                    request()->userAgent()
+                );
+
+                Bonus::create([
+                    'employee_id' => $employee->id,
+                    'amount' => $bonusAmount,
+                    'type' => 'packaging',
+                    'description' => 'Qadoqlash bonusi',
+                    'date' => now(),
+                    'order_id' => $order->id,
+                ]);
+            }
+
+            /** 📌 DAILY PAYMENT hisoblash (finishCutting() dan keltirildi) */
+            $departmentId = auth()->user()->employee->department_id ?? null;
+
+            if ($departmentId) {
+                $departmentBudget = DB::table('department_budgets')
+                    ->where('department_id', $departmentId)
+                    ->first();
+
+                if ($departmentBudget && $departmentBudget->type === 'minute_based') {
+                    $modelMinute = $order->orderModel->model->minute ?? 0;
+
+                    if ($modelMinute > 0) {
+                        $totalMinutes = $modelMinute * $data['quantity'];
+                        $totalEarned = $departmentBudget->quantity * $totalMinutes;
+
+                        $employees = Employee::where('department_id', $departmentId)
+                            ->whereHas('attendances', function ($q) {
+                                $q->whereDate('date', Carbon::today())->where('status', 'present');
+                            })
+                            ->where('status', 'working')
+                            ->get();
+
+                        foreach ($employees as $emp) {
+                            $percentage = $emp->percentage ?? 0;
+                            if ($percentage == 0) continue;
+
+                            $earned = round(($totalEarned * $percentage) / 100, 2);
+                            if ($earned == 0) continue;
+
+                            $existingPayment = DB::table('daily_payments')
+                                ->where('employee_id', $emp->id)
+                                ->where('order_id', $order->id)
+                                ->where('model_id', $order->orderModel->model->id)
+                                ->whereDate('payment_date', Carbon::today())
+                                ->first();
+
+                            if ($existingPayment) {
+                                DB::table('daily_payments')
+                                    ->where('id', $existingPayment->id)
+                                    ->update([
+                                        'quantity_produced' => $existingPayment->quantity_produced + $data['quantity'],
+                                        'calculated_amount' => $existingPayment->calculated_amount + $earned,
+                                        'updated_at' => now(),
+                                    ]);
+                            } else {
+                                DB::table('daily_payments')->insert([
+                                    'employee_id' => $emp->id,
+                                    'model_id' => $order->orderModel->model->id,
+                                    'order_id' => $order->id,
+                                    'department_id' => $departmentId,
+                                    'payment_date' => Carbon::today(),
+                                    'quantity_produced' => $data['quantity'],
+                                    'calculated_amount' => $earned,
+                                    'employee_percentage' => $percentage,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            /** ✅ Agar kesish to‘liq tugagan bo‘lsa */
+            $totalCut = OrderCut::where('order_id', $order->id)->sum('quantity');
+            if ($totalCut >= $order->quantity) {
+                $order->update(['status' => 'pending']);
+            }
+
+            DB::commit();
+            return response()->json(['message' => 'Kesish bajarildi va to‘lovlar hisoblandi ✅']);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ], 500);
         }
-
-        $totalCut = OrderCut::where('order_id', $order->id)->sum('quantity');
-
-        if ($totalCut >= $order->quantity) {
-            $order->status = 'pending';
-            $order->save();
-        }
-
-
-        $submodel = OrderSubmodel::with([
-            'orderModel.order:id,name',
-            'orderModel.model:id,name',
-            'submodel:id,name',
-        ])->findOrFail($data['submodel_id']);
-
-        // Tanlangan regionga mos tarificationCategories olish:
-        $filteredCategories = $submodel->tarificationCategories()
-            ->where('region', $data['region'])
-            ->with([
-                'tarifications.razryad:id,name',
-                'tarifications.typewriter:id,name',
-                'tarifications.employee:id,name'
-            ])
-            ->get();
-
-        $submodel->tarificationCategories = $filteredCategories;
-
-
-        $sizeName = OrderSize::find($data['size_id'])->size->name ?? '-';
-        $totalQuantity = $data['quantity'];
-        $capacity = $data['box_capacity'];
-        $boxes = intdiv($totalQuantity, $capacity);
-        $remainder = $totalQuantity % $capacity;
-
-        $pdfBoxes = [];
-        $boxNumber = 1;
-
-        for ($i = 0; $i < $boxes; $i++) {
-            $pdfBoxes[] = $this->storeBoxTarifications(
-                $boxNumber++, $capacity, $data, $submodel, $sizeName
-            );
-        }
-
-        if ($remainder > 0) {
-            $pdfBoxes[] = $this->storeBoxTarifications(
-                $boxNumber, $remainder, $data, $submodel, $sizeName
-            );
-        }
-
-        $pdf = Pdf::loadView('pdf.tarifications-pdf', [ 
-            'boxes' => $pdfBoxes,
-            'totalQuantity' => $totalQuantity,
-            'totalBoxes' => count($pdfBoxes),
-            'submodel' => $submodel,
-            'size' => $sizeName,
-            'order_id' => $data['order_id'],
-        ])->setPaper('A4', 'portrait');
-
-        return $pdf->download('kesish_tarifikatsiyasi_' . now()->format('Ymd_His') . '.pdf');
     }
 
     private function storeBoxTarifications($boxNumber, $quantity, $data, $submodel, $sizeName): array

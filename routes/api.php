@@ -554,7 +554,7 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::get('orders/{order}', [CuttingMasterController::class, 'showOrder']);
     Route::get('completedItems', [CuttingMasterController::class, 'getCompletedItems']);
     Route::get('specifications/{id}', [CuttingMasterController::class, 'getSpecificationByOrderId']);
-    Route::get('markAsCut', [CuttingMasterController::class, 'markAsCutAndExportMultiplePdfs']);
+    Route::get('markAsCut', [CuttingMasterController::class, 'markAsCut']);
     Route::get('cuts/{id}', [CuttingMasterController::class, 'getCuts']);
     Route::get('finishCutting/{id}', [CuttingMasterController::class, 'finishCutting']);
     Route::get('markAsCut/{boxTarification}', [CuttingMasterController::class, 'updateBoxTarification']);
