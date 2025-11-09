@@ -86,6 +86,8 @@ class ManufactuterController extends Controller
                 continue;
             }
 
+            $totalQuantity = $monthlyOrders->sum('quantity');
+
             // So‘nggi 30 ish kunidagi attendance
             $last30Workdays = collect();
             $date = now();
@@ -139,6 +141,7 @@ class ManufactuterController extends Controller
                 'responsibleUser' => $group->responsibleUser->employee,
                 'avgWorkersLast30Days' => round($avgWorkers, 2),
                 'dailyProductionMinutes' => round($dailyProductionMinutes, 2),
+                'totalQuantity' => $totalQuantity,
                 'monthlyOrdersCount' => $monthlyOrders->count(),
                 'monthlySewingOutputsSum' => $monthlySewingOutputsSum,
                 'monthlyMinutesTotal' => $monthlyMinutesTotal,

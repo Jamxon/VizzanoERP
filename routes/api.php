@@ -47,6 +47,7 @@ use App\Http\Controllers\EskizTestController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\MessageController;
+
 Route::prefix('manufacturer')->middleware('role:manufacturer')->group(function () {
     Route::get('groups', [ManufactuterController::class, 'getBranchGroupsWithBudgets']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
