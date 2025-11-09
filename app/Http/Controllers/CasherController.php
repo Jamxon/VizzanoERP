@@ -919,9 +919,9 @@ class CasherController extends Controller
             // ⛔ ONLY If amount is negative — CONTROL RULES APPLY
 //            if ($validated['amount'] < 0) {
 
-//                $lastPayment = SalaryPayment::where('employee_id', $validated['employee_id'])
-//                    ->orderByDesc('id')
-//                    ->first();
+                $lastPayment = SalaryPayment::where('employee_id', $validated['employee_id'])
+                    ->orderByDesc('id')
+                    ->first();
 
 //                if (!$lastPayment) {
 //                    return response()->json([
@@ -929,12 +929,12 @@ class CasherController extends Controller
 //                    ], 500);
 //                }
 
-                // QOIDA #2: 5 daqiqa o'tgan bo'lsa — Block
-                // if ($lastPayment->created_at->lt(now()->subMinutes(5))) {
-                //     return response()->json([
-                //         'message' => "Oxirgi to‘lovdan 5 daqiqa o‘tib ketgan 😉"
-                //     ], 500);
-                // }
+                 //QOIDA #2: 5 daqiqa o'tgan bo'lsa — Block
+                 if ($lastPayment->created_at->lt(now()->subMinutes(5))) {
+                     return response()->json([
+                         'message' => "Oxirgi to‘lovdan 5 daqiqa o‘tib ketgan 😉"
+                     ], 500);
+                 }
 
                 // QOIDA #3: Minus kattalik check
 //                if (abs($validated['amount']) > abs($lastPayment->amount)) {
