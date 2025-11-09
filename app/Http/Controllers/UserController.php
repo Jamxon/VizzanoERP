@@ -894,7 +894,6 @@ class UserController extends Controller
         $month = date('m', strtotime($selectedMonth));
         $year = date('Y', strtotime($selectedMonth));
 
-        // ✅ Orders + Model + DailyPayments + Earned + Produced → bitta join orqali
         $data = DB::table('orders')
             ->select(
                 'orders.id as order_id',
@@ -973,6 +972,19 @@ class UserController extends Controller
 
             $remainingQuantity = max($row->planned_quantity - $row->produced_quantity, 0);
 
+            // 🔹 order_cutsdan quantity yig‘ish
+            $orderCutsSum = DB::table('order_cuts')
+                ->where('order_id', $row->order_id)
+                ->sum('quantity');
+
+            // 🔹 sewingOutputsni yig‘ish
+            $sewingOutputsSum = DB::table('sewing_outputs')
+                ->join('sub_models', 'sewing_outputs.sub_model_id', '=', 'sub_models.id')
+                ->join('order_sub_models', 'order_sub_models.submodel_id', '=', 'sub_models.id')
+                ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
+                ->where('order_models.order_id', $row->order_id)
+                ->sum('sewing_outputs.quantity');
+
             return [
                 "order" => [
                     "id" => $row->order_id,
@@ -983,22 +995,20 @@ class UserController extends Controller
                     "name" => $row->model_name,
                     "minute" => $row->model_minute,
                 ],
-                'submodels' => DB::table('sub_models')
-                    ->join('order_sub_models', 'order_sub_models.submodel_id', '=', 'sub_models.id')
-                    ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
-                    ->where('order_models.order_id', $row->order_id)
-                    ->select('sub_models.id', 'sub_models.name')
-                    ->get(),
                 "planned_quantity" => $row->planned_quantity,
                 "produced_quantity" => $row->produced_quantity,
                 "remaining_quantity" => $remainingQuantity,
-                'departmentBudget' => $departmentBudget,
                 "earned_amount" => round($row->earned_amount, 2),
                 "remaining_earn_amount" => round($remainingQuantity * $perPieceEarn, 2),
                 "possible_full_earn_amount" => round($row->planned_quantity * $perPieceEarn, 2),
                 "per_piece_earn" => round($perPieceEarn, 4),
+                "departmentBudget" => $departmentBudget,
 
-                // ✅ faqat shu order employee bo‘yicha paymentlar
+                // 🔹 Yangi qo‘shilganlar:
+                "total_cut_quantity" => (int) $orderCutsSum,
+                "total_sewing_output_quantity" => (int) $sewingOutputsSum,
+
+                // 🔹 faqat shu order bo‘yicha paymentlar
                 "payments" => DB::table('daily_payments')
                     ->select(
                         'id', 'payment_date', 'quantity_produced',
@@ -1013,50 +1023,7 @@ class UserController extends Controller
             ];
         });
 
-        // ✅ Additional SEASON earning calculation
-        $seasonYear = 2026;
-        $seasonType = 'summer';
-
-        $seasonOrders = DB::table('orders')
-            ->select(
-                'orders.id as order_id',
-                'orders.quantity as planned_quantity',
-                'order_models.model_id',
-                'models.minute as model_minute',
-                'orders.price'
-            )
-            ->join('order_models', 'order_models.order_id', '=', 'orders.id')
-            ->join('models', 'models.id', '=', 'order_models.model_id')
-            ->where('orders.branch_id', $branchId)
-            ->where('orders.season_year', $seasonYear)
-            ->where('orders.season_type', $seasonType)
-            ->get();
-
-        $totalPossibleSeason = 0;
-
-        foreach ($seasonOrders as $row) {
-            $departmentBudget = DB::table('department_budgets')
-                ->where('department_id', $employee->department_id)
-                ->first();
-
-            if (!$departmentBudget || $departmentBudget->quantity <= 0) {
-                continue;
-            }
-
-            $perPieceEarn = 0;
-            if ($departmentBudget->type === 'minute_based') {
-                $perPieceEarn =
-                    $row->model_minute * $departmentBudget->quantity / 100 * $empPercent;
-            } elseif ($departmentBudget->type === 'percentage_based') {
-                $priceUzs = ($row->price ?? 0) * $usdRate;
-                $perPieceEarn =
-                    (($priceUzs * $departmentBudget->quantity) / 100)
-                    * ($empPercent / 100);
-            }
-
-            $totalPossibleSeason += $row->planned_quantity * $perPieceEarn;
-        }
-
+        // ✅ umumiy ma’lumotlar
         return response()->json([
             "employee" => [
                 "id" => $employeeId,
@@ -1067,7 +1034,6 @@ class UserController extends Controller
             "total_remaining" => round($orders->sum('remaining_earn_amount'), 2),
             "total_possible" => round($orders->sum('possible_full_earn_amount'), 2),
             "orders" => $orders->values(),
-            "total_possible_season" => round($totalPossibleSeason, 2),
         ]);
     }
 
