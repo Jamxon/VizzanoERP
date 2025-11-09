@@ -49,9 +49,9 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\MessageController;
 Route::prefix('manufacturer')->middleware('role:manufacturer')->group(function () {
     Route::get('groups', [ManufactuterController::class, 'getBranchGroupsWithBudgets']);
-    Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
     Route::get('departments', [SuperHRController::class, 'getDepartments']);
     Route::get('employees/{employee}', [UserController::class, 'showEmployee']);
+    Route::get('employees', [SuperHRController::class, 'getEmployees']);
 });
 
 Route::prefix('ceo')->middleware('role:ceo')->group(function () {
