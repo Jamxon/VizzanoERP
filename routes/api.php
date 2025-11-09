@@ -559,6 +559,7 @@ Route::prefix('cuttingMaster')->middleware('role:cuttingMaster')->group(function
     Route::get('finishCutting/{id}', [CuttingMasterController::class, 'finishCutting']);
     Route::get('markAsCut/{boxTarification}', [CuttingMasterController::class, 'updateBoxTarification']);
     Route::get('cuttingPlans', [CuttingPlanController::class, 'index']);
+    Route::get('departments', [CuttingMasterController::class, 'show']);
 
 });
 
