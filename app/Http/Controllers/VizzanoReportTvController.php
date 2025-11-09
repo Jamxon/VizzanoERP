@@ -197,7 +197,7 @@ class VizzanoReportTvController extends Controller
                         $q->where('status', '!=', 'kicked')
                             ->where('group_id', $groupId);
                     })
-                    ->where('status', '!=', 'ABSENT')
+                    ->where('status', 'present')
                     ->count();
 
                 // ❗️Bugun ishlagan har bir xodimga tushadigan o‘rtacha summa

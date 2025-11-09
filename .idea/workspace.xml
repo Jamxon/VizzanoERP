@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CuttingMasterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -503,15 +503,7 @@
       <workItem from="1762519243993" duration="29761000" />
       <workItem from="1762610846664" duration="22961000" />
       <workItem from="1762644680269" duration="4983000" />
-      <workItem from="1762713114894" duration="3975000" />
-    </task>
-    <task id="LOCAL-01844" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762564377727</created>
-      <option name="number" value="01844" />
-      <option name="presentableId" value="LOCAL-01844" />
-      <option name="project" value="LOCAL" />
-      <updated>1762564377727</updated>
+      <workItem from="1762713114894" duration="5496000" />
     </task>
     <task id="LOCAL-01845" summary="feat: add DailyPayment model and controller for managing daily payment records">
       <option name="closed" value="true" />
@@ -897,7 +889,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762717182703</updated>
     </task>
-    <option name="localTasksCounter" value="1893" />
+    <task id="LOCAL-01893" summary="feat: add DailyPayment model and controller for managing daily payment records">
+      <option name="closed" value="true" />
+      <created>1762717589844</created>
+      <option name="number" value="01893" />
+      <option name="presentableId" value="LOCAL-01893" />
+      <option name="project" value="LOCAL" />
+      <updated>1762717589844</updated>
+    </task>
+    <option name="localTasksCounter" value="1894" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
