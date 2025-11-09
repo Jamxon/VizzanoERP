@@ -151,7 +151,7 @@ class CuttingMasterController extends Controller
     {
         $cuts = OrderCut::where('order_id', $id)
             ->with([
-                'user:id,name',
+                'user.employee',
                 'submodel.submodel',
                 'size.size'
             ])
