@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -501,15 +504,7 @@
       <workItem from="1762519243993" duration="29761000" />
       <workItem from="1762610846664" duration="22961000" />
       <workItem from="1762644680269" duration="4983000" />
-      <workItem from="1762713114894" duration="16162000" />
-    </task>
-    <task id="LOCAL-01853" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762565789032</created>
-      <option name="number" value="01853" />
-      <option name="presentableId" value="LOCAL-01853" />
-      <option name="project" value="LOCAL" />
-      <updated>1762565789033</updated>
+      <workItem from="1762713114894" duration="18916000" />
     </task>
     <task id="LOCAL-01854" summary="feat: add DailyPayment model and controller for managing daily payment records">
       <option name="closed" value="true" />
@@ -895,7 +890,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762732825169</updated>
     </task>
-    <option name="localTasksCounter" value="1902" />
+    <task id="LOCAL-01902" summary="fix: correct join column name in sewing outputs query">
+      <option name="closed" value="true" />
+      <created>1762732895515</created>
+      <option name="number" value="01902" />
+      <option name="presentableId" value="LOCAL-01902" />
+      <option name="project" value="LOCAL" />
+      <updated>1762732895515</updated>
+    </task>
+    <option name="localTasksCounter" value="1903" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -925,7 +928,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update supplier name retrieval in SupplierController for order notifications" />
     <MESSAGE value="fix: enhance order data structure in CeoController to include submodel sewing outputs" />
     <MESSAGE value="fix: add route for retrieving employee tarification logs in InternalAccountantController" />
     <MESSAGE value="fix: add route for retrieving order attendance salary in InternalAccountantController" />
@@ -950,7 +952,8 @@
     <MESSAGE value="fix: update payment calculation logic for 2026 summer season and improve department queries" />
     <MESSAGE value="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService" />
     <MESSAGE value="feat: add DailyPayment model and controller for managing daily payment records" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add DailyPayment model and controller for managing daily payment records" />
+    <MESSAGE value="fix: correct join column name in sewing outputs query" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: correct join column name in sewing outputs query" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

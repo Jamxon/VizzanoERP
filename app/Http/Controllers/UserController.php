@@ -1027,6 +1027,7 @@ class UserController extends Controller
             "employee" => [
                 "id" => $employeeId,
                 "name" => $employee->name,
+                'percentage' => $employee->percentage,
             ],
             "month" => $selectedMonth,
             "total_earned" => round($orders->sum('earned_amount'), 2),
