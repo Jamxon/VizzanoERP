@@ -979,8 +979,7 @@ class UserController extends Controller
 
             // 🔹 sewingOutputsni yig‘ish
             $sewingOutputsSum = DB::table('sewing_outputs')
-                ->join('sub_models', 'sewing_outputs.sub_model_id', '=', 'sub_models.id')
-                ->join('order_sub_models', 'order_sub_models.submodel_id', '=', 'sub_models.id')
+                ->join('order_sub_models', 'sewing_outputs.order_sub_model_id', '=', 'order_sub_models.id')
                 ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                 ->where('order_models.order_id', $row->order_id)
                 ->sum('sewing_outputs.quantity');
@@ -1036,6 +1035,5 @@ class UserController extends Controller
             "orders" => $orders->values(),
         ]);
     }
-
 
 }
