@@ -2444,8 +2444,8 @@ class CasherController extends Controller
                                 $q->whereDate('date', $sewingDate)
                                     ->where('status', 'present')
                                     ->where(function($q2) use ($sewingTime) {
-                                        $q2->whereNull('arrival_time')
-                                            ->orWhereTime('arrival_time', '<=', $sewingTime->format('H:i:s'));
+                                        $q2->whereNull('check_in')
+                                            ->orWhereTime('check_in', '<=', $sewingTime->format('H:i:s'));
                                     });
                             })
                             ->get();
