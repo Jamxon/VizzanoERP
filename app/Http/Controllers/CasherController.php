@@ -2314,6 +2314,7 @@ class CasherController extends Controller
                     'attendance.check_in as arrival_time'
                 )
                 ->get();
+            dd($attendancesRaw->all());
 
             // Organize: attendances[date][employee_id] => ['status'=>..., 'arrival_time'=>...]
             $attendances = [];
@@ -2335,7 +2336,6 @@ class CasherController extends Controller
                 })
                 ->select('*')
                 ->get();
-dd($existingPaymentsRaw->all());
             // Map existingPayments[date][order_id][model_id][employee_id][expense_id|null] => payment row
             $existingPayments = [];
             foreach ($existingPaymentsRaw as $p) {
