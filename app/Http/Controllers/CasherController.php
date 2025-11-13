@@ -2532,7 +2532,7 @@ class CasherController extends Controller
                                 } else {
                                     $totalAmount = $newQty * $deptBudget->quantity;
                                 }
-dd($totalAmount);
+
                                 if ($totalAmount <= 0) continue;
 
                                 // employees in department
@@ -2541,7 +2541,7 @@ dd($totalAmount);
                                     $log['skipped_no_attendance']++;
                                     continue;
                                 }
-
+dd($empList);
                                 foreach ($empList as $emp) {
                                     $empId = $emp->id;
                                     if (!$wasEmployeeEligible($empId, $sewDate, $sewTime)) continue;
