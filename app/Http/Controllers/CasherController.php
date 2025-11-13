@@ -2355,7 +2355,8 @@ class CasherController extends Controller
                 if (is_null($rec['arrival_time'])) return true;
                 // arrival_time stored as e.g. "08:30:00"
                 try {
-                    $arrival = Carbon::createFromFormat('H:i:s', $rec['arrival_time']);
+                    $arrival = Carbon::createFromFormat('H:i:s', $rec['arrival_time'])
+                        ->setDate($eventTime->year, $eventTime->month, $eventTime->day);
                 } catch (\Throwable $e) {
                     // if parse fail, consider not eligible
                     return false;
@@ -2363,7 +2364,7 @@ class CasherController extends Controller
                 // if arrival <= eventTime->time => eligible
                 return $arrival->lessThanOrEqualTo($eventTime);
             };
-    dd($wasEmployeeEligible);
+
             // We'll accumulate inserts and updates in batches
             $toInsert = [];
             $toUpdate = []; // array of ['id'=>..., 'data'=>[...]]
