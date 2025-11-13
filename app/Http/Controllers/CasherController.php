@@ -2303,15 +2303,15 @@ class CasherController extends Controller
 
             // ===== 3) preload attendances for the whole month for branch =====
             // We'll need to check present status and arrival_time for each employee/date.
-            $attendancesRaw = DB::table('attendances')
-                ->join('employees as e', 'e.id', '=', 'attendances.employee_id')
+            $attendancesRaw = DB::table('attendance')
+                ->join('employees as e', 'e.id', '=', 'attendance.employee_id')
                 ->where('e.branch_id', $branchId)
-                ->whereBetween('attendances.date', [Carbon::parse($startDate)->toDateString(), Carbon::parse($endDate)->toDateString()])
+                ->whereBetween('attendance.date', [Carbon::parse($startDate)->toDateString(), Carbon::parse($endDate)->toDateString()])
                 ->select(
-                    'attendances.employee_id',
-                    'attendances.status',
-                    'attendances.date',
-                    'attendances.check_in as arrival_time'
+                    'attendance.employee_id',
+                    'attendance.status',
+                    'attendance.date',
+                    'attendance.check_in as arrival_time'
                 )
                 ->get();
             dd($attendancesRaw);
