@@ -18,6 +18,7 @@ use App\Models\Currency;
 use App\Models\MonthlyExpense;
 use App\Models\MonthlySelectedOrder;
 use App\Models\Order;
+use App\Models\OrderCut;
 use App\Models\SalaryPayment;
 use App\Models\SewingOutputs;
 use Carbon\CarbonPeriod;
@@ -2232,5 +2233,290 @@ class CasherController extends Controller
             $request->end_date,
             $request->type
         ), 'cashbox_transactions.xlsx');
+    }
+
+    public function recalculateDailyPayments(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'year' => 'required|integer',
+            'month' => 'required|integer|min:1|max:12',
+        ]);
+
+        ini_set('memory_limit', '3G');
+        set_time_limit(0);
+
+        DB::beginTransaction();
+        try {
+            $year = $data['year'];
+            $month = $data['month'];
+            $branchId = auth()->user()->employee->branch_id;
+
+            $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+            $endDate = Carbon::create($year, $month, 1)->endOfMonth();
+
+            $log = [
+                'processed_cuts' => 0,
+                'processed_sewings' => 0,
+                'updated_payments' => 0,
+                'created_payments' => 0,
+                'skipped_no_attendance' => 0,
+                'errors' => []
+            ];
+
+            // ============================================
+            // 1️⃣ CUTTING natijalarini qayta hisoblash
+            // ============================================
+            $orderCuts = OrderCut::whereBetween('created_at', [$startDate, $endDate])
+                ->whereHas('order', function($q) use ($branchId) {
+                    $q->where('branch_id', $branchId);
+                })
+                ->with(['order.orderModel.model'])
+                ->get();
+
+            foreach ($orderCuts as $cut) {
+                try {
+                    $order = $cut->order;
+                    $cutDate = Carbon::parse($cut->created_at)->toDateString();
+                    $cutTime = Carbon::parse($cut->created_at);
+
+                    // 📌 Ombor va Kroy bo'limlari uchun hisoblash
+                    $cuttingDepartments = [
+                        "Markaziy ombor",
+                        "Kroy bo'limi"
+                    ];
+
+                    foreach ($cuttingDepartments as $deptName) {
+                        $department = Department::where('name', $deptName)
+                            ->whereHas('mainDepartment', function($q) use($branchId) {
+                                $q->where('branch_id', $branchId);
+                            })->first();
+
+                        if (!$department) continue;
+
+                        $departmentBudget = DB::table('department_budgets')
+                            ->where('department_id', $department->id)
+                            ->first();
+
+                        if (!$departmentBudget || $departmentBudget->type !== 'minute_based') continue;
+
+                        $modelMinute = $order->orderModel->model->minute ?? 0;
+                        if ($modelMinute <= 0) continue;
+
+                        $totalMinutes = $modelMinute * $cut->quantity;
+                        $totalEarned = $departmentBudget->quantity * $totalMinutes;
+
+                        // ✅ Faqat o'sha kun davomatda bo'lgan va cut vaqtidan OLDIN kelgan xodimlar
+                        $employees = Employee::where('department_id', $department->id)
+                            ->where('status', 'working')
+                            ->whereHas('attendances', function ($q) use ($cutDate, $cutTime) {
+                                $q->whereDate('date', $cutDate)
+                                    ->where('status', 'present')
+                                    ->where(function($q2) use ($cutTime) {
+                                        // Agar arrival_time NULL bo'lsa yoki cut vaqtidan oldin bo'lsa
+                                        $q2->whereNull('check_in')
+                                            ->orWhereTime('check_in', '<=', $cutTime->format('H:i:s'));
+                                    });
+                            })
+                            ->get();
+
+                        foreach ($employees as $emp) {
+                            // ✅ Percentage olish: avval daily_payment'dan, yo'q bo'lsa employee'dan
+                            $existingPayment = DB::table('daily_payments')
+                                ->where('employee_id', $emp->id)
+                                ->where('order_id', $order->id)
+                                ->where('model_id', $order->orderModel->model->id)
+                                ->whereDate('payment_date', $cutDate)
+                                ->first();
+
+                            $percentage = $existingPayment
+                                ? $existingPayment->employee_percentage
+                                : ($emp->percentage ?? 0);
+
+                            if ($percentage == 0) continue;
+
+                            $earned = round(($totalEarned * $percentage) / 100, 2);
+                            if ($earned == 0) continue;
+
+                            if ($existingPayment) {
+                                // ✅ Agar mavjud bo'lsa va to'g'ri bo'lsa, tekshirish
+                                $expectedAmount = round(($totalMinutes * $departmentBudget->quantity * $percentage) / 100, 2);
+
+                                if (abs($existingPayment->calculated_amount - $expectedAmount) > 0.01) {
+                                    DB::table('daily_payments')
+                                        ->where('id', $existingPayment->id)
+                                        ->update([
+                                            'quantity_produced' => $cut->quantity,
+                                            'calculated_amount' => $earned,
+                                            'employee_percentage' => $percentage,
+                                            'updated_at' => now(),
+                                        ]);
+                                    $log['updated_payments']++;
+                                }
+                            } else {
+                                DB::table('daily_payments')->insert([
+                                    'employee_id' => $emp->id,
+                                    'model_id' => $order->orderModel->model->id,
+                                    'order_id' => $order->id,
+                                    'department_id' => $department->id,
+                                    'payment_date' => $cutDate,
+                                    'quantity_produced' => $cut->quantity,
+                                    'calculated_amount' => $earned,
+                                    'employee_percentage' => $percentage,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                                $log['created_payments']++;
+                            }
+                        }
+                    }
+
+                    $log['processed_cuts']++;
+                } catch (\Throwable $e) {
+                    $log['errors'][] = "Cut ID {$cut->id}: {$e->getMessage()}";
+                }
+            }
+
+            // ============================================
+            // 2️⃣ SEWING natijalarini qayta hisoblash
+            // ============================================
+
+            $sewingOutputs = SewingOutputs::whereBetween('created_at', [$startDate, $endDate])
+                ->whereHas('orderSubmodel.orderModel.order', function($q) use ($branchId) {
+                    $q->where('branch_id', $branchId);
+                })
+                ->with([
+                    'orderSubmodel.orderModel.model',
+                    'orderSubmodel.orderModel.order'
+                ])
+                ->get();
+
+            foreach ($sewingOutputs as $sewing) {
+                try {
+                    $orderSubModel = $sewing->orderSubmodel;
+                    $orderModel = $orderSubModel->orderModel;
+                    $order = $orderModel->order;
+
+                    $sewingDate = Carbon::parse($sewing->created_at)->toDateString();
+                    $sewingTime = Carbon::parse($sewing->created_at);
+                    $newQuantity = $sewing->quantity;
+
+                    // 📌 Sewing asosidagi bo'limlar
+                    $sewingDepartments = [
+                        "Sifat nazorati va qadoqlash bo'limi",
+                        "Texnik bo'lim",
+                        "Ho'jalik ishlari bo'limi",
+                        "Rejalashtirish va iqtisod bo'limi",
+                        "Ma'muriy boshqaruv"
+                    ];
+
+                    foreach ($sewingDepartments as $deptName) {
+                        $department = Department::where('name', $deptName)
+                            ->whereHas('mainDepartment', function($q) use($branchId) {
+                                $q->where('branch_id', $branchId);
+                            })->first();
+
+                        if (!$department) continue;
+
+                        $budget = DB::table('department_budgets')
+                            ->where('department_id', $department->id)
+                            ->first();
+
+                        if (!$budget) continue;
+
+                        $modelMinute = $orderModel->model->minute ?? 0;
+                        $usdRate = getUsdRate();
+                        $orderUsdPrice = $order->price ?? 0;
+                        $orderUzsPrice = $orderUsdPrice * $usdRate;
+
+                        if ($budget->type == 'minute_based' && $modelMinute > 0) {
+                            $totalAmount = $modelMinute * $newQuantity * $budget->quantity;
+                        } elseif ($budget->type == 'percentage_based') {
+                            $percentage = $budget->quantity ?? 0;
+                            $totalAmount = round(($orderUzsPrice * $percentage) / 100, 2);
+                        } else {
+                            $totalAmount = $newQuantity * $budget->quantity;
+                        }
+
+                        // ✅ Faqat o'sha kun davomatda va sewing vaqtidan OLDIN kelgan xodimlar
+                        $employees = Employee::where('department_id', $department->id)
+                            ->where('status', 'working')
+                            ->whereHas('attendances', function ($q) use ($sewingDate, $sewingTime) {
+                                $q->whereDate('date', $sewingDate)
+                                    ->where('status', 'present')
+                                    ->where(function($q2) use ($sewingTime) {
+                                        $q2->whereNull('arrival_time')
+                                            ->orWhereTime('arrival_time', '<=', $sewingTime->format('H:i:s'));
+                                    });
+                            })
+                            ->get();
+
+                        foreach ($employees as $emp) {
+                            $existingPayment = DB::table('daily_payments')
+                                ->where('employee_id', $emp->id)
+                                ->where('order_id', $order->id)
+                                ->where('model_id', $orderModel->model->id)
+                                ->whereDate('payment_date', $sewingDate)
+                                ->first();
+
+                            $percentage = $existingPayment
+                                ? $existingPayment->employee_percentage
+                                : ($emp->percentage ?? 0);
+
+                            if ($percentage == 0) continue;
+
+                            $earned = round(($totalAmount * $percentage) / 100, 2);
+                            if ($earned == 0) continue;
+
+                            if ($existingPayment) {
+                                $expectedAmount = round(($totalAmount * $percentage) / 100, 2);
+
+                                if (abs($existingPayment->calculated_amount - $expectedAmount) > 0.01) {
+                                    DB::table('daily_payments')->where('id', $existingPayment->id)
+                                        ->update([
+                                            'quantity_produced' => $newQuantity,
+                                            'calculated_amount' => $earned,
+                                            'employee_percentage' => $percentage,
+                                            'updated_at' => now(),
+                                        ]);
+                                    $log['updated_payments']++;
+                                }
+                            } else {
+                                DB::table('daily_payments')->insert([
+                                    'employee_id' => $emp->id,
+                                    'model_id' => $orderModel->model->id,
+                                    'order_id' => $order->id,
+                                    'department_id' => $department->id,
+                                    'payment_date' => $sewingDate,
+                                    'quantity_produced' => $newQuantity,
+                                    'calculated_amount' => $earned,
+                                    'employee_percentage' => $percentage,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                                $log['created_payments']++;
+                            }
+                        }
+                    }
+
+                    $log['processed_sewings']++;
+                } catch (\Throwable $e) {
+                    $log['errors'][] = "Sewing ID {$sewing->id}: {$e->getMessage()}";
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'To\'lovlar muvaffaqiyatli qayta hisoblandi ✅',
+                'summary' => $log
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ], 500);
+        }
     }
 }

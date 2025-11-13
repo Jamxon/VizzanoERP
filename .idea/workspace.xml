@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -504,15 +504,8 @@
       <workItem from="1762519243993" duration="29761000" />
       <workItem from="1762610846664" duration="22961000" />
       <workItem from="1762644680269" duration="4983000" />
-      <workItem from="1762713114894" duration="18916000" />
-    </task>
-    <task id="LOCAL-01854" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762566000146</created>
-      <option name="number" value="01854" />
-      <option name="presentableId" value="LOCAL-01854" />
-      <option name="project" value="LOCAL" />
-      <updated>1762566000146</updated>
+      <workItem from="1762713114894" duration="20778000" />
+      <workItem from="1763031712051" duration="2504000" />
     </task>
     <task id="LOCAL-01855" summary="feat: add DailyPayment model and controller for managing daily payment records">
       <option name="closed" value="true" />
@@ -898,7 +891,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762732895515</updated>
     </task>
-    <option name="localTasksCounter" value="1903" />
+    <task id="LOCAL-01903" summary="fix: correct join column name in sewing outputs query">
+      <option name="closed" value="true" />
+      <created>1762737176543</created>
+      <option name="number" value="01903" />
+      <option name="presentableId" value="LOCAL-01903" />
+      <option name="project" value="LOCAL" />
+      <updated>1762737176543</updated>
+    </task>
+    <option name="localTasksCounter" value="1904" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

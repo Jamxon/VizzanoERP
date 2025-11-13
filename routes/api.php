@@ -129,6 +129,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::get('confirmOrder', [TechnologController::class, 'confirmOrder']);
     Route::patch('dailyPayments/{dailyPayment}', [DailyPaymentController::class, 'editDailyPayment']);
     Route::post('dailyPayments', [DailyPaymentController::class, 'storeDailyPayment']);
+    Route::post('recalculate-daily-payments', [CasherController::class, 'recalculateDailyPayments']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
