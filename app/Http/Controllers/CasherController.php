@@ -2314,7 +2314,6 @@ class CasherController extends Controller
                     'attendance.check_in as arrival_time'
                 )
                 ->get();
-            dd($attendancesRaw->all());
 
             // Organize: attendances[date][employee_id] => ['status'=>..., 'arrival_time'=>...]
             $attendances = [];
@@ -2533,7 +2532,7 @@ class CasherController extends Controller
                                 } else {
                                     $totalAmount = $newQty * $deptBudget->quantity;
                                 }
-
+dd($totalAmount);
                                 if ($totalAmount <= 0) continue;
 
                                 // employees in department
