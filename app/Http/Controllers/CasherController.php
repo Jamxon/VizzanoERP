@@ -2335,7 +2335,7 @@ class CasherController extends Controller
                 })
                 ->select('*')
                 ->get();
-dd($existingPaymentsRaw->first);
+dd($existingPaymentsRaw->all());
             // Map existingPayments[date][order_id][model_id][employee_id][expense_id|null] => payment row
             $existingPayments = [];
             foreach ($existingPaymentsRaw as $p) {
