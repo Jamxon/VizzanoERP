@@ -2314,7 +2314,6 @@ class CasherController extends Controller
                     'attendance.check_in as arrival_time'
                 )
                 ->get();
-            dd($attendancesRaw);
 
             // Organize: attendances[date][employee_id] => ['status'=>..., 'arrival_time'=>...]
             $attendances = [];
