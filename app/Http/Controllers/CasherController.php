@@ -2286,13 +2286,13 @@ class CasherController extends Controller
                 ->select('d.id', 'd.name')
                 ->get()
                 ->keyBy('name');
-dd($departments);
+
             // budgets
             $budgets = DB::table('department_budgets')
                 ->whereIn('department_id', $departments->pluck('id')->all())
                 ->get()
                 ->keyBy('department_id');
-
+dd($budgets);
             // ===== 2) preload employees by department (working only) =====
             $employees = DB::table('employees')
                 ->where('branch_id', $branchId)
