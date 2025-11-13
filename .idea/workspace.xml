@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
-    </list>
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -505,47 +503,7 @@
       <workItem from="1762644680269" duration="4983000" />
       <workItem from="1762713114894" duration="20778000" />
       <workItem from="1763031712051" duration="2504000" />
-      <workItem from="1763039640369" duration="919000" />
-    </task>
-    <task id="LOCAL-01868" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762630476856</created>
-      <option name="number" value="01868" />
-      <option name="presentableId" value="LOCAL-01868" />
-      <option name="project" value="LOCAL" />
-      <updated>1762630476856</updated>
-    </task>
-    <task id="LOCAL-01869" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762630541523</created>
-      <option name="number" value="01869" />
-      <option name="presentableId" value="LOCAL-01869" />
-      <option name="project" value="LOCAL" />
-      <updated>1762630541523</updated>
-    </task>
-    <task id="LOCAL-01870" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762631342792</created>
-      <option name="number" value="01870" />
-      <option name="presentableId" value="LOCAL-01870" />
-      <option name="project" value="LOCAL" />
-      <updated>1762631342792</updated>
-    </task>
-    <task id="LOCAL-01871" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762639974913</created>
-      <option name="number" value="01871" />
-      <option name="presentableId" value="LOCAL-01871" />
-      <option name="project" value="LOCAL" />
-      <updated>1762639974913</updated>
-    </task>
-    <task id="LOCAL-01872" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762640168453</created>
-      <option name="number" value="01872" />
-      <option name="presentableId" value="LOCAL-01872" />
-      <option name="project" value="LOCAL" />
-      <updated>1762640168453</updated>
+      <workItem from="1763039640369" duration="1296000" />
     </task>
     <task id="LOCAL-01873" summary="feat: add DailyPayment model and controller for managing daily payment records">
       <option name="closed" value="true" />
@@ -899,7 +857,47 @@
       <option name="project" value="LOCAL" />
       <updated>1763040479774</updated>
     </task>
-    <option name="localTasksCounter" value="1917" />
+    <task id="LOCAL-01917" summary="fix: correct join column name in sewing outputs query">
+      <option name="closed" value="true" />
+      <created>1763040599741</created>
+      <option name="number" value="01917" />
+      <option name="presentableId" value="LOCAL-01917" />
+      <option name="project" value="LOCAL" />
+      <updated>1763040599741</updated>
+    </task>
+    <task id="LOCAL-01918" summary="fix: correct join column name in sewing outputs query">
+      <option name="closed" value="true" />
+      <created>1763040685404</created>
+      <option name="number" value="01918" />
+      <option name="presentableId" value="LOCAL-01918" />
+      <option name="project" value="LOCAL" />
+      <updated>1763040685404</updated>
+    </task>
+    <task id="LOCAL-01919" summary="fix: correct join column name in sewing outputs query">
+      <option name="closed" value="true" />
+      <created>1763040809126</created>
+      <option name="number" value="01919" />
+      <option name="presentableId" value="LOCAL-01919" />
+      <option name="project" value="LOCAL" />
+      <updated>1763040809126</updated>
+    </task>
+    <task id="LOCAL-01920" summary="fix: correct join column name in sewing outputs query">
+      <option name="closed" value="true" />
+      <created>1763040857258</created>
+      <option name="number" value="01920" />
+      <option name="presentableId" value="LOCAL-01920" />
+      <option name="project" value="LOCAL" />
+      <updated>1763040857258</updated>
+    </task>
+    <task id="LOCAL-01921" summary="fix: correct join column name in sewing outputs query">
+      <option name="closed" value="true" />
+      <created>1763040937608</created>
+      <option name="number" value="01921" />
+      <option name="presentableId" value="LOCAL-01921" />
+      <option name="project" value="LOCAL" />
+      <updated>1763040937608</updated>
+    </task>
+    <option name="localTasksCounter" value="1922" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
