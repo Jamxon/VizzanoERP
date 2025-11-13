@@ -2280,7 +2280,7 @@ class CasherController extends Controller
             ];
 
             $departments = DB::table('departments as d')
-                ->join('main_departments as md', 'md.id', '=', 'd.main_department_id')
+                ->join('main_department as md', 'md.id', '=', 'd.main_department_id')
                 ->where('md.branch_id', $branchId)
                 ->whereIn('d.name', $neededDeptNames)
                 ->select('d.id', 'd.name')
