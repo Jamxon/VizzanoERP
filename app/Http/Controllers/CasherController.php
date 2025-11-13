@@ -2541,7 +2541,7 @@ class CasherController extends Controller
                                     $log['skipped_no_attendance']++;
                                     continue;
                                 }
-dd($empList);
+
                                 foreach ($empList as $emp) {
                                     $empId = $emp->id;
                                     if (!$wasEmployeeEligible($empId, $sewDate, $sewTime)) continue;
@@ -2591,7 +2591,7 @@ dd($empList);
                             $log['errors'][] = "Sewing ID {$s->sewing_id}: {$e->getMessage()}";
                         }
                     } // foreach sew
-
+dd($toInsert);
                     // flush batch
                     if (!empty($toInsert)) {
                         DB::table('daily_payments')->insert($toInsert);
