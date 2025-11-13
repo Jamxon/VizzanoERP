@@ -2270,13 +2270,13 @@ class CasherController extends Controller
             // ===== 1) preload departments & budgets used =====
             $neededDeptNames = [
                 // cutting
-                "Markaziy ombor", "Kroy bo'limi", "Ombor",
+//                "Markaziy ombor", "Kroy bo'limi", "Ombor",
                 // sewing
-                "Sifat nazorati va qadoqlash bo'limi",
-                "Texnik bo'lim",
-                "Ho'jalik ishlari bo'limi",
+//                "Sifat nazorati va qadoqlash bo'limi",
+//                "Texnik bo'lim",
+//                "Ho'jalik ishlari bo'limi",
                 "Rejalashtirish va iqtisod bo'limi",
-                "Ma'muriy boshqaruv"
+//                "Ma'muriy boshqaruv"
             ];
 
             $departments = DB::table('departments as d')
