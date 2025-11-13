@@ -2300,7 +2300,7 @@ class CasherController extends Controller
                 ->select('id', 'department_id', 'percentage')
                 ->get()
                 ->groupBy('department_id');
-dd($employees);
+
             // ===== 3) preload attendances for the whole month for branch =====
             // We'll need to check present status and arrival_time for each employee/date.
             $attendancesRaw = DB::table('attendances')
@@ -2314,6 +2314,7 @@ dd($employees);
                     'attendances.check_in as arrival_time'
                 )
                 ->get();
+            dd($attendancesRaw);
 
             // Organize: attendances[date][employee_id] => ['status'=>..., 'arrival_time'=>...]
             $attendances = [];
