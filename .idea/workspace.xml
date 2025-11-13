@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -504,14 +506,6 @@
       <workItem from="1762713114894" duration="20778000" />
       <workItem from="1763031712051" duration="2504000" />
     </task>
-    <task id="LOCAL-01857" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762618889724</created>
-      <option name="number" value="01857" />
-      <option name="presentableId" value="LOCAL-01857" />
-      <option name="project" value="LOCAL" />
-      <updated>1762618889725</updated>
-    </task>
     <task id="LOCAL-01858" summary="feat: add DailyPayment model and controller for managing daily payment records">
       <option name="closed" value="true" />
       <created>1762618958108</created>
@@ -896,7 +890,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763038008928</updated>
     </task>
-    <option name="localTasksCounter" value="1906" />
+    <task id="LOCAL-01906" summary="fix: correct join column name in sewing outputs query">
+      <option name="closed" value="true" />
+      <created>1763038154884</created>
+      <option name="number" value="01906" />
+      <option name="presentableId" value="LOCAL-01906" />
+      <option name="project" value="LOCAL" />
+      <updated>1763038154884</updated>
+    </task>
+    <option name="localTasksCounter" value="1907" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
