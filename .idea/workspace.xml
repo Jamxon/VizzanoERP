@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -506,14 +506,6 @@
       <workItem from="1762713114894" duration="20778000" />
       <workItem from="1763031712051" duration="2504000" />
     </task>
-    <task id="LOCAL-01855" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762566956648</created>
-      <option name="number" value="01855" />
-      <option name="presentableId" value="LOCAL-01855" />
-      <option name="project" value="LOCAL" />
-      <updated>1762566956649</updated>
-    </task>
     <task id="LOCAL-01856" summary="feat: add DailyPayment model and controller for managing daily payment records">
       <option name="closed" value="true" />
       <created>1762611201675</created>
@@ -898,7 +890,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762737176543</updated>
     </task>
-    <option name="localTasksCounter" value="1904" />
+    <task id="LOCAL-01904" summary="Merge branch 'main' of https://github.com/Jamxon/VizzanoERP&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml">
+      <option name="closed" value="true" />
+      <created>1763035888461</created>
+      <option name="number" value="01904" />
+      <option name="presentableId" value="LOCAL-01904" />
+      <option name="project" value="LOCAL" />
+      <updated>1763035888462</updated>
+    </task>
+    <option name="localTasksCounter" value="1905" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

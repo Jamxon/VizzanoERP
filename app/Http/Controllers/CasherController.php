@@ -2243,25 +2243,53 @@ class CasherController extends Controller
         ]);
 
         ini_set('memory_limit', '3G');
-        set_time_limit(0);
+        set_time_limit(300); // 5 minut
 
-        DB::beginTransaction();
+        $year = $data['year'];
+        $month = $data['month'];
+        $branchId = auth()->user()->employee->branch_id;
+
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate = Carbon::create($year, $month, 1)->endOfMonth();
+
+        $log = [
+            'processed_cuts' => 0,
+            'processed_sewings' => 0,
+            'updated_payments' => 0,
+            'created_payments' => 0,
+            'skipped_no_attendance' => 0,
+            'errors' => []
+        ];
+
+        // ✅ Cache departments va budgets
+        $cuttingDepartments = ["Markaziy ombor", "Kroy bo'limi"];
+        $sewingDepartments = [
+            "Sifat nazorati va qadoqlash bo'limi",
+            "Texnik bo'lim",
+            "Ho'jalik ishlari bo'limi",
+            "Rejalashtirish va iqtisod bo'limi",
+            "Ma'muriy boshqaruv"
+        ];
+
+        // Cache departments and budgets
+        $deptCache = [];
+        $allDepartmentNames = array_merge($cuttingDepartments, $sewingDepartments);
+
+        foreach ($allDepartmentNames as $deptName) {
+            $dept = Department::where('name', $deptName)
+                ->whereHas('mainDepartment', function($q) use($branchId) {
+                    $q->where('branch_id', $branchId);
+                })->first();
+
+            if ($dept) {
+                $budget = DB::table('department_budgets')
+                    ->where('department_id', $dept->id)
+                    ->first();
+                $deptCache[$deptName] = ['dept' => $dept, 'budget' => $budget];
+            }
+        }
+
         try {
-            $year = $data['year'];
-            $month = $data['month'];
-            $branchId = auth()->user()->employee->branch_id;
-
-            $startDate = Carbon::create($year, $month, 1)->startOfMonth();
-            $endDate = Carbon::create($year, $month, 1)->endOfMonth();
-
-            $log = [
-                'processed_cuts' => 0,
-                'processed_sewings' => 0,
-                'updated_payments' => 0,
-                'created_payments' => 0,
-                'skipped_no_attendance' => 0,
-                'errors' => []
-            ];
 
             // ============================================
             // 1️⃣ CUTTING natijalarini qayta hisoblash
@@ -2281,7 +2309,7 @@ class CasherController extends Controller
 
                     // 📌 Ombor va Kroy bo'limlari uchun hisoblash
                     $cuttingDepartments = [
-                        "Markaziy ombor",
+                        "Ombor",
                         "Kroy bo'limi"
                     ];
 
@@ -2312,8 +2340,9 @@ class CasherController extends Controller
                                 $q->whereDate('date', $cutDate)
                                     ->where('status', 'present')
                                     ->where(function($q2) use ($cutTime) {
-                                        $q2->whereNull('check_in')
-                                            ->orWhereTime('check_in', '<=', $cutTime->format('H:i:s'));
+                                        // Agar arrival_time NULL bo'lsa yoki cut vaqtidan oldin bo'lsa
+                                        $q2->whereNull('arrival_time')
+                                            ->orWhereTime('arrival_time', '<=', $cutTime->format('H:i:s'));
                                     });
                             })
                             ->get();
@@ -2378,7 +2407,6 @@ class CasherController extends Controller
             // ============================================
             // 2️⃣ SEWING natijalarini qayta hisoblash
             // ============================================
-
             $sewingOutputs = SewingOutputs::whereBetween('created_at', [$startDate, $endDate])
                 ->whereHas('orderSubmodel.orderModel.order', function($q) use ($branchId) {
                     $q->where('branch_id', $branchId);
@@ -2443,8 +2471,8 @@ class CasherController extends Controller
                                 $q->whereDate('date', $sewingDate)
                                     ->where('status', 'present')
                                     ->where(function($q2) use ($sewingTime) {
-                                        $q2->whereNull('check_in')
-                                            ->orWhereTime('check_in', '<=', $sewingTime->format('H:i:s'));
+                                        $q2->whereNull('arrival_time')
+                                            ->orWhereTime('arrival_time', '<=', $sewingTime->format('H:i:s'));
                                     });
                             })
                             ->get();
@@ -2487,6 +2515,77 @@ class CasherController extends Controller
                                     'department_id' => $department->id,
                                     'payment_date' => $sewingDate,
                                     'quantity_produced' => $newQuantity,
+                                    'calculated_amount' => $earned,
+                                    'employee_percentage' => $percentage,
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ]);
+                                $log['created_payments']++;
+                            }
+                        }
+                    }
+
+                    // 📌 Master va Texnolog uchun expense based hisoblash
+                    $usdRate = getUsdRate();
+                    $orderUsdPrice = $order->total_price_usd ?? 0;
+                    $orderUzsPrice = $orderUsdPrice * $usdRate;
+
+                    $expenses = DB::table('expenses')
+                        ->where('branch_id', $branchId)
+                        ->get();
+
+                    foreach ($expenses as $expense) {
+                        if (!in_array(strtolower($expense->name), ['master', 'texnolog'])) {
+                            continue;
+                        }
+
+                        if ($expense->type !== 'percentage_based') continue;
+
+                        $expenseAmount = round(($orderUzsPrice * $expense->quantity) / 100, 2);
+
+                        $employees = Employee::whereHas('position', function($q) {
+                            $q->whereIn('name', [
+                                'master', 'Master', 'MASTer',
+                                'texnolog', 'Texnolog', 'TEXNOLOG'
+                            ]);
+                        })
+                            ->where('branch_id', $branchId)
+                            ->where('status', 'working')
+                            ->whereHas('attendances', function ($q) use ($sewingDate, $sewingTime) {
+                                $q->whereDate('date', $sewingDate)
+                                    ->where('status', 'present')
+                                    ->where(function($q2) use ($sewingTime) {
+                                        $q2->whereNull('arrival_time')
+                                            ->orWhereTime('arrival_time', '<=', $sewingTime->format('H:i:s'));
+                                    });
+                            })
+                            ->get();
+
+                        foreach ($employees as $emp) {
+                            $existingPayment = DB::table('daily_payments')
+                                ->where('employee_id', $emp->id)
+                                ->where('order_id', $order->id)
+                                ->where('expense_id', $expense->id)
+                                ->whereDate('payment_date', $sewingDate)
+                                ->first();
+
+                            $percentage = $existingPayment
+                                ? $existingPayment->employee_percentage
+                                : ($emp->percentage ?? 0);
+
+                            $earned = round(($expenseAmount * $percentage) / 100, 2);
+
+                            if ($earned <= 0) continue;
+
+                            if (!$existingPayment) {
+                                DB::table('daily_payments')->insert([
+                                    'employee_id' => $emp->id,
+                                    'order_id' => $order->id,
+                                    'model_id' => $order->orderModel->model->id,
+                                    'department_id' => null,
+                                    'expense_id' => $expense->id,
+                                    'payment_date' => $sewingDate,
+                                    'quantity_produced' => $order->quantity,
                                     'calculated_amount' => $earned,
                                     'employee_percentage' => $percentage,
                                     'created_at' => now(),
