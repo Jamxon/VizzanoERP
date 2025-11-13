@@ -2363,7 +2363,7 @@ class CasherController extends Controller
                 // if arrival <= eventTime->time => eligible
                 return $arrival->lessThanOrEqualTo($eventTime);
             };
-    dd($wasEmployeeEligible->all());
+    dd($wasEmployeeEligible);
             // We'll accumulate inserts and updates in batches
             $toInsert = [];
             $toUpdate = []; // array of ['id'=>..., 'data'=>[...]]
