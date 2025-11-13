@@ -2591,7 +2591,7 @@ class CasherController extends Controller
                             $log['errors'][] = "Sewing ID {$s->sewing_id}: {$e->getMessage()}";
                         }
                     } // foreach sew
-dd($toUpdate);
+
                     // flush batch
                     if (!empty($toInsert)) {
                         DB::table('daily_payments')->insert($toInsert);
