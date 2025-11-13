@@ -2235,6 +2235,10 @@ class CasherController extends Controller
         ), 'cashbox_transactions.xlsx');
     }
 
+    /**
+     * Recalculate daily payments for given year/month (optimized)
+     */
+
     public function recalculateDailyPayments(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
@@ -2243,14 +2247,14 @@ class CasherController extends Controller
         ]);
 
         ini_set('memory_limit', '3G');
-        set_time_limit(300); // 5 minut
+        set_time_limit(0); // long-running allowed for big months
 
         $year = $data['year'];
         $month = $data['month'];
         $branchId = auth()->user()->employee->branch_id;
 
-        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
-        $endDate = Carbon::create($year, $month, 1)->endOfMonth();
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth()->toDateTimeString();
+        $endDate = Carbon::create($year, $month, 1)->endOfMonth()->endOfDay()->toDateTimeString();
 
         $log = [
             'processed_cuts' => 0,
@@ -2261,359 +2265,359 @@ class CasherController extends Controller
             'errors' => []
         ];
 
-        // ✅ Cache departments va budgets
-        $cuttingDepartments = ["Markaziy ombor", "Kroy bo'limi"];
-        $sewingDepartments = [
-            "Sifat nazorati va qadoqlash bo'limi",
-            "Texnik bo'lim",
-            "Ho'jalik ishlari bo'limi",
-            "Rejalashtirish va iqtisod bo'limi",
-            "Ma'muriy boshqaruv"
-        ];
-
-        // Cache departments and budgets
-        $deptCache = [];
-        $allDepartmentNames = array_merge($cuttingDepartments, $sewingDepartments);
-
-        foreach ($allDepartmentNames as $deptName) {
-            $dept = Department::where('name', $deptName)
-                ->whereHas('mainDepartment', function($q) use($branchId) {
-                    $q->where('branch_id', $branchId);
-                })->first();
-
-            if ($dept) {
-                $budget = DB::table('department_budgets')
-                    ->where('department_id', $dept->id)
-                    ->first();
-                $deptCache[$deptName] = ['dept' => $dept, 'budget' => $budget];
-            }
-        }
-
+        DB::beginTransaction();
         try {
+            // ===== 1) preload departments & budgets used =====
+            $neededDeptNames = [
+                // cutting
+                "Markaziy ombor", "Kroy bo'limi", "Ombor",
+                // sewing
+                "Sifat nazorati va qadoqlash bo'limi",
+                "Texnik bo'lim",
+                "Ho'jalik ishlari bo'limi",
+                "Rejalashtirish va iqtisod bo'limi",
+                "Ma'muriy boshqaruv"
+            ];
 
-            // ============================================
-            // 1️⃣ CUTTING natijalarini qayta hisoblash
-            // ============================================
-            $orderCuts = OrderCut::whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('order', function($q) use ($branchId) {
-                    $q->where('branch_id', $branchId);
-                })
-                ->with(['order.orderModel.model'])
+            $departments = DB::table('departments as d')
+                ->join('main_departments as md', 'md.id', '=', 'd.main_department_id')
+                ->where('md.branch_id', $branchId)
+                ->whereIn('d.name', $neededDeptNames)
+                ->select('d.id', 'd.name')
+                ->get()
+                ->keyBy('name');
+
+            // budgets
+            $budgets = DB::table('department_budgets')
+                ->whereIn('department_id', $departments->pluck('id')->all())
+                ->get()
+                ->keyBy('department_id');
+
+            // ===== 2) preload employees by department (working only) =====
+            $employees = DB::table('employees')
+                ->where('branch_id', $branchId)
+                ->where('status', 'working')
+                ->select('id', 'department_id', 'percentage')
+                ->get()
+                ->groupBy('department_id');
+
+            // ===== 3) preload attendances for the whole month for branch =====
+            // We'll need to check present status and arrival_time for each employee/date.
+            $attendancesRaw = DB::table('attendances')
+                ->join('employees as e', 'e.id', '=', 'attendances.employee_id')
+                ->where('e.branch_id', $branchId)
+                ->whereBetween('attendances.date', [Carbon::parse($startDate)->toDateString(), Carbon::parse($endDate)->toDateString()])
+                ->select(
+                    'attendances.employee_id',
+                    'attendances.status',
+                    'attendances.date',
+                    'attendances.check_in as arrival_time'
+                )
                 ->get();
 
-            foreach ($orderCuts as $cut) {
-                try {
-                    $order = $cut->order;
-                    $cutDate = Carbon::parse($cut->created_at)->toDateString();
-                    $cutTime = Carbon::parse($cut->created_at);
-
-                    // 📌 Ombor va Kroy bo'limlari uchun hisoblash
-                    $cuttingDepartments = [
-                        "Ombor",
-                        "Kroy bo'limi"
-                    ];
-
-                    foreach ($cuttingDepartments as $deptName) {
-                        $department = Department::where('name', $deptName)
-                            ->whereHas('mainDepartment', function($q) use($branchId) {
-                                $q->where('branch_id', $branchId);
-                            })->first();
-
-                        if (!$department) continue;
-
-                        $departmentBudget = DB::table('department_budgets')
-                            ->where('department_id', $department->id)
-                            ->first();
-
-                        if (!$departmentBudget || $departmentBudget->type !== 'minute_based') continue;
-
-                        $modelMinute = $order->orderModel->model->minute ?? 0;
-                        if ($modelMinute <= 0) continue;
-
-                        $totalMinutes = $modelMinute * $cut->quantity;
-                        $totalEarned = $departmentBudget->quantity * $totalMinutes;
-
-                        // ✅ Faqat o'sha kun davomatda bo'lgan va cut vaqtidan OLDIN kelgan xodimlar
-                        $employees = Employee::where('department_id', $department->id)
-                            ->where('status', 'working')
-                            ->whereHas('attendances', function ($q) use ($cutDate, $cutTime) {
-                                $q->whereDate('date', $cutDate)
-                                    ->where('status', 'present')
-                                    ->where(function($q2) use ($cutTime) {
-                                        // Agar arrival_time NULL bo'lsa yoki cut vaqtidan oldin bo'lsa
-                                        $q2->whereNull('arrival_time')
-                                            ->orWhereTime('arrival_time', '<=', $cutTime->format('H:i:s'));
-                                    });
-                            })
-                            ->get();
-
-                        foreach ($employees as $emp) {
-                            // ✅ Percentage olish: avval daily_payment'dan, yo'q bo'lsa employee'dan
-                            $existingPayment = DB::table('daily_payments')
-                                ->where('employee_id', $emp->id)
-                                ->where('order_id', $order->id)
-                                ->where('model_id', $order->orderModel->model->id)
-                                ->whereDate('payment_date', $cutDate)
-                                ->first();
-
-                            $percentage = $existingPayment
-                                ? $existingPayment->employee_percentage
-                                : ($emp->percentage ?? 0);
-
-                            if ($percentage == 0) continue;
-
-                            $earned = round(($totalEarned * $percentage) / 100, 2);
-                            if ($earned == 0) continue;
-
-                            if ($existingPayment) {
-                                // ✅ Agar mavjud bo'lsa va to'g'ri bo'lsa, tekshirish
-                                $expectedAmount = round(($totalMinutes * $departmentBudget->quantity * $percentage) / 100, 2);
-
-                                if (abs($existingPayment->calculated_amount - $expectedAmount) > 0.01) {
-                                    DB::table('daily_payments')
-                                        ->where('id', $existingPayment->id)
-                                        ->update([
-                                            'quantity_produced' => $cut->quantity,
-                                            'calculated_amount' => $earned,
-                                            'employee_percentage' => $percentage,
-                                            'updated_at' => now(),
-                                        ]);
-                                    $log['updated_payments']++;
-                                }
-                            } else {
-                                DB::table('daily_payments')->insert([
-                                    'employee_id' => $emp->id,
-                                    'model_id' => $order->orderModel->model->id,
-                                    'order_id' => $order->id,
-                                    'department_id' => $department->id,
-                                    'payment_date' => $cutDate,
-                                    'quantity_produced' => $cut->quantity,
-                                    'calculated_amount' => $earned,
-                                    'employee_percentage' => $percentage,
-                                    'created_at' => now(),
-                                    'updated_at' => now(),
-                                ]);
-                                $log['created_payments']++;
-                            }
-                        }
-                    }
-
-                    $log['processed_cuts']++;
-                } catch (\Throwable $e) {
-                    $log['errors'][] = "Cut ID {$cut->id}: {$e->getMessage()}";
-                }
+            // Organize: attendances[date][employee_id] => ['status'=>..., 'arrival_time'=>...]
+            $attendances = [];
+            foreach ($attendancesRaw as $a) {
+                $d = $a->date;
+                if (!isset($attendances[$d])) $attendances[$d] = [];
+                $attendances[$d][$a->employee_id] = [
+                    'status' => $a->status,
+                    'arrival_time' => $a->arrival_time // may be null
+                ];
             }
+            unset($attendancesRaw);
 
-            // ============================================
-            // 2️⃣ SEWING natijalarini qayta hisoblash
-            // ============================================
-            $sewingOutputs = SewingOutputs::whereBetween('created_at', [$startDate, $endDate])
-                ->whereHas('orderSubmodel.orderModel.order', function($q) use ($branchId) {
-                    $q->where('branch_id', $branchId);
+            // ===== 4) preload existing daily_payments for the month (to detect updates) =====
+            $existingPaymentsRaw = DB::table('daily_payments')
+                ->whereBetween('payment_date', [Carbon::parse($startDate)->toDateString(), Carbon::parse($endDate)->toDateString()])
+                ->whereIn('order_id', function($q) use ($branchId) {
+                    $q->select('o.id')->from('orders as o')->where('o.branch_id', $branchId);
                 })
-                ->with([
-                    'orderSubmodel.orderModel.model',
-                    'orderSubmodel.orderModel.order'
-                ])
+                ->select('*')
                 ->get();
 
-            foreach ($sewingOutputs as $sewing) {
+            // Map existingPayments[date][order_id][model_id][employee_id][expense_id|null] => payment row
+            $existingPayments = [];
+            foreach ($existingPaymentsRaw as $p) {
+                $d = $p->payment_date;
+                $orderId = $p->order_id;
+                $modelId = $p->model_id ?? 0;
+                $empId = $p->employee_id;
+                $expenseId = $p->expense_id ?? 0;
+                $existingPayments[$d][$orderId][$modelId][$empId][$expenseId] = $p;
+            }
+            unset($existingPaymentsRaw);
+
+            // Helper: function to check if employee was present on date and before event time
+            $wasEmployeeEligible = function(int $employeeId, string $date, Carbon $eventTime) use ($attendances) : bool {
+                if (!isset($attendances[$date][$employeeId])) return false;
+                $rec = $attendances[$date][$employeeId];
+                if ($rec['status'] !== 'present') return false;
+                if (is_null($rec['arrival_time'])) return true;
+                // arrival_time stored as e.g. "08:30:00"
                 try {
-                    $orderSubModel = $sewing->orderSubmodel;
-                    $orderModel = $orderSubModel->orderModel;
-                    $order = $orderModel->order;
+                    $arrival = Carbon::createFromFormat('H:i:s', $rec['arrival_time']);
+                } catch (\Throwable $e) {
+                    // if parse fail, consider not eligible
+                    return false;
+                }
+                // if arrival <= eventTime->time => eligible
+                return $arrival->lessThanOrEqualTo($eventTime);
+            };
 
-                    $sewingDate = Carbon::parse($sewing->created_at)->toDateString();
-                    $sewingTime = Carbon::parse($sewing->created_at);
-                    $newQuantity = $sewing->quantity;
+            // We'll accumulate inserts and updates in batches
+            $toInsert = [];
+            $toUpdate = []; // array of ['id'=>..., 'data'=>[...]]
 
-                    // 📌 Sewing asosidagi bo'limlar
-                    $sewingDepartments = [
-                        "Sifat nazorati va qadoqlash bo'limi",
-                        "Texnik bo'lim",
-                        "Ho'jalik ishlari bo'limi",
-                        "Rejalashtirish va iqtisod bo'limi",
-                        "Ma'muriy boshqaruv"
-                    ];
+            // ===== 5) Process Order Cuts (chunked via DB) =====
+            // Fetch cuts joined with orders and order_models.model minute
+            DB::table('order_cuts as oc')
+                ->join('orders as o', 'o.id', '=', 'oc.order_id')
+                ->join('order_models as om', 'om.order_id', '=', 'o.id')
+                ->join('models as m', 'm.id', '=', 'om.model_id')
+                ->whereBetween('oc.created_at', [$startDate, $endDate])
+                ->where('o.branch_id', $branchId)
+                ->select('oc.id as cut_id', 'oc.order_id', 'oc.quantity as cut_quantity', 'oc.created_at as cut_created_at', 'om.model_id', 'm.minute as model_minute', 'o.quantity as order_planned_quantity')
+                ->orderBy('oc.id')
+                ->chunk(300, function($cuts) use (
+                    &$log, $departments, $budgets, $employees, $attendances,
+                    $wasEmployeeEligible, &$existingPayments, &$toInsert, &$toUpdate
+                ) {
+                    foreach ($cuts as $cut) {
+                        try {
+                            $cutDate = Carbon::parse($cut->cut_created_at)->toDateString();
+                            $cutTime = Carbon::parse($cut->cut_created_at);
+                            $orderId = $cut->order_id;
+                            $cutQty = (int)$cut->cut_quantity;
+                            $modelMinute = (float)($cut->model_minute ?? 0);
+                            if ($modelMinute <= 0 || $cutQty <= 0) {
+                                $log['skipped_no_attendance']++;
+                                continue;
+                            }
 
-                    foreach ($sewingDepartments as $deptName) {
-                        $department = Department::where('name', $deptName)
-                            ->whereHas('mainDepartment', function($q) use($branchId) {
-                                $q->where('branch_id', $branchId);
-                            })->first();
+                            // For cutting departments we use 'Ombor' and 'Kroy bo'limi' if available in preload
+                            $cuttingDeptNames = ["Ombor", "Kroy bo'limi"];
+                            foreach ($cuttingDeptNames as $dname) {
+                                if (!isset($departments[$dname])) continue;
+                                $dept = $departments[$dname];
+                                $deptBudget = $budgets[$dept->id] ?? null;
+                                if (!$deptBudget || $deptBudget->type !== 'minute_based') continue;
 
-                        if (!$department) continue;
+                                $totalMinutes = $modelMinute * $cutQty;
+                                $totalEarned = $deptBudget->quantity * $totalMinutes; // budget->quantity is per-minute amount
 
-                        $budget = DB::table('department_budgets')
-                            ->where('department_id', $department->id)
-                            ->first();
+                                // employees in this department
+                                $empList = $employees[$dept->id] ?? collect();
+                                if (empty($empList)) {
+                                    $log['skipped_no_attendance']++;
+                                    continue;
+                                }
 
-                        if (!$budget) continue;
+                                // for each employee check attendance for that date and arrival_time <= cutTime
+                                foreach ($empList as $emp) {
+                                    $empId = $emp->id;
+                                    // check attendance eligibility by closure:
+                                    if (!$wasEmployeeEligible($empId, $cutDate, $cutTime)) {
+                                        continue;
+                                    }
 
-                        $modelMinute = $orderModel->model->minute ?? 0;
-                        $usdRate = getUsdRate();
-                        $orderUsdPrice = $order->price ?? 0;
-                        $orderUzsPrice = $orderUsdPrice * $usdRate;
+                                    // percentage: prefer existing daily_payment entry's employee_percentage if exists
+                                    $existing = $existingPayments[$cutDate][$orderId][$cut->model_id][$empId][0] ?? null;
+                                    $percentage = $existing ? ($existing->employee_percentage ?? 0) : ($emp->percentage ?? 0);
+                                    if ($percentage == 0) continue;
 
-                        if ($budget->type == 'minute_based' && $modelMinute > 0) {
-                            $totalAmount = $modelMinute * $newQuantity * $budget->quantity;
-                        } elseif ($budget->type == 'percentage_based') {
-                            $percentage = $budget->quantity ?? 0;
-                            $totalAmount = round(($orderUzsPrice * $percentage) / 100, 2);
-                        } else {
-                            $totalAmount = $newQuantity * $budget->quantity;
-                        }
+                                    $earned = round(($totalEarned * $percentage) / 100, 2);
+                                    if ($earned <= 0) continue;
 
-                        // ✅ Faqat o'sha kun davomatda va sewing vaqtidan OLDIN kelgan xodimlar
-                        $employees = Employee::where('department_id', $department->id)
-                            ->where('status', 'working')
-                            ->whereHas('attendances', function ($q) use ($sewingDate, $sewingTime) {
-                                $q->whereDate('date', $sewingDate)
-                                    ->where('status', 'present')
-                                    ->where(function($q2) use ($sewingTime) {
-                                        $q2->whereNull('arrival_time')
-                                            ->orWhereTime('arrival_time', '<=', $sewingTime->format('H:i:s'));
-                                    });
-                            })
-                            ->get();
-
-                        foreach ($employees as $emp) {
-                            $existingPayment = DB::table('daily_payments')
-                                ->where('employee_id', $emp->id)
-                                ->where('order_id', $order->id)
-                                ->where('model_id', $orderModel->model->id)
-                                ->whereDate('payment_date', $sewingDate)
-                                ->first();
-
-                            $percentage = $existingPayment
-                                ? $existingPayment->employee_percentage
-                                : ($emp->percentage ?? 0);
-
-                            if ($percentage == 0) continue;
-
-                            $earned = round(($totalAmount * $percentage) / 100, 2);
-                            if ($earned == 0) continue;
-
-                            if ($existingPayment) {
-                                $expectedAmount = round(($totalAmount * $percentage) / 100, 2);
-
-                                if (abs($existingPayment->calculated_amount - $expectedAmount) > 0.01) {
-                                    DB::table('daily_payments')->where('id', $existingPayment->id)
-                                        ->update([
-                                            'quantity_produced' => $newQuantity,
+                                    if ($existing) {
+                                        // compute expected: note expected uses totalMinutes * budget->quantity * percentage /100
+                                        $expected = round(($totalMinutes * $deptBudget->quantity * $percentage) / 100, 2);
+                                        if (abs($existing->calculated_amount - $expected) > 0.01 || $existing->quantity_produced != $cutQty) {
+                                            $toUpdate[] = [
+                                                'id' => $existing->id,
+                                                'data' => [
+                                                    'quantity_produced' => $cutQty,
+                                                    'calculated_amount' => $earned,
+                                                    'employee_percentage' => $percentage,
+                                                    'updated_at' => now(),
+                                                ]
+                                            ];
+                                            $log['updated_payments']++;
+                                        }
+                                    } else {
+                                        $toInsert[] = [
+                                            'employee_id' => $empId,
+                                            'model_id' => $cut->model_id,
+                                            'order_id' => $orderId,
+                                            'department_id' => $dept->id,
+                                            'payment_date' => $cutDate,
+                                            'quantity_produced' => $cutQty,
                                             'calculated_amount' => $earned,
                                             'employee_percentage' => $percentage,
+                                            'created_at' => now(),
                                             'updated_at' => now(),
-                                        ]);
-                                    $log['updated_payments']++;
+                                        ];
+                                        $log['created_payments']++;
+                                    }
+                                } // foreach emp
+                            } // foreach dept
+
+                            $log['processed_cuts']++;
+                        } catch (\Throwable $e) {
+                            $log['errors'][] = "Cut ID {$cut->cut_id}: {$e->getMessage()}";
+                        }
+                    } // foreach cut
+
+                    // flush batch every chunk to avoid memory growth
+                    if (!empty($toInsert)) {
+                        DB::table('daily_payments')->insert($toInsert);
+                        $toInsert = [];
+                    }
+                    if (!empty($toUpdate)) {
+                        foreach ($toUpdate as $u) {
+                            DB::table('daily_payments')->where('id', $u['id'])->update($u['data']);
+                        }
+                        $toUpdate = [];
+                    }
+                }); // chunk cuts
+
+            // ===== 6) Process Sewing outputs (chunked) =====
+            // We'll join sewing_outputs -> order_sub_models -> order_models -> orders to filter branch
+            DB::table('sewing_outputs as so')
+                ->join('order_sub_models as osm', 'osm.id', '=', 'so.order_submodel_id')
+                ->join('order_models as om', 'om.id', '=', 'osm.order_model_id')
+                ->join('orders as o', 'o.id', '=', 'om.order_id')
+                ->join('models as m', 'm.id', '=', 'om.model_id')
+                ->whereBetween('so.created_at', [$startDate, $endDate])
+                ->where('o.branch_id', $branchId)
+                ->select('so.id as sewing_id', 'so.quantity as sewing_quantity', 'so.created_at as sewing_created_at',
+                    'om.model_id', 'm.minute as model_minute', 'o.id as order_id', 'o.price as order_usd_price', 'o.quantity as order_quantity', 'om.id as order_model_id')
+                ->orderBy('so.id')
+                ->chunk(300, function($sews) use (
+                    &$log, $departments, $budgets, $employees, $attendances, $wasEmployeeEligible,
+                    &$existingPayments, &$toInsert, &$toUpdate, $branchId
+                ) {
+                    foreach ($sews as $s) {
+                        try {
+                            $sewDate = Carbon::parse($s->sewing_created_at)->toDateString();
+                            $sewTime = Carbon::parse($s->sewing_created_at);
+                            $orderId = $s->order_id;
+                            $newQty = (int)$s->sewing_quantity;
+                            $modelMinute = (float)($s->model_minute ?? 0);
+
+                            // Sewing departments list
+                            $sewingDeptNames = [
+                                "Sifat nazorati va qadoqlash bo'limi",
+                                "Texnik bo'lim",
+                                "Ho'jalik ishlari bo'limi",
+                                "Rejalashtirish va iqtisod bo'limi",
+                                "Ma'muriy boshqaruv"
+                            ];
+
+                            foreach ($sewingDeptNames as $dname) {
+                                if (!isset($departments[$dname])) continue;
+                                $dept = $departments[$dname];
+                                $deptBudget = $budgets[$dept->id] ?? null;
+                                if (!$deptBudget) continue;
+
+                                // Calculate totalAmount based on budget type
+                                if ($deptBudget->type === 'minute_based' && $modelMinute > 0) {
+                                    $totalAmount = $modelMinute * $newQty * $deptBudget->quantity;
+                                } elseif ($deptBudget->type === 'percentage_based') {
+                                    // order price is USD; get UZS if needed
+                                    $usdRate = getUsdRate();
+                                    $orderUsdPrice = $s->order_usd_price ?? 0;
+                                    $orderUzsPrice = $orderUsdPrice * $usdRate;
+                                    $percentage = $deptBudget->quantity ?? 0;
+                                    $totalAmount = round(($orderUzsPrice * $percentage) / 100, 2);
+                                } else {
+                                    $totalAmount = $newQty * $deptBudget->quantity;
                                 }
-                            } else {
-                                DB::table('daily_payments')->insert([
-                                    'employee_id' => $emp->id,
-                                    'model_id' => $orderModel->model->id,
-                                    'order_id' => $order->id,
-                                    'department_id' => $department->id,
-                                    'payment_date' => $sewingDate,
-                                    'quantity_produced' => $newQuantity,
-                                    'calculated_amount' => $earned,
-                                    'employee_percentage' => $percentage,
-                                    'created_at' => now(),
-                                    'updated_at' => now(),
-                                ]);
-                                $log['created_payments']++;
-                            }
+
+                                if ($totalAmount <= 0) continue;
+
+                                // employees in department
+                                $empList = $employees[$dept->id] ?? collect();
+                                if (empty($empList)) {
+                                    $log['skipped_no_attendance']++;
+                                    continue;
+                                }
+
+                                foreach ($empList as $emp) {
+                                    $empId = $emp->id;
+                                    if (!$wasEmployeeEligible($empId, $sewDate, $sewTime)) continue;
+
+                                    // existing payment? (model-level)
+                                    $existing = $existingPayments[$sewDate][$orderId][$s->model_id][$empId][0] ?? null;
+                                    $percentage = $existing ? ($existing->employee_percentage ?? 0) : ($emp->percentage ?? 0);
+                                    if ($percentage == 0) continue;
+
+                                    $earned = round(($totalAmount * $percentage) / 100, 2);
+                                    if ($earned <= 0) continue;
+
+                                    if ($existing) {
+                                        $expected = round(($totalAmount * $percentage) / 100, 2);
+                                        if (abs($existing->calculated_amount - $expected) > 0.01 || $existing->quantity_produced != $newQty) {
+                                            $toUpdate[] = [
+                                                'id' => $existing->id,
+                                                'data' => [
+                                                    'quantity_produced' => $newQty,
+                                                    'calculated_amount' => $earned,
+                                                    'employee_percentage' => $percentage,
+                                                    'updated_at' => now(),
+                                                ]
+                                            ];
+                                            $log['updated_payments']++;
+                                        }
+                                    } else {
+                                        $toInsert[] = [
+                                            'employee_id' => $empId,
+                                            'model_id' => $s->model_id,
+                                            'order_id' => $orderId,
+                                            'department_id' => $dept->id,
+                                            'payment_date' => $sewDate,
+                                            'quantity_produced' => $newQty,
+                                            'calculated_amount' => $earned,
+                                            'employee_percentage' => $percentage,
+                                            'created_at' => now(),
+                                            'updated_at' => now(),
+                                        ];
+                                        $log['created_payments']++;
+                                    }
+                                } // foreach emp
+                            } // foreach dept
+
+                            $log['processed_sewings']++;
+                        } catch (\Throwable $e) {
+                            $log['errors'][] = "Sewing ID {$s->sewing_id}: {$e->getMessage()}";
                         }
+                    } // foreach sew
+
+                    // flush batch
+                    if (!empty($toInsert)) {
+                        DB::table('daily_payments')->insert($toInsert);
+                        $toInsert = [];
                     }
-
-                    // 📌 Master va Texnolog uchun expense based hisoblash
-                    $usdRate = getUsdRate();
-                    $orderUsdPrice = $order->total_price_usd ?? 0;
-                    $orderUzsPrice = $orderUsdPrice * $usdRate;
-
-                    $expenses = DB::table('expenses')
-                        ->where('branch_id', $branchId)
-                        ->get();
-
-                    foreach ($expenses as $expense) {
-                        if (!in_array(strtolower($expense->name), ['master', 'texnolog'])) {
-                            continue;
+                    if (!empty($toUpdate)) {
+                        foreach ($toUpdate as $u) {
+                            DB::table('daily_payments')->where('id', $u['id'])->update($u['data']);
                         }
-
-                        if ($expense->type !== 'percentage_based') continue;
-
-                        $expenseAmount = round(($orderUzsPrice * $expense->quantity) / 100, 2);
-
-                        $employees = Employee::whereHas('position', function($q) {
-                            $q->whereIn('name', [
-                                'master', 'Master', 'MASTer',
-                                'texnolog', 'Texnolog', 'TEXNOLOG'
-                            ]);
-                        })
-                            ->where('branch_id', $branchId)
-                            ->where('status', 'working')
-                            ->whereHas('attendances', function ($q) use ($sewingDate, $sewingTime) {
-                                $q->whereDate('date', $sewingDate)
-                                    ->where('status', 'present')
-                                    ->where(function($q2) use ($sewingTime) {
-                                        $q2->whereNull('arrival_time')
-                                            ->orWhereTime('arrival_time', '<=', $sewingTime->format('H:i:s'));
-                                    });
-                            })
-                            ->get();
-
-                        foreach ($employees as $emp) {
-                            $existingPayment = DB::table('daily_payments')
-                                ->where('employee_id', $emp->id)
-                                ->where('order_id', $order->id)
-                                ->where('expense_id', $expense->id)
-                                ->whereDate('payment_date', $sewingDate)
-                                ->first();
-
-                            $percentage = $existingPayment
-                                ? $existingPayment->employee_percentage
-                                : ($emp->percentage ?? 0);
-
-                            $earned = round(($expenseAmount * $percentage) / 100, 2);
-
-                            if ($earned <= 0) continue;
-
-                            if (!$existingPayment) {
-                                DB::table('daily_payments')->insert([
-                                    'employee_id' => $emp->id,
-                                    'order_id' => $order->id,
-                                    'model_id' => $order->orderModel->model->id,
-                                    'department_id' => null,
-                                    'expense_id' => $expense->id,
-                                    'payment_date' => $sewingDate,
-                                    'quantity_produced' => $order->quantity,
-                                    'calculated_amount' => $earned,
-                                    'employee_percentage' => $percentage,
-                                    'created_at' => now(),
-                                    'updated_at' => now(),
-                                ]);
-                                $log['created_payments']++;
-                            }
-                        }
+                        $toUpdate = [];
                     }
-
-                    $log['processed_sewings']++;
-                } catch (\Throwable $e) {
-                    $log['errors'][] = "Sewing ID {$sewing->id}: {$e->getMessage()}";
-                }
-            }
+                }); // chunk sewing
 
             DB::commit();
 
             return response()->json([
-                'message' => 'To\'lovlar muvaffaqiyatli qayta hisoblandi ✅',
+                'message' => "To'lovlar muvaffaqiyatli qayta hisoblandi",
                 'summary' => $log
             ]);
-
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json([
                 'error' => $e->getMessage(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'summary' => $log
             ], 500);
         }
     }
