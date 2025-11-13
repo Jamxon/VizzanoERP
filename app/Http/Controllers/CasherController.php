@@ -2312,7 +2312,6 @@ class CasherController extends Controller
                                 $q->whereDate('date', $cutDate)
                                     ->where('status', 'present')
                                     ->where(function($q2) use ($cutTime) {
-                                        // Agar arrival_time NULL bo'lsa yoki cut vaqtidan oldin bo'lsa
                                         $q2->whereNull('check_in')
                                             ->orWhereTime('check_in', '<=', $cutTime->format('H:i:s'));
                                     });

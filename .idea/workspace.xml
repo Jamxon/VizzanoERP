@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query" />
+    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="fix: correct join column name in sewing outputs query">
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
