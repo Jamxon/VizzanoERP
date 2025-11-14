@@ -2336,7 +2336,6 @@ class CasherController extends Controller
                 ->select('*')
                 ->get();
 
-            dd($existingPaymentsRaw);
             // Map existingPayments[date][order_id][model_id][employee_id][expense_id|null] => payment row
             $existingPayments = [];
             foreach ($existingPaymentsRaw as $p) {
@@ -2354,7 +2353,7 @@ class CasherController extends Controller
                 if (!isset($attendances[$date][$employeeId])) return false;
                 $rec = $attendances[$date][$employeeId];
                 if ($rec['status'] !== 'present') return false;
-                if (is_null($rec['check_in'])) return true;
+                if (is_null($rec['check_in'])) return false;
                 // check_in stored as e.g. "08:30:00"
                 try {
                     $arrival = Carbon::createFromFormat('H:i:s', $rec['check_in'])
