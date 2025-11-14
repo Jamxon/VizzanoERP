@@ -100,42 +100,41 @@ class HikvisionEventController extends Controller
             // === CHECK-IN ===
             if ($deviceId === 255 || $deviceId === 105) {
                 if (!$attendance->check_in) {
-                    $image = $request->file('Picture');
+//                    $image = $request->file('Picture');
+//                    $imagePath = null;
+//
+//                    if ($image && $image->isValid() && (!isEmpty($image))) {
+//                        $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
+//                        $path = $image->storeAs('hikvisionImages', $filename, 's3');
+//                        Storage::disk('s3')->setVisibility($path, 'public');
+//                        $imagePath = Storage::disk('s3')->url($path);
+//                    }
+
                     $imagePath = null;
 
-                    if ($image && $image->isValid() && (!isEmpty($image))) {
+// 1️⃣ Agar fayl sifatida kelgan bo‘lsa
+                    if ($request->hasFile('Picture') && $request->file('Picture')->isValid()) {
+                        $image = $request->file('Picture');
                         $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
                         $path = $image->storeAs('hikvisionImages', $filename, 's3');
                         Storage::disk('s3')->setVisibility($path, 'public');
                         $imagePath = Storage::disk('s3')->url($path);
                     }
 
-                    if ($request->hasFile('Picture')) {
-                        // Bu fayl sifatida yuborilgan
-                        $image = $request->file('Picture');
-                        if ($image->isValid()) {
-                            $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
-                            $path = $image->storeAs('hikvisionImages', $filename, 's3');
-                            Storage::disk('s3')->setVisibility($path, 'public');
-                            $imagePath = Storage::disk('s3')->url($path);
-                        }
-                    } elseif ($request->input('Picture')) {
-                        // Bu JSON yoki base64 formatida yuborilgan
+// 2️⃣ Agar JSON ichida base64 formatida kelgan bo‘lsa
+                    elseif ($request->input('Picture')) {
                         $pictureData = $request->input('Picture');
 
+                        // tekshirish: object bo‘lsa va image_base64 mavjud bo‘lsa
                         if (is_array($pictureData) && isset($pictureData['image_base64'])) {
                             $imageData = base64_decode($pictureData['image_base64']);
                             $filename = uniqid($employeeNo . '_') . '.jpg';
                             Storage::disk('s3')->put('hikvisionImages/' . $filename, $imageData, 'public');
                             $imagePath = Storage::disk('s3')->url('hikvisionImages/' . $filename);
-                        } else {
-                            $imagePath = null; // bo‘sh object yoki noto‘g‘ri format
                         }
-                    } else {
-                        $imagePath = null; // Picture yo‘q
                     }
 
-
+// 3️⃣ Endi xavfsiz log yozish
                     Log::add(
                         $employee->user_id ?? null,
                         'Yangi faceId aniqlandi',
@@ -145,9 +144,10 @@ class HikvisionEventController extends Controller
                             'employee_id' => $employee->id,
                             'device_id' => $deviceId,
                             'time' => $eventTime,
-                            'image_path' => $imagePath
+                            'image_path' => $imagePath // null bo‘lsa ham xavfsiz
                         ]
                     );
+
 
                     $attendance->check_in = $eventCarbon;
                     $attendance->check_in_image = $imagePath ?? null;
