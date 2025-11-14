@@ -2624,8 +2624,6 @@ class CasherController extends Controller
                 ->select('attendance.employee_id', 'attendance.status', 'attendance.date', 'attendance.check_in')
                 ->get();
 
-            dd($employees);
-
             $attendances = [];
             foreach ($attendancesRaw as $a) {
                 $d = $a->date;
@@ -2673,9 +2671,9 @@ class CasherController extends Controller
 
             // ===== 5) Process Order Cuts =====
             DB::table('order_cuts as oc')
-                ->join('order_sub_models as osm', 'osm.id', '=', 'oc.submodel_id')
-                ->join('order_models as om', 'om.id', '=', 'osm.order_model_id')
-                ->join('orders as o', 'o.id', '=', 'om.order_id')
+                ->join('orders as o', 'o.id', '=', 'oc.order_id')
+                ->join('order_models as om', 'om.id', '=', 'o.order_model_id')
+                ->join('models as m', 'm.id', '=', 'om.model_id')
                 ->whereBetween('oc.cut_at', [$startDate, $endDate])
                 ->where('o.branch_id', $branchId)
                 ->select(
