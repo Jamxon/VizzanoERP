@@ -229,7 +229,7 @@ class HikvisionEventController extends Controller
 
 
 
-                    Log::add($employee->user_id ?? null, 'Hodim ishga keldi', 'Check In', null, [
+                    Log::add($employee->user_id ?? null, 'Hodim ishga keldi FaceId', 'Check In', null, [
                         'employee_id' => $employee->id,
                         'image_path' => $imagePath,
                         'device_id' => $deviceId,
