@@ -607,7 +607,7 @@ class CasherController extends Controller
                 $profitUZS = ($priceUZS * $totalQty) - ($fixedCost + $totalExtra);
 
                 $responsibleUsers = $orderModel->submodels->map(function ($submodel) {
-                    return optional($submodel->group->group)->responsibleUser;
+                    return $submodel->group?->group?->responsibleUser;
                 })->filter()->unique('id')->values();
 
                 $rasxodPercentOfPrice = $priceUZS > 0
