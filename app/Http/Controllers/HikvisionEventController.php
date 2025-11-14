@@ -52,10 +52,21 @@ class HikvisionEventController extends Controller
 
             if ($eventLogRaw) {
                 $outerEvent = json_decode($eventLogRaw, true);
+
+                // Agar decode qilingan narsa hali string bo‘lsa, yana decode qilamiz
+                if (is_string($outerEvent)) {
+                    $outerEvent = json_decode($outerEvent, true);
+                }
+
                 $accessData = $outerEvent['AccessControllerEvent'] ?? [];
+                $eventTime = $outerEvent['dateTime'] ?? now()->toDateTimeString();
             } elseif ($request->has('AccessControllerEvent')) {
                 $outerEvent = json_decode($request->input('AccessControllerEvent'), true);
+                if (is_string($outerEvent)) {
+                    $outerEvent = json_decode($outerEvent, true);
+                }
                 $accessData = $outerEvent['AccessControllerEvent'] ?? [];
+                $eventTime = $outerEvent['dateTime'] ?? now()->toDateTimeString();
             } else {
                 Log::add(null, 'Hikvision event: format aniqlanmadi', 'error', null, [
                     'request_data' => $request->all(),
