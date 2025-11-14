@@ -110,6 +110,32 @@ class HikvisionEventController extends Controller
                         $imagePath = Storage::disk('s3')->url($path);
                     }
 
+                    if ($request->hasFile('Picture')) {
+                        // Bu fayl sifatida yuborilgan
+                        $image = $request->file('Picture');
+                        if ($image->isValid()) {
+                            $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
+                            $path = $image->storeAs('hikvisionImages', $filename, 's3');
+                            Storage::disk('s3')->setVisibility($path, 'public');
+                            $imagePath = Storage::disk('s3')->url($path);
+                        }
+                    } elseif ($request->input('Picture')) {
+                        // Bu JSON yoki base64 formatida yuborilgan
+                        $pictureData = $request->input('Picture');
+
+                        if (is_array($pictureData) && isset($pictureData['image_base64'])) {
+                            $imageData = base64_decode($pictureData['image_base64']);
+                            $filename = uniqid($employeeNo . '_') . '.jpg';
+                            Storage::disk('s3')->put('hikvisionImages/' . $filename, $imageData, 'public');
+                            $imagePath = Storage::disk('s3')->url('hikvisionImages/' . $filename);
+                        } else {
+                            $imagePath = null; // bo‘sh object yoki noto‘g‘ri format
+                        }
+                    } else {
+                        $imagePath = null; // Picture yo‘q
+                    }
+
+
                     Log::add(
                         $employee->user_id ?? null,
                         'Yangi faceId aniqlandi',
