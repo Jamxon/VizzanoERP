@@ -2300,11 +2300,9 @@ class CasherController extends Controller
                 ->select('id', 'department_id', 'percentage')
                 ->get()
                 ->groupBy('department_id');
-
-            dd($employees);
-
+            
             // ===== 3) preload attendances for the whole month for branch =====
-            // We'll need to check present status and arrival_time for each employee/date.
+            // We'll need to check present status and check_in for each employee/date.
             $attendancesRaw = DB::table('attendance')
                 ->join('employees as e', 'e.id', '=', 'attendance.employee_id')
                 ->where('e.branch_id', $branchId)
@@ -2313,21 +2311,22 @@ class CasherController extends Controller
                     'attendance.employee_id',
                     'attendance.status',
                     'attendance.date',
-                    'attendance.check_in as arrival_time'
+                    'attendance.check_in'
                 )
                 ->get();
 
-            // Organize: attendances[date][employee_id] => ['status'=>..., 'arrival_time'=>...]
+            // Organize: attendances[date][employee_id] => ['status'=>..., 'check_in'=>...]
             $attendances = [];
             foreach ($attendancesRaw as $a) {
                 $d = $a->date;
                 if (!isset($attendances[$d])) $attendances[$d] = [];
                 $attendances[$d][$a->employee_id] = [
                     'status' => $a->status,
-                    'arrival_time' => $a->arrival_time // may be null
+                    'check_in' => $a->check_in // may be null
                 ];
             }
             unset($attendancesRaw);
+            dd($attendances);
 
             // ===== 4) preload existing daily_payments for the month (to detect updates) =====
             $existingPaymentsRaw = DB::table('daily_payments')
@@ -2354,10 +2353,10 @@ class CasherController extends Controller
                 if (!isset($attendances[$date][$employeeId])) return false;
                 $rec = $attendances[$date][$employeeId];
                 if ($rec['status'] !== 'present') return false;
-                if (is_null($rec['arrival_time'])) return true;
-                // arrival_time stored as e.g. "08:30:00"
+                if (is_null($rec['check_in'])) return true;
+                // check_in stored as e.g. "08:30:00"
                 try {
-                    $arrival = Carbon::createFromFormat('H:i:s', $rec['arrival_time'])
+                    $arrival = Carbon::createFromFormat('H:i:s', $rec['check_in'])
                         ->setDate($eventTime->year, $eventTime->month, $eventTime->day);
                 } catch (\Throwable $e) {
                     // if parse fail, consider not eligible
@@ -2415,7 +2414,7 @@ class CasherController extends Controller
                                     continue;
                                 }
 
-                                // for each employee check attendance for that date and arrival_time <= cutTime
+                                // for each employee check attendance for that date and check_in <= cutTime
                                 foreach ($empList as $emp) {
                                     $empId = $emp->id;
                                     // check attendance eligibility by closure:
