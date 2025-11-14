@@ -296,12 +296,26 @@ class AttendanceController extends Controller
             ]);
         } else {
             // Yangi salary log
-            AttendanceSalary::create([
-                'employee_id' => $attendance->employee_id,
-                'attendance_id' => $attendance->id,
-                'amount' => $salaryToAdd,
-                'date' => $attendance->date,
-            ]);
+
+            // yangi attendance salary yozuvi yaraatishdan oldin tekshirsh kerak
+
+            $salary = AttendanceSalary::where('employee_id', $attendance->employee_id)
+                ->whereDate('date', $attendance->date)
+                ->first();
+
+            if (!$salary) {
+                AttendanceSalary::create([
+                    'employee_id' => $attendance->employee_id,
+                    'attendance_id' => $attendance->id,
+                    'amount' => $salaryToAdd,
+                    'date' => $attendance->date,
+                ]);
+            }else {
+                // Agar mavjud bo'lsa, eski yozuvni yangilaymiz
+                $salary->update([
+                    'amount' => $salaryToAdd,
+                ]);
+            }
 
             // Faqat yangi bo‘lsa balansga qo‘shamiz
             $employee->increment('balance', $salaryToAdd);
