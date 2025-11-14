@@ -109,11 +109,6 @@ class HikvisionEventController extends Controller
                         $imagePath = Storage::disk('s3')->url($path);
                     }
 
-                    $attendance->check_in = $eventCarbon;
-                    $attendance->check_in_image = $imagePath ?? null;
-                    $attendance->status = 'present';
-                    $attendance->save();
-
                     Log::add(
                         $employee->user_id ?? null,
                         'Yangi faceId aniqlandi',
@@ -126,6 +121,11 @@ class HikvisionEventController extends Controller
                             'image_path' => $imagePath
                         ]
                     );
+
+                    $attendance->check_in = $eventCarbon;
+                    $attendance->check_in_image = $imagePath ?? null;
+                    $attendance->status = 'present';
+                    $attendance->save();
 
                     // Transport davomat
                     if (!$employee->transports->isEmpty()) {
