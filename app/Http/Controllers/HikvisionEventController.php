@@ -121,7 +121,7 @@ class HikvisionEventController extends Controller
                     }
 
                     $attendance->check_in = $eventCarbon;
-                    $attendance->check_in_image = $imagePath ?? null;
+                    $attendance->check_in_image = $imagePath;
                     $attendance->status = 'present';
                     $attendance->save();
 
