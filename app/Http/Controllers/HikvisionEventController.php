@@ -110,18 +110,18 @@ class HikvisionEventController extends Controller
                         $imagePath = Storage::disk('s3')->url($path);
                     }
 
-//                    Log::add(
-//                        $employee->user_id ?? null,
-//                        'Yangi faceId aniqlandi',
-//                        'new_checkin',
-//                        null,
-//                        [
-//                            'employee_id' => $employee->id,
-//                            'device_id' => $deviceId,
-//                            'time' => $eventTime,
-//                            'image_path' => $imagePath
-//                        ]
-//                    );
+                    Log::add(
+                        $employee->user_id ?? null,
+                        'Yangi faceId aniqlandi',
+                        'new_checkin',
+                        null,
+                        [
+                            'employee_id' => $employee->id,
+                            'device_id' => $deviceId,
+                            'time' => $eventTime,
+                            'image_path' => $imagePath
+                        ]
+                    );
 
                     $attendance->check_in = $eventCarbon;
                     $attendance->check_in_image = $imagePath ?? null;
