@@ -2352,72 +2352,38 @@ class CasherController extends Controller
             // Helper: function to check if employee was present on date and before event time
             $wasEmployeeEligible = function(int $employeeId, string $date, Carbon $eventTime) use ($attendances) : bool {
 
-                Log::add(null, 'CHECK START', 'debug', null, [
-                    'employee_id' => $employeeId,
-                    'date'        => $date,
-                    'event_time'  => $eventTime->toDateTimeString()
-                ]);
-
-                // 1) Attendance mavjud emas
-                if (!isset($attendances[$date][$employeeId])) {
-                    Log::add(null, 'NOT FOUND attendance', 'debug', null, [
-                        'employee_id' => $employeeId,
-                        'date'        => $date
-                    ]);
-                    return false;
-                }
-
+                if (!isset($attendances[$date][$employeeId])) return false;
                 $rec = $attendances[$date][$employeeId];
 
-                Log::add(null, 'FOUND attendance', 'debug', null, [
-                    'record' => $rec
-                ]);
+                if ($rec['status'] !== 'present') return false;
+                if (empty($rec['check_in'])) return false;
 
-                // 2) Status present emas
-                if ($rec['status'] !== 'present') {
-                    Log::add(null, 'STATUS not present', 'debug', null, [
-                        'status' => $rec['status']
-                    ]);
-                    return false;
-                }
+                $checkInRaw = $rec['check_in'];
 
-                // 3) Check_in bo‘sh
-                if (empty($rec['check_in'])) {
-                    Log::add(null, 'CHECK IN EMPTY', 'debug', null, [
-                        'check_in' => $rec['check_in']
-                    ]);
-                    return false;
-                }
-
-                // 4) Check_in formatlash
                 try {
-                    $arrival = Carbon::createFromFormat('H:i:s', $rec['check_in'])
-                        ->setDate($eventTime->year, $eventTime->month, $eventTime->day);
+                    // 1) Datetime format: "Y-m-d H:i:s"
+                    if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $checkInRaw)) {
 
-                    Log::add(null, 'PARSED ARRIVAL', 'debug', null, [
-                        'arrival' => $arrival->toDateTimeString()
-                    ]);
+                        $arrival = Carbon::createFromFormat('Y-m-d H:i:s', $checkInRaw);
+
+                    } else {
+
+                        // 2) Time format: "H:i:s"
+                        $arrival = Carbon::createFromFormat('H:i:s', $checkInRaw)
+                            ->setDate($eventTime->year, $eventTime->month, $eventTime->day);
+                    }
 
                 } catch (\Throwable $e) {
 
                     Log::add(null, 'ARRIVAL PARSE ERROR', 'error', null, [
-                        'check_in_raw' => $rec['check_in'],
-                        'message'      => $e->getMessage()
+                        'check_in_raw' => $checkInRaw,
+                        'message'      => $e->getMessage(),
                     ]);
 
                     return false;
                 }
 
-                // 5) Solishtirish
-                $eligible = $arrival->lessThanOrEqualTo($eventTime);
-
-                Log::add(null, 'FINAL RESULT', 'debug', null, [
-                    'arrival'    => $arrival->toDateTimeString(),
-                    'event_time' => $eventTime->toDateTimeString(),
-                    'eligible'   => $eligible
-                ]);
-
-                return $eligible;
+                return $arrival->lessThanOrEqualTo($eventTime);
             };
 
             // We'll accumulate inserts and updates in batches
