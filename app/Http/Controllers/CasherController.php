@@ -2672,7 +2672,7 @@ class CasherController extends Controller
             // ===== 5) Process Order Cuts =====
             DB::table('order_cuts as oc')
                 ->join('orders as o', 'o.id', '=', 'oc.order_id')
-                ->join('order_models as om', 'om.id', '=', 'o.order_model_id')
+                ->join('order_models as om', 'om.order_id', '=', 'o.id')
                 ->join('models as m', 'm.id', '=', 'om.model_id')
                 ->whereBetween('oc.cut_at', [$startDate, $endDate])
                 ->where('o.branch_id', $branchId)
