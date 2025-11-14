@@ -1288,6 +1288,16 @@ class CasherController extends Controller
             ->get()
             ->keyBy('employee_id');
 
+        foreach ($attendanceData as $empId => $dates) {
+            foreach ($dates as $dateRecord) {
+                if ($dateRecord->entries_count > 1) {
+                    return response()->json([
+                        'message' => "❌ Muammo: Employee ID {$empId} uchun {$dateRecord->date} sanasida {$dateRecord->entries_count} ta attendance_salary yozilgan. Iltimos, ma'lumotlarni tekshiring."
+                    ], 422);
+                }
+            }
+        }
+
         // 2. Tarification logs with all relations - BULK
         $tarificationData = DB::table('employee_tarification_logs as etl')
             ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
