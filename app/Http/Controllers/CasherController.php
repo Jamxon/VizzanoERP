@@ -2248,7 +2248,7 @@ class CasherController extends Controller
         ]);
 
         ini_set('memory_limit', '3G');
-        set_time_limit(0); // long-running allowed for big months
+        set_time_limit(0);
 
         $year = $data['year'];
         $month = $data['month'];
@@ -2268,14 +2268,8 @@ class CasherController extends Controller
 
         DB::beginTransaction();
         try {
-            // ===== 1) preload departments & budgets used =====
+            // ===== 1) Preload departments & budgets =====
             $neededDeptNames = [
-                // cutting
-//                "Markaziy ombor", "Kroy bo'limi", "Ombor",
-                // sewing
-//                "Sifat nazorati va qadoqlash bo'limi",
-//                "Texnik bo'lim",
-//                "Ho'jalik ishlari bo'limi",
                 "Rejalashtirish va iqtisod bo'limi",
                 "Ma'muriy boshqaruv"
             ];
@@ -2288,47 +2282,40 @@ class CasherController extends Controller
                 ->get()
                 ->keyBy('name');
 
-            // budgets
             $budgets = DB::table('department_budgets')
                 ->whereIn('department_id', $departments->pluck('id')->all())
                 ->get()
                 ->keyBy('department_id');
 
-            // ===== 2) preload employees by department (working only) =====
+            // ===== 2) Preload employees =====
             $employees = DB::table('employees')
                 ->where('branch_id', $branchId)
                 ->where('status', 'working')
                 ->select('id', 'department_id', 'percentage')
                 ->get()
                 ->groupBy('department_id');
-            
-            // ===== 3) preload attendances for the whole month for branch =====
-            // We'll need to check present status and check_in for each employee/date.
+
+            // ===== 3) Preload attendances =====
             $attendancesRaw = DB::table('attendance')
                 ->join('employees as e', 'e.id', '=', 'attendance.employee_id')
                 ->where('e.branch_id', $branchId)
                 ->whereBetween('attendance.date', [Carbon::parse($startDate)->toDateString(), Carbon::parse($endDate)->toDateString()])
-                ->select(
-                    'attendance.employee_id',
-                    'attendance.status',
-                    'attendance.date',
-                    'attendance.check_in'
-                )
+                ->select('attendance.employee_id', 'attendance.status', 'attendance.date', 'attendance.check_in')
                 ->get();
 
-            // Organize: attendances[date][employee_id] => ['status'=>..., 'check_in'=>...]
             $attendances = [];
             foreach ($attendancesRaw as $a) {
                 $d = $a->date;
                 if (!isset($attendances[$d])) $attendances[$d] = [];
                 $attendances[$d][$a->employee_id] = [
                     'status' => $a->status,
-                    'check_in' => $a->check_in // may be null
+                    'check_in' => $a->check_in
                 ];
             }
             unset($attendancesRaw);
 
-            // ===== 4) preload existing daily_payments for the month (to detect updates) =====
+            // ===== 4) Preload existing payments - YANGI STRUKTURA =====
+            // Faqat date, order_id, employee_id bo'yicha unique
             $existingPaymentsRaw = DB::table('daily_payments')
                 ->whereBetween('payment_date', [Carbon::parse($startDate)->toDateString(), Carbon::parse($endDate)->toDateString()])
                 ->whereIn('order_id', function($q) use ($branchId) {
@@ -2337,21 +2324,21 @@ class CasherController extends Controller
                 ->select('*')
                 ->get();
 
-            // Map existingPayments[date][order_id][model_id][employee_id][expense_id|null] => payment row
+            // YANGI MAP: existingPayments[date][order_id][employee_id] => payment row
             $existingPayments = [];
             foreach ($existingPaymentsRaw as $p) {
                 $d = $p->payment_date;
                 $orderId = $p->order_id;
-                $modelId = $p->model_id ?? 0;
                 $empId = $p->employee_id;
-                $expenseId = $p->expense_id ?? 0;
-                $existingPayments[$d][$orderId][$modelId][$empId][$expenseId] = $p;
+
+                // Agar bir employee uchun bir date va order bo'yicha bir nechta yozuv bo'lsa,
+                // eng oxirgisini saqlash (yoki birinchisini - sizning logikangizga bog'liq)
+                $existingPayments[$d][$orderId][$empId] = $p;
             }
             unset($existingPaymentsRaw);
 
-            // Helper: function to check if employee was present on date and before event time
+            // ===== Helper function =====
             $wasEmployeeEligible = function(int $employeeId, string $date, Carbon $eventTime) use ($attendances) : bool {
-
                 if (!isset($attendances[$date][$employeeId])) return false;
                 $rec = $attendances[$date][$employeeId];
 
@@ -2361,149 +2348,27 @@ class CasherController extends Controller
                 $checkInRaw = $rec['check_in'];
 
                 try {
-                    // 1) Datetime format: "Y-m-d H:i:s"
                     if (preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $checkInRaw)) {
-
                         $arrival = Carbon::createFromFormat('Y-m-d H:i:s', $checkInRaw);
-
                     } else {
-
-                        // 2) Time format: "H:i:s"
                         $arrival = Carbon::createFromFormat('H:i:s', $checkInRaw)
                             ->setDate($eventTime->year, $eventTime->month, $eventTime->day);
                     }
-
                 } catch (\Throwable $e) {
-
                     Log::add(null, 'ARRIVAL PARSE ERROR', 'error', null, [
                         'check_in_raw' => $checkInRaw,
-                        'message'      => $e->getMessage(),
+                        'message' => $e->getMessage(),
                     ]);
-
                     return false;
                 }
 
                 return $arrival->lessThanOrEqualTo($eventTime);
             };
 
-            // We'll accumulate inserts and updates in batches
             $toInsert = [];
-            $toUpdate = []; // array of ['id'=>..., 'data'=>[...]]
+            $toUpdate = [];
 
-            // ===== 5) Process Order Cuts (chunked via DB) =====
-            // Fetch cuts joined with orders and order_models.model minute
-            DB::table('order_cuts as oc')
-                ->join('orders as o', 'o.id', '=', 'oc.order_id')
-                ->join('order_models as om', 'om.order_id', '=', 'o.id')
-                ->join('models as m', 'm.id', '=', 'om.model_id')
-                ->whereBetween('oc.created_at', [$startDate, $endDate])
-                ->where('o.branch_id', $branchId)
-                ->select('oc.id as cut_id', 'oc.order_id', 'oc.quantity as cut_quantity', 'oc.created_at as cut_created_at', 'om.model_id', 'm.minute as model_minute', 'o.quantity as order_planned_quantity')
-                ->orderBy('oc.id')
-                ->chunk(300, function($cuts) use (
-                    &$log, $departments, $budgets, $employees, $attendances,
-                    $wasEmployeeEligible, &$existingPayments, &$toInsert, &$toUpdate
-                ) {
-                    foreach ($cuts as $cut) {
-                        try {
-                            $cutDate = Carbon::parse($cut->cut_created_at)->toDateString();
-                            $cutTime = Carbon::parse($cut->cut_created_at);
-                            $orderId = $cut->order_id;
-                            $cutQty = (int)$cut->cut_quantity;
-                            $modelMinute = (float)($cut->model_minute ?? 0);
-                            if ($modelMinute <= 0 || $cutQty <= 0) {
-                                $log['skipped_no_attendance']++;
-                                continue;
-                            }
-
-                            // For cutting departments we use 'Ombor' and 'Kroy bo'limi' if available in preload
-                            $cuttingDeptNames = ["Ombor", "Kroy bo'limi"];
-                            foreach ($cuttingDeptNames as $dname) {
-                                if (!isset($departments[$dname])) continue;
-                                $dept = $departments[$dname];
-                                $deptBudget = $budgets[$dept->id] ?? null;
-                                if (!$deptBudget || $deptBudget->type !== 'minute_based') continue;
-
-                                $totalMinutes = $modelMinute * $cutQty;
-                                $totalEarned = $deptBudget->quantity * $totalMinutes; // budget->quantity is per-minute amount
-
-                                // employees in this department
-                                $empList = $employees[$dept->id] ?? collect();
-                                if (empty($empList)) {
-                                    $log['skipped_no_attendance']++;
-                                    continue;
-                                }
-
-                                // for each employee check attendance for that date and check_in <= cutTime
-                                foreach ($empList as $emp) {
-                                    $empId = $emp->id;
-                                    // check attendance eligibility by closure:
-                                    if (!$wasEmployeeEligible($empId, $cutDate, $cutTime)) {
-                                        continue;
-                                    }
-
-                                    // percentage: prefer existing daily_payment entry's employee_percentage if exists
-                                    $existing = $existingPayments[$cutDate][$orderId][$cut->model_id][$empId][0] ?? null;
-                                    $percentage = $existing ? ($existing->employee_percentage ?? 0) : ($emp->percentage ?? 0);
-                                    if ($percentage == 0) continue;
-
-                                    $earned = round(($totalEarned * $percentage) / 100, 2);
-                                    if ($earned <= 0) continue;
-
-                                    if ($existing) {
-                                        // compute expected: note expected uses totalMinutes * budget->quantity * percentage /100
-                                        $expected = round(($totalMinutes * $deptBudget->quantity * $percentage) / 100, 2);
-                                        if (abs($existing->calculated_amount - $expected) > 0.01 || $existing->quantity_produced != $cutQty) {
-                                            $toUpdate[] = [
-                                                'id' => $existing->id,
-                                                'data' => [
-                                                    'quantity_produced' => $cutQty,
-                                                    'calculated_amount' => $earned,
-                                                    'employee_percentage' => $percentage,
-                                                    'updated_at' => now(),
-                                                ]
-                                            ];
-                                            $log['updated_payments']++;
-                                        }
-                                    } else {
-                                        $toInsert[] = [
-                                            'employee_id' => $empId,
-                                            'model_id' => $cut->model_id,
-                                            'order_id' => $orderId,
-                                            'department_id' => $dept->id,
-                                            'payment_date' => $cutDate,
-                                            'quantity_produced' => $cutQty,
-                                            'calculated_amount' => $earned,
-                                            'employee_percentage' => $percentage,
-                                            'created_at' => now(),
-                                            'updated_at' => now(),
-                                        ];
-                                        $log['created_payments']++;
-                                    }
-                                } // foreach emp
-                            } // foreach dept
-
-                            $log['processed_cuts']++;
-                        } catch (\Throwable $e) {
-                            $log['errors'][] = "Cut ID {$cut->cut_id}: {$e->getMessage()}";
-                        }
-                    } // foreach cut
-
-                    // flush batch every chunk to avoid memory growth
-                    if (!empty($toInsert)) {
-                        DB::table('daily_payments')->insert($toInsert);
-                        $toInsert = [];
-                    }
-                    if (!empty($toUpdate)) {
-                        foreach ($toUpdate as $u) {
-                            DB::table('daily_payments')->where('id', $u['id'])->update($u['data']);
-                        }
-                        $toUpdate = [];
-                    }
-                }); // chunk cuts
-
-            // ===== 6) Process Sewing outputs (chunked) =====
-            // We'll join sewing_outputs -> order_sub_models -> order_models -> orders to filter branch
+            // ===== 5) Process Sewing outputs =====
             DB::table('sewing_outputs as so')
                 ->join('order_sub_models as osm', 'osm.id', '=', 'so.order_submodel_id')
                 ->join('order_models as om', 'om.id', '=', 'osm.order_model_id')
@@ -2511,8 +2376,16 @@ class CasherController extends Controller
                 ->join('models as m', 'm.id', '=', 'om.model_id')
                 ->whereBetween('so.created_at', [$startDate, $endDate])
                 ->where('o.branch_id', $branchId)
-                ->select('so.id as sewing_id', 'so.quantity as sewing_quantity', 'so.created_at as sewing_created_at',
-                    'om.model_id', 'm.minute as model_minute', 'o.id as order_id', 'o.price as order_usd_price', 'o.quantity as order_quantity', 'om.id as order_model_id')
+                ->select(
+                    'so.id as sewing_id',
+                    'so.quantity as sewing_quantity',
+                    'so.created_at as sewing_created_at',
+                    'om.model_id',
+                    'm.minute as model_minute',
+                    'o.id as order_id',
+                    'o.price as order_usd_price',
+                    'o.quantity as order_quantity'
+                )
                 ->orderBy('so.id')
                 ->chunk(300, function($sews) use (
                     &$log, $departments, $budgets, $employees, $attendances, $wasEmployeeEligible,
@@ -2526,7 +2399,6 @@ class CasherController extends Controller
                             $newQty = (int)$s->sewing_quantity;
                             $modelMinute = (float)($s->model_minute ?? 0);
 
-                            // Sewing departments list
                             $sewingDeptNames = [
                                 "Sifat nazorati va qadoqlash bo'limi",
                                 "Texnik bo'lim",
@@ -2541,11 +2413,10 @@ class CasherController extends Controller
                                 $deptBudget = $budgets[$dept->id] ?? null;
                                 if (!$deptBudget) continue;
 
-                                // Calculate totalAmount based on budget type
+                                // Calculate totalAmount
                                 if ($deptBudget->type === 'minute_based' && $modelMinute > 0) {
                                     $totalAmount = $modelMinute * $newQty * $deptBudget->quantity;
                                 } elseif ($deptBudget->type === 'percentage_based') {
-                                    // order price is USD; get UZS if needed
                                     $usdRate = getUsdRate();
                                     $orderUsdPrice = $s->order_usd_price ?? 0;
                                     $orderUzsPrice = $orderUsdPrice * $usdRate;
@@ -2557,20 +2428,19 @@ class CasherController extends Controller
 
                                 if ($totalAmount <= 0) continue;
 
-                                // employees in department
                                 $empList = $employees[$dept->id] ?? collect();
                                 if (empty($empList)) {
                                     $log['skipped_no_attendance']++;
                                     continue;
                                 }
 
-                                // existing payment? (model-level)
                                 foreach ($empList as $emp) {
                                     $empId = $emp->id;
                                     if (!$wasEmployeeEligible($empId, $sewDate, $sewTime)) continue;
 
-                                    // existing payment? (model-level)
-                                    $existing = $existingPayments[$sewDate][$orderId][$s->model_id][$empId] ?? null;
+                                    // MUHIM: Faqat date, order_id, employee_id bo'yicha existing topish
+                                    $existing = $existingPayments[$sewDate][$orderId][$empId] ?? null;
+
                                     $percentage = $existing ? ($existing->employee_percentage ?? 0) : ($emp->percentage ?? 0);
                                     if ($percentage == 0) continue;
 
@@ -2578,9 +2448,9 @@ class CasherController extends Controller
                                     if ($earned <= 0) continue;
 
                                     if ($existing) {
-                                        // Qo‘shish: quantity va amountni yangi output bilan birlashtirish
+                                        // QO'SHISH: yangi quantity va amountni mavjudga qo'shamiz
                                         $newQuantity = $existing->quantity_produced + $newQty;
-                                        $newAmount   = $existing->calculated_amount + $earned;
+                                        $newAmount = $existing->calculated_amount + $earned;
 
                                         $toUpdate[] = [
                                             'id' => $existing->id,
@@ -2591,10 +2461,15 @@ class CasherController extends Controller
                                                 'updated_at' => now(),
                                             ]
                                         ];
+
+                                        // Update qilgandan keyin memory-dagi existing-ni ham yangilash
+                                        $existingPayments[$sewDate][$orderId][$empId]->quantity_produced = $newQuantity;
+                                        $existingPayments[$sewDate][$orderId][$empId]->calculated_amount = $newAmount;
+
                                         $log['updated_payments']++;
                                     } else {
-                                        // yangi yozish
-                                        $toInsert[] = [
+                                        // Yangi yozuv yaratish
+                                        $newPayment = [
                                             'employee_id' => $empId,
                                             'model_id' => $s->model_id,
                                             'order_id' => $orderId,
@@ -2606,19 +2481,30 @@ class CasherController extends Controller
                                             'created_at' => now(),
                                             'updated_at' => now(),
                                         ];
+
+                                        $toInsert[] = $newPayment;
+
+                                        // Memory-ga ham qo'shish keyingi sewingOutput lar uchun
+                                        if (!isset($existingPayments[$sewDate])) {
+                                            $existingPayments[$sewDate] = [];
+                                        }
+                                        if (!isset($existingPayments[$sewDate][$orderId])) {
+                                            $existingPayments[$sewDate][$orderId] = [];
+                                        }
+                                        $existingPayments[$sewDate][$orderId][$empId] = (object)$newPayment;
+
                                         $log['created_payments']++;
                                     }
                                 }
-                                // foreach emp
-                            } // foreach dept
+                            }
 
                             $log['processed_sewings']++;
                         } catch (\Throwable $e) {
                             $log['errors'][] = "Sewing ID {$s->sewing_id}: {$e->getMessage()}";
                         }
-                    } // foreach sew
+                    }
 
-                    // flush batch
+                    // Flush batch
                     if (!empty($toInsert)) {
                         DB::table('daily_payments')->insert($toInsert);
                         $toInsert = [];
@@ -2629,7 +2515,7 @@ class CasherController extends Controller
                         }
                         $toUpdate = [];
                     }
-                }); // chunk sewing
+                });
 
             DB::commit();
 
