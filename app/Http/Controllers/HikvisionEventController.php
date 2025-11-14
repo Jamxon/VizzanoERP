@@ -11,6 +11,7 @@ use App\Models\Attendance;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
+use function PHPUnit\Framework\isEmpty;
 
 // <— ⚠️ BU YO‘Q EDI, Telegram POST uchun kerak
 
@@ -102,7 +103,7 @@ class HikvisionEventController extends Controller
                     $image = $request->file('Picture');
                     $imagePath = null;
 
-                    if ($image && $image->isValid()) {
+                    if ($image && $image->isValid() && (!isEmpty($image))) {
                         $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
                         $path = $image->storeAs('hikvisionImages', $filename, 's3');
                         Storage::disk('s3')->setVisibility($path, 'public');
