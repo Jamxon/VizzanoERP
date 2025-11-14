@@ -2564,6 +2564,7 @@ class CasherController extends Controller
                                     continue;
                                 }
 
+                                // existing payment? (model-level)
                                 foreach ($empList as $emp) {
                                     $empId = $emp->id;
                                     if (!$wasEmployeeEligible($empId, $sewDate, $sewTime)) continue;
@@ -2577,20 +2578,22 @@ class CasherController extends Controller
                                     if ($earned <= 0) continue;
 
                                     if ($existing) {
-                                        $expected = round(($totalAmount * $percentage) / 100, 2);
-                                        if (abs($existing->calculated_amount - $expected) > 0.01 || $existing->quantity_produced != $newQty) {
-                                            $toUpdate[] = [
-                                                'id' => $existing->id,
-                                                'data' => [
-                                                    'quantity_produced' => $newQty,
-                                                    'calculated_amount' => $earned,
-                                                    'employee_percentage' => $percentage,
-                                                    'updated_at' => now(),
-                                                ]
-                                            ];
-                                            $log['updated_payments']++;
-                                        }
+                                        // Qo‘shish: quantity va amountni yangi output bilan birlashtirish
+                                        $newQuantity = $existing->quantity_produced + $newQty;
+                                        $newAmount   = $existing->calculated_amount + $earned;
+
+                                        $toUpdate[] = [
+                                            'id' => $existing->id,
+                                            'data' => [
+                                                'quantity_produced' => $newQuantity,
+                                                'calculated_amount' => $newAmount,
+                                                'employee_percentage' => $percentage,
+                                                'updated_at' => now(),
+                                            ]
+                                        ];
+                                        $log['updated_payments']++;
                                     } else {
+                                        // yangi yozish
                                         $toInsert[] = [
                                             'employee_id' => $empId,
                                             'model_id' => $s->model_id,
@@ -2605,7 +2608,8 @@ class CasherController extends Controller
                                         ];
                                         $log['created_payments']++;
                                     }
-                                } // foreach emp
+                                }
+                                // foreach emp
                             } // foreach dept
 
                             $log['processed_sewings']++;
