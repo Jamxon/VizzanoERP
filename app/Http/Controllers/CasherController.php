@@ -2623,6 +2623,8 @@ class CasherController extends Controller
                 ->select('attendance.employee_id', 'attendance.status', 'attendance.date', 'attendance.check_in')
                 ->get();
 
+            dd($attendancesRaw);
+
             $attendances = [];
             foreach ($attendancesRaw as $a) {
                 $d = $a->date;
