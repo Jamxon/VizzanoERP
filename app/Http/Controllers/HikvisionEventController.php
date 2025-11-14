@@ -11,7 +11,6 @@ use App\Models\Attendance;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
-use function PHPUnit\Framework\isEmpty;
 
 // <— ⚠️ BU YO‘Q EDI, Telegram POST uchun kerak
 
@@ -21,7 +20,7 @@ class HikvisionEventController extends Controller
     {
         $contentType = $request->header('Content-Type');
 
-        // Qurilma → filial mapping
+// Qurilma → filial mapping
         $deviceBranchMap = [
             255 => 4,
             105 => 5,
@@ -37,8 +36,15 @@ class HikvisionEventController extends Controller
             'Hikvision event qabul qilindi',
             'info',
             null,
-            [$request->all(), $request->file('Picture')]
+            ['event_log' => $request->event_log ?? $request->all()]
         );
+//        Log::add(
+//            null,
+//            'Hikvision event qabul qilindi',
+//            'info',
+//            null,
+//            ['event_log' => $request->event_log ?? $request->all()]
+//        );
 
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
@@ -57,23 +63,12 @@ class HikvisionEventController extends Controller
                 return response()->json(['status' => 'unknown_format']);
             }
 
-
             $employeeNo = $accessData['employeeNoString'] ?? null;
             $deviceId = isset($outerEvent['deviceID']) ? (int)$outerEvent['deviceID'] : null;
             $eventTime = $outerEvent['dateTime'] ?? now()->toDateTimeString();
 
             $branchFromDevice = $deviceBranchMap[$deviceId] ?? null;
             if (!$branchFromDevice) {
-                Log::add(
-                    null,
-                    'Hikvision event: noma\'lum qurilma ID',
-                    'unknown_device',
-                    null,
-                    [
-                        'device_id' => $deviceId,
-                        'event_data' => $outerEvent,
-                    ]
-                );
                 return response()->json(['status' => 'unknown_device']);
             }
 
@@ -97,77 +92,27 @@ class HikvisionEventController extends Controller
                 ['source_type' => 'device']
             );
 
-            // === CHECK-IN ===
+// === CHECK-IN ===
             if ($deviceId === 255 || $deviceId === 105) {
                 if (!$attendance->check_in) {
-//                    $image = $request->file('Picture');
-//                    $imagePath = null;
-//
-//                    if ($image && $image->isValid() && (!isEmpty($image))) {
-//                        $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
-//                        $path = $image->storeAs('hikvisionImages', $filename, 's3');
-//                        Storage::disk('s3')->setVisibility($path, 'public');
-//                        $imagePath = Storage::disk('s3')->url($path);
-//                    }
-
+                    $image = $request->file('Picture');
                     $imagePath = null;
 
-// 1️⃣ Agar fayl sifatida kelgan bo‘lsa
-                    if ($request->hasFile('Picture') && $request->file('Picture')->isValid()) {
-                        $image = $request->file('Picture');
+                    if ($image && $image->isValid()) {
                         $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
                         $path = $image->storeAs('hikvisionImages', $filename, 's3');
                         Storage::disk('s3')->setVisibility($path, 'public');
                         $imagePath = Storage::disk('s3')->url($path);
                     }
 
-// 2️⃣ Agar JSON ichida base64 formatida kelgan bo‘lsa
-                    elseif ($request->input('Picture')) {
-                        $pictureData = $request->input('Picture');
-
-                        // tekshirish: object bo‘lsa va image_base64 mavjud bo‘lsa
-                        if (is_array($pictureData) && isset($pictureData['image_base64'])) {
-                            $imageData = base64_decode($pictureData['image_base64']);
-                            $filename = uniqid($employeeNo . '_') . '.jpg';
-                            Storage::disk('s3')->put('hikvisionImages/' . $filename, $imageData, 'public');
-                            $imagePath = Storage::disk('s3')->url('hikvisionImages/' . $filename);
-                        }
-                    }
-
-// 3️⃣ Endi xavfsiz log yozish
-                    Log::add(
-                        $employee->user_id ?? null,
-                        'Yangi faceId aniqlandi',
-                        'new_checkin',
-                        null,
-                        [
-                            'employee_id' => $employee->id,
-                            'device_id' => $deviceId,
-                            'time' => $eventTime,
-                            'image_path' => $imagePath // null bo‘lsa ham xavfsiz
-                        ]
-                    );
-
-
                     $attendance->check_in = $eventCarbon;
-                    $attendance->check_in_image = $imagePath ?? null;
+                    $attendance->check_in_image = $imagePath;
                     $attendance->status = 'present';
                     $attendance->save();
 
-                    // Transport davomat
+// Transport davomat
                     if (!$employee->transports->isEmpty()) {
                         $transport = $employee->transports->first();
-                        Log::add(
-                            $employee->user_id ?? null,
-                            'Hodim transporti bo‘yicha davomat qayd etildi',
-                            'employee_transport_daily',
-                            null,
-                            [
-                                'employee_id' => $employee->id,
-                                'transport_id' => $transport->id,
-                                'date' => now()->toDateString(),
-                            ]
-                        );
 
                         $exists = EmployeeTransportDaily::where('employee_id', $employee->id)
                             ->where('transport_id', $transport->id)
@@ -183,19 +128,8 @@ class HikvisionEventController extends Controller
                         }
                     }
 
-                    // === AUP kechikish tekshiruvi ===
+// === AUP kechikish tekshiruvi ===
                     if ($employee->type === 'aup') {
-                        Log::add(
-                            $employee->user_id ?? null,
-                            'AUP hodim kechikish tekshiruvi boshlandi',
-                            'aup_late_check',
-                            null,
-                            [
-                                'employee_id' => $employee->id,
-                                'device_id' => $deviceId,
-                                'time' => $eventTime,
-                            ]
-                        );
                         $lateTime = Carbon::createFromTime(7, 30, 0, 'Asia/Tashkent');
 
                         if ($eventCarbon->gt($lateTime)) {
@@ -216,53 +150,51 @@ class HikvisionEventController extends Controller
                                 $employee->group->name ?? '-'
                             );
 
-                            // Default employee rasmi
+// Default employee rasmi
                             $imageUrl = !empty($employee->img)
                                 ? (str_starts_with($employee->img, 'http') ? $employee->img : url($employee->img))
                                 : null;
 
-                            // Hikvision eventdan kelgan rasm (S3 dan)
+// Hikvision eventdan kelgan rasm (S3 dan)
                             if (!empty($imagePath)) {
                                 $imageUrl = $imagePath; // bu allaqachon to‘liq public URL
                             }
 
-                            // Fon jarayon sifatida yuborish
+// Fon jarayon sifatida yuborish
                             dispatch(function () use ($botToken, $lateChatId, $msg, $imageUrl) {
                                 try {
                                     if ($imageUrl) {
-                                        // Telegramga rasm bilan yuborish
-                                        Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+// Telegramga rasm bilan yuborish
+                                        \Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
                                             'chat_id' => $lateChatId,
                                             'photo' => $imageUrl,
                                             'caption' => $msg,
                                             'parse_mode' => 'Markdown',
                                         ]);
                                     } else {
-                                        // Agar rasm yo‘q bo‘lsa, faqat matn yuborish
-                                        Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+// Agar rasm yo‘q bo‘lsa, faqat matn yuborish
+                                        \Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                                             'chat_id' => $lateChatId,
                                             'text' => $msg,
                                             'parse_mode' => 'Markdown',
                                         ]);
                                     }
                                 } catch (\Throwable $e) {
-                                    Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
+                                    \Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
                                 }
                             });
                         }
                     }
 
 
-
-
-                    Log::add($employee->user_id ?? null, 'Hodim ishga keldi FaceId', 'Check In', null, [
+                    Log::add($employee->user_id ?? null, 'Hodim ishga keldi', 'Check In', null, [
                         'employee_id' => $employee->id,
                         'image_path' => $imagePath,
                         'device_id' => $deviceId,
                         'time' => $eventTime,
                     ]);
 
-                    // Branchning umumiy hisobotini yangilash
+// Branchning umumiy hisobotini yangilash
                     $branchId = $employee->branch_id;
                     $chatId = $branchChatMap[$branchId] ?? null;
 
@@ -284,9 +216,7 @@ class HikvisionEventController extends Controller
                         'time' => $eventTime,
                     ]);
                 }
-            }
-
-            // === CHECK-OUT ===
+            } // === CHECK-OUT ===
             elseif ($deviceId === 256) {
                 if (!$attendance->check_out) {
                     $attendance->check_out = $eventCarbon;
