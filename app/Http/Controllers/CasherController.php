@@ -2611,6 +2611,7 @@ class CasherController extends Controller
             $employees = DB::table('employees')
                 ->where('branch_id', $branchId)
                 ->where('status', 'working')
+                ->whereIn('department_id', $departments->pluck('id')->all())
                 ->select('id', 'department_id', 'percentage')
                 ->get()
                 ->groupBy('department_id');
