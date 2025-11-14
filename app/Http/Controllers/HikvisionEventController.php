@@ -52,27 +52,17 @@ class HikvisionEventController extends Controller
 
             if ($eventLogRaw) {
                 $outerEvent = json_decode($eventLogRaw, true);
-
-                // Agar hali string bo‘lsa, yana decode qilamiz
-                if (is_string($outerEvent)) {
-                    $outerEvent = json_decode($outerEvent, true);
-                }
-
                 $accessData = $outerEvent['AccessControllerEvent'] ?? [];
-                $eventTime = $outerEvent['dateTime'] ?? now()->toDateTimeString();
             } elseif ($request->has('AccessControllerEvent')) {
                 $outerEvent = json_decode($request->input('AccessControllerEvent'), true);
-                if (is_string($outerEvent)) {
-                    $outerEvent = json_decode($outerEvent, true);
-                }
                 $accessData = $outerEvent['AccessControllerEvent'] ?? [];
-                $eventTime = $outerEvent['dateTime'] ?? now()->toDateTimeString();
             } else {
                 Log::add(null, 'Hikvision event: format aniqlanmadi', 'error', null, [
                     'request_data' => $request->all(),
                 ]);
                 return response()->json(['status' => 'unknown_format']);
             }
+
 
             $employeeNo = $accessData['employeeNoString'] ?? null;
             $deviceId = isset($outerEvent['deviceID']) ? (int)$outerEvent['deviceID'] : null;
@@ -109,7 +99,7 @@ class HikvisionEventController extends Controller
                     $image = $request->file('Picture');
                     $imagePath = null;
 
-                    if ($image && $image->isValid() && (isset($image))) {
+                    if ($image && $image->isValid()) {
                         $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
                         $path = $image->storeAs('hikvisionImages', $filename, 's3');
                         Storage::disk('s3')->setVisibility($path, 'public');
@@ -176,7 +166,7 @@ class HikvisionEventController extends Controller
                                 try {
                                     if ($imageUrl) {
 // Telegramga rasm bilan yuborish
-                                        \Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                                        Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
                                             'chat_id' => $lateChatId,
                                             'photo' => $imageUrl,
                                             'caption' => $msg,
@@ -184,14 +174,14 @@ class HikvisionEventController extends Controller
                                         ]);
                                     } else {
 // Agar rasm yo‘q bo‘lsa, faqat matn yuborish
-                                        \Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                                        Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                                             'chat_id' => $lateChatId,
                                             'text' => $msg,
                                             'parse_mode' => 'Markdown',
                                         ]);
                                     }
                                 } catch (\Throwable $e) {
-                                    \Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
+                                    Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
                                 }
                             });
                         }
