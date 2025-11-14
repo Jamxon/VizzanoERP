@@ -2326,7 +2326,7 @@ class CasherController extends Controller
                 ];
             }
             unset($attendancesRaw);
-            dd($attendances);
+            dd($attendances[]);
 
             // ===== 4) preload existing daily_payments for the month (to detect updates) =====
             $existingPaymentsRaw = DB::table('daily_payments')

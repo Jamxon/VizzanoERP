@@ -113,7 +113,7 @@ class HikvisionEventController extends Controller
                     $image = $request->file('Picture');
                     $imagePath = null;
 
-                    if ($image && $image->isValid() && (!empty($imagePath))) {
+                    if ($image && $image->isValid()) {
                         $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
                         $path = $image->storeAs('hikvisionImages', $filename, 's3');
                         Storage::disk('s3')->setVisibility($path, 'public');
