@@ -2276,7 +2276,7 @@ class CasherController extends Controller
 //                "Texnik bo'lim",
 //                "Ho'jalik ishlari bo'limi",
                 "Rejalashtirish va iqtisod bo'limi",
-//                "Ma'muriy boshqaruv"
+                "Ma'muriy boshqaruv"
             ];
 
             $departments = DB::table('departments as d')
