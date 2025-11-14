@@ -88,7 +88,8 @@ class HikvisionEventController extends Controller
                 return response()->json(['status' => 'branch_mismatch']);
             }
 
-            $eventCarbon = Carbon::parse($eventTime)->setTimezone('Asia/Tashkent'); // ⚠️ vaqtni to‘g‘ri zona bilan olish
+//            $eventCarbon = Carbon::parse($eventTime)->setTimezone('Asia/Tashkent'); // ⚠️ vaqtni to‘g‘ri zona bilan olish
+            $eventCarbon = Carbon::parse($eventTime); // ⚠️ vaqtni to‘g‘ri zona bilan olish
             $today = $eventCarbon->toDateString();
 
             $attendance = Attendance::firstOrCreate(
