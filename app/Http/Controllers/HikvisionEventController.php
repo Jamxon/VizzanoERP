@@ -10,7 +10,6 @@ use App\Models\Employee;
 use App\Models\Attendance;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
-use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 
 // <— ⚠️ BU YO‘Q EDI, Telegram POST uchun kerak
 
@@ -66,7 +65,7 @@ class HikvisionEventController extends Controller
 
             $employeeNo = $accessData['employeeNoString'] ?? null;
             $deviceId = isset($outerEvent['deviceID']) ? (int)$outerEvent['deviceID'] : null;
-            $eventTime = $outerEvent['dateTime'] ?? now()->toDateTimeString();
+            $eventTime = $accessData['dateTime'] ?? now()->toDateTimeString();
 
             $branchFromDevice = $deviceBranchMap[$deviceId] ?? null;
             if (!$branchFromDevice) {
