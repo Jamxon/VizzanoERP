@@ -2560,4 +2560,232 @@ class CasherController extends Controller
             ], 500);
         }
     }
+
+    public function recalculateDailyPaymentsCut(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'year' => 'required|integer',
+            'month' => 'required|integer|min:1|max:12',
+        ]);
+
+        ini_set('memory_limit', '3G');
+        set_time_limit(0);
+
+        $year = $data['year'];
+        $month = $data['month'];
+        $branchId = auth()->user()->employee->branch_id;
+
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth()->toDateTimeString();
+        $endDate = Carbon::create($year, $month, 1)->endOfMonth()->endOfDay()->toDateTimeString();
+
+        $log = [
+            'processed_cuts' => 0,
+            'updated_payments' => 0,
+            'created_payments' => 0,
+            'skipped_no_attendance' => 0,
+            'errors' => []
+        ];
+
+        DB::beginTransaction();
+        try {
+            // ===== 1) Preload Kroy bo'limi va Markaziy ombor bo'limlari =====
+            $neededDeptNames = [
+                "Kroy bo'limi",
+                "Markaziy ombor"
+            ];
+
+            $departments = DB::table('departments as d')
+                ->join('main_department as md', 'md.id', '=', 'd.main_department_id')
+                ->where('md.branch_id', $branchId)
+                ->whereIn('d.name', $neededDeptNames)
+                ->select('d.id', 'd.name')
+                ->get()
+                ->keyBy('name');
+
+            $budgets = DB::table('department_budgets')
+                ->whereIn('department_id', $departments->pluck('id')->all())
+                ->get()
+                ->keyBy('department_id');
+
+            // ===== 2) Preload employees =====
+            $employees = DB::table('employees')
+                ->where('branch_id', $branchId)
+                ->where('status', 'working')
+                ->select('id', 'department_id', 'percentage')
+                ->get()
+                ->groupBy('department_id');
+
+            // ===== 3) Preload attendances =====
+            $attendancesRaw = DB::table('attendance')
+                ->join('employees as e', 'e.id', '=', 'attendance.employee_id')
+                ->where('e.branch_id', $branchId)
+                ->whereBetween('attendance.date', [Carbon::parse($startDate)->toDateString(), Carbon::parse($endDate)->toDateString()])
+                ->select('attendance.employee_id', 'attendance.status', 'attendance.date', 'attendance.check_in')
+                ->get();
+
+            $attendances = [];
+            foreach ($attendancesRaw as $a) {
+                $d = $a->date;
+                if (!isset($attendances[$d])) $attendances[$d] = [];
+                $attendances[$d][$a->employee_id] = [
+                    'status' => $a->status,
+                    'check_in' => $a->check_in
+                ];
+            }
+            unset($attendancesRaw);
+
+            $existingPaymentsRaw = DB::table('daily_payments')
+                ->whereBetween('payment_date', [Carbon::parse($startDate)->toDateString(), Carbon::parse($endDate)->toDateString()])
+                ->whereIn('order_id', function($q) use ($branchId) {
+                    $q->select('id')->from('orders')->where('branch_id', $branchId);
+                })
+                ->select('*')
+                ->get();
+
+            $existingPayments = [];
+            foreach ($existingPaymentsRaw as $p) {
+                $d = $p->payment_date;
+                $orderId = $p->order_id;
+                $empId = $p->employee_id;
+                $existingPayments[$d][$orderId][$empId] = $p;
+            }
+            unset($existingPaymentsRaw);
+
+            // ===== 4) Helper function =====
+            $wasEmployeeEligible = function(int $employeeId, string $date, Carbon $eventTime) use ($attendances) : bool {
+                if (!isset($attendances[$date][$employeeId])) return false;
+                $rec = $attendances[$date][$employeeId];
+                if ($rec['status'] !== 'present') return false;
+                if (empty($rec['check_in'])) return false;
+                try {
+                    $arrival = Carbon::parse($rec['check_in']);
+                } catch (\Throwable $e) {
+                    return false;
+                }
+                return $arrival->lessThanOrEqualTo($eventTime);
+            };
+
+            $toInsert = [];
+            $toUpdate = [];
+
+            // ===== 5) Process Order Cuts =====
+            DB::table('order_cuts as oc')
+                ->join('order_sub_models as osm', 'osm.id', '=', 'oc.submodel_id')
+                ->join('order_models as om', 'om.id', '=', 'osm.order_model_id')
+                ->join('orders as o', 'o.id', '=', 'om.order_id')
+                ->whereBetween('oc.cut_at', [$startDate, $endDate])
+                ->where('o.branch_id', $branchId)
+                ->select(
+                    'oc.id as cut_id',
+                    'oc.quantity as cut_quantity',
+                    'oc.cut_at',
+                    'om.model_id',
+                    'o.id as order_id',
+                    'o.price as order_usd_price'
+                )
+                ->orderBy('oc.id')
+                ->chunk(300, function($cuts) use (
+                    &$log, $departments, $budgets, $employees, $attendances, $wasEmployeeEligible,
+                    &$existingPayments, &$toInsert, &$toUpdate
+                ) {
+                    foreach ($cuts as $c) {
+                        try {
+                            $cutDate = Carbon::parse($c->cut_at)->toDateString();
+                            $cutTime = Carbon::parse($c->cut_at);
+                            $orderId = $c->order_id;
+                            $quantity = (int)$c->cut_quantity;
+
+                            foreach ($departments as $dept) {
+                                $deptBudget = $budgets[$dept->id] ?? null;
+                                if (!$deptBudget) continue;
+
+                                // Simple calculation: quantity * budget quantity
+                                $totalAmount = $quantity * ($deptBudget->quantity ?? 0);
+                                if ($totalAmount <= 0) continue;
+
+                                $empList = $employees[$dept->id] ?? collect();
+                                if (empty($empList)) {
+                                    $log['skipped_no_attendance']++;
+                                    continue;
+                                }
+
+                                foreach ($empList as $emp) {
+                                    $empId = $emp->id;
+                                    if (!$wasEmployeeEligible($empId, $cutDate, $cutTime)) continue;
+
+                                    $existing = $existingPayments[$cutDate][$orderId][$empId] ?? null;
+                                    $percentage = $existing ? ($existing->employee_percentage ?? 0) : ($emp->percentage ?? 0);
+                                    if ($percentage == 0) continue;
+
+                                    $earned = round(($totalAmount * $percentage) / 100, 2);
+                                    if ($earned <= 0) continue;
+
+                                    if ($existing && isset($existing->id)) {
+                                        $toUpdate[] = [
+                                            'id' => $existing->id,
+                                            'data' => [
+                                                'quantity_produced' => $existing->quantity_produced + $quantity,
+                                                'calculated_amount' => $existing->calculated_amount + $earned,
+                                                'employee_percentage' => $percentage,
+                                                'updated_at' => now(),
+                                            ]
+                                        ];
+                                        $existingPayments[$cutDate][$orderId][$empId]->quantity_produced += $quantity;
+                                        $existingPayments[$cutDate][$orderId][$empId]->calculated_amount += $earned;
+                                        $log['updated_payments']++;
+                                    } else {
+                                        $newPayment = [
+                                            'employee_id' => $empId,
+                                            'model_id' => $c->model_id,
+                                            'order_id' => $orderId,
+                                            'department_id' => $dept->id,
+                                            'payment_date' => $cutDate,
+                                            'quantity_produced' => $quantity,
+                                            'calculated_amount' => $earned,
+                                            'employee_percentage' => $percentage,
+                                            'created_at' => now(),
+                                            'updated_at' => now(),
+                                        ];
+                                        $toInsert[] = $newPayment;
+                                        $existingPayments[$cutDate][$orderId][$empId] = (object)$newPayment;
+                                        $log['created_payments']++;
+                                    }
+                                }
+                            }
+
+                            $log['processed_cuts']++;
+                        } catch (\Throwable $e) {
+                            $log['errors'][] = "Cut ID {$c->cut_id}: {$e->getMessage()}";
+                        }
+                    }
+
+                    if (!empty($toInsert)) {
+                        DB::table('daily_payments')->insert($toInsert);
+                        $toInsert = [];
+                    }
+                    if (!empty($toUpdate)) {
+                        foreach ($toUpdate as $u) {
+                            DB::table('daily_payments')->where('id', $u['id'])->update($u['data']);
+                        }
+                        $toUpdate = [];
+                    }
+                });
+
+            DB::commit();
+
+            return response()->json([
+                'message' => "Cut bo'limi to'lovlari muvaffaqiyatli qayta hisoblandi",
+                'summary' => $log
+            ]);
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'summary' => $log
+            ], 500);
+        }
+    }
+
 }
