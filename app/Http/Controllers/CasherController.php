@@ -997,6 +997,8 @@ class CasherController extends Controller
                     . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
                     . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik') . "\n"
                     . "🏦 Qolgan balans: *{$remainingBalance} so‘m*\n"
+                    //branch info
+                    . "🏢 Filial: " . (auth()->user()->employee->branch->name ?? '-')
                     . "\n📝 Izoh: " . ($validated['comment'] ?? '-');
 
                 Http::post("https://api.telegram.org/bot" . '7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms' . "/sendMessage", [
