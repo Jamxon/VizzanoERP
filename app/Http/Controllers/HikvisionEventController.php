@@ -31,13 +31,13 @@ class HikvisionEventController extends Controller
             5 => -1001883536528,
         ];
 
-        Log::add(
-            null,
-            'Hikvision event qabul qilindi',
-            'info',
-            null,
-            [$request->all()]
-        );
+//        Log::add(
+//            null,
+//            'Hikvision event qabul qilindi',
+//            'info',
+//            null,
+//            [$request->all()]
+//        );
 
         if (str_contains($contentType, 'multipart/form-data')) {
             $eventLogRaw = $request->input('event_log');
@@ -63,6 +63,16 @@ class HikvisionEventController extends Controller
 
             $branchFromDevice = $deviceBranchMap[$deviceId] ?? null;
             if (!$branchFromDevice) {
+                Log::add(
+                    null,
+                    'Hikvision event: noma\'lum qurilma ID',
+                    'unknown_device',
+                    null,
+                    [
+                        'device_id' => $deviceId,
+                        'event_data' => $outerEvent,
+                    ]
+                );
                 return response()->json(['status' => 'unknown_device']);
             }
 
@@ -89,6 +99,17 @@ class HikvisionEventController extends Controller
             // === CHECK-IN ===
             if ($deviceId === 255 || $deviceId === 105) {
                 if (!$attendance->check_in) {
+                    Log::add(
+                        $employee->user_id ?? null,
+                        'Yangi faceId aniqlandi',
+                        'new_checkin',
+                        null,
+                        [
+                            'employee_id' => $employee->id,
+                            'device_id' => $deviceId,
+                            'time' => $eventTime,
+                        ]
+                    );
                     $image = $request->file('Picture');
                     $imagePath = null;
 
@@ -107,6 +128,17 @@ class HikvisionEventController extends Controller
                     // Transport davomat
                     if (!$employee->transports->isEmpty()) {
                         $transport = $employee->transports->first();
+                        Log::add(
+                            $employee->user_id ?? null,
+                            'Hodim transporti bo‘yicha davomat qayd etildi',
+                            'employee_transport_daily',
+                            null,
+                            [
+                                'employee_id' => $employee->id,
+                                'transport_id' => $transport->id,
+                                'date' => now()->toDateString(),
+                            ]
+                        );
 
                         $exists = EmployeeTransportDaily::where('employee_id', $employee->id)
                             ->where('transport_id', $transport->id)
@@ -124,6 +156,17 @@ class HikvisionEventController extends Controller
 
                     // === AUP kechikish tekshiruvi ===
                     if ($employee->type === 'aup') {
+                        Log::add(
+                            $employee->user_id ?? null,
+                            'AUP hodim kechikish tekshiruvi boshlandi',
+                            'aup_late_check',
+                            null,
+                            [
+                                'employee_id' => $employee->id,
+                                'device_id' => $deviceId,
+                                'time' => $eventTime,
+                            ]
+                        );
                         $lateTime = Carbon::createFromTime(7, 30, 0, 'Asia/Tashkent');
 
                         if ($eventCarbon->gt($lateTime)) {
