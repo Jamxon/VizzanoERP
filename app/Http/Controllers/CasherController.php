@@ -2447,7 +2447,7 @@ class CasherController extends Controller
                                     $earned = round(($totalAmount * $percentage) / 100, 2);
                                     if ($earned <= 0) continue;
 
-                                    if ($existing) {
+                                    if ($existing && isset($existing->id)) {
                                         // QO'SHISH: yangi quantity va amountni mavjudga qo'shamiz
                                         $newQuantity = $existing->quantity_produced + $newQty;
                                         $newAmount = $existing->calculated_amount + $earned;
@@ -2468,32 +2468,51 @@ class CasherController extends Controller
 
                                         $log['updated_payments']++;
                                     } else {
-                                        // Yangi yozuv yaratish
-                                        $newPayment = [
-                                            'employee_id' => $empId,
-                                            'model_id' => $s->model_id,
-                                            'order_id' => $orderId,
-                                            'department_id' => $dept->id,
-                                            'payment_date' => $sewDate,
-                                            'quantity_produced' => $newQty,
-                                            'calculated_amount' => $earned,
-                                            'employee_percentage' => $percentage,
-                                            'created_at' => now(),
-                                            'updated_at' => now(),
-                                        ];
+                                        // Mavjud yozuv bor-yo'qligini tekshirish (memory-da)
+                                        $memoryExisting = $existingPayments[$sewDate][$orderId][$empId] ?? null;
 
-                                        $toInsert[] = $newPayment;
+                                        if ($memoryExisting && !isset($memoryExisting->id)) {
+                                            // Bu yozuv shu chunk ichida yaratilgan, faqat memory-da yangilash
+                                            $memoryExisting->quantity_produced += $newQty;
+                                            $memoryExisting->calculated_amount += $earned;
+                                            // toInsert massivida ham yangilash kerak
+                                            foreach ($toInsert as &$insertItem) {
+                                                if ($insertItem['employee_id'] == $empId &&
+                                                    $insertItem['order_id'] == $orderId &&
+                                                    $insertItem['payment_date'] == $sewDate) {
+                                                    $insertItem['quantity_produced'] += $newQty;
+                                                    $insertItem['calculated_amount'] += $earned;
+                                                    break;
+                                                }
+                                            }
+                                        } else {
+                                            // Yangi yozuv yaratish
+                                            $newPayment = [
+                                                'employee_id' => $empId,
+                                                'model_id' => $s->model_id,
+                                                'order_id' => $orderId,
+                                                'department_id' => $dept->id,
+                                                'payment_date' => $sewDate,
+                                                'quantity_produced' => $newQty,
+                                                'calculated_amount' => $earned,
+                                                'employee_percentage' => $percentage,
+                                                'created_at' => now(),
+                                                'updated_at' => now(),
+                                            ];
 
-                                        // Memory-ga ham qo'shish keyingi sewingOutput lar uchun
-                                        if (!isset($existingPayments[$sewDate])) {
-                                            $existingPayments[$sewDate] = [];
+                                            $toInsert[] = $newPayment;
+
+                                            // Memory-ga ham qo'shish keyingi sewingOutput lar uchun
+                                            if (!isset($existingPayments[$sewDate])) {
+                                                $existingPayments[$sewDate] = [];
+                                            }
+                                            if (!isset($existingPayments[$sewDate][$orderId])) {
+                                                $existingPayments[$sewDate][$orderId] = [];
+                                            }
+                                            $existingPayments[$sewDate][$orderId][$empId] = (object)$newPayment;
+
+                                            $log['created_payments']++;
                                         }
-                                        if (!isset($existingPayments[$sewDate][$orderId])) {
-                                            $existingPayments[$sewDate][$orderId] = [];
-                                        }
-                                        $existingPayments[$sewDate][$orderId][$empId] = (object)$newPayment;
-
-                                        $log['created_payments']++;
                                     }
                                 }
                             }
