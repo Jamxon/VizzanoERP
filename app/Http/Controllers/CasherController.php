@@ -2270,6 +2270,9 @@ class CasherController extends Controller
         try {
             // ===== 1) Preload departments & budgets =====
             $neededDeptNames = [
+                "Sifat nazorati va qadoqlash bo'limi",
+                "Texnik bo'lim",
+                "Ho'jalik ishlari bo'limi",
                 "Rejalashtirish va iqtisod bo'limi",
                 "Ma'muriy boshqaruv"
             ];
