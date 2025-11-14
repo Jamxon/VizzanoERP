@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="feat: add DailyPayment model and controller for managing daily payment records" />
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -12,12 +12,9 @@
   </component>
   <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
-    <execution>
-      <executable path="composer" />
-    </execution>
+    <execution />
   </component>
   <component name="Git.Settings">
-    <option name="PUSH_AUTO_UPDATE" value="true" />
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -37,11 +34,7 @@
     <setting file="file://$PROJECT_DIR$/app/Http/Controllers/ResultCheckerController.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/routes/api.php" root0="FORCE_HIGHLIGHTING" root1="FORCE_HIGHLIGHTING" />
   </component>
-  <component name="PackageJsonUpdateNotifier">
-    <dismissed value="$PROJECT_DIR$/package.json" />
-  </component>
-  <component name="PhpDebugGeneral" listening_started="true" />
-  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="$PROJECT_DIR$/../php/php.exe">
+  <component name="PhpWorkspaceProjectConfiguration">
     <include_path>
       <path value="$PROJECT_DIR$/vendor/doctrine/cache" />
       <path value="$PROJECT_DIR$/vendor/doctrine/lexer" />
@@ -200,50 +193,30 @@
     <option name="selectedTabId" value="CurrentFile" />
     <option name="showPreview" value="true" />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 2
-}</component>
-  <component name="ProjectId" id="2pULeBqwNrNnim6YmZ67tyqrkXt" />
-  <component name="ProjectLevelVcsManager">
-    <ConfirmationsSetting value="2" id="Add" />
-  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="35SCAHyzkJoEWXZVTcp04CDIskJ" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;PHPUnit.Main.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;com.laravel_idea.eloquent_global_unguard&quot;: &quot;0&quot;,
-    &quot;database.data.extractors.current.export.id&quot;: &quot;Excel (xlsx)&quot;,
-    &quot;database.data.extractors.current.id&quot;: &quot;CSV-Groovy.csv.groovy&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/jamkhan/Desktop/VizzanoERP&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;php.override.implement.member.chooser.php.doc&quot;: &quot;NONE&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
-  },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;
-    ]
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/storage/fonts" />
@@ -264,696 +237,30 @@
       </set>
     </attachedChunks>
   </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="6d7ca805-b105-4f4e-beb7-ef93e65f0a7f" name="Changes" comment="" />
-      <created>1732815799814</created>
+      <changelist id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="" />
+      <created>1763093944124</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1732815799814</updated>
-      <workItem from="1732815801672" duration="5647000" />
-      <workItem from="1732871828931" duration="1619000" />
-      <workItem from="1732873980745" duration="12558000" />
-      <workItem from="1732893188742" duration="2422000" />
-      <workItem from="1732939540663" duration="14313000" />
-      <workItem from="1732958480231" duration="4900000" />
-      <workItem from="1732964191867" duration="7000" />
-      <workItem from="1732964204777" duration="18064000" />
-      <workItem from="1733030916314" duration="44644000" />
-      <workItem from="1733227874625" duration="4706000" />
-      <workItem from="1733370100289" duration="26152000" />
-      <workItem from="1733551514192" duration="17000" />
-      <workItem from="1733551537372" duration="26586000" />
-      <workItem from="1733638388154" duration="30643000" />
-      <workItem from="1733718278133" duration="24870000" />
-      <workItem from="1733919347046" duration="37415000" />
-      <workItem from="1734085017237" duration="14188000" />
-      <workItem from="1734156357945" duration="13505000" />
-      <workItem from="1734242461603" duration="35806000" />
-      <workItem from="1734328184413" duration="9952000" />
-      <workItem from="1734343199733" duration="8393000" />
-      <workItem from="1734445721131" duration="29941000" />
-      <workItem from="1734620569531" duration="48667000" />
-      <workItem from="1734880852297" duration="169000" />
-      <workItem from="1734881030137" duration="80000" />
-      <workItem from="1734881117240" duration="123249000" />
-      <workItem from="1735464297693" duration="27453000" />
-      <workItem from="1735892543609" duration="285185000" />
-      <workItem from="1737451183299" duration="44502000" />
-      <workItem from="1737627437272" duration="4149000" />
-      <workItem from="1737691796794" duration="5358000" />
-      <workItem from="1737698058134" duration="58515000" />
-      <workItem from="1738136394804" duration="7306000" />
-      <workItem from="1738150229098" duration="38000" />
-      <workItem from="1738150275701" duration="24020000" />
-      <workItem from="1738316004127" duration="14347000" />
-      <workItem from="1738644612505" duration="401000" />
-      <workItem from="1738645050807" duration="12035000" />
-      <workItem from="1738921667722" duration="534000" />
-      <workItem from="1738922218127" duration="170439000" />
-      <workItem from="1739815357912" duration="598000" />
-      <workItem from="1739939018318" duration="41436000" />
-      <workItem from="1740248217686" duration="418000" />
-      <workItem from="1740469185556" duration="6530000" />
-      <workItem from="1740659759337" duration="3567000" />
-      <workItem from="1740663338010" duration="50000" />
-      <workItem from="1740663405658" duration="8086000" />
-      <workItem from="1740735187737" duration="16683000" />
-      <workItem from="1741766048451" duration="4659000" />
-      <workItem from="1741855404878" duration="301000" />
-      <workItem from="1741855748226" duration="1486000" />
-      <workItem from="1741941474763" duration="5433000" />
-      <workItem from="1741954676932" duration="58989000" />
-      <workItem from="1743138246243" duration="41861000" />
-      <workItem from="1743510169755" duration="230908000" />
-      <workItem from="1744443741471" duration="61765000" />
-      <workItem from="1744813142360" duration="790000" />
-      <workItem from="1744870055538" duration="809000" />
-      <workItem from="1744871038796" duration="8465000" />
-      <workItem from="1744951228255" duration="1192000" />
-      <workItem from="1744952470574" duration="21783000" />
-      <workItem from="1745038653694" duration="30962000" />
-      <workItem from="1745222272471" duration="11000" />
-      <workItem from="1745222297650" duration="26560000" />
-      <workItem from="1745303207118" duration="44297000" />
-      <workItem from="1745485070343" duration="75179000" />
-      <workItem from="1745916228550" duration="117733000" />
-      <workItem from="1746869349673" duration="33665000" />
-      <workItem from="1747650677313" duration="45401000" />
-      <workItem from="1747805735328" duration="85348000" />
-      <workItem from="1748085734900" duration="18000" />
-      <workItem from="1748085763506" duration="10129000" />
-      <workItem from="1748929470653" duration="19581000" />
-      <workItem from="1749008089755" duration="2982000" />
-      <workItem from="1749012396751" duration="17372000" />
-      <workItem from="1749039244580" duration="98000" />
-      <workItem from="1749039358773" duration="8619000" />
-      <workItem from="1749095537237" duration="9790000" />
-      <workItem from="1749370347161" duration="10114000" />
-      <workItem from="1749382139867" duration="4422000" />
-      <workItem from="1749387605241" duration="1606000" />
-      <workItem from="1749443010392" duration="21336000" />
-      <workItem from="1749528590888" duration="11233000" />
-      <workItem from="1749549408089" duration="1150000" />
-      <workItem from="1749550589141" duration="13025000" />
-      <workItem from="1749614493650" duration="1548000" />
-      <workItem from="1749629603254" duration="6560000" />
-      <workItem from="1749644433774" duration="3442000" />
-      <workItem from="1749702180705" duration="6311000" />
-      <workItem from="1749717110025" duration="1664000" />
-      <workItem from="1749720750062" duration="12000" />
-      <workItem from="1749721045215" duration="23000" />
-      <workItem from="1749790147274" duration="127000" />
-      <workItem from="1749795627660" duration="68000" />
-      <workItem from="1749795785216" duration="607000" />
-      <workItem from="1749809534077" duration="12577000" />
-      <workItem from="1749873632137" duration="15816000" />
-      <workItem from="1750047278709" duration="20720000" />
-      <workItem from="1750131005853" duration="19487000" />
-      <workItem from="1750221634660" duration="7862000" />
-      <workItem from="1750305899667" duration="19360000" />
-      <workItem from="1750392497866" duration="20029000" />
-      <workItem from="1750427572972" duration="288000" />
-      <workItem from="1750478676942" duration="19056000" />
-      <workItem from="1750506843742" duration="1274000" />
-      <workItem from="1750650436924" duration="23353000" />
-      <workItem from="1750741289727" duration="14461000" />
-      <workItem from="1750824048570" duration="16212000" />
-      <workItem from="1750911476513" duration="8486000" />
-      <workItem from="1750997346621" duration="12577000" />
-      <workItem from="1751084029479" duration="3709000" />
-      <workItem from="1751087818667" duration="13824000" />
-      <workItem from="1751255793996" duration="9457000" />
-      <workItem from="1751277219377" duration="3088000" />
-      <workItem from="1751343592281" duration="12588000" />
-      <workItem from="1751432833774" duration="32026000" />
-      <workItem from="1751517131245" duration="13508000" />
-      <workItem from="1751602589172" duration="16369000" />
-      <workItem from="1751688620067" duration="17670000" />
-      <workItem from="1751863286087" duration="14260000" />
-      <workItem from="1751952279529" duration="8382000" />
-      <workItem from="1752032799117" duration="16055000" />
-      <workItem from="1752121381931" duration="19264000" />
-      <workItem from="1752207734715" duration="9325000" />
-      <workItem from="1752294056668" duration="7108000" />
-      <workItem from="1752467143431" duration="17066000" />
-      <workItem from="1752554554901" duration="14949000" />
-      <workItem from="1752639015923" duration="11964000" />
-      <workItem from="1752727624023" duration="13208000" />
-      <workItem from="1752811712425" duration="5753000" />
-      <workItem from="1752897519834" duration="8291000" />
-      <workItem from="1753073473836" duration="8149000" />
-      <workItem from="1753158637202" duration="15599000" />
-      <workItem from="1753244517827" duration="11702000" />
-      <workItem from="1753332777470" duration="1084000" />
-      <workItem from="1753344880394" duration="5225000" />
-      <workItem from="1753415745966" duration="10668000" />
-      <workItem from="1753504160140" duration="7808000" />
-      <workItem from="1753677291569" duration="12264000" />
-      <workItem from="1753763833309" duration="9273000" />
-      <workItem from="1753780797536" duration="381000" />
-      <workItem from="1753854491530" duration="958000" />
-      <workItem from="1753855561347" duration="8419000" />
-      <workItem from="1753934960659" duration="16743000" />
-      <workItem from="1754022224415" duration="11643000" />
-      <workItem from="1754108186755" duration="18539000" />
-      <workItem from="1754281291114" duration="9794000" />
-      <workItem from="1754367849437" duration="4786000" />
-      <workItem from="1754397224305" duration="1195000" />
-      <workItem from="1754453313779" duration="2772000" />
-      <workItem from="1754465263485" duration="4715000" />
-      <workItem from="1754541753989" duration="9613000" />
-      <workItem from="1754626767965" duration="683000" />
-      <workItem from="1754628459107" duration="9475000" />
-      <workItem from="1754721911145" duration="9404000" />
-      <workItem from="1754808086247" duration="27708000" />
-      <workItem from="1754971510318" duration="30586000" />
-      <workItem from="1755056050959" duration="1224000" />
-      <workItem from="1755098913642" duration="2816000" />
-      <workItem from="1755148942853" duration="14030000" />
-      <workItem from="1755231953038" duration="11552000" />
-      <workItem from="1755316321759" duration="21878000" />
-      <workItem from="1755490840842" duration="13762000" />
-      <workItem from="1755573704521" duration="634000" />
-      <workItem from="1755576366145" duration="3789000" />
-      <workItem from="1755661288200" duration="4132000" />
-      <workItem from="1755751862233" duration="1250000" />
-      <workItem from="1755837746056" duration="2550000" />
-      <workItem from="1755920289579" duration="3129000" />
-      <workItem from="1756114874304" duration="11544000" />
-      <workItem from="1756179711186" duration="19501000" />
-      <workItem from="1756268702388" duration="17501000" />
-      <workItem from="1756353994222" duration="19196000" />
-      <workItem from="1756720738596" duration="3110000" />
-      <workItem from="1756783969780" duration="6307000" />
-      <workItem from="1756793374710" duration="17092000" />
-      <workItem from="1756873290773" duration="13851000" />
-      <workItem from="1756961219470" duration="15654000" />
-      <workItem from="1757046849246" duration="4971000" />
-      <workItem from="1757738542207" duration="11992000" />
-      <workItem from="1757762132977" duration="2915000" />
-      <workItem from="1757829555229" duration="3103000" />
-      <workItem from="1757835145822" duration="902000" />
-      <workItem from="1757841908475" duration="4576000" />
-      <workItem from="1757908435282" duration="9451000" />
-      <workItem from="1757927282628" duration="13185000" />
-      <workItem from="1757995927780" duration="8584000" />
-      <workItem from="1758081928897" duration="11767000" />
-      <workItem from="1758170494220" duration="3146000" />
-      <workItem from="1758255527259" duration="7636000" />
-      <workItem from="1758342986210" duration="11143000" />
-      <workItem from="1758517769970" duration="14561000" />
-      <workItem from="1758606346601" duration="12386000" />
-      <workItem from="1758692886021" duration="5114000" />
-      <workItem from="1758708237598" duration="1478000" />
-      <workItem from="1758711605755" duration="4029000" />
-      <workItem from="1758774127700" duration="11612000" />
-      <workItem from="1758864472510" duration="6523000" />
-      <workItem from="1758949185635" duration="20545000" />
-      <workItem from="1759122279117" duration="15187000" />
-      <workItem from="1759204679625" duration="13726000" />
-      <workItem from="1759293522466" duration="9302000" />
-      <workItem from="1759376230263" duration="14977000" />
-      <workItem from="1759464805600" duration="8579000" />
-      <workItem from="1759485516361" duration="2922000" />
-      <workItem from="1759551368016" duration="3353000" />
-      <workItem from="1759637971018" duration="355000" />
-      <workItem from="1759655189323" duration="947000" />
-      <workItem from="1760109865663" duration="35000" />
-      <workItem from="1760109909440" duration="170000" />
-      <workItem from="1760156044319" duration="3064000" />
-      <workItem from="1760178268095" duration="345000" />
-      <workItem from="1761992248949" duration="177000" />
-      <workItem from="1761992451897" duration="292000" />
-      <workItem from="1761992767268" duration="213000" />
-      <workItem from="1761992994939" duration="1407000" />
-      <workItem from="1761994438958" duration="21001000" />
-      <workItem from="1762063784746" duration="22759000" />
-      <workItem from="1762142764178" duration="16574000" />
-      <workItem from="1762425582395" duration="29795000" />
-      <workItem from="1762519243993" duration="5025000" />
-      <workItem from="1762834371067" duration="15433000" />
+      <updated>1763093944124</updated>
+      <workItem from="1763093948611" duration="634000" />
     </task>
-    <task id="LOCAL-01772" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762430402359</created>
-      <option name="number" value="01772" />
-      <option name="presentableId" value="LOCAL-01772" />
-      <option name="project" value="LOCAL" />
-      <updated>1762430402359</updated>
-    </task>
-    <task id="LOCAL-01773" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762430697370</created>
-      <option name="number" value="01773" />
-      <option name="presentableId" value="LOCAL-01773" />
-      <option name="project" value="LOCAL" />
-      <updated>1762430697370</updated>
-    </task>
-    <task id="LOCAL-01774" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762430961824</created>
-      <option name="number" value="01774" />
-      <option name="presentableId" value="LOCAL-01774" />
-      <option name="project" value="LOCAL" />
-      <updated>1762430961824</updated>
-    </task>
-    <task id="LOCAL-01775" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762431147653</created>
-      <option name="number" value="01775" />
-      <option name="presentableId" value="LOCAL-01775" />
-      <option name="project" value="LOCAL" />
-      <updated>1762431147653</updated>
-    </task>
-    <task id="LOCAL-01776" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762431365012</created>
-      <option name="number" value="01776" />
-      <option name="presentableId" value="LOCAL-01776" />
-      <option name="project" value="LOCAL" />
-      <updated>1762431365012</updated>
-    </task>
-    <task id="LOCAL-01777" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762431534793</created>
-      <option name="number" value="01777" />
-      <option name="presentableId" value="LOCAL-01777" />
-      <option name="project" value="LOCAL" />
-      <updated>1762431534793</updated>
-    </task>
-    <task id="LOCAL-01778" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762431635536</created>
-      <option name="number" value="01778" />
-      <option name="presentableId" value="LOCAL-01778" />
-      <option name="project" value="LOCAL" />
-      <updated>1762431635536</updated>
-    </task>
-    <task id="LOCAL-01779" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762432464025</created>
-      <option name="number" value="01779" />
-      <option name="presentableId" value="LOCAL-01779" />
-      <option name="project" value="LOCAL" />
-      <updated>1762432464025</updated>
-    </task>
-    <task id="LOCAL-01780" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762437304511</created>
-      <option name="number" value="01780" />
-      <option name="presentableId" value="LOCAL-01780" />
-      <option name="project" value="LOCAL" />
-      <updated>1762437304511</updated>
-    </task>
-    <task id="LOCAL-01781" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762437694279</created>
-      <option name="number" value="01781" />
-      <option name="presentableId" value="LOCAL-01781" />
-      <option name="project" value="LOCAL" />
-      <updated>1762437694279</updated>
-    </task>
-    <task id="LOCAL-01782" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762438809381</created>
-      <option name="number" value="01782" />
-      <option name="presentableId" value="LOCAL-01782" />
-      <option name="project" value="LOCAL" />
-      <updated>1762438809381</updated>
-    </task>
-    <task id="LOCAL-01783" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762438866351</created>
-      <option name="number" value="01783" />
-      <option name="presentableId" value="LOCAL-01783" />
-      <option name="project" value="LOCAL" />
-      <updated>1762438866351</updated>
-    </task>
-    <task id="LOCAL-01784" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762438896896</created>
-      <option name="number" value="01784" />
-      <option name="presentableId" value="LOCAL-01784" />
-      <option name="project" value="LOCAL" />
-      <updated>1762438896896</updated>
-    </task>
-    <task id="LOCAL-01785" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762438990832</created>
-      <option name="number" value="01785" />
-      <option name="presentableId" value="LOCAL-01785" />
-      <option name="project" value="LOCAL" />
-      <updated>1762438990832</updated>
-    </task>
-    <task id="LOCAL-01786" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762441472695</created>
-      <option name="number" value="01786" />
-      <option name="presentableId" value="LOCAL-01786" />
-      <option name="project" value="LOCAL" />
-      <updated>1762441472695</updated>
-    </task>
-    <task id="LOCAL-01787" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762441495905</created>
-      <option name="number" value="01787" />
-      <option name="presentableId" value="LOCAL-01787" />
-      <option name="project" value="LOCAL" />
-      <updated>1762441495905</updated>
-    </task>
-    <task id="LOCAL-01788" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762442873375</created>
-      <option name="number" value="01788" />
-      <option name="presentableId" value="LOCAL-01788" />
-      <option name="project" value="LOCAL" />
-      <updated>1762442873375</updated>
-    </task>
-    <task id="LOCAL-01789" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762444398552</created>
-      <option name="number" value="01789" />
-      <option name="presentableId" value="LOCAL-01789" />
-      <option name="project" value="LOCAL" />
-      <updated>1762444398553</updated>
-    </task>
-    <task id="LOCAL-01790" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762444525874</created>
-      <option name="number" value="01790" />
-      <option name="presentableId" value="LOCAL-01790" />
-      <option name="project" value="LOCAL" />
-      <updated>1762444525874</updated>
-    </task>
-    <task id="LOCAL-01791" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762444971487</created>
-      <option name="number" value="01791" />
-      <option name="presentableId" value="LOCAL-01791" />
-      <option name="project" value="LOCAL" />
-      <updated>1762444971487</updated>
-    </task>
-    <task id="LOCAL-01792" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762445169439</created>
-      <option name="number" value="01792" />
-      <option name="presentableId" value="LOCAL-01792" />
-      <option name="project" value="LOCAL" />
-      <updated>1762445169439</updated>
-    </task>
-    <task id="LOCAL-01793" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762445253277</created>
-      <option name="number" value="01793" />
-      <option name="presentableId" value="LOCAL-01793" />
-      <option name="project" value="LOCAL" />
-      <updated>1762445253277</updated>
-    </task>
-    <task id="LOCAL-01794" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762445315667</created>
-      <option name="number" value="01794" />
-      <option name="presentableId" value="LOCAL-01794" />
-      <option name="project" value="LOCAL" />
-      <updated>1762445315667</updated>
-    </task>
-    <task id="LOCAL-01795" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762445551244</created>
-      <option name="number" value="01795" />
-      <option name="presentableId" value="LOCAL-01795" />
-      <option name="project" value="LOCAL" />
-      <updated>1762445551244</updated>
-    </task>
-    <task id="LOCAL-01796" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762445755261</created>
-      <option name="number" value="01796" />
-      <option name="presentableId" value="LOCAL-01796" />
-      <option name="project" value="LOCAL" />
-      <updated>1762445755261</updated>
-    </task>
-    <task id="LOCAL-01797" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762445803990</created>
-      <option name="number" value="01797" />
-      <option name="presentableId" value="LOCAL-01797" />
-      <option name="project" value="LOCAL" />
-      <updated>1762445803990</updated>
-    </task>
-    <task id="LOCAL-01798" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762445964387</created>
-      <option name="number" value="01798" />
-      <option name="presentableId" value="LOCAL-01798" />
-      <option name="project" value="LOCAL" />
-      <updated>1762445964388</updated>
-    </task>
-    <task id="LOCAL-01799" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762446114305</created>
-      <option name="number" value="01799" />
-      <option name="presentableId" value="LOCAL-01799" />
-      <option name="project" value="LOCAL" />
-      <updated>1762446114305</updated>
-    </task>
-    <task id="LOCAL-01800" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762446186670</created>
-      <option name="number" value="01800" />
-      <option name="presentableId" value="LOCAL-01800" />
-      <option name="project" value="LOCAL" />
-      <updated>1762446186670</updated>
-    </task>
-    <task id="LOCAL-01801" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762446302754</created>
-      <option name="number" value="01801" />
-      <option name="presentableId" value="LOCAL-01801" />
-      <option name="project" value="LOCAL" />
-      <updated>1762446302754</updated>
-    </task>
-    <task id="LOCAL-01802" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762446368019</created>
-      <option name="number" value="01802" />
-      <option name="presentableId" value="LOCAL-01802" />
-      <option name="project" value="LOCAL" />
-      <updated>1762446368019</updated>
-    </task>
-    <task id="LOCAL-01803" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762446811068</created>
-      <option name="number" value="01803" />
-      <option name="presentableId" value="LOCAL-01803" />
-      <option name="project" value="LOCAL" />
-      <updated>1762446811068</updated>
-    </task>
-    <task id="LOCAL-01804" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762447621686</created>
-      <option name="number" value="01804" />
-      <option name="presentableId" value="LOCAL-01804" />
-      <option name="project" value="LOCAL" />
-      <updated>1762447621686</updated>
-    </task>
-    <task id="LOCAL-01805" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762449082907</created>
-      <option name="number" value="01805" />
-      <option name="presentableId" value="LOCAL-01805" />
-      <option name="project" value="LOCAL" />
-      <updated>1762449082907</updated>
-    </task>
-    <task id="LOCAL-01806" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762450580159</created>
-      <option name="number" value="01806" />
-      <option name="presentableId" value="LOCAL-01806" />
-      <option name="project" value="LOCAL" />
-      <updated>1762450580159</updated>
-    </task>
-    <task id="LOCAL-01807" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762450657810</created>
-      <option name="number" value="01807" />
-      <option name="presentableId" value="LOCAL-01807" />
-      <option name="project" value="LOCAL" />
-      <updated>1762450657810</updated>
-    </task>
-    <task id="LOCAL-01808" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762450757688</created>
-      <option name="number" value="01808" />
-      <option name="presentableId" value="LOCAL-01808" />
-      <option name="project" value="LOCAL" />
-      <updated>1762450757688</updated>
-    </task>
-    <task id="LOCAL-01809" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762466262187</created>
-      <option name="number" value="01809" />
-      <option name="presentableId" value="LOCAL-01809" />
-      <option name="project" value="LOCAL" />
-      <updated>1762466262187</updated>
-    </task>
-    <task id="LOCAL-01810" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762466504321</created>
-      <option name="number" value="01810" />
-      <option name="presentableId" value="LOCAL-01810" />
-      <option name="project" value="LOCAL" />
-      <updated>1762466504321</updated>
-    </task>
-    <task id="LOCAL-01811" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762469223008</created>
-      <option name="number" value="01811" />
-      <option name="presentableId" value="LOCAL-01811" />
-      <option name="project" value="LOCAL" />
-      <updated>1762469223009</updated>
-    </task>
-    <task id="LOCAL-01812" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762527934973</created>
-      <option name="number" value="01812" />
-      <option name="presentableId" value="LOCAL-01812" />
-      <option name="project" value="LOCAL" />
-      <updated>1762527934973</updated>
-    </task>
-    <task id="LOCAL-01813" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762528477032</created>
-      <option name="number" value="01813" />
-      <option name="presentableId" value="LOCAL-01813" />
-      <option name="project" value="LOCAL" />
-      <updated>1762528477032</updated>
-    </task>
-    <task id="LOCAL-01814" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762529265847</created>
-      <option name="number" value="01814" />
-      <option name="presentableId" value="LOCAL-01814" />
-      <option name="project" value="LOCAL" />
-      <updated>1762529265847</updated>
-    </task>
-    <task id="LOCAL-01815" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762834739144</created>
-      <option name="number" value="01815" />
-      <option name="presentableId" value="LOCAL-01815" />
-      <option name="project" value="LOCAL" />
-      <updated>1762834739145</updated>
-    </task>
-    <task id="LOCAL-01816" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762924688680</created>
-      <option name="number" value="01816" />
-      <option name="presentableId" value="LOCAL-01816" />
-      <option name="project" value="LOCAL" />
-      <updated>1762924688680</updated>
-    </task>
-    <task id="LOCAL-01817" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762924921728</created>
-      <option name="number" value="01817" />
-      <option name="presentableId" value="LOCAL-01817" />
-      <option name="project" value="LOCAL" />
-      <updated>1762924921729</updated>
-    </task>
-    <task id="LOCAL-01818" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762925143628</created>
-      <option name="number" value="01818" />
-      <option name="presentableId" value="LOCAL-01818" />
-      <option name="project" value="LOCAL" />
-      <updated>1762925143628</updated>
-    </task>
-    <task id="LOCAL-01819" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762925299901</created>
-      <option name="number" value="01819" />
-      <option name="presentableId" value="LOCAL-01819" />
-      <option name="project" value="LOCAL" />
-      <updated>1762925299901</updated>
-    </task>
-    <task id="LOCAL-01820" summary="feat: add DailyPayment model and controller for managing daily payment records">
-      <option name="closed" value="true" />
-      <created>1762925479906</created>
-      <option name="number" value="01820" />
-      <option name="presentableId" value="LOCAL-01820" />
-      <option name="project" value="LOCAL" />
-      <updated>1762925479907</updated>
-    </task>
-    <option name="localTasksCounter" value="1821" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
-  <component name="UnknownFeatures">
-    <option featureType="dependencySupport" implementationName="javascript:npm:react" />
-    <option featureType="dependencySupport" implementationName="javascript:npm:prettier" />
-    <option featureType="dependencySupport" implementationName="javascript:npm:vite" />
-    <option featureType="dependencySupport" implementationName="javascript:npm:webpack" />
-    <option featureType="dependencySupport" implementationName="javascript:npm:cypress" />
-    <option featureType="dependencySupport" implementationName="javascript:npm:postcss" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="origin/main" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="fix: update supplier name retrieval in SupplierController for order notifications" />
-    <MESSAGE value="fix: enhance order data structure in CeoController to include submodel sewing outputs" />
-    <MESSAGE value="fix: add route for retrieving employee tarification logs in InternalAccountantController" />
-    <MESSAGE value="fix: add route for retrieving order attendance salary in InternalAccountantController" />
-    <MESSAGE value="fix: calculate overall cost per unit and include total output quantity in CasherController" />
-    <MESSAGE value="fix: filter outputs in CasherController to exclude specific group names" />
-    <MESSAGE value="fix: optimize daily salary calculation in InternalAccountantController" />
-    <MESSAGE value="fix: refine daily salary calculation logic in InternalAccountantController" />
-    <MESSAGE value="fix: add endpoint to retrieve order attendance salary in InternalAccountantController" />
-    <MESSAGE value="fix: calculate total summa based on maximum spend in InternalAccountantController" />
-    <MESSAGE value="fix: optimize order attendance salary calculation in InternalAccountantController" />
-    <MESSAGE value="fix: update attendance salary table and optimize group orders query in InternalAccountantController" />
-    <MESSAGE value="fix: update joins in attendance salary query for order submodels in InternalAccountantController" />
-    <MESSAGE value="fix: correct orders_count calculation in attendance salary query for order submodels in InternalAccountantController" />
-    <MESSAGE value="fix: rename tarification_salary to salary in attendance salary calculation in InternalAccountantController" />
-    <MESSAGE value="fix: add max-width and overflow handling for product column in stock balances table" />
-    <MESSAGE value="fix: optimize order retrieval in TechnologController by reducing selected columns and improving tarification check" />
-    <MESSAGE value="fix: enhance order retrieval in TechnologController by refining selected columns and adding has_tarifications logic" />
-    <MESSAGE value="fix: enhance order retrieval in TechnologController by adding tarifications relationship and simplifying has_tarifications logic" />
-    <MESSAGE value="fix: enhance order data structure in CeoController by adding status and submodel name fields" />
-    <MESSAGE value="fix: enhance order data structure in CeoController by adding outputs to submodels" />
-    <MESSAGE value="fix: enhance order data structure in CeoController by adding submodel name and outputs to submodels" />
-    <MESSAGE value="fix: update payment calculation logic for 2026 summer season and improve department queries" />
-    <MESSAGE value="fix: enhance payment distribution logic in CuttingMasterController and update employee status filter in PaymentCalculationService" />
-    <MESSAGE value="feat: add DailyPayment model and controller for managing daily payment records" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: add DailyPayment model and controller for managing daily payment records" />
-  </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
     <select />
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
   </component>
 </project>

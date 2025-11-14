@@ -158,7 +158,7 @@ class HikvisionEventController extends Controller
                                 try {
                                     if ($imageUrl) {
                                         // Telegramga rasm bilan yuborish
-                                        \Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
+                                        Http::post("https://api.telegram.org/bot{$botToken}/sendPhoto", [
                                             'chat_id' => $lateChatId,
                                             'photo' => $imageUrl,
                                             'caption' => $msg,
@@ -166,14 +166,14 @@ class HikvisionEventController extends Controller
                                         ]);
                                     } else {
                                         // Agar rasm yo‘q bo‘lsa, faqat matn yuborish
-                                        \Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                                        Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
                                             'chat_id' => $lateChatId,
                                             'text' => $msg,
                                             'parse_mode' => 'Markdown',
                                         ]);
                                     }
                                 } catch (\Throwable $e) {
-                                    \Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
+                                    Log::error('Telegram kechikish xabar yuborilmadi: ' . $e->getMessage());
                                 }
                             });
                         }
