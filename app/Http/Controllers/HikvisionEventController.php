@@ -56,6 +56,7 @@ class HikvisionEventController extends Controller
                 return response()->json(['status' => 'unknown_format']);
             }
 
+
             $employeeNo = $accessData['employeeNoString'] ?? null;
             $deviceId = isset($outerEvent['deviceID']) ? (int)$outerEvent['deviceID'] : null;
             $eventTime = $outerEvent['dateTime'] ?? now()->toDateTimeString();
