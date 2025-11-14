@@ -48,6 +48,10 @@ class CheckRole
             }
         }
 
+        if ($user->employee->status === 'kicked') {
+            return response('Siz tizimga kira olmaysiz, chunki siz ishdan bo‘shatilgansiz.', 403);
+        }
+
         return $next($request);
     }
 }
