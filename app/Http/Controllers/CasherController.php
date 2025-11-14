@@ -2351,18 +2351,24 @@ class CasherController extends Controller
             // Helper: function to check if employee was present on date and before event time
             $wasEmployeeEligible = function(int $employeeId, string $date, Carbon $eventTime) use ($attendances) : bool {
                 if (!isset($attendances[$date][$employeeId])) return false;
+
                 $rec = $attendances[$date][$employeeId];
+
+                // Faqat present bo‘lsa
                 if ($rec['status'] !== 'present') return false;
-                if (is_null($rec['check_in'])) return false;
-                // check_in stored as e.g. "08:30:00"
+
+                // Agar check_in bo‘lmasa – eligible emas
+                if (empty($rec['check_in'])) return false;
+
                 try {
+                    // check_in: "HH:MM:SS"
                     $arrival = Carbon::createFromFormat('H:i:s', $rec['check_in'])
                         ->setDate($eventTime->year, $eventTime->month, $eventTime->day);
                 } catch (\Throwable $e) {
-                    // if parse fail, consider not eligible
                     return false;
                 }
-                // if arrival <= eventTime->time => eligible
+
+                // Agar kelgan vaqti event vaqtidan oldin yoki teng bo‘lsa – eligible
                 return $arrival->lessThanOrEqualTo($eventTime);
             };
 
