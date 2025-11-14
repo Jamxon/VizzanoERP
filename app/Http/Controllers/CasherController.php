@@ -918,34 +918,6 @@ class CasherController extends Controller
             $validated['month'] = Carbon::createFromFormat('Y-m', $validated['month'])->startOfMonth();
             $employee = Employee::findOrFail($validated['employee_id']);
 
-            // ⛔ ONLY If amount is negative — CONTROL RULES APPLY
-//            if ($validated['amount'] < 0) {
-
-                $lastPayment = SalaryPayment::where('employee_id', $validated['employee_id'])
-                    ->orderByDesc('id')
-                    ->first();
-
-//                if (!$lastPayment) {
-//                    return response()->json([
-//                        'message' => "Oldin to‘lov yo‘q — minus qilishga ruxsat yo‘q!"
-//                    ], 500);
-//                }
-
-                 //QOIDA #2: 5 daqiqa o'tgan bo'lsa — Block
-//                 if ($lastPayment->created_at->lt(now()->subMinutes(5))) {
-//                     return response()->json([
-//                         'message' => "Oxirgi to‘lovdan 5 daqiqa o‘tib ketgan 😉"
-//                     ], 500);
-//                 }
-
-                // QOIDA #3: Minus kattalik check
-//                if (abs($validated['amount']) > abs($lastPayment->amount)) {
-//                    return response()->json([
-//                        'message' => "Minus miqdori oxirgi to‘lovni oshib ketmasin! (Limit: {$lastPayment->amount})"
-//                    ], 403);
-//                }
-//            }
-
             $cashboxBalance = CashboxBalance::with('cashbox')
                 ->whereHas('cashbox', fn($q) =>
                 $q->where('branch_id', auth()->user()->employee->branch_id)
@@ -958,8 +930,11 @@ class CasherController extends Controller
             $cashboxId = $cashboxBalance->cashbox_id;
             $currency = Currency::where('name', "So'm")->firstOrFail();
 
-            // ✅ SalaryPayment yoziladi
-            $payment = SalaryPayment::create([
+            // ✅ Miqdorni tekshirish
+            $absoluteAmount = abs($validated['amount']);
+            $isPositive = $validated['amount'] >= 0;
+
+            SalaryPayment::create([
                 'employee_id' => $validated['employee_id'],
                 'amount' => $validated['amount'],
                 'month' => $validated['month'],
@@ -967,46 +942,56 @@ class CasherController extends Controller
                 'comment' => $validated['comment'] ?? null,
             ]);
 
-            // ✅ CashboxTransaction yoziladi
             CashboxTransaction::create([
                 'cashbox_id' => $cashboxId,
                 'currency_id' => $currency->id,
-                'type' => 'expense',
-                'amount' => $validated['amount'],
+                'type' => $isPositive ? 'expense' : 'income',
+                'amount' => $absoluteAmount,
                 'date' => now()->toDateString(),
                 'destination_id' => $employee->id,
                 'via_id' => auth()->user()->employee->id,
-                'purpose' => $validated['type'] === 'advance' ? 'Avans to‘lovi' : 'Oylik to‘lovi',
-                'comment' => $validated['type'] === 'advance' ? $employee->name . ' uchun avans to‘lovi | '. $validated['comment'] ?? null : $employee->name . ' uchun avans to‘lovi | ' . $validated['comment'] ?? null,
+                'purpose' => $validated['type'] === 'advance' ? "Avans to'lovi" : "Oylik to'lovi",
+                'comment' => ($validated['type'] === 'advance' ? 'Avans' : 'Oylik') . ' - ' . $employee->name . ' | ' . ($validated['comment'] ?? ''),
                 'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
             // ✅ Balanslarni yangilash
-            $employee->decrement('balance', $validated['amount']);
-            $cashboxBalance->decrement('amount', $validated['amount']);
+            if ($isPositive) {
+                $employee->decrement('balance', $absoluteAmount);
+                $cashboxBalance->decrement('amount', $absoluteAmount);
+            } else {
+                $employee->increment('balance', $absoluteAmount);
+                $cashboxBalance->increment('amount', $absoluteAmount);
+            }
 
-            // ✅ Telegram xabar
-            // ✅ Telegram xabar
-            DB::afterCommit(function () use ($employee, $validated, $cashboxBalance) {
+            // ✅ Yangilangan balansni olish
+            $updatedBalance = CashboxBalance::find($cashboxBalance->id);
 
-                $remainingBalance = number_format($cashboxBalance->amount, 0, '.', ' ');
+            DB::afterCommit(function () use ($employee, $validated, $updatedBalance, $isPositive, $absoluteAmount) {
 
-                $text = "💸 *To‘lov amalga oshirildi!*\n"
+                $remainingBalance = number_format($updatedBalance->amount, 0, '.', ' ');
+                $icon = $isPositive ? '💸' : '↩️';
+                $action = $isPositive ? "To'lov amalga oshirildi!" : "To'lov qaytarildi!";
+
+                $text = "$icon *$action*\n"
                     . "👤 Xodim: {$employee->name}\n"
-                    . "💰 Miqdor: " . number_format($validated['amount'], 0, '.', ' ') . " so‘m\n"
+                    . "💰 Miqdor: " . number_format($absoluteAmount, 0, '.', ' ') . " so'm" . ($isPositive ? '' : ' (qaytarildi)') . "\n"
                     . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
                     . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik') . "\n"
-                    . "🏦 Qolgan balans: *{$remainingBalance} so‘m*\n"
-                    //branch info
-                    . "🏢 Filial: " . (auth()->user()->employee->branch->name ?? '-')
-                    . "\n📝 Izoh: " . ($validated['comment'] ?? '-');
+                    . "🏦 Qolgan balans: *{$remainingBalance} so'm*\n"
+                    . "🏢 Filial: " . (auth()->user()->employee->branch->name ?? '-') . "\n"
+                    . "📝 Izoh: " . ($validated['comment'] ?? '-');
 
-                Http::post("https://api.telegram.org/bot" . '7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms' . "/sendMessage", [
+                Http::post("https://api.telegram.org/bot7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms/sendMessage", [
                     'chat_id' => -979504247,
                     'text' => $text,
                     'parse_mode' => 'Markdown',
                 ]);
             });
+
+            return response()->json([
+                'message' => $isPositive ? "✅ To'lov muvaffaqiyatli amalga oshirildi." : "✅ To'lov qaytarildi."
+            ]);
         });
     }
 
@@ -1657,7 +1642,6 @@ class CasherController extends Controller
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
             'source' => 'nullable|string|max:255',
-        //            'via_id' => 'required|exists:employees,id',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
             'purpose' => 'nullable|string|max:1000',
@@ -1667,11 +1651,9 @@ class CasherController extends Controller
             $data['type'] = 'income';
             $data['date'] = $data['date'] ?? now()->toDateString();
             $data['branch_id'] = auth()->user()->employee->branch_id;
-
             $data['via_id'] = auth()->user()->employee->id;
 
             DB::transaction(function () use (&$data) {
-                // ✅ 1. Branch bo‘yicha bitta Cashbox topamiz yoki yaratamiz
                 $cashbox = \App\Models\Cashbox::firstOrCreate(
                     ['branch_id' => $data['branch_id']],
                     ['name' => 'Avto Cashbox: ' . now()->format('Y-m-d H:i:s')]
@@ -1679,10 +1661,8 @@ class CasherController extends Controller
 
                 $data['cashbox_id'] = $cashbox->id;
 
-                // ✅ 2. Transaction yozamiz
                 \App\Models\CashboxTransaction::create($data);
 
-                // ✅ 3. Cashbox balanceni yangilaymiz (currency_id bo‘yicha)
                 $balance = \App\Models\CashboxBalance::firstOrCreate(
                     [
                         'cashbox_id' => $cashbox->id,
@@ -1693,50 +1673,54 @@ class CasherController extends Controller
 
                 $balance->increment('amount', $data['amount']);
 
-                // ✅ 4. Telegramga xabar yuborish (faqat transaction commit bo‘lgandan so‘ng)
-                DB::afterCommit(function () use ($data, $balance) {
+                // ✅ TUZATISH: Yangilangan balansni refresh qilamiz
+                $balance->refresh();
+
+                // ✅ Yoki yanada ishonchliroq: ID orqali qayta yuklaymiz
+                $updatedBalance = \App\Models\CashboxBalance::find($balance->id);
+
+                DB::afterCommit(function () use ($data, $updatedBalance) {
                     $currency = \App\Models\Currency::find($data['currency_id']);
                     $branch = \App\Models\Branch::find($data['branch_id']);
                     $user = auth()->user()->employee;
 
-                    $remainingBalance = number_format($balance->amount, 0, '.', ' ');
+                    // ✅ Endi to'g'ri yangilangan balans
+                    $remainingBalance = number_format($updatedBalance->amount, 0, '.', ' ');
 
-                    $text = "💰 *Kirim qo‘shildi!*\n"
+                    $text = "💰 *Kirim qo'shildi!*\n"
                         . "🏢 Filial: {$branch->name}\n"
                         . "👤 Xodim: {$user->name}\n"
                         . "💵 Miqdor: " . number_format($data['amount'], 0, '.', ' ') . " {$currency->name}\n"
                         . "📅 Sana: {$data['date']}\n"
                         . "🏦 Qolgan balans: *{$remainingBalance} {$currency->name}*\n"
-                        . "📘 Maqsad: " . ($data['purpose'] ?? 'Noma’lum') . "\n"
-                        . "💬 Izoh: " . ($data['comment'] ?? '-');
+                        . "📘 Maqsad: " . ($data['purpose'] ?? "Noma'lum") . "\n"
+                    . "💬 Izoh: " . ($data['comment'] ?? "-");
 
-                    $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
-                    $chatId = -979504247;
+                $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
+                $chatId = -979504247;
 
-                    Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
-                        'chat_id' => $chatId,
-                        'text' => $text,
-                        'parse_mode' => 'Markdown',
-                    ]);
-                });
+                Http::post("https://api.telegram.org/bot{$botToken}/sendMessage", [
+                    'chat_id' => $chatId,
+                    'text' => $text,
+                    'parse_mode' => 'Markdown',
+                ]);
             });
+        });
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => '❌ Kirim muvaffaqiyatsiz.' . $e->getMessage(),
-            ], 500);
-        }
-
-        return response()->json(['message' => '✅ Kirim muvaffaqiyatli qo‘shildi.']);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => '❌ Kirim muvaffaqiyatsiz. ' . $e->getMessage(),
+        ], 500);
     }
+
+    return response()->json(['message' => "✅ Kirim muvaffaqiyatli qo'shildi."]);
+}
 
     public function storeExpense(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'currency_id' => 'required|exists:currencies,id',
             'amount' => 'required|numeric|min:0.01',
-            //            'destination_id' => 'nullable|exists:employees,id',
-            //            'via_id' => 'required|exists:employees,id',
             'purpose' => 'nullable|string|max:1000',
             'comment' => 'nullable|string|max:1000',
             'date' => 'nullable|date',
@@ -1748,17 +1732,14 @@ class CasherController extends Controller
 
         try {
             DB::transaction(function () use (&$data) {
-                // ✅ Branch bo‘yicha bitta Cashbox topamiz yoki yaratamiz
                 $cashbox = \App\Models\Cashbox::firstOrCreate(
                     ['branch_id' => $data['branch_id']],
                     ['name' => 'Avto Cashbox: ' . now()->format('Y-m-d H:i:s')]
                 );
 
                 $data['cashbox_id'] = $cashbox->id;
-
                 $data['via_id'] = auth()->user()->employee->id;
 
-                // ✅ Balansni tekshiramiz
                 $balance = \App\Models\CashboxBalance::firstOrCreate(
                     [
                         'cashbox_id' => $cashbox->id,
@@ -1768,21 +1749,22 @@ class CasherController extends Controller
                 );
 
                 if ($balance->amount < $data['amount']) {
-                    throw new \Exception('❌ Kassada yetarli mablag‘ mavjud emas.');
+                    throw new \Exception('❌ Kassada yetarli mablag\' mavjud emas.');
                 }
 
-                // ✅ Transaction yozamiz
                 \App\Models\CashboxTransaction::create($data);
-
-                // ✅ Balansni kamaytiramiz
                 $balance->decrement('amount', $data['amount']);
 
-                DB::afterCommit(function () use ($data, $balance) {
+                // ✅ TUZATISH: Yangilangan balansni olish
+                $updatedBalance = \App\Models\CashboxBalance::find($balance->id);
+
+                DB::afterCommit(function () use ($data, $updatedBalance) {
                     $currency = \App\Models\Currency::find($data['currency_id']);
                     $branch = \App\Models\Branch::find($data['branch_id']);
                     $user = auth()->user()->employee;
 
-                    $remainingBalance = number_format($balance->amount, 0, '.', ' ');
+                    // ✅ To'g'ri yangilangan balans
+                    $remainingBalance = number_format($updatedBalance->amount, 0, '.', ' ');
 
                     $text = "📤 *Chiqim amalga oshirildi!*\n"
                         . "🏢 Filial: {$branch->name}\n"
@@ -1790,7 +1772,7 @@ class CasherController extends Controller
                         . "💸 Miqdor: " . number_format($data['amount'], 0, '.', ' ') . " {$currency->name}\n"
                         . "📅 Sana: {$data['date']}\n"
                         . "🏦 Qolgan balans: *{$remainingBalance} {$currency->name}*\n"
-                        . "📘 Maqsad: " . ($data['purpose'] ?? 'Noma’lum') . "\n"
+                        . "📘 Maqsad: " . ($data['purpose'] ?? "Noma'lum") . "\n"
                         . "💬 Izoh: " . ($data['comment'] ?? '-');
 
                     $botToken = "7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms";
@@ -1806,7 +1788,7 @@ class CasherController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'message' => '❌ Chiqim muvaffaqiyatsiz.' . $e->getMessage(),
+                'message' => '❌ Chiqim muvaffaqiyatsiz. ' . $e->getMessage(),
             ], 500);
         }
 
