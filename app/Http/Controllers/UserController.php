@@ -937,6 +937,8 @@ class UserController extends Controller
                 'order_models.model_id',
                 'models.name',
                 'models.minute',
+                'sub_models.id',
+                'sub_models.name',
                 'orders.name',
                 'orders.quantity',
                 'orders.price'
