@@ -2326,7 +2326,6 @@ class CasherController extends Controller
                 ];
             }
             unset($attendancesRaw);
-            dd($attendances);
 
             // ===== 4) preload existing daily_payments for the month (to detect updates) =====
             $existingPaymentsRaw = DB::table('daily_payments')
@@ -2336,6 +2335,8 @@ class CasherController extends Controller
                 })
                 ->select('*')
                 ->get();
+
+            dd($existingPaymentsRaw);
             // Map existingPayments[date][order_id][model_id][employee_id][expense_id|null] => payment row
             $existingPayments = [];
             foreach ($existingPaymentsRaw as $p) {
