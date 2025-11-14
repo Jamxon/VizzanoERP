@@ -42,7 +42,8 @@ class Employee extends Model
         'balance',
         'bonus',
         'salary_visible',
-        'percentage'
+        'percentage',
+        'passport_code'
     ];
 
     public function getImgAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
