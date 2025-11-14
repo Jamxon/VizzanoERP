@@ -1280,23 +1280,35 @@ class CasherController extends Controller
         // BULK: Barcha kerakli ma'lumotlarni bir marta olamiz
 
         // 1. Attendance salaries - BULK
+        // Attendance salaries - BULK + check for multiple entries per day
         $attendanceData = DB::table('attendance_salary')
             ->whereIn('employee_id', $employeeIds)
             ->whereBetween('date', [$startDate, $endDate])
-            ->selectRaw('employee_id, SUM(amount) as total_amount, COUNT(*) as days_count')
-            ->groupBy('employee_id')
+            ->select('employee_id', 'date', DB::raw('SUM(amount) as total_amount'), DB::raw('COUNT(*) as entries_count'))
+            ->groupBy('employee_id', 'date') // employee+date bo'yicha guruhlash
             ->get()
-            ->keyBy('employee_id');
+            ->groupBy('employee_id'); // employee bo'yicha key qilamiz
 
-        foreach ($attendanceData as $empId => $dates) {
-            foreach ($dates as $dateRecord) {
-                if ($dateRecord->entries_count > 1) {
+// Tekshirish: bir kunda bir nechta yozuv bo'lsa, xato qaytarish
+        foreach ($attendanceData as $empId => $recordsByDate) {
+            foreach ($recordsByDate as $record) {
+                if ($record->entries_count > 1) {
                     return response()->json([
-                        'message' => "❌ Muammo: Employee ID {$empId} uchun {$dateRecord->date} sanasida {$dateRecord->entries_count} ta attendance_salary yozilgan. Iltimos, ma'lumotlarni tekshiring."
+                        'message' => "❌ Muammo: Employee ID {$empId} uchun {$record->date} sanasida {$record->entries_count} ta attendance_salary yozilgan. Iltimos, ma'lumotlarni tekshiring."
                     ], 422);
                 }
             }
         }
+
+// Attendance summasini olish (normal holat)
+        $attendanceTotals = $attendanceData->map(function ($recordsByDate) {
+            $totalAmount = $recordsByDate->sum('total_amount');
+            $daysCount = $recordsByDate->count();
+            return (object)[
+                'total_amount' => $totalAmount,
+                'days_count' => $daysCount,
+            ];
+        });
 
         // 2. Tarification logs with all relations - BULK
         $tarificationData = DB::table('employee_tarification_logs as etl')
@@ -1361,7 +1373,7 @@ class CasherController extends Controller
 
         foreach ($employees as $employee) {
             // Attendance
-            $attendanceInfo = $attendanceData->get($employee->id);
+            $attendanceInfo = $attendanceTotals->get($employee->id);
             $attendanceTotal = $attendanceInfo ? (float)$attendanceInfo->total_amount : 0;
             $attendanceDays = $attendanceInfo ? (int)$attendanceInfo->days_count : 0;
 
