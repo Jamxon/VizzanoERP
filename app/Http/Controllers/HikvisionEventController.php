@@ -88,8 +88,7 @@ class HikvisionEventController extends Controller
                 return response()->json(['status' => 'branch_mismatch']);
             }
 
-//            $eventCarbon = Carbon::parse($eventTime)->setTimezone('Asia/Tashkent'); // ⚠️ vaqtni to‘g‘ri zona bilan olish
-            $eventCarbon = Carbon::parse($eventTime); // ⚠️ vaqtni to‘g‘ri zona bilan olish
+            $eventCarbon = Carbon::parse($eventTime)->setTimezone('Asia/Tashkent'); // ⚠️ vaqtni to‘g‘ri zona bilan olish
             $today = $eventCarbon->toDateString();
 
             $attendance = Attendance::firstOrCreate(
@@ -100,21 +99,21 @@ class HikvisionEventController extends Controller
             // === CHECK-IN ===
             if ($deviceId === 255 || $deviceId === 105) {
                 if (!$attendance->check_in) {
-                    Log::add(
-                        $employee->user_id ?? null,
-                        'Yangi faceId aniqlandi',
-                        'new_checkin',
-                        null,
-                        [
-                            'employee_id' => $employee->id,
-                            'device_id' => $deviceId,
-                            'time' => $eventTime,
-                        ]
-                    );
+//                    Log::add(
+//                        $employee->user_id ?? null,
+//                        'Yangi faceId aniqlandi',
+//                        'new_checkin',
+//                        null,
+//                        [
+//                            'employee_id' => $employee->id,
+//                            'device_id' => $deviceId,
+//                            'time' => $eventTime,
+//                        ]
+//                    );
                     $image = $request->file('Picture');
                     $imagePath = null;
 
-                    if ($image && $image->isValid() && (!empty($image))) {
+                    if ($image && $image->isValid()) {
                         $filename = uniqid($employeeNo . '_') . '.' . $image->getClientOriginalExtension();
                         $path = $image->storeAs('hikvisionImages', $filename, 's3');
                         Storage::disk('s3')->setVisibility($path, 'public');
@@ -250,15 +249,10 @@ class HikvisionEventController extends Controller
                             ->updateDailyReport($branchId, $chatId, $employees);
                     }
                 } else {
-                    Log::add(
-                        $employee->user_id ?? null,
-                        'Qaytadan faceId aniqlandi',
-                        'already_checkin',
-                        null, [
+                    Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already_checkin', null, [
                         'employee_id' => $employee->id,
                         'device_id' => $deviceId,
                         'time' => $eventTime,
-                            'image_path' => $attendance->check_in_image,
                     ]);
                 }
             }
