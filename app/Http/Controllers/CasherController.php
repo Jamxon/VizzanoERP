@@ -2570,7 +2570,7 @@ class CasherController extends Controller
                                     if (!$wasEmployeeEligible($empId, $sewDate, $sewTime)) continue;
 
                                     // existing payment? (model-level)
-                                    $existing = $existingPayments[$sewDate][$orderId][$s->model_id][$empId][0] ?? null;
+                                    $existing = $existingPayments[$sewDate][$orderId][$s->model_id][$empId] ?? null;
                                     $percentage = $existing ? ($existing->employee_percentage ?? 0) : ($emp->percentage ?? 0);
                                     if ($percentage == 0) continue;
 
