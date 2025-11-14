@@ -249,10 +249,15 @@ class HikvisionEventController extends Controller
                             ->updateDailyReport($branchId, $chatId, $employees);
                     }
                 } else {
-                    Log::add($employee->user_id ?? null, 'Qaytadan faceId aniqlandi', 'already_checkin', null, [
+                    Log::add(
+                        $employee->user_id ?? null,
+                        'Qaytadan faceId aniqlandi',
+                        'already_checkin',
+                        null, [
                         'employee_id' => $employee->id,
                         'device_id' => $deviceId,
                         'time' => $eventTime,
+                            'image_path' => $attendance->check_in_image,
                     ]);
                 }
             }
