@@ -99,17 +99,6 @@ class HikvisionEventController extends Controller
             // === CHECK-IN ===
             if ($deviceId === 255 || $deviceId === 105) {
                 if (!$attendance->check_in) {
-                    Log::add(
-                        $employee->user_id ?? null,
-                        'Yangi faceId aniqlandi',
-                        'new_checkin',
-                        null,
-                        [
-                            'employee_id' => $employee->id,
-                            'device_id' => $deviceId,
-                            'time' => $eventTime,
-                        ]
-                    );
                     $image = $request->file('Picture');
                     $imagePath = null;
 
@@ -124,6 +113,19 @@ class HikvisionEventController extends Controller
                     $attendance->check_in_image = $imagePath ?? null;
                     $attendance->status = 'present';
                     $attendance->save();
+
+                    Log::add(
+                        $employee->user_id ?? null,
+                        'Yangi faceId aniqlandi',
+                        'new_checkin',
+                        null,
+                        [
+                            'employee_id' => $employee->id,
+                            'device_id' => $deviceId,
+                            'time' => $eventTime,
+                            'image_path' => $imagePath
+                        ]
+                    );
 
                     // Transport davomat
                     if (!$employee->transports->isEmpty()) {
