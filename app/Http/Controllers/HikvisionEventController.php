@@ -50,10 +50,12 @@ class HikvisionEventController extends Controller
             $eventLogRaw = $request->input('event_log');
             $outerEvent = null;
 
+            $eventLogRaw = $request->input('event_log');
+
             if ($eventLogRaw) {
                 $outerEvent = json_decode($eventLogRaw, true);
 
-                // Agar decode qilingan narsa hali string bo‘lsa, yana decode qilamiz
+                // Agar hali string bo‘lsa, yana decode qilamiz
                 if (is_string($outerEvent)) {
                     $outerEvent = json_decode($outerEvent, true);
                 }
