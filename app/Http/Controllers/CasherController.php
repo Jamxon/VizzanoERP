@@ -2681,6 +2681,7 @@ class CasherController extends Controller
                     'oc.quantity as cut_quantity',
                     'oc.cut_at',
                     'om.model_id',
+                    'm.minute as model_minute',
                     'o.id as order_id',
                     'o.price as order_usd_price'
                 )
@@ -2701,7 +2702,7 @@ class CasherController extends Controller
                                 if (!$deptBudget) continue;
 
                                 // Simple calculation: quantity * budget quantity
-                                $totalAmount = $quantity * ($deptBudget->quantity ?? 0);
+                                $totalAmount = $quantity * $deptBudget->quantity;
                                 if ($totalAmount <= 0) continue;
 
                                 $empList = $employees[$dept->id] ?? collect();
@@ -2710,48 +2711,75 @@ class CasherController extends Controller
                                     continue;
                                 }
 
-                                foreach ($empList as $emp) {
-                                    $empId = $emp->id;
-                                    if (!$wasEmployeeEligible($empId, $cutDate, $cutTime)) continue;
+                                foreach ($departments as $dept) {
+                                    $deptBudget = $budgets[$dept->id] ?? null;
+                                    if (!$deptBudget) continue;
 
-                                    $existing = $existingPayments[$cutDate][$orderId][$empId] ?? null;
-                                    $percentage = $existing ? ($existing->employee_percentage ?? 0) : ($emp->percentage ?? 0);
-                                    if ($percentage == 0) continue;
-
-                                    $earned = round(($totalAmount * $percentage) / 100, 2);
-                                    if ($earned <= 0) continue;
-
-                                    if ($existing && isset($existing->id)) {
-                                        $toUpdate[] = [
-                                            'id' => $existing->id,
-                                            'data' => [
-                                                'quantity_produced' => $existing->quantity_produced + $quantity,
-                                                'calculated_amount' => $existing->calculated_amount + $earned,
-                                                'employee_percentage' => $percentage,
-                                                'updated_at' => now(),
-                                            ]
-                                        ];
-                                        $existingPayments[$cutDate][$orderId][$empId]->quantity_produced += $quantity;
-                                        $existingPayments[$cutDate][$orderId][$empId]->calculated_amount += $earned;
-                                        $log['updated_payments']++;
+                                    // Minute-based hisoblash
+                                    if ($deptBudget->type === 'minute_based' && $c->model_minute > 0) {
+                                        $totalAmount = $c->model_minute * $quantity * $deptBudget->quantity;
+                                    } elseif ($deptBudget->type === 'percentage_based') {
+                                        $usdRate = getUsdRate();
+                                        $orderUsdPrice = $c->order_usd_price ?? 0;
+                                        $orderUzsPrice = $orderUsdPrice * $usdRate;
+                                        $percentage = $deptBudget->quantity ?? 0;
+                                        $totalAmount = round(($orderUzsPrice * $percentage) / 100, 2);
                                     } else {
-                                        $newPayment = [
-                                            'employee_id' => $empId,
-                                            'model_id' => $c->model_id,
-                                            'order_id' => $orderId,
-                                            'department_id' => $dept->id,
-                                            'payment_date' => $cutDate,
-                                            'quantity_produced' => $quantity,
-                                            'calculated_amount' => $earned,
-                                            'employee_percentage' => $percentage,
-                                            'created_at' => now(),
-                                            'updated_at' => now(),
-                                        ];
-                                        $toInsert[] = $newPayment;
-                                        $existingPayments[$cutDate][$orderId][$empId] = (object)$newPayment;
-                                        $log['created_payments']++;
+                                        $totalAmount = $quantity * $deptBudget->quantity;
+                                    }
+
+                                    if ($totalAmount <= 0) continue;
+
+                                    $empList = $employees[$dept->id] ?? collect();
+                                    if (empty($empList)) {
+                                        $log['skipped_no_attendance']++;
+                                        continue;
+                                    }
+
+                                    foreach ($empList as $emp) {
+                                        $empId = $emp->id;
+                                        if (!$wasEmployeeEligible($empId, $cutDate, $cutTime)) continue;
+
+                                        $existing = $existingPayments[$cutDate][$orderId][$empId] ?? null;
+                                        $percentage = $existing ? ($existing->employee_percentage ?? 0) : ($emp->percentage ?? 0);
+                                        if ($percentage == 0) continue;
+
+                                        $earned = round(($totalAmount * $percentage) / 100, 2);
+                                        if ($earned <= 0) continue;
+
+                                        if ($existing && isset($existing->id)) {
+                                            $toUpdate[] = [
+                                                'id' => $existing->id,
+                                                'data' => [
+                                                    'quantity_produced' => $existing->quantity_produced + $quantity,
+                                                    'calculated_amount' => $existing->calculated_amount + $earned,
+                                                    'employee_percentage' => $percentage,
+                                                    'updated_at' => now(),
+                                                ]
+                                            ];
+                                            $existingPayments[$cutDate][$orderId][$empId]->quantity_produced += $quantity;
+                                            $existingPayments[$cutDate][$orderId][$empId]->calculated_amount += $earned;
+                                            $log['updated_payments']++;
+                                        } else {
+                                            $newPayment = [
+                                                'employee_id' => $empId,
+                                                'model_id' => $c->model_id,
+                                                'order_id' => $orderId,
+                                                'department_id' => $dept->id,
+                                                'payment_date' => $cutDate,
+                                                'quantity_produced' => $quantity,
+                                                'calculated_amount' => $earned,
+                                                'employee_percentage' => $percentage,
+                                                'created_at' => now(),
+                                                'updated_at' => now(),
+                                            ];
+                                            $toInsert[] = $newPayment;
+                                            $existingPayments[$cutDate][$orderId][$empId] = (object)$newPayment;
+                                            $log['created_payments']++;
+                                        }
                                     }
                                 }
+
                             }
 
                             $log['processed_cuts']++;
