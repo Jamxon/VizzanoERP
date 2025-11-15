@@ -895,14 +895,14 @@ class DailyPaymentController extends Controller
 
                 $details = $group->map(function ($payment) use (&$totalPotential) {
 
-                    // Shu order bo‘yicha shu kunda chiqgan quantity
                     $dayOutputQuantity = $payment->order->orderModel->submodels->sum(function ($submodel) {
                         return $submodel->sewingOutputs->sum('quantity');
                     });
 
-                    // Agar mavjud bo‘lsa potensial daromadni hisoblash
-                    $potential = (( $payment->calculated_amount ?: 1 ) / ( $payment->quantity_produced ?: 1 ))
-                        * $dayOutputQuantity;
+                    $qty = $payment->quantity_produced > 0 ? $payment->quantity_produced : 1;
+                    $amount = $payment->calculated_amount > 0 ? $payment->calculated_amount : 1;
+
+                    $potential = ($amount / $qty) * $dayOutputQuantity;
 
                     $potential = round($potential, 2);
 
