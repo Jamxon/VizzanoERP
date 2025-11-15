@@ -871,7 +871,7 @@ class DailyPaymentController extends Controller
             ->values();
 
         $payments = DailyPayment::with([
-            'employee:id,name',
+            'employee:id,name,img',
             'order:id,name',
             'order.orderModel:id,model_id,order_id',
             'order.orderModel.submodels:id,order_model_id,submodel_id',
