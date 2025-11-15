@@ -19,6 +19,7 @@ class DailyPayment extends Model
         'calculated_amount',
         'employee_percentage',
         'updated_at',
+        'bonus'
     ];
 
     protected $table = 'daily_payments';

@@ -356,7 +356,14 @@ class DailyPaymentController extends Controller
                     'order_models.model_id',
                     'models.name as model_name',
                     'models.minute as model_minute',
-                    DB::raw("COALESCE(SUM(daily_payments.calculated_amount),0) as earned_amount"),
+                    DB::raw("
+                        COALESCE(
+                            SUM(
+                                COALESCE(daily_payments.calculated_amount, 0)
+                                + COALESCE(daily_payments.bonus, 0)
+                            ),
+                        0) AS earned_amount
+                    "),
                     DB::raw("COALESCE(SUM(daily_payments.quantity_produced),0) as produced_quantity"),
                     DB::raw("MAX(daily_payments.department_id) as department_id"),
                     'orders.price'
@@ -895,7 +902,7 @@ class DailyPaymentController extends Controller
 
                     // Agar mavjud bo‘lsa potensial daromadni hisoblash
                     $potential = $payment->quantity_produced > 0
-                        ? ($payment->calculated_amount / $payment->quantity_produced) * $dayOutputQuantity
+                        ? (($payment->calculated_amount + $payment->bonus) / $payment->quantity_produced) * $dayOutputQuantity
                         : 0;
 
                     $potential = round($potential, 2);
@@ -916,13 +923,14 @@ class DailyPaymentController extends Controller
                         'potential_earn' => $potential,
                         'employee_percentage' => round($payment->employee_percentage, 2),
                         'payment_date' => $payment->payment_date,
+                        'bonus' => round($payment->bonus, 2)
                     ];
                 })->values();
 
                 return [
                     'employee_id' => $employee->id,
                     'employee_name' => $employee->name,
-                    'total_calculated_amount' => round($group->sum('calculated_amount'), 2),
+                    'total_calculated_amount' => round($group->sum('calculated_amount'), 2) + round($group->sum('bonus'), 2),
                     'total_potential_earn' => round($totalPotential, 2),
                     'details' => $details,
                 ];
@@ -944,29 +952,11 @@ class DailyPaymentController extends Controller
     public function editDailyPayment(Request $request, DailyPayment $dailyPayment): \Illuminate\Http\JsonResponse
     {
         $validated = $request->validate([
-            'quantity_produced' => 'nullable|numeric|min:0',
-            'employee_percentage' => 'nullable|numeric|min:0|max:100',
+            'bonus' => 'required|numeric|min:0',
         ]);
 
-        $oldProduced = $dailyPayment->quantity_produced;
-        $oldPercentage = $dailyPayment->employee_percentage;
-        $oldCalculated = $dailyPayment->calculated_amount;
-
-        $newProduced = $validated['quantity_produced'] ?? $oldProduced;
-        $newPercentage = $validated['employee_percentage'] ?? $oldPercentage;
-
-        if (isset($validated['quantity_produced']) && $oldProduced > 0) {
-            $newCalculated = ($oldCalculated / $oldProduced) * $newProduced;
-        } elseif (isset($validated['employee_percentage']) && $oldPercentage > 0) {
-            $newCalculated = ($oldCalculated / $oldPercentage) * $newPercentage;
-        } else {
-            return response()->json(['message' => 'Nothing to update'], 400);
-        }
-
         $dailyPayment->update([
-            'quantity_produced' => $newProduced,
-            'employee_percentage' => $newPercentage,
-            'calculated_amount' => round($newCalculated, 2),
+            'bonus' => $validated['bonus']
         ]);
 
         return response()->json([
