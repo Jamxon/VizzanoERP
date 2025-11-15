@@ -975,17 +975,18 @@ class DailyPaymentController extends Controller
 
         $branchId = auth()->user()->employee->branch_id;
 
-        // ✅ Branch security
         $employee = Employee::where('id', $validated['employee_id'])
             ->where('branch_id', $branchId)
             ->whereHas('attendances', function ($q) use ($validated) {
                 $q->whereDate('date', $validated['payment_date'])
                     ->where('status', 'present');
             })
-            ->firstOrFail();
+            ->first();
 
-        if (!$employee){
-            return response()->json(['message' => 'Unauthorized access.'], 403);
+        if (!$employee) {
+            return response()->json([
+                'message' => 'Employee not found or not present on this date.'
+            ], 404);
         }
 
         $orders = Order::where('branch_id', $branchId)
