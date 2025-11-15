@@ -901,9 +901,8 @@ class DailyPaymentController extends Controller
                     });
 
                     // Agar mavjud bo‘lsa potensial daromadni hisoblash
-                    $potential = $payment->quantity_produced > 0
-                        ? (($payment->calculated_amount ?? 1) / $payment->quantity_produced ?? 1) * $dayOutputQuantity
-                        : 0;
+                    $potential = (( $payment->calculated_amount ?: 1 ) / ( $payment->quantity_produced ?: 1 ))
+                        * $dayOutputQuantity;
 
                     $potential = round($potential, 2);
 
