@@ -1008,7 +1008,7 @@ class UserController extends Controller
                 "remaining_quantity" => $remainingQuantity,
                 "earned_amount" => round($row->earned_amount, 2),
                 'bonus' => $row->bonus ?? 0,
-                "remaining_earn_amount" => round($remainingQuantity * $perPieceEarn, 2),
+                "remaining_earn_amount" => round(($remainingQuantity * $perPieceEarn) - $row->bonus, 2),
                 "possible_full_earn_amount" => round($row->planned_quantity * $perPieceEarn, 2),
                 "per_piece_earn" => round($perPieceEarn, 4),
                 "departmentBudget" => $departmentBudget,
