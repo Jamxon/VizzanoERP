@@ -990,7 +990,7 @@ class DailyPaymentController extends Controller
         }
 
         $orders = Order::where('branch_id', $branchId)
-            ->whereHas('monthlySelectedOrders', function ($q) use ($validated) {
+            ->whereHas('monthlySelectedOrder', function ($q) use ($validated) {
                 $q->whereMonth('month', Carbon::parse($validated['payment_date'])->format('m'))
                   ->whereYear('month', Carbon::parse($validated['payment_date'])->format('Y'));
             })
