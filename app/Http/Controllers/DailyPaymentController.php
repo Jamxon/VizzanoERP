@@ -985,7 +985,7 @@ class DailyPaymentController extends Controller
 
         if (!$employee) {
             return response()->json([
-                'message' => 'Employee not found or not present on this date.'
+                'message' => 'Belgilangan kunda hodim ishga kelmagan!'
             ], 404);
         }
 
