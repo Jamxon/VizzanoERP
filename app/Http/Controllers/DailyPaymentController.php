@@ -66,7 +66,7 @@ class DailyPaymentController extends Controller
                     // ✅ Department Real Costs (maybe zero)
                     $departmentRealCosts = DailyPayment::select(
                         'department_id',
-                        DB::raw('SUM(calculated_amount) as cost')
+                        DB::raw('SUM(calculated_amount + bonus) as cost')
                     )
                         ->with('department:id,name')
                         ->where('order_id', $order->id)
