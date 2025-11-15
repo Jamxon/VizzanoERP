@@ -989,6 +989,7 @@ class UserController extends Controller
                 ->where('order_models.order_id', $row->order_id)
                 ->sum('sewing_outputs.quantity');
 
+
             return [
                 "order" => [
                     "id" => $row->order_id,
