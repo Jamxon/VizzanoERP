@@ -47,10 +47,9 @@ class TransportAttendanceController extends Controller
                 return response()->json(['data' => []]);
             }
 
-            $attendanceIds = $attendances->pluck('id')->toArray();
-            $transportIds  = $attendances->pluck('transport_id')->unique()->toArray();
+            $transportIds = $attendances->pluck('transport_id')->unique()->toArray();
 
-            // 2) Transportlarga bog‘langan barcha employees (oy bo‘yicha)
+            // 2) Transportlarga biriktirilgan employees (oy bo‘yicha)
             $employees = DB::table('employee_transport_daily as etd')
                 ->leftJoin('employees as e', 'e.id', '=', 'etd.employee_id')
                 ->select(
@@ -73,48 +72,47 @@ class TransportAttendanceController extends Controller
                 ->whereYear('date', $year)
                 ->whereMonth('date', $month)
                 ->get()
-                ->groupBy(function ($row) {
-                    return $row->employee_id . '_' . $row->date;
-                });
+                ->groupBy(fn($row) => $row->employee_id . '_' . $row->date);
 
-            // 4) Formatlash — Resource bilan bir xil
+            // 4) RESOURCE FORMATIDA YIG‘ISH
             $result = [];
 
             foreach ($attendances as $att) {
-                $groupKey = $att->id;
 
-                $result[$groupKey] = [
-                    'id' => $att->id,
-                    'date' => date('Y-m-d', strtotime($att->date)),
-                    'attendance_type' => $att->attendance_type,
-                    'salary' => $att->salary,
-                    'fuel_bonus' => $att->fuel_bonus,
-                    'transport' => [
-                        'id' => $att->transport_id,
-                        'name' => $att->transport_name,
-                        'employees' => []
-                    ]
-                ];
+                $dayEmployees = []; // shu kun + shu transportga tegishli odamlar
 
-                // Faqat shu attendance kunidagi employees
                 foreach ($employees as $emp) {
-                    if ($emp->transport_id == $att->transport_id && $emp->date == $att->date) {
-
+                    if (
+                        $emp->transport_id == $att->transport_id &&
+                        $emp->date == $att->date
+                    ) {
                         $key = $emp->employee_id . '_' . $emp->date;
                         $status = $statuses[$key][0]->status ?? 'absent';
 
-                        $result[$groupKey]['transport']['employees'][] = [
-                            'id' => $emp->employee_id,
+                        $dayEmployees[] = [
+                            'id'   => $emp->employee_id,
                             'name' => $emp->name,
                             'attendance_status' => $status
                         ];
                     }
                 }
+
+                $result[] = [
+                    'id'              => $att->id,
+                    'date'            => date('Y-m-d', strtotime($att->date)),
+                    'attendance_type' => $att->attendance_type,
+                    'salary'          => $att->salary,
+                    'fuel_bonus'      => $att->fuel_bonus,
+
+                    'transport' => [
+                        'id'   => $att->transport_id,
+                        'name' => $att->transport_name,
+                        'employees' => $dayEmployees // resource bilan bir xil format
+                    ]
+                ];
             }
 
-            return response()->json([
-                'data' => array_values($result)
-            ]);
+            return response()->json(['data' => $result]);
 
         } catch (\Exception $e) {
             return response()->json([
