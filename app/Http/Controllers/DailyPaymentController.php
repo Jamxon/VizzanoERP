@@ -930,6 +930,7 @@ class DailyPaymentController extends Controller
                 return [
                     'employee_id' => $employee->id,
                     'employee_name' => $employee->name,
+                    'img' => $employee->img,
                     'total_calculated_amount' => round($group->sum('calculated_amount'), 2) + round($group->sum('bonus'), 2),
                     'total_potential_earn' => round($totalPotential, 2),
                     'details' => $details,
