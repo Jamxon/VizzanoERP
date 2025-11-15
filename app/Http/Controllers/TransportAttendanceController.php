@@ -26,9 +26,9 @@ class TransportAttendanceController extends Controller
             $year = $date->year;
             $month = $date->month;
 
-            $rows = DB::table('transport_attendances as ta')
-                ->leftJoin('transports as t', 't.id', '=', 'ta.transport_id')
-                ->leftJoin('transport_daily_employees as tde', 'tde.transport_id', '=', 't.id')
+            $rows = DB::table('transport_attendance as ta')
+                ->leftJoin('transport as t', 't.id', '=', 'ta.transport_id')
+                ->leftJoin('employee_transport_daily as tde', 'tde.transport_id', '=', 't.id')
                 ->leftJoin('employees as e', 'e.id', '=', 'tde.employee_id')
                 ->select(
                     'ta.id as attendance_id',
