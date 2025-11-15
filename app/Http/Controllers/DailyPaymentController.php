@@ -970,12 +970,6 @@ class DailyPaymentController extends Controller
     {
         $validated = $request->validate([
             'employee_id' => 'required|integer|exists:employees,id',
-            'model_id' => 'required|integer|exists:models,id',
-            'order_id' => 'required|integer|exists:orders,id',
-            'department_id' => 'required|integer|exists:departments,id',
-            'quantity_produced' => 'required|numeric|min:0',
-            'calculated_amount' => 'required|numeric|min:0',
-            'employee_percentage' => 'required|numeric|min:0|max:100',
             'payment_date' => 'required|date',
         ]);
 
@@ -984,26 +978,43 @@ class DailyPaymentController extends Controller
         // ✅ Branch security
         $employee = Employee::where('id', $validated['employee_id'])
             ->where('branch_id', $branchId)
+            ->whereHas('attendances', function ($q) use ($validated) {
+                $q->whereDate('date', $validated['payment_date'])
+                    ->where('status', 'present');
+            })
             ->firstOrFail();
 
         if (!$employee){
             return response()->json(['message' => 'Unauthorized access.'], 403);
         }
 
-        $dailyPayment = DailyPayment::create([
-            'employee_id' => $validated['employee_id'],
-            'model_id' => $validated['model_id'],
-            'order_id' => $validated['order_id'],
-            'department_id' => $validated['department_id'],
-            'quantity_produced' => $validated['quantity_produced'],
-            'calculated_amount' => $validated['calculated_amount'],
-            'employee_percentage' => $validated['employee_percentage'],
-            'payment_date' => $validated['payment_date'],
-        ]);
+        $orders = Order::where('branch_id', $branchId)
+            ->whereHas('monthlySelectedOrders', function ($q) use ($validated) {
+                $q->whereMonth('month', Carbon::parse($validated['payment_date'])->format('m'))
+                  ->whereYear('month', Carbon::parse($validated['payment_date'])->format('Y'));
+            })
+            ->whereHas('orderModels.submodels.sewingOutputs', function ($q) use ($validated) {
+                $q->whereDate('sewing_outputs.created_at', $validated['payment_date']);
+            })
+            ->get();
+
+        foreach ($orders as $order) {
+            DailyPayment::firstOrCreate([
+                'employee_id' => $employee->id,
+                'order_id' => $order->id,
+                'payment_date' => $validated['payment_date'],
+            ], [
+                'model_id' => $order->orderModels->model_id ?? null,
+                'department_id' => $employee->department_id,
+                'quantity_produced' => 0,
+                'calculated_amount' => 0,
+                'employee_percentage' => $employee->percentage,
+                'bonus' => 0,
+            ]);
+        }
 
         return response()->json([
             'message' => 'DailyPayment created successfully',
-            'daily_payment' => $dailyPayment
         ], 201);
     }
 }
