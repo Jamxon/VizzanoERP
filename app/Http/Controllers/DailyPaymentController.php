@@ -939,7 +939,8 @@ class DailyPaymentController extends Controller
         $workingEmployees = Employee::where('branch_id', $branchId)
             ->when($departmentId, fn($q) => $q->where('department_id', $departmentId))
             ->where('status', 'working') // status filter
-            ->select('id', 'name')
+            ->select('id', 'name', 'position_id')
+            ->with('position:id,name')
             ->get();
 
         return response()->json([
