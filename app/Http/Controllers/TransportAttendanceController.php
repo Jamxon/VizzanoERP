@@ -100,8 +100,8 @@ class TransportAttendanceController extends Controller
                 $result[] = [
                     'id'              => $att->id,
                     'date'            => date('Y-m-d', strtotime($att->date)),
-                    'attendance_type' => $att->attendance_type,
-                    'salary'          => $att->salary,
+                    'attendance_type' => (double) $att->attendance_type,
+                    'salary'          => (double) $att->salary,
                     'fuel_bonus'      => $att->fuel_bonus,
 
                     'transport' => [
