@@ -38,8 +38,8 @@ class TransportAttendanceController extends Controller
                     'tde.employee_id',
                     'e.name as employee_name',
                     'e.phone',
-                    'tde.amount as daily_amount',
-                    'tde.bonus as daily_bonus'
+                    'ta.salary as daily_amount',
+                    'ta.fuel_bonus as daily_bonus'
                 )
                 ->whereYear('ta.date', $year)
                 ->whereMonth('ta.date', $month)
