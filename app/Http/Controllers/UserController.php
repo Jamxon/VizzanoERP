@@ -986,6 +986,8 @@ class UserController extends Controller
                 ->join('order_sub_models', 'sewing_outputs.order_submodel_id', '=', 'order_sub_models.id')
                 ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
                 ->where('order_models.order_id', $row->order_id)
+                ->whereMonth('sewing_outputs.output_date', $month)
+                ->whereYear('sewing_outputs.output_date', $year)
                 ->sum('sewing_outputs.quantity');
 
             $remainingQuantity = max($row->planned_quantity - $sewingOutputsSum, 0);
