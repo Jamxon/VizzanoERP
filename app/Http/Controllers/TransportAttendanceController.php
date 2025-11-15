@@ -16,30 +16,44 @@ use Illuminate\Support\Facades\DB;
 
 class TransportAttendanceController extends Controller
 {
-    public function index(Request $request): \Illuminate\Http\JsonResponse|\Illuminate\Http\Resources\Json\AnonymousResourceCollection
+    public function index(Request $request): \Illuminate\Http\JsonResponse
     {
         try {
-            $currentYear = now()->year;
-            $currentMonth = now()->month;
+            $date = $request->has('date')
+                ? Carbon::parse($request->date)
+                : now();
 
-            if ($request->has('date')) {
-                $date = \Carbon\Carbon::parse($request->date);
-                $attendances = TransportAttendance::with('transport.dailyEmployees.employee')
-                ->whereYear('date', $date->year)
-                    ->whereMonth('date', $date->month)
-                    ->orderBy('date', 'desc')
-                    ->get();
-            } else {
-                $attendances = TransportAttendance::with('transport.dailyEmployees.employee')
-                ->whereYear('date', $currentYear)
-                    ->whereMonth('date', $currentMonth)
-                    ->orderBy('date', 'desc')
-                    ->get();
-            }
+            $year = $date->year;
+            $month = $date->month;
 
-            return TransportAttendanceResource::collection($attendances);
+            $rows = DB::table('transport_attendances as ta')
+                ->leftJoin('transports as t', 't.id', '=', 'ta.transport_id')
+                ->leftJoin('transport_daily_employees as tde', 'tde.transport_id', '=', 't.id')
+                ->leftJoin('employees as e', 'e.id', '=', 'tde.employee_id')
+                ->select(
+                    'ta.id as attendance_id',
+                    'ta.date',
+                    'ta.transport_id',
+                    't.name as transport_name',
+                    'tde.employee_id',
+                    'e.name as employee_name',
+                    'e.phone',
+                    'tde.amount as daily_amount',
+                    'tde.bonus as daily_bonus'
+                )
+                ->whereYear('ta.date', $year)
+                ->whereMonth('ta.date', $month)
+                ->orderBy('ta.date', 'desc')
+                ->get();
+
+            return response()->json([
+                'data' => $rows,
+            ]);
+
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Davomatlarni olishda xatolik yuz berdi: ' . $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Davomatlarni olishda xatolik yuz berdi: ' . $e->getMessage()
+            ], 500);
         }
     }
 
