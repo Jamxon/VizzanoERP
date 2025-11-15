@@ -23,71 +23,97 @@ class TransportAttendanceController extends Controller
                 ? \Carbon\Carbon::parse($request->date)
                 : now();
 
-            $year = $date->year;
+            $year  = $date->year;
             $month = $date->month;
 
-            $rows = DB::table('transport_attendance as ta')
+            // 1) ASOSIY DAVOMATLAR
+            $attendances = DB::table('transport_attendance as ta')
                 ->leftJoin('transport as t', 't.id', '=', 'ta.transport_id')
-                ->leftJoin('employee_transport_daily as tde', function ($join) {
-                    $join->on('tde.transport_id', '=', 't.id');
-                })
-                ->leftJoin('employees as e', 'e.id', '=', 'tde.employee_id')
-                ->leftJoin('attendance as att', function ($join) {
-                    $join->on('att.employee_id', '=', 'tde.employee_id')
-                        ->on('att.date', '=', 'tde.date');
-                })
                 ->select(
-                    'ta.id as attendance_id',
-                    'ta.date as attendance_date',
+                    'ta.id',
+                    'ta.date',
                     'ta.attendance_type',
                     'ta.salary',
                     'ta.fuel_bonus',
-
                     't.id as transport_id',
-                    't.name as transport_name',
-
-                    'e.id as employee_id',
-                    'e.name as employee_name',
-
-                    DB::raw("COALESCE(att.status, 'absent') as attendance_status")
+                    't.name as transport_name'
                 )
                 ->whereYear('ta.date', $year)
                 ->whereMonth('ta.date', $month)
                 ->orderBy('ta.date', 'desc')
                 ->get();
 
-            // === FORMAT RESOURCE STYLE === //
-            $grouped = [];
+            if ($attendances->isEmpty()) {
+                return response()->json(['data' => []]);
+            }
 
-            foreach ($rows as $row) {
-                $id = $row->attendance_id;
+            $attendanceIds = $attendances->pluck('id')->toArray();
+            $transportIds  = $attendances->pluck('transport_id')->unique()->toArray();
 
-                if (!isset($grouped[$id])) {
-                    $grouped[$id] = [
-                        'id' => $row->attendance_id,
-                        'date' => date('Y-m-d', strtotime($row->attendance_date)),
-                        'attendance_type' => $row->attendance_type,
-                        'salary' => $row->salary,
-                        'fuel_bonus' => $row->fuel_bonus,
-                        'transport' => [
-                            'id' => $row->transport_id,
-                            'name' => $row->transport_name,
-                            'employees' => []
-                        ]
-                    ];
-                }
+            // 2) Transportlarga bog‘langan barcha employees (oy bo‘yicha)
+            $employees = DB::table('employee_transport_daily as etd')
+                ->leftJoin('employees as e', 'e.id', '=', 'etd.employee_id')
+                ->select(
+                    'etd.transport_id',
+                    'etd.employee_id',
+                    'etd.date',
+                    'e.name'
+                )
+                ->whereIn('etd.transport_id', $transportIds)
+                ->whereYear('etd.date', $year)
+                ->whereMonth('etd.date', $month)
+                ->get();
 
-                if ($row->employee_id) {
-                    $grouped[$id]['transport']['employees'][] = [
-                        'id' => $row->employee_id,
-                        'name' => $row->employee_name,
-                        'attendance_status' => $row->attendance_status
-                    ];
+            // 3) Attendance statuslar
+            $employeeIds = $employees->pluck('employee_id')->unique()->toArray();
+
+            $statuses = DB::table('attendance')
+                ->select('employee_id', 'date', 'status')
+                ->whereIn('employee_id', $employeeIds)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->get()
+                ->groupBy(function ($row) {
+                    return $row->employee_id . '_' . $row->date;
+                });
+
+            // 4) Formatlash — Resource bilan bir xil
+            $result = [];
+
+            foreach ($attendances as $att) {
+                $groupKey = $att->id;
+
+                $result[$groupKey] = [
+                    'id' => $att->id,
+                    'date' => date('Y-m-d', strtotime($att->date)),
+                    'attendance_type' => $att->attendance_type,
+                    'salary' => $att->salary,
+                    'fuel_bonus' => $att->fuel_bonus,
+                    'transport' => [
+                        'id' => $att->transport_id,
+                        'name' => $att->transport_name,
+                        'employees' => []
+                    ]
+                ];
+
+                // Faqat shu attendance kunidagi employees
+                foreach ($employees as $emp) {
+                    if ($emp->transport_id == $att->transport_id && $emp->date == $att->date) {
+
+                        $key = $emp->employee_id . '_' . $emp->date;
+                        $status = $statuses[$key][0]->status ?? 'absent';
+
+                        $result[$groupKey]['transport']['employees'][] = [
+                            'id' => $emp->employee_id,
+                            'name' => $emp->name,
+                            'attendance_status' => $status
+                        ];
+                    }
                 }
             }
 
             return response()->json([
-                'data' => array_values($grouped)
+                'data' => array_values($result)
             ]);
 
         } catch (\Exception $e) {
