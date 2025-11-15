@@ -994,7 +994,7 @@ class DailyPaymentController extends Controller
                 $q->whereMonth('month', Carbon::parse($validated['payment_date'])->format('m'))
                   ->whereYear('month', Carbon::parse($validated['payment_date'])->format('Y'));
             })
-            ->whereHas('orderModels.submodels.sewingOutputs', function ($q) use ($validated) {
+            ->whereHas('orderModel.submodels.sewingOutputs', function ($q) use ($validated) {
                 $q->whereDate('sewing_outputs.created_at', $validated['payment_date']);
             })
             ->get();
@@ -1005,7 +1005,7 @@ class DailyPaymentController extends Controller
                 'order_id' => $order->id,
                 'payment_date' => $validated['payment_date'],
             ], [
-                'model_id' => $order->orderModels->model_id ?? null,
+                'model_id' => $order->orderModel->model_id ?? null,
                 'department_id' => $employee->department_id,
                 'quantity_produced' => 0,
                 'calculated_amount' => 0,
