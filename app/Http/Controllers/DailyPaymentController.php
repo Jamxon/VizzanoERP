@@ -895,14 +895,15 @@ class DailyPaymentController extends Controller
 
                 $details = $group->map(function ($payment) use (&$totalPotential) {
 
+                    // Shu order bo‘yicha shu kunda chiqgan quantity
                     $dayOutputQuantity = $payment->order->orderModel->submodels->sum(function ($submodel) {
                         return $submodel->sewingOutputs->sum('quantity');
                     });
 
-                    $qty = $payment->quantity_produced > 0 ? $payment->quantity_produced : 1;
-                    $amount = $payment->calculated_amount > 0 ? $payment->calculated_amount : 1;
-
-                    $potential = ($amount / $qty) * $dayOutputQuantity;
+                    // Agar mavjud bo‘lsa potensial daromadni hisoblash
+                    $potential = $payment->quantity_produced > 0
+                        ? (($payment->calculated_amount) / $payment->quantity_produced) * $dayOutputQuantity
+                        : 0;
 
                     $potential = round($potential, 2);
 
@@ -996,9 +997,18 @@ class DailyPaymentController extends Controller
             ->whereHas('orderModel.submodels.sewingOutputs', function ($q) use ($validated) {
                 $q->whereDate('sewing_outputs.created_at', $validated['payment_date']);
             })
+            ->with(['orderModel.model'])
             ->get();
 
+        $departmentBudget = DepartmentBudget::where('department_id', $employee->department_id)->first();
+        if (!$departmentBudget) {
+            return response()->json([
+                'message' => 'Hodimning bo‘limi uchun byudjet belgilanmagan!'
+            ], 404);
+        }
+
         foreach ($orders as $order) {
+            $calculatedAmount = $order->orderModel->model->minute * $departmentBudget->quantity / 100 * $employee->percentage * 1;
             DailyPayment::firstOrCreate([
                 'employee_id' => $employee->id,
                 'order_id' => $order->id,
@@ -1006,8 +1016,8 @@ class DailyPaymentController extends Controller
             ], [
                 'model_id' => $order->orderModel->model_id ?? null,
                 'department_id' => $employee->department_id,
-                'quantity_produced' => 0,
-                'calculated_amount' => 0,
+                'quantity_produced' => 1,
+                'calculated_amount' => $calculatedAmount,
                 'employee_percentage' => $employee->percentage,
                 'bonus' => 0,
             ]);
