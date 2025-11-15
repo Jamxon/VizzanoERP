@@ -905,6 +905,7 @@ class UserController extends Controller
                 'sub_models.id as submodel_id',
                 'sub_models.name as submodel_name',
                 DB::raw("COALESCE(SUM(daily_payments.calculated_amount),0) as earned_amount"),
+                DB::raw("COALESCE(SUM(daily_payments.bonus),0) as bonus"),
                 DB::raw("COALESCE(SUM(daily_payments.quantity_produced),0) as produced_quantity"),
                 DB::raw("MAX(daily_payments.department_id) as department_id"),
                 'orders.price'
@@ -1006,6 +1007,7 @@ class UserController extends Controller
                 "produced_quantity" => $row->produced_quantity,
                 "remaining_quantity" => $remainingQuantity,
                 "earned_amount" => round($row->earned_amount, 2),
+                'bonus' => $row->bonus ?? 0,
                 "remaining_earn_amount" => round($remainingQuantity * $perPieceEarn, 2),
                 "possible_full_earn_amount" => round($row->planned_quantity * $perPieceEarn, 2),
                 "per_piece_earn" => round($perPieceEarn, 4),
@@ -1041,6 +1043,7 @@ class UserController extends Controller
             "total_earned" => round($orders->sum('earned_amount'), 2),
             "total_remaining" => round($orders->sum('remaining_earn_amount'), 2),
             "total_possible" => round($orders->sum('possible_full_earn_amount'), 2),
+            "total_bonus" => round($orders->sum('bonus'), 2),
             "orders" => $orders->values(),
         ]);
     }
