@@ -6195,7 +6195,7 @@ gas</Labels>
       <Comment>Kunlik hisoblangan to&apos;lovlar tarixi</Comment>
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>83939</ObjectId>
-      <StateNumber>9525135</StateNumber>
+      <StateNumber>9531546</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -8526,16 +8526,16 @@ left_at</ColNames>
     <column id="732" parent="407" name="updated_at">
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
       <Position>11</Position>
-      <StateNumber>8370019</StateNumber>
+      <StateNumber>9531546</StateNumber>
       <StoredType>timestamp|0s</StoredType>
       <TypeId>1114</TypeId>
     </column>
     <column id="733" parent="407" name="bonus">
       <DefaultExpression>0</DefaultExpression>
       <Position>12</Position>
-      <StateNumber>9525135</StateNumber>
-      <StoredType>integer|0s</StoredType>
-      <TypeId>23</TypeId>
+      <StateNumber>9531546</StateNumber>
+      <StoredType>numeric|0s</StoredType>
+      <TypeId>1700</TypeId>
     </column>
     <foreign-key id="734" parent="407" name="daily_payments_employee_id_fkey">
       <ColNames>employee_id</ColNames>
@@ -8578,7 +8578,7 @@ left_at</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>83945</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>9448177</StateNumber>
+      <StateNumber>9531546</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>
@@ -8586,31 +8586,31 @@ left_at</ColNames>
       <ColNames>employee_id
 payment_date</ColNames>
       <ObjectId>83968</ObjectId>
-      <StateNumber>9448177</StateNumber>
+      <StateNumber>9531546</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="740" parent="407" name="idx_daily_payments_model">
       <ColNames>model_id</ColNames>
       <ObjectId>83970</ObjectId>
-      <StateNumber>9448177</StateNumber>
+      <StateNumber>9531546</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="741" parent="407" name="idx_daily_payments_order">
       <ColNames>order_id</ColNames>
       <ObjectId>83969</ObjectId>
-      <StateNumber>9448177</StateNumber>
+      <StateNumber>9531546</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="742" parent="407" name="idx_daily_payments_department">
       <ColNames>department_id</ColNames>
       <ObjectId>84006</ObjectId>
-      <StateNumber>9448177</StateNumber>
+      <StateNumber>9531546</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <index id="743" parent="407" name="idx_daily_payments_date">
       <ColNames>payment_date</ColNames>
       <ObjectId>83967</ObjectId>
-      <StateNumber>9448177</StateNumber>
+      <StateNumber>9531546</StateNumber>
       <AccessMethodId>403</AccessMethodId>
     </index>
     <key id="744" parent="407" name="daily_payments_pkey">
