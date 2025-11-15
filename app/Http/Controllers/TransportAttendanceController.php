@@ -20,7 +20,7 @@ class TransportAttendanceController extends Controller
     {
         try {
             $date = $request->has('date')
-                ? Carbon::parse($request->date)
+                ? \Carbon\Carbon::parse($request->date)
                 : now();
 
             $year = $date->year;
@@ -28,26 +28,66 @@ class TransportAttendanceController extends Controller
 
             $rows = DB::table('transport_attendance as ta')
                 ->leftJoin('transport as t', 't.id', '=', 'ta.transport_id')
-                ->leftJoin('employee_transport_daily as tde', 'tde.transport_id', '=', 't.id')
+                ->leftJoin('employee_transport_daily as tde', function ($join) {
+                    $join->on('tde.transport_id', '=', 't.id');
+                })
                 ->leftJoin('employees as e', 'e.id', '=', 'tde.employee_id')
+                ->leftJoin('attendance as att', function ($join) {
+                    $join->on('att.employee_id', '=', 'tde.employee_id')
+                        ->on('att.date', '=', 'tde.date');
+                })
                 ->select(
                     'ta.id as attendance_id',
-                    'ta.date',
-                    'ta.transport_id',
+                    'ta.date as attendance_date',
+                    'ta.attendance_type',
+                    'ta.salary',
+                    'ta.fuel_bonus',
+
+                    't.id as transport_id',
                     't.name as transport_name',
-                    'tde.employee_id',
+
+                    'e.id as employee_id',
                     'e.name as employee_name',
-                    'e.phone',
-                    'ta.salary as daily_amount',
-                    'ta.fuel_bonus as daily_bonus'
+
+                    DB::raw("COALESCE(att.status, 'absent') as attendance_status")
                 )
                 ->whereYear('ta.date', $year)
                 ->whereMonth('ta.date', $month)
                 ->orderBy('ta.date', 'desc')
                 ->get();
 
+            // === FORMAT RESOURCE STYLE === //
+            $grouped = [];
+
+            foreach ($rows as $row) {
+                $id = $row->attendance_id;
+
+                if (!isset($grouped[$id])) {
+                    $grouped[$id] = [
+                        'id' => $row->attendance_id,
+                        'date' => date('Y-m-d', strtotime($row->attendance_date)),
+                        'attendance_type' => $row->attendance_type,
+                        'salary' => $row->salary,
+                        'fuel_bonus' => $row->fuel_bonus,
+                        'transport' => [
+                            'id' => $row->transport_id,
+                            'name' => $row->transport_name,
+                            'employees' => []
+                        ]
+                    ];
+                }
+
+                if ($row->employee_id) {
+                    $grouped[$id]['transport']['employees'][] = [
+                        'id' => $row->employee_id,
+                        'name' => $row->employee_name,
+                        'attendance_status' => $row->attendance_status
+                    ];
+                }
+            }
+
             return response()->json([
-                'data' => $rows,
+                'data' => array_values($grouped)
             ]);
 
         } catch (\Exception $e) {
