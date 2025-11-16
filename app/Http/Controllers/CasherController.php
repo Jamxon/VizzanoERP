@@ -436,17 +436,14 @@ class CasherController extends Controller
                 $incomePercentageExpenses = $expensesForMonth->where('type', 'income_percentage');
                 if ($incomePercentageExpenses->count() > 0) {
                     foreach ($incomePercentageExpenses as $exp) {
-                        // per-day addition (as in daily)
-                        $perDayIncomePercentAmount = ($priceUZS * $totalQty) * ($exp->amount / 100);
-                        $incomePercentageExpenseTotal += $perDayIncomePercentAmount * $daysIncluded;
+                        $incomePercentageExpenseTotal = ($priceUZS * $totalQty) * ($exp->amount / 100);
                     }
                 }
 
                 // 3) amortization: in daily() amortizationExpense = $totalQty * 0.10 * $dollarRate (if any amortization entries exist)
                 $amortizationExpenses = $expensesForMonth->where('type', 'amortization');
                 if ($amortizationExpenses->count() > 0) {
-                    $perDayAmortization = $totalQty * 0.10 * $dollarRate;
-                    $amortizationExpenseTotal += $perDayAmortization * $daysIncluded;
+                    $amortizationExpenseTotal = $totalQty * 0.10 * $dollarRate;
                 }
             } // end foreach month segment
 
