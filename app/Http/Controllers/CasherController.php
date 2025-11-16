@@ -270,145 +270,356 @@ class CasherController extends Controller
         }
 
         $dollarRate = $request->dollar_rate ?? 12900;
+        $branchId = auth()->user()->employee->branch_id;
 
+        // Period related helpers
         $period = CarbonPeriod::create($start, $end);
+        $daysInPeriod = collect($period)->count();
+
+        // ====== 1) AGGREGATE: transport total and transport employees (sum of daily counts)
+        $transportTotal = DB::table('transport_attendance')
+            ->join('transport', 'transport_attendance.transport_id', '=', 'transport.id')
+            ->whereBetween('transport_attendance.date', [$start, $end])
+            ->where('transport.branch_id', $branchId)
+            ->sum(DB::raw('(transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type'));
+
+        // Sum of daily transport employee counts (equivalent to summing transportEmployeesCount for each day)
+        $transportEmployeesCountSum = DB::table('employee_transport_daily as etd')
+            ->join('employees as e', 'etd.employee_id', '=', 'e.id')
+            ->join('transport as t', 'etd.transport_id', '=', 't.id')
+            ->whereBetween('etd.date', [$start, $end])
+            ->where('e.branch_id', $branchId)
+            ->where('t.branch_id', $branchId)
+            ->count('etd.employee_id');
+
+        $transportPerEmployeeSum = $transportEmployeesCountSum > 0 ? $transportTotal / $transportEmployeesCountSum : 0;
+
+        // ====== 2) MONTHLY_EXPENSES: get all monthly_expenses in range, grouped by month (Y-m)
+        $monthlyExpenses = DB::table('monthly_expenses')
+            ->where('branch_id', $branchId)
+            ->whereBetween('month', [$start->toDateString(), $end->toDateString()])
+            ->get()
+            ->map(function ($r) {
+                $r->month_key = Carbon::parse($r->month)->format('Y-m');
+                return $r;
+            })
+            ->groupBy('month_key'); // collection keyed by 'YYYY-MM'
+
+        // ====== 3) AUP and non-AUP sums across period
+        $aupTotal = DB::table('attendance_salary')
+            ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
+            ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
+            ->where('employees.branch_id', $branchId)
+            ->where('employees.type', 'aup')
+            ->whereBetween('attendance.date', [$start, $end])
+            ->sum('attendance_salary.amount');
+
+        $isNotAupTotal = DB::table('attendance_salary')
+            ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
+            ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
+            ->where('employees.branch_id', $branchId)
+            ->where('employees.type', '!=', 'aup')
+            ->whereBetween('attendance.date', [$start, $end])
+            ->sum('attendance_salary.amount');
+
+        // ====== 4) Employee present counts - note: original monthlyStats summed daily employee counts,
+        // so we count attendance.present rows in period (this equals sum of daily present counts)
+        $employeeCountSum = Attendance::whereBetween('date', [$start, $end])
+            ->where('status', 'present')
+            ->whereHas('employee', function ($q) use ($branchId) {
+                $q->where('status', '!=', 'kicked')->where('branch_id', $branchId);
+            })
+            ->count();
+
+        // ====== 5) Outputs in period, group by order_id (same grouping as daily)
+        $outputs = SewingOutputs::with([
+            'orderSubmodel.orderModel.order',
+            'orderSubmodel.orderModel.model',
+            'orderSubmodel.orderModel.submodels.submodel'
+        ])
+            ->whereBetween('created_at', [$start, $end])
+            ->whereHas('orderSubmodel.orderModel.order', function ($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+            })
+            ->get();
+
+        $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);
+        $totalOutputQty = $outputs->sum('quantity');
+
+        // Preload some caches to avoid repeated DB calls inside loop
+        $orderModelIds = $outputs->map(fn($o) => optional($o->orderSubmodel->orderModel)->id)->unique()->filter()->values();
+        $orderIds = $grouped->keys()->filter()->values();
+
+        // We'll compute per-order aggregates
         $orderSummaries = [];
-        $monthlyStats = [
-            'aup' => 0,
-            'kpi' => 0,
-            'transport_attendance' => 0,
-            'tarification' => 0,
-            'daily_expenses' => 0,
-            'total_earned_uzs' => 0,
-            'total_output_cost_uzs' => 0,
-            'total_fixed_cost_uzs' => 0,
-            'net_profit_uzs' => 0,
-            'employee_count_sum' => 0,
-            'total_output_quantity' => 0,
-            'rasxod_limit_uzs' => 0,
-            'transport_employees_count' => 0,
-            'transport_per_employee' => 0,
-        ];
+        foreach ($grouped as $orderId => $items) {
+            // $orderId here is the order_model->order_id, but grouped key maybe numeric or null
+            // find first to extract orderModel and order
+            $first = $items->first();
+            $orderModel = optional(optional($first)->orderSubmodel)->orderModel;
+            $order = optional($orderModel)->order;
+            $orderId = $order->id ?? null;
+            if (!$orderId) continue;
 
-        foreach ($period as $dateObj) {
-            $date = $dateObj->toDateString();
+            $totalQty = $items->sum('quantity');
+            $priceUSD = $order->price ?? 0;
+            $priceUZS = $priceUSD * $dollarRate;
 
-            $requestForDay = new Request([
-                'date' => $date,
-                'dollar_rate' => $dollarRate,
-            ]);
+            // submodel spends (sum for the order_model id, region 'uz')
+            $submodelSpendsSum = DB::table('order_sub_models as osm')
+                ->join('submodel_spends as ss', 'ss.submodel_id', '=', 'osm.id')
+                ->where('osm.order_model_id', $orderModel->id)
+                ->where('ss.region', 'uz')
+                ->sum('ss.summa');
 
-            $daily = $this->getDailyCost($requestForDay)->getData(true);
+            $remainder = $submodelSpendsSum * $totalQty;
 
-            $monthlyStats['aup'] += $daily['aup'] ?? 0;
-            $monthlyStats['kpi'] += $daily['kpi'] ?? 0;
-            $monthlyStats['transport_attendance'] += $daily['transport_attendance'] ?? 0;
-            $monthlyStats['tarification'] += $daily['tarification'] ?? 0;
-            $monthlyStats['daily_expenses'] += $daily['daily_expenses'] ?? 0;
-            $monthlyStats['total_earned_uzs'] += $daily['total_earned_uzs'] ?? 0;
-            $monthlyStats['total_output_cost_uzs'] += isset($daily['orders']) ? array_sum(array_column($daily['orders'], 'total_output_cost_uzs')) : 0;
-            $monthlyStats['total_fixed_cost_uzs'] += $daily['total_fixed_cost_uzs'] ?? 0;
-            $monthlyStats['net_profit_uzs'] += $daily['net_profit_uzs'] ?? 0;
-            $monthlyStats['employee_count_sum'] += $daily['employee_count'] ?? 0;
-            $monthlyStats['total_output_quantity'] += $daily['total_output_quantity'] ?? 0;
-            $monthlyStats['rasxod_limit_uzs'] += $daily['rasxod_limit_uzs'] ?? 0;
-            $monthlyStats['transport_employees_count'] += $daily['transport_employees_count'] ?? 0;
-            $monthlyStats['transport_per_employee'] += $daily['transport_per_employee'] ?? 0;
+            // Bonuses for this order in period (sum over period)
+            $bonus = DB::table('bonuses')
+                ->whereBetween('created_at', [$start, $end])
+                ->where('order_id', $orderId)
+                ->sum('amount');
 
-            if (!isset($daily['orders'])) continue;
+            // Tarification for this order in period (sum over period)
+            $tarification = DB::table('employee_tarification_logs')
+                ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+                ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+                ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+                ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+                ->join('orders', 'order_models.order_id', '=', 'orders.id')
+                ->whereBetween('employee_tarification_logs.date', [$start, $end])
+                ->where('orders.id', $orderId)
+                ->sum('employee_tarification_logs.amount_earned');
 
-            foreach ($daily['orders'] as $order) {
-                $orderId = $order['order']['id'] ?? null;
-                if (!$orderId) continue;
+            // === Now compute monthly-type allocations that in daily were computed per-day.
+            // To match daily+foreach behaviour we must replicate sum of per-day values across the period.
+            // For this we iterate per-month segment inside the requested range and consider how many days of that month are included.
 
-                if (!isset($orderSummaries[$orderId])) {
-                    $orderSummaries[$orderId] = $order;
-                    $orderSummaries[$orderId]['total_earned_uzs'] = $order['total_output_cost_uzs']; // initial
-                    continue;
+            // Prepare accumulators for this order
+            $allocatedMonthlyExpenseTotal = 0; // sum of allocatedMonthlyExpenseMonthly across period (was daily value summed)
+            $incomePercentageExpenseTotal = 0;
+            $amortizationExpenseTotal = 0;
+
+            // Build month segments from start to end (YYYY-MM keys)
+            $monthPeriod = CarbonPeriod::create($start->copy()->startOfMonth(), $end->copy()->startOfMonth())->month();
+
+            foreach ($monthPeriod as $monthStart) {
+                $monthKey = $monthStart->format('Y-m');
+                $monthBegin = $monthStart->copy()->startOfMonth();
+                $monthEnd = $monthStart->copy()->endOfMonth();
+
+                // overlap between requested $start..$end and this month
+                $segStart = $start->greaterThan($monthBegin) ? $start->copy() : $monthBegin->copy();
+                $segEnd = $end->lessThan($monthEnd) ? $end->copy() : $monthEnd->copy();
+
+                if ($segStart->gt($segEnd)) continue;
+
+                $daysInMonth = $monthStart->daysInMonth;
+                // number of days from segStart to segEnd inclusive
+                $daysIncluded = $segStart->diffInDays($segEnd) + 1;
+
+                // monthly expenses entries for this month (if any)
+                $expensesForMonth = $monthlyExpenses->get($monthKey, collect());
+
+                // 1) monthly-type: daily portion in that month = monthly_amount / daysInMonth
+                $monthlyTypeSumForMonth = $expensesForMonth->where('type', 'monthly')->sum('amount');
+                if ($monthlyTypeSumForMonth > 0) {
+                    $dailyMonthlyForMonth = $monthlyTypeSumForMonth / max($daysInMonth, 1);
+                    // allocated per-day for this order = dailyMonthlyForMonth * orderShareRatio
+                    // orderShareRatio needs totalOutputQty across the whole period
+                    $orderShareRatio = $totalOutputQty > 0 ? ($totalQty / $totalOutputQty) : 0;
+                    $allocatedMonthlyExpenseTotal += $dailyMonthlyForMonth * $orderShareRatio * $daysIncluded;
                 }
 
-                $orderSummaries[$orderId]['total_quantity'] += $order['total_quantity'];
-                $orderSummaries[$orderId]['rasxod_limit_uzs'] += $order['rasxod_limit_uzs'];
-                $orderSummaries[$orderId]['bonus'] += $order['bonus'];
-                $orderSummaries[$orderId]['tarification'] += $order['tarification'];
-                $orderSummaries[$orderId]['total_earned_uzs'] += $order['total_output_cost_uzs'];
-                $orderSummaries[$orderId]['total_output_cost_uzs'] += $order['total_output_cost_uzs'];
-                $orderSummaries[$orderId]['total_fixed_cost_uzs'] += $order['total_fixed_cost_uzs'];
-                $orderSummaries[$orderId]['net_profit_uzs'] += $order['net_profit_uzs'];
-
-                foreach ($order['costs_uzs'] as $key => $val) {
-                    if (!isset($orderSummaries[$orderId]['costs_uzs'][$key])) {
-                        $orderSummaries[$orderId]['costs_uzs'][$key] = 0;
+                // 2) income_percentage: note in original daily() this was applied per day (full percent),
+                // so to replicate we compute per-day income percentage amount and multiply by daysIncluded.
+                $incomePercentageExpenses = $expensesForMonth->where('type', 'income_percentage');
+                if ($incomePercentageExpenses->count() > 0) {
+                    foreach ($incomePercentageExpenses as $exp) {
+                        // per-day addition (as in daily)
+                        $perDayIncomePercentAmount = ($priceUZS * $totalQty) * ($exp->amount / 100);
+                        $incomePercentageExpenseTotal += $perDayIncomePercentAmount * $daysIncluded;
                     }
-                    $orderSummaries[$orderId]['costs_uzs'][$key] += $val;
                 }
-            }
-        }
 
-        foreach ($orderSummaries as &$order) {
-            $qty = max($order['total_quantity'], 1);
-            $totalCost = $order['total_fixed_cost_uzs'];
-            $earned = $order['total_earned_uzs'];
+                // 3) amortization: in daily() amortizationExpense = $totalQty * 0.10 * $dollarRate (if any amortization entries exist)
+                $amortizationExpenses = $expensesForMonth->where('type', 'amortization');
+                if ($amortizationExpenses->count() > 0) {
+                    $perDayAmortization = $totalQty * 0.10 * $dollarRate;
+                    $amortizationExpenseTotal += $perDayAmortization * $daysIncluded;
+                }
+            } // end foreach month segment
 
-            $order['cost_per_unit_uzs'] = round($totalCost / $qty);
-            $order['profit_per_unit_uzs'] = round(($earned / $qty) - $order['cost_per_unit_uzs']);
-            $order['profitability_percent'] = $totalCost > 0
-                ? round(($order['net_profit_uzs'] / $totalCost) * 100, 2)
+            // Note: earlier we used variables $incomePercentageExpenseTotal, $amortizationExpenseTotal,
+            // $allocatedMonthlyExpenseTotal — ensure we use correct variable names
+            // (typo guard)
+            $incomePercentageExpense = $incomePercentageExpenseTotal ?? 0;
+            $amortizationExpense = $amortizationExpenseTotal ?? 0;
+
+            // Allocations from global transport/aup/isNotAup proportional to orderShareRatio
+            $orderShareRatio = $totalOutputQty > 0 ? ($totalQty / $totalOutputQty) : 0;
+            $allocatedTransport = $transportTotal * $orderShareRatio;
+            $allocatedAup = $aupTotal * $orderShareRatio;
+            $allocatedIsNotAup = $isNotAupTotal * $orderShareRatio;
+
+            // totalExtra (same as daily logic but using monthly sums)
+            $totalExtra = $allocatedTransport + $allocatedAup + $allocatedMonthlyExpenseTotal + $incomePercentageExpense + $amortizationExpense;
+
+            $fixedCost = $bonus + $remainder;
+            $totalFixedCostForOrder = $fixedCost + $totalExtra;
+
+            $perUnitCost = $totalQty > 0 ? ($totalFixedCostForOrder) / $totalQty : 0;
+            $profitUZS = ($priceUZS * $totalQty) - ($totalFixedCostForOrder);
+
+            // Responsible users and submodels
+            $responsibleUsers = $orderModel->submodels->map(function ($submodel) {
+                return $submodel->group?->group?->responsibleUser;
+            })->filter()->unique('id')->values();
+
+            $rasxodPercentOfPrice = $priceUZS > 0
+                ? round((($submodelSpendsSum ?? 0) / $priceUZS) * 100, 2)
                 : null;
+
+            $orderSummaries[$orderId] = [
+                'order' => $order,
+                'responsibleUser' => $responsibleUsers,
+                'model' => $orderModel->model ?? null,
+                'submodels' => $orderModel->submodels->pluck('submodel')->filter()->values(),
+                'price_usd' => $priceUSD,
+                'price_uzs' => $priceUZS,
+                'total_quantity' => $totalQty,
+                'rasxod_limit_uzs' => $remainder,
+                'rasxod_percent_of_price' => $rasxodPercentOfPrice,
+                'bonus' => $bonus,
+                'tarification' => $tarification,
+                'total_output_cost_uzs' => $priceUSD * $totalQty * $dollarRate,
+                'costs_uzs' => [
+                    'bonus' => $bonus,
+                    'remainder' => $remainder,
+                    'tarification' => $tarification,
+                    'allocatedTransport' => $allocatedTransport,
+                    'allocatedAup' => $allocatedAup,
+                    'allocatedMonthlyExpenseMonthly' => $allocatedMonthlyExpenseTotal,
+                    'incomePercentageExpense' => $incomePercentageExpense,
+                    'amortizationExpense' => $amortizationExpense,
+                ],
+                'total_fixed_cost_uzs' => $totalFixedCostForOrder,
+                'net_profit_uzs' => $profitUZS,
+                'cost_per_unit_uzs' => round($perUnitCost),
+                'profit_per_unit_uzs' => round(($priceUZS - $perUnitCost)),
+                'profitability_percent' => ($totalFixedCostForOrder) > 0
+                    ? round(($profitUZS / ($totalFixedCostForOrder)) * 100, 2)
+                    : null,
+            ];
+        } // end foreach grouped orders
+
+        // Now aggregate overall totals similar to original monthlyStats (sum of per-order and global sums)
+        $monthlyStats = [];
+        $monthlyStats['aup'] = $aupTotal;
+        // KPI (bonuses across period)
+        $monthlyStats['kpi'] = DB::table('bonuses')->whereBetween('created_at', [$start, $end])->sum('amount');
+        $monthlyStats['transport_attendance'] = $transportTotal;
+        $monthlyStats['tarification'] = DB::table('employee_tarification_logs')
+            ->whereBetween('employee_tarification_logs.date', [$start, $end])
+            ->sum('employee_tarification_logs.amount_earned');
+        // daily_expenses (sum across period): compute monthly 'monthly' part aggregated over days + all orders incomePercentage & amortization
+        // monthly type totals across period:
+        $monthlyTypeTotalAcrossPeriod = 0;
+        foreach ($monthlyExpenses as $monthKey => $coll) {
+            $monthlyTypeTotalAcrossPeriod += $coll->where('type', 'monthly')->sum('amount');
+        }
+        // BUT note: in daily() the monthlyType contributed per day as monthly/daysInMonth; summing across days will produce
+        // monthlyTypeTotalAcrossPeriod * (daysIncluded/daysInMonth) over each month. We already accounted for this in per-order allocation
+        // For global "daily_expenses" we should compute total of:
+        // sum_over_months( monthly_type_sum / daysInMonth * days_in_segment ) + totalIncomePercentageExpense (sum over orders) + totalAmortizationExpense (sum over orders)
+        $totalMonthlyTypeDailySum = 0;
+        $monthPeriod = CarbonPeriod::create($start->copy()->startOfMonth(), $end->copy()->startOfMonth())->month();
+        foreach ($monthPeriod as $monthStart) {
+            $monthKey = $monthStart->format('Y-m');
+            $monthBegin = $monthStart->copy()->startOfMonth();
+            $monthEnd = $monthStart->copy()->endOfMonth();
+
+            $segStart = $start->greaterThan($monthBegin) ? $start->copy() : $monthBegin->copy();
+            $segEnd = $end->lessThan($monthEnd) ? $end->copy() : $monthEnd->copy();
+
+            if ($segStart->gt($segEnd)) continue;
+
+            $daysInMonth = $monthStart->daysInMonth;
+            $daysIncluded = $segStart->diffInDays($segEnd) + 1;
+
+            $expensesForMonth = $monthlyExpenses->get($monthKey, collect());
+            $monthlyTypeSumForMonth = $expensesForMonth->where('type', 'monthly')->sum('amount');
+            $totalMonthlyTypeDailySum += ($monthlyTypeSumForMonth / max($daysInMonth, 1)) * $daysIncluded;
         }
 
-        $workingDays = collect($period)->filter(fn($date) => !$date->isSunday())->count();
-        $averageEmployeeCount = round($monthlyStats['employee_count_sum'] / max($workingDays, 1));
-        //        $perEmployeeCost = $monthlyStats['total_fixed_cost_uzs'] / max(1, $monthlyStats['employee_count_sum']);
-        // per_employee_cost_uzs breakdown
-        $employeeCount = max($monthlyStats['employee_count_sum'], 1);
+        // Sum incomePercentage and amortization across all orders in orderSummaries (we already computed per-order totals in 'costs_uzs' keys)
+        $totalIncomePercentageExpense = collect($orderSummaries)->sum(fn($o) => $o['costs_uzs']['incomePercentageExpense'] ?? 0);
+        $totalAmortizationExpense = collect($orderSummaries)->sum(fn($o) => $o['costs_uzs']['amortizationExpense'] ?? 0);
 
-        $rasxodLimit = $monthlyStats['rasxod_limit_uzs'] / $employeeCount;
-        $transportCost = $monthlyStats['transport_attendance'] / $employeeCount;
-        $aupCost = $monthlyStats['aup'] / $employeeCount;
-        $monthlyExpenseCost = $monthlyStats['daily_expenses'] / $employeeCount;
-        $incomePercentageCost = collect($orderSummaries)->sum(fn($order) => $order['costs_uzs']['incomePercentageExpense'] ?? 0) / $employeeCount;
-        $amortizationCost = collect($orderSummaries)->sum(fn($order) => $order['costs_uzs']['amortizationExpense'] ?? 0) / $employeeCount;
+        $monthlyStats['daily_expenses'] = $totalMonthlyTypeDailySum + $totalIncomePercentageExpense + $totalAmortizationExpense;
 
-        $totalPerEmployee = $rasxodLimit + $transportCost + $aupCost + $monthlyExpenseCost + $incomePercentageCost + $amortizationCost;
+        // total earned & totals from orders
+        $monthlyStats['total_earned_uzs'] = collect($orderSummaries)->sum('total_output_cost_uzs');
+        $monthlyStats['total_output_cost_uzs'] = collect($orderSummaries)->sum('total_output_cost_uzs');
+        $monthlyStats['total_fixed_cost_uzs'] = collect($orderSummaries)->sum('total_fixed_cost_uzs') + ($transportTotal + $aupTotal); // ensure global fixed cost includes allocated global bits
+        $monthlyStats['net_profit_uzs'] = collect($orderSummaries)->sum('net_profit_uzs') - 0; // orders' net profit is already net per order
+        $monthlyStats['employee_count_sum'] = $employeeCountSum;
+        $monthlyStats['total_output_quantity'] = $totalOutputQty;
+        $monthlyStats['rasxod_limit_uzs'] = collect($orderSummaries)->sum('rasxod_limit_uzs');
+        $monthlyStats['transport_employees_count'] = $transportEmployeesCountSum;
+        $monthlyStats['transport_per_employee'] = round($transportPerEmployeeSum);
+
+        // per-employee breakdown (mirror original calculation)
+        $employeeCountForDivision = max($monthlyStats['employee_count_sum'], 1);
+        $rasxodLimitPerEmployee = $monthlyStats['rasxod_limit_uzs'] / $employeeCountForDivision;
+        $transportCostPerEmployee = $monthlyStats['transport_attendance'] / $employeeCountForDivision;
+        $aupPerEmployee = $monthlyStats['aup'] / $employeeCountForDivision;
+        $monthlyExpensePerEmployee = $monthlyStats['daily_expenses'] / $employeeCountForDivision;
+        $incomePercentagePerEmployee = $totalIncomePercentageExpense / $employeeCountForDivision;
+        $amortizationPerEmployee = $totalAmortizationExpense / $employeeCountForDivision;
+
+        $totalPerEmployee = $rasxodLimitPerEmployee + $transportCostPerEmployee + $aupPerEmployee + $monthlyExpensePerEmployee + $incomePercentagePerEmployee + $amortizationPerEmployee;
 
         $perEmployeeCosts = [
             'rasxod_limit_uzs' => [
-                'amount' => round($rasxodLimit),
-                'percent' => round(($rasxodLimit / $totalPerEmployee) * 100, 2)
+                'amount' => round($rasxodLimitPerEmployee),
+                'percent' => $totalPerEmployee > 0 ? round(($rasxodLimitPerEmployee / $totalPerEmployee) * 100, 2) : 0
             ],
             'transport' => [
-                'amount' => round($transportCost),
-                'percent' => round(($transportCost / $totalPerEmployee) * 100, 2)
+                'amount' => round($transportCostPerEmployee),
+                'percent' => $totalPerEmployee > 0 ? round(($transportCostPerEmployee / $totalPerEmployee) * 100, 2) : 0
             ],
             'aup' => [
-                'amount' => round($aupCost),
-                'percent' => round(($aupCost / $totalPerEmployee) * 100, 2)
+                'amount' => round($aupPerEmployee),
+                'percent' => $totalPerEmployee > 0 ? round(($aupPerEmployee / $totalPerEmployee) * 100, 2) : 0
             ],
             'monthly_expense' => [
-                'amount' => round($monthlyExpenseCost),
-                'percent' => round(($monthlyExpenseCost / $totalPerEmployee) * 100, 2)
+                'amount' => round($monthlyExpensePerEmployee),
+                'percent' => $totalPerEmployee > 0 ? round(($monthlyExpensePerEmployee / $totalPerEmployee) * 100, 2) : 0
             ],
             'income_percentage_expense' => [
-                'amount' => round($incomePercentageCost),
-                'percent' => round(($incomePercentageCost / $totalPerEmployee) * 100, 2)
+                'amount' => round($incomePercentagePerEmployee),
+                'percent' => $totalPerEmployee > 0 ? round(($incomePercentagePerEmployee / $totalPerEmployee) * 100, 2) : 0
             ],
             'amortization_expense' => [
-                'amount' => round($amortizationCost),
-                'percent' => round(($amortizationCost / $totalPerEmployee) * 100, 2)
+                'amount' => round($amortizationPerEmployee),
+                'percent' => $totalPerEmployee > 0 ? round(($amortizationPerEmployee / $totalPerEmployee) * 100, 2) : 0
             ],
             'total' => round($totalPerEmployee)
         ];
 
-        // Umumiy quantity va har bir dona uchun xarajat hisoblash
+        // cost per unit overall
         $costPerUnitOverall = $monthlyStats['total_output_quantity'] > 0
-            ? $monthlyStats['total_fixed_cost_uzs'] / $monthlyStats['total_output_quantity']
+            ? ($monthlyStats['total_fixed_cost_uzs'] / $monthlyStats['total_output_quantity'])
             : 0;
+
+        // convert orderSummaries to indexed array like original
+        $ordersArray = array_values($orderSummaries);
 
         return response()->json([
             'start_date' => $start->toDateString(),
             'end_date' => $end->toDateString(),
-            'days_in_period' => count($period),
+            'days_in_period' => $daysInPeriod,
             'dollar_rate' => $dollarRate,
             'aup' => $monthlyStats['aup'],
             'kpi' => $monthlyStats['kpi'],
@@ -419,16 +630,13 @@ class CasherController extends Controller
             'total_output_cost_uzs' => $monthlyStats['total_output_cost_uzs'],
             'total_fixed_cost_uzs' => $monthlyStats['total_fixed_cost_uzs'],
             'net_profit_uzs' => $monthlyStats['net_profit_uzs'],
-            'average_employee_count' => $averageEmployeeCount,
+            'average_employee_count' => $employeeCountSum > 0 ? round($employeeCountSum / max(1, $daysInPeriod - collect($period)->filter(fn($d)=>$d->isSunday())->count())) : 0,
             'per_employee_cost_uzs' => $perEmployeeCosts,
-            'orders' => array_values($orderSummaries),
+            'orders' => $ordersArray,
             'rasxod_limit_uzs' => $monthlyStats['rasxod_limit_uzs'],
-
             'employee_count_sum' => $monthlyStats['employee_count_sum'],
             'transport_employees_count' => $monthlyStats['transport_employees_count'],
             'transport_per_employee' => $monthlyStats['transport_per_employee'],
-
-            // Yangi qo'shilgan qismlar
             'total_output_quantity' => $monthlyStats['total_output_quantity'],
             'cost_per_unit_overall_uzs' => round($costPerUnitOverall, 2),
         ]);
