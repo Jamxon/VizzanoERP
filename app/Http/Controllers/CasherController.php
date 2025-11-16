@@ -553,7 +553,7 @@ class CasherController extends Controller
         $totalIncomePercentageExpense = collect($orderSummaries)->sum(fn($o) => $o['costs_uzs']['incomePercentageExpense'] ?? 0);
         $totalAmortizationExpense = collect($orderSummaries)->sum(fn($o) => $o['costs_uzs']['amortizationExpense'] ?? 0);
 
-        $monthlyStats['daily_expenses'] = $totalMonthlyTypeDailySum;
+        $monthlyStats['daily_expenses'] = $totalMonthlyTypeDailySum + $totalIncomePercentageExpense + $totalAmortizationExpense;
 
         // total earned & totals from orders
         $monthlyStats['total_earned_uzs'] = collect($orderSummaries)->sum('total_output_cost_uzs');
