@@ -1044,28 +1044,34 @@ class DailyPaymentController extends Controller
 
         // ====== REAL HARAJATLAR (Bo'limlar bo'yicha) ======
 
-        // 1) Barcha bo'limlar uchun real harajatlar (DailyPayment dan)
-        $departmentRealCosts = DailyPayment::select(
-            'department_id',
-            DB::raw('SUM(calculated_amount + bonus) as total_cost')
-        )
-            ->with('department:id,name')
-            ->whereHas('order', function($q) use ($branchId) {
-                $q->where('branch_id', $branchId);
-            })
-            ->whereNotNull('department_id')
-            ->whereBetween('created_at', [$start, $end])
-            ->groupBy('department_id')
+        // 1) Barcha bo'limlar uchun real harajatlar (attendance_salary dan - oylik/kunlik maoshlar)
+        $departmentRealCosts = DB::table('attendance_salary')
+            ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
+            ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
+            ->select(
+                'employees.department_id',
+                DB::raw('SUM(attendance_salary.amount) as total_cost')
+            )
+            ->where('employees.branch_id', $branchId)
+            ->whereNotNull('employees.department_id')
+            ->whereBetween('attendance.date', [$start, $end])
+            ->groupBy('employees.department_id')
             ->get()
-            ->keyBy('department_id');
+            ->mapWithKeys(function($item) {
+                $dept = DB::table('departments')->where('id', $item->department_id)->first();
+                return [$item->department_id => (object)[
+                    'department_id' => $item->department_id,
+                    'total_cost' => $item->total_cost,
+                    'department' => $dept
+                ]];
+            });
 
-        // 2) Ishchilar uchun real harajatlar (department_id bo'lmaganlar)
-        $workerRealTotal = DailyPayment::whereHas('order', function($q) use ($branchId) {
-            $q->where('branch_id', $branchId);
-        })
-            ->whereNull('department_id')
-            ->whereBetween('created_at', [$start, $end])
-            ->sum(DB::raw('calculated_amount + bonus'));
+        // 2) Tikuvchilar uchun real harajatlar (employee_tarification_logs dan)
+        $workerRealTotal = DB::table('employee_tarification_logs')
+            ->join('employees', 'employee_tarification_logs.employee_id', '=', 'employees.id')
+            ->where('employees.branch_id', $branchId)
+            ->whereBetween('employee_tarification_logs.date', [$start, $end])
+            ->sum('employee_tarification_logs.amount_earned');
 
         // 3) Transport real harajati
         $transportRealTotal = DB::table('transport_attendance')
@@ -1093,9 +1099,6 @@ class DailyPaymentController extends Controller
                 'orderModel.submodels.submodel',
                 'orderModel.submodels.group.group.responsibleUser',
                 'monthlySelectedOrder',
-                'dailyPayments' => function ($q) use ($branchId) {
-                    $q->whereHas('employee', fn($q2) => $q2->where('branch_id', $branchId));
-                }
             ])
             ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
                 $q->whereMonth('month', date('m', strtotime($selectedMonth)))
@@ -1171,12 +1174,11 @@ class DailyPaymentController extends Controller
                     ];
                 });
 
-            // Bu buyurtma uchun real department costs
-            $orderDepartmentRealCosts = DailyPayment::select(
+            // Bu buyurtma uchun real department costs (daily_payments - faqat donalik tizim)
+            $orderDepartmentDailyPayments = DailyPayment::select(
                 'department_id',
                 DB::raw('SUM(calculated_amount + bonus) as cost')
             )
-                ->with('department:id,name')
                 ->where('order_id', $order->id)
                 ->where('model_id', $model->id)
                 ->whereNotNull('department_id')
@@ -1185,17 +1187,39 @@ class DailyPaymentController extends Controller
                 ->get()
                 ->keyBy('department_id');
 
-            // Ishchilar uchun real (bu buyurtma)
-            $orderWorkerReal = DailyPayment::where('order_id', $order->id)
-                ->where('model_id', $model->id)
-                ->whereNull('department_id')
-                ->whereBetween('created_at', [$start, $end])
-                ->sum(DB::raw('calculated_amount + bonus'));
+            // Bu buyurtma uchun real department costs (attendance_salary - oylik tizim)
+            // Bu buyurtmaning ulushini hisoblaymiz
+            $orderShareRatio = $totalProducedQty > 0 ? ($producedQty / $totalProducedQty) : 0;
+
+            $orderDepartmentAttendanceCosts = $departmentRealCosts->map(function($dept) use ($orderShareRatio) {
+                return [
+                    'department_id' => $dept->department_id,
+                    'cost' => $dept->total_cost * $orderShareRatio
+                ];
+            })->keyBy('department_id');
+
+            // Tikuvchilar uchun real (bu buyurtma) - tarification_logs dan
+            $orderWorkerReal = DB::table('employee_tarification_logs')
+                ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
+                ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
+                ->join('order_sub_models', 'tarification_categories.submodel_id', '=', 'order_sub_models.id')
+                ->join('order_models', 'order_sub_models.order_model_id', '=', 'order_models.id')
+                ->where('order_models.order_id', $order->id)
+                ->whereBetween('employee_tarification_logs.date', [$start, $end])
+                ->sum('employee_tarification_logs.amount_earned');
 
             // Real va Planned ni birlashtirish
-            $departmentComparison = $plannedDepartmentCosts->map(function ($planned) use ($orderDepartmentRealCosts, $minutes, $producedQty) {
-                $realData = $orderDepartmentRealCosts->get($planned['id']);
-                $realTotal = $realData ? $realData->cost : 0;
+            $departmentComparison = $plannedDepartmentCosts->map(function ($planned) use ($orderDepartmentDailyPayments, $orderDepartmentAttendanceCosts, $minutes, $producedQty) {
+                // Donalik tizimdan
+                $dailyPaymentData = $orderDepartmentDailyPayments->get($planned['id']);
+                $dailyPaymentCost = $dailyPaymentData ? $dailyPaymentData->cost : 0;
+
+                // Oylik tizimdan (proportional)
+                $attendanceData = $orderDepartmentAttendanceCosts->get($planned['id']);
+                $attendanceCost = $attendanceData ? $attendanceData['cost'] : 0;
+
+                // Jami real
+                $realTotal = $dailyPaymentCost + $attendanceCost;
 
                 return [
                     'id' => $planned['id'],
@@ -1206,6 +1230,8 @@ class DailyPaymentController extends Controller
                     'planned_per_minute' => $planned['planned_per_minute'],
                     'planned_per_unit' => $planned['planned_per_unit'],
                     'real_total' => round($realTotal, 2),
+                    'real_from_daily_payments' => round($dailyPaymentCost, 2),
+                    'real_from_attendance' => round($attendanceCost, 2),
                     'real_per_minute' => $minutes > 0 ? round($realTotal / $minutes, 2) : 0,
                     'real_per_unit' => $producedQty > 0 ? round($realTotal / $producedQty, 2) : 0,
                     'difference' => round($realTotal - $planned['planned_total'], 2),
@@ -1249,6 +1275,8 @@ class DailyPaymentController extends Controller
                 'minutes' => $minutes,
                 'price_uzs' => $priceUzs,
                 'workers_real_cost' => round($orderWorkerReal, 2),
+                'workers_real_cost_per_minute' => $minutes > 0 ? round($orderWorkerReal / $minutes, 2) : 0,
+                'workers_real_cost_per_unit' => $producedQty > 0 ? round($orderWorkerReal / $producedQty, 2) : 0,
                 'departments' => $departmentComparison,
                 'expenses_planned' => $expensesPlanned,
                 'income_percentage_expense' => round($orderIncomePercentage, 2),
@@ -1258,54 +1286,86 @@ class DailyPaymentController extends Controller
 
         // ====== UMUMIY REAL HARAJATLARNI BO'LIMLAR BO'YICHA TESKARI HISOBLASH ======
 
-        // Bo'limlar bo'yicha real harajatlar breakdown
+        // Bo'limlar bo'yicha real harajatlar breakdown (attendance_salary dan)
         $departmentRealBreakdown = $departmentRealCosts->map(function($dept) use ($totalMinutes, $totalProducedQty) {
             return [
                 'id' => $dept->department_id,
-                'name' => $dept->department?->name ?? 'Noma\'lum',
+                'name' => $dept->department->name ?? 'Noma\'lum',
                 'real_total' => round($dept->total_cost, 2),
                 'real_per_minute' => $totalMinutes > 0 ? round($dept->total_cost / $totalMinutes, 2) : 0,
                 'real_per_unit' => $totalProducedQty > 0 ? round($dept->total_cost / $totalProducedQty, 2) : 0,
+                'source' => 'attendance_salary (oylik/kunlik maosh)'
             ];
         })->values();
+
+        // Bo'limlar uchun daily_payments dan ham olish (donalik tizim)
+        $departmentDailyPayments = DailyPayment::select(
+            'department_id',
+            DB::raw('SUM(calculated_amount + bonus) as total_cost')
+        )
+            ->whereHas('order', function($q) use ($branchId) {
+                $q->where('branch_id', $branchId);
+            })
+            ->whereNotNull('department_id')
+            ->whereBetween('created_at', [$start, $end])
+            ->groupBy('department_id')
+            ->get();
+
+        $departmentDailyBreakdown = $departmentDailyPayments->map(function($dept) use ($totalMinutes, $totalProducedQty) {
+            $deptInfo = DB::table('departments')->where('id', $dept->department_id)->first();
+            return [
+                'id' => $dept->department_id,
+                'name' => $deptInfo->name ?? 'Noma\'lum',
+                'real_total' => round($dept->total_cost, 2),
+                'real_per_minute' => $totalMinutes > 0 ? round($dept->total_cost / $totalMinutes, 2) : 0,
+                'real_per_unit' => $totalProducedQty > 0 ? round($dept->total_cost / $totalProducedQty, 2) : 0,
+                'source' => 'daily_payments (donalik tizim)'
+            ];
+        });
 
         // Boshqa umumiy harajatlar
         $otherRealCosts = [
             'workers' => [
-                'name' => 'Tikuvchilar (Ishchilar)',
+                'name' => 'Tikuvchilar (Tarifikatsiya)',
                 'real_total' => round($workerRealTotal, 2),
                 'real_per_minute' => $totalMinutes > 0 ? round($workerRealTotal / $totalMinutes, 2) : 0,
                 'real_per_unit' => $totalProducedQty > 0 ? round($workerRealTotal / $totalProducedQty, 2) : 0,
+                'source' => 'employee_tarification_logs'
             ],
             'transport' => [
                 'name' => 'Transport',
                 'real_total' => round($transportRealTotal, 2),
                 'real_per_minute' => $totalMinutes > 0 ? round($transportRealTotal / $totalMinutes, 2) : 0,
                 'real_per_unit' => $totalProducedQty > 0 ? round($transportRealTotal / $totalProducedQty, 2) : 0,
+                'source' => 'transport_attendance'
             ],
             'monthly_expenses' => [
                 'name' => 'Oylik harajatlar',
                 'real_total' => round($monthlyTypeTotal, 2),
                 'real_per_minute' => $totalMinutes > 0 ? round($monthlyTypeTotal / $totalMinutes, 2) : 0,
                 'real_per_unit' => $totalProducedQty > 0 ? round($monthlyTypeTotal / $totalProducedQty, 2) : 0,
+                'source' => 'monthly_expenses'
             ],
             'income_percentage' => [
                 'name' => 'Foizli harajatlar',
                 'real_total' => round($incomePercentageTotal, 2),
                 'real_per_minute' => $totalMinutes > 0 ? round($incomePercentageTotal / $totalMinutes, 2) : 0,
                 'real_per_unit' => $totalProducedQty > 0 ? round($incomePercentageTotal / $totalProducedQty, 2) : 0,
+                'source' => 'monthly_expenses (income_percentage)'
             ],
             'amortization' => [
                 'name' => 'Amortizatsiya',
                 'real_total' => round($amortizationTotal, 2),
                 'real_per_minute' => $totalMinutes > 0 ? round($amortizationTotal / $totalMinutes, 2) : 0,
                 'real_per_unit' => $totalProducedQty > 0 ? round($amortizationTotal / $totalProducedQty, 2) : 0,
+                'source' => 'monthly_expenses (amortization)'
             ],
         ];
 
-        $totalDepartmentRealCost = $departmentRealCosts->sum('total_cost');
-        $totalRealCost = $totalDepartmentRealCost + $workerRealTotal + $transportRealTotal +
-            $monthlyTypeTotal + $incomePercentageTotal + $amortizationTotal;
+        $totalDepartmentAttendanceCost = $departmentRealCosts->sum('total_cost');
+        $totalDepartmentDailyPaymentCost = $departmentDailyPayments->sum('total_cost');
+        $totalRealCost = $totalDepartmentAttendanceCost + $totalDepartmentDailyPaymentCost + $workerRealTotal +
+            $transportRealTotal + $monthlyTypeTotal + $incomePercentageTotal + $amortizationTotal;
 
         return response()->json([
             'period' => [
@@ -1319,7 +1379,8 @@ class DailyPaymentController extends Controller
                 'total_minutes' => $totalMinutes,
             ],
             'real_costs_breakdown' => [
-                'departments' => $departmentRealBreakdown,
+                'departments_from_attendance' => $departmentRealBreakdown,
+                'departments_from_daily_payments' => $departmentDailyBreakdown,
                 'others' => $otherRealCosts,
             ],
             'total_real_cost' => round($totalRealCost, 2),
