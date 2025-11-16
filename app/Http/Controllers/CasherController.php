@@ -556,12 +556,12 @@ class CasherController extends Controller
         $totalIncomePercentageExpense = collect($orderSummaries)->sum(fn($o) => $o['costs_uzs']['incomePercentageExpense'] ?? 0);
         $totalAmortizationExpense = collect($orderSummaries)->sum(fn($o) => $o['costs_uzs']['amortizationExpense'] ?? 0);
 
-        $monthlyStats['daily_expenses'] = $totalMonthlyTypeDailySum + $totalIncomePercentageExpense + $totalAmortizationExpense;
+        $monthlyStats['daily_expenses'] = $totalMonthlyTypeDailySum;
 
         // total earned & totals from orders
         $monthlyStats['total_earned_uzs'] = collect($orderSummaries)->sum('total_output_cost_uzs');
         $monthlyStats['total_output_cost_uzs'] = collect($orderSummaries)->sum('total_output_cost_uzs');
-        $monthlyStats['total_fixed_cost_uzs'] = collect($orderSummaries)->sum('total_fixed_cost_uzs') + ($transportTotal + $aupTotal); // ensure global fixed cost includes allocated global bits
+        $monthlyStats['total_fixed_cost_uzs'] = collect($orderSummaries)->sum('total_fixed_cost_uzs');
         $monthlyStats['net_profit_uzs'] = collect($orderSummaries)->sum('net_profit_uzs') - 0; // orders' net profit is already net per order
         $monthlyStats['employee_count_sum'] = $employeeCountSum;
         $monthlyStats['total_output_quantity'] = $totalOutputQty;
