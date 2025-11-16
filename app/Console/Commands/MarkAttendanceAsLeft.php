@@ -47,7 +47,7 @@ class MarkAttendanceAsLeft extends Command
                     $checkOut  = $now->copy()->setTime(17, 30, 0);
 
                     // 🔎 Agar 08:00 gacha bo‘lsa → 07:30 qilib qo‘yamiz
-                    if ($checkIn->lt($checkIn->copy()->setTime(8, 0))) {
+                    if ($checkIn->lt($checkIn->copy()->setTime(7, 40))) {
                         $checkIn->setTime(7, 30);
                     }
 
@@ -70,7 +70,7 @@ class MarkAttendanceAsLeft extends Command
                         $checkOut = \Carbon\Carbon::parse($attendance->check_out);
 
                         // 🔎 Agar 8:00 gacha bo'lsa => 7:30 ga tenglashtiramiz
-                        if ($checkIn->lt($checkIn->copy()->setTime(8, 0))) {
+                        if ($checkIn->lt($checkIn->copy()->setTime(7, 40))) {
                             $checkIn->setTime(7, 30);
                         }
 
