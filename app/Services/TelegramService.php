@@ -57,7 +57,7 @@ class TelegramService
         foreach ($departments as $departmentId => $deptEmployees) {
             $departmentName = optional($deptEmployees->first()->department)->name ?? "No department";
 
-            if ($departmentName === 'Тикув бўлими' || $departmentName === 'Тикув') {
+            if ($departmentName === "Tikuv bo'limi" || $departmentName === 'Tikuv') {
                 $text .= "🏢 <b>{$departmentName}</b> — " . $deptEmployees->count() . " ta hodim\n";
 
                 $groups = $deptEmployees->groupBy('group_id');
