@@ -1028,4 +1028,276 @@ class DailyPaymentController extends Controller
             'message' => 'DailyPayment created successfully',
         ], 201);
     }
+
+    public function getCombinedCostAnalysis(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $branchId = auth()->user()->employee->branch_id ?? null;
+        $usdRate = $request->dollar_rate ?? getUsdRate();
+
+        $selectedMonth = $request->month ?? now()->format('Y-m');
+        $selectedSeasonYear = $request->season_year;
+        $selectedSeasonType = $request->season_type;
+
+        // Oyning boshi va oxiri
+        $start = Carbon::parse($selectedMonth)->startOfMonth();
+        $end = Carbon::parse($selectedMonth)->endOfMonth();
+
+        // ====== REAL HARAJATLAR (getMonthlyCost dan) ======
+
+        // 1) Transport real harajati
+        $transportRealTotal = DB::table('transport_attendance')
+            ->join('transport', 'transport_attendance.transport_id', '=', 'transport.id')
+            ->whereBetween('transport_attendance.date', [$start, $end])
+            ->where('transport.branch_id', $branchId)
+            ->sum(DB::raw('(transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type'));
+
+        // 2) AUP real harajati
+        $aupRealTotal = DB::table('attendance_salary')
+            ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
+            ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
+            ->where('employees.branch_id', $branchId)
+            ->where('employees.type', 'aup')
+            ->whereBetween('attendance.date', [$start, $end])
+            ->sum('attendance_salary.amount');
+
+        // 3) Boshqa xodimlar (non-AUP)
+        $nonAupRealTotal = DB::table('attendance_salary')
+            ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
+            ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
+            ->where('employees.branch_id', $branchId)
+            ->where('employees.type', '!=', 'aup')
+            ->whereBetween('attendance.date', [$start, $end])
+            ->sum('attendance_salary.amount');
+
+        // 4) Monthly expenses (oylik harajatlar)
+        $monthlyExpensesReal = DB::table('monthly_expenses')
+            ->where('branch_id', $branchId)
+            ->whereMonth('month', $start->month)
+            ->whereYear('month', $start->year)
+            ->get();
+
+        $monthlyTypeTotal = $monthlyExpensesReal->where('type', 'monthly')->sum('amount');
+        $incomePercentageTotal = 0; // Bu har bir buyurtma uchun alohida hisoblanadi
+        $amortizationTotal = 0; // Bu ham alohida
+
+        // ====== BUYURTMALAR VA MAHSULOTLAR ======
+
+        $orders = Order::query()
+            ->with([
+                'orderModel.model',
+                'orderModel.submodels.submodel',
+                'orderModel.submodels.group.group.responsibleUser',
+                'monthlySelectedOrder',
+                'dailyPayments' => function ($q) use ($branchId) {
+                    $q->whereHas('employee', fn($q2) => $q2->where('branch_id', $branchId));
+                }
+            ])
+            ->whereHas('monthlySelectedOrder', function ($q) use ($selectedMonth) {
+                $q->whereMonth('month', date('m', strtotime($selectedMonth)))
+                    ->whereYear('month', date('Y', strtotime($selectedMonth)));
+            })
+            ->where('branch_id', $branchId)
+            ->when($selectedSeasonYear, fn($q) => $q->where('season_year', $selectedSeasonYear))
+            ->when($selectedSeasonType, fn($q) => $q->where('season_type', $selectedSeasonType))
+            ->get();
+
+        // Jami ishlab chiqarilgan miqdor va daqiqalar
+        $totalProducedQty = 0;
+        $totalMinutes = 0;
+
+        $orderResults = [];
+
+        foreach ($orders as $order) {
+            if (!$order->orderModel) continue;
+
+            $orderModel = $order->orderModel;
+            $model = $orderModel->model;
+
+            // Ishlab chiqarilgan miqdor
+            $producedQty = SewingOutputs::join('order_sub_models', 'order_sub_models.id', '=', 'sewing_outputs.order_submodel_id')
+                ->join('order_models', 'order_models.id', '=', 'order_sub_models.order_model_id')
+                ->where('order_models.order_id', $order->id)
+                ->where('order_models.model_id', $model->id)
+                ->whereBetween('sewing_outputs.created_at', [$start, $end])
+                ->sum('sewing_outputs.quantity');
+
+            $minutes = $producedQty * ($model->minute ?? 0);
+            $totalProducedQty += $producedQty;
+            $totalMinutes += $minutes;
+
+            // Income percentage expense (bu buyurtma uchun)
+            $priceUzs = ($order->price ?? 0) * $usdRate;
+            $orderIncomePercentage = 0;
+            foreach ($monthlyExpensesReal->where('type', 'income_percentage') as $exp) {
+                $orderIncomePercentage += ($priceUzs * $producedQty) * ($exp->amount / 100);
+            }
+            $incomePercentageTotal += $orderIncomePercentage;
+
+            // Amortization expense
+            $orderAmortization = 0;
+            if ($monthlyExpensesReal->where('type', 'amortization')->count() > 0) {
+                $orderAmortization = $producedQty * 0.10 * $usdRate;
+            }
+            $amortizationTotal += $orderAmortization;
+
+            // ====== PLANNED COSTS (index funksiyadan) ======
+
+            // Bo'limlar uchun planned costs
+            $plannedDepartmentCosts = DepartmentBudget::with('department:id,name')
+                ->whereHas('department.mainDepartment', fn($q) => $q->where('branch_id', $branchId))
+                ->get()
+                ->map(function ($db) use ($order, $model, $usdRate, $minutes) {
+                    if ($db->type === 'minute_based') {
+                        $planned = $db->quantity * $minutes;
+                    } elseif ($db->type === 'percentage_based') {
+                        $priceUzs = ($order->price ?? 0) * $usdRate;
+                        $planned = $priceUzs * ($db->quantity / 100) * ($order->quantity ?? 0);
+                    } else {
+                        $planned = 0;
+                    }
+
+                    return [
+                        'id' => $db->department_id,
+                        'name' => $db->department?->name,
+                        'type' => $db->type,
+                        'rate' => $db->quantity,
+                        'planned_total' => round($planned, 2),
+                        'planned_per_minute' => $minutes > 0 ? round($planned / $minutes, 2) : 0,
+                    ];
+                });
+
+            // Bo'limlar uchun real costs
+            $realDepartmentCosts = DailyPayment::select(
+                'department_id',
+                DB::raw('SUM(calculated_amount + bonus) as cost')
+            )
+                ->with('department:id,name')
+                ->where('order_id', $order->id)
+                ->where('model_id', $model->id)
+                ->whereNotNull('department_id')
+                ->whereBetween('created_at', [$start, $end])
+                ->groupBy('department_id')
+                ->get();
+
+            // Real va Planned ni birlashtirish
+            $departmentComparison = $plannedDepartmentCosts->map(function ($planned) use ($realDepartmentCosts, $minutes) {
+                $real = $realDepartmentCosts->firstWhere('department_id', $planned['id']);
+                $realTotal = $real ? $real->cost : 0;
+
+                return [
+                    'id' => $planned['id'],
+                    'name' => $planned['name'],
+                    'type' => $planned['type'],
+                    'planned_rate' => $planned['rate'],
+                    'planned_total' => $planned['planned_total'],
+                    'planned_per_minute' => $planned['planned_per_minute'],
+                    'real_total' => round($realTotal, 2),
+                    'real_per_minute' => $minutes > 0 ? round($realTotal / $minutes, 2) : 0,
+                    'difference' => round($realTotal - $planned['planned_total'], 2),
+                    'difference_percent' => $planned['planned_total'] > 0
+                        ? round((($realTotal - $planned['planned_total']) / $planned['planned_total']) * 100, 2)
+                        : null,
+                ];
+            });
+
+            // Expense harajatlar (planned)
+            $expensesPlanned = Expense::where('branch_id', $branchId)->get()->map(function ($exp) use ($order, $model, $usdRate, $producedQty, $minutes) {
+                $priceUzs = ($order->price ?? 0) * $usdRate;
+
+                if ($exp->type === 'minute_based') {
+                    $planned = $exp->quantity * ($model->minute ?? 0) * $order->quantity;
+                } elseif ($exp->type === 'percentage_based') {
+                    $planned = $priceUzs * ($exp->quantity / 100) * $order->quantity;
+                } else {
+                    $planned = 0;
+                }
+
+                return [
+                    'id' => $exp->id,
+                    'name' => $exp->name,
+                    'type' => $exp->type,
+                    'rate' => $exp->quantity,
+                    'planned_total' => round($planned, 2),
+                ];
+            });
+
+            $orderResults[] = [
+                'order' => $order,
+                'model' => [
+                    'id' => $model->id,
+                    'name' => $model->name,
+                    'minute' => $model->minute,
+                ],
+                'produced_quantity' => $producedQty,
+                'minutes' => $minutes,
+                'price_uzs' => $priceUzs,
+                'departments' => $departmentComparison,
+                'expenses' => $expensesPlanned,
+                'income_percentage_expense' => round($orderIncomePercentage, 2),
+                'amortization_expense' => round($orderAmortization, 2),
+            ];
+        }
+
+        // ====== UMUMIY REAL HARAJATLARNI DAQIQAGA TESKARI HISOBLASH ======
+
+        $realCostBreakdown = [
+            'transport' => [
+                'name' => 'Transport',
+                'real_total' => round($transportRealTotal, 2),
+                'real_per_minute' => $totalMinutes > 0 ? round($transportRealTotal / $totalMinutes, 2) : 0,
+                'real_per_unit' => $totalProducedQty > 0 ? round($transportRealTotal / $totalProducedQty, 2) : 0,
+            ],
+            'aup' => [
+                'name' => 'AUP (Boshqaruv xodimlari)',
+                'real_total' => round($aupRealTotal, 2),
+                'real_per_minute' => $totalMinutes > 0 ? round($aupRealTotal / $totalMinutes, 2) : 0,
+                'real_per_unit' => $totalProducedQty > 0 ? round($aupRealTotal / $totalProducedQty, 2) : 0,
+            ],
+            'non_aup' => [
+                'name' => 'Boshqa xodimlar',
+                'real_total' => round($nonAupRealTotal, 2),
+                'real_per_minute' => $totalMinutes > 0 ? round($nonAupRealTotal / $totalMinutes, 2) : 0,
+                'real_per_unit' => $totalProducedQty > 0 ? round($nonAupRealTotal / $totalProducedQty, 2) : 0,
+            ],
+            'monthly_expenses' => [
+                'name' => 'Oylik harajatlar',
+                'real_total' => round($monthlyTypeTotal, 2),
+                'real_per_minute' => $totalMinutes > 0 ? round($monthlyTypeTotal / $totalMinutes, 2) : 0,
+                'real_per_unit' => $totalProducedQty > 0 ? round($monthlyTypeTotal / $totalProducedQty, 2) : 0,
+            ],
+            'income_percentage' => [
+                'name' => 'Foizli harajatlar',
+                'real_total' => round($incomePercentageTotal, 2),
+                'real_per_minute' => $totalMinutes > 0 ? round($incomePercentageTotal / $totalMinutes, 2) : 0,
+                'real_per_unit' => $totalProducedQty > 0 ? round($incomePercentageTotal / $totalProducedQty, 2) : 0,
+            ],
+            'amortization' => [
+                'name' => 'Amortizatsiya',
+                'real_total' => round($amortizationTotal, 2),
+                'real_per_minute' => $totalMinutes > 0 ? round($amortizationTotal / $totalMinutes, 2) : 0,
+                'real_per_unit' => $totalProducedQty > 0 ? round($amortizationTotal / $totalProducedQty, 2) : 0,
+            ],
+        ];
+
+        $totalRealCost = $transportRealTotal + $aupRealTotal + $nonAupRealTotal +
+            $monthlyTypeTotal + $incomePercentageTotal + $amortizationTotal;
+
+        return response()->json([
+            'period' => [
+                'month' => $selectedMonth,
+                'start_date' => $start->toDateString(),
+                'end_date' => $end->toDateString(),
+            ],
+            'usd_rate' => $usdRate,
+            'production_summary' => [
+                'total_produced_quantity' => $totalProducedQty,
+                'total_minutes' => $totalMinutes,
+            ],
+            'real_costs_breakdown' => $realCostBreakdown,
+            'total_real_cost' => round($totalRealCost, 2),
+            'total_real_cost_per_minute' => $totalMinutes > 0 ? round($totalRealCost / $totalMinutes, 2) : 0,
+            'total_real_cost_per_unit' => $totalProducedQty > 0 ? round($totalRealCost / $totalProducedQty, 2) : 0,
+            'orders' => $orderResults,
+        ]);
+    }
 }

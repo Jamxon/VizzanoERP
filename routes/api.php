@@ -130,6 +130,7 @@ Route::prefix('ceo')->middleware('role:ceo')->group(function () {
     Route::patch('dailyPayments/{dailyPayment}', [DailyPaymentController::class, 'editDailyPayment']);
     Route::post('dailyPayments', [DailyPaymentController::class, 'storeDailyPayment']);
     Route::post('recalculate-daily-payments', [CasherController::class, 'recalculateDailyPaymentsCut']);
+    Route::get('combinedCostAnalysis', [DailyPaymentController::class, 'getCombinedCostAnalysis']);
 });
 
 Route::prefix('tailor')->middleware('role:tailor')->group(function () {
