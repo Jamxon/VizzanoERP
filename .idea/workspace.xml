@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/phpunit.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/phpunit.xml" afterDir="false" />
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="Add present attendance check in CasherController and update PHPUnit config">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -248,12 +246,25 @@
       <option name="presentableId" value="Default" />
       <updated>1763093944124</updated>
       <workItem from="1763093948611" duration="73863000" />
-      <workItem from="1763632790922" duration="3660000" />
+      <workItem from="1763632790922" duration="4877000" />
     </task>
+    <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
+      <option name="closed" value="true" />
+      <created>1763637014547</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1763637014547</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add present attendance check in CasherController and update PHPUnit config" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add present attendance check in CasherController and update PHPUnit config" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

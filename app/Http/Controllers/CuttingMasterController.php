@@ -41,6 +41,7 @@ class CuttingMasterController extends Controller
                 'orderModel.submodels',
                 'orderModel.submodels.submodel',
                 'orderModel.sizes.size',
+                'orderModel.sizes.color',
                 'orderPrintingTime',
                 'orderPrintingTime.user'
             )
@@ -127,6 +128,7 @@ class CuttingMasterController extends Controller
             'orderModel.material',
             'orderModel.submodels',
             'orderModel.sizes.size',
+            'orderModel.sizes.color',
             'orderModel.submodels.submodel',
             'orderModel.submodels.specificationCategories',
         ]);
