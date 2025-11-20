@@ -1494,6 +1494,15 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id'); // employee bo'yicha key qilamiz
 
+        $presentAttendance = DB::table('attendances')
+            ->whereIn('employee_id', $employeeIds)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->where('status', 'present')
+            ->select('employee_id')
+            ->groupBy('employee_id')
+            ->pluck('employee_id')
+            ->toArray();
+
 // Tekshirish: bir kunda bir nechta yozuv bo'lsa, xato qaytarish
         foreach ($attendanceData as $empId => $recordsByDate) {
             foreach ($recordsByDate as $record) {
@@ -1615,8 +1624,9 @@ class CasherController extends Controller
 
             $totalEarned = $tarificationTotal + $attendanceTotal;
 
-            // Agar xodim hech narsa topmagan bo'lsa, skip qilamiz
-            if ($totalEarned <= 0) {
+            $hasPresent = in_array($employee->id, $presentAttendance);
+
+            if ($totalEarned <= 0 && !$hasPresent) {
                 continue;
             }
 
