@@ -629,7 +629,6 @@ class WarehouseController extends Controller
         $positions = DB::table('positions')->whereIn('id', $positionIds)->pluck('name', 'id');
 
         // 2) Working days (we compute by distinct attendance dates in the department/month)
-        // Note: if you have a fixed working days source, replace this logic accordingly.
         $total_working_days = DB::table('attendances')
             ->whereBetween('date', [$startDate, $endDate])
             ->select(DB::raw('count(distinct date) as days'))
@@ -645,13 +644,48 @@ class WarehouseController extends Controller
             ->pluck('present_days', 'employee_id')
             ->toArray();
 
-        // 4) Selected orders for the month (planned quantities) - bulk
-        $selectedOrders = MonthlySelectedOrder::whereDate('month', $month . '-01')
-            ->select('order_id', 'quantity')
-            ->get()
-            ->keyBy('order_id'); // ->get(order_id => model with quantity)
+        // 4) Selected order IDs for the month (MonthlySelectedOrder only contains order_id)
+        $selectedOrderIds = MonthlySelectedOrder::whereDate('month', $month . '-01')
+            ->pluck('order_id')
+            ->toArray();
 
-        $selectedOrderIds = $selectedOrders->keys()->toArray();
+        if (empty($selectedOrderIds)) {
+            // nothing selected this month
+            return response()->json([
+                'id' => $department->id,
+                'name' => $department->name,
+                'budget' => [
+                    'id' => $departmentBudget->id,
+                    'quantity' => (string) $departmentBudget->quantity,
+                    'type' => $departmentBudget->type,
+                ],
+                'employee_count' => $employees->count(),
+                'employees' => $employees->map(function($emp) use ($positions, $attendancePresent, $total_working_days) {
+                    return [
+                        'id' => $emp->id,
+                        'name' => $emp->name,
+                        'percentage' => number_format((float)$emp->percentage, 2, '.', ''),
+                        'position' => $emp->position_id ? [
+                            'id' => $emp->position_id,
+                            'name' => $positions->get($emp->position_id) ?? 'N/A'
+                        ] : null,
+                        'img' => $emp->img ?? null,
+                        'payment_type' => $emp->payment_type ?? null,
+                        'salary' => $emp->salary ? (int) $emp->salary : null,
+                        'attendance' => [
+                            'present_days' => (int) ($attendancePresent[$emp->id] ?? 0),
+                            'total_working_days' => (int) $total_working_days,
+                        ],
+                        'orders' => []
+                    ];
+                })->values()->toArray(),
+                'orders' => [],
+                'totals' => [
+                    'earned' => 0,
+                    'possible_full_earn' => 0,
+                ],
+            ]);
+        }
 
         // 5) Produced quantities per order from WarehouseCompleteOrder (bulk)
         $producedPerOrder = WarehouseCompleteOrder::where('department_id', $department->id)
@@ -678,7 +712,20 @@ class WarehouseController extends Controller
             $order = $orders->get($orderId);
             if (!$order) continue;
 
-            $plannedQty = (int) ($selectedOrders->get($orderId)->quantity ?? 0);
+            // --- Determine planned quantity:
+            // try multiple fields in order: planned_quantity, quantity, orderModel->quantity
+            $plannedQty = 0;
+            if (isset($order->quantity)) {
+                $plannedQty = (int) $order->quantity;
+            } elseif (isset($order->quantity)) {
+                $plannedQty = (int) $order->quantity;
+            } elseif (!empty($order->orderModel) && isset($order->quantity)) {
+                $plannedQty = (int) $order->quantity;
+            } else {
+                // fallback 0
+                $plannedQty = 0;
+            }
+
             $producedQty = (int) ($producedPerOrder[$orderId] ?? 0);
             $remainingQty = max(0, $plannedQty - $producedQty);
 
@@ -708,7 +755,7 @@ class WarehouseController extends Controller
                 $employeesForOrder[] = [
                     'id' => $emp->id,
                     'name' => $emp->name,
-                    'percentage' => number_format($empPercent, 2, '.', ''), // match sample "14.00"
+                    'percentage' => number_format($empPercent, 2, '.', ''),
                     'position' => $emp->position_id ? [
                         'id' => $emp->position_id,
                         'name' => $positions->get($emp->position_id) ?? 'N/A'
@@ -721,7 +768,6 @@ class WarehouseController extends Controller
                         'total_working_days' => (int) $total_working_days,
                     ],
                     'orders' => [
-                        // per employee values for this order
                         'order' => [
                             'id' => $order->id,
                             'name' => $order->name,
@@ -780,7 +826,6 @@ class WarehouseController extends Controller
                         'present_days' => (int) ($attendancePresent[$emp->id] ?? 0),
                         'total_working_days' => (int) $total_working_days,
                     ],
-                    // orders per employee can be omitted here because we include orders->employees; but include empty array for compatibility
                     'orders' => []
                 ];
             })->values()->toArray(),
