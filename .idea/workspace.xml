@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="Add color attribute to order model sizes in CuttingMasterController">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/WarehouseController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/WarehouseController.php" afterDir="false" />
-    </list>
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="Fix month filtering in warehouseCompleteOrders query to use whereDate" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -249,7 +246,7 @@
       <workItem from="1763093948611" duration="73863000" />
       <workItem from="1763632790922" duration="8097000" />
       <workItem from="1763741478933" duration="14000" />
-      <workItem from="1763792435036" duration="4655000" />
+      <workItem from="1763792435036" duration="4959000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -267,7 +264,31 @@
       <option name="project" value="LOCAL" />
       <updated>1763638328383</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Add department_id to warehouseCompleteOrderStore method in WarehouseController">
+      <option name="closed" value="true" />
+      <created>1763814597189</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1763814597189</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Update quantity assignment in warehouseCompleteOrderStore method in WarehouseController">
+      <option name="closed" value="true" />
+      <created>1763814659226</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1763814659226</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Fix month filtering in warehouseCompleteOrders query to use whereDate">
+      <option name="closed" value="true" />
+      <created>1763814817193</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1763814817193</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -276,7 +297,10 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Add present attendance check in CasherController and update PHPUnit config" />
     <MESSAGE value="Add color attribute to order model sizes in CuttingMasterController" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add color attribute to order model sizes in CuttingMasterController" />
+    <MESSAGE value="Add department_id to warehouseCompleteOrderStore method in WarehouseController" />
+    <MESSAGE value="Update quantity assignment in warehouseCompleteOrderStore method in WarehouseController" />
+    <MESSAGE value="Fix month filtering in warehouseCompleteOrders query to use whereDate" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix month filtering in warehouseCompleteOrders query to use whereDate" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -641,7 +641,7 @@ class WarehouseController extends Controller
 
 
         // ===== 3. POSSIBLE ORDERS (other selected orders) ======================
-        $selectedOrderIds = MonthlySelectedOrder::whereMonth('month', $month)
+        $selectedOrderIds = MonthlySelectedOrder::whereDate('month', $month. '-01')
             ->pluck('order_id')
             ->toArray();
 
