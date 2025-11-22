@@ -10,6 +10,7 @@ use App\Models\StockBalance;
 use App\Models\StockEntry;
 use App\Models\StockEntryItem;
 use App\Models\Warehouse;
+use App\Models\WarehouseCompleteOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -569,5 +570,22 @@ class WarehouseController extends Controller
             ], 500);
         }
     }
+
+    public function warehouseCompleteOrderStore(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $data = $request->validate([
+            'department_id' => 'required|integer|exists:departments,id',
+            'order_id' => 'required|integer|exists:orders,id',
+            'quantity' => 'required|integer|min:0',
+        ]);
+
+        $record = WarehouseCompleteOrder::create($data);
+
+        return response()->json([
+            'message' => 'Created successfully',
+            'data' => $record
+        ], 201);
+    }
+
 
 }
