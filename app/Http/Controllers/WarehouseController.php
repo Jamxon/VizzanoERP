@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contragent;
+use App\Models\Department;
 use App\Models\Destination;
+use App\Models\Employee;
+use App\Models\MonthlySelectedOrder;
 use App\Models\Order;
 use App\Models\Source;
 use App\Models\StockBalance;
@@ -12,6 +15,7 @@ use App\Models\StockEntryItem;
 use App\Models\Warehouse;
 use App\Models\WarehouseCompleteOrder;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Log;
@@ -587,5 +591,129 @@ class WarehouseController extends Controller
         ], 201);
     }
 
+    public function warehouseCompleteOrdersGet(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $month = $request->month ?? now()->format('Y-m');
+        $startDate = Carbon::parse($month)->startOfMonth();
+        $endDate = Carbon::parse($month)->endOfMonth();
+
+        $department = Department::find(auth()->user()->employee->department_id);
+        $departmentBudget = $department->departmentBudget;
+
+        // ==== 1. Department employees with percentage ======================
+        $employees = Employee::where('department_id', $department->id)
+            ->select('id', 'name', 'percentage')
+            ->get();
+
+        if ($employees->count() == 0) {
+            return response()->json(['message' => 'No employees found'], 404);
+        }
+
+        // Foizlarning jami
+        $totalPercentage = $employees->sum('percentage');
+        if ($totalPercentage <= 0) {
+            return response()->json(['message' => 'Employees percentage sum is zero'], 422);
+        }
+
+        // ===== 2. Complete orders (earned) =================================
+        $warehouseCompleteOrders = WarehouseCompleteOrder::where('department_id', $department->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereHas('order.monthlySelectedOrder', function ($q) use ($month) {
+                $q->whereMonth('month', $month);
+            })
+            ->get();
+
+        $earned = 0;
+        $ordersEarnedMap = [];
+
+        if ($departmentBudget->type == 'minute_based') {
+            foreach ($warehouseCompleteOrders as $o) {
+                $minutes = $o->order->orderModel->model->minute * $o->quantity;
+                $money = $departmentBudget->quantity * $minutes;
+
+                $earned += $money;
+                $ordersEarnedMap[$o->order_id] = ($ordersEarnedMap[$o->order_id] ?? 0) + $money;
+            }
+        } else {
+            return response()->json(['message' => 'Budget type not supported'], 400);
+        }
+
+
+        // ===== 3. POSSIBLE ORDERS (other selected orders) ======================
+        $selectedOrderIds = MonthlySelectedOrder::whereMonth('month', $month)
+            ->pluck('order_id')
+            ->toArray();
+
+        $completeOrderIds = $warehouseCompleteOrders->pluck('order_id')->toArray();
+
+        // Faqat complete qilinmagan orderlar (possible)
+        $possibleOrderIds = array_diff($selectedOrderIds, $completeOrderIds);
+
+        $possibleOrders = Order::whereIn('id', $possibleOrderIds)->get();
+
+        $possibleEarn = 0;
+        $possibleOrdersMap = [];
+
+        foreach ($possibleOrders as $order) {
+
+            // Quantity qayerdan olinadi? Modelda quantity yo‘q bo‘lsa sen ayt, qo‘shib beraman.
+            // Hozircha order->expected_quantity deb qo‘yaman:
+            $qty = $order->expected_quantity ?? 0;
+
+            $minutes = $order->orderModel->model->minute * $qty;
+            $money = $departmentBudget->quantity * $minutes;
+
+            $possibleEarn += $money;
+            $possibleOrdersMap[$order->id] = $money;
+        }
+
+
+        // ==== 4. EMPLOYEE BY EMPLOYEE BO‘LINISH ============================
+
+        $employeeResult = [];
+
+        foreach ($employees as $emp) {
+
+            $percent = $emp->percentage; // employee foizi
+
+            $empEarned = ($earned * $percent) / $totalPercentage;
+            $empPossible = ($possibleEarn * $percent) / $totalPercentage;
+
+            // Orderlar bo‘yicha earned bo‘linishi
+            $empOrderEarned = [];
+            foreach ($ordersEarnedMap as $orderId => $money) {
+                $empOrderEarned[$orderId] = ($money * $percent) / $totalPercentage;
+            }
+
+            // Orderlar bo‘yicha possible earn bo‘linishi
+            $empOrderPossible = [];
+            foreach ($possibleOrdersMap as $orderId => $money) {
+                $empOrderPossible[$orderId] = ($money * $percent) / $totalPercentage;
+            }
+
+            $employeeResult[] = [
+                'id' => $emp->id,
+                'name' => $emp->name,
+                'percentage' => $percent,
+                'earned' => round($empEarned, 2),
+                'possible_earned' => round($empPossible, 2),
+                'orders' => [
+                    'earned' => $empOrderEarned,
+                    'possible' => $empOrderPossible,
+                ]
+            ];
+        }
+
+
+        // ==== 5. RESPONSE ==================================================
+
+        return response()->json([
+            'earned' => round($earned, 2),
+            'possible_earned' => round($possibleEarn, 2),
+            'orders_earned' => $ordersEarnedMap,
+            'orders_possible' => $possibleOrdersMap,
+            'employees' => $employeeResult,
+        ]);
+    }
 
 }

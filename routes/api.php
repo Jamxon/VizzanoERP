@@ -294,6 +294,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::delete('supplierOrders/{id}', [SupplierController::class, 'destroySupplierOrder']);
     Route::get('suppliers', [SupplierController::class, 'getSupplier']);
     Route::post('completeOrders', [WarehouseController::class, 'warehouseCompleteOrderStore']);
+    Route::get('completeOrders', [WarehouseController::class, 'warehouseCompleteOrdersGet']);
 });
 
 Route::prefix('transport')->middleware('role:transport')->group(function () {

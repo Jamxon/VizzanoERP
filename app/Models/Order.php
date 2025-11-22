@@ -133,4 +133,9 @@ class Order extends Model
     {
         return $this->hasMany(DailyPayment::class, 'order_id');
     }
+
+    public function warehouseCompleteOrder(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(WarehouseCompleteOrder::class, 'order_id');
+    }
 }

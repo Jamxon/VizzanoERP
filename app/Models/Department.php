@@ -76,4 +76,9 @@ class Department extends Model
     {
         return $this->hasMany(DailyPayment::class, 'department_id');
     }
+
+    public function warehouseCompleteOrders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(WarehouseCompleteOrder::class, 'department_id');
+    }
 }
