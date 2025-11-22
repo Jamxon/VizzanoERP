@@ -773,7 +773,7 @@ class WarehouseController extends Controller
                         'id' => $emp->position_id,
                         'name' => $positions->get($emp->position_id) ?? 'N/A'
                     ] : null,
-                    'img' => $emp->img ?? $emp->image ?? null,
+                    'img' => $emp->img ?? null,
                     'payment_type' => $emp->payment_type ?? null,
                     'salary' => $emp->salary ? (int) $emp->salary : null,
                     'attendance' => [
