@@ -659,7 +659,7 @@ class WarehouseController extends Controller
 
             // Quantity qayerdan olinadi? Modelda quantity yo‘q bo‘lsa sen ayt, qo‘shib beraman.
             // Hozircha order->expected_quantity deb qo‘yaman:
-            $qty = $order->expected_quantity ?? 0;
+            $qty = $order->quantity ?? 0;
 
             $minutes = $order->orderModel->model->minute * $qty;
             $money = $departmentBudget->quantity * $minutes;
