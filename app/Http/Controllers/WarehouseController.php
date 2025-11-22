@@ -579,10 +579,10 @@ class WarehouseController extends Controller
     {
         $data = $request->validate([
             'order_id' => 'required|integer|exists:orders,id',
-            'quantity' => 'required|integer|min:0',
         ]);
 
         $data['department_id'] = auth()->user()->employee->department_id;
+        $data['quantity'] = Order::findOrFail($data['order_id'])->quantity;
 
         $record = WarehouseCompleteOrder::create($data);
 
