@@ -610,7 +610,7 @@ class WarehouseController extends Controller
             return response()->json(['message' => 'Department budget type not supported'], 400);
         }
 
-        // 1) Employees (bulk)
+        // 1) Employees
         $employees = Employee::where('department_id', $department->id)
             ->select('id', 'name', 'percentage', 'position_id', 'img', 'payment_type', 'salary')
             ->get();
@@ -624,18 +624,18 @@ class WarehouseController extends Controller
             return response()->json(['message' => 'Employees percentage sum is zero'], 422);
         }
 
-        // Load positions in bulk
+        // Positions (bulk)
         $positionIds = $employees->pluck('position_id')->filter()->unique()->toArray();
         $positions = DB::table('positions')->whereIn('id', $positionIds)->pluck('name', 'id');
 
-        // 2) Working days (we compute by distinct attendance dates in the department/month)
-        $total_working_days = DB::table('attendances')
+        // Working days
+        $total_working_days = DB::table('attendance')
             ->whereBetween('date', [$startDate, $endDate])
             ->select(DB::raw('count(distinct date) as days'))
             ->value('days') ?? 0;
 
-        // 3) Attendance present days per employee (bulk)
-        $attendancePresent = DB::table('attendances')
+        // Attendance
+        $attendancePresent = DB::table('attendance')
             ->whereBetween('date', [$startDate, $endDate])
             ->whereIn('employee_id', $employees->pluck('id')->toArray())
             ->where('status', 'present')
@@ -644,13 +644,12 @@ class WarehouseController extends Controller
             ->pluck('present_days', 'employee_id')
             ->toArray();
 
-        // 4) Selected order IDs for the month (MonthlySelectedOrder only contains order_id)
+        // Selected order IDs
         $selectedOrderIds = MonthlySelectedOrder::whereDate('month', $month . '-01')
             ->pluck('order_id')
             ->toArray();
 
         if (empty($selectedOrderIds)) {
-            // nothing selected this month
             return response()->json([
                 'id' => $department->id,
                 'name' => $department->name,
@@ -660,25 +659,7 @@ class WarehouseController extends Controller
                     'type' => $departmentBudget->type,
                 ],
                 'employee_count' => $employees->count(),
-                'employees' => $employees->map(function($emp) use ($positions, $attendancePresent, $total_working_days) {
-                    return [
-                        'id' => $emp->id,
-                        'name' => $emp->name,
-                        'percentage' => number_format((float)$emp->percentage, 2, '.', ''),
-                        'position' => $emp->position_id ? [
-                            'id' => $emp->position_id,
-                            'name' => $positions->get($emp->position_id) ?? 'N/A'
-                        ] : null,
-                        'img' => $emp->img ?? null,
-                        'payment_type' => $emp->payment_type ?? null,
-                        'salary' => $emp->salary ? (int) $emp->salary : null,
-                        'attendance' => [
-                            'present_days' => (int) ($attendancePresent[$emp->id] ?? 0),
-                            'total_working_days' => (int) $total_working_days,
-                        ],
-                        'orders' => []
-                    ];
-                })->values()->toArray(),
+                'employees' => [],
                 'orders' => [],
                 'totals' => [
                     'earned' => 0,
@@ -687,7 +668,7 @@ class WarehouseController extends Controller
             ]);
         }
 
-        // 5) Produced quantities per order from WarehouseCompleteOrder (bulk)
+        // Produced quantity
         $producedPerOrder = WarehouseCompleteOrder::where('department_id', $department->id)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereIn('order_id', $selectedOrderIds)
@@ -696,43 +677,25 @@ class WarehouseController extends Controller
             ->pluck('produced_quantity', 'order_id')
             ->toArray();
 
-        // 6) Load Order details in bulk (with minute)
+        // Orders load
         $orders = Order::with(['orderModel.model'])
             ->whereIn('id', $selectedOrderIds)
             ->get()
             ->keyBy('id');
 
-        // Prepare results: for each selected order compute totals (produced, planned, remaining) and money values
         $ordersResult = [];
         $totalEarnedAll = 0;
         $totalPossibleAll = 0;
 
         foreach ($selectedOrderIds as $orderId) {
-            /** @var \App\Models\Order|null $order */
             $order = $orders->get($orderId);
             if (!$order) continue;
 
-            // --- Determine planned quantity:
-            // try multiple fields in order: planned_quantity, quantity, orderModel->quantity
-            $plannedQty = 0;
-            if (isset($order->quantity)) {
-                $plannedQty = (int) $order->quantity;
-            } elseif (isset($order->quantity)) {
-                $plannedQty = (int) $order->quantity;
-            } elseif (!empty($order->orderModel) && isset($order->quantity)) {
-                $plannedQty = (int) $order->quantity;
-            } else {
-                // fallback 0
-                $plannedQty = 0;
-            }
-
+            $plannedQty = (int) ($order->quantity ?? 0);
             $producedQty = (int) ($producedPerOrder[$orderId] ?? 0);
             $remainingQty = max(0, $plannedQty - $producedQty);
 
-            // minute per piece
             $minutePerPiece = $order->orderModel->model->minute ?? 0;
-
-            // money = rate(so'm/daqiqa) * minutes * qty
             $rate = (float) $departmentBudget->quantity;
 
             $earnedTotalForOrder = $rate * $minutePerPiece * $producedQty;
@@ -742,17 +705,13 @@ class WarehouseController extends Controller
             $totalEarnedAll += $earnedTotalForOrder;
             $totalPossibleAll += $possibleFullForOrder;
 
-            // build employee split for this order
-            $employeesForOrder = [];
+            // Employees per order
+            $empList = [];
             foreach ($employees as $emp) {
                 $empPercent = (float) $emp->percentage;
-                $empShareFactor = $empPercent / $totalPercentage;
+                $empFactor = $empPercent / $totalPercentage;
 
-                $empEarned = $earnedTotalForOrder * $empShareFactor;
-                $empRemainingEarn = $remainingMoneyForOrder * $empShareFactor;
-                $empPossibleFull = $possibleFullForOrder * $empShareFactor;
-
-                $employeesForOrder[] = [
+                $empList[] = [
                     'id' => $emp->id,
                     'name' => $emp->name,
                     'percentage' => number_format($empPercent, 2, '.', ''),
@@ -760,13 +719,6 @@ class WarehouseController extends Controller
                         'id' => $emp->position_id,
                         'name' => $positions->get($emp->position_id) ?? 'N/A'
                     ] : null,
-                    'img' => $emp->img ?? null,
-                    'payment_type' => $emp->payment_type ?? null,
-                    'salary' => $emp->salary ? (int) $emp->salary : null,
-                    'attendance' => [
-                        'present_days' => (int) ($attendancePresent[$emp->id] ?? 0),
-                        'total_working_days' => (int) $total_working_days,
-                    ],
                     'orders' => [
                         'order' => [
                             'id' => $order->id,
@@ -776,9 +728,9 @@ class WarehouseController extends Controller
                         'planned_quantity' => $plannedQty,
                         'produced_quantity' => $producedQty,
                         'remaining_quantity' => $remainingQty,
-                        'earned_amount' => round($empEarned, 2),
-                        'remaining_earn_amount' => round($empRemainingEarn, 2),
-                        'possible_full_earn_amount' => round($empPossibleFull, 2),
+                        'earned_amount' => round($earnedTotalForOrder * $empFactor, 2),
+                        'remaining_earn_amount' => round($remainingMoneyForOrder * $empFactor, 2),
+                        'possible_full_earn_amount' => round($possibleFullForOrder * $empFactor, 2),
                     ],
                 ];
             }
@@ -795,13 +747,44 @@ class WarehouseController extends Controller
                 'earned_amount' => round($earnedTotalForOrder, 2),
                 'remaining_earn_amount' => round($remainingMoneyForOrder, 2),
                 'possible_full_earn_amount' => round($possibleFullForOrder, 2),
-                // employees array contains per-employee values
-                'employees' => $employeesForOrder,
+                'employees' => $empList,
             ];
         }
 
-        // Build final response about department
-        $response = [
+        // FINAL EMPLOYEE LIST (with totals)
+        $employeesFinal = $employees->map(function($emp) use (
+            $positions,
+            $attendancePresent,
+            $total_working_days,
+            $totalEarnedAll,
+            $totalPossibleAll,
+            $totalPercentage
+        ) {
+            $empPercent = (float) $emp->percentage;
+            $factor = $empPercent / $totalPercentage;
+
+            return [
+                'id' => $emp->id,
+                'name' => $emp->name,
+                'percentage' => number_format($empPercent, 2, '.', ''),
+                'position' => $emp->position_id ? [
+                    'id' => $emp->position_id,
+                    'name' => $positions->get($emp->position_id) ?? 'N/A'
+                ] : null,
+                'attendance' => [
+                    'present_days' => (int) ($attendancePresent[$emp->id] ?? 0),
+                    'total_working_days' => (int) $total_working_days,
+                ],
+
+                // 🔥 Siz so‘ragan yangi maydonlar:
+                'total_earned_share' => round($totalEarnedAll * $factor, 2),
+                'total_possible_share' => round($totalPossibleAll * $factor, 2),
+
+                'orders' => []
+            ];
+        })->values()->toArray();
+
+        return response()->json([
             'id' => $department->id,
             'name' => $department->name,
             'budget' => [
@@ -810,33 +793,13 @@ class WarehouseController extends Controller
                 'type' => $departmentBudget->type,
             ],
             'employee_count' => $employees->count(),
-            'employees' => $employees->map(function($emp) use ($positions, $attendancePresent, $total_working_days) {
-                return [
-                    'id' => $emp->id,
-                    'name' => $emp->name,
-                    'percentage' => number_format((float)$emp->percentage, 2, '.', ''),
-                    'position' => $emp->position_id ? [
-                        'id' => $emp->position_id,
-                        'name' => $positions->get($emp->position_id) ?? 'N/A'
-                    ] : null,
-                    'img' => $emp->img ?? null,
-                    'payment_type' => $emp->payment_type ?? null,
-                    'salary' => $emp->salary ? (int) $emp->salary : null,
-                    'attendance' => [
-                        'present_days' => (int) ($attendancePresent[$emp->id] ?? 0),
-                        'total_working_days' => (int) $total_working_days,
-                    ],
-                    'orders' => []
-                ];
-            })->values()->toArray(),
+            'employees' => $employeesFinal,
             'orders' => $ordersResult,
             'totals' => [
                 'earned' => round($totalEarnedAll, 2),
                 'possible_full_earn' => round($totalPossibleAll, 2),
             ],
-        ];
-
-        return response()->json($response);
+        ]);
     }
 
 }
