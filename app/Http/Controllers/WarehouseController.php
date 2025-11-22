@@ -612,7 +612,7 @@ class WarehouseController extends Controller
 
         // 1) Employees (bulk)
         $employees = Employee::where('department_id', $department->id)
-            ->select('id', 'name', 'percentage', 'position_id', 'img', 'image', 'payment_type', 'salary')
+            ->select('id', 'name', 'percentage', 'position_id', 'img', 'payment_type', 'salary')
             ->get();
 
         if ($employees->isEmpty()) {
@@ -713,7 +713,7 @@ class WarehouseController extends Controller
                         'id' => $emp->position_id,
                         'name' => $positions->get($emp->position_id) ?? 'N/A'
                     ] : null,
-                    'img' => $emp->img ?? $emp->image ?? null,
+                    'img' => $emp->img ?? null,
                     'payment_type' => $emp->payment_type ?? null,
                     'salary' => $emp->salary ? (int) $emp->salary : null,
                     'attendance' => [
