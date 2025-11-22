@@ -595,126 +595,203 @@ class WarehouseController extends Controller
     public function warehouseCompleteOrdersGet(Request $request): \Illuminate\Http\JsonResponse
     {
         $month = $request->month ?? now()->format('Y-m');
-        $startDate = Carbon::parse($month)->startOfMonth();
-        $endDate = Carbon::parse($month)->endOfMonth();
+        $startDate = Carbon::parse($month)->startOfMonth()->toDateString();
+        $endDate = Carbon::parse($month)->endOfMonth()->toDateString();
 
         $department = Department::find(auth()->user()->employee->department_id);
+        if (!$department) {
+            return response()->json(['message' => 'Department not found'], 404);
+        }
         $departmentBudget = $department->departmentBudget;
+        if (!$departmentBudget) {
+            return response()->json(['message' => 'Department budget not found'], 404);
+        }
+        if ($departmentBudget->type !== 'minute_based') {
+            return response()->json(['message' => 'Department budget type not supported'], 400);
+        }
 
-        // ==== 1. Department employees with percentage ======================
+        // 1) Employees (bulk)
         $employees = Employee::where('department_id', $department->id)
-            ->select('id', 'name', 'percentage')
+            ->select('id', 'name', 'percentage', 'position_id', 'img', 'image', 'payment_type', 'salary')
             ->get();
 
-        if ($employees->count() == 0) {
+        if ($employees->isEmpty()) {
             return response()->json(['message' => 'No employees found'], 404);
         }
 
-        // Foizlarning jami
         $totalPercentage = $employees->sum('percentage');
         if ($totalPercentage <= 0) {
             return response()->json(['message' => 'Employees percentage sum is zero'], 422);
         }
 
-        // ===== 2. Complete orders (earned) =================================
-        $warehouseCompleteOrders = WarehouseCompleteOrder::where('department_id', $department->id)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereHas('order.monthlySelectedOrder', function ($q) use ($month) {
-                $q->whereDate('month', $month. '-01');
-            })
-            ->get();
+        // Load positions in bulk
+        $positionIds = $employees->pluck('position_id')->filter()->unique()->toArray();
+        $positions = DB::table('positions')->whereIn('id', $positionIds)->pluck('name', 'id');
 
-        $earned = 0;
-        $ordersEarnedMap = [];
+        // 2) Working days (we compute by distinct attendance dates in the department/month)
+        // Note: if you have a fixed working days source, replace this logic accordingly.
+        $total_working_days = DB::table('attendances')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->select(DB::raw('count(distinct date) as days'))
+            ->value('days') ?? 0;
 
-        if ($departmentBudget->type == 'minute_based') {
-            foreach ($warehouseCompleteOrders as $o) {
-                $minutes = $o->order->orderModel->model->minute * $o->quantity;
-                $money = $departmentBudget->quantity * $minutes;
-
-                $earned += $money;
-                $ordersEarnedMap[$o->order_id] = ($ordersEarnedMap[$o->order_id] ?? 0) + $money;
-            }
-        } else {
-            return response()->json(['message' => 'Budget type not supported'], 400);
-        }
-
-
-        // ===== 3. POSSIBLE ORDERS (other selected orders) ======================
-        $selectedOrderIds = MonthlySelectedOrder::whereDate('month', $month. '-01')
-            ->pluck('order_id')
+        // 3) Attendance present days per employee (bulk)
+        $attendancePresent = DB::table('attendances')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->whereIn('employee_id', $employees->pluck('id')->toArray())
+            ->where('status', 'present')
+            ->select('employee_id', DB::raw('count(*) as present_days'))
+            ->groupBy('employee_id')
+            ->pluck('present_days', 'employee_id')
             ->toArray();
 
-        $completeOrderIds = $warehouseCompleteOrders->pluck('order_id')->toArray();
+        // 4) Selected orders for the month (planned quantities) - bulk
+        $selectedOrders = MonthlySelectedOrder::whereDate('month', $month . '-01')
+            ->select('order_id', 'quantity')
+            ->get()
+            ->keyBy('order_id'); // ->get(order_id => model with quantity)
 
-        // Faqat complete qilinmagan orderlar (possible)
-        $possibleOrderIds = array_diff($selectedOrderIds, $completeOrderIds);
+        $selectedOrderIds = $selectedOrders->keys()->toArray();
 
-        $possibleOrders = Order::whereIn('id', $possibleOrderIds)->get();
+        // 5) Produced quantities per order from WarehouseCompleteOrder (bulk)
+        $producedPerOrder = WarehouseCompleteOrder::where('department_id', $department->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereIn('order_id', $selectedOrderIds)
+            ->select('order_id', DB::raw('SUM(quantity) as produced_quantity'))
+            ->groupBy('order_id')
+            ->pluck('produced_quantity', 'order_id')
+            ->toArray();
 
-        $possibleEarn = 0;
-        $possibleOrdersMap = [];
+        // 6) Load Order details in bulk (with minute)
+        $orders = Order::with(['orderModel.model'])
+            ->whereIn('id', $selectedOrderIds)
+            ->get()
+            ->keyBy('id');
 
-        foreach ($possibleOrders as $order) {
+        // Prepare results: for each selected order compute totals (produced, planned, remaining) and money values
+        $ordersResult = [];
+        $totalEarnedAll = 0;
+        $totalPossibleAll = 0;
 
-            // Quantity qayerdan olinadi? Modelda quantity yo‘q bo‘lsa sen ayt, qo‘shib beraman.
-            // Hozircha order->expected_quantity deb qo‘yaman:
-            $qty = $order->quantity ?? 0;
+        foreach ($selectedOrderIds as $orderId) {
+            /** @var \App\Models\Order|null $order */
+            $order = $orders->get($orderId);
+            if (!$order) continue;
 
-            $minutes = $order->orderModel->model->minute * $qty;
-            $money = $departmentBudget->quantity * $minutes;
+            $plannedQty = (int) ($selectedOrders->get($orderId)->quantity ?? 0);
+            $producedQty = (int) ($producedPerOrder[$orderId] ?? 0);
+            $remainingQty = max(0, $plannedQty - $producedQty);
 
-            $possibleEarn += $money;
-            $possibleOrdersMap[$order->id] = $money;
-        }
+            // minute per piece
+            $minutePerPiece = $order->orderModel->model->minute ?? 0;
 
+            // money = rate(so'm/daqiqa) * minutes * qty
+            $rate = (float) $departmentBudget->quantity;
 
-        // ==== 4. EMPLOYEE BY EMPLOYEE BO‘LINISH ============================
+            $earnedTotalForOrder = $rate * $minutePerPiece * $producedQty;
+            $possibleFullForOrder = $rate * $minutePerPiece * $plannedQty;
+            $remainingMoneyForOrder = $rate * $minutePerPiece * $remainingQty;
 
-        $employeeResult = [];
+            $totalEarnedAll += $earnedTotalForOrder;
+            $totalPossibleAll += $possibleFullForOrder;
 
-        foreach ($employees as $emp) {
+            // build employee split for this order
+            $employeesForOrder = [];
+            foreach ($employees as $emp) {
+                $empPercent = (float) $emp->percentage;
+                $empShareFactor = $empPercent / $totalPercentage;
 
-            $percent = $emp->percentage; // employee foizi
+                $empEarned = $earnedTotalForOrder * $empShareFactor;
+                $empRemainingEarn = $remainingMoneyForOrder * $empShareFactor;
+                $empPossibleFull = $possibleFullForOrder * $empShareFactor;
 
-            $empEarned = ($earned * $percent) / $totalPercentage;
-            $empPossible = ($possibleEarn * $percent) / $totalPercentage;
-
-            // Orderlar bo‘yicha earned bo‘linishi
-            $empOrderEarned = [];
-            foreach ($ordersEarnedMap as $orderId => $money) {
-                $empOrderEarned[$orderId] = ($money * $percent) / $totalPercentage;
+                $employeesForOrder[] = [
+                    'id' => $emp->id,
+                    'name' => $emp->name,
+                    'percentage' => number_format($empPercent, 2, '.', ''), // match sample "14.00"
+                    'position' => $emp->position_id ? [
+                        'id' => $emp->position_id,
+                        'name' => $positions->get($emp->position_id) ?? 'N/A'
+                    ] : null,
+                    'img' => $emp->img ?? $emp->image ?? null,
+                    'payment_type' => $emp->payment_type ?? null,
+                    'salary' => $emp->salary ? (int) $emp->salary : null,
+                    'attendance' => [
+                        'present_days' => (int) ($attendancePresent[$emp->id] ?? 0),
+                        'total_working_days' => (int) $total_working_days,
+                    ],
+                    'orders' => [
+                        // per employee values for this order
+                        'order' => [
+                            'id' => $order->id,
+                            'name' => $order->name,
+                            'minute' => (string) $minutePerPiece,
+                        ],
+                        'planned_quantity' => $plannedQty,
+                        'produced_quantity' => $producedQty,
+                        'remaining_quantity' => $remainingQty,
+                        'earned_amount' => round($empEarned, 2),
+                        'remaining_earn_amount' => round($empRemainingEarn, 2),
+                        'possible_full_earn_amount' => round($empPossibleFull, 2),
+                    ],
+                ];
             }
 
-            // Orderlar bo‘yicha possible earn bo‘linishi
-            $empOrderPossible = [];
-            foreach ($possibleOrdersMap as $orderId => $money) {
-                $empOrderPossible[$orderId] = ($money * $percent) / $totalPercentage;
-            }
-
-            $employeeResult[] = [
-                'id' => $emp->id,
-                'name' => $emp->name,
-                'percentage' => $percent,
-                'earned' => round($empEarned, 2),
-                'possible_earned' => round($empPossible, 2),
-                'orders' => [
-                    'earned' => $empOrderEarned,
-                    'possible' => $empOrderPossible,
-                ]
+            $ordersResult[] = [
+                'order' => [
+                    'id' => $order->id,
+                    'name' => $order->name,
+                    'minute' => (string) $minutePerPiece,
+                ],
+                'planned_quantity' => $plannedQty,
+                'produced_quantity' => $producedQty,
+                'remaining_quantity' => $remainingQty,
+                'earned_amount' => round($earnedTotalForOrder, 2),
+                'remaining_earn_amount' => round($remainingMoneyForOrder, 2),
+                'possible_full_earn_amount' => round($possibleFullForOrder, 2),
+                // employees array contains per-employee values
+                'employees' => $employeesForOrder,
             ];
         }
 
+        // Build final response about department
+        $response = [
+            'id' => $department->id,
+            'name' => $department->name,
+            'budget' => [
+                'id' => $departmentBudget->id,
+                'quantity' => (string) $departmentBudget->quantity,
+                'type' => $departmentBudget->type,
+            ],
+            'employee_count' => $employees->count(),
+            'employees' => $employees->map(function($emp) use ($positions, $attendancePresent, $total_working_days) {
+                return [
+                    'id' => $emp->id,
+                    'name' => $emp->name,
+                    'percentage' => number_format((float)$emp->percentage, 2, '.', ''),
+                    'position' => $emp->position_id ? [
+                        'id' => $emp->position_id,
+                        'name' => $positions->get($emp->position_id) ?? 'N/A'
+                    ] : null,
+                    'img' => $emp->img ?? $emp->image ?? null,
+                    'payment_type' => $emp->payment_type ?? null,
+                    'salary' => $emp->salary ? (int) $emp->salary : null,
+                    'attendance' => [
+                        'present_days' => (int) ($attendancePresent[$emp->id] ?? 0),
+                        'total_working_days' => (int) $total_working_days,
+                    ],
+                    // orders per employee can be omitted here because we include orders->employees; but include empty array for compatibility
+                    'orders' => []
+                ];
+            })->values()->toArray(),
+            'orders' => $ordersResult,
+            'totals' => [
+                'earned' => round($totalEarnedAll, 2),
+                'possible_full_earn' => round($totalPossibleAll, 2),
+            ],
+        ];
 
-        // ==== 5. RESPONSE ==================================================
-
-        return response()->json([
-            'earned' => round($earned, 2),
-            'possible_earned' => round($possibleEarn, 2),
-            'orders_earned' => $ordersEarnedMap,
-            'orders_possible' => $possibleOrdersMap,
-            'employees' => $employeeResult,
-        ]);
+        return response()->json($response);
     }
 
 }
