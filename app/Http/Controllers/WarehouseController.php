@@ -620,7 +620,7 @@ class WarehouseController extends Controller
         $warehouseCompleteOrders = WarehouseCompleteOrder::where('department_id', $department->id)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->whereHas('order.monthlySelectedOrder', function ($q) use ($month) {
-                $q->whereMonth('month', $month);
+                $q->whereDate('month', $month. '-01');
             })
             ->get();
 
