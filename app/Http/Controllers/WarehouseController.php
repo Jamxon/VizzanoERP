@@ -578,10 +578,11 @@ class WarehouseController extends Controller
     public function warehouseCompleteOrderStore(Request $request): \Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
-            'department_id' => 'required|integer|exists:departments,id',
             'order_id' => 'required|integer|exists:orders,id',
             'quantity' => 'required|integer|min:0',
         ]);
+
+        $data['department_id'] = auth()->user()->employee->department_id;
 
         $record = WarehouseCompleteOrder::create($data);
 
