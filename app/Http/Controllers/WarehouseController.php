@@ -592,10 +592,11 @@ class WarehouseController extends Controller
             ->first();
 
         if ($exist) {
+            $exist->delete();
+
             return response()->json([
-                'message' => 'Record already exists',
-                'data' => $exist
-            ], 200);
+                'message' => 'Deleted successfully',
+            ]);
         }
 
         $record = WarehouseCompleteOrder::create($data);
