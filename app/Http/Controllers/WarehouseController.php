@@ -129,7 +129,10 @@ class WarehouseController extends Controller
     {
         $orders = Order::where('branch_id', auth()->user()->employee->branch_id)
             ->with([
-                'contragent'
+                'contragent',
+                'warehouseCompleteOrder',
+                'orderModel.model',
+                'orderModel.submodels.submodel'
             ])
             ->get();
 
