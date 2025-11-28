@@ -660,8 +660,12 @@ class WarehouseController extends Controller
             ->toArray();
 
         // Selected order IDs
-        $selectedOrderIds = MonthlySelectedOrder::whereDate('month', $month . '-01')
+        // Berilgan oyda department bo‘yicha real ishlab chiqarilgan orderlar ro‘yxati
+        $selectedOrderIds = WarehouseCompleteOrder::where('department_id', $department->id)
+            ->whereBetween('created_at', [$startDate, $endDate])
             ->pluck('order_id')
+            ->unique()
+            ->values()
             ->toArray();
 
         if (empty($selectedOrderIds)) {
