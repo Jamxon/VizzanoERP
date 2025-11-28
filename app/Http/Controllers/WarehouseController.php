@@ -584,6 +584,17 @@ class WarehouseController extends Controller
         $data['department_id'] = auth()->user()->employee->department_id;
         $data['quantity'] = Order::findOrFail($data['order_id'])->quantity;
 
+        $exist = WarehouseCompleteOrder::where('order_id', $data['order_id'])
+            ->where('department_id', $data['department_id'])
+            ->first();
+
+        if ($exist) {
+            return response()->json([
+                'message' => 'Record already exists',
+                'data' => $exist
+            ], 200);
+        }
+
         $record = WarehouseCompleteOrder::create($data);
 
         return response()->json([

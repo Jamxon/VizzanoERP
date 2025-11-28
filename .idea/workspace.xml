@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="Refactor employee data retrieval in WarehouseController to streamline response structure" />
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -246,7 +248,7 @@
       <workItem from="1763093948611" duration="73863000" />
       <workItem from="1763632790922" duration="8097000" />
       <workItem from="1763741478933" duration="14000" />
-      <workItem from="1763792435036" duration="5907000" />
+      <workItem from="1763792435036" duration="9974000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -336,7 +338,15 @@
       <option name="project" value="LOCAL" />
       <updated>1763815715587</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity">
+      <option name="closed" value="true" />
+      <created>1763816106584</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1763816106584</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -351,7 +361,8 @@
     <MESSAGE value="Update quantity assignment in warehouseCompleteOrderStore method to use order quantity" />
     <MESSAGE value="Refactor warehouseCompleteOrdersGet method to improve data handling and response structure" />
     <MESSAGE value="Refactor employee data retrieval in WarehouseController to streamline response structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor employee data retrieval in WarehouseController to streamline response structure" />
+    <MESSAGE value="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity" />
+    <option name="LAST_COMMIT_MESSAGE" value="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
