@@ -991,7 +991,7 @@ class UserController extends Controller
                 ->leftJoin('groups', 'groups.id', '=', 'order_groups.group_id')
                 ->leftJoin('users', 'users.id', '=', 'groups.responsible_user_id')
                 ->leftJoin('employees', 'employees.user_id', '=', 'users.id')
-                ->where('order_groups.submodel_id', $row->submodel_id)
+                ->where('order_groups.order_id', $row->order_id)
                 ->select(
                     'order_groups.id',
                     'groups.name',
