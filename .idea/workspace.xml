@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: correct table references for order groups in UserController">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ItemController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ItemController.php" afterDir="false" />
-    </list>
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update image handling to use S3 storage in ItemController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -252,7 +249,7 @@
       <workItem from="1763792435036" duration="9974000" />
       <workItem from="1764308484973" duration="3608000" />
       <workItem from="1764319488306" duration="6059000" />
-      <workItem from="1764391147557" duration="10451000" />
+      <workItem from="1764391147557" duration="10843000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -398,7 +395,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764405419227</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="fix: update image handling to use S3 storage in ItemController">
+      <option name="closed" value="true" />
+      <created>1764415344088</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1764415344088</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -415,7 +420,8 @@
     <MESSAGE value="Refactor employee data retrieval in WarehouseController to streamline response structure" />
     <MESSAGE value="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity" />
     <MESSAGE value="fix: correct table references for order groups in UserController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct table references for order groups in UserController" />
+    <MESSAGE value="fix: update image handling to use S3 storage in ItemController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update image handling to use S3 storage in ItemController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

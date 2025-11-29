@@ -41,18 +41,18 @@ class Item extends Model
         'currency_id',
     ];
 
-    public function getImageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
-    {
-        if (str_starts_with($value, 'items/')) {
-            return url('storage/' . $value);
-        }
-        return null;
-    }
+//    public function getImageAttribute($value): \Illuminate\Foundation\Application|string|\Illuminate\Contracts\Routing\UrlGenerator|\Illuminate\Contracts\Foundation\Application|null
+//    {
+//        if (str_starts_with($value, 'items/')) {
+//            return url('storage/' . $value);
+//        }
+//        return null;
+//    }
 
-    public function getImageRawAttribute(): ?string
-    {
-        return $this->attributes['image'] ?? null;
-    }
+//    public function getImageRawAttribute(): ?string
+//    {
+//        return $this->attributes['image'] ?? null;
+//    }
 
 
     public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
