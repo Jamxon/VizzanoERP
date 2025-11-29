@@ -950,7 +950,11 @@ class UserController extends Controller
                 'sub_models.name',
                 'orders.name',
                 'orders.quantity',
-                'orders.price'
+                'orders.price',
+                'groups.id',
+                'groups.name',
+                'groups.responsible_user_id',
+                'employees.name'
             )
             ->get();
 
