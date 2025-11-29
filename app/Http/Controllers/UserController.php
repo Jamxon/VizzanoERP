@@ -904,9 +904,9 @@ class UserController extends Controller
                 'models.minute as model_minute',
                 'sub_models.id as submodel_id',
                 'sub_models.name as submodel_name',
-                'order_groups_groups.id as group_id',
-                'order_groups_groups.name as group_name',
-                'order_groups_groups.responsible_user_id',
+                'order_group_groups.id as group_id',
+                'order_group_groups.name as group_name',
+                'order_group_groups.responsible_user_id',
                 'users.name as responsible_user_name',
                 DB::raw("COALESCE(SUM(daily_payments.calculated_amount),0) as earned_amount"),
                 DB::raw("COALESCE(SUM(daily_payments.bonus),0) as bonus"),
@@ -929,8 +929,8 @@ class UserController extends Controller
                     ->whereMonth('monthly_selected_orders.month', $month)
                     ->whereYear('monthly_selected_orders.month', $year);
             })
-            ->leftJoin('order_groups_groups', 'order_groups_groups.order_submodel_id', '=', 'order_sub_models.id')
-            ->leftJoin('users', 'users.id', '=', 'order_groups_groups.responsible_user_id')
+            ->leftJoin('order_group_groups', 'order_group_groups.order_submodel_id', '=', 'order_sub_models.id')
+            ->leftJoin('users', 'users.id', '=', 'order_group_groups.responsible_user_id')
             ->where('orders.branch_id', $branchId)
             ->whereExists(function($query) use ($month, $year) {
                 $query->select(DB::raw(1))
@@ -981,13 +981,13 @@ class UserController extends Controller
                 }
             }
 
-            $groups = DB::table('order_groups_groups')
-                ->leftJoin('users', 'users.id', '=', 'order_groups_groups.responsible_user_id')
-                ->where('order_groups_groups.order_submodel_id', $row->submodel_id)
+            $groups = DB::table('order_group_groups')
+                ->leftJoin('users', 'users.id', '=', 'order_group_groups.responsible_user_id')
+                ->where('order_group_groups.order_submodel_id', $row->submodel_id)
                 ->select(
-                    'order_groups_groups.id',
-                    'order_groups_groups.name',
-                    'order_groups_groups.responsible_user_id',
+                    'order_group_groups.id',
+                    'order_group_groups.name',
+                    'order_group_groups.responsible_user_id',
                     'users.name as responsible_user_name'
                 )
                 ->get();

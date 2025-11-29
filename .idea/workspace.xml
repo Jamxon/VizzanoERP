@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -251,7 +249,7 @@
       <workItem from="1763792435036" duration="9974000" />
       <workItem from="1764308484973" duration="3608000" />
       <workItem from="1764319488306" duration="6059000" />
-      <workItem from="1764391147557" duration="3411000" />
+      <workItem from="1764391147557" duration="3946000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
