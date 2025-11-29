@@ -249,7 +249,9 @@
       <workItem from="1763632790922" duration="8097000" />
       <workItem from="1763741478933" duration="14000" />
       <workItem from="1763792435036" duration="9974000" />
-      <workItem from="1764308484973" duration="3210000" />
+      <workItem from="1764308484973" duration="3608000" />
+      <workItem from="1764319488306" duration="6059000" />
+      <workItem from="1764391147557" duration="3411000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
