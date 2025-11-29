@@ -904,10 +904,10 @@ class UserController extends Controller
                 'models.minute as model_minute',
                 'sub_models.id as submodel_id',
                 'sub_models.name as submodel_name',
-                'order_groups.id as group_id',
-                'order_groups.name as group_name',
-                'order_groups.responsible_user_id',
-                'users.name as responsible_user_name',
+                'groups.id as group_id',
+                'groups.name as group_name',
+                'groups.responsible_user_id',
+                'employees.name as responsible_user_name',
                 DB::raw("COALESCE(SUM(daily_payments.calculated_amount),0) as earned_amount"),
                 DB::raw("COALESCE(SUM(daily_payments.bonus),0) as bonus"),
                 DB::raw("COALESCE(SUM(daily_payments.quantity_produced),0) as produced_quantity"),
@@ -930,7 +930,9 @@ class UserController extends Controller
                     ->whereYear('monthly_selected_orders.month', $year);
             })
             ->leftJoin('order_groups', 'order_groups.submodel_id', '=', 'order_sub_models.id')
-            ->leftJoin('users', 'users.id', '=', 'order_groups.responsible_user_id')
+            ->leftJoin('groups', 'groups.id', '=', 'order_groups.group_id')
+            ->leftJoin('users', 'users.id', '=', 'groups.responsible_user_id')
+            ->leftJoin('employees', 'users.id', '=', 'employees.user_id')
             ->where('orders.branch_id', $branchId)
             ->whereExists(function($query) use ($month, $year) {
                 $query->select(DB::raw(1))
@@ -982,13 +984,15 @@ class UserController extends Controller
             }
 
             $groups = DB::table('order_groups')
-                ->leftJoin('users', 'users.id', '=', 'order_groups.responsible_user_id')
+                ->leftJoin('groups', 'groups.id', '=', 'order_groups.group_id')
+                ->leftJoin('users', 'users.id', '=', 'groups.responsible_user_id')
+                ->leftJoin('employees', 'employees.user_id', '=', 'users.id')
                 ->where('order_groups.submodel_id', $row->submodel_id)
                 ->select(
                     'order_groups.id',
-                    'order_groups.name',
-                    'order_groups.responsible_user_id',
-                    'users.name as responsible_user_name'
+                    'groups.name',
+                    'groups.responsible_user_id',
+                    'employees.name as responsible_user_name'
                 )
                 ->get();
 
