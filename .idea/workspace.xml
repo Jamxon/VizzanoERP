@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity" />
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: correct table references for order groups in UserController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -249,7 +249,7 @@
       <workItem from="1763792435036" duration="9974000" />
       <workItem from="1764308484973" duration="3608000" />
       <workItem from="1764319488306" duration="6059000" />
-      <workItem from="1764391147557" duration="3946000" />
+      <workItem from="1764391147557" duration="4274000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -347,7 +347,23 @@
       <option name="project" value="LOCAL" />
       <updated>1763816106584</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="fix: correct table references for order groups in UserController">
+      <option name="closed" value="true" />
+      <created>1764404492923</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1764404492923</updated>
+    </task>
+    <task id="LOCAL-00014" summary="fix: correct table references for order groups in UserController">
+      <option name="closed" value="true" />
+      <created>1764404611983</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1764404611983</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -363,7 +379,8 @@
     <MESSAGE value="Refactor warehouseCompleteOrdersGet method to improve data handling and response structure" />
     <MESSAGE value="Refactor employee data retrieval in WarehouseController to streamline response structure" />
     <MESSAGE value="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity" />
+    <MESSAGE value="fix: correct table references for order groups in UserController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: correct table references for order groups in UserController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

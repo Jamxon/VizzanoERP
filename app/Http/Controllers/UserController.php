@@ -929,7 +929,7 @@ class UserController extends Controller
                     ->whereMonth('monthly_selected_orders.month', $month)
                     ->whereYear('monthly_selected_orders.month', $year);
             })
-            ->leftJoin('order_groups', 'order_groups.order_submodel_id', '=', 'order_sub_models.id')
+            ->leftJoin('order_groups', 'order_groups.submodel_id', '=', 'order_sub_models.id')
             ->leftJoin('users', 'users.id', '=', 'order_groups.responsible_user_id')
             ->where('orders.branch_id', $branchId)
             ->whereExists(function($query) use ($month, $year) {
@@ -983,7 +983,7 @@ class UserController extends Controller
 
             $groups = DB::table('order_groups')
                 ->leftJoin('users', 'users.id', '=', 'order_groups.responsible_user_id')
-                ->where('order_groups.order_submodel_id', $row->submodel_id)
+                ->where('order_groups.submodel_id', $row->submodel_id)
                 ->select(
                     'order_groups.id',
                     'order_groups.name',
