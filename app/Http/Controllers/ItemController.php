@@ -187,11 +187,13 @@ class ItemController extends Controller
                 }
             }
 
-            // 3. Faylni saqlash
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
-                $filename = time() . '_' . \Str::slug(pathinfo($image->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $image->getClientOriginalExtension();
-                $validated['image'] = $image->storeAs('items', $filename, 'public');
+                $imageName = 'items/' . time() . '_' . $image->getClientOriginalName();
+
+                Storage::disk('s3')->put($imageName, file_get_contents($image));
+
+                $validated['image'] = Storage::disk('s3')->url($imageName);
             }
 
             $validated['branch_id'] = auth()->user()->employee->branch_id;
@@ -246,25 +248,28 @@ class ItemController extends Controller
                 'lot' => 'sometimes',
             ]);
 
-            // 1. Rasm yangilanishi
+            // 1. Rasm yuklansa
             if ($request->hasFile('image') && $request->file('image')->isValid()) {
-                $image = $request->file('image');
-                $imageName = time() . '_' . $image->getClientOriginalName();
-                $imagePath = $image->storeAs('/items', $imageName);
-                $imagePath = str_replace('public/', '', $imagePath);
 
-                // eski rasmni o'chirish
-                if ($item->image && Storage::exists('public/' . $item->image)) {
-                    Storage::delete('public/' . $item->image);
+                // eski faylni o‘chirish
+                if ($item->image) {
+                    $old = str_replace(Storage::disk('s3')->url(''), '', $item->image);
+                    Storage::disk('s3')->delete($old);
                 }
 
-                $item->image = $imagePath;
+                $image = $request->file('image');
+                $imageName = 'items/' . time() . '_' . $image->getClientOriginalName();
+
+                Storage::disk('s3')->put($imageName, file_get_contents($image));
+
+                $item->image = Storage::disk('s3')->url($imageName);
             }
 
-            // 2. image = null deb kelsa
-            elseif ($request->has('image') && in_array($request->input('image'), [null, 'null', ''])) {
-                if ($item->image && Storage::exists('public/' . $item->image)) {
-                    Storage::delete('public/' . $item->image);
+            elseif ($request->has('image') && $request->input('image') === null) {
+
+                if ($item->image) {
+                    $old = str_replace(Storage::disk('s3')->url(''), '', $item->image);
+                    Storage::disk('s3')->delete($old);
                 }
 
                 $item->image = null;
