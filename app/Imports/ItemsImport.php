@@ -20,8 +20,17 @@ class ItemsImport implements ToModel, WithHeadingRow
         }
 
         $unit = Unit::where('name', $row['unit'] ?? '')->first();
+        if (!$unit && !empty($row['unit'])) {
+            $unit = Unit::create(['name' => $row['unit']]);
+        }
         $color = Color::where('name', $row['color'] ?? '')->first();
+        if (!$color && !empty($row['color'])) {
+            $color = Color::create(['name' => $row['color']]);
+        }
         $type  = ItemType::where('name', $row['type'] ?? '')->first();
+        if (!$type && !empty($row['type'])) {
+            $type = ItemType::create(['name' => $row['type']]);
+        }
 
         return new Item([
             'name'        => $row['name'],
