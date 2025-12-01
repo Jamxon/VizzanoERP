@@ -49,7 +49,7 @@ class ItemsImport implements ToModel, WithStartRow
             $typeModel = ItemType::firstOrCreate(['name' => $type]);
         }
 
-        return new Item([
+        Item::create([
             'name'         => $name,
             'price'        => 0,
             'unit_id'      => $unitModel->id ?? null,
