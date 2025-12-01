@@ -29,29 +29,21 @@ class ItemsImport implements ToModel, WithStartRow
     public function model(array $row)
     {
         info("ROW:", $row);
-        dd($row);
-        $name  = $row[0] ?? null;
-        $color = $row[1] ?? null;
-        $type  = $row[2] ?? null;
-        $unit  = $row[5] ?? null;
+
+        $name  = $row[1] ?? null;  // B ustun
+        $color = $row[2] ?? null;  // C ustun
+        $type  = $row[3] ?? null;  // D ustun
+        $unit  = $row[5] ?? null;  // F ustun (E keraksiz)
 
         if (!$name) {
             return null;
         }
 
-        if ($unit) {
-            $unitModel = Unit::firstOrCreate(['name' => $unit]);
-        }
+        $unitModel  = $unit  ? Unit::firstOrCreate(['name' => $unit])  : null;
+        $colorModel = $color ? Color::firstOrCreate(['name' => $color]) : null;
+        $typeModel  = $type  ? ItemType::firstOrCreate(['name' => $type]) : null;
 
-        if ($color) {
-            $colorModel = Color::firstOrCreate(['name' => $color]);
-        }
-
-        if ($type) {
-            $typeModel = ItemType::firstOrCreate(['name' => $type]);
-        }
-
-        Item::create([
+        return Item::create([
             'name'         => $name,
             'price'        => 0,
             'unit_id'      => $unitModel->id ?? null,
