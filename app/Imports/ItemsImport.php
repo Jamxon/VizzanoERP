@@ -7,40 +7,54 @@ use App\Models\Unit;
 use App\Models\Color;
 use App\Models\ItemType;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithStartRow;
 
-class ItemsImport implements ToModel, WithHeadingRow
+class ItemsImport implements ToModel, WithStartRow
 {
+    // 1-qatorda sarlavhalar bo‘lsa, ma'lumot 2-qatoridan boshlanadi
+    public function startRow(): int
+    {
+        return 2;
+    }
+
     public function model(array $row)
     {
-        if (!isset($row['name']) || empty($row['name'])) {
-            return null;
+        // Excel ustun mapping
+        $name  = $row[0] ?? null; // A
+        $color = $row[1] ?? null; // B
+        $type  = $row[2] ?? null; // C
+        // $row[3]   // D → keraksiz
+        $unit  = $row[5] ?? null; // F
+
+        if (!$name) {
+            return null; // name bo‘lmasa skip
         }
 
-        $unit = Unit::where('name', $row['unit'] ?? '')->first();
-        if (!$unit && !empty($row['unit'])) {
-            $unit = Unit::create(['name' => $row['unit']]);
+        // 🔵 Unit create or get
+        if ($unit) {
+            $unitModel = Unit::firstOrCreate(['name' => $unit]);
         }
-        $color = Color::where('name', $row['color'] ?? '')->first();
-        if (!$color && !empty($row['color'])) {
-            $color = Color::create(['name' => $row['color']]);
+
+        // 🔵 Color create or get
+        if ($color) {
+            $colorModel = Color::firstOrCreate(['name' => $color]);
         }
-        $type  = ItemType::where('name', $row['type'] ?? '')->first();
-        if (!$type && !empty($row['type'])) {
-            $type = ItemType::create(['name' => $row['type']]);
+
+        // 🔵 Type create or get
+        if ($type) {
+            $typeModel = ItemType::firstOrCreate(['name' => $type]);
         }
 
         return new Item([
-            'name'        => $row['name'],
-            'price'       => 0,
-            'unit_id'     => $unit?->id,
-            'color_id'    => $color?->id,
-            'type_id'     => $type?->id,
-            'code'        => Str::uuid(),
-            'min_quantity'=> 0,
-            'branch_id'   => auth()->user()->employee->branch_id,
+            'name'         => $name,
+            'price'        => 0,
+            'unit_id'      => $unitModel->id ?? null,
+            'color_id'     => $colorModel->id ?? null,
+            'type_id'      => $typeModel->id ?? null,
+            'code'         => Str::uuid(),
+            'min_quantity' => 0,
+            'branch_id'    => auth()->user()->employee->branch_id,
         ]);
     }
 }
