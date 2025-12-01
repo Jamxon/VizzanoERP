@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update image handling to use S3 storage in ItemController">
-      <change beforePath="$PROJECT_DIR$/app/Imports/ItemsImport.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Imports/ItemsImport.php" afterDir="false" />
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update item import logic to correctly map row indices and streamline model creation">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -253,7 +253,7 @@
       <workItem from="1764319488306" duration="6059000" />
       <workItem from="1764391147557" duration="11653000" />
       <workItem from="1764495947778" duration="2299000" />
-      <workItem from="1764563581605" duration="3327000" />
+      <workItem from="1764563581605" duration="4933000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -431,7 +431,23 @@
       <option name="project" value="LOCAL" />
       <updated>1764567241565</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="fix: update image handling to use S3 storage in ItemController">
+      <option name="closed" value="true" />
+      <created>1764567385404</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1764567385404</updated>
+    </task>
+    <task id="LOCAL-00024" summary="fix: update item import logic to correctly map row indices and streamline model creation">
+      <option name="closed" value="true" />
+      <created>1764567548877</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1764567548878</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -449,7 +465,8 @@
     <MESSAGE value="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity" />
     <MESSAGE value="fix: correct table references for order groups in UserController" />
     <MESSAGE value="fix: update image handling to use S3 storage in ItemController" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update image handling to use S3 storage in ItemController" />
+    <MESSAGE value="fix: update item import logic to correctly map row indices and streamline model creation" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update item import logic to correctly map row indices and streamline model creation" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

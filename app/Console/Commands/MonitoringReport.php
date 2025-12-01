@@ -92,23 +92,32 @@ class MonitoringReport extends Command
 
     private function readRecentLogs($file)
     {
-        if (!is_readable($file)) return collect();
+        $handle = fopen($file, "r");
+        if (!$handle) return collect();
 
-        $lines = [];
-        foreach (file($file) as $line) {
+        $result = [];
+
+        // 1 soatdan oldingi vaqt
+        $threshold = Carbon::now()->subHour();
+
+        while (($line = fgets($handle)) !== false) {
+
             $pos = strpos($line, '{');
             if ($pos === false) continue;
 
             $data = json_decode(substr($line, $pos), true);
             if (!$data || empty($data['time'])) continue;
 
-            if (Carbon::parse($data['time'])->greaterThan(Carbon::now()->subHour())) {
+            // Logni vaqt bo‘yicha filtr qilish
+            if (Carbon::parse($data['time'])->greaterThan($threshold)) {
                 $data['path'] = $data['path'] ?? 'Unknown';
-                $lines[] = $data;
+                $result[] = $data;
             }
         }
 
-        return collect($lines)->take(5000);
+        fclose($handle);
+
+        return collect($result); // Bu yerda limit yo‘q — hammasini oladi
     }
 
     private function getSystemUsage()
