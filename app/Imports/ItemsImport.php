@@ -28,6 +28,8 @@ class ItemsImport implements ToModel, WithStartRow
 
     public function model(array $row)
     {
+        info("ROW:", $row);
+        dd($row);
         $name  = $row[0] ?? null;
         $color = $row[1] ?? null;
         $type  = $row[2] ?? null;
