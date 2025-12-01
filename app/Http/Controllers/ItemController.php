@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\ItemsImport;
 use App\Jobs\NotifyUserOfCompletedExport;
 use App\Models\Item;
 use App\Models\Log;
@@ -327,6 +328,43 @@ class ItemController extends Controller
 
             return response()->json([
                 'message' => 'Xatolik yuz berdi!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function importItems(Request $request): \Illuminate\Http\JsonResponse
+    {
+        try {
+            $request->validate([
+                'file' => 'required|mimes:xlsx,xls,csv'
+            ]);
+
+            Excel::import(new ItemsImport, $request->file('file'));
+
+            Log::add(
+                auth()->user()->id,
+                'Excel orqali materiallar import qilindi',
+                'import',
+                null,
+                ['file' => $request->file('file')->getClientOriginalName()]
+            );
+
+            return response()->json([
+                'message' => 'Items imported successfully'
+            ]);
+        } catch (\Exception $e) {
+
+            Log::add(
+                auth()->user()->id,
+                'Excel importda xatolik',
+                'import_error',
+                null,
+                ['error' => $e->getMessage()]
+            );
+
+            return response()->json([
+                'message' => 'Import failed',
                 'error' => $e->getMessage(),
             ], 500);
         }

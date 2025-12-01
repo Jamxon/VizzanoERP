@@ -295,6 +295,7 @@ Route::prefix('warehouseManager')->middleware('role:warehouseManager')->group(fu
     Route::get('suppliers', [SupplierController::class, 'getSupplier']);
     Route::post('completeOrders', [WarehouseController::class, 'warehouseCompleteOrderStore']);
     Route::get('completeOrders', [WarehouseController::class, 'warehouseCompleteOrdersGet']);
+    Route::post('/items/import', [ItemController::class, 'importItems']);
 });
 
 Route::prefix('transport')->middleware('role:transport')->group(function () {
