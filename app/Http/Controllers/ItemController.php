@@ -340,7 +340,10 @@ class ItemController extends Controller
                 'file' => 'required|mimes:xlsx,xls,csv'
             ]);
 
-            Excel::import(new ItemsImport, $request->file('file'));
+            Excel::import(new ItemsImport(
+                auth()->id(),
+                auth()->user()->employee->branch_id
+            ), $request->file('file'));
 
             Log::add(
                 auth()->user()->id,

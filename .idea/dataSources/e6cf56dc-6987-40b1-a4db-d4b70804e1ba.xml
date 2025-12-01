@@ -6393,7 +6393,7 @@ gas</Labels>
     <table id="435" parent="263" name="items">
       <DetailsLevel>2</DetailsLevel>
       <ObjectId>18049</ObjectId>
-      <StateNumber>206116</StateNumber>
+      <StateNumber>10825837</StateNumber>
       <AccessMethodId>2</AccessMethodId>
       <OwnerName>vizzano</OwnerName>
     </table>
@@ -10813,8 +10813,9 @@ date</ColNames>
       <TypeId>23</TypeId>
     </column>
     <column id="1047" parent="435" name="image">
+      <DefaultExpression>NULL::character varying</DefaultExpression>
       <Position>6</Position>
-      <StateNumber>3262</StateNumber>
+      <StateNumber>10931595</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
@@ -10840,14 +10841,16 @@ date</ColNames>
       <TypeId>23</TypeId>
     </column>
     <column id="1051" parent="435" name="code">
+      <DefaultExpression>NULL::character varying</DefaultExpression>
       <Position>10</Position>
-      <StateNumber>3262</StateNumber>
+      <StateNumber>10931596</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
     <column id="1052" parent="435" name="qr_code">
+      <DefaultExpression>NULL::character varying</DefaultExpression>
       <Position>11</Position>
-      <StateNumber>3262</StateNumber>
+      <StateNumber>10931597</StateNumber>
       <StoredType>varchar(255)|0s</StoredType>
       <TypeId>1043</TypeId>
     </column>
@@ -10865,14 +10868,16 @@ date</ColNames>
       <TypeId>23</TypeId>
     </column>
     <column id="1055" parent="435" name="min_quantity">
+      <DefaultExpression>0</DefaultExpression>
       <Position>16</Position>
-      <StateNumber>193522</StateNumber>
+      <StateNumber>10931599</StateNumber>
       <StoredType>numeric|0s</StoredType>
       <TypeId>1700</TypeId>
     </column>
     <column id="1056" parent="435" name="lot">
+      <DefaultExpression>0</DefaultExpression>
       <Position>17</Position>
-      <StateNumber>206125</StateNumber>
+      <StateNumber>10931600</StateNumber>
       <StoredType>numeric|0s</StoredType>
       <TypeId>1700</TypeId>
     </column>
@@ -10881,7 +10886,7 @@ date</ColNames>
       <NameSurrogate>1</NameSurrogate>
       <ObjectId>18396</ObjectId>
       <Primary>1</Primary>
-      <StateNumber>193522</StateNumber>
+      <StateNumber>10825837</StateNumber>
       <Unique>1</Unique>
       <AccessMethodId>403</AccessMethodId>
     </index>

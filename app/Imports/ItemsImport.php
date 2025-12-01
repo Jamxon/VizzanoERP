@@ -12,7 +12,15 @@ use Maatwebsite\Excel\Concerns\WithStartRow;
 
 class ItemsImport implements ToModel, WithStartRow
 {
-    // 1-qatorda sarlavhalar bo‘lsa, ma'lumot 2-qatoridan boshlanadi
+    protected $userId;
+    protected $branchId;
+
+    public function __construct($userId, $branchId)
+    {
+        $this->userId = $userId;
+        $this->branchId = $branchId;
+    }
+
     public function startRow(): int
     {
         return 2;
@@ -20,28 +28,23 @@ class ItemsImport implements ToModel, WithStartRow
 
     public function model(array $row)
     {
-        // Excel ustun mapping
-        $name  = $row[0] ?? null; // A
-        $color = $row[1] ?? null; // B
-        $type  = $row[2] ?? null; // C
-        // $row[3]   // D → keraksiz
-        $unit  = $row[5] ?? null; // F
+        $name  = $row[0] ?? null;
+        $color = $row[1] ?? null;
+        $type  = $row[2] ?? null;
+        $unit  = $row[5] ?? null;
 
         if (!$name) {
-            return null; // name bo‘lmasa skip
+            return null;
         }
 
-        // 🔵 Unit create or get
         if ($unit) {
             $unitModel = Unit::firstOrCreate(['name' => $unit]);
         }
 
-        // 🔵 Color create or get
         if ($color) {
             $colorModel = Color::firstOrCreate(['name' => $color]);
         }
 
-        // 🔵 Type create or get
         if ($type) {
             $typeModel = ItemType::firstOrCreate(['name' => $type]);
         }
@@ -54,7 +57,7 @@ class ItemsImport implements ToModel, WithStartRow
             'type_id'      => $typeModel->id ?? null,
             'code'         => Str::uuid(),
             'min_quantity' => 0,
-            'branch_id'    => auth()->user()->employee->branch_id,
+            'branch_id'    => $this->branchId,
         ]);
     }
 }
