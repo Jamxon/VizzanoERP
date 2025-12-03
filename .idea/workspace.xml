@@ -253,7 +253,8 @@
       <workItem from="1764319488306" duration="6059000" />
       <workItem from="1764391147557" duration="11653000" />
       <workItem from="1764495947778" duration="2299000" />
-      <workItem from="1764563581605" duration="4933000" />
+      <workItem from="1764563581605" duration="5760000" />
+      <workItem from="1764754440368" duration="702000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -447,7 +448,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764567548878</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="fix: update item import logic to correctly map row indices and streamline model creation">
+      <option name="closed" value="true" />
+      <created>1764569697134</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1764569697134</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

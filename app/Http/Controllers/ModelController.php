@@ -60,7 +60,8 @@ class ModelController extends Controller
     public function getMaterials(): \Illuminate\Http\JsonResponse
     {
         $materials = Item::whereHas('type', function ($query) {
-            $query->where('name', 'Mato');
+            $query->where('name', 'Mato')
+                ->orWhere('name', 'Материал');
         })
             ->with(['color'])
             ->get();
