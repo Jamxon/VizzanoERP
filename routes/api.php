@@ -591,6 +591,7 @@ Route::prefix('orderManager')->middleware('role:orderManager')->group(function (
     Route::get('models/{model}', [ModelController::class, 'show']);
     Route::patch('models/{model}', [ModelController::class, 'update']);
     Route::delete('models/{model}', [ModelController::class, 'destroy']);
+    Route::patch('orders/change/{order}', [OrderController::class, 'changeOrderStatus']);
     Route::delete('models/image/{modelImage}', [ModelController::class, 'destroyImage']);
 
     Route::get('materials', [ModelController::class, 'getMaterials']);
