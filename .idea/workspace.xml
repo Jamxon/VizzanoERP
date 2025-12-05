@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update model.material_id validation to allow nullable values">
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: add route to update employee percentage in DailyPaymentController">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -255,6 +255,7 @@
       <workItem from="1764495947778" duration="2299000" />
       <workItem from="1764563581605" duration="5760000" />
       <workItem from="1764754440368" duration="2568000" />
+      <workItem from="1764936263174" duration="716000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -472,7 +473,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764755716066</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="fix: add route to update employee percentage in DailyPaymentController">
+      <option name="closed" value="true" />
+      <created>1764936631799</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1764936631799</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -493,7 +502,8 @@
     <MESSAGE value="fix: update item import logic to correctly map row indices and streamline model creation" />
     <MESSAGE value="fix: update getMaterials method to include additional material type in query" />
     <MESSAGE value="fix: update model.material_id validation to allow nullable values" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update model.material_id validation to allow nullable values" />
+    <MESSAGE value="fix: add route to update employee percentage in DailyPaymentController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: add route to update employee percentage in DailyPaymentController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
