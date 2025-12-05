@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update getMaterials method to include additional material type in query" />
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update model.material_id validation to allow nullable values">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -252,7 +254,7 @@
       <workItem from="1764391147557" duration="11653000" />
       <workItem from="1764495947778" duration="2299000" />
       <workItem from="1764563581605" duration="5760000" />
-      <workItem from="1764754440368" duration="1155000" />
+      <workItem from="1764754440368" duration="2568000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -462,7 +464,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764755231885</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="fix: update model.material_id validation to allow nullable values">
+      <option name="closed" value="true" />
+      <created>1764755716066</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1764755716066</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -482,7 +492,8 @@
     <MESSAGE value="fix: update image handling to use S3 storage in ItemController" />
     <MESSAGE value="fix: update item import logic to correctly map row indices and streamline model creation" />
     <MESSAGE value="fix: update getMaterials method to include additional material type in query" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: update getMaterials method to include additional material type in query" />
+    <MESSAGE value="fix: update model.material_id validation to allow nullable values" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update model.material_id validation to allow nullable values" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
