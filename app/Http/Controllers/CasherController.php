@@ -1780,16 +1780,18 @@ class CasherController extends Controller
             $defaultGroupId = $employees->find($empId)->group_id;
 
             foreach ($days as $day) {
-                $realGroupId = $defaultGroupId;
+                $realGroupId = $defaultGroupId; // default employee group
 
-                // Har bir group change tarixini tekshirish
+                // Kun bo'yicha group o'zgarishini topamiz
                 foreach ($empGroupChanges as $change) {
-                    if ($day->date >= $change->created_at) {
+                    if ($change->created_at <= $day->date) {
                         $realGroupId = $change->new_group_id;
+                    } else {
+                        break; // bundan keyingi o'zgarishlar hali kelmagan
                     }
                 }
 
-                // Agar filter group_id bo‘lsa, faqat shu groupdagi kunlarni olamiz
+                // Filter group_id faqat shu kun uchun
                 if (!empty($groupId) && $realGroupId != $groupId) continue;
 
                 if (!isset($attendanceGrouped[$empId][$realGroupId])) {
