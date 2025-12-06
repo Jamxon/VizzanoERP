@@ -254,15 +254,7 @@
       <workItem from="1764563581605" duration="5760000" />
       <workItem from="1764754440368" duration="2568000" />
       <workItem from="1764936263174" duration="3255000" />
-      <workItem from="1764997229693" duration="13957000" />
-    </task>
-    <task id="LOCAL-00020" summary="fix: update image handling to use S3 storage in ItemController">
-      <option name="closed" value="true" />
-      <created>1764415682282</created>
-      <option name="number" value="00020" />
-      <option name="presentableId" value="LOCAL-00020" />
-      <option name="project" value="LOCAL" />
-      <updated>1764415682282</updated>
+      <workItem from="1764997229693" duration="14321000" />
     </task>
     <task id="LOCAL-00021" summary="fix: update image handling to use S3 storage in ItemController">
       <option name="closed" value="true" />
@@ -648,7 +640,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765017492363</updated>
     </task>
-    <option name="localTasksCounter" value="69" />
+    <task id="LOCAL-00069" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765017644022</created>
+      <option name="number" value="00069" />
+      <option name="presentableId" value="LOCAL-00069" />
+      <option name="project" value="LOCAL" />
+      <updated>1765017644022</updated>
+    </task>
+    <option name="localTasksCounter" value="70" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
