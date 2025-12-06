@@ -1754,7 +1754,6 @@ class CasherController extends Controller
         elseif ($branchId) $employeeQuery->whereHas('department', fn($q) => $q->where('branch_id', $branchId));
         if ($type === 'aup') $employeeQuery->where('type', 'aup');
         elseif ($type === 'simple') $employeeQuery->where('type', '!=', 'aup');
-        if (!empty($groupId)) $employeeQuery->where('group_id', $groupId);
 
         $employees = $employeeQuery->get();
         $employeeIds = $employees->pluck('id')->toArray();
@@ -1829,14 +1828,15 @@ class CasherController extends Controller
             $defaultGroupId = $employee->group_id;
 
             foreach ($empAttendance as $day) {
-                $realGroupId = $defaultGroupId;
                 $dayDate = Carbon::parse($day->date)->startOfDay();
-
+                $realGroupId = $defaultGroupId;
                 foreach ($empGroupChanges as $change) {
                     $changeDate = Carbon::parse($change->created_at)->startOfDay();
-                    if ($changeDate <= $dayDate) $realGroupId = $change->new_group_id;
-                    else break;
+                    if ($changeDate <= $dayDate) {
+                        $realGroupId = $change->new_group_id;
+                    } else break;
                 }
+
                 if ($groupId && $realGroupId != $groupId) continue;
 
                 if (!isset($empDataPerGroup[$realGroupId])) $empDataPerGroup[$realGroupId] = ['attendance_salary' => 0, 'attendance_days' => 0];
