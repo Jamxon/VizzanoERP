@@ -1785,6 +1785,8 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
+        dd($monthlyPieceworksData);
+
         // Monthly Salaries
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
