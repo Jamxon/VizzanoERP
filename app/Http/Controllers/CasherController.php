@@ -1752,11 +1752,10 @@ class CasherController extends Controller
         $addOrderIds = MonthlySelectedOrder::where('month', $monthDate)
             ->pluck('order_id')->toArray();
 
-        $allOrderIds = Order::pluck('id')->toArray();
-        $minusOrderIds = array_diff($allOrderIds, $addOrderIds);
+        $minusOrderIds = Order::pluck('id')->diff($addOrderIds)->toArray();
 
         // Employees
-        $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id');
+        $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'department_id');
 
         if ($departmentId) {
             $employeeQuery->where('department_id', $departmentId);
@@ -1766,42 +1765,63 @@ class CasherController extends Controller
             });
         }
 
-        if ($type === 'aup') {
-            $employeeQuery->where('type', 'aup');
-        } elseif ($type === 'simple') {
-            $employeeQuery->where('type', '!=', 'aup');
-        }
-
-//        if (!empty($groupId)) {
-//            $employeeQuery->where('group_id', $groupId);
-//        }
+        if ($type === 'aup') $employeeQuery->where('type', 'aup');
+        elseif ($type === 'simple') $employeeQuery->where('type', '!=', 'aup');
 
         $employees = $employeeQuery->get();
         $employeeIds = $employees->pluck('id')->toArray();
 
         if (empty($employeeIds)) return response()->json([]);
 
-        // Attendance bulk
-        $attendanceData = DB::table('attendance_salary')
-            ->whereIn('employee_id', $employeeIds)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->select('employee_id', 'date', DB::raw('SUM(amount) as total_amount'), DB::raw('COUNT(*) as entries_count'))
-            ->groupBy('employee_id', 'date')
+        // Attendance with dynamic group split
+        $attendanceData = DB::table('attendance_salary as asal')
+            ->join('attendances as att', function ($q) {
+                $q->on('asal.employee_id', '=', 'att.employee_id')
+                    ->on('asal.date', '=', 'att.date');
+            })
+            ->whereIn('asal.employee_id', $employeeIds)
+            ->whereBetween('asal.date', [$startDate, $endDate])
+            ->select(
+                'asal.employee_id',
+                'asal.date',
+                'asal.amount',
+                'att.group_id as worked_group_id'
+            )
             ->get()
             ->groupBy('employee_id');
 
-        $attendanceTotals = $attendanceData->map(fn($records) => (object)[
-            'total_amount' => $records->sum('total_amount'),
-            'days_count' => $records->count(),
-        ]);
+        // Handle missing group via group_changes history
+        foreach ($attendanceData as $empId => $days) {
+            foreach ($days as $i => $day) {
+                if (!$day->worked_group_id) {
+                    $chg = DB::table('group_changes')
+                        ->where('employee_id', $empId)
+                        ->whereDate('created_at', '<=', $day->date)
+                        ->orderBy('created_at', 'desc')
+                        ->first();
 
-        $presentAttendance = DB::table('attendances')
-            ->whereIn('employee_id', $employeeIds)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->where('status', 'present')
-            ->pluck('employee_id')->toArray();
+                    $days[$i]->worked_group_id = $chg->new_group_id ?? Employee::find($empId)->group_id;
+                }
+            }
+        }
 
-        // Tarification logs with real worked group
+        // Salary grouped by group
+        $attendanceGrouped = [];
+        foreach ($attendanceData as $empId => $days) {
+            foreach ($days as $day) {
+                $gid = $day->worked_group_id ?: 0;
+                if (!isset($attendanceGrouped[$empId][$gid])) {
+                    $attendanceGrouped[$empId][$gid] = [
+                        'salary' => 0,
+                        'days' => 0
+                    ];
+                }
+                $attendanceGrouped[$empId][$gid]['salary'] += $day->amount;
+                $attendanceGrouped[$empId][$gid]['days']++;
+            }
+        }
+
+        // Tarification logs grouped by real group
         $tarificationQuery = DB::table('employee_tarification_logs as etl')
             ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
             ->join('tarification_categories as tc', 't.tarification_category_id', '=', 'tc.id')
@@ -1813,96 +1833,71 @@ class CasherController extends Controller
             ->whereIn('etl.employee_id', $employeeIds)
             ->whereNotIn('o.id', $minusOrderIds);
 
-// Agar group_id bo‘lsa → faqat shu group orderlari olinadi
-        if (!empty($groupId)) {
-            $tarificationQuery->where('g.id', $groupId);
-        }
+        if (!empty($groupId)) $tarificationQuery->where('g.id', $groupId);
 
         $tarificationData = $tarificationQuery
             ->select(
                 'etl.employee_id',
                 'etl.amount_earned',
-                'o.id as order_id',
                 'g.id as real_group_id'
             )
             ->get()
             ->groupBy('employee_id');
-        // Payments bulk
-        $paymentsData = DB::table('salary_payments')
-            ->whereIn('employee_id', $employeeIds)
-            ->whereBetween('month', [$startDate, $endDate])
-            ->get()
-            ->groupBy('employee_id');
 
-        $extraOrdersData = $addOrderIds;
-
-        // Positions & Groups
-        $positions = DB::table('positions')->pluck('name', 'id');
+        // Data build
         $groups = DB::table('groups')->pluck('name', 'id');
-
-        // Final processing
-        $processedEmployees = [];
+        $processed = [];
 
         foreach ($employees as $employee) {
+            $empDataPerGroup = [];
 
-            $att = $attendanceTotals->get($employee->id);
-            $attendanceSalary = $att->total_amount ?? 0;
-            $attendanceDays = $att->days_count ?? 0;
+            $attGroup = $attendanceGrouped[$employee->id] ?? [];
+            $tlGroups = $tarificationData[$employee->id] ?? collect();
 
-            $tl = $tarificationData->get($employee->id, collect());
-            $tarificationSalary = $tl->sum('amount_earned');
-
-            $workedGroupId = $tl->pluck('real_group_id')->unique()->first();
-
-            if (!$workedGroupId && $attendanceSalary <= 0 && !in_array($employee->id, $presentAttendance)) {
-                continue;
+            foreach ($attGroup as $gid => $data) {
+                $empDataPerGroup[$gid]['attendance_salary'] = $data['salary'];
+                $empDataPerGroup[$gid]['attendance_days'] = $data['days'];
             }
 
-            $orders = $tl->pluck('order_id')->unique()->merge($extraOrdersData)->unique()->values();
+            foreach ($tlGroups as $tl) {
+                $gid = $tl->real_group_id ?: 0;
+                if (!isset($empDataPerGroup[$gid])) {
+                    $empDataPerGroup[$gid] = [
+                        'attendance_salary' => 0,
+                        'attendance_days' => 0
+                    ];
+                }
+                $empDataPerGroup[$gid]['tarification_salary'] =
+                    ($empDataPerGroup[$gid]['tarification_salary'] ?? 0) + $tl->amount_earned;
+            }
 
-            $empPayments = $paymentsData->get($employee->id, collect());
-            $paidTotal = $empPayments->sum('amount');
-
-            $totalEarned = $tarificationSalary + $attendanceSalary;
-
-            if ($employee->status === 'kicked' && $totalEarned < 0) continue;
-
-            $processedEmployees[] = [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'position' => $positions[$employee->position_id] ?? 'N/A',
-                'group' => $workedGroupId ? ($groups[$workedGroupId] ?? 'N/A') : 'N/A',
-                'worked_group_id' => $workedGroupId,
-                'attendance_salary' => $attendanceSalary,
-                'attendance_days' => $attendanceDays,
-                'tarification_salary' => $tarificationSalary,
-                'total_earned' => $totalEarned,
-                'total_paid' => round($paidTotal, 2),
-                'net_balance' => round($totalEarned - $paidTotal, 2),
-                'orders' => $orders->toArray(),
-            ];
+            foreach ($empDataPerGroup as $gid => $row) {
+                $processed[$gid][] = [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'group' => $groups[$gid] ?? 'N/A',
+                    'attendance_salary' => $row['attendance_salary'] ?? 0,
+                    'attendance_days' => $row['attendance_days'] ?? 0,
+                    'tarification_salary' => $row['tarification_salary'] ?? 0,
+                    'total_earned' =>
+                        ($row['attendance_salary'] ?? 0) +
+                        ($row['tarification_salary'] ?? 0),
+                ];
+            }
         }
 
-        // Grouping by REAL worked group
-        $grouped = collect($processedEmployees)->groupBy('worked_group_id');
-
-        $result = [];
-
-        foreach ($grouped as $gid => $list) {
-            $groupName = $gid ? ($groups[$gid] ?? 'N/A') : 'Guruhsizlik';
-
-            $result[] = [
+        // Final format
+        $response = [];
+        foreach ($processed as $gid => $list) {
+            $response[] = [
                 'id' => $gid,
-                'name' => $groupName,
-                'total_balance' => $list->sum('total_earned'),
-                'employees' => $list->map(function ($e) {
-                    unset($e['worked_group_id']);
-                    return $e;
-                })->values()->toArray(),
+                'name' => $groups[$gid] ?? 'Guruhsizlik',
+                'total_balance' => collect($list)->sum('total_earned'),
+                'employees' => array_values($list)
             ];
         }
 
-        return response()->json(array_values($result));
+        return response()->json(array_values($response));
     }
 
     public function getEmployeeEarnings($employee, $startDate, $endDate, $orderIds = [])
