@@ -1744,6 +1744,7 @@ class CasherController extends Controller
             return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
         }
 
+        $debug = "";
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
 
