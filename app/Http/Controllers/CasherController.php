@@ -1817,7 +1817,7 @@ class CasherController extends Controller
 
             // debug chiqarish
             foreach ($debugAttendance as $log) {
-                $debug .= "Date: {$log['date']}, Employee {$log['emp_id']}, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}\n";
+                $debug .= "{$log['dateChange']}Date: {$log['date']}, Employee {$log['emp_id']}, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}\n";
             }
         }
         dd($debug);
