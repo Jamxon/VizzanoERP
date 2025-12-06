@@ -1560,7 +1560,7 @@ class CasherController extends Controller
                 'u.username as created_by_name' // <-- "created_by_name" is from users table
             )
             ->get()
-            ->keyBy('employee_id');
+            ->keyBy('emp.employee_id');
 
 // 5. Monthly Salaries - BULK
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
@@ -1577,7 +1577,7 @@ class CasherController extends Controller
                 'u.username as created_by_name'
             )
             ->get()
-            ->keyBy('employee_id');
+            ->keyBy('ems.employee_id');
 
         // 6. Extra orders data if needed
         $extraOrdersData = [];
