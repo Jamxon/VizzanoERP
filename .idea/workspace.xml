@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: correct group ID references in employee group changes" />
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update comments for clarity in CasherController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -254,23 +254,7 @@
       <workItem from="1764563581605" duration="5760000" />
       <workItem from="1764754440368" duration="2568000" />
       <workItem from="1764936263174" duration="3255000" />
-      <workItem from="1764997229693" duration="16620000" />
-    </task>
-    <task id="LOCAL-00033" summary="fix: update employee selection to include status and filter by working employees">
-      <option name="closed" value="true" />
-      <created>1765000252122</created>
-      <option name="number" value="00033" />
-      <option name="presentableId" value="LOCAL-00033" />
-      <option name="project" value="LOCAL" />
-      <updated>1765000252122</updated>
-    </task>
-    <task id="LOCAL-00034" summary="fix: update employee selection to include status and filter by working employees">
-      <option name="closed" value="true" />
-      <created>1765001344328</created>
-      <option name="number" value="00034" />
-      <option name="presentableId" value="LOCAL-00034" />
-      <option name="project" value="LOCAL" />
-      <updated>1765001344328</updated>
+      <workItem from="1764997229693" duration="16920000" />
     </task>
     <task id="LOCAL-00035" summary="fix: update employee selection to include status and filter by working employees">
       <option name="closed" value="true" />
@@ -648,7 +632,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765020157388</updated>
     </task>
-    <option name="localTasksCounter" value="82" />
+    <task id="LOCAL-00082" summary="fix: update comments for clarity in CasherController">
+      <option name="closed" value="true" />
+      <created>1765020383932</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1765020383932</updated>
+    </task>
+    <task id="LOCAL-00083" summary="fix: update comments for clarity in CasherController">
+      <option name="closed" value="true" />
+      <created>1765020455597</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1765020455597</updated>
+    </task>
+    <option name="localTasksCounter" value="84" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -672,7 +672,8 @@
     <MESSAGE value="fix: add route to update employee percentage in DailyPaymentController" />
     <MESSAGE value="fix: update employee selection to include status and filter by working employees" />
     <MESSAGE value="fix: correct group ID references in employee group changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix: correct group ID references in employee group changes" />
+    <MESSAGE value="fix: update comments for clarity in CasherController" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix: update comments for clarity in CasherController" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
