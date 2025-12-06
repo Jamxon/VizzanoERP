@@ -1773,7 +1773,7 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // 4. Monthly Pieceworks - BULK
+        // Monthly Pieceworks
         $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
             ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
@@ -1781,19 +1781,19 @@ class CasherController extends Controller
             ->whereMonth('emp.month', $month)
             ->select('emp.id', 'emp.employee_id', 'emp.amount', 'emp.comment', 'emp.status', 'e.name as created_by_name')
             ->get()
-            ->keyBy('employee_id');
+            ->groupBy('employee_id'); // <-- groupBy bo‘yicha to‘g‘riladik
 
-        // 5. Monthly Salaries - BULK
+        // Monthly Salaries
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
             ->whereIn('ems.employee_id', $employeeIds)
             ->whereMonth('ems.month', $month)
-            ->select( 'ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
+            ->select('ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
             ->get()
-            ->keyBy('employee_id');
+            ->groupBy('employee_id'); // <-- groupBy bo‘yicha to‘g‘riladik
 
-        // Attendance grouped by real group per day with $realGroupId logic
+        // Attendance grouped by real group per day
         $attendanceGrouped = [];
         foreach ($attendanceData as $empId => $days) {
             $empGroupChanges = $groupChanges[$empId] ?? collect();
@@ -1812,28 +1812,12 @@ class CasherController extends Controller
                     }
                 }
 
-                if (!isset($attendanceGrouped[$empId][$day->date][$realGroupId])) {
-                    $attendanceGrouped[$empId][$day->date][$realGroupId] = ['salary' => 0, 'days' => 0];
+                if (!isset($attendanceGrouped[$empId][$realGroupId])) {
+                    $attendanceGrouped[$empId][$realGroupId] = ['salary' => 0, 'days' => 0];
                 }
 
-                $attendanceGrouped[$empId][$day->date][$realGroupId]['salary'] += $day->amount;
-                $attendanceGrouped[$empId][$day->date][$realGroupId]['days']++;
-            }
-        }
-
-        // Attendance summed per group with optional group filter
-        $attendanceSumPerGroup = [];
-        foreach ($attendanceGrouped as $empId => $dates) {
-            foreach ($dates as $date => $groups) {
-                foreach ($groups as $gid => $data) {
-                    if (!empty($groupId) && $gid != $groupId) continue;
-
-                    if (!isset($attendanceSumPerGroup[$empId][$gid])) {
-                        $attendanceSumPerGroup[$empId][$gid] = ['salary' => 0, 'days' => 0];
-                    }
-                    $attendanceSumPerGroup[$empId][$gid]['salary'] += $data['salary'];
-                    $attendanceSumPerGroup[$empId][$gid]['days'] += $data['days'];
-                }
+                $attendanceGrouped[$empId][$realGroupId]['salary'] += $day->amount;
+                $attendanceGrouped[$empId][$realGroupId]['days']++;
             }
         }
 
@@ -1866,54 +1850,52 @@ class CasherController extends Controller
             $empDataPerGroup = [];
 
             // Attendance per group
-            $attGroups = $attendanceSumPerGroup[$employee->id] ?? [];
+            $attGroups = $attendanceGrouped[$employee->id] ?? [];
             foreach ($attGroups as $gid => $data) {
+                if (!empty($groupId) && $gid != $groupId) continue;
                 $empDataPerGroup[$gid]['attendance_salary'] = $data['salary'];
                 $empDataPerGroup[$gid]['attendance_days'] = $data['days'];
             }
-
-            // Monthly Piecework
-            $monthlyPiecework = $monthlyPieceworksData->get($employee->id);
-            $monthlyPieceworkData = null;
-            if ($monthlyPiecework) {
-                $monthlyPieceworkData = [
-                    'id' => $monthlyPiecework->id,
-                    'amount' => (float) $monthlyPiecework->amount,
-                    'status' => (bool) $monthlyPiecework->status,
-                    'created_by' => $monthlyPiecework->created_by_name,
-                    'comment' => $monthlyPiecework->comment,
-                ];
-            }
-
-// Monthly Salary
-            $monthlySalary = $monthlySalariesData->get($employee->id);
-            $monthlySalaryData = null;
-            if ($monthlySalary) {
-                $monthlySalaryData = [
-                    'id' => $monthlySalary->id,
-                    'amount' => (float) $monthlySalary->amount,
-                    'status' => (bool) $monthlySalary->status,
-                    'created_by' => $monthlySalary->created_by_name,
-                    'comment' => $monthlySalary->comment,
-                ];
-            }
-
 
             // Tarification per group
             $tlGroups = $tarificationData[$employee->id] ?? collect();
             foreach ($tlGroups as $tl) {
                 $gid = $tl->real_group_id ?: 0;
-
                 if (!empty($groupId) && $gid != $groupId) continue;
-
-                if (!isset($empDataPerGroup[$gid])) {
-                    $empDataPerGroup[$gid] = ['attendance_salary' => 0, 'attendance_days' => 0];
-                }
+                if (!isset($empDataPerGroup[$gid])) $empDataPerGroup[$gid] = ['attendance_salary' => 0, 'attendance_days' => 0];
                 $empDataPerGroup[$gid]['tarification_salary'] =
                     ($empDataPerGroup[$gid]['tarification_salary'] ?? 0) + $tl->amount_earned;
             }
 
             foreach ($empDataPerGroup as $gid => $row) {
+                // Monthly Piecework
+                $monthlyPieceworkData = null;
+                $mpData = $monthlyPieceworksData[$employee->id] ?? null;
+                if ($mpData) {
+                    $mp = $mpData->first(); // agar bir nechta bo‘lsa, oxirgi emas birinchi
+                    $monthlyPieceworkData = [
+                        'id' => $mp->id,
+                        'amount' => (float)$mp->amount,
+                        'status' => (bool)$mp->status,
+                        'created_by' => $mp->created_by_name,
+                        'comment' => $mp->comment,
+                    ];
+                }
+
+                // Monthly Salary
+                $monthlySalaryData = null;
+                $msData = $monthlySalariesData[$employee->id] ?? null;
+                if ($msData) {
+                    $ms = $msData->first();
+                    $monthlySalaryData = [
+                        'id' => $ms->id,
+                        'amount' => (float)$ms->amount,
+                        'status' => (bool)$ms->status,
+                        'created_by' => $ms->created_by_name,
+                        'comment' => $ms->comment,
+                    ];
+                }
+
                 $processed[$gid][] = [
                     'id' => $employee->id,
                     'name' => $employee->name,
