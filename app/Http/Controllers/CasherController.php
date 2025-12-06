@@ -1548,7 +1548,7 @@ class CasherController extends Controller
         // 4. Monthly Pieceworks - BULK
         $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
             ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
-            ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id') // <-- to'g'ri
+            ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id') // <-- to'g'ri alias
             ->whereIn('emp.employee_id', $employeeIds)
             ->where('emp.month', $monthDate)
             ->select(
@@ -1557,7 +1557,7 @@ class CasherController extends Controller
                 'emp.amount',
                 'emp.comment',
                 'emp.status',
-                'u.username as created_by_name'
+                'u.username as created_by_name' // <-- "created_by_name" is from users table
             )
             ->get()
             ->keyBy('employee_id');
