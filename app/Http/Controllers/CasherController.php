@@ -1773,6 +1773,26 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
+        // 4. Monthly Pieceworks - BULK
+        $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
+            ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
+            ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
+            ->whereIn('emp.employee_id', $employeeIds)
+            ->whereMonth('emp.month', $month)
+            ->select('emp.id', 'emp.employee_id', 'emp.amount', 'emp.comment', 'emp.status', 'e.name as created_by_name')
+            ->get()
+            ->keyBy('employee_id');
+
+        // 5. Monthly Salaries - BULK
+        $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
+            ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
+            ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
+            ->whereIn('ems.employee_id', $employeeIds)
+            ->whereMonth('ems.month', $month)
+            ->select( 'ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
+            ->get()
+            ->keyBy('employee_id');
+
         // Attendance grouped by real group per day with $realGroupId logic
         $attendanceGrouped = [];
         foreach ($attendanceData as $empId => $days) {
@@ -1852,6 +1872,33 @@ class CasherController extends Controller
                 $empDataPerGroup[$gid]['attendance_days'] = $data['days'];
             }
 
+            // Monthly Piecework
+            $monthlyPiecework = $monthlyPieceworksData->get($employee->id);
+            $monthlyPieceworkData = null;
+            if ($monthlyPiecework) {
+                $monthlyPieceworkData = [
+                    'id' => $monthlyPiecework->id,
+                    'amount' => (float) $monthlyPiecework->amount,
+                    'status' => (bool) $monthlyPiecework->status,
+                    'created_by' => $monthlyPiecework->created_by_name,
+                    'comment' => $monthlyPiecework->comment,
+                ];
+            }
+
+// Monthly Salary
+            $monthlySalary = $monthlySalariesData->get($employee->id);
+            $monthlySalaryData = null;
+            if ($monthlySalary) {
+                $monthlySalaryData = [
+                    'id' => $monthlySalary->id,
+                    'amount' => (float) $monthlySalary->amount,
+                    'status' => (bool) $monthlySalary->status,
+                    'created_by' => $monthlySalary->created_by_name,
+                    'comment' => $monthlySalary->comment,
+                ];
+            }
+
+
             // Tarification per group
             $tlGroups = $tarificationData[$employee->id] ?? collect();
             foreach ($tlGroups as $tl) {
@@ -1877,6 +1924,8 @@ class CasherController extends Controller
                     'total_earned' =>
                         ($row['attendance_salary'] ?? 0) +
                         ($row['tarification_salary'] ?? 0),
+                    'monthly_piecework' => $monthlyPieceworkData,
+                    'monthly_salary' => $monthlySalaryData,
                 ];
             }
         }
