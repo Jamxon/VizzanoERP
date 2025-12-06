@@ -1744,19 +1744,17 @@ class CasherController extends Controller
             return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
         }
 
-        $monthDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
-        $startDate = $monthDate;
+        $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
 
         // ORDER Filtering
-        $addOrderIds = MonthlySelectedOrder::where('month', $monthDate)
+        $addOrderIds = MonthlySelectedOrder::where('month', $startDate)
             ->pluck('order_id')->toArray();
 
         $minusOrderIds = Order::pluck('id')->diff($addOrderIds)->toArray();
 
         // Employees
         $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'department_id');
-
         if ($departmentId) {
             $employeeQuery->where('department_id', $departmentId);
         } elseif ($branchId) {
@@ -1764,7 +1762,6 @@ class CasherController extends Controller
                 $q->where('branch_id', $branchId);
             });
         }
-
         if ($type === 'aup') $employeeQuery->where('type', 'aup');
         elseif ($type === 'simple') $employeeQuery->where('type', '!=', 'aup');
 
@@ -1773,49 +1770,42 @@ class CasherController extends Controller
 
         if (empty($employeeIds)) return response()->json([]);
 
-        // Attendance with dynamic group split
-        $attendanceData = DB::table('attendance_salary as asal')
-            ->join('attendances as att', function ($q) {
-                $q->on('asal.employee_id', '=', 'att.employee_id')
-                    ->on('asal.date', '=', 'att.date');
-            })
-            ->whereIn('asal.employee_id', $employeeIds)
-            ->whereBetween('asal.date', [$startDate, $endDate])
-            ->select(
-                'asal.employee_id',
-                'asal.date',
-                'asal.amount',
-                'att.group_id as worked_group_id'
-            )
+        // Attendance
+        $attendanceData = DB::table('attendance_salary')
+            ->whereIn('employee_id', $employeeIds)
+            ->whereBetween('date', [$startDate, $endDate])
+            ->select('employee_id', 'date', 'amount')
             ->get()
             ->groupBy('employee_id');
 
-        // Handle missing group via group_changes history
-        foreach ($attendanceData as $empId => $days) {
-            foreach ($days as $i => $day) {
-                if (!$day->worked_group_id) {
-                    $chg = DB::table('group_changes')
-                        ->where('employee_id', $empId)
-                        ->whereDate('created_at', '<=', $day->date)
-                        ->orderBy('created_at', 'desc')
-                        ->first();
+        // Group changes for employees in this month
+        $groupChanges = DB::table('group_changes')
+            ->whereIn('employee_id', $employeeIds)
+            ->whereDate('created_at', '<=', $endDate)
+            ->orderBy('created_at', 'asc')
+            ->get()
+            ->groupBy('employee_id');
 
-                    $days[$i]->worked_group_id = $chg->new_group_id ?? Employee::find($empId)->group_id;
-                }
-            }
-        }
-
-        // Salary grouped by group
+        // Attendance salary per group
         $attendanceGrouped = [];
         foreach ($attendanceData as $empId => $days) {
             foreach ($days as $day) {
-                $gid = $day->worked_group_id ?: 0;
-                if (!isset($attendanceGrouped[$empId][$gid])) {
-                    $attendanceGrouped[$empId][$gid] = [
-                        'salary' => 0,
-                        'days' => 0
-                    ];
+                $gid = $employees->find($empId)->group_id; // default employee group
+
+                if (isset($groupChanges[$empId])) {
+                    foreach ($groupChanges[$empId] as $change) {
+                        if ($day->date >= $change->created_at) {
+                            $gid = $change->new_group_id;
+                        }
+                    }
                 }
+
+                if (!empty($groupId) && $gid != $groupId) continue;
+
+                if (!isset($attendanceGrouped[$empId][$gid])) {
+                    $attendanceGrouped[$empId][$gid] = ['salary' => 0, 'days' => 0];
+                }
+
                 $attendanceGrouped[$empId][$gid]['salary'] += $day->amount;
                 $attendanceGrouped[$empId][$gid]['days']++;
             }
@@ -1836,15 +1826,10 @@ class CasherController extends Controller
         if (!empty($groupId)) $tarificationQuery->where('g.id', $groupId);
 
         $tarificationData = $tarificationQuery
-            ->select(
-                'etl.employee_id',
-                'etl.amount_earned',
-                'g.id as real_group_id'
-            )
+            ->select('etl.employee_id', 'etl.amount_earned', 'g.id as real_group_id')
             ->get()
             ->groupBy('employee_id');
 
-        // Data build
         $groups = DB::table('groups')->pluck('name', 'id');
         $processed = [];
 
@@ -1862,10 +1847,7 @@ class CasherController extends Controller
             foreach ($tlGroups as $tl) {
                 $gid = $tl->real_group_id ?: 0;
                 if (!isset($empDataPerGroup[$gid])) {
-                    $empDataPerGroup[$gid] = [
-                        'attendance_salary' => 0,
-                        'attendance_days' => 0
-                    ];
+                    $empDataPerGroup[$gid] = ['attendance_salary' => 0, 'attendance_days' => 0];
                 }
                 $empDataPerGroup[$gid]['tarification_salary'] =
                     ($empDataPerGroup[$gid]['tarification_salary'] ?? 0) + $tl->amount_earned;
@@ -1886,7 +1868,6 @@ class CasherController extends Controller
             }
         }
 
-        // Final format
         $response = [];
         foreach ($processed as $gid => $list) {
             $response[] = [
