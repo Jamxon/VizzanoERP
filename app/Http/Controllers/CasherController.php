@@ -1857,7 +1857,7 @@ class CasherController extends Controller
                 $monthlyPieceworkData = null;
                 $mpData = $monthlyPieceworksData[$employee->id] ?? null;
                 if ($mpData) {
-                    $mp = $mpData->first();
+                    $mp = $mpData;
                     $monthlyPieceworkData = [
                         'id' => $mp->id,
                         'amount' => (float)$mp->amount,
@@ -1871,7 +1871,7 @@ class CasherController extends Controller
                 $monthlySalaryData = null;
                 $msData = $monthlySalariesData[$employee->id] ?? null;
                 if ($msData) {
-                    $ms = $msData->first();
+                    $ms = $msData;
                     $monthlySalaryData = [
                         'id' => $ms->id,
                         'amount' => (float)$ms->amount,
