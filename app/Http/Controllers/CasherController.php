@@ -1790,7 +1790,7 @@ class CasherController extends Controller
                 foreach ($empGroupChanges as $change) {
                     $changeDate = Carbon::parse($change->created_at)->startOfDay();
                     if ($changeDate > $dayDate) {
-                        $realGroupId = $change->new_group_id;
+                        $realGroupId = $change->old_group_id;
                         $dateChange = $change->old_group_id;
                     } else {
                         break;
