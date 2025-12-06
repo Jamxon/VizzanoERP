@@ -1780,26 +1780,25 @@ class CasherController extends Controller
             $defaultGroupId = $employees->find($empId)->group_id;
 
             foreach ($days as $day) {
-                $realGroupId = $defaultGroupId; // default employee group
+                $realGroupId = $defaultGroupId;
 
-                // Kun bo'yicha group o'zgarishini topamiz
                 foreach ($empGroupChanges as $change) {
                     if ($change->created_at <= $day->date) {
                         $realGroupId = $change->new_group_id;
                     } else {
-                        break; // bundan keyingi o'zgarishlar hali kelmagan
+                        break;
                     }
                 }
 
-                // Filter group_id faqat shu kun uchun
+                // Shu kun uchun filter
                 if (!empty($groupId) && $realGroupId != $groupId) continue;
 
-                if (!isset($attendanceGrouped[$empId][$realGroupId])) {
-                    $attendanceGrouped[$empId][$realGroupId] = ['salary' => 0, 'days' => 0];
+                if (!isset($attendanceGrouped[$empId][$day->date][$realGroupId])) {
+                    $attendanceGrouped[$empId][$day->date][$realGroupId] = ['salary' => 0, 'days' => 0];
                 }
 
-                $attendanceGrouped[$empId][$realGroupId]['salary'] += $day->amount;
-                $attendanceGrouped[$empId][$realGroupId]['days']++;
+                $attendanceGrouped[$empId][$day->date][$realGroupId]['salary'] += $day->amount;
+                $attendanceGrouped[$empId][$day->date][$realGroupId]['days']++;
             }
         }
 
