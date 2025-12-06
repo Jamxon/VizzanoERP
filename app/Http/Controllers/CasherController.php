@@ -1800,7 +1800,7 @@ class CasherController extends Controller
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['salary'] += $day->amount;
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['days']++;
 
-                if ($attendanceData->employee_id == 1525){
+                if ($day->employee_id == 1525){
                     dd($attendanceData);
                 }
             }

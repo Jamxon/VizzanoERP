@@ -254,7 +254,7 @@
       <workItem from="1764563581605" duration="5760000" />
       <workItem from="1764754440368" duration="2568000" />
       <workItem from="1764936263174" duration="3255000" />
-      <workItem from="1764997229693" duration="7726000" />
+      <workItem from="1764997229693" duration="8195000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -576,7 +576,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765011255613</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765011725384</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1765011725384</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
