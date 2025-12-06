@@ -1801,7 +1801,8 @@ class CasherController extends Controller
                         'date' => $day->date,
                         'default_group' => $defaultGroupId,
                         'real_group' => $realGroupId,
-                        'amount' => $day->amount
+                        'amount' => $day->amount,
+                        'emp_id' => $empId,
                     ];
                 }
 
@@ -1811,7 +1812,7 @@ class CasherController extends Controller
         }
 
             foreach ($debugAttendance as $log) {
-                $debug .= "Date: {$log['date']}, Employee 1525, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}\n";
+                $debug .= "Date: {$log['date']}, Employee {$empId}, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}\n";
             }
 
             dd($debug);
