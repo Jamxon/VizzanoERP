@@ -1773,7 +1773,7 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // Attendance grouped by real group per day
+        // Attendance grouped by real group per day with $realGroupId logic
         $attendanceGrouped = [];
         foreach ($attendanceData as $empId => $days) {
             $empGroupChanges = $groupChanges[$empId] ?? collect();
@@ -1801,11 +1801,13 @@ class CasherController extends Controller
             }
         }
 
-        // Attendance summed per group
+        // Attendance summed per group with optional group filter
         $attendanceSumPerGroup = [];
         foreach ($attendanceGrouped as $empId => $dates) {
             foreach ($dates as $date => $groups) {
                 foreach ($groups as $gid => $data) {
+                    if (!empty($groupId) && $gid != $groupId) continue;
+
                     if (!isset($attendanceSumPerGroup[$empId][$gid])) {
                         $attendanceSumPerGroup[$empId][$gid] = ['salary' => 0, 'days' => 0];
                     }
