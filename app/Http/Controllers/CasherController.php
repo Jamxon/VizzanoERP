@@ -1837,7 +1837,7 @@ class CasherController extends Controller
                     if ($changeDate > $dayDate) $realGroupId = $change->new_group_id;
                     else break;
                 }
-                if ($groupId && $realGroupId != $groupId) continue;
+//                if ($groupId && $realGroupId != $groupId) continue;
 
                 if (!isset($empDataPerGroup[$realGroupId])) $empDataPerGroup[$realGroupId] = ['attendance_salary' => 0, 'attendance_days' => 0];
                 $empDataPerGroup[$realGroupId]['attendance_salary'] += $day->amount;
