@@ -1893,6 +1893,15 @@ class CasherController extends Controller
                     ];
                 }
 
+                $totalEarned = ($row['attendance_salary'] ?? 0) + ($row['tarification_salary'] ?? 0);
+
+                if ($totalEarned == 0) {
+                    // Agar group_id filter bo'lsa va employee bu groupda hech nima topmagan bo'lsa, o'tkazib yuborish
+                    if (!empty($groupId)) continue;
+                    // Agar filter bo'lmasa, lekin employee umumiy 0 bo'lsa, ham chiqarish shart emas
+                    else continue;
+                }
+
                 $processed[$gid][] = [
                     'id' => $employee->id,
                     'name' => $employee->name,
