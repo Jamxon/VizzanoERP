@@ -1791,17 +1791,18 @@ class CasherController extends Controller
                     }
                 }
 
-                // Debug faqat 1525 employee uchun
-                if ($empId == 1525) {
-                   dd("Date: {$day->date}, Employee 1525, Default Group: {$defaultGroupId}, Real Group: {$realGroupId}, Amount: {$day->amount}");
-                }
-
                 if (!isset($attendanceGrouped[$empId][$day->date][$realGroupId])) {
                     $attendanceGrouped[$empId][$day->date][$realGroupId] = ['salary' => 0, 'days' => 0];
                 }
 
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['salary'] += $day->amount;
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['days']++;
+            }
+        }
+
+        if (!empty($debugAttendance)) {
+            foreach ($debugAttendance as $log) {
+                dd("Date: {$log['date']}, Employee 1525, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}");
             }
         }
 
