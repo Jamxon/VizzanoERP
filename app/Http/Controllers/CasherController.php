@@ -1853,12 +1853,11 @@ class CasherController extends Controller
 
                 foreach ($empGroupChanges as $change) {
                     $changeDate = Carbon::parse($change->created_at)->startOfDay();
-                    if ($changeDate <= $tlDate) $realGroupId = $change->new_group_id;
+                    if ($changeDate < $tlDate) $realGroupId = $change->new_group_id;
                     else break;
                 }
 
-                // Agar group filter mavjud bo'lsa va mos kelmasa, o'tkazib yuborish
-                if (!empty($groupId) && $realGroupId != $groupId) continue;
+                if ($groupId && $realGroupId != $groupId) continue;
 
                 if (!isset($empDataPerGroup[$realGroupId])) $empDataPerGroup[$realGroupId] = ['attendance_salary' => 0, 'attendance_days' => 0];
                 $empDataPerGroup[$realGroupId]['tarification_salary'] =
