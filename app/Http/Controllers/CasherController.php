@@ -1748,7 +1748,7 @@ class CasherController extends Controller
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
         $monthDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
 
-        // Employee Query
+        // Employee query
         $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id');
         if ($departmentId) $employeeQuery->where('department_id', $departmentId);
         elseif ($branchId) $employeeQuery->whereHas('department', fn($q) => $q->where('branch_id', $branchId));
@@ -1760,7 +1760,7 @@ class CasherController extends Controller
         $employeeIds = $employees->pluck('id')->toArray();
         if (empty($employeeIds)) return response()->json([]);
 
-        // Attendance salaries grouped
+        // Attendance per employee
         $attendanceData = DB::table('attendance_salary')
             ->whereIn('employee_id', $employeeIds)
             ->whereBetween('date', [$startDate, $endDate])
@@ -1775,7 +1775,7 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // Monthly Pieceworks
+        // Monthly pieceworks & salaries
         $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
             ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
@@ -1785,7 +1785,6 @@ class CasherController extends Controller
             ->get()
             ->keyBy('employee_id');
 
-        // Monthly Salaries
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
@@ -1810,11 +1809,11 @@ class CasherController extends Controller
             ->whereIn('etl.employee_id', $employeeIds)
             ->whereNotIn('o.id', $minusOrderIds)
             ->when(!empty($groupId), fn($q) => $q->where('g.id', $groupId))
-            ->select('etl.employee_id', 'etl.amount_earned', 'g.id as real_group_id', 'o.id as order_id')
+            ->select('etl.employee_id', 'etl.amount_earned', 'o.id as order_id', 'g.id as real_group_id')
             ->get()
             ->groupBy('employee_id');
 
-        // Salary payments
+        // Payments
         $paymentsData = DB::table('salary_payments')
             ->whereIn('employee_id', $employeeIds)
             ->whereBetween('month', [$startDate, $endDate])
@@ -1839,7 +1838,6 @@ class CasherController extends Controller
             foreach ($empAttendance as $day) {
                 $realGroupId = $defaultGroupId;
                 $dayDate = Carbon::parse($day->date)->startOfDay();
-
                 foreach ($empGroupChanges as $change) {
                     $changeDate = Carbon::parse($change->created_at)->startOfDay();
                     if ($changeDate > $dayDate) $realGroupId = $change->old_group_id;
@@ -1853,17 +1851,29 @@ class CasherController extends Controller
 
             // Tarification per group
             $tlGroups = $tarificationData[$employee->id] ?? collect();
-            $orderIdsByEmployee = [];
             foreach ($tlGroups as $tl) {
                 $gid = $tl->real_group_id ?: 0;
                 if (!isset($empDataPerGroup[$gid])) $empDataPerGroup[$gid] = ['attendance_salary' => 0, 'attendance_days' => 0];
-                $empDataPerGroup[$gid]['tarification_salary'] =
-                    ($empDataPerGroup[$gid]['tarification_salary'] ?? 0) + $tl->amount_earned;
-
-                $orderIdsByEmployee[] = $tl->order_id;
+                $empDataPerGroup[$gid]['tarification_salary'] = ($empDataPerGroup[$gid]['tarification_salary'] ?? 0) + $tl->amount_earned;
+                if (!isset($empDataPerGroup[$gid]['orders'])) $empDataPerGroup[$gid]['orders'] = [];
+                $empDataPerGroup[$gid]['orders'][] = $tl->order_id;
             }
 
-            $orderIdsByEmployee = collect($orderIdsByEmployee)->merge($addOrderIds)->unique()->values()->toArray();
+            // Payments by type
+            $empPayments = $paymentsData[$employee->id] ?? collect();
+            $paidAmountsByType = [];
+            $paidTotal = 0;
+            foreach ($empPayments->groupBy('type') as $ptype => $payments) {
+                $paidAmountsByType[$ptype] = $payments->map(function ($payment) use (&$paidTotal) {
+                    $paidTotal += (float)$payment->amount;
+                    return [
+                        'amount' => (float)$payment->amount,
+                        'date' => $payment->date,
+                        'comment' => $payment->comment,
+                        'month' => $payment->month ? Carbon::parse($payment->month)->format('Y-m') : null,
+                    ];
+                })->values()->toArray();
+            }
 
             foreach ($empDataPerGroup as $gid => $row) {
                 // Monthly Piecework
@@ -1892,22 +1902,6 @@ class CasherController extends Controller
                     ];
                 }
 
-                // Payments
-                $empPayments = $paymentsData[$employee->id] ?? collect();
-                $paidAmountsByType = [];
-                $paidTotal = 0;
-                foreach ($empPayments->groupBy('type') as $ptype => $payments) {
-                    $paidAmountsByType[$ptype] = $payments->map(function ($payment) use (&$paidTotal) {
-                        $paidTotal += (float) $payment->amount;
-                        return [
-                            'amount' => (float) $payment->amount,
-                            'date' => $payment->date,
-                            'comment' => $payment->comment,
-                            'month' => $payment->month ? Carbon::parse($payment->month)->format('Y-m') : null,
-                        ];
-                    })->values()->toArray();
-                }
-
                 $totalEarned = ($row['attendance_salary'] ?? 0) + ($row['tarification_salary'] ?? 0);
 
                 $processed[$gid][] = [
@@ -1919,12 +1913,16 @@ class CasherController extends Controller
                     'attendance_days' => $row['attendance_days'] ?? 0,
                     'tarification_salary' => $row['tarification_salary'] ?? 0,
                     'total_earned' => $totalEarned,
+                    'orders' => array_values($row['orders'] ?? []),
+                    'monthly_piecework' => $monthlyPieceworkData,
+                    'monthly_salary' => $monthlySalaryData,
                     'paid_amounts' => $paidAmountsByType,
                     'total_paid' => round($paidTotal, 2),
                     'net_balance' => round($totalEarned - $paidTotal, 2),
-                    'orders' => $orderIdsByEmployee,
-                    'monthly_piecework' => $monthlyPieceworkData,
-                    'monthly_salary' => $monthlySalaryData,
+                    'salary' => (float)$employee->salary,
+                    'balance' => (float)$employee->balance,
+                    'payment_type' => $employee->payment_type,
+                    'status' => $employee->status,
                 ];
             }
         }
@@ -1935,7 +1933,7 @@ class CasherController extends Controller
                 'id' => $gid,
                 'name' => $groups[$gid] ?? 'Guruhsizlik',
                 'total_balance' => collect($list)->sum('total_earned'),
-                'employees' => array_values($list)
+                'employees' => array_values($list),
             ];
         }
 
