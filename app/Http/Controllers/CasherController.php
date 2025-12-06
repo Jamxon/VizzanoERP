@@ -1821,7 +1821,7 @@ class CasherController extends Controller
                 $debug .= "{$log['dateChange']}Date: {$log['date']}, Employee {$log['emp_id']}, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}\n";
             }
         }
-        dd($debug);
+//        dd($debug);
 
         // Attendance summed per group
         $attendanceSumPerGroup = [];
