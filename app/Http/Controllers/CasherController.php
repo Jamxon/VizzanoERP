@@ -1908,8 +1908,8 @@ class CasherController extends Controller
 
             $employeeGroupChanges = $groupChanges->get($employee->id, collect())->map(function ($gc) use ($groups) {
                 return [
-                    'old_group' => $groups->get($gc->from_group_id) ?? 'N/A',
-                    'new_group' => $groups->get($gc->to_group_id) ?? 'N/A',
+                    'old_group' => $groups->get($gc->old_group_id) ?? 'N/A',
+                    'new_group' => $groups->get($gc->new_group_id) ?? 'N/A',
                     'date' => Carbon::parse($gc->created_at)->toDateString(),
                 ];
             });
