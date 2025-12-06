@@ -1834,10 +1834,9 @@ class CasherController extends Controller
 
                 foreach ($empGroupChanges as $change) {
                     $changeDate = Carbon::parse($change->created_at)->startOfDay();
-                    if ($changeDate > $dayDate) $realGroupId = $change->new_group_id;
+                    if ($changeDate > $dayDate) $realGroupId = $change->old_group_id;
                     else break;
                 }
-//                if ($groupId && $realGroupId != $groupId) continue;
 
                 if (!isset($empDataPerGroup[$realGroupId])) $empDataPerGroup[$realGroupId] = ['attendance_salary' => 0, 'attendance_days' => 0];
                 $empDataPerGroup[$realGroupId]['attendance_salary'] += $day->amount;
@@ -1893,15 +1892,6 @@ class CasherController extends Controller
                         'comment' => $ms->comment,
                     ];
                 }
-
-                $totalEarned = ($row['attendance_salary'] ?? 0) + ($row['tarification_salary'] ?? 0);
-
-//                if ($totalEarned == 0) {
-//                    // Agar group_id filter bo'lsa va employee bu groupda hech nima topmagan bo'lsa, o'tkazib yuborish
-//                    if (!empty($groupId)) continue;
-//                    // Agar filter bo'lmasa, lekin employee umumiy 0 bo'lsa, ham chiqarish shart emas
-//                    else continue;
-//                }
 
                 $processed[$gid][] = [
                     'id' => $employee->id,
