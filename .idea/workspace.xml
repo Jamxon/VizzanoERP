@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update employee selection to include status and filter by working employees" />
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update employee selection to include status and filter by working employees">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -253,7 +256,8 @@
       <workItem from="1764495947778" duration="2299000" />
       <workItem from="1764563581605" duration="5760000" />
       <workItem from="1764754440368" duration="2568000" />
-      <workItem from="1764936263174" duration="1338000" />
+      <workItem from="1764936263174" duration="3255000" />
+      <workItem from="1764997229693" duration="1788000" />
     </task>
     <task id="LOCAL-00001" summary="Add present attendance check in CasherController and update PHPUnit config">
       <option name="closed" value="true" />
@@ -487,7 +491,15 @@
       <option name="project" value="LOCAL" />
       <updated>1764937600879</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1764938697244</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1764938697244</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
