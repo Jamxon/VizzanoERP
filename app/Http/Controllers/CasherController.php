@@ -1795,16 +1795,25 @@ class CasherController extends Controller
                     $attendanceGrouped[$empId][$day->date][$realGroupId] = ['salary' => 0, 'days' => 0];
                 }
 
+                if ($empId == 1525) {
+                    $debugAttendance[] = [
+                        'date' => $day->date,
+                        'default_group' => $defaultGroupId,
+                        'real_group' => $realGroupId,
+                        'amount' => $day->amount
+                    ];
+                }
+
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['salary'] += $day->amount;
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['days']++;
             }
         }
 
-        if (!empty($debugAttendance)) {
             foreach ($debugAttendance as $log) {
-                dd("Date: {$log['date']}, Employee 1525, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}");
+                $debug .= "Date: {$log['date']}, Employee 1525, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}\n";
             }
-        }
+
+            dd($debug);
 
         // Attendance summed per group
         $attendanceSumPerGroup = [];
