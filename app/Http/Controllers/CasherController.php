@@ -1780,42 +1780,43 @@ class CasherController extends Controller
             $empGroupChanges = $groupChanges[$empId] ?? collect();
             $defaultGroupId = $employees->find($empId)->group_id;
 
+            $debugAttendance = []; // har employee uchun alohida
+
             foreach ($days as $day) {
+                $realGroupId = $defaultGroupId;
                 $dayDate = Carbon::parse($day->date)->startOfDay();
-                $realGroupId = $employees->find($empId)->group_id; // default group
 
                 foreach ($empGroupChanges as $change) {
                     $changeDate = Carbon::parse($change->created_at)->startOfDay();
-                    if ($changeDate > $dayDate) {
+                    if ($changeDate->lessThanOrEqualTo($dayDate)) {
                         $realGroupId = $change->new_group_id;
+                    } else {
+                        break;
                     }
                 }
 
-                // Attendance grouped
                 if (!isset($attendanceGrouped[$empId][$day->date][$realGroupId])) {
                     $attendanceGrouped[$empId][$day->date][$realGroupId] = ['salary' => 0, 'days' => 0];
                 }
 
-                if ($empId == 1525) {
-                    $debugAttendance[] = [
-                        'date' => $day->date,
-                        'default_group' => $defaultGroupId,
-                        'real_group' => $realGroupId,
-                        'amount' => $day->amount,
-                        'emp_id' => $empId,
-                    ];
-                }
+                $debugAttendance[] = [
+                    'date' => $day->date,
+                    'default_group' => $defaultGroupId,
+                    'real_group' => $realGroupId,
+                    'amount' => $day->amount,
+                    'emp_id' => $empId,
+                ];
 
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['salary'] += $day->amount;
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['days']++;
             }
-        }
 
+            // debug chiqarish
             foreach ($debugAttendance as $log) {
-                $debug .= "Date: {$log['date']}, Employee {$empId}, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}\n";
+                $debug .= "Date: {$log['date']}, Employee {$log['emp_id']}, Default Group: {$log['default_group']}, Real Group: {$log['real_group']}, Amount: {$log['amount']}\n";
             }
-
-            dd($debug);
+        }
+        dd($debug);
 
         // Attendance summed per group
         $attendanceSumPerGroup = [];
