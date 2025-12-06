@@ -1551,17 +1551,30 @@ class CasherController extends Controller
             ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
             ->whereIn('emp.employee_id', $employeeIds)
             ->where('emp.month', $monthDate)
-            ->select('emp.id', 'emp.employee_id', 'emp.amount', 'emp.comment', 'emp.status', 'e.name as created_by_name')
+            ->select(
+                'emp.id',
+                'emp.employee_id',
+                'emp.amount',
+                'emp.comment',
+                'emp.status',
+                'e.full_name as created_by_name'
+            )
             ->get()
             ->keyBy('employee_id');
 
-        // 5. Monthly Salaries - BULK
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
             ->whereIn('ems.employee_id', $employeeIds)
             ->where('ems.month', $monthDate)
-            ->select( 'ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
+            ->select(
+                'ems.id',
+                'ems.employee_id',
+                'ems.comment',
+                'ems.amount',
+                'ems.status',
+                'e.full_name as created_by_name'
+            )
             ->get()
             ->keyBy('employee_id');
 
