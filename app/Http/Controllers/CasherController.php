@@ -1772,9 +1772,9 @@ class CasherController extends Controller
             $employeeQuery->where('type', '!=', 'aup');
         }
 
-        if (!empty($groupId)) {
-            $employeeQuery->where('group_id', $groupId);
-        }
+//        if (!empty($groupId)) {
+//            $employeeQuery->where('group_id', $groupId);
+//        }
 
         $employees = $employeeQuery->get();
         $employeeIds = $employees->pluck('id')->toArray();
@@ -1802,7 +1802,7 @@ class CasherController extends Controller
             ->pluck('employee_id')->toArray();
 
         // Tarification logs with real worked group
-        $tarificationData = DB::table('employee_tarification_logs as etl')
+        $tarificationQuery = DB::table('employee_tarification_logs as etl')
             ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
             ->join('tarification_categories as tc', 't.tarification_category_id', '=', 'tc.id')
             ->join('order_sub_models as sm', 'tc.submodel_id', '=', 'sm.id')
@@ -1811,7 +1811,14 @@ class CasherController extends Controller
             ->join('orders as o', 'om.order_id', '=', 'o.id')
             ->join('groups as g', 'og.group_id', '=', 'g.id')
             ->whereIn('etl.employee_id', $employeeIds)
-            ->whereNotIn('o.id', $minusOrderIds)
+            ->whereNotIn('o.id', $minusOrderIds);
+
+// Agar group_id bo‘lsa → faqat shu group orderlari olinadi
+        if (!empty($groupId)) {
+            $tarificationQuery->where('g.id', $groupId);
+        }
+
+        $tarificationData = $tarificationQuery
             ->select(
                 'etl.employee_id',
                 'etl.amount_earned',
@@ -1820,7 +1827,6 @@ class CasherController extends Controller
             )
             ->get()
             ->groupBy('employee_id');
-
         // Payments bulk
         $paymentsData = DB::table('salary_payments')
             ->whereIn('employee_id', $employeeIds)
