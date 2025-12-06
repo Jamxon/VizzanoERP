@@ -1782,6 +1782,7 @@ class CasherController extends Controller
             foreach ($days as $day) {
                 $realGroupId = $defaultGroupId;
 
+                // Kun bo‘yicha real groupni aniqlaymiz
                 foreach ($empGroupChanges as $change) {
                     if ($change->created_at <= $day->date) {
                         $realGroupId = $change->new_group_id;
@@ -1790,8 +1791,10 @@ class CasherController extends Controller
                     }
                 }
 
-                // Kun bo‘yicha filter
-                if (!empty($groupId) && $realGroupId != $groupId) continue;
+                // Debug faqat 1525 employee uchun
+                if ($empId == 1525) {
+                   dd("Date: {$day->date}, Employee 1525, Default Group: {$defaultGroupId}, Real Group: {$realGroupId}, Amount: {$day->amount}");
+                }
 
                 if (!isset($attendanceGrouped[$empId][$day->date][$realGroupId])) {
                     $attendanceGrouped[$empId][$day->date][$realGroupId] = ['salary' => 0, 'days' => 0];
@@ -1799,10 +1802,6 @@ class CasherController extends Controller
 
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['salary'] += $day->amount;
                 $attendanceGrouped[$empId][$day->date][$realGroupId]['days']++;
-
-                if ($day->employee_id == 1525){
-                    dd($attendanceData);
-                }
             }
         }
 
