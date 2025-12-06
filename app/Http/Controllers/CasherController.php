@@ -1756,7 +1756,7 @@ class CasherController extends Controller
         $minusOrderIds = array_diff($allOrderIds, $addOrderIds);
 
         // Employees
-        $employeeQuery = Employee::select('id', 'name', 'position_id', 'salary', 'balance', 'payment_type', 'status', 'department_id');
+        $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id');
 
         if ($departmentId) {
             $employeeQuery->where('department_id', $departmentId);
