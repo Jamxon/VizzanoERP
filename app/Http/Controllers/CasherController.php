@@ -1551,32 +1551,17 @@ class CasherController extends Controller
             ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
             ->whereIn('emp.employee_id', $employeeIds)
             ->where('emp.month', $monthDate)
-            ->select(
-                'emp.id',
-                'emp.employee_id',
-                'emp.amount',
-                'emp.comment',
-                'emp.status',
-                'u.username as created_by_name'
-            )
+            ->select('emp.id', 'emp.employee_id', 'emp.amount', 'emp.comment', 'emp.status', 'e.name as created_by_name')
             ->get()
             ->keyBy('employee_id');
 
-
-// 5. Monthly Salaries - BULK
+        // 5. Monthly Salaries - BULK
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
             ->whereIn('ems.employee_id', $employeeIds)
             ->where('ems.month', $monthDate)
-            ->select(
-                'ems.id',
-                'ems.employee_id',
-                'ems.comment',
-                'ems.amount',
-                'ems.status',
-                'u.username as created_by_name'
-            )
+            ->select( 'ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
             ->get()
             ->keyBy('employee_id');
 
@@ -1763,7 +1748,7 @@ class CasherController extends Controller
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
         $monthDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
 
-        // **Employee Query**
+        // Employee Query
         $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id');
         if ($departmentId) $employeeQuery->where('department_id', $departmentId);
         elseif ($branchId) $employeeQuery->whereHas('department', fn($q) => $q->where('branch_id', $branchId));
@@ -1775,185 +1760,155 @@ class CasherController extends Controller
         $employeeIds = $employees->pluck('id')->toArray();
         if (empty($employeeIds)) return response()->json([]);
 
-        // Attendance salaries BULK
+        // Attendance salaries grouped
         $attendanceData = DB::table('attendance_salary')
             ->whereIn('employee_id', $employeeIds)
             ->whereBetween('date', [$startDate, $endDate])
-            ->select('employee_id', DB::raw('SUM(amount) as total_amount'), DB::raw('COUNT(*) as days_count'))
-            ->groupBy('employee_id')
+            ->select('employee_id', 'date', 'amount')
             ->get()
-            ->keyBy('employee_id');
+            ->groupBy('employee_id');
 
-        $presentAttendance = DB::table('attendances')
-            ->whereIn('employee_id', $employeeIds)
-            ->whereBetween('date', [$startDate, $endDate])
-            ->where('status', 'present')
-            ->pluck('employee_id')
-            ->toArray();
-
-        // GROUP CHANGES (Eski logikani saqlaymiz!)
+        // Group changes
         $groupChanges = DB::table('group_changes')
             ->whereIn('employee_id', $employeeIds)
             ->orderBy('created_at', 'asc')
             ->get()
             ->groupBy('employee_id');
 
-        // Tarification salaries and orders
-        $tarificationData = DB::table('employee_tarification_logs as etl')
-            ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
-            ->join('tarification_categories as tc', 't.tarification_category_id', '=', 'tc.id')
-            ->join('order_sub_models as sm', 'tc.submodel_id', '=', 'sm.id')
-            ->join('order_models as om', 'sm.order_model_id', '=', 'om.id')
-            ->join('orders as o', 'om.order_id', '=', 'o.id')
-            ->whereIn('etl.employee_id', $employeeIds)
-            ->select('etl.employee_id', 'etl.amount_earned', 'o.id as order_id')
-            ->get()
-            ->groupBy('employee_id');
-
-        // Payments
-        $paymentsData = DB::table('salary_payments')
-            ->whereIn('employee_id', $employeeIds)
-            ->whereBetween('month', [$startDate, $endDate])
-            ->select('employee_id', 'type', 'amount', 'date', 'comment', 'month')
-            ->get()
-            ->groupBy('employee_id');
-
-        // Monthly Pieceworks
         $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
             ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
             ->whereIn('emp.employee_id', $employeeIds)
             ->where('emp.month', $monthDate)
-            ->select(
-                'emp.id',
-                'emp.employee_id',
-                'emp.amount',
-                'emp.comment',
-                'emp.status',
-                'u.username as created_by_name'
-            )
+            ->select('emp.id', 'emp.employee_id', 'emp.amount', 'emp.comment', 'emp.status', 'e.name as created_by_name')
             ->get()
             ->keyBy('employee_id');
 
-
-// 5. Monthly Salaries - BULK
+        // 5. Monthly Salaries - BULK
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
             ->whereIn('ems.employee_id', $employeeIds)
             ->where('ems.month', $monthDate)
-            ->select(
-                'ems.id',
-                'ems.employee_id',
-                'ems.comment',
-                'ems.amount',
-                'ems.status',
-                'u.username as created_by_name'
-            )
+            ->select( 'ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
             ->get()
             ->keyBy('employee_id');
 
-        $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
-            ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
-            ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
-            ->whereIn('ems.employee_id', $employeeIds)
-            ->where('ems.month', $monthDate)
-            ->select(
-                'ems.id',
-                'ems.employee_id',
-                'ems.comment',
-                'ems.amount',
-                'ems.status',
-                'u.username as created_by_name'
-            )
-            ->get()
-            ->keyBy('employee_id');
 
-        // Positions & Groups
-        $positions = DB::table('positions')->pluck('name', 'id');
+        // Tarification logs
+        $addOrderIds = MonthlySelectedOrder::where('month', $monthDate)->pluck('order_id')->toArray();
+        $minusOrderIds = Order::pluck('id')->diff($addOrderIds)->toArray();
+
+        $tarificationData = DB::table('employee_tarification_logs as etl')
+            ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
+            ->join('tarification_categories as tc', 't.tarification_category_id', '=', 'tc.id')
+            ->join('order_sub_models as sm', 'tc.submodel_id', '=', 'sm.id')
+            ->join('order_groups as og', 'sm.id', '=', 'og.submodel_id')
+            ->join('order_models as om', 'sm.order_model_id', '=', 'om.id')
+            ->join('orders as o', 'om.order_id', '=', 'o.id')
+            ->join('groups as g', 'og.group_id', '=', 'g.id')
+            ->whereIn('etl.employee_id', $employeeIds)
+            ->whereNotIn('o.id', $minusOrderIds)
+            ->when(!empty($groupId), fn($q) => $q->where('g.id', $groupId))
+            ->select('etl.employee_id', 'etl.amount_earned', 'g.id as real_group_id')
+            ->get()
+            ->groupBy('employee_id');
+
+        // Groups & Positions
         $groups = DB::table('groups')->pluck('name', 'id');
+        $positions = DB::table('positions')->pluck('name', 'id');
 
-        $processedEmployees = [];
+        $processed = [];
+
         foreach ($employees as $employee) {
-            $attendanceInfo = $attendanceData->get($employee->id);
-            $attendanceTotal = $attendanceInfo->total_amount ?? 0;
-            $attendanceDays = $attendanceInfo->days_count ?? 0;
+            $empDataPerGroup = [];
 
-            $hasPresent = in_array($employee->id, $presentAttendance);
+            // Attendance per group
+            $empAttendance = $attendanceData[$employee->id] ?? [];
+            $empGroupChanges = $groupChanges[$employee->id] ?? collect();
+            $defaultGroupId = $employee->group_id;
 
-            $tarificationLogs = $tarificationData->get($employee->id, collect());
-            $tarificationTotal = $tarificationLogs->sum('amount_earned');
-            $orderIds = $tarificationLogs->pluck('order_id')->unique()->values();
+            foreach ($empAttendance as $day) {
+                $realGroupId = $defaultGroupId;
+                $dayDate = Carbon::parse($day->date)->startOfDay();
 
-            $monthlyPiecework = $monthlyPieceworksData->get($employee->id);
-            $mp = $monthlyPiecework ? [
-                'id' => $monthlyPiecework->id,
-                'amount' => (float)$monthlyPiecework->amount,
-                'status' => (bool)$monthlyPiecework->status,
-                'created_by' => $monthlyPiecework->created_by_name,
-                'comment' => $monthlyPiecework->comment,
-            ] : null;
-
-            $monthlySalary = $monthlySalariesData->get($employee->id);
-            $ms = $monthlySalary ? [
-                'id' => $monthlySalary->id,
-                'amount' => (float)$monthlySalary->amount,
-                'status' => (bool)$monthlySalary->status,
-                'created_by' => $monthlySalary->created_by_name,
-                'comment' => $monthlySalary->comment,
-            ] : null;
-
-            $totalEarned = $tarificationTotal + $attendanceTotal;
-            if ($totalEarned <= 0 && !$hasPresent) continue;
-
-            $employeeGroupChanges = $groupChanges->get($employee->id, collect())->map(function ($gc) use ($groups) {
-                return [
-                    'old_group' => $groups->get($gc->old_group_id) ?? 'N/A',
-                    'new_group' => $groups->get($gc->new_group_id) ?? 'N/A',
-                    'date' => Carbon::parse($gc->created_at)->toDateString(),
-                ];
-            });
-
-            $empPayments = $paymentsData->get($employee->id, collect());
-            $paidAmountsByType = [];
-            $totalPaid = 0;
-            foreach ($empPayments->groupBy('type') as $ptype => $payments) {
-                $paidAmountsByType[$ptype] = [];
-                foreach ($payments as $p) {
-                    $totalPaid += (float)$p->amount;
-                    $paidAmountsByType[$ptype][] = [
-                        'amount' => (float)$p->amount,
-                        'date' => $p->date,
-                        'comment' => $p->comment,
-                        'month' => Carbon::parse($p->month)->format('Y-m')
-                    ];
+                foreach ($empGroupChanges as $change) {
+                    $changeDate = Carbon::parse($change->created_at)->startOfDay();
+                    if ($changeDate > $dayDate) $realGroupId = $change->old_group_id;
+                    else break;
                 }
+
+                if (!isset($empDataPerGroup[$realGroupId])) $empDataPerGroup[$realGroupId] = ['attendance_salary' => 0, 'attendance_days' => 0];
+                $empDataPerGroup[$realGroupId]['attendance_salary'] += $day->amount;
+                $empDataPerGroup[$realGroupId]['attendance_days']++;
             }
 
-            $processedEmployees[] = [
-                'id' => $employee->id,
-                'name' => $employee->name,
-                'position' => $positions->get($employee->position_id) ?? 'N/A',
-                'group' => $groups->get($employee->group_id) ?? 'N/A',
-                'balance' => (float)$employee->balance,
-                'payment_type' => $employee->payment_type,
-                'salary' => (float)$employee->salary,
-                'status' => $employee->status,
-                'attendance_salary' => $attendanceTotal,
-                'attendance_days' => $attendanceDays,
-                'tarification_salary' => $tarificationTotal,
-                'total_earned' => $totalEarned,
-                'paid_amounts' => $paidAmountsByType,
-                'total_paid' => round($totalPaid, 2),
-                'net_balance' => round($totalEarned - $totalPaid, 2),
-                'orders' => $orderIds->toArray(),
-                'monthly_piecework' => $mp,
-                'monthly_salary' => $ms,
-                'group_changes' => $employeeGroupChanges, // <-- Qo‘shildi ✨
+            // Tarification per group
+            $tlGroups = $tarificationData[$employee->id] ?? collect();
+            foreach ($tlGroups as $tl) {
+                $gid = $tl->real_group_id ?: 0;
+                if (!isset($empDataPerGroup[$gid])) $empDataPerGroup[$gid] = ['attendance_salary' => 0, 'attendance_days' => 0];
+                $empDataPerGroup[$gid]['tarification_salary'] =
+                    ($empDataPerGroup[$gid]['tarification_salary'] ?? 0) + $tl->amount_earned;
+            }
+
+            foreach ($empDataPerGroup as $gid => $row) {
+                // Monthly Piecework
+                $monthlyPieceworkData = null;
+                $mpData = $monthlyPieceworksData[$employee->id] ?? null;
+                if ($mpData) {
+                    $mp = $mpData;
+                    $monthlyPieceworkData = [
+                        'id' => $mp->id,
+                        'amount' => (float)$mp->amount,
+                        'status' => (bool)$mp->status,
+                        'created_by' => $mp->created_by_name,
+                        'comment' => $mp->comment,
+                    ];
+                }
+
+                // Monthly Salary
+                $monthlySalaryData = null;
+                $msData = $monthlySalariesData[$employee->id] ?? null;
+                if ($msData) {
+                    $ms = $msData;
+                    $monthlySalaryData = [
+                        'id' => $ms->id,
+                        'amount' => (float)$ms->amount,
+                        'status' => (bool)$ms->status,
+                        'created_by' => $ms->created_by_name,
+                        'comment' => $ms->comment,
+                    ];
+                }
+
+                $processed[$gid][] = [
+                    'id' => $employee->id,
+                    'name' => $employee->name,
+                    'position' => $positions[$employee->position_id] ?? 'N/A',
+                    'group' => $groups[$gid] ?? 'N/A',
+                    'attendance_salary' => $row['attendance_salary'] ?? 0,
+                    'attendance_days' => $row['attendance_days'] ?? 0,
+                    'tarification_salary' => $row['tarification_salary'] ?? 0,
+                    'total_earned' =>
+                        ($row['attendance_salary'] ?? 0) +
+                        ($row['tarification_salary'] ?? 0),
+                    'monthly_piecework' => $monthlyPieceworkData,
+                    'monthly_salary' => $monthlySalaryData,
+                ];
+            }
+        }
+
+        $response = [];
+        foreach ($processed as $gid => $list) {
+            $response[] = [
+                'id' => $gid,
+                'name' => $groups[$gid] ?? 'Guruhsizlik',
+                'total_balance' => collect($list)->sum('total_earned'),
+                'employees' => array_values($list)
             ];
         }
 
-        return response()->json(array_values($processedEmployees));
+        return response()->json(array_values($response));
     }
 
     public function getEmployeeEarnings($employee, $startDate, $endDate, $orderIds = [])
