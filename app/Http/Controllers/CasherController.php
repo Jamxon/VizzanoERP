@@ -1766,14 +1766,14 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // Group changes for these employees
+        // Group changes
         $groupChanges = DB::table('group_changes')
             ->whereIn('employee_id', $employeeIds)
             ->orderBy('created_at', 'asc')
             ->get()
             ->groupBy('employee_id');
 
-        // Attendance salary per real group
+        // Attendance grouped by real group per day
         $attendanceGrouped = [];
         foreach ($attendanceData as $empId => $days) {
             $empGroupChanges = $groupChanges[$empId] ?? collect();
@@ -1790,7 +1790,7 @@ class CasherController extends Controller
                     }
                 }
 
-                // Shu kun uchun filter
+                // Kun bo‘yicha filter
                 if (!empty($groupId) && $realGroupId != $groupId) continue;
 
                 if (!isset($attendanceGrouped[$empId][$day->date][$realGroupId])) {
@@ -1802,7 +1802,21 @@ class CasherController extends Controller
             }
         }
 
-        // Tarification logs grouped by real group
+        // Attendance summed per group
+        $attendanceSumPerGroup = [];
+        foreach ($attendanceGrouped as $empId => $dates) {
+            foreach ($dates as $date => $groups) {
+                foreach ($groups as $gid => $data) {
+                    if (!isset($attendanceSumPerGroup[$empId][$gid])) {
+                        $attendanceSumPerGroup[$empId][$gid] = ['salary' => 0, 'days' => 0];
+                    }
+                    $attendanceSumPerGroup[$empId][$gid]['salary'] += $data['salary'];
+                    $attendanceSumPerGroup[$empId][$gid]['days'] += $data['days'];
+                }
+            }
+        }
+
+        // Tarification logs
         $addOrderIds = MonthlySelectedOrder::where('month', $startDate)->pluck('order_id')->toArray();
         $minusOrderIds = Order::pluck('id')->diff($addOrderIds)->toArray();
 
@@ -1830,16 +1844,20 @@ class CasherController extends Controller
         foreach ($employees as $employee) {
             $empDataPerGroup = [];
 
-            $attGroup = $attendanceGrouped[$employee->id] ?? [];
-            $tlGroups = $tarificationData[$employee->id] ?? collect();
-
-            foreach ($attGroup as $gid => $data) {
+            // Attendance per group
+            $attGroups = $attendanceSumPerGroup[$employee->id] ?? [];
+            foreach ($attGroups as $gid => $data) {
                 $empDataPerGroup[$gid]['attendance_salary'] = $data['salary'];
                 $empDataPerGroup[$gid]['attendance_days'] = $data['days'];
             }
 
+            // Tarification per group
+            $tlGroups = $tarificationData[$employee->id] ?? collect();
             foreach ($tlGroups as $tl) {
                 $gid = $tl->real_group_id ?: 0;
+
+                if (!empty($groupId) && $gid != $groupId) continue;
+
                 if (!isset($empDataPerGroup[$gid])) {
                     $empDataPerGroup[$gid] = ['attendance_salary' => 0, 'attendance_days' => 0];
                 }
