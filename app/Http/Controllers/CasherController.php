@@ -1747,27 +1747,15 @@ class CasherController extends Controller
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
 
-        // ORDER Filtering
-        $addOrderIds = MonthlySelectedOrder::where('month', $startDate)
-            ->pluck('order_id')->toArray();
-
-        $minusOrderIds = Order::pluck('id')->diff($addOrderIds)->toArray();
-
         // Employees
         $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'department_id');
-        if ($departmentId) {
-            $employeeQuery->where('department_id', $departmentId);
-        } elseif ($branchId) {
-            $employeeQuery->whereHas('department', function ($q) use ($branchId) {
-                $q->where('branch_id', $branchId);
-            });
-        }
+        if ($departmentId) $employeeQuery->where('department_id', $departmentId);
+        elseif ($branchId) $employeeQuery->whereHas('department', fn($q) => $q->where('branch_id', $branchId));
         if ($type === 'aup') $employeeQuery->where('type', 'aup');
         elseif ($type === 'simple') $employeeQuery->where('type', '!=', 'aup');
 
         $employees = $employeeQuery->get();
         $employeeIds = $employees->pluck('id')->toArray();
-
         if (empty($employeeIds)) return response()->json([]);
 
         // Attendance
@@ -1778,40 +1766,45 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // Group changes for employees in this month
+        // Group changes for these employees
         $groupChanges = DB::table('group_changes')
             ->whereIn('employee_id', $employeeIds)
-            ->whereDate('created_at', '<=', $endDate)
             ->orderBy('created_at', 'asc')
             ->get()
             ->groupBy('employee_id');
 
-        // Attendance salary per group
+        // Attendance salary per real group
         $attendanceGrouped = [];
         foreach ($attendanceData as $empId => $days) {
-            foreach ($days as $day) {
-                $gid = $employees->find($empId)->group_id; // default employee group
+            $empGroupChanges = $groupChanges[$empId] ?? collect();
+            $defaultGroupId = $employees->find($empId)->group_id;
 
-                if (isset($groupChanges[$empId])) {
-                    foreach ($groupChanges[$empId] as $change) {
-                        if ($day->date >= $change->created_at) {
-                            $gid = $change->new_group_id;
-                        }
+            foreach ($days as $day) {
+                $realGroupId = $defaultGroupId;
+
+                // Har bir group change tarixini tekshirish
+                foreach ($empGroupChanges as $change) {
+                    if ($day->date >= $change->created_at) {
+                        $realGroupId = $change->new_group_id;
                     }
                 }
 
-                if (!empty($groupId) && $gid != $groupId) continue;
+                // Agar filter group_id bo‘lsa, faqat shu groupdagi kunlarni olamiz
+                if (!empty($groupId) && $realGroupId != $groupId) continue;
 
-                if (!isset($attendanceGrouped[$empId][$gid])) {
-                    $attendanceGrouped[$empId][$gid] = ['salary' => 0, 'days' => 0];
+                if (!isset($attendanceGrouped[$empId][$realGroupId])) {
+                    $attendanceGrouped[$empId][$realGroupId] = ['salary' => 0, 'days' => 0];
                 }
 
-                $attendanceGrouped[$empId][$gid]['salary'] += $day->amount;
-                $attendanceGrouped[$empId][$gid]['days']++;
+                $attendanceGrouped[$empId][$realGroupId]['salary'] += $day->amount;
+                $attendanceGrouped[$empId][$realGroupId]['days']++;
             }
         }
 
         // Tarification logs grouped by real group
+        $addOrderIds = MonthlySelectedOrder::where('month', $startDate)->pluck('order_id')->toArray();
+        $minusOrderIds = Order::pluck('id')->diff($addOrderIds)->toArray();
+
         $tarificationQuery = DB::table('employee_tarification_logs as etl')
             ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
             ->join('tarification_categories as tc', 't.tarification_category_id', '=', 'tc.id')
