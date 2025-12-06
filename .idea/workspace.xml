@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update employee selection to include status and filter by working employees">
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/CasherController.php" afterDir="false" />
-    </list>
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update employee selection to include status and filter by working employees" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -256,47 +254,7 @@
       <workItem from="1764563581605" duration="5760000" />
       <workItem from="1764754440368" duration="2568000" />
       <workItem from="1764936263174" duration="3255000" />
-      <workItem from="1764997229693" duration="10594000" />
-    </task>
-    <task id="LOCAL-00008" summary="Refactor warehouseCompleteOrdersGet method to improve data handling and response structure">
-      <option name="closed" value="true" />
-      <created>1763815433336</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1763815433336</updated>
-    </task>
-    <task id="LOCAL-00009" summary="Refactor employee data retrieval in WarehouseController to streamline response structure">
-      <option name="closed" value="true" />
-      <created>1763815505658</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1763815505658</updated>
-    </task>
-    <task id="LOCAL-00010" summary="Refactor employee data retrieval in WarehouseController to streamline response structure">
-      <option name="closed" value="true" />
-      <created>1763815526495</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1763815526495</updated>
-    </task>
-    <task id="LOCAL-00011" summary="Refactor employee data retrieval in WarehouseController to streamline response structure">
-      <option name="closed" value="true" />
-      <created>1763815715587</created>
-      <option name="number" value="00011" />
-      <option name="presentableId" value="LOCAL-00011" />
-      <option name="project" value="LOCAL" />
-      <updated>1763815715587</updated>
-    </task>
-    <task id="LOCAL-00012" summary="Refactor employee data retrieval in WarehouseController to enhance response structure and clarity">
-      <option name="closed" value="true" />
-      <created>1763816106584</created>
-      <option name="number" value="00012" />
-      <option name="presentableId" value="LOCAL-00012" />
-      <option name="project" value="LOCAL" />
-      <updated>1763816106584</updated>
+      <workItem from="1764997229693" duration="11046000" />
     </task>
     <task id="LOCAL-00013" summary="fix: correct table references for order groups in UserController">
       <option name="closed" value="true" />
@@ -650,7 +608,47 @@
       <option name="project" value="LOCAL" />
       <updated>1765014125861</updated>
     </task>
-    <option name="localTasksCounter" value="57" />
+    <task id="LOCAL-00057" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765014154535</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1765014154535</updated>
+    </task>
+    <task id="LOCAL-00058" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765014251044</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1765014251044</updated>
+    </task>
+    <task id="LOCAL-00059" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765014316147</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1765014316147</updated>
+    </task>
+    <task id="LOCAL-00060" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765014357667</created>
+      <option name="number" value="00060" />
+      <option name="presentableId" value="LOCAL-00060" />
+      <option name="project" value="LOCAL" />
+      <updated>1765014357667</updated>
+    </task>
+    <task id="LOCAL-00061" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765014578353</created>
+      <option name="number" value="00061" />
+      <option name="presentableId" value="LOCAL-00061" />
+      <option name="project" value="LOCAL" />
+      <updated>1765014578353</updated>
+    </task>
+    <option name="localTasksCounter" value="62" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

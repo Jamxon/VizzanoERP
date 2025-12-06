@@ -1744,8 +1744,6 @@ class CasherController extends Controller
             return response()->json(['message' => '❌ department_id yoki branch_id kiritilishi shart.'], 422);
         }
 
-        $debug = "";
-        $dateChange = null;
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
 
@@ -1781,8 +1779,6 @@ class CasherController extends Controller
             $empGroupChanges = $groupChanges[$empId] ?? collect();
             $defaultGroupId = $employees->find($empId)->group_id;
 
-            $debugAttendance = []; // har employee uchun alohida
-
             foreach ($days as $day) {
                 $realGroupId = $defaultGroupId;
                 $dayDate = Carbon::parse($day->date)->startOfDay();
@@ -1791,7 +1787,6 @@ class CasherController extends Controller
                     $changeDate = Carbon::parse($change->created_at)->startOfDay();
                     if ($changeDate > $dayDate) {
                         $realGroupId = $change->old_group_id;
-                        $dateChange = $change->old_group_id;
                     } else {
                         break;
                     }
