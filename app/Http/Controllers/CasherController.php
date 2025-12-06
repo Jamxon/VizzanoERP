@@ -1806,9 +1806,10 @@ class CasherController extends Controller
             ->join('tarifications as t', 'etl.tarification_id', '=', 't.id')
             ->join('tarification_categories as tc', 't.tarification_category_id', '=', 'tc.id')
             ->join('order_sub_models as sm', 'tc.submodel_id', '=', 'sm.id')
+            ->join('order_groups as og', 'sm.id', '=', 'og.submodel_id')
             ->join('order_models as om', 'sm.order_model_id', '=', 'om.id')
             ->join('orders as o', 'om.order_id', '=', 'o.id')
-            ->join('groups as g', 'sm.group_id', '=', 'g.id')
+            ->join('groups as g', 'og.group_id', '=', 'g.id')
             ->whereIn('etl.employee_id', $employeeIds)
             ->whereNotIn('o.id', $minusOrderIds)
             ->select(
