@@ -1781,21 +1781,19 @@ class CasherController extends Controller
             $defaultGroupId = $employees->find($empId)->group_id;
 
             foreach ($days as $day) {
-                $realGroupId = $defaultGroupId;
-
-                $dayDate = Carbon::parse($day->date); // day->date Carbon ga
+                $dayDate = Carbon::parse($day->date)->startOfDay();
+                $realGroupId = $employees->find($empId)->group_id; // default group
 
                 foreach ($empGroupChanges as $change) {
-                    $changeDate = Carbon::parse($change->created_at)->toDateString(); // faqat 'Y-m-d'
-                    $dayDate = Carbon::parse($day->date)->toDateString();
-
-                    if ($changeDate <= $dayDate) {
+                    $changeDate = Carbon::parse($change->created_at)->startOfDay();
+                    if ($changeDate->lessThanOrEqualTo($dayDate)) {
                         $realGroupId = $change->new_group_id;
                     } else {
                         break;
                     }
                 }
 
+                // Attendance grouped
                 if (!isset($attendanceGrouped[$empId][$day->date][$realGroupId])) {
                     $attendanceGrouped[$empId][$day->date][$realGroupId] = ['salary' => 0, 'days' => 0];
                 }
