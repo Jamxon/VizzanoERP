@@ -1783,9 +1783,11 @@ class CasherController extends Controller
             foreach ($days as $day) {
                 $realGroupId = $defaultGroupId;
 
-                // Kun bo‘yicha real groupni aniqlaymiz
+                $dayDate = Carbon::parse($day->date); // day->date Carbon ga
+
                 foreach ($empGroupChanges as $change) {
-                    if ($change->created_at <= $day->date) {
+                    $changeDate = Carbon::parse($change->created_at); // change->created_at Carbon ga
+                    if ($changeDate->lessThanOrEqualTo($dayDate)) {
                         $realGroupId = $change->new_group_id;
                     } else {
                         break;
