@@ -1548,7 +1548,7 @@ class CasherController extends Controller
         // 4. Monthly Pieceworks - BULK
         $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
             ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
-            ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
+            ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id') // <-- to'g'ri
             ->whereIn('emp.employee_id', $employeeIds)
             ->where('emp.month', $monthDate)
             ->select(
@@ -1557,11 +1557,12 @@ class CasherController extends Controller
                 'emp.amount',
                 'emp.comment',
                 'emp.status',
-                'e.full_name as created_by_name'
+                'u.username as created_by_name'
             )
             ->get()
             ->keyBy('employee_id');
 
+// 5. Monthly Salaries - BULK
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
@@ -1573,7 +1574,7 @@ class CasherController extends Controller
                 'ems.comment',
                 'ems.amount',
                 'ems.status',
-                'e.full_name as created_by_name'
+                'u.username as created_by_name'
             )
             ->get()
             ->keyBy('employee_id');
