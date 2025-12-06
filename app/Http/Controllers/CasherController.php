@@ -1754,7 +1754,7 @@ class CasherController extends Controller
         elseif ($branchId) $employeeQuery->whereHas('department', fn($q) => $q->where('branch_id', $branchId));
         if ($type === 'aup') $employeeQuery->where('type', 'aup');
         elseif ($type === 'simple') $employeeQuery->where('type', '!=', 'aup');
-        if (!empty($groupId)) $employeeQuery->where('group_id', $groupId);
+//        if (!empty($groupId)) $employeeQuery->where('group_id', $groupId);
 
         $employees = $employeeQuery->get();
         $employeeIds = $employees->pluck('id')->toArray();
