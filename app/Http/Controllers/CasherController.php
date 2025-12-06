@@ -1806,18 +1806,20 @@ class CasherController extends Controller
         // Monthly Pieceworks
         $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
             ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
+            ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
             ->whereIn('emp.employee_id', $employeeIds)
             ->where('emp.month', $monthDate)
-            ->select('emp.*', 'u.name as created_by_name')
+            ->select('emp.*', 'e.name as created_by_name')
             ->get()
             ->keyBy('employee_id');
 
         // Monthly Salary
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
+            ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
             ->whereIn('ems.employee_id', $employeeIds)
             ->where('ems.month', $monthDate)
-            ->select('ems.*', 'u.name as created_by_name')
+            ->select('ems.*', 'e.name as created_by_name')
             ->get()
             ->keyBy('employee_id');
 
