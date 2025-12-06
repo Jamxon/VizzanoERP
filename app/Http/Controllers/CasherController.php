@@ -1745,6 +1745,7 @@ class CasherController extends Controller
         }
 
         $debug = "";
+        $dateChange = null;
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
 
@@ -1790,7 +1791,7 @@ class CasherController extends Controller
                     $changeDate = Carbon::parse($change->created_at)->startOfDay();
                     if ($changeDate > $dayDate) {
                         $realGroupId = $change->new_group_id;
-                        $dateChange = $change;
+                        $dateChange = $change->old_group_id;
                     } else {
                         break;
                     }
