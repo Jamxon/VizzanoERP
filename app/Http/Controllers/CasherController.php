@@ -1746,7 +1746,7 @@ class CasherController extends Controller
 
         $startDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
         $endDate = Carbon::createFromFormat('Y-m', $month)->endOfMonth()->toDateString();
-        $monthDate = $startDate;
+        $monthDate = Carbon::createFromFormat('Y-m', $month)->startOfMonth()->toDateString();
 
         // Employee Query
         $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id');
@@ -1775,27 +1775,25 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // Monthly Pieceworks
         $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
             ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
             ->whereIn('emp.employee_id', $employeeIds)
-            ->whereMonth('emp.month', $month)
+            ->where('emp.month', $monthDate)
             ->select('emp.id', 'emp.employee_id', 'emp.amount', 'emp.comment', 'emp.status', 'e.name as created_by_name')
             ->get()
-            ->groupBy('employee_id');
+            ->keyBy('employee_id');
 
-        dd($monthlyPieceworksData);
-
-        // Monthly Salaries
+        // 5. Monthly Salaries - BULK
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
             ->whereIn('ems.employee_id', $employeeIds)
-            ->whereMonth('ems.month', $month)
-            ->select('ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
+            ->where('ems.month', $monthDate)
+            ->select( 'ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
             ->get()
-            ->groupBy('employee_id');
+            ->keyBy('employee_id');
+
 
         // Tarification logs
         $addOrderIds = MonthlySelectedOrder::where('month', $monthDate)->pluck('order_id')->toArray();

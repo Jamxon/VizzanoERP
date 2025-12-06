@@ -254,23 +254,7 @@
       <workItem from="1764563581605" duration="5760000" />
       <workItem from="1764754440368" duration="2568000" />
       <workItem from="1764936263174" duration="3255000" />
-      <workItem from="1764997229693" duration="13185000" />
-    </task>
-    <task id="LOCAL-00017" summary="fix: correct table references for order groups in UserController">
-      <option name="closed" value="true" />
-      <created>1764405201521</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1764405201521</updated>
-    </task>
-    <task id="LOCAL-00018" summary="fix: correct table references for order groups in UserController">
-      <option name="closed" value="true" />
-      <created>1764405419227</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1764405419227</updated>
+      <workItem from="1764997229693" duration="13615000" />
     </task>
     <task id="LOCAL-00019" summary="fix: update image handling to use S3 storage in ItemController">
       <option name="closed" value="true" />
@@ -648,7 +632,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765016719104</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765016945938</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1765016945938</updated>
+    </task>
+    <task id="LOCAL-00067" summary="fix: update employee selection to include status and filter by working employees">
+      <option name="closed" value="true" />
+      <created>1765017150213</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1765017150213</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
