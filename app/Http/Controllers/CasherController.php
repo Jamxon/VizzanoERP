@@ -1786,8 +1786,10 @@ class CasherController extends Controller
                 $dayDate = Carbon::parse($day->date); // day->date Carbon ga
 
                 foreach ($empGroupChanges as $change) {
-                    $changeDate = Carbon::parse($change->created_at); // change->created_at Carbon ga
-                    if ($changeDate->lessThanOrEqualTo($dayDate)) {
+                    $changeDate = Carbon::parse($change->created_at)->toDateString(); // faqat 'Y-m-d'
+                    $dayDate = Carbon::parse($day->date)->toDateString();
+
+                    if ($changeDate <= $dayDate) {
                         $realGroupId = $change->new_group_id;
                     } else {
                         break;
