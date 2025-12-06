@@ -1844,12 +1844,24 @@ class CasherController extends Controller
             }
 
             // Tarification per group
+            // Tarification per day with group tracking
             $tlGroups = $tarificationData[$employee->id] ?? collect();
             foreach ($tlGroups as $tl) {
-                $gid = $tl->real_group_id ?: 0;
-                if (!isset($empDataPerGroup[$gid])) $empDataPerGroup[$gid] = ['attendance_salary' => 0, 'attendance_days' => 0];
-                $empDataPerGroup[$gid]['tarification_salary'] =
-                    ($empDataPerGroup[$gid]['tarification_salary'] ?? 0) + $tl->amount_earned;
+                $tlDate = Carbon::parse($tl->created_at ?? $monthDate)->startOfDay(); // created_at bo'lmasa oy boshini olamiz
+                $realGroupId = $defaultGroupId;
+
+                foreach ($empGroupChanges as $change) {
+                    $changeDate = Carbon::parse($change->created_at)->startOfDay();
+                    if ($changeDate <= $tlDate) $realGroupId = $change->new_group_id;
+                    else break;
+                }
+
+                // Agar group filter mavjud bo'lsa va mos kelmasa, o'tkazib yuborish
+                if (!empty($groupId) && $realGroupId != $groupId) continue;
+
+                if (!isset($empDataPerGroup[$realGroupId])) $empDataPerGroup[$realGroupId] = ['attendance_salary' => 0, 'attendance_days' => 0];
+                $empDataPerGroup[$realGroupId]['tarification_salary'] =
+                    ($empDataPerGroup[$realGroupId]['tarification_salary'] ?? 0) + $tl->amount_earned;
             }
 
             foreach ($empDataPerGroup as $gid => $row) {
