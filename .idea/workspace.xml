@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update comments for clarity in CasherController">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="fix: update comments for clarity in CasherController" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -257,23 +255,7 @@
       <workItem from="1764754440368" duration="2568000" />
       <workItem from="1764936263174" duration="3255000" />
       <workItem from="1764997229693" duration="23724000" />
-      <workItem from="1765093326178" duration="1862000" />
-    </task>
-    <task id="LOCAL-00058" summary="fix: update employee selection to include status and filter by working employees">
-      <option name="closed" value="true" />
-      <created>1765014251044</created>
-      <option name="number" value="00058" />
-      <option name="presentableId" value="LOCAL-00058" />
-      <option name="project" value="LOCAL" />
-      <updated>1765014251044</updated>
-    </task>
-    <task id="LOCAL-00059" summary="fix: update employee selection to include status and filter by working employees">
-      <option name="closed" value="true" />
-      <created>1765014316147</created>
-      <option name="number" value="00059" />
-      <option name="presentableId" value="LOCAL-00059" />
-      <option name="project" value="LOCAL" />
-      <updated>1765014316147</updated>
+      <workItem from="1765093326178" duration="2210000" />
     </task>
     <task id="LOCAL-00060" summary="fix: update employee selection to include status and filter by working employees">
       <option name="closed" value="true" />
@@ -651,7 +633,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765026537960</updated>
     </task>
-    <option name="localTasksCounter" value="107" />
+    <task id="LOCAL-00107" summary="fix: update comments for clarity in CasherController">
+      <option name="closed" value="true" />
+      <created>1765107785233</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1765107785234</updated>
+    </task>
+    <task id="LOCAL-00108" summary="fix: update comments for clarity in CasherController">
+      <option name="closed" value="true" />
+      <created>1765107896040</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1765107896040</updated>
+    </task>
+    <option name="localTasksCounter" value="109" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
