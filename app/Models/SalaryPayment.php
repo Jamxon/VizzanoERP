@@ -22,6 +22,7 @@ class SalaryPayment extends Model
         'month',     // '2025-05-01' formatda oyning 1-kuni
         'comment',
         'date',
+        'group_id'
     ];
 
     protected $casts = [
@@ -34,5 +35,10 @@ class SalaryPayment extends Model
     public function employee()
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
     }
 }

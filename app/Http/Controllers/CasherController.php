@@ -1117,6 +1117,7 @@ class CasherController extends Controller
                 'amount' => 'required|numeric',
                 'month' => 'required|date_format:Y-m',
                 'type' => 'required|in:salary,advance',
+                'group_id' => 'nullable|exists:groups,id', // 🔥 YANGI
                 'comment' => 'nullable|string',
             ]);
 
@@ -1135,12 +1136,13 @@ class CasherController extends Controller
             $cashboxId = $cashboxBalance->cashbox_id;
             $currency = Currency::where('name', "So'm")->firstOrFail();
 
-            // ✅ Miqdorni tekshirish
+            // Miqdorni tekshirish
             $absoluteAmount = abs($validated['amount']);
             $isPositive = $validated['amount'] >= 0;
 
             SalaryPayment::create([
                 'employee_id' => $validated['employee_id'],
+                'group_id' => $validated['group_id'] ?? null,
                 'amount' => $validated['amount'],
                 'month' => $validated['month'],
                 'type' => $validated['type'],
@@ -1160,7 +1162,6 @@ class CasherController extends Controller
                 'branch_id' => auth()->user()->employee->branch_id,
             ]);
 
-            // ✅ Balanslarni yangilash
             if ($isPositive) {
                 $employee->decrement('balance', $absoluteAmount);
                 $cashboxBalance->decrement('amount', $absoluteAmount);
@@ -1169,7 +1170,6 @@ class CasherController extends Controller
                 $cashboxBalance->increment('amount', $absoluteAmount);
             }
 
-            // ✅ Yangilangan balansni olish
             $updatedBalance = CashboxBalance::find($cashboxBalance->id);
 
             DB::afterCommit(function () use ($employee, $validated, $updatedBalance, $isPositive, $absoluteAmount) {
@@ -1183,8 +1183,8 @@ class CasherController extends Controller
                     . "💰 Miqdor: " . number_format($absoluteAmount, 0, '.', ' ') . " so'm" . ($isPositive ? '' : ' (qaytarildi)') . "\n"
                     . "📅 Oy: " . $validated['month']->format('Y-m') . "\n"
                     . "🏷️ Turi: " . ($validated['type'] === 'advance' ? 'Avans' : 'Oylik') . "\n"
-                    . "🏦 Qolgan balans: *{$remainingBalance} so'm*\n"
                     . "🏢 Filial: " . (auth()->user()->employee->branch->name ?? '-') . "\n"
+                    . "👥 Guruh: " . ($validated['group_id'] ?? '-') . "\n" // 🔥 YANGI
                     . "📝 Izoh: " . ($validated['comment'] ?? '-');
 
                 Http::post("https://api.telegram.org/bot7778276162:AAHVKgbh5mJlgp7jMhw_VNunvvR3qoDyjms/sendMessage", [
