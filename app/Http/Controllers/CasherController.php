@@ -1814,7 +1814,7 @@ class CasherController extends Controller
             ->join('groups as g', 'og.group_id', '=', 'g.id')
             ->whereIn('etl.employee_id', $employeeIds)
             ->whereNotIn('o.id', $minusOrderIds)
-            ->when(!empty($groupId), fn($q) => $q->where('g.id', $groupId))
+//            ->when(!empty($groupId), fn($q) => $q->where('g.id', $groupId))
             ->select('etl.employee_id', 'etl.amount_earned', 'etl.created_at', 'g.id as real_group_id')
             ->get()
             ->groupBy('employee_id');
