@@ -1796,7 +1796,7 @@ class CasherController extends Controller
         // Salary payments grouped per employee & per group
         $paymentsRaw = DB::table('salary_payments')
             ->whereIn('employee_id', $employeeIds)
-            ->whereBetween('date', [$startDate, $endDate])
+            ->whereBetween('month', [$startDate, $endDate])
             ->select('employee_id', 'amount', 'type', 'date', 'comment', 'month', 'group_id')
             ->get();
 
