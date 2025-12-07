@@ -1912,6 +1912,7 @@ class CasherController extends Controller
                     'name' => $employee->name,
                     'position' => $positions[$employee->position_id] ?? 'N/A',
                     'group' => $groups[$gid] ?? 'N/A',
+                    'group_id' => $gid,
                     'attendance_salary' => $row['attendance_salary'] ?? 0,
                     'attendance_days' => $row['attendance_days'] ?? 0,
                     'tarification_salary' => $row['tarification_salary'] ?? 0,
