@@ -107,7 +107,7 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
                 "Topgan puli",
                 "Avans",
                 "Qolgan summa",
-                "Passport kodi", // ⬅️ YANGI
+                "JSHSHIR",
                 "Imzo",
             ]
         ];
