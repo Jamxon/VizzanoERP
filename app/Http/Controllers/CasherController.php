@@ -1453,7 +1453,7 @@ class CasherController extends Controller
         $minusOrderIds = array_diff($allOrderIds, $addOrderIds);
 
         // BULK: Employee ID'larni olish
-        $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id');
+        $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id', 'passport_code');
 
         if ($departmentId) {
             $employeeQuery->where('department_id', $departmentId);
@@ -1662,6 +1662,7 @@ class CasherController extends Controller
                 'payment_type' => $employee->payment_type,
                 'salary' => (float) $employee->salary,
                 'status' => $employee->status,
+                'passport_code' => $employee->passport_code,
                 'attendance_salary' => $attendanceTotal,
                 'attendance_days' => $attendanceDays,
                 'tarification_salary' => $tarificationTotal,

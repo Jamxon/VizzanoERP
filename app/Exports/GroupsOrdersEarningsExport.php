@@ -30,7 +30,6 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
         $i = 1;
 
         foreach ($this->data as $group) {
-            // sort employees by name before looping
             usort($group['employees'], fn($a, $b) => strcmp($a['name'], $b['name']));
 
             foreach ($group['employees'] as $emp) {
@@ -45,67 +44,57 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
                     default                      => ucfirst($emp['payment_type'] ?? 'Oylik'),
                 };
 
-                $monthlySalary = 0;
-                $pieceworkSalary = 0;
-                $usedMonthlySalary = false;
-                $usedMonthlyPiecework = false;
+                $monthlySalary = isset($emp['monthly_salary']) && $emp['monthly_salary']['status'] === true
+                    ? (int)$emp['monthly_salary']['amount']
+                    : (int)$emp['attendance_salary'];
 
-                if (isset($emp['monthly_salary']) && $emp['monthly_salary'] && $emp['monthly_salary']['status'] === true) {
-                    $monthlySalary = (int) $emp['monthly_salary']['amount'];
-                    $usedMonthlySalary = true;
-                } else {
-                    $monthlySalary = (int) $emp['attendance_salary'];
-                }
+                $pieceworkSalary = isset($emp['monthly_piecework']) && $emp['monthly_piecework']['status'] === true
+                    ? (int)$emp['monthly_piecework']['amount']
+                    : (int)$emp['tarification_salary'];
 
-                if (isset($emp['monthly_piecework']) && $emp['monthly_piecework'] && $emp['monthly_piecework']['status'] === true) {
-                    $pieceworkSalary = (int) $emp['monthly_piecework']['amount'];
-                    $usedMonthlyPiecework = true;
-                } else {
-                    $pieceworkSalary = (int) $emp['tarification_salary'];
-                }
+                $usedMonthlyValues = ($emp['monthly_salary']['status'] ?? false) || ($emp['monthly_piecework']['status'] ?? false);
 
-                $totalEarned = ($usedMonthlySalary || $usedMonthlyPiecework)
+                $totalEarned = $usedMonthlyValues
                     ? $monthlySalary + $pieceworkSalary
-                    : (int) $emp['total_earned'];
+                    : (int)$emp['total_earned'];
 
-                $netBalance = $totalEarned - (int) $emp['total_paid'];
+                $netBalance = $totalEarned - (int)$emp['total_paid'];
 
                 $rows[] = [
                     $i++,
                     $emp['name'],
-                    (int) $emp['attendance_days'],
+                    (int)$emp['attendance_days'],
                     $paymentType,
                     $monthlySalary,
                     $pieceworkSalary,
                     $totalEarned,
-                    (int) $emp['total_paid'],
+                    (int)$emp['total_paid'],
                     $netBalance,
+                    $emp['passport_code'] ?? '', // ⬅️ YANGI USTUN
                     '',
                 ];
             }
         }
 
-        // totals row
         $totals = [
             '', 'Jami',
-            array_sum(array_column($rows, 2)), // attendance_days
+            array_sum(array_column($rows, 2)),
             '',
-            array_sum(array_column($rows, 4)), // monthly
-            array_sum(array_column($rows, 5)), // piecework
-            array_sum(array_column($rows, 6)), // total earned
-            array_sum(array_column($rows, 7)), // total paid
-            array_sum(array_column($rows, 8)), // net balance
+            array_sum(array_column($rows, 4)),
+            array_sum(array_column($rows, 5)),
+            array_sum(array_column($rows, 6)),
+            array_sum(array_column($rows, 7)),
+            array_sum(array_column($rows, 8)),
+            '', // passport_code total bo’lmaydi
             '',
         ];
 
         $rows[] = $totals;
-
         return $rows;
     }
 
     public function headings(): array
     {
-        // Empty row for merged title, then actual headings
         return [
             [$this->department . ' - ' . $this->group . ' (' . $this->month . ')'],
             [
@@ -118,6 +107,7 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
                 "Topgan puli",
                 "Avans",
                 "Qolgan summa",
+                "Passport kodi", // ⬅️ YANGI
                 "Imzo",
             ]
         ];
@@ -125,17 +115,14 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
 
     public function styles(Worksheet $sheet)
     {
-        // Merge first row across all columns
-        $sheet->mergeCells('A1:J1');
+        $sheet->mergeCells('A1:K1'); // ⬅️ A dan K gacha kengaydi
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
         $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Bold headings
-        $sheet->getStyle('A2:J2')->getFont()->setBold(true);
+        $sheet->getStyle('A2:K2')->getFont()->setBold(true);
 
-        // Bold totals row
         $lastRow = $sheet->getHighestRow();
-        $sheet->getStyle('A' . $lastRow . ':J' . $lastRow)->getFont()->setBold(true);
+        $sheet->getStyle('A' . $lastRow . ':K' . $lastRow)->getFont()->setBold(true);
 
         return [];
     }
@@ -152,7 +139,8 @@ class GroupsOrdersEarningsExport implements FromArray, WithHeadings, WithStyles,
             'G' => 20,
             'H' => 15,
             'I' => 18,
-            'J' => 15,
+            'J' => 20, // passport_code width
+            'K' => 15, // signature width
         ];
     }
 }
