@@ -1676,11 +1676,10 @@ class CasherController extends Controller
 
         $masterEarnings = [];
         if ($masterEmployees->isNotEmpty()) {
-            dd($masterEmployees);
             foreach ($masterEmployees as $masterEmp) {
                 $groupId = $masterEmp->group_id;
                 $branchId = $masterEmp->department->mainDepartment->branch->id ?? null;
-
+dd($branchId, $groupId);
                 if (!$groupId || !$branchId) continue;
 
                 // Fetch monthly selected orders
