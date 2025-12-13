@@ -716,7 +716,7 @@ class CasherController extends Controller
         // ===== YANGI: Ombor hisob-kitobi =====
         $warehouseSalary = 0;
         $warehouseDepartments = DB::table('departments as d')
-            ->join('main_departments as md', 'd.main_department_id', '=', 'md.id')
+            ->join('main_department as md', 'd.main_department_id', '=', 'md.id')
             ->join('department_budgets as db', 'd.id', '=', 'db.department_id')
             ->where('md.branch_id', $branchId)
             ->where('d.name', 'like', '%ombor%')
