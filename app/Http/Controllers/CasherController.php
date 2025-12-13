@@ -1679,7 +1679,7 @@ class CasherController extends Controller
             foreach ($masterEmployees as $masterEmp) {
                 $groupId = $masterEmp->group_id;
                 $branchId = $masterEmp->department->mainDepartment->branch->id ?? null;
-//                dd($branchId, $groupId);
+                return response()->json($masterEmp);
 //                if (!$groupId || !$branchId) continue;
 
                 // Fetch monthly selected orders
