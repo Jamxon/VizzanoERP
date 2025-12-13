@@ -1454,7 +1454,7 @@ class CasherController extends Controller
 
         // BULK: Employee ID'larni olish
         $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id', 'passport_code', 'user_id', 'percentage')
-            ->with(['department:id,name', 'user.role:id,name', 'department.mainDepartment:id,name,branch_id']);
+            ->with(['department:id,name,main_department_id', 'user.role:id,name', 'department.mainDepartment:id,name,branch_id']);
 
         if ($departmentId) {
             $employeeQuery->where('department_id', $departmentId);
