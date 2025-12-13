@@ -1459,7 +1459,7 @@ class CasherController extends Controller
         if ($departmentId) {
             $employeeQuery->where('department_id', $departmentId);
         } elseif ($branchId) {
-            $employeeQuery->whereHas('department', function ($q) use ($branchId) {
+            $employeeQuery->whereHas('department.mainDepartment', function ($q) use ($branchId) {
                 $q->where('branch_id', $branchId);
             });
         }
