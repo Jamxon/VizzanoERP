@@ -1676,13 +1676,12 @@ class CasherController extends Controller
 
         $masterEarnings = [];
         if ($masterEmployees->isNotEmpty()) {
+            dd($masterEmployees);
             foreach ($masterEmployees as $masterEmp) {
                 $groupId = $masterEmp->group_id;
                 $branchId = $masterEmp->department->mainDepartment->branch->id ?? null;
 
                 if (!$groupId || !$branchId) continue;
-
-                dd($masterEmp);
 
                 // Fetch monthly selected orders
                 $monthlyOrders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
