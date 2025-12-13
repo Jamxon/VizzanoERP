@@ -1674,13 +1674,13 @@ class CasherController extends Controller
             return $emp->user && $emp->user->role && $emp->user->role->name === 'groupMaster';
         });
 
-        dd($masterEmployees);
-
         $masterEarnings = [];
         if ($masterEmployees->isNotEmpty()) {
             foreach ($masterEmployees as $masterEmp) {
                 $groupId = $masterEmp->group_id;
                 $branchId = $masterEmp->department->mainDepartment->branch->id ?? null;
+
+                dd($groupId, $branchId);
 
                 if (!$groupId || !$branchId) continue;
 
