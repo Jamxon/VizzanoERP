@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="feat: enhance employee earnings calculation and add warehouse/master salary handling">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="157bad5f-dc67-4df7-a57d-6f6eeddefacc" name="Changes" comment="feat: enhance employee earnings calculation and add warehouse/master salary handling" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -265,23 +263,7 @@
       <workItem from="1765339935435" duration="486000" />
       <workItem from="1765442584864" duration="680000" />
       <workItem from="1765457635081" duration="649000" />
-      <workItem from="1765616113047" duration="4778000" />
-    </task>
-    <task id="LOCAL-00074" summary="fix: update employee selection to include status and filter by working employees">
-      <option name="closed" value="true" />
-      <created>1765018843744</created>
-      <option name="number" value="00074" />
-      <option name="presentableId" value="LOCAL-00074" />
-      <option name="project" value="LOCAL" />
-      <updated>1765018843744</updated>
-    </task>
-    <task id="LOCAL-00075" summary="fix: update employee selection to include status and filter by working employees">
-      <option name="closed" value="true" />
-      <created>1765019016908</created>
-      <option name="number" value="00075" />
-      <option name="presentableId" value="LOCAL-00075" />
-      <option name="project" value="LOCAL" />
-      <updated>1765019016908</updated>
+      <workItem from="1765616113047" duration="5109000" />
     </task>
     <task id="LOCAL-00076" summary="fix: update employee selection to include status and filter by working employees">
       <option name="closed" value="true" />
@@ -659,7 +641,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765620110168</updated>
     </task>
-    <option name="localTasksCounter" value="123" />
+    <task id="LOCAL-00123" summary="feat: enhance employee earnings calculation and add warehouse/master salary handling">
+      <option name="closed" value="true" />
+      <created>1765620966326</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1765620966326</updated>
+    </task>
+    <task id="LOCAL-00124" summary="feat: enhance employee earnings calculation and add warehouse/master salary handling">
+      <option name="closed" value="true" />
+      <created>1765621227294</created>
+      <option name="number" value="00124" />
+      <option name="presentableId" value="LOCAL-00124" />
+      <option name="project" value="LOCAL" />
+      <updated>1765621227294</updated>
+    </task>
+    <option name="localTasksCounter" value="125" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

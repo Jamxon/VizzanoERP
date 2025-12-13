@@ -1674,6 +1674,8 @@ class CasherController extends Controller
             return $emp->user && $emp->user->role && $emp->user->role->name === 'groupMaster';
         });
 
+        dd($masterEmployees);
+
         $masterEarnings = [];
         if ($masterEmployees->isNotEmpty()) {
             foreach ($masterEmployees as $masterEmp) {
