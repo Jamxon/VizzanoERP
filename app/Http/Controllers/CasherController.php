@@ -1678,7 +1678,7 @@ class CasherController extends Controller
         if ($masterEmployees->isNotEmpty()) {
             foreach ($masterEmployees as $masterEmp) {
                 $groupId = $masterEmp->group_id;
-                $branchId = $masterEmp->department->branch->id ?? null;
+                $branchId = $masterEmp->department->mainDepartment->branch->id ?? null;
 
                 if (!$groupId || !$branchId) continue;
 
