@@ -663,37 +663,30 @@ class CasherController extends Controller
             ->where('transport.branch_id', $branchId)
             ->sum(DB::raw('(transport.salary + transport.fuel_bonus) * transport_attendance.attendance_type'));
 
-
         // 🚍 Shu kuni transportda kelgan odamlar soni
         $transportEmployeesCount = DB::table('employee_transport_daily as etd')
             ->join('employees as e', 'etd.employee_id', '=', 'e.id')
             ->join('transport as t', 'etd.transport_id', '=', 't.id')
             ->whereDate('etd.date', $date)
-            ->where('t.branch_id', $branchId)   // transport shu filialdan bo‘lishi kerak
-            ->where('e.branch_id', $branchId)   // xodim ham shu filialdan bo‘lishi kerak
+            ->where('t.branch_id', $branchId)
+            ->where('e.branch_id', $branchId)
             ->count('etd.employee_id');
 
         // 🚍 Bir kishi uchun transport xarajati
-        $transportPerEmployee = $transportEmployeesCount > 0
-            ? $transport / $transportEmployeesCount
-            : 0;
+        $transportPerEmployee = $transportEmployeesCount > 0 ? $transport / $transportEmployeesCount : 0;
 
-
-        // Monthly expenses ni type bo'yicha ajratish - har doim hisoblanadi
+        // Monthly expenses ni type bo'yicha ajratish
         $monthlyExpenses = DB::table('monthly_expenses')
             ->whereMonth('month', $carbonDate->month)
             ->whereYear('month', $carbonDate->year)
             ->where('branch_id', $branchId)
             ->get();
 
-        // Type = 'monthly' bo'lgan xarajatlarni kuniga bo'lib hisoblash
-        $dailyExpenseMonthly = $monthlyExpenses
-                ->where('type', 'monthly')
-                ->sum('amount') / $daysInMonth;
+        $dailyExpenseMonthly = $monthlyExpenses->where('type', 'monthly')->sum('amount') / $daysInMonth;
 
         $thisBranchEmployeeIds = Employee::where('branch_id', $branchId)->pluck('id');
 
-        // AUP xarajatlari - har doim hisoblanadi
+        // AUP xarajatlari
         $aup = DB::table('attendance_salary')
             ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
             ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
@@ -703,7 +696,7 @@ class CasherController extends Controller
             ->whereIn('attendance_salary.employee_id', $thisBranchEmployeeIds)
             ->sum('attendance_salary.amount');
 
-        // AUP emas lekin oylikka ishlovchilar - har doim hisoblanadi
+        // AUP emas lekin oylikka ishlovchilar
         $isNotAup = DB::table('attendance_salary')
             ->join('attendance', 'attendance_salary.attendance_id', '=', 'attendance.id')
             ->join('employees', 'attendance_salary.employee_id', '=', 'employees.id')
@@ -713,10 +706,106 @@ class CasherController extends Controller
             ->whereIn('attendance_salary.employee_id', $thisBranchEmployeeIds)
             ->sum('attendance_salary.amount');
 
-        // Ishchilar soni - har doim hisoblanadi
+        // ===== YANGI: Daily Payments hisob-kitobi =====
+        $dailyPayments = DB::table('daily_payments')
+            ->join('employees', 'daily_payments.employee_id', '=', 'employees.id')
+            ->where('employees.branch_id', $branchId)
+            ->whereDate('daily_payments.payment_date', $date)
+            ->sum(DB::raw('daily_payments.calculated_amount + COALESCE(daily_payments.bonus, 0)'));
+
+        // ===== YANGI: Ombor hisob-kitobi =====
+        $warehouseSalary = 0;
+        $warehouseDepartments = DB::table('departments as d')
+            ->join('main_departments as md', 'd.main_department_id', '=', 'md.id')
+            ->join('department_budgets as db', 'd.id', '=', 'db.department_id')
+            ->where('md.branch_id', $branchId)
+            ->where('d.name', 'like', '%ombor%')
+            ->where('db.type', 'minute_based')
+            ->select('d.id', 'db.quantity')
+            ->get();
+
+        foreach ($warehouseDepartments as $dept) {
+            // Shu departmentdagi employeelar
+            $deptEmployees = Employee::where('department_id', $dept->id)
+                ->where('branch_id', $branchId)
+                ->get();
+
+            $totalPercentage = $deptEmployees->sum('percentage');
+            if ($totalPercentage <= 0) continue;
+
+            // Shu kuni tugallangan orderlar
+            $completedOrders = DB::table('warehouse_complete_orders')
+                ->where('department_id', $dept->id)
+                ->whereDate('created_at', $date)
+                ->select('order_id', DB::raw('SUM(quantity) as produced_quantity'))
+                ->groupBy('order_id')
+                ->get();
+
+            if ($completedOrders->isEmpty()) continue;
+
+            $orderIds = $completedOrders->pluck('order_id')->toArray();
+
+            $orders = Order::with(['orderModel.model'])
+                ->whereIn('id', $orderIds)
+                ->get()
+                ->keyBy('id');
+
+            $totalEarned = 0;
+            foreach ($completedOrders as $completed) {
+                $order = $orders->get($completed->order_id);
+                if (!$order || !$order->orderModel || !$order->orderModel->model) continue;
+
+                $minutePerPiece = $order->orderModel->model->minute ?? 0;
+                $rate = (float)$dept->quantity;
+                $totalEarned += $rate * $minutePerPiece * $completed->produced_quantity;
+            }
+
+            $warehouseSalary += $totalEarned;
+        }
+
+        // ===== YANGI: Master hisob-kitobi =====
+        $masterSalary = 0;
+        $masterEmployees = DB::table('employees as e')
+            ->join('users as u', 'e.user_id', '=', 'u.id')
+            ->join('roles as r', 'u.role_id', '=', 'r.id')
+            ->where('e.branch_id', $branchId)
+            ->where('r.name', 'groupMaster')
+            ->select('e.id', 'e.group_id')
+            ->get();
+
+        foreach ($masterEmployees as $master) {
+            if (!$master->group_id) continue;
+
+            // Master expense
+            $totalExpense = DB::table('expenses')
+                ->where('name', 'Master')
+                ->where('branch_id', $branchId)
+                ->sum('quantity');
+
+            if ($totalExpense <= 0) continue;
+
+            // Shu kuni shu masterni guruhida ishlab chiqarilgan mahsulotlar
+            $sewingOutputs = DB::table('sewing_outputs as so')
+                ->join('order_sub_models as osm', 'so.order_submodel_id', '=', 'osm.id')
+                ->join('order_models as om', 'osm.order_model_id', '=', 'om.id')
+                ->join('orders as o', 'om.order_id', '=', 'o.id')
+                ->join('order_groups as og', 'o.id', '=', 'og.order_id')
+                ->join('models as m', 'om.model_id', '=', 'm.id')
+                ->where('og.group_id', $master->group_id)
+                ->where('o.branch_id', $branchId)
+                ->whereDate('so.created_at', $date)
+                ->select(DB::raw('SUM(so.quantity * m.minute) as total_minutes'))
+                ->value('total_minutes');
+
+            if ($sewingOutputs > 0) {
+                $masterSalary += $sewingOutputs * $totalExpense;
+            }
+        }
+
+        // Ishchilar soni
         $employees = Attendance::whereDate('date', $date)
             ->where('status', 'present')
-            ->whereHas('employee', function ($q) use ($branchId)  {
+            ->whereHas('employee', function ($q) use ($branchId) {
                 $q->where('status', '!=', 'kicked');
                 $q->where('branch_id', $branchId);
             })->count();
@@ -735,7 +824,6 @@ class CasherController extends Controller
         $grouped = $outputs->groupBy(fn($item) => optional($item->orderSubmodel->orderModel)->order_id);
         $totalOutputQty = $outputs->sum('quantity');
 
-        // Agar orders mavjud bo'lsa, ularga xos harajatlarni hisoblash
         $orders = collect();
         $totalEarned = 0;
         $totalOrderSpecificCosts = 0;
@@ -746,10 +834,8 @@ class CasherController extends Controller
                 $dailyExpenseMonthly, $transport, $aup, $isNotAup, $totalOutputQty, $monthlyExpenses
             ) {
                 $first = $items->first();
-
                 $orderModel = optional(optional($first)->orderSubmodel)->orderModel;
                 $order = optional($orderModel)->order;
-
                 $orderId = $order->id ?? null;
 
                 $totalQty = $items->sum('quantity');
@@ -763,7 +849,6 @@ class CasherController extends Controller
                     ->sum('ss.summa');
 
                 $remainder = $submodelSpendsSum * $totalQty;
-
 
                 $bonus = DB::table('bonuses')
                     ->whereDate('created_at', $date)
@@ -780,13 +865,10 @@ class CasherController extends Controller
                     ->where('orders.id', $orderId)
                     ->sum('employee_tarification_logs.amount_earned');
 
-                // Type bo'yicha xarajatlarni hisoblash
                 $orderShareRatio = $totalOutputQty > 0 ? $totalQty / $totalOutputQty : 0;
 
-                // Monthly type xarajat
                 $allocatedMonthlyExpenseMonthly = $dailyExpenseMonthly * $orderShareRatio;
 
-                // Income percentage type xarajat
                 $incomePercentageExpense = 0;
                 $incomePercentageExpenses = $monthlyExpenses->where('type', 'income_percentage');
                 foreach ($incomePercentageExpenses as $expense) {
@@ -794,7 +876,6 @@ class CasherController extends Controller
                     $incomePercentageExpense += $percentageAmount;
                 }
 
-                // Amortization type xarajat (har bir mahsulot uchun 10 sent)
                 $amortizationExpense = 0;
                 $amortizationExpenses = $monthlyExpenses->where('type', 'amortization');
                 if ($amortizationExpenses->count() > 0) {
@@ -848,15 +929,13 @@ class CasherController extends Controller
             $totalOrderSpecificCosts = $orders->sum('total_fixed_cost_uzs');
         }
 
-        // Agar orders bo'sh bo'lsa ham harajatlarni hisoblash
         $totalIncomePercentageExpense = $orders->sum('costs_uzs.incomePercentageExpense');
         $totalAmortizationExpense = $orders->sum('costs_uzs.amortizationExpense');
 
-        // Kunlik xarajat (orders bo'lmasa ham mavjud)
         $dailyExpense = $dailyExpenseMonthly + $totalIncomePercentageExpense + $totalAmortizationExpense;
 
-        // Umumiy harajat (orders bo'lmasa ham o'zgarmas harajatlar mavjud)
-        $totalFixedCost = $transport + $aup + $dailyExpense + $orders->sum('rasxod_limit_uzs') ;
+        // ===== YANGI: Umumiy harajatga daily_payments, warehouse va master qo'shamiz =====
+        $totalFixedCost = $transport + $aup + $dailyExpense + $orders->sum('rasxod_limit_uzs') + $dailyPayments + $warehouseSalary + $masterSalary;
 
         // Per employee cost calculation
         $perEmployeeCosts = [];
@@ -869,8 +948,11 @@ class CasherController extends Controller
         $monthlyExpenseCost = $dailyExpenseMonthly / $employeeCount;
         $incomePercentageCost = $totalIncomePercentageExpense / $employeeCount;
         $amortizationCost = $totalAmortizationExpense / $employeeCount;
+        $dailyPaymentCost = $dailyPayments / $employeeCount;
+        $warehouseCost = $warehouseSalary / $employeeCount;
+        $masterCost = $masterSalary / $employeeCount;
 
-        $totalPerEmployee = $rasxodLimit + $transportCost + $aupCost + $monthlyExpenseCost + $incomePercentageCost + $amortizationCost;
+        $totalPerEmployee = $rasxodLimit + $transportCost + $aupCost + $monthlyExpenseCost + $incomePercentageCost + $amortizationCost + $dailyPaymentCost + $warehouseCost + $masterCost;
 
         $perEmployeeCosts = [
             'rasxod_limit_uzs' => [
@@ -897,13 +979,23 @@ class CasherController extends Controller
                 'amount' => round($amortizationCost),
                 'percent' => $totalPerEmployee > 0 ? round(($amortizationCost / $totalPerEmployee) * 100, 2) : 0
             ],
+            'daily_payment' => [
+                'amount' => round($dailyPaymentCost),
+                'percent' => $totalPerEmployee > 0 ? round(($dailyPaymentCost / $totalPerEmployee) * 100, 2) : 0
+            ],
+            'warehouse_salary' => [
+                'amount' => round($warehouseCost),
+                'percent' => $totalPerEmployee > 0 ? round(($warehouseCost / $totalPerEmployee) * 100, 2) : 0
+            ],
+            'master_salary' => [
+                'amount' => round($masterCost),
+                'percent' => $totalPerEmployee > 0 ? round(($masterCost / $totalPerEmployee) * 100, 2) : 0
+            ],
             'total' => round($totalPerEmployee)
         ];
 
-        // Cost per unit calculation
         $costPerUnitOverall = $totalOutputQty > 0 ? $totalFixedCost / $totalOutputQty : 0;
 
-        // Tarification calculation (orders bo'lmasa ham hisoblanishi kerak)
         $tarificationTotal = DB::table('employee_tarification_logs')
             ->join('tarifications', 'employee_tarification_logs.tarification_id', '=', 'tarifications.id')
             ->join('tarification_categories', 'tarifications.tarification_category_id', '=', 'tarification_categories.id')
@@ -914,7 +1006,6 @@ class CasherController extends Controller
             ->whereIn('employee_tarification_logs.employee_id', $relatedEmployeeIds)
             ->sum('employee_tarification_logs.amount_earned');
 
-        // Bonuses calculation (orders bo'lmasa ham hisoblanishi kerak)
         $kpiTotal = DB::table('bonuses')->whereDate('created_at', $date)->sum('amount');
 
         return response()->json([
@@ -927,6 +1018,9 @@ class CasherController extends Controller
             'daily_expenses' => $dailyExpense,
             'aup' => $aup,
             'isNotAup' => $isNotAup,
+            'daily_payments' => $dailyPayments,
+            'warehouse_salary' => $warehouseSalary,
+            'master_salary' => $masterSalary,
             'total_earned_uzs' => $totalEarned,
             'total_fixed_cost_uzs' => $totalFixedCost,
             'employee_count' => $employees,
