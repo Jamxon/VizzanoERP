@@ -1453,7 +1453,8 @@ class CasherController extends Controller
         $minusOrderIds = array_diff($allOrderIds, $addOrderIds);
 
         // BULK: Employee ID'larni olish
-        $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id', 'passport_code');
+        $employeeQuery = Employee::select('id', 'name', 'position_id', 'group_id', 'salary', 'balance', 'payment_type', 'status', 'department_id', 'passport_code', 'user_id', 'percentage')
+            ->with(['department:id,name', 'user.role:id,name']);
 
         if ($departmentId) {
             $employeeQuery->where('department_id', $departmentId);
@@ -1603,10 +1604,120 @@ class CasherController extends Controller
             ->whereIn('id', $employees->pluck('group_id')->filter()->unique())
             ->pluck('name', 'id');
 
+        // ===== WAREHOUSE VA MASTER HISOB-KITOBLARI =====
+        // Warehouse hisob-kitobi uchun kerakli ma'lumotlar
+        $warehouseDepartmentIds = $employees
+            ->filter(fn($emp) => $emp->department && stripos($emp->department->name, 'ombor') !== false)
+            ->pluck('department_id')
+            ->unique()
+            ->toArray();
+
+        $warehouseEarnings = [];
+        if (!empty($warehouseDepartmentIds)) {
+            foreach ($warehouseDepartmentIds as $deptId) {
+                $dept = Department::with('departmentBudget')->find($deptId);
+                if (!$dept || !$dept->departmentBudget || $dept->departmentBudget->type !== 'minute_based') {
+                    continue;
+                }
+
+                $deptEmployees = $employees->where('department_id', $deptId);
+                $deptEmployeeIds = $deptEmployees->pluck('id')->toArray();
+                $totalPercentage = $deptEmployees->sum('percentage');
+
+                if ($totalPercentage <= 0) continue;
+
+                // Selected order IDs for this warehouse department
+                $selectedOrderIds = DB::table('warehouse_complete_orders')
+                    ->where('department_id', $deptId)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->pluck('order_id')
+                    ->unique()
+                    ->toArray();
+
+                if (empty($selectedOrderIds)) continue;
+
+                // Produced quantity per order
+                $producedPerOrder = DB::table('warehouse_complete_orders')
+                    ->where('department_id', $deptId)
+                    ->whereBetween('created_at', [$startDate, $endDate])
+                    ->whereIn('order_id', $selectedOrderIds)
+                    ->select('order_id', DB::raw('SUM(quantity) as produced_quantity'))
+                    ->groupBy('order_id')
+                    ->get()
+                    ->keyBy('order_id');
+
+                // Orders with models
+                $orders = Order::with(['orderModel.model'])
+                    ->whereIn('id', $selectedOrderIds)
+                    ->get();
+
+                $totalEarned = 0;
+                foreach ($orders as $order) {
+                    $produced = $producedPerOrder->get($order->id);
+                    $producedQty = $produced ? (int)$produced->produced_quantity : 0;
+                    $minutePerPiece = $order->orderModel->model->minute ?? 0;
+                    $rate = (float)$dept->departmentBudget->quantity;
+                    $totalEarned += $rate * $minutePerPiece * $producedQty;
+                }
+
+                // Har bir employee uchun ulushini hisoblash
+                foreach ($deptEmployees as $emp) {
+                    $empPercent = (float)$emp->percentage;
+                    $factor = $empPercent / $totalPercentage;
+                    $warehouseEarnings[$emp->id] = round($totalEarned * $factor, 2);
+                }
+            }
+        }
+
+        // Master hisob-kitobi uchun kerakli ma'lumotlar
+        $masterEmployees = $employees->filter(function($emp) {
+            return $emp->user && $emp->user->role && $emp->user->role->name === 'groupMaster';
+        });
+
+        $masterEarnings = [];
+        if ($masterEmployees->isNotEmpty()) {
+            foreach ($masterEmployees as $masterEmp) {
+                $groupId = $masterEmp->group_id;
+                $branchId = $masterEmp->department->branch->id ?? null;
+
+                if (!$groupId || !$branchId) continue;
+
+                // Fetch monthly selected orders
+                $monthlyOrders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
+                    ->whereHas('monthlySelectedOrder', fn($q) => $q
+                        ->whereMonth('month', Carbon::parse($month)->month)
+                        ->whereYear('month', Carbon::parse($month)->year))
+                    ->where('branch_id', $branchId)
+                    ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
+                    ->get();
+
+                // Get master expense
+                $totalExpense = DB::table('expenses')
+                    ->where('name', 'Master')
+                    ->where('branch_id', $branchId)
+                    ->sum('quantity');
+
+                $totalEarnedFromSewing = 0;
+                foreach ($monthlyOrders as $order) {
+                    $orderModel = $order->orderModel;
+                    $submodels = $orderModel->submodels;
+                    $totalSewnQuantity = $submodels->flatMap(fn($sub) => $sub->sewingOutputs)->sum('quantity');
+                    $totalMinutes = $orderModel->model->minute * $totalSewnQuantity;
+                    $totalEarnedFromSewing += $totalMinutes * $totalExpense;
+                }
+
+                $masterEarnings[$masterEmp->id] = round($totalEarnedFromSewing, 2);
+            }
+        }
+
         // PROCESSING: Har bir employee uchun ma'lumotlarni process qilamiz
         $processedEmployees = [];
 
         foreach ($employees as $employee) {
+            // Determine employee type
+            $isWarehouse = $employee->department && stripos($employee->department->name, 'ombor') !== false;
+            $isMaster = $employee->user && $employee->user->role && $employee->user->role->name === 'groupMaster';
+
             // Attendance
             $attendanceInfo = $attendanceTotals->get($employee->id);
             $attendanceTotal = $attendanceInfo ? (float)$attendanceInfo->total_amount : 0;
@@ -1617,9 +1728,18 @@ class CasherController extends Controller
             $tarificationTotal = $empTarificationLogs->sum('amount_earned');
             $orderIds = $empTarificationLogs->pluck('order_id')->unique()->merge($extraOrdersData)->unique()->values();
 
-            // Daily Payments - YANGI
-            $dailyPaymentRecord = $dailyPaymentsData->get($employee->id);
-            $dailyPaymentTotal = $dailyPaymentRecord ? (float)$dailyPaymentRecord->total_daily_payment : 0;
+            // Daily Payments - faqat oddiy employeelar uchun
+            $dailyPaymentTotal = 0;
+            if (!$isWarehouse && !$isMaster) {
+                $dailyPaymentRecord = $dailyPaymentsData->get($employee->id);
+                $dailyPaymentTotal = $dailyPaymentRecord ? (float)$dailyPaymentRecord->total_daily_payment : 0;
+            }
+
+            // Warehouse earnings
+            $warehouseEarning = $warehouseEarnings[$employee->id] ?? 0;
+
+            // Master earnings
+            $masterEarning = $masterEarnings[$employee->id] ?? 0;
 
             // Monthly Piecework
             $monthlyPiecework = $monthlyPieceworksData->get($employee->id);
@@ -1647,7 +1767,7 @@ class CasherController extends Controller
                 ];
             }
 
-            // Monthly Daily Payment - YANGI
+            // Monthly Daily Payment
             $monthlyDailyPayment = $monthlyDailyPaymentsData->get($employee->id);
             $monthlyDailyPaymentData = null;
             if ($monthlyDailyPayment) {
@@ -1660,7 +1780,14 @@ class CasherController extends Controller
                 ];
             }
 
-            $totalEarned = $tarificationTotal + $attendanceTotal + $dailyPaymentTotal;
+            // Total earned calculation based on type
+            if ($isWarehouse) {
+                $totalEarned = $attendanceTotal + $warehouseEarning;
+            } elseif ($isMaster) {
+                $totalEarned = $attendanceTotal + $masterEarning;
+            } else {
+                $totalEarned = $tarificationTotal + $attendanceTotal + $dailyPaymentTotal;
+            }
 
             $hasPresent = in_array($employee->id, $presentAttendance);
 
@@ -1690,7 +1817,7 @@ class CasherController extends Controller
                 continue;
             }
 
-            $processedEmployees[] = [
+            $employeeData = [
                 'id' => $employee->id,
                 'name' => $employee->name,
                 'position' => $positions->get($employee->position_id) ?? 'N/A',
@@ -1703,17 +1830,29 @@ class CasherController extends Controller
                 'passport_code' => $employee->passport_code,
                 'attendance_salary' => $attendanceTotal,
                 'attendance_days' => $attendanceDays,
-                'tarification_salary' => $tarificationTotal,
-                'daily_payment_salary' => $dailyPaymentTotal, // YANGI
                 'total_earned' => $totalEarned,
                 'paid_amounts' => $paidAmountsByType,
                 'total_paid' => round($paidTotal, 2),
                 'net_balance' => round($totalEarned - $paidTotal, 2),
-                'orders' => $orderIds->toArray(),
                 'monthly_piecework' => $monthlyPieceworkData,
                 'monthly_salary' => $monthlySalaryData,
-                'monthly_daily_payment' => $monthlyDailyPaymentData, // YANGI
+                'monthly_daily_payment' => $monthlyDailyPaymentData,
             ];
+
+            // Add specific earnings based on type
+            if ($isWarehouse) {
+                $employeeData['warehouse_salary'] = $warehouseEarning;
+                // orders yuborilmaydi
+            } elseif ($isMaster) {
+                $employeeData['master_salary'] = $masterEarning;
+                // orders yuborilmaydi
+            } else {
+                $employeeData['tarification_salary'] = $tarificationTotal;
+                $employeeData['daily_payment_salary'] = $dailyPaymentTotal;
+                $employeeData['orders'] = $orderIds->toArray();
+            }
+
+            $processedEmployees[] = $employeeData;
         }
 
         // GROUPING: Employee'larni group bo'yicha guruhlash
@@ -1741,6 +1880,7 @@ class CasherController extends Controller
 
         return response()->json(array_values($result));
     }
+
     //2-usul excel
 
     public function exportGroupsOrdersEarnings(Request $request)
