@@ -1679,8 +1679,8 @@ class CasherController extends Controller
             foreach ($masterEmployees as $masterEmp) {
                 $groupId = $masterEmp->group_id;
                 $branchId = $masterEmp->department->mainDepartment->branch->id ?? null;
-                return response()->json($masterEmp);
-//                if (!$groupId || !$branchId) continue;
+//                return response()->json($masterEmp);
+                if (!$groupId || !$branchId) continue;
 
                 // Fetch monthly selected orders
                 $monthlyOrders = Order::whereHas('orderGroups', fn($q) => $q->where('group_id', $groupId))
