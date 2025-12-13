@@ -1842,9 +1842,13 @@ class CasherController extends Controller
             // Add specific earnings based on type
             if ($isWarehouse) {
                 $employeeData['warehouse_salary'] = $warehouseEarning;
+                $employeeData['tarification_salary'] = 0;
+                $employeeData['daily_payment_salary'] = $dailyPaymentTotal;
                 // orders yuborilmaydi
             } elseif ($isMaster) {
                 $employeeData['master_salary'] = $masterEarning;
+                $employeeData['tarification_salary'] = $tarificationTotal;
+                $employeeData['daily_payment_salary'] = $dailyPaymentTotal;
                 // orders yuborilmaydi
             } else {
                 $employeeData['tarification_salary'] = $tarificationTotal;
