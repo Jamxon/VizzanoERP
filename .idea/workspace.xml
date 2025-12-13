@@ -263,23 +263,7 @@
       <workItem from="1765339935435" duration="486000" />
       <workItem from="1765442584864" duration="680000" />
       <workItem from="1765457635081" duration="649000" />
-      <workItem from="1765616113047" duration="5109000" />
-    </task>
-    <task id="LOCAL-00076" summary="fix: update employee selection to include status and filter by working employees">
-      <option name="closed" value="true" />
-      <created>1765019120340</created>
-      <option name="number" value="00076" />
-      <option name="presentableId" value="LOCAL-00076" />
-      <option name="project" value="LOCAL" />
-      <updated>1765019120340</updated>
-    </task>
-    <task id="LOCAL-00077" summary="fix: update employee selection to include status and filter by working employees">
-      <option name="closed" value="true" />
-      <created>1765019255501</created>
-      <option name="number" value="00077" />
-      <option name="presentableId" value="LOCAL-00077" />
-      <option name="project" value="LOCAL" />
-      <updated>1765019255501</updated>
+      <workItem from="1765616113047" duration="5424000" />
     </task>
     <task id="LOCAL-00078" summary="fix: update employee selection to include status and filter by working employees">
       <option name="closed" value="true" />
@@ -657,7 +641,23 @@
       <option name="project" value="LOCAL" />
       <updated>1765621227294</updated>
     </task>
-    <option name="localTasksCounter" value="125" />
+    <task id="LOCAL-00125" summary="feat: enhance employee earnings calculation and add warehouse/master salary handling">
+      <option name="closed" value="true" />
+      <created>1765621341257</created>
+      <option name="number" value="00125" />
+      <option name="presentableId" value="LOCAL-00125" />
+      <option name="project" value="LOCAL" />
+      <updated>1765621341257</updated>
+    </task>
+    <task id="LOCAL-00126" summary="feat: enhance employee earnings calculation and add warehouse/master salary handling">
+      <option name="closed" value="true" />
+      <created>1765621503076</created>
+      <option name="number" value="00126" />
+      <option name="presentableId" value="LOCAL-00126" />
+      <option name="project" value="LOCAL" />
+      <updated>1765621503077</updated>
+    </task>
+    <option name="localTasksCounter" value="127" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -1680,7 +1680,7 @@ class CasherController extends Controller
                 $groupId = $masterEmp->group_id;
                 $branchId = $masterEmp->department->mainDepartment->branch->id ?? null;
 
-                dd($groupId, $branchId);
+                dd($masterEmp);
 
                 if (!$groupId || !$branchId) continue;
 
