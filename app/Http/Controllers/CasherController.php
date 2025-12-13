@@ -1690,6 +1690,7 @@ class CasherController extends Controller
                     ->where('branch_id', $branchId)
                     ->with('orderModel.model', 'orderModel.submodels.sewingOutputs')
                     ->get();
+                dd($monthlyOrders);
 
                 // Get master expense
                 $totalExpense = DB::table('expenses')
