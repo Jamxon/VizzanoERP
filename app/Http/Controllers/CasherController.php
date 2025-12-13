@@ -1484,15 +1484,14 @@ class CasherController extends Controller
 
         // BULK: Barcha kerakli ma'lumotlarni bir marta olamiz
 
-        // 1. Attendance salaries - BULK
-        // Attendance salaries - BULK + check for multiple entries per day
+        // 1. Attendance salaries - BULK + check for multiple entries per day
         $attendanceData = DB::table('attendance_salary')
             ->whereIn('employee_id', $employeeIds)
             ->whereBetween('date', [$startDate, $endDate])
             ->select('employee_id', 'date', DB::raw('SUM(amount) as total_amount'), DB::raw('COUNT(*) as entries_count'))
-            ->groupBy('employee_id', 'date') // employee+date bo'yicha guruhlash
+            ->groupBy('employee_id', 'date')
             ->get()
-            ->groupBy('employee_id'); // employee bo'yicha key qilamiz
+            ->groupBy('employee_id');
 
         $presentAttendance = DB::table('attendances')
             ->whereIn('employee_id', $employeeIds)
@@ -1503,7 +1502,7 @@ class CasherController extends Controller
             ->pluck('employee_id')
             ->toArray();
 
-// Tekshirish: bir kunda bir nechta yozuv bo'lsa, xato qaytarish
+        // Tekshirish: bir kunda bir nechta yozuv bo'lsa, xato qaytarish
         foreach ($attendanceData as $empId => $recordsByDate) {
             foreach ($recordsByDate as $record) {
                 if ($record->entries_count > 1) {
@@ -1514,7 +1513,7 @@ class CasherController extends Controller
             }
         }
 
-// Attendance summasini olish (normal holat)
+        // Attendance summasini olish (normal holat)
         $attendanceTotals = $attendanceData->map(function ($recordsByDate) {
             $totalAmount = $recordsByDate->sum('total_amount');
             $daysCount = $recordsByDate->count();
@@ -1537,7 +1536,19 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // 3. Salary payments - BULK
+        // 3. Daily Payments - YANGI - BULK
+        $dailyPaymentsData = DB::table('daily_payments')
+            ->whereIn('employee_id', $employeeIds)
+            ->whereBetween('payment_date', [$startDate, $endDate])
+            ->select(
+                'employee_id',
+                DB::raw('SUM(calculated_amount + COALESCE(bonus, 0)) as total_daily_payment')
+            )
+            ->groupBy('employee_id')
+            ->get()
+            ->keyBy('employee_id');
+
+        // 4. Salary payments - BULK
         $paymentsData = DB::table('salary_payments')
             ->whereIn('employee_id', $employeeIds)
             ->whereBetween('month', [$startDate, $endDate])
@@ -1545,7 +1556,7 @@ class CasherController extends Controller
             ->get()
             ->groupBy('employee_id');
 
-        // 4. Monthly Pieceworks - BULK
+        // 5. Monthly Pieceworks - BULK
         $monthlyPieceworksData = DB::table('employee_monthly_pieceworks as emp')
             ->leftJoin('users as u', 'emp.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'emp.employee_id', '=', 'e.id')
@@ -1555,17 +1566,27 @@ class CasherController extends Controller
             ->get()
             ->keyBy('employee_id');
 
-        // 5. Monthly Salaries - BULK
+        // 6. Monthly Salaries - BULK
         $monthlySalariesData = DB::table('employee_monthly_salaries as ems')
             ->leftJoin('users as u', 'ems.created_by', '=', 'u.id')
             ->leftJoin('employees as e', 'ems.employee_id', '=', 'e.id')
             ->whereIn('ems.employee_id', $employeeIds)
             ->where('ems.month', $monthDate)
-            ->select( 'ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
+            ->select('ems.id', 'ems.employee_id', 'ems.comment', 'ems.amount', 'ems.status', 'e.name as created_by_name')
             ->get()
             ->keyBy('employee_id');
 
-        // 6. Extra orders data if needed
+        // 7. Monthly Daily Payments - YANGI - BULK
+        $monthlyDailyPaymentsData = DB::table('employee_monthly_daily_payments as emdp')
+            ->leftJoin('users as u', 'emdp.created_by', '=', 'u.id')
+            ->leftJoin('employees as e', 'emdp.employee_id', '=', 'e.id')
+            ->whereIn('emdp.employee_id', $employeeIds)
+            ->where('emdp.month', $monthDate)
+            ->select('emdp.id', 'emdp.employee_id', 'emdp.amount', 'emdp.comment', 'emdp.status', 'e.name as created_by_name')
+            ->get()
+            ->keyBy('employee_id');
+
+        // 8. Extra orders data if needed
         $extraOrdersData = [];
         if (!empty($addOrderIds)) {
             $extraOrdersData = Order::whereIn('id', $addOrderIds)
@@ -1596,6 +1617,10 @@ class CasherController extends Controller
             $tarificationTotal = $empTarificationLogs->sum('amount_earned');
             $orderIds = $empTarificationLogs->pluck('order_id')->unique()->merge($extraOrdersData)->unique()->values();
 
+            // Daily Payments - YANGI
+            $dailyPaymentRecord = $dailyPaymentsData->get($employee->id);
+            $dailyPaymentTotal = $dailyPaymentRecord ? (float)$dailyPaymentRecord->total_daily_payment : 0;
+
             // Monthly Piecework
             $monthlyPiecework = $monthlyPieceworksData->get($employee->id);
             $monthlyPieceworkData = null;
@@ -1622,7 +1647,20 @@ class CasherController extends Controller
                 ];
             }
 
-            $totalEarned = $tarificationTotal + $attendanceTotal;
+            // Monthly Daily Payment - YANGI
+            $monthlyDailyPayment = $monthlyDailyPaymentsData->get($employee->id);
+            $monthlyDailyPaymentData = null;
+            if ($monthlyDailyPayment) {
+                $monthlyDailyPaymentData = [
+                    'id' => $monthlyDailyPayment->id,
+                    'amount' => (float) $monthlyDailyPayment->amount,
+                    'status' => (bool) $monthlyDailyPayment->status,
+                    'created_by' => $monthlyDailyPayment->created_by_name,
+                    'comment' => $monthlyDailyPayment->comment,
+                ];
+            }
+
+            $totalEarned = $tarificationTotal + $attendanceTotal + $dailyPaymentTotal;
 
             $hasPresent = in_array($employee->id, $presentAttendance);
 
@@ -1666,6 +1704,7 @@ class CasherController extends Controller
                 'attendance_salary' => $attendanceTotal,
                 'attendance_days' => $attendanceDays,
                 'tarification_salary' => $tarificationTotal,
+                'daily_payment_salary' => $dailyPaymentTotal, // YANGI
                 'total_earned' => $totalEarned,
                 'paid_amounts' => $paidAmountsByType,
                 'total_paid' => round($paidTotal, 2),
@@ -1673,6 +1712,7 @@ class CasherController extends Controller
                 'orders' => $orderIds->toArray(),
                 'monthly_piecework' => $monthlyPieceworkData,
                 'monthly_salary' => $monthlySalaryData,
+                'monthly_daily_payment' => $monthlyDailyPaymentData, // YANGI
             ];
         }
 
